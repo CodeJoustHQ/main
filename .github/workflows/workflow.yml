@@ -9,6 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    if: github.refs == 'refs/heads/master'
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 1.14
