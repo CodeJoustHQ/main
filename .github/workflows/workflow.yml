@@ -9,7 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    if: github.refs == 'refs/heads/master'
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 1.14
@@ -21,7 +20,6 @@ jobs:
 
   deploy:
     needs: test
-    if: github.refs == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
