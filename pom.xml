@@ -62,7 +62,7 @@
               <goal>install-node-and-npm</goal>
             </goals>
             <configuration>
-              <nodeVersion>v8.9.4</nodeVersion>
+              <nodeVersion>v14.8.0</nodeVersion>
               <npmVersion>6.14.8</npmVersion>
             </configuration>
           </execution>
@@ -76,11 +76,7 @@
             </configuration>
           </execution>
           <execution>
-            <!-- 
-              Add CI=false so warnings do not cause errors.
-              See https://github.com/facebook/create-react-app/issues/3657.
-             -->
-            <id>CI=false npm run build</id>
+            <id>npm run build</id>
             <goals>
               <goal>npm</goal>
             </goals>
