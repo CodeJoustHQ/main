@@ -1,9 +1,23 @@
-# Created by https://www.toptal.com/developers/gitignore/api/intellij,java
-# Edit at https://www.toptal.com/developers/gitignore?templates=intellij,java
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
 
-### Intellij ###
-# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
-# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+
+# Target build folder
+target/
+
+# Eclipse files
+.project
+.factorypath
+.settings/
+.classpath
 
 # User-specific stuff
 .idea/**/workspace.xml
