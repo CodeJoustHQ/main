@@ -31,7 +31,7 @@ class MainTests {
 	// Less extensive - mocks a REST call and checks the response
 	@Test
 	public void shouldReturnHelloWorld() throws Exception {
-		this.mockMvc.perform(get("/api/hello").contextPath("/api")).andDo(print())
+		this.mockMvc.perform(get("/api/v1/hello")).andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("Hello, World!")));
 	}
@@ -39,7 +39,7 @@ class MainTests {
 	// More extensive - loads up an actual web environment for testing
 	@Test
 	public void restCallShouldReturnHelloWorld() throws Exception {
-		assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/api/hello",
+		assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/api/v1/hello",
 				String.class)).contains("Hello, World!");
 	}
 
