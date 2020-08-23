@@ -1,6 +1,47 @@
 import React, { Component } from 'react';
+import styled from 'styled-components';
 import logo from './logo.svg';
-import './App.css';
+import LandingPage from './views/Landing';
+import fetchHello from './api/hello';
+
+const StyledApp = styled.div`
+  text-align: center;
+  
+  .App-logo {
+    height: 40vmin;
+    pointer-events: none;
+  }
+  
+  @media (prefers-reduced-motion: no-preference) {
+    .App-logo {
+      animation: App-logo-spin infinite 20s linear;
+    }
+  }
+  
+  .App-header {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+  }
+  
+  .App-link {
+    color: #61dafb;
+  }
+  
+  @keyframes App-logo-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`;
 
 type MyProps = {};
 
@@ -21,8 +62,7 @@ class App extends Component<MyProps, MyState> {
   }
 
   hello = () => {
-    fetch('/hello')
-      .then((response) => response.text())
+    fetchHello()
       .then((message) => {
         this.setState({ message });
       });
@@ -32,7 +72,7 @@ class App extends Component<MyProps, MyState> {
     const { message } = this.state;
 
     return (
-      <div className="App">
+      <StyledApp className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">{message}</h1>
@@ -44,7 +84,8 @@ class App extends Component<MyProps, MyState> {
           {' '}
           and save to reload.
         </p>
-      </div>
+        <LandingPage />
+      </StyledApp>
     );
   }
 }

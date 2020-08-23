@@ -31,14 +31,14 @@ class MainTests {
 	// Less extensive - mocks a REST call and checks the response
 	@Test
 	public void shouldReturnHelloWorld() throws Exception {
-		this.mockMvc.perform(get("/hello")).andDo(print()).andExpect(status().isOk())
+		this.mockMvc.perform(get("/api/hello")).andDo(print()).andExpect(status().isOk())
 				.andExpect(content().string(containsString("Hello, World!")));
 	}
 
 	// More extensive - loads up an actual web environment for testing
 	@Test
 	public void restCallShouldReturnHelloWorld() throws Exception {
-		assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/hello",
+		assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/api/hello",
 				String.class)).contains("Hello, World!");
 	}
 
