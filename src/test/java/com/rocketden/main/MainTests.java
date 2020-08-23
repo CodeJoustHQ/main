@@ -31,7 +31,8 @@ class MainTests {
 	// Less extensive - mocks a REST call and checks the response
 	@Test
 	public void shouldReturnHelloWorld() throws Exception {
-		this.mockMvc.perform(get("/api/hello")).andDo(print()).andExpect(status().isOk())
+		this.mockMvc.perform(get("/api/hello").contextPath("/api")).andDo(print())
+				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("Hello, World!")));
 	}
 
