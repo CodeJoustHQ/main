@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import logo from './logo.svg';
-import LandingPage from './views/Landing';
-import fetchHello from './api/hello';
+import fetchHello from '../../api/hello';
+import LandingPage from '../../views/Landing';
+import logo from '../../logo.svg';
 
 const StyledApp = styled.div`
   text-align: center;
@@ -50,7 +50,6 @@ type MyState = {
 };
 
 class App extends Component<MyProps, MyState> {
-
   constructor(props: MyProps) {
     super(props);
 
@@ -58,13 +57,14 @@ class App extends Component<MyProps, MyState> {
   }
 
   componentDidMount() {
+    this.hello();
     setInterval(this.hello, 250);
   }
 
   hello = () => {
     fetchHello()
-      .then((message) => {
-        this.setState({ message });
+      .then((res) => {
+        this.setState({ message: res.message });
       });
   };
 
