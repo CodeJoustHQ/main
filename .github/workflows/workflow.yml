@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+     - JASYPT_ENCRYPTOR_PASSWORD: ${{secrets.JASYPT_ENCRYPTOR_PASSWORD}}
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 11
@@ -22,6 +24,8 @@ jobs:
     needs: test
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
+    env:
+     - JASYPT_ENCRYPTOR_PASSWORD: ${{secrets.JASYPT_ENCRYPTOR_PASSWORD}}
     steps:
       - uses: actions/checkout@v2
       - uses: akhileshns/heroku-deploy@v3.4.6
