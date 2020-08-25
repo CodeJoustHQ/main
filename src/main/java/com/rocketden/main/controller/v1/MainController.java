@@ -1,4 +1,4 @@
-package com.rocketden.main.controller;
+package com.rocketden.main.controller.v1;
 
 import com.rocketden.main.dto.problem.Problem;
 import com.rocketden.main.dao.problem.ProblemRepository;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class MainController {
+public class MainController extends BaseRestController {
 
 	@Autowired
 	private ProblemRepository problemRepository;
@@ -19,9 +19,7 @@ public class MainController {
 	@PostMapping("/addProblem")
 	public @ResponseBody Problem addNewProblem (@RequestParam String name
 			, @RequestParam String description) {
-		// @ResponseBody means the returned String is the response, not a view name
-		// @RequestParam means it is a parameter from the GET or POST request
-
+        
     // Add the problem to the database.
 		Problem problem = new Problem();
 		problem.setName(name);

@@ -26,6 +26,8 @@ target/
 .idea/**/dictionaries
 .idea/**/shelf
 
+main.iml
+
 # Generated files
 .idea/**/contentModel.xml
 
