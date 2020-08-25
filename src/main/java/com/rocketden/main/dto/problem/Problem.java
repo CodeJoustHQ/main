@@ -17,5 +17,5 @@ public class Problem {
 	private Integer id;
 
   private String name;
-	private String email;
+	private String description;
 }
