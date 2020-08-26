@@ -20,7 +20,7 @@ public class ProblemController extends BaseRestController {
   public @ResponseBody Problem addNewProblem (@RequestParam String name, 
     @RequestParam String description) {
         
-    // Add the problem to the database.
+    // Add the problem to the database, and return the problem JSON.
     Problem problem = new Problem();
     problem.setName(name);
 		problem.setDescription(description);
@@ -30,7 +30,7 @@ public class ProblemController extends BaseRestController {
 
 	@GetMapping("/getProblems")
 	public @ResponseBody Iterable<Problem> getAllProblems() {
-		// Return a JSON with the problems
+		// Return a JSON with all problems in the database.
 		return problemRepository.findAll();
 	}
 }
