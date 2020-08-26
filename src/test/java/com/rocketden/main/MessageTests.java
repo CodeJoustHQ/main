@@ -28,17 +28,15 @@ class MainTests {
 	@LocalServerPort
 	private int port;
 
-	// Less extensive - mocks a REST call and checks the response
 	@Test
-	public void shouldReturnHelloWorld() throws Exception {
+	public void helloWorld() throws Exception {
 		this.mockMvc.perform(get("/api/v1/hello")).andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(content().string(containsString("Hello, World!")));
+				.andExpect(content().string("{\"message\":\"Hello, World!\"}"));
 	}
 
-	// More extensive - loads up an actual web environment for testing
 	@Test
-	public void restCallShouldReturnHelloWorld() throws Exception {
+	public void restCallHelloWorld() throws Exception {
 		assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/api/v1/hello",
 				String.class)).contains("Hello, World!");
 	}

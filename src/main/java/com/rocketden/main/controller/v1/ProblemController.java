@@ -11,18 +11,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class MainController extends BaseRestController {
+public class ProblemController extends BaseRestController {
 
 	@Autowired
 	private ProblemRepository problemRepository;
-
-	@PostMapping("/addProblem")
-	public @ResponseBody Problem addNewProblem (@RequestParam String name
-			, @RequestParam String description) {
+  
+  @PostMapping("/addProblem")
+  public @ResponseBody Problem addNewProblem (@RequestParam String name, 
+    @RequestParam String description) {
         
     // Add the problem to the database.
-		Problem problem = new Problem();
-		problem.setName(name);
+    Problem problem = new Problem();
+    problem.setName(name);
 		problem.setDescription(description);
     problemRepository.save(problem);
 		return problem;
