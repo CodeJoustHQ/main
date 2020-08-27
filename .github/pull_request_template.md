@@ -1,11 +1,11 @@
-### List of changes:
+### List of Changes:
 
-Type your changes here.
+Add bullet points here.
 
 ### Notes:
 
-Add additional notes here.
+Add additional bullet points here.
 
 ### Screencast and Images:
 
-Add your images here.
+Add your images and/or screencasts here.
