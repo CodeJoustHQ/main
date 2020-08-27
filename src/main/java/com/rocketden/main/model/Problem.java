@@ -1,4 +1,4 @@
-package com.rocketden.main.dto.problem;
+package com.rocketden.main.model;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,10 +12,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Problem {
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Integer id;
+  @Id
+  @GeneratedValue(strategy=GenerationType.AUTO)
+  private Integer id;
 
   private String name;
-	private String description;
+  private String description;
 }

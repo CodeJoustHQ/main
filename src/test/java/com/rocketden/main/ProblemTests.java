@@ -24,24 +24,24 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class ProblemTests {
 
-	@Autowired
-	private MockMvc mockMvc;
+  @Autowired
+  private MockMvc mockMvc;
 
-	@Autowired
-	private TestRestTemplate restTemplate;
+  @Autowired
+  private TestRestTemplate restTemplate;
 
-	@LocalServerPort
+  @LocalServerPort
   private int port;
   
   // Constants for common POST requests.
-  private final String postAddProblemRequestOne = "/api/v1/addProblem?name=" +
+  private final String postAddProblemRequestOne = "/api/v1/problems?name=" +
     "Sort an Array&description=Sort an array from lowest to highest value.";
-  private final String postAddProblemRequestTwo = "/api/v1/addProblem?name=" +
+  private final String postAddProblemRequestTwo = "/api/v1/problems?name=" +
     "Find Maximum&description=Find the maximum value in an array.";
 
 	@Test
 	public void getProblemsEmptyList() throws Exception {
-		this.mockMvc.perform(get("/api/v1/getProblems")).andDo(print())
+		this.mockMvc.perform(get("/api/v1/problems")).andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("[]")));
   }
@@ -50,38 +50,38 @@ class ProblemTests {
 	public void addProblemReturnProblem() throws Exception {
     String postAddProblemReturn = "{\"id\":1,\"name\":\"Sort an Array\"," +
       "\"description\":\"Sort an array from lowest to highest value.\"}";
-		this.mockMvc.perform(post(postAddProblemRequestOne)).andDo(print())
-				.andExpect(status().isOk())
-				.andExpect(content().string(postAddProblemReturn));
+    this.mockMvc.perform(post(postAddProblemRequestOne)).andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(content().string(postAddProblemReturn));
   }
   
   @Test
-	public void addProblemGetProblemsOne() throws Exception {
+  public void addProblemGetProblemsOne() throws Exception {
     String getProblemsResult = "[{\"id\":1,\"name\":\"Sort an Array\"," +
       "\"description\":\"Sort an array from lowest to highest value.\"}]";
     this.mockMvc.perform(post(postAddProblemRequestOne));
-    this.mockMvc.perform(get("/api/v1/getProblems")).andDo(print())
-				.andExpect(status().isOk())
-				.andExpect(content().string(getProblemsResult));
+    this.mockMvc.perform(get("/api/v1/problems")).andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(content().string(getProblemsResult));
   }
   
   @Test
-	public void addProblemGetProblemsTwo() throws Exception {
+  public void addProblemGetProblemsTwo() throws Exception {
     String getProblemsResult = "[{\"id\":1,\"name\":\"Sort an Array\"," +
       "\"description\":\"Sort an array from lowest to highest value.\"}," + 
       "{\"id\":2,\"name\":\"Find Maximum\",\"description\":" +
       "\"Find the maximum value in an array.\"}]";
     this.mockMvc.perform(post(postAddProblemRequestOne));
     this.mockMvc.perform(post(postAddProblemRequestTwo));
-    this.mockMvc.perform(get("/api/v1/getProblems")).andDo(print())
-				.andExpect(status().isOk())
-				.andExpect(content().string(containsString(getProblemsResult)));
-	}
+    this.mockMvc.perform(get("/api/v1/problems")).andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString(getProblemsResult)));
+  }
 
-	@Test
-	public void restCallGetProblemsEmptyList() throws Exception {
-		assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/api/v1/getProblems",
-				String.class)).contains("[]");
+  @Test
+  public void restCallGetProblemsEmptyList() throws Exception {
+    assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/api/v1/problems",
+        String.class)).contains("[]");
   }
 
 }

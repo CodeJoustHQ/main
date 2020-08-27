@@ -1,7 +1,7 @@
 package com.rocketden.main.controller.v1;
 
-import com.rocketden.main.dto.problem.Problem;
 import com.rocketden.main.dao.problem.ProblemRepository;
+import com.rocketden.main.model.Problem;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,10 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ProblemController extends BaseRestController {
 
-	@Autowired
-	private ProblemRepository problemRepository;
+  private ProblemRepository problemRepository;
+
+  @Autowired
+  public ProblemController(ProblemRepository problemRepository){
+      this.problemRepository = problemRepository;
+  }
   
-  @PostMapping("/addProblem")
+  @PostMapping("/problems")
   public @ResponseBody Problem addNewProblem (@RequestParam String name, 
     @RequestParam String description) {
         
@@ -28,7 +32,7 @@ public class ProblemController extends BaseRestController {
 		return problem;
 	}
 
-	@GetMapping("/getProblems")
+	@GetMapping("/problems")
 	public @ResponseBody Iterable<Problem> getAllProblems() {
 		// Return a JSON with all problems in the database.
 		return problemRepository.findAll();
