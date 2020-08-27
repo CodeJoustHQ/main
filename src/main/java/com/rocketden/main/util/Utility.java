@@ -20,8 +20,11 @@ public class Utility {
     for (String value : values) {
       String[] pair = value.split("=");
       if (pair.length == 2) {
-        // Add the key-value pairs to the HashMap, replacing the '+' with space.
-        body.put(pair[0], pair[1].replace("+", " "));
+        /**
+         * Add the key-value pairs to the HashMap, replacing the '+' and '%0A'
+         * with ' ' (space) and '\n' (newline).
+         */
+        body.put(pair[0], pair[1].replace("+", " ").replace("%0A", "\n"));
       }
     }
     return body;
