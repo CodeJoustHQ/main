@@ -1,7 +1,6 @@
 package com.rocketden.main;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -28,17 +27,15 @@ class MainTests {
 	@LocalServerPort
 	private int port;
 
-	// Less extensive - mocks a REST call and checks the response
 	@Test
-	public void shouldReturnHelloWorld() throws Exception {
+	public void helloWorld() throws Exception {
 		this.mockMvc.perform(get("/api/v1/hello")).andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(content().string(containsString("Hello, World!")));
+				.andExpect(content().string("{\"message\":\"Hello, World!\"}"));
 	}
 
-	// More extensive - loads up an actual web environment for testing
 	@Test
-	public void restCallShouldReturnHelloWorld() throws Exception {
+	public void restCallHelloWorld() throws Exception {
 		assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/api/v1/hello",
 				String.class)).contains("Hello, World!");
 	}
