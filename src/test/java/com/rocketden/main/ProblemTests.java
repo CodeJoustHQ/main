@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import javax.sql.DataSource;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,11 +20,27 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+import org.junit.Assert;
+
+@SpringBootTest(
+  webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+  properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource"
+)
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @Transactional
 class ProblemTests {
+
+  // Constants to hold problem POST request content and content type details.
+  private static final String urlEncodedContentType = 
+    "application/x-www-form-urlencoded";
+  private static final String sortArrayProblemContent = "name=Sort+an+Array&" + 
+    "description=Sort+an+array+from+lowest+to+highest+value.";
+  private static final String findMaxProblemContent = "name=Find+Maximum&" + 
+    "description=Find+the+maximum+value+in+an+array.";
+
+  @Autowired
+  private DataSource dataSource;
 
   @Autowired
   private MockMvc mockMvc;
@@ -32,56 +50,63 @@ class ProblemTests {
 
   @LocalServerPort
   private int port;
-  
-  // Constants for common POST requests.
-  private final String postAddProblemRequestOne = "/api/v1/problems?name=" +
-    "Sort an Array&description=Sort an array from lowest to highest value.";
-  private final String postAddProblemRequestTwo = "/api/v1/problems?name=" +
-    "Find Maximum&description=Find the maximum value in an array.";
+
+  @Test
+  public void hikariConnectionPoolIsConfigured() {
+    Assert.assertEquals("com.zaxxer.hikari.HikariDataSource", dataSource.
+      getClass().getName());
+  }
 
   @Test
   public void getProblemsEmptyList() throws Exception {
-    this.mockMvc.perform(get("/api/v1/problems")).andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(content().string(containsString("[]")));
+    this.mockMvc.perform(get("/api/v1/problems"))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(content().string(containsString("[]")));
   }
-  
+
   @Test
   public void addProblemReturnProblem() throws Exception {
-    String postAddProblemReturn = "{\"id\":1,\"name\":\"Sort an Array\"," +
-      "\"description\":\"Sort an array from lowest to highest value.\"}";
-    this.mockMvc.perform(post(postAddProblemRequestOne)).andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(content().string(postAddProblemReturn));
+    String postAddProblemReturn = "{\"id\":1,\"name\":\"Sort an Array\","
+        + "\"description\":\"Sort an array from lowest to highest value.\"}";
+    this.mockMvc.perform(post("/api/v1/problems")
+      .contentType(urlEncodedContentType)
+      .content(sortArrayProblemContent))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(content().string(postAddProblemReturn));
   }
-  
+
   @Test
   public void addProblemGetProblemsOne() throws Exception {
-    String getProblemsResult = "[{\"id\":1,\"name\":\"Sort an Array\"," +
-      "\"description\":\"Sort an array from lowest to highest value.\"}]";
-    this.mockMvc.perform(post(postAddProblemRequestOne));
-    this.mockMvc.perform(get("/api/v1/problems")).andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(content().string(getProblemsResult));
+    String getProblemsResult = "[{\"id\":1,\"name\":\"Sort an Array\","
+        + "\"description\":\"Sort an array from lowest to highest value.\"}]";
+    this.mockMvc.perform(post("/api/v1/problems")
+      .contentType(urlEncodedContentType)
+      .content(sortArrayProblemContent));
+    this.mockMvc.perform(get("/api/v1/problems"))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(content().string(getProblemsResult));
   }
-  
+
   @Test
   public void addProblemGetProblemsTwo() throws Exception {
-    String getProblemsResult = "[{\"id\":1,\"name\":\"Sort an Array\"," +
-      "\"description\":\"Sort an array from lowest to highest value.\"}," + 
-      "{\"id\":2,\"name\":\"Find Maximum\",\"description\":" +
-      "\"Find the maximum value in an array.\"}]";
-    this.mockMvc.perform(post(postAddProblemRequestOne));
-    this.mockMvc.perform(post(postAddProblemRequestTwo));
-    this.mockMvc.perform(get("/api/v1/problems")).andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(content().string(containsString(getProblemsResult)));
+    String getProblemsResult = "[{\"id\":1,\"name\":\"Sort an Array\","
+        + "\"description\":\"Sort an array from lowest to highest value.\"},"
+        + "{\"id\":2,\"name\":\"Find Maximum\",\"description\":" + "\"Find the maximum value in an array.\"}]";
+    this.mockMvc.perform(post("/api/v1/problems")
+      .contentType(urlEncodedContentType)
+      .content(sortArrayProblemContent));
+    this.mockMvc.perform(post("/api/v1/problems")
+      .contentType(urlEncodedContentType)
+      .content(findMaxProblemContent));
+    this.mockMvc.perform(get("/api/v1/problems"))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(content().string(containsString(getProblemsResult)));
   }
 
   @Test
   public void restCallGetProblemsEmptyList() throws Exception {
-    assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/api/v1/problems",
-        String.class)).contains("[]");
+    assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/api/v1/problems", String.class))
+        .contains("[]");
   }
 
 }
