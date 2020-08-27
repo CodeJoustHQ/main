@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import fetchHello from '../../api/hello';
-import LandingPage from '../../views/Landing';
-import logo from '../../logo.svg';
 import Editor from "@monaco-editor/react";
 
 const StyledApp = styled.div`
@@ -70,7 +68,6 @@ class App extends Component<MyProps, MyState> {
   };
 
   render() {
-    const { message } = this.state;
 
     return (
       <StyledApp className="App">
