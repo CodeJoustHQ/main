@@ -39,15 +39,15 @@ class ProblemTests {
   private final String postAddProblemRequestTwo = "/api/v1/problems?name=" +
     "Find Maximum&description=Find the maximum value in an array.";
 
-	@Test
-	public void getProblemsEmptyList() throws Exception {
-		this.mockMvc.perform(get("/api/v1/problems")).andDo(print())
-				.andExpect(status().isOk())
-				.andExpect(content().string(containsString("[]")));
+  @Test
+  public void getProblemsEmptyList() throws Exception {
+    this.mockMvc.perform(get("/api/v1/problems")).andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString("[]")));
   }
   
-	@Test
-	public void addProblemReturnProblem() throws Exception {
+  @Test
+  public void addProblemReturnProblem() throws Exception {
     String postAddProblemReturn = "{\"id\":1,\"name\":\"Sort an Array\"," +
       "\"description\":\"Sort an array from lowest to highest value.\"}";
     this.mockMvc.perform(post(postAddProblemRequestOne)).andDo(print())
