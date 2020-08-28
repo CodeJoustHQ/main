@@ -8,6 +8,7 @@ import * as serviceWorker from './serviceWorker';
 const GlobalStyle = createGlobalStyle`
   html {
     height: 100vh;
+    font-size: 1.2vw;
   }
   
   body {

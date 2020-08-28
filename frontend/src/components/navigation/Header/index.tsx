@@ -1,13 +1,41 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import styled from 'styled-components';
+import { NavbarLink } from '../../controls/Link';
+
+const Content = styled.div`
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  padding: 10px;
+  text-align: center;
+`;
+
+const LeftHeader = styled(NavbarLink)`
+  float: left;
+  margin-left: 50px;
+  font-weight: bold;
+`;
+
+const RightHeader = styled(NavbarLink)`
+  float: right;
+  margin-right: 50px;
+`;
+
+// Note: Can also create a center header with simply display: inline-block
 
 function Header() {
-  // Example header component
   return (
-    <div>
-      <Link to="/">Home</Link>
-      <Link to="/">Play</Link>
-    </div>
+    <Content>
+      <nav>
+        <LeftHeader to="/">
+          Our Site Name
+        </LeftHeader>
+        <RightHeader to="/roadmap">
+          See our roadmap
+        </RightHeader>
+      </nav>
+    </Content>
   );
 }
 

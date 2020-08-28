@@ -3,7 +3,7 @@ import styled from 'styled-components';
 const DefaultButton = styled.button`
   border: none;
   margin: 5px;
-  font-size: medium;
+  font-size: 1rem;
   
   &:hover {
     outline: none;
@@ -15,7 +15,7 @@ const DefaultButton = styled.button`
   }
 `;
 
-export const StyledPrimaryButton = styled(DefaultButton)<any>`
+export const PrimaryButton = styled(DefaultButton)<any>`
   background-color: #3399cc;
   color: white;
   width: ${({ width }) => width || '200px'};

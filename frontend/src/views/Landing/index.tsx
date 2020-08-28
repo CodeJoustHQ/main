@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { PrimaryLink, TextLink } from '../../components/controls/Link';
+import { PrimaryButtonLink, TextLink } from '../../components/controls/Link';
 
 const Content = styled.div`
   width: 80%;
@@ -11,9 +11,9 @@ function LandingPage() {
   return (
     <div>
       <Content>
-        <PrimaryLink to="/game/join" width="400px">
+        <PrimaryButtonLink to="/game/join" width="400px">
           Join a Game
-        </PrimaryLink>
+        </PrimaryButtonLink>
         <br />
         <TextLink to="/game/join">
           Or create a room
