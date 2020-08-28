@@ -35,7 +35,7 @@ import org.junit.Assert;
 @Transactional
 class ProblemTests {
 
-  // Constants to hold POST request JSON content. Initialized in setUp().
+  // Constants to hold POST request JSON content. Initialized in constructor.
   private static ProblemDto sortArrayProblem;
   private static ProblemDto findMaxProblem;
   private static String sortArrayProblemJson;
