@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { NavbarLink } from '../../controls/Link';
+import { NavbarLink } from '../../core/Link';
 
 const Content = styled.div`
   top: 0;

@@ -1,16 +1,21 @@
 import React from 'react';
 import styled from 'styled-components';
-import { PrimaryButtonLink, TextLink } from '../../components/controls/Link';
+import { PrimaryButtonLink, TextLink } from '../../components/core/Link';
+import { LandingHeaderText } from '../../components/core/Text';
 
 const Content = styled.div`
-  width: 80%;
-  padding: 20% 10%;
+  margin: 0 auto;
+  width: 50%;
+  padding: 10% 20%;
 `;
 
 function LandingPage() {
   return (
     <div>
       <Content>
+        <LandingHeaderText>
+          Practice coding by competing against your friends.
+        </LandingHeaderText>
         <PrimaryButtonLink to="/game/join" width="400px">
           Join a Game
         </PrimaryButtonLink>

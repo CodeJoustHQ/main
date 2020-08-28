@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 const DefaultButton = styled.button`
   border: none;
-  margin: 5px;
+  margin: 1.2rem;
   font-size: 1rem;
   
   &:hover {
