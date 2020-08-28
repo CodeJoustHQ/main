@@ -1,11 +1,8 @@
 package com.rocketden.main.controller.v1;
 
-import java.util.Map;
-
 import com.rocketden.main.dao.problem.ProblemRepository;
 import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.model.Problem;
-import com.rocketden.main.util.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -17,10 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ProblemController extends BaseRestController {
 
-  // Create key constants for request body from POST.
-  private final String ADD_NEW_PROBLEM_NAME_KEY = "name";
-  private final String ADD_NEW_PROBLEM_DESCRIPTION_KEY = "description";
-
   private ProblemRepository problemRepository;
 
   @Autowired
@@ -28,7 +21,7 @@ public class ProblemController extends BaseRestController {
       this.problemRepository = problemRepository;
   }
   
-  @PostMapping(value = "/content", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(value = "/problems", produces = MediaType.APPLICATION_JSON_VALUE)
   public Problem addNewProblem (@RequestBody ProblemDto problem) {
     // Map between the problem DTO and the persistent problem object.
     Problem persistentProblem = new Problem();
