@@ -21,7 +21,7 @@ function LandingPage() {
         </PrimaryButtonLink>
         <br />
         <TextLink to="/game/join">
-          Or create a room
+          Or create a room &#8594;
         </TextLink>
       </Content>
     </div>

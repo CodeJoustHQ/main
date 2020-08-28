@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Switch, Route } from 'react-router-dom';
 import styled from 'styled-components';
-import fetchHello from '../../api/hello';
-import MainLayout from '../layout/Main';
-import LandingPage from '../../views/Landing';
+import fetchHello from '../../../api/hello';
+import MainLayout from '../../layout/Main';
+import LandingPage from '../../../views/Landing';
 
 const StyledApp = styled.div`
   text-align: center;

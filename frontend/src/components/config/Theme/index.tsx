@@ -1,0 +1,30 @@
+import React from 'react';
+import { ThemeProvider } from 'styled-components';
+
+export const ThemeConfig: any = {
+  // Can be extended in the future to support dark mode
+  colors: {
+    text: '#444',
+    background: '#f0f4f8',
+    blue: '#3E93CD',
+    gray: 'gray',
+    white: 'white',
+  },
+  font: 'Lato',
+  fontSize: {
+    xSmall: '0.4rem',
+    small: '0.6rem',
+    mediumSmall: '0.8rem',
+    default: '1rem',
+    mediumLarge: '1.2rem',
+    large: '1.8rem',
+    xLarge: '2.5rem',
+    global: '1.2vw',
+  },
+};
+
+const Theme = ({ children }: any) => (
+  <ThemeProvider theme={ThemeConfig}>{children}</ThemeProvider>
+);
+
+export default Theme;

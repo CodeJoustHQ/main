@@ -18,13 +18,13 @@ const createButtonLink = (Button:any, props:any) => {
 export const PrimaryButtonLink = (props:any) => createButtonLink(PrimaryButton, props);
 
 export const NavbarLink = styled(Link)`
-  color: #333;
-  font-size: 1.2rem;
+  color: ${({ theme }) => theme.colors.text};
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   text-decoration: none;
 `;
 
 export const TextLink = styled(Link)`
-  font-size: 1rem;
-  color: gray;
+  font-size: ${({ theme }) => theme.fontSize.default};
+  color: ${({ theme }) => theme.colors.gray};
   text-decoration: none;
 `;

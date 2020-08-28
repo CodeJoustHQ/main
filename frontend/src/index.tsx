@@ -2,18 +2,20 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components';
-import App from './components/App';
+import App from './components/config/App';
 import * as serviceWorker from './serviceWorker';
+import Theme from './components/config/Theme';
 
 const GlobalStyle = createGlobalStyle`
   html {
     height: 100vh;
-    font-size: 1.2vw;
-    color: #333;
+    // @ts-ignore
+    font-size: ${({ theme }) => theme.fontSize.global};
+    // @ts-ignore
+    color: ${({ theme }) => theme.colors.text};
   }
   
   body {
-    height: 100vh;
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
       'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -30,10 +32,12 @@ const GlobalStyle = createGlobalStyle`
 
 ReactDOM.render(
   <React.StrictMode>
-    <GlobalStyle />
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <Theme>
+      <GlobalStyle />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </Theme>
   </React.StrictMode>,
   document.getElementById('root'),
 );

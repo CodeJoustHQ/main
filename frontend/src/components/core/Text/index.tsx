@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 
 export const Text = styled.p`
-  font-size: 1rem;
+  font-size: ${({ theme }) => theme.fontSize.default};
 `;
 
 export const LandingHeaderText = styled.h1`
-  font-size: 2.5rem;
+  font-size: ${({ theme }) => theme.fontSize.xLarge};
 `;
