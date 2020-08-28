@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import Header from '../../navigation/Header';
+import { MainContainer } from '../Container';
 
 const Content = styled.div`
   width: 100%;
   min-height: 100vh;
   text-align: center;
-  // @ts-ignore
   background-color: ${({ theme }) => theme.colors.background};
 `;
 
@@ -16,12 +16,12 @@ type MyProps = {
 
 function MainLayout({ children }: MyProps) {
   return (
-    <div>
-      <Content>
-        <Header />
+    <Content>
+      <Header />
+      <MainContainer>
         {children}
-      </Content>
-    </div>
+      </MainContainer>
+    </Content>
   );
 }
 

@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import fetchHello from '../../../api/hello';
 import MainLayout from '../../layout/Main';
 import LandingPage from '../../../views/Landing';
+import NotFound from '../../../views/NotFound';
+import { CustomRoute } from '../Route';
 
 const StyledApp = styled.div`
   text-align: center;
@@ -75,9 +77,8 @@ class App extends Component<MyProps, MyState> {
     return (
       <StyledApp className="App">
         <Switch>
-          <MainLayout>
-            <Route path="/" component={LandingPage} exact />
-          </MainLayout>
+          <CustomRoute path="/" component={LandingPage} layout={MainLayout} exact />
+          <CustomRoute path="*" component={NotFound} layout={MainLayout} />
         </Switch>
       </StyledApp>
     );
