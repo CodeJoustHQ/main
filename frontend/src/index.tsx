@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components';
+import 'typeface-roboto';
 import App from './components/config/App';
 import * as serviceWorker from './serviceWorker';
 import Theme from './components/config/Theme';
@@ -10,6 +11,8 @@ const GlobalStyle = createGlobalStyle`
   html {
     height: 100vh;
     // @ts-ignore
+    font-family: ${({ theme }) => theme.font};
+    // @ts-ignore
     font-size: ${({ theme }) => theme.fontSize.global};
     // @ts-ignore
     color: ${({ theme }) => theme.colors.text};
@@ -17,16 +20,6 @@ const GlobalStyle = createGlobalStyle`
   
   body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-      sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  
-  code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-      monospace;
   }
 `;
 

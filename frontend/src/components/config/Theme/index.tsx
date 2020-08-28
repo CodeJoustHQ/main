@@ -10,7 +10,7 @@ export const ThemeConfig: any = {
     gray: 'gray',
     white: 'white',
   },
-  font: 'Lato',
+  font: 'Roboto',
   fontSize: {
     xSmall: '0.4rem',
     small: '0.6rem',
