@@ -30,7 +30,8 @@
                 "tsx": "never"
             }
         ],
-        "react/jsx-filename-extension": [1, { "extensions": [".tsx", ".jsx"] }]
+        "react/jsx-filename-extension": [1, { "extensions": [".tsx", ".jsx"] }],
+        "react/jsx-props-no-spreading": "off"
     },
     "settings": {
         "import/resolver": {
