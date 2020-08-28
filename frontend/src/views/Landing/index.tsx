@@ -1,29 +1,23 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import Header from '../../components/navigation/Header';
+import { PrimaryLink, TextLink } from '../../components/controls/Link';
 
 const Content = styled.div`
   width: 80%;
-  margin: 10%;
-  text-align: center;
-  font-size: large;
+  padding: 20% 10%;
 `;
 
 function LandingPage() {
-  // Example usage of React Hooks
-  const [count, setCount] = useState(0);
-
   return (
     <div>
       <Content>
-        <p>
-          This is our landing page. You clicked the button
-          {` ${count} `}
-          times.
-        </p>
-        <button type="button" onClick={() => setCount(count + 1)}>
-          Click me
-        </button>
+        <PrimaryLink to="/game/join" width="400px">
+          Join a Game
+        </PrimaryLink>
+        <br />
+        <TextLink to="/game/join">
+          Or create a room
+        </TextLink>
       </Content>
     </div>
   );

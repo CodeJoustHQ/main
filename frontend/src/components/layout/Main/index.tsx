@@ -4,8 +4,7 @@ import Header from '../../navigation/Header';
 
 const Content = styled.div`
   width: 100%;
-  height: 100%;
-  padding: 20px;
+  height: 100vh;
   text-align: center;
   font-size: large;
   background-color: #f0f4f8;
