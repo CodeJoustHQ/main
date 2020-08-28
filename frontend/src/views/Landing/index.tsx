@@ -5,7 +5,7 @@ import { LandingHeaderText } from '../../components/core/Text';
 
 const Content = styled.div`
   margin: 0 auto;
-  width: 50%;
+  width: 60%;
   padding: 10% 20%;
 `;
 
