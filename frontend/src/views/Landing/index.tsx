@@ -15,7 +15,6 @@ function LandingPage() {
 
   return (
     <div>
-      <Header />
       <Content>
         <p>
           This is our landing page. You clicked the button

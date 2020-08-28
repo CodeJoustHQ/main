@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { Switch, Route } from 'react-router-dom';
 import styled from 'styled-components';
 import fetchHello from '../../api/hello';
+import MainLayout from '../layout/Main';
 import LandingPage from '../../views/Landing';
-import logo from '../../logo.svg';
 
 const StyledApp = styled.div`
   text-align: center;
@@ -75,7 +75,9 @@ class App extends Component<MyProps, MyState> {
     return (
       <StyledApp className="App">
         <Switch>
-          <Route path="/" component={LandingPage} exact />
+          <MainLayout>
+            <Route path="/" component={LandingPage} exact />
+          </MainLayout>
         </Switch>
       </StyledApp>
     );
