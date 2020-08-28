@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import fetchHello from '../../api/hello';
-import LandingPage from '../../views/Landing';
-import logo from '../../logo.svg';
+import Editor from "@monaco-editor/react";
 
 const StyledApp = styled.div`
   text-align: center;
@@ -69,14 +68,10 @@ class App extends Component<MyProps, MyState> {
   };
 
   render() {
-    const { message } = this.state;
 
     return (
       <StyledApp className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">{message}</h1>
-        </header>
+
         <p className="App-intro">
           To get started, edit
           {' '}
@@ -84,7 +79,7 @@ class App extends Component<MyProps, MyState> {
           {' '}
           and save to reload.
         </p>
-        <LandingPage />
+        <Editor height="90vh" language="javascript"/>
       </StyledApp>
     );
   }
