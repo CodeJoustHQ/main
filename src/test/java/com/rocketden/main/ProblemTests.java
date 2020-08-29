@@ -10,12 +10,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import javax.sql.DataSource;
 
+import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.util.Utility;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,13 +35,11 @@ import org.junit.Assert;
 @Transactional
 class ProblemTests {
 
-  // Constants to hold problem POST request content and content type details.
-  private static final String urlEncodedContentType = 
-    "application/x-www-form-urlencoded";
-  private static final String sortArrayProblemContent = "name=Sort+an+Array&" + 
-    "description=Sort+an+array+from+lowest+to+highest+value.";
-  private static final String findMaxProblemContent = "name=Find+Maximum&" + 
-    "description=Find+the+maximum+value+in+an+array.";
+  // Constants to hold POST request JSON content. Initialized in constructor.
+  private static ProblemDto sortArrayProblem;
+  private static ProblemDto findMaxProblem;
+  private static String sortArrayProblemJson;
+  private static String findMaxProblemJson;
 
   @Autowired
   private DataSource dataSource;
@@ -50,6 +52,26 @@ class ProblemTests {
 
   @LocalServerPort
   private int port;
+
+  /**
+   * Sets up necessary test fields and fixtures.
+   * (Called once before the rest of the test case methods.)
+   */
+  public ProblemTests() {
+    // Create "Sort Array" problem JSON string.
+    sortArrayProblem = new ProblemDto();
+    sortArrayProblem.setName("Sort an Array");
+    sortArrayProblem.setDescription
+      ("Sort an array from lowest to highest value.");
+    sortArrayProblemJson = Utility.convertObjectToJsonString(sortArrayProblem);
+
+    // Create "Find Maximum" problem JSON string.
+    findMaxProblem = new ProblemDto();
+    findMaxProblem.setName("Find Maximum");
+    findMaxProblem.setDescription
+      ("Find the maximum value in an array.");
+    findMaxProblemJson = Utility.convertObjectToJsonString(findMaxProblem);
+  }
 
   @Test
   public void hikariConnectionPoolIsConfigured() {
@@ -69,8 +91,8 @@ class ProblemTests {
     String postAddProblemReturn = "{\"id\":1,\"name\":\"Sort an Array\","
         + "\"description\":\"Sort an array from lowest to highest value.\"}";
     this.mockMvc.perform(post("/api/v1/problems")
-      .contentType(urlEncodedContentType)
-      .content(sortArrayProblemContent))
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .content(sortArrayProblemJson))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(content().string(postAddProblemReturn));
   }
@@ -80,8 +102,8 @@ class ProblemTests {
     String getProblemsResult = "[{\"id\":1,\"name\":\"Sort an Array\","
         + "\"description\":\"Sort an array from lowest to highest value.\"}]";
     this.mockMvc.perform(post("/api/v1/problems")
-      .contentType(urlEncodedContentType)
-      .content(sortArrayProblemContent));
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .content(sortArrayProblemJson));
     this.mockMvc.perform(get("/api/v1/problems"))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(content().string(getProblemsResult));
@@ -93,11 +115,11 @@ class ProblemTests {
         + "\"description\":\"Sort an array from lowest to highest value.\"},"
         + "{\"id\":2,\"name\":\"Find Maximum\",\"description\":" + "\"Find the maximum value in an array.\"}]";
     this.mockMvc.perform(post("/api/v1/problems")
-      .contentType(urlEncodedContentType)
-      .content(sortArrayProblemContent));
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .content(sortArrayProblemJson));
     this.mockMvc.perform(post("/api/v1/problems")
-      .contentType(urlEncodedContentType)
-      .content(findMaxProblemContent));
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .content(findMaxProblemJson));
     this.mockMvc.perform(get("/api/v1/problems"))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(content().string(containsString(getProblemsResult)));

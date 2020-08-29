@@ -1,12 +1,11 @@
 package com.rocketden.main.controller.v1;
 
-import java.util.Map;
-
 import com.rocketden.main.dao.problem.ProblemRepository;
+import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.model.Problem;
-import com.rocketden.main.util.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,10 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ProblemController extends BaseRestController {
 
-  // Create key constants for request body from POST.
-  private final String ADD_NEW_PROBLEM_NAME_KEY = "name";
-  private final String ADD_NEW_PROBLEM_DESCRIPTION_KEY = "description";
-
   private ProblemRepository problemRepository;
 
   @Autowired
@@ -26,19 +21,16 @@ public class ProblemController extends BaseRestController {
       this.problemRepository = problemRepository;
   }
   
-  @PostMapping("/problems")
-  public Problem addNewProblem (@RequestBody String bodyStr) {
-    // Get and parse the parameters from the Request Body.
-    Map<String, String> body = Utility.bodyToMap(bodyStr);
-    String name = body.get(ADD_NEW_PROBLEM_NAME_KEY);
-    String description = body.get(ADD_NEW_PROBLEM_DESCRIPTION_KEY);
-        
+  @PostMapping(value = "/problems", produces = MediaType.APPLICATION_JSON_VALUE)
+  public Problem addNewProblem (@RequestBody ProblemDto problem) {
+    // Map between the problem DTO and the persistent problem object.
+    Problem persistentProblem = new Problem();
+    persistentProblem.setName(problem.getName());
+    persistentProblem.setDescription(problem.getDescription());
+
     // Add the problem to the database, and return the problem JSON.
-    Problem problem = new Problem();
-    problem.setName(name);
-    problem.setDescription(description);
-    problemRepository.save(problem);
-		return problem;
+    problemRepository.save(persistentProblem);
+		return persistentProblem;
 	}
 
 	@GetMapping("/problems")
