@@ -19,7 +19,8 @@ export const ThemeConfig: any = {
     mediumLarge: '1.2rem',
     large: '1.8rem',
     xLarge: '2.5rem',
-    global: '1.2vw',
+    globalDefault: '16px',
+    globalSmall: '14px',
   },
 };
 

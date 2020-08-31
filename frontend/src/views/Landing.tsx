@@ -1,6 +1,6 @@
 import React from 'react';
-import { PrimaryButtonLink, TextLink } from '../../components/core/Link';
-import { LandingHeaderText } from '../../components/core/Text';
+import { PrimaryButtonLink, TextLink } from '../components/core/Link';
+import { LandingHeaderText } from '../components/core/Text';
 
 function LandingPage() {
   return (

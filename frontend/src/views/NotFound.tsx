@@ -1,6 +1,6 @@
 import React from 'react';
-import { TextLink } from '../../components/core/Link';
-import { LandingHeaderText } from '../../components/core/Text';
+import { TextLink } from '../components/core/Link';
+import { LandingHeaderText } from '../components/core/Text';
 
 function NotFound() {
   return (

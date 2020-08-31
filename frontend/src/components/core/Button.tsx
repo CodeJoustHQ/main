@@ -25,4 +25,6 @@ export const PrimaryButton = styled(DefaultButton)<any>`
   color: ${({ theme }) => theme.colors.white};
   width: ${({ width }) => width || '32vw'};
   height: ${({ height }) => height || '8vw'};
+  min-width: 280px;
+  min-height: 70px;
 `;

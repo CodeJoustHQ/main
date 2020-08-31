@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { PrimaryButton } from '../Button';
+import { PrimaryButton } from './Button';
 
 // Wrap a button inside of a Link to get the styling of a button
 const createButtonLink = (Button:any, props:any) => {

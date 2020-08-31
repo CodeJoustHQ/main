@@ -1,13 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import { NavbarLink } from '../../core/Link';
+import { NavbarLink } from '../core/Link';
 
 const Content = styled.div`
   top: 0;
   left: 0;
   right: 0;
   height: 50px;
-  padding: 10px;
+  padding: 20px;
   text-align: center;
 `;
 
