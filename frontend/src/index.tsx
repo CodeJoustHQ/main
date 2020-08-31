@@ -1,29 +1,42 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components';
-import App from './components/App';
+import 'typeface-roboto';
+import App from './components/config/App';
 import * as serviceWorker from './serviceWorker';
+import Theme from './components/config/Theme';
 
 const GlobalStyle = createGlobalStyle`
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-      sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  html {
+    height: 100vh;
+    min-width: 640px;
+    // @ts-ignore
+    font-family: ${({ theme }) => theme.font};
+    // @ts-ignore
+    font-size: ${({ theme }) => theme.fontSize.globalDefault};
+    // @ts-ignore
+    color: ${({ theme }) => theme.colors.text};
+    
+    @media (max-width: 800px) {
+      // @ts-ignore
+      font-size: ${({ theme }) => theme.fontSize.globalSmall};
+    }
   }
   
-  code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-      monospace;
+  body {
+    margin: 0;
   }
 `;
 
 ReactDOM.render(
   <React.StrictMode>
-    <GlobalStyle />
-    <App />
+    <Theme>
+      <GlobalStyle />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </Theme>
   </React.StrictMode>,
   document.getElementById('root'),
 );
