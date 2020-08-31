@@ -14,7 +14,7 @@ export const DefaultButton = styled.button`
   }
   
   &:focus {
-  outline: none;
+    outline: none;
   }
 `;
 
