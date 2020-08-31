@@ -8,7 +8,7 @@ function LandingPage() {
       <LandingHeaderText>
         Practice coding by competing against your friends.
       </LandingHeaderText>
-      <PrimaryButtonLink to="/game/join" width="400px">
+      <PrimaryButtonLink to="/game/join">
         Join a Game
       </PrimaryButtonLink>
       <br />

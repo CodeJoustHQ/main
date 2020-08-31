@@ -23,6 +23,6 @@ export const PrimaryButton = styled(DefaultButton)<any>`
   font-weight: bold;
   background-color: ${({ theme }) => theme.colors.blue};
   color: ${({ theme }) => theme.colors.white};
-  width: ${({ width }) => width || '200px'};
-  height: ${({ height }) => height || '90px'};
+  width: ${({ width }) => width || '32vw'};
+  height: ${({ height }) => height || '8vw'};
 `;
