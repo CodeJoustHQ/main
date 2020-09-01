@@ -9,4 +9,8 @@ public class Utility {
         return gson.toJson(o);
     }
 
+    public static <T> T toObject(String json, Class<T> c) {
+        Gson gson = new Gson();
+        return gson.fromJson(json, c);
+    }
 }

@@ -1,5 +1,7 @@
 package com.rocketden.main;
 
+import com.rocketden.main.dto.room.CreateRoomRequest;
+import com.rocketden.main.dto.room.CreateRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
 import com.rocketden.main.util.Utility;
@@ -9,8 +11,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -34,20 +37,39 @@ public class RoomTests {
         request.setRoomId("012345");
         request.setPlayerName("Rocket");
 
-        JoinRoomResponse response = new JoinRoomResponse();
-        response.setMessage("Room does not exist");
-        String responseString = Utility.convertObjectToJsonString(response);
+        JoinRoomResponse expected = new JoinRoomResponse();
+        expected.setMessage(JoinRoomResponse.ERROR_NOT_FOUND);
 
-        this.mockMvc.perform(post(GET_ROOM)
+        MvcResult result = this.mockMvc.perform(get(GET_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().isNotFound())
-                .andExpect(content().string(responseString));
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        JoinRoomResponse actual = Utility.toObject(jsonResponse, JoinRoomResponse.class);
+
+        assertEquals(expected.getMessage(), actual.getMessage());
     }
 
     @Test
     public void createValidRoom() throws Exception {
         // POST request to create valid room should return successful response
+        CreateRoomRequest request = new CreateRoomRequest();
+
+        CreateRoomResponse expected = new CreateRoomResponse();
+        expected.setMessage(CreateRoomResponse.SUCCESS);
+
+        MvcResult result = this.mockMvc.perform(post(POST_ROOM)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        CreateRoomResponse actual = Utility.toObject(jsonResponse, CreateRoomResponse.class);
+
+        assertEquals(expected.getMessage(), actual.getMessage());
     }
 
     @Test

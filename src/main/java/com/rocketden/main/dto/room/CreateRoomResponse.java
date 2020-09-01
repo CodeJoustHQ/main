@@ -5,12 +5,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class JoinRoomResponse {
-
-    public static final String ERROR_NOT_FOUND = "A room could not be found with the given id.";
+public class CreateRoomResponse {
+    public static final String SUCCESS = "Successfully created room.";
 
     private String message;
     private String roomId;
-    private String playerName;
     // future: add fields such as list of other players
 }
