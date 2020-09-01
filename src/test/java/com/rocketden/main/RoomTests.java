@@ -14,8 +14,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.junit.Assert.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -26,7 +26,7 @@ public class RoomTests {
     @Autowired
     private MockMvc mockMvc;
 
-    private static final String GET_ROOM = "/api/v1/rooms";
+    private static final String PUT_ROOM = "/api/v1/rooms";
     private static final String POST_ROOM = "/api/v1/rooms";
 
     @Test
@@ -39,7 +39,7 @@ public class RoomTests {
         JoinRoomResponse expected = new JoinRoomResponse();
         expected.setMessage(JoinRoomResponse.ERROR_NOT_FOUND);
 
-        MvcResult result = this.mockMvc.perform(get(GET_ROOM)
+        MvcResult result = this.mockMvc.perform(put(PUT_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().isNotFound())
@@ -101,7 +101,7 @@ public class RoomTests {
         expected.setPlayerName("Rocket");
         expected.setRoomId(roomId);
 
-        result = this.mockMvc.perform(get(GET_ROOM)
+        result = this.mockMvc.perform(put(PUT_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().isOk())
