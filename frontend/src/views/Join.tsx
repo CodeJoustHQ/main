@@ -1,21 +1,14 @@
 import React from 'react';
 import { SocketButtonConnection } from '../components/core/Link';
-
-function connect() {
-  console.log('Connect');
-}
-
-function disconnect() {
-  console.log('Disconnect');
-}
+import { Connect, Disconnect } from '../util/Utility';
 
 function JoinGamePage() {
   return (
     <div>
-      <SocketButtonConnection onClick={connect}>
+      <SocketButtonConnection onClick={() => Connect('/join-room-endpoint')}>
         Connect
       </SocketButtonConnection>
-      <SocketButtonConnection onClick={disconnect}>
+      <SocketButtonConnection onClick={Disconnect}>
         Disconnect
       </SocketButtonConnection>
     </div>

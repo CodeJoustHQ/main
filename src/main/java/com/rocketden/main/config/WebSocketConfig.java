@@ -18,7 +18,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/gs-guide-websocket").withSockJS();
+        // This should be replaced with the actual room name.
+        // See https://stackoverflow.com/questions/32843788/websocket-dynamically-add-and-remove-endpoints.
+		registry.addEndpoint("/join-room-endpoint").withSockJS();
 	}
 
 }
