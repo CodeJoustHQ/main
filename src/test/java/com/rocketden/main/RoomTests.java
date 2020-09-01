@@ -75,6 +75,45 @@ public class RoomTests {
     @Test
     public void createAndJoinRoom() throws Exception {
         // POST request to create room and GET request to join room should succeed
+        CreateRoomRequest createRequest = new CreateRoomRequest();
+
+        CreateRoomResponse createExpected = new CreateRoomResponse();
+        createExpected.setMessage(CreateRoomResponse.SUCCESS);
+
+        MvcResult result = this.mockMvc.perform(post(POST_ROOM)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(createRequest)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        CreateRoomResponse createActual = Utility.toObject(jsonResponse, CreateRoomResponse.class);
+
+        assertEquals(createExpected.getMessage(), createActual.getMessage());
+
+        String roomId = createActual.getRoomId();
+
+        JoinRoomRequest request = new JoinRoomRequest();
+        request.setRoomId(roomId);
+        request.setPlayerName("Rocket");
+
+        JoinRoomResponse expected = new JoinRoomResponse();
+        expected.setMessage(JoinRoomResponse.SUCCESS);
+        expected.setPlayerName("Rocket");
+        expected.setRoomId(roomId);
+
+        result = this.mockMvc.perform(get(GET_ROOM)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        JoinRoomResponse actual = Utility.toObject(jsonResponse, JoinRoomResponse.class);
+
+        assertEquals(expected.getMessage(), actual.getMessage());
+        assertEquals(expected.getPlayerName(), actual.getPlayerName());
+        assertEquals(expected.getRoomId(), actual.getRoomId());
     }
 
     @Test
