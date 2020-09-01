@@ -17,7 +17,6 @@ import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -114,10 +113,5 @@ public class RoomTests {
         assertEquals(expected.getMessage(), actual.getMessage());
         assertEquals(expected.getPlayerName(), actual.getPlayerName());
         assertEquals(expected.getRoomId(), actual.getRoomId());
-    }
-
-    @Test
-    public void createMultipleRooms() throws Exception {
-        // Multiple POST requests to create rooms should result in multiple open rooms
     }
 }
