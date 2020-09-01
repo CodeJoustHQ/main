@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { PrimaryButton } from './Button';
+import { PrimaryButton, SecondaryButton } from './Button';
 
 // Wrap a button inside of a Link to get the styling of a button
 const createButtonLink = (Button:any, props:any) => {
@@ -15,7 +15,21 @@ const createButtonLink = (Button:any, props:any) => {
   return <Link to={to}>{button}</Link>;
 };
 
+// Wrap a button inside of a Link that triggers an onClick function
+const createButtonOnClick = (Button:any, props:any) => {
+  const { onClickFunc, children, ...rest } = props;
+  const button = (
+    <Button onClick={onClickFunc} {...rest}>
+      {children}
+    </Button>
+  );
+
+  return button;
+};
+
 export const PrimaryButtonLink = (props:any) => createButtonLink(PrimaryButton, props);
+
+export const SocketButtonConnection = (props:any) => createButtonOnClick(SecondaryButton, props);
 
 export const NavbarLink = styled(Link)`
   color: ${({ theme }) => theme.colors.text};
