@@ -22,7 +22,6 @@ public class RoomMapperTests {
 
         assertNotNull(entity);
         assertNotNull(entity.getId());
-        assertNotNull(entity.getRoomId());
         assertNotNull(entity.getCreatedDate());
     }
 
