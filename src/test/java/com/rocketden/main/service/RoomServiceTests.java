@@ -6,6 +6,7 @@ import com.rocketden.main.dto.room.CreateRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
 import com.rocketden.main.model.Room;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,24 +14,26 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest
 @ExtendWith(MockitoExtension.class)
 public class RoomServiceTests {
 
     @Mock
     private RoomRepository repository;
 
-    @Autowired
     @Spy
     @InjectMocks
     private RoomService service;
+
+    @Before
+    public void setUp() {
+        service = new RoomService(repository);
+    }
 
     @Test
     public void createRoomSuccess() {
@@ -59,7 +62,7 @@ public class RoomServiceTests {
         room.setRoomId(roomId);
 
         // Mock repository to return room when called
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(roomId);
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
         JoinRoomResponse response = service.joinRoom(request);
 
         assertEquals(JoinRoomResponse.SUCCESS, response.getMessage());
@@ -77,7 +80,7 @@ public class RoomServiceTests {
         request.setRoomId(roomId);
 
         // Mock repository to return room when called
-        Mockito.doReturn(null).when(repository).findRoomByRoomId(roomId);
+        Mockito.doReturn(null).when(repository).findRoomByRoomId(eq(roomId));
         JoinRoomResponse response = service.joinRoom(request);
 
         verify(repository).findRoomByRoomId(roomId);

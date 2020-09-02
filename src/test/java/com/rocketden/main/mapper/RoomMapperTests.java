@@ -21,7 +21,6 @@ public class RoomMapperTests {
         Room entity = CreateRoomMapper.requestToEntity(request);
 
         assertNotNull(entity);
-        assertNotNull(entity.getId());
         assertNotNull(entity.getCreatedDate());
     }
 

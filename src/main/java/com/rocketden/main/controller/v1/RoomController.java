@@ -6,6 +6,8 @@ import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
 import com.rocketden.main.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,8 +24,15 @@ public class RoomController extends BaseRestController {
     }
 
     @PutMapping("/rooms")
-    public JoinRoomResponse joinRoom(@RequestBody JoinRoomRequest request) {
-        return service.joinRoom(request);
+    public ResponseEntity<JoinRoomResponse> joinRoom(@RequestBody JoinRoomRequest request) {
+        JoinRoomResponse response = service.joinRoom(request);
+
+        // Return 404 error if response message is invalid
+        if (response.getMessage().equals(JoinRoomResponse.ERROR_NOT_FOUND)) {
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/rooms")

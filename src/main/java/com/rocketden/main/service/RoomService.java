@@ -11,6 +11,8 @@ import com.rocketden.main.model.Room;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Random;
+
 @Service
 public class RoomService {
 
@@ -51,7 +53,17 @@ public class RoomService {
         return response;
     }
 
+    // Generate numeric String with length ROOM_ID_LENGTH
     protected String generateRoomId() {
-        return "";
+        String numbers = "1234567890";
+        char[] values = new char[ROOM_ID_LENGTH];
+        Random rand = new Random();
+
+        for (int i = 0; i < values.length; i++) {
+            int index = rand.nextInt(numbers.length());
+            values[i] = numbers.charAt(index);
+        }
+
+        return new String(values);
     }
 }

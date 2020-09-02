@@ -10,8 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -19,8 +21,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Transactional
 public class RoomTests {
 
     @Autowired
@@ -31,7 +35,7 @@ public class RoomTests {
 
     @Test
     public void joinNonExistentRoom() throws Exception {
-        // GET request to join non-existent room should fail
+        // PUT request to join non-existent room should fail
         JoinRoomRequest request = new JoinRoomRequest();
         request.setRoomId("012345");
         request.setPlayerName("Rocket");
@@ -73,7 +77,7 @@ public class RoomTests {
 
     @Test
     public void createAndJoinRoom() throws Exception {
-        // POST request to create room and GET request to join room should succeed
+        // POST request to create room and PUT request to join room should succeed
         CreateRoomRequest createRequest = new CreateRoomRequest();
 
         CreateRoomResponse createExpected = new CreateRoomResponse();
