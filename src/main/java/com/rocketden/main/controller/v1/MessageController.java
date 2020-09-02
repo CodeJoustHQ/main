@@ -8,10 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class MessageController extends BaseRestController {
-
     @GetMapping("/hello")
     public Message hello(@RequestParam(value = "name", defaultValue = "World") String name) {
         return new Message("Hello, " + name + "!");
     }
-
 }
