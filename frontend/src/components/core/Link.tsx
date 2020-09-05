@@ -15,21 +15,7 @@ const createButtonLink = (Button:any, props:any) => {
   return <Link to={to}>{button}</Link>;
 };
 
-// Wrap a button inside of a Link that triggers an onClick function
-const createButtonOnClick = (Button:any, props:any) => {
-  const { onClickFunc, children, ...rest } = props;
-  const button = (
-    <Button onClick={onClickFunc} {...rest}>
-      {children}
-    </Button>
-  );
-
-  return button;
-};
-
 export const PrimaryButtonLink = (props:any) => createButtonLink(PrimaryButton, props);
-
-export const SocketButtonConnection = (props:any) => createButtonOnClick(PrimaryButton, props);
 
 export const NavbarLink = styled(Link)`
   color: ${({ theme }) => theme.colors.text};

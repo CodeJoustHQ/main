@@ -10,5 +10,7 @@ const routes = {
   postProblem: `${basePath}/`,
 };
 
-export const getProblems = (): Promise<Problem[]> => fetch(routes.getProblems)
+const getProblems = (): Promise<Problem[]> => fetch(routes.getProblems)
   .then((response) => response.json());
+
+export default getProblems;
