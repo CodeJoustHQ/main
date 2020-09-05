@@ -24,6 +24,8 @@ export const ThemeConfig: any = {
   },
 };
 
+export type ThemeType = typeof ThemeConfig;
+
 const Theme = ({ children }: any) => (
   <ThemeProvider theme={ThemeConfig}>{children}</ThemeProvider>
 );

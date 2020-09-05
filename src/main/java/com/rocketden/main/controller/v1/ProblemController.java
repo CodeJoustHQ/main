@@ -14,28 +14,28 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ProblemController extends BaseRestController {
 
-  private ProblemRepository problemRepository;
+    private ProblemRepository problemRepository;
 
-  @Autowired
-  public ProblemController(ProblemRepository problemRepository){
-      this.problemRepository = problemRepository;
-  }
-  
-  @PostMapping(value = "/problems", produces = MediaType.APPLICATION_JSON_VALUE)
-  public Problem addNewProblem (@RequestBody ProblemDto problem) {
-    // Map between the problem DTO and the persistent problem object.
-    Problem persistentProblem = new Problem();
-    persistentProblem.setName(problem.getName());
-    persistentProblem.setDescription(problem.getDescription());
+    @Autowired
+    public ProblemController(ProblemRepository problemRepository){
+        this.problemRepository = problemRepository;
+    }
 
-    // Add the problem to the database, and return the problem JSON.
-    problemRepository.save(persistentProblem);
-		return persistentProblem;
-	}
+    @PostMapping(value = "/problems", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Problem addNewProblem (@RequestBody ProblemDto problem) {
+        // Map between the problem DTO and the persistent problem object.
+        Problem persistentProblem = new Problem();
+        persistentProblem.setName(problem.getName());
+        persistentProblem.setDescription(problem.getDescription());
 
-	@GetMapping("/problems")
-	public Iterable<Problem> getAllProblems() {
-		// Return a JSON with all problems in the database.
-		return problemRepository.findAll();
-  }
+        // Add the problem to the database, and return the problem JSON.
+        problemRepository.save(persistentProblem);
+        return persistentProblem;
+    }
+
+    @GetMapping("/problems")
+    public Iterable<Problem> getAllProblems() {
+        // Return a JSON with all problems in the database.
+        return problemRepository.findAll();
+    }
 }

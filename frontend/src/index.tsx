@@ -5,9 +5,9 @@ import { createGlobalStyle } from 'styled-components';
 import 'typeface-roboto';
 import App from './components/config/App';
 import * as serviceWorker from './serviceWorker';
-import Theme from './components/config/Theme';
+import Theme, { ThemeType } from './components/config/Theme';
 
-const GlobalStyle = createGlobalStyle`
+const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
   html {
     height: 100vh;
     min-width: 640px;

@@ -12,10 +12,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Problem {
-  @Id
-  @GeneratedValue(strategy=GenerationType.AUTO)
-  private Integer id;
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private Integer id;
 
-  private String name;
-  private String description;
+    private String name;
+    private String description;
 }

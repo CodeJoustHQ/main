@@ -16,28 +16,28 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-class MainTests {
+class MessageTests {
 
-	@Autowired
-	private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-	@Autowired
-	private TestRestTemplate restTemplate;
+    @Autowired
+    private TestRestTemplate restTemplate;
 
-	@LocalServerPort
-	private int port;
+    @LocalServerPort
+    private int port;
 
-	@Test
-	public void helloWorld() throws Exception {
-		this.mockMvc.perform(get("/api/v1/hello")).andDo(print())
-				.andExpect(status().isOk())
-				.andExpect(content().string("{\"message\":\"Hello, World!\"}"));
-	}
+    @Test
+    public void helloWorld() throws Exception {
+        this.mockMvc.perform(get("/api/v1/hello")).andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string("{\"message\":\"Hello, World!\"}"));
+    }
 
-	@Test
-	public void restCallHelloWorld() throws Exception {
-		assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/api/v1/hello",
-				String.class)).contains("Hello, World!");
-	}
+    @Test
+    public void restCallHelloWorld() throws Exception {
+        assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/api/v1/hello",
+                String.class)).contains("Hello, World!");
+    }
 
 }
