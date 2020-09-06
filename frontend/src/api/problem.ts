@@ -12,4 +12,3 @@ const routes = {
 
 export const getProblems = (): Promise<Problem[]> => fetch(routes.getProblems)
   .then((response) => response.json());
-

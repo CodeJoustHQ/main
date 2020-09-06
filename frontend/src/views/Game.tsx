@@ -29,14 +29,6 @@ class GamePage extends React.Component<GameProps, GameState> {
     return (
       <div>
         <div className={styles.header}><h3>Game page</h3></div>
-        {/*
-        {this.state.problems?.map(problem => {
-          return (<div>
-          <h3>{ problem.name }</h3>
-          <p>{ problem.description }</p>
-          </div>);
-        })}
-        */}
         <div className={styles.problemPanel}>        
           <h3>{ firstProblem?.name }</h3>
           <p>{ firstProblem?.description}</p>
