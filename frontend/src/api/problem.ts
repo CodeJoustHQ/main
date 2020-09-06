@@ -1,4 +1,4 @@
-type Problem = {
+export type Problem = {
   id: number,
   name: string;
   description: string;
@@ -12,3 +12,4 @@ const routes = {
 
 export const getProblems = (): Promise<Problem[]> => fetch(routes.getProblems)
   .then((response) => response.json());
+
