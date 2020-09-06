@@ -1,0 +1,28 @@
+.problemPanel {
+    position: absolute;
+    top: 80px;
+    left: 0;
+    bottom: 0;
+    width: 50%;
+    display: inline-block;
+    background-color: #e3e3e3;
+}
+
+.editorPanel {
+    position: absolute;
+    top: 80px;
+    right: 0;
+    bottom: 0;
+    width: 50%;
+    display: inline-block;
+}
+
+.header {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 80px;
+    display: block;
+    background-color: #85d2ff;
+    text-align: center;
+}
