@@ -1,4 +1,4 @@
-package com.rocketden.main.dao.problem;
+package com.rocketden.main.dao;
 
 import org.springframework.data.repository.CrudRepository;
 

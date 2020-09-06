@@ -58,15 +58,12 @@ public class RoomTests {
     @Test
     public void createValidRoom() throws Exception {
         // POST request to create valid room should return successful response
-        CreateRoomRequest request = new CreateRoomRequest();
-
         CreateRoomResponse expected = new CreateRoomResponse();
         expected.setMessage(CreateRoomResponse.SUCCESS);
 
         MvcResult result = this.mockMvc.perform(post(POST_ROOM)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(Utility.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().isOk())
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andDo(print()).andExpect(status().isCreated())
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
@@ -78,15 +75,13 @@ public class RoomTests {
     @Test
     public void createAndJoinRoom() throws Exception {
         // POST request to create room and PUT request to join room should succeed
-        CreateRoomRequest createRequest = new CreateRoomRequest();
-
+        // 1. Send POST request and verify room was created
         CreateRoomResponse createExpected = new CreateRoomResponse();
         createExpected.setMessage(CreateRoomResponse.SUCCESS);
 
         MvcResult result = this.mockMvc.perform(post(POST_ROOM)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(Utility.convertObjectToJsonString(createRequest)))
-                .andDo(print()).andExpect(status().isOk())
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andDo(print()).andExpect(status().isCreated())
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
@@ -94,8 +89,10 @@ public class RoomTests {
 
         assertEquals(createExpected.getMessage(), createActual.getMessage());
 
+        // Get id of created room to join
         String roomId = createActual.getRoomId();
 
+        // 2. Send PUT request and verify room was joined
         JoinRoomRequest request = new JoinRoomRequest();
         request.setRoomId(roomId);
         request.setPlayerName("Rocket");

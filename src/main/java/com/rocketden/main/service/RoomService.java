@@ -1,12 +1,10 @@
 package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
-import com.rocketden.main.dto.room.CreateRoomMapper;
-import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.CreateRoomResponse;
-import com.rocketden.main.dto.room.JoinRoomMapper;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
+import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.model.Room;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +17,7 @@ public class RoomService {
     public static final int ROOM_ID_LENGTH = 6;
 
     private final RoomRepository repository;
+    private static final Random random = new Random();
 
     @Autowired
     public RoomService(RoomRepository repository) {
@@ -35,19 +34,19 @@ public class RoomService {
             return response;
         }
 
-        JoinRoomResponse response = JoinRoomMapper.entityToResponse(room);
+        JoinRoomResponse response = RoomMapper.entityToJoinResponse(room);
         response.setMessage(JoinRoomResponse.SUCCESS);
         response.setPlayerName(request.getPlayerName());
 
         return response;
     }
 
-    public CreateRoomResponse createRoom(CreateRoomRequest request) {
+    public CreateRoomResponse createRoom() {
         Room room = new Room();
         room.setRoomId(generateRoomId());
         repository.save(room);
 
-        CreateRoomResponse response = CreateRoomMapper.entityToResponse(room);
+        CreateRoomResponse response = RoomMapper.entityToCreateResponse(room);
         response.setMessage(CreateRoomResponse.SUCCESS);
 
         return response;
@@ -57,10 +56,9 @@ public class RoomService {
     protected String generateRoomId() {
         String numbers = "1234567890";
         char[] values = new char[ROOM_ID_LENGTH];
-        Random rand = new Random();
 
         for (int i = 0; i < values.length; i++) {
-            int index = rand.nextInt(numbers.length());
+            int index = random.nextInt(numbers.length());
             values[i] = numbers.charAt(index);
         }
 

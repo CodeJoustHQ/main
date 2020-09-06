@@ -38,13 +38,11 @@ public class RoomServiceTests {
     @Test
     public void createRoomSuccess() {
         // Verify create room request succeeds and returns correct response
-        CreateRoomRequest request = new CreateRoomRequest();
-
         // Mock generateRoomId to return a custom room id
         Mockito.doReturn("012345").when(service).generateRoomId();
-        CreateRoomResponse response = service.createRoom(request);
+        CreateRoomResponse response = service.createRoom();
 
-        verify(repository).save(Mockito.any());
+        verify(repository).save(Mockito.any(Room.class));
         assertEquals(CreateRoomResponse.SUCCESS, response.getMessage());
         assertEquals("012345", response.getRoomId());
     }

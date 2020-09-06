@@ -3,11 +3,15 @@ package com.rocketden.main.dto.room;
 import com.rocketden.main.model.Room;
 import org.modelmapper.ModelMapper;
 
-public class JoinRoomMapper {
+public class RoomMapper {
 
     private static final ModelMapper mapper = new ModelMapper();
 
-    public static JoinRoomResponse entityToResponse(Room entity) {
+    public static CreateRoomResponse entityToCreateResponse(Room entity) {
+        return mapper.map(entity, CreateRoomResponse.class);
+    }
+
+    public static JoinRoomResponse entityToJoinResponse(Room entity) {
         return mapper.map(entity, JoinRoomResponse.class);
     }
 }
