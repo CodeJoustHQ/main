@@ -1,4 +1,4 @@
-type Problem = {
+export type Problem = {
   id: number,
   name: string;
   description: string;
@@ -10,7 +10,5 @@ const routes = {
   postProblem: `${basePath}/`,
 };
 
-const getProblems = (): Promise<Problem[]> => fetch(routes.getProblems)
+export const getProblems = (): Promise<Problem[]> => fetch(routes.getProblems)
   .then((response) => response.json());
-
-export default getProblems;
