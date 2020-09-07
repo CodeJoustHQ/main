@@ -23,7 +23,7 @@ type User = {
 const SUBSCRIBE_URL:string = '/api/v1/socket/subscribe-greeting';
 const SEND_GREETING_URL:string = '/api/v1/socket/greeting';
 
-export const sendMessage = (nickname:string) => {
+export const sendGreeting = (nickname:string) => {
   const nicknameInput:string = (nickname !== '') ? nickname : 'Anonymous';
   stompClient.send(SEND_GREETING_URL, {}, nicknameInput);
 };
@@ -37,7 +37,7 @@ export const connect = (endpoint:string, nickname:string) => {
       console.log(`Welcome ${greetingObject.nickname} to the page!`);
       console.log(`Color: rgb(${greetingObject.color.red}, ${greetingObject.color.green}, ${greetingObject.color.blue})`);
     });
-    sendMessage(nickname);
+    sendGreeting(nickname);
   });
 };
 

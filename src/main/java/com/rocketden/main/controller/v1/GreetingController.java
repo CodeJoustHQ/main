@@ -3,24 +3,16 @@ package com.rocketden.main.controller.v1;
 import java.awt.Color;
 import java.util.Random;
 
-import com.rocketden.main.model.Message;
 import com.rocketden.main.model.User;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class MessageController extends BaseRestController {
+public class GreetingController extends BaseRestController {
 
     private final Random random = new Random();
-
-    @GetMapping("/hello")
-    public Message hello(@RequestParam(value = "name", defaultValue = "World") String name) {
-        return new Message("Hello, " + name + "!");
-    }
 
     @MessageMapping("/greeting")
     @SendTo(BaseRestController.BASE_SOCKET_URL + "/subscribe-greeting")
