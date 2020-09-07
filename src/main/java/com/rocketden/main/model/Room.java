@@ -20,5 +20,5 @@ public class Room {
 
     private String roomId;
 
-    private LocalDateTime createdDate = LocalDateTime.now();
+    private LocalDateTime createdDateTime = LocalDateTime.now();
 }
