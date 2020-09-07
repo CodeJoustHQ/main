@@ -1,6 +1,9 @@
 package com.rocketden.main.controller.v1;
 
+import java.awt.Color;
+
 import com.rocketden.main.model.Message;
+import com.rocketden.main.model.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,11 +23,14 @@ public class MessageController extends BaseRestController {
         return new Message("Hello, " + name + "!");
     }
 
-    @MessageMapping(BaseRestController.BASE_SOCKET_URL + "/receive-greeting")
-    @SendTo(BaseRestController.BASE_SOCKET_URL + "/send-greeting")
-    public String greeting(String message) throws InterruptedException {
+    @MessageMapping("/greeting")
+    @SendTo(BaseRestController.BASE_SOCKET_URL + "/subscribe-greeting")
+    public User greeting(String nickname) throws InterruptedException {
         Thread.sleep(1000); // simulated delay
-        logger.info(message);
-    	return message;
+        logger.info(nickname);
+        User user = new User();
+        user.setNickname(nickname);
+        user.setColor(new Color(100, 50, 230));
+    	return user;
     }
 }

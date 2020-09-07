@@ -13,7 +13,7 @@ function JoinGamePage() {
   return (
     <div>
       <Input placeholder="Enter your nickname" onChange={(event) => setNickname(event.target.value)} />
-      <PrimaryButton id="connect_socket" onClick={() => connect(SOCKET_ENDPOINT, nickname)}>
+      <PrimaryButton onClick={() => connect(SOCKET_ENDPOINT, nickname)}>
         Connect
       </PrimaryButton>
       <PrimaryButton onClick={disconnect}>
