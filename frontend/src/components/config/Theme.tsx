@@ -7,6 +7,7 @@ export const ThemeConfig: any = {
     text: '#444',
     background: '#f0f4f8',
     blue: '#3E93CD',
+    red: 'red',
     gray: 'gray',
     white: 'white',
   },

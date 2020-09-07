@@ -1,30 +1,35 @@
 import React, { useCallback, useState } from 'react';
-import { createRoom } from '../api/Room';
+import { useHistory } from 'react-router-dom';
+import { createRoom, Room } from '../api/Room';
 import { PrimaryButton } from '../components/core/Button';
-import { Text } from '../components/core/Text';
+import { isError } from '../api/Error';
+import ErrorMessage from '../components/core/Error';
 
 function CreateGamePage() {
-  const [roomId, setRoomId] = useState('');
+  const history = useHistory();
+  const [error, setError] = useState('');
+
+  const redirectToGame = (room: Room) => {
+    history.push('/game', { room });
+  };
 
   const createNewRoom = useCallback(() => {
     createRoom()
       .then((res) => {
-        console.log(res);
-        setRoomId(res.roomId);
+        if (isError(res)) {
+          setError(res.message);
+        } else {
+          redirectToGame(res as Room);
+        }
       });
   }, []);
 
   return (
     <div>
-      Create game page
-
+      {error ? <ErrorMessage message={error} /> : null}
       <PrimaryButton onClick={createNewRoom}>
         Create New Room
       </PrimaryButton>
-
-      <Text>
-        {roomId}
-      </Text>
     </div>
   );
 }
