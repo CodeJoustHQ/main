@@ -7,13 +7,19 @@ let stompClient:any = null;
 const SUBSCRIBE_URL:string = '/api/v1/socket/receive-greeting';
 const SEND_URL:string = '/api/v1/socket/receive-greeting';
 
-export const connect = (endpoint:string) => {
+export const sendMessage = (nickname:string) => {
+  const nicknameInput:string = (nickname !== '') ? nickname : 'Anonymous';
+  stompClient.send(SEND_URL, {}, `Welcome ${nicknameInput} to the page!`);
+};
+
+export const connect = (endpoint:string, nickname:string) => {
   const socket:any = new SockJS(endpoint);
   stompClient = Stomp.over(socket);
   stompClient.connect({}, () => {
     stompClient.subscribe(SUBSCRIBE_URL, (greeting:any) => {
-      console.log(greeting);
+      console.log(greeting.body);
     });
+    sendMessage(nickname);
   });
 };
 
@@ -21,8 +27,4 @@ export const disconnect = () => {
   if (stompClient !== null) {
     stompClient.disconnect();
   }
-};
-
-export const sendMessage = () => {
-  stompClient.send(SEND_URL, {}, 'text');
 };

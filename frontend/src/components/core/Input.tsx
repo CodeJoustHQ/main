@@ -1,10 +1,18 @@
 import styled from 'styled-components';
 
-const Input = styled.input`
+const InputBlock = styled.input`
   border-radius: 0.25rem;
-  border: 1px solid black;
-  margin: 0 0 1rem;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  border: 3px solid ${({ theme }) => theme.colors.blue};
+  color: ${({ theme }) => theme.colors.text};
+  display: block;
   padding: 1rem;
+  margin: 1rem auto;
+  outline: none;
+
+  &:focus {
+    border: 3px solid ${({ theme }) => theme.colors.darkBlue};
+  }
 `;
 
-export default Input;
+export default InputBlock;

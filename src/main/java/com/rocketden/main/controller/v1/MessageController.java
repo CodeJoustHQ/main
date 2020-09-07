@@ -22,7 +22,8 @@ public class MessageController extends BaseRestController {
 
     @MessageMapping(BaseRestController.BASE_SOCKET_URL + "/receive-greeting")
     @SendTo(BaseRestController.BASE_SOCKET_URL + "/send-greeting")
-    public String greeting(String message) {
+    public String greeting(String message) throws InterruptedException {
+        Thread.sleep(1000); // simulated delay
         logger.info(message);
     	return message;
     }
