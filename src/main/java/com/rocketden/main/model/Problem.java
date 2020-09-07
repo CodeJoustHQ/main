@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 public class Problem {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
     private String name;

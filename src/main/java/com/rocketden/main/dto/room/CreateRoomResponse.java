@@ -10,5 +10,4 @@ public class CreateRoomResponse {
 
     private String message;
     private String roomId;
-    // future: add fields such as list of other players
 }

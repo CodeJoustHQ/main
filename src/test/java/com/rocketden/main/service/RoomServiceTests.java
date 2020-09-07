@@ -5,7 +5,6 @@ import com.rocketden.main.dto.room.CreateRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
 import com.rocketden.main.model.Room;
-import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,11 +27,6 @@ public class RoomServiceTests {
     @Spy
     @InjectMocks
     private RoomService service;
-
-    @Before
-    public void setUp() {
-        service = new RoomService(repository);
-    }
 
     @Test
     public void createRoomSuccess() {
