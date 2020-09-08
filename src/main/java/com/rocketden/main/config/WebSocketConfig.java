@@ -14,6 +14,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
+        // Sets the base URL for message subscription and sending, respectively.
         config.enableSimpleBroker(BaseRestController.BASE_SOCKET_URL);
         config.setApplicationDestinationPrefixes(BaseRestController.BASE_SOCKET_URL);
     }
