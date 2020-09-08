@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserSocketController extends BaseRestController {
 
-    @MessageMapping("/user-list")
-    @SendTo(BaseRestController.BASE_SOCKET_URL + "/subscribe-user-list")
+    @MessageMapping("/user")
+    @SendTo(BaseRestController.BASE_SOCKET_URL + "/subscribe-user")
     public User user(String nickname) throws InterruptedException {
         Thread.sleep(1000); // simulated delay
         User user = new User();

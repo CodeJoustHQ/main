@@ -3,29 +3,17 @@ import Stomp from 'stompjs';
 
 let stompClient:any = null;
 
-type Color = {
-  alpha: number;
-  red: number;
-  green: number;
-  blue: number;
-  rgb: number;
-  transparency: number;
-  colorSpace: any;
-}
-
 type User = {
-  color: Color;
-  id: number;
   nickname: string;
 }
 
 // Create constants for the subscription and send message URLs.
-const SUBSCRIBE_URL:string = '/api/v1/socket/subscribe-user-list';
-const SEND_GREETING_URL:string = '/api/v1/socket/user-list';
+const SUBSCRIBE_URL:string = '/api/v1/socket/subscribe-user';
+const SEND_USER_URL:string = '/api/v1/socket/user';
 
 export const sendGreeting = (nickname:string) => {
   const nicknameInput:string = (nickname !== '') ? nickname : 'Anonymous';
-  stompClient.send(SEND_GREETING_URL, {}, nicknameInput);
+  stompClient.send(SEND_USER_URL, {}, nicknameInput);
 };
 
 export const connect = (endpoint:string, nickname:string) => {

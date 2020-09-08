@@ -96,7 +96,7 @@ public class UserIntegrationTests {
 
             @Override
             public void afterConnected(final StompSession session, StompHeaders connectedHeaders) {
-                session.subscribe(BaseRestController.BASE_SOCKET_URL + "/subscribe-user-list", new StompFrameHandler() {
+                session.subscribe(BaseRestController.BASE_SOCKET_URL + "/subscribe-user", new StompFrameHandler() {
                     @Override
                     public Type getPayloadType(StompHeaders headers) {
                         return User.class;
@@ -116,7 +116,7 @@ public class UserIntegrationTests {
                     }
                 });
                 try {
-                    session.send(BaseRestController.BASE_SOCKET_URL + "/user-list", "Chris");
+                    session.send(BaseRestController.BASE_SOCKET_URL + "/user", "Chris");
                 } catch (Throwable t) {
                     failure.set(t);
                     latch.countDown();
