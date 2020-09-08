@@ -20,8 +20,8 @@ type User = {
 }
 
 // Create constants for the subscription and send message URLs.
-const SUBSCRIBE_URL:string = '/api/v1/socket/subscribe-greeting';
-const SEND_GREETING_URL:string = '/api/v1/socket/greeting';
+const SUBSCRIBE_URL:string = '/api/v1/socket/subscribe-user-list';
+const SEND_GREETING_URL:string = '/api/v1/socket/user-list';
 
 export const sendGreeting = (nickname:string) => {
   const nicknameInput:string = (nickname !== '') ? nickname : 'Anonymous';
@@ -32,10 +32,9 @@ export const connect = (endpoint:string, nickname:string) => {
   const socket:any = new SockJS(endpoint);
   stompClient = Stomp.over(socket);
   stompClient.connect({}, () => {
-    stompClient.subscribe(SUBSCRIBE_URL, (greeting:any) => {
-      const greetingObject:User = JSON.parse(greeting.body);
-      console.log(`Welcome ${greetingObject.nickname} to the page!`);
-      console.log(`Color: rgb(${greetingObject.color.red}, ${greetingObject.color.green}, ${greetingObject.color.blue})`);
+    stompClient.subscribe(SUBSCRIBE_URL, (userList:any) => {
+      const userListObject:User = JSON.parse(userList.body);
+      console.log(`Welcome ${userListObject.nickname} to the page!`);
     });
     sendGreeting(nickname);
   });
