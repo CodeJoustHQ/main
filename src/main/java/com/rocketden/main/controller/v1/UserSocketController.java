@@ -11,8 +11,7 @@ public class UserSocketController extends BaseRestController {
 
     @MessageMapping("/user")
     @SendTo(BaseRestController.BASE_SOCKET_URL + "/subscribe-user")
-    public User user(String nickname) throws InterruptedException {
-        Thread.sleep(1000); // simulated delay
+    public User user(String nickname) {
         User user = new User();
         user.setNickname(nickname);
     	return user;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { PrimaryButton } from '../components/core/Button';
 import Input from '../components/core/Input';
-import { connect, disconnect, sendGreeting } from '../api/Socket';
+import { connect, disconnect, sendUser } from '../api/Socket';
 
 // Create constants for the subscription and send message URLs.
 const SOCKET_ENDPOINT:string = '/api/v1/socket/join-room-endpoint';
@@ -19,8 +19,8 @@ function JoinGamePage() {
       <PrimaryButton onClick={disconnect}>
         Disconnect
       </PrimaryButton>
-      <PrimaryButton onClick={() => sendGreeting(nickname)}>
-        Send a Greeting
+      <PrimaryButton onClick={() => sendUser(nickname)}>
+        Send User Information
       </PrimaryButton>
     </div>
   );
