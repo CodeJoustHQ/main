@@ -1,39 +1,5 @@
 package com.rocketden.main;
 
-// import static org.assertj.core.api.Assertions.assertThat;
-// import static org.hamcrest.Matchers.containsString;
-// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-// import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-// import javax.sql.DataSource;
-
-// import com.rocketden.main.dto.problem.ProblemDto;
-// import com.rocketden.main.util.Utility;
-
-// import org.junit.jupiter.api.Test;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-// import org.springframework.boot.test.context.SpringBootTest;
-// import org.springframework.boot.test.web.client.TestRestTemplate;
-// import org.springframework.boot.web.server.LocalServerPort;
-// import org.springframework.http.MediaType;
-// import org.springframework.test.annotation.DirtiesContext;
-// import org.springframework.test.web.servlet.MockMvc;
-// import org.springframework.transaction.annotation.Transactional;
-
-// import org.junit.Assert;
-
-// @SpringBootTest(
-//     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-//     properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource"
-// )
-// @AutoConfigureMockMvc
-// @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-// @Transactional
-
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Type;
@@ -78,10 +44,10 @@ public class UserIntegrationTests {
 
     @BeforeEach
     public void setup() {
+        // Create variables to model message transport, the SockJS client, and the STOMP client.
         List<Transport> transports = new ArrayList<>();
         transports.add(new WebSocketTransport(new StandardWebSocketClient()));
         this.sockJsClient = new SockJsClient(transports);
-
         this.stompClient = new WebSocketStompClient(sockJsClient);
         this.stompClient.setMessageConverter(new MappingJackson2MessageConverter());
     }
@@ -89,13 +55,16 @@ public class UserIntegrationTests {
     @Test
     public void getUser() throws Exception {
 
+        // Latch allows threads to wait until remaining operations complete.
         final CountDownLatch latch = new CountDownLatch(1);
         final AtomicReference<Throwable> failure = new AtomicReference<>();
 
+        // Test session handler for STOMP (created below).
         StompSessionHandler handler = new TestSessionHandler(failure) {
 
             @Override
             public void afterConnected(final StompSession session, StompHeaders connectedHeaders) {
+                // After the socket is connected, subscribe and send message.
                 session.subscribe(BaseRestController.BASE_SOCKET_URL + "/subscribe-user", new StompFrameHandler() {
                     @Override
                     public Type getPayloadType(StompHeaders headers) {
@@ -106,6 +75,7 @@ public class UserIntegrationTests {
                     public void handleFrame(StompHeaders headers, Object payload) {
                         User user = (User) payload;
                         try {
+                            // Verify that the subscription received the expected message.
                             assertEquals("Chris", user.getNickname());
                         } catch (Throwable t) {
                             failure.set(t);
@@ -124,6 +94,7 @@ public class UserIntegrationTests {
             }
         };
 
+        // Connect to the socket with the STOMP client.
         this.stompClient.connect("ws://localhost:{port}" + BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint", this.headers, handler, this.port);
 
         if (latch.await(3, TimeUnit.SECONDS)) {
@@ -136,6 +107,7 @@ public class UserIntegrationTests {
 
     }
 
+    // Create a custom STOMP session handler for testing.
     private class TestSessionHandler extends StompSessionHandlerAdapter {
 
         private final AtomicReference<Throwable> failure;
