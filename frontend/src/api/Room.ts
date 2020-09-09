@@ -6,7 +6,7 @@ export type Room = {
   roomId: string;
 };
 
-const basePath = 'http://localhost:8080/api/v1/rooms';
+const basePath = '/api/v1/rooms';
 const routes = {
   createRoom: `${basePath}/`,
   joinRoom: `${basePath}/`,

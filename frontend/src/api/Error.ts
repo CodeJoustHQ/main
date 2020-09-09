@@ -23,7 +23,7 @@ export const errorHandler = (err: AxiosError): ErrorResponse => {
   return {
     error: true,
     status: err.response.status,
-    message: err.response.data.message,
+    message: err.response.data.message || 'An error occurred; please try again later.',
   };
 };
 

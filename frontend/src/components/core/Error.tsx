@@ -1,12 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
-import { Text } from './Text';
-
-const Content = styled.div`
-  p {
-    color: ${({ theme }) => theme.colors.red};
-  }
-`;
+import { ErrorText } from './Text';
 
 type MyProps = {
   message: string,
@@ -15,11 +8,9 @@ type MyProps = {
 function ErrorMessage(props: MyProps) {
   const { message } = props;
   return (
-    <Content>
-      <Text>
-        {message}
-      </Text>
-    </Content>
+    <ErrorText>
+      {message}
+    </ErrorText>
   );
 }
 
