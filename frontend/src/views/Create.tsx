@@ -11,11 +11,11 @@ function CreateGamePage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const redirectToGame = (room: Room) => {
-    history.push('/game', { room });
-  };
-
   const createNewRoom = useCallback(() => {
+    const redirectToGame = (room: Room) => {
+      history.push('/game', { room });
+    };
+
     setLoading(true);
     createRoom()
       .then((res) => {
@@ -26,7 +26,7 @@ function CreateGamePage() {
           redirectToGame(res as Room);
         }
       });
-  }, []);
+  }, [history]);
 
   return (
     <div>
