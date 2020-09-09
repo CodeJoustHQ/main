@@ -1,6 +1,6 @@
 package com.rocketden.main.controller.v1;
 
-import com.rocketden.main.dao.problem.ProblemRepository;
+import com.rocketden.main.dao.ProblemRepository;
 import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.model.Problem;
 
