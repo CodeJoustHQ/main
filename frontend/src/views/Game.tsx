@@ -1,7 +1,7 @@
 import Editor from '@monaco-editor/react';
 import React from 'react';
 import styled from 'styled-components';
-import { Problem, getProblems } from '../api/Problem';
+import { Problem, getProblems } from '../api/problem';
 import Header from '../components/navigation/Header';
 import { Text, ProblemHeaderText } from '../components/core/Text';
 
