@@ -1,7 +1,7 @@
 import Editor from '@monaco-editor/react';
 import React from 'react';
+import styled from 'styled-components';
 import { Problem, getProblems } from '../api/Problem';
-import styles from './styles.module.css';
 import Header from '../components/navigation/Header';
 import { Text, ProblemHeaderText } from '../components/core/Text';
 
@@ -10,6 +10,25 @@ interface GameState {
 }
 
 interface GameProps {}
+
+const ProblemPanel = styled.div`
+  position: absolute;
+  top: 80px;
+  left: 0;
+  bottom: 0;
+  width: 50%;
+  display: inline-block;
+  background-color: #e3e3e3;
+`;
+
+const EditorPanel = styled.div`
+  position: absolute;
+  top: 80px;
+  right: 0;
+  bottom: 0;
+  width: 50%;
+  display: inline-block;  
+`;
 
 class GamePage extends React.Component<GameProps, GameState> {
   constructor(props: GameProps) {
@@ -31,13 +50,13 @@ class GamePage extends React.Component<GameProps, GameState> {
     return (
       <div>
         <Header />
-        <div className={styles.problemPanel}>
+        <ProblemPanel>
           <ProblemHeaderText>{ firstProblem?.name }</ProblemHeaderText>
           <Text>{ firstProblem?.description}</Text>
-        </div>
-        <div className={styles.editorPanel}>
+        </ProblemPanel>
+        <EditorPanel>
           <Editor height="90vh" language="javascript" />
-        </div>
+        </EditorPanel>
       </div>
     );
   }
