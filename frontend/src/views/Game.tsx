@@ -1,7 +1,9 @@
 import Editor from '@monaco-editor/react';
 import React from 'react';
-import { Problem, getProblems } from '../api/problem';
+import { Problem, getProblems } from '../api/Problem';
 import styles from './styles.module.css';
+import Header from '../components/navigation/Header';
+import { Text, ProblemHeaderText } from '../components/core/Text';
 
 interface GameState {
   problems?: Problem[];
@@ -28,10 +30,10 @@ class GamePage extends React.Component<GameProps, GameState> {
     const firstProblem = problems?.[0];
     return (
       <div>
-        <div className={styles.header}><h3>Game page</h3></div>
+        <Header />
         <div className={styles.problemPanel}>
-          <h3>{ firstProblem?.name }</h3>
-          <p>{ firstProblem?.description}</p>
+          <ProblemHeaderText>{ firstProblem?.name }</ProblemHeaderText>
+          <Text>{ firstProblem?.description}</Text>
         </div>
         <div className={styles.editorPanel}>
           <Editor height="90vh" language="javascript" />
