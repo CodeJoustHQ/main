@@ -16,9 +16,9 @@ const ProblemPanel = styled.div`
   top: 80px;
   left: 0;
   bottom: 0;
-  width: 50%;
-  display: inline-block;
+  width: 50vw;
   background-color: #e3e3e3;
+  padding: 50px;
 `;
 
 const EditorPanel = styled.div`
@@ -26,8 +26,7 @@ const EditorPanel = styled.div`
   top: 80px;
   right: 0;
   bottom: 0;
-  width: 50%;
-  display: inline-block;  
+  width: 50vw;
 `;
 
 class GamePage extends React.Component<GameProps, GameState> {
