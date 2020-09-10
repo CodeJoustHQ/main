@@ -14,6 +14,6 @@ public class UserSocketController extends BaseRestController {
     public User user(String nickname) {
         User user = new User();
         user.setNickname(nickname);
-    	return user;
+        return user;
     }
 }
