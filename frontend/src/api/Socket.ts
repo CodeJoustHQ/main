@@ -16,8 +16,7 @@ const SEND_USER_URL:string = '/api/v1/socket/user';
 
 export const sendUser = (nickname:string) => {
   if (connected) {
-    const nicknameInput:string = (nickname !== '') ? nickname : 'Anonymous';
-    stompClient.send(SEND_USER_URL, {}, nicknameInput);
+    stompClient.send(SEND_USER_URL, {}, nickname || 'Anonymous');
   } else {
     console.error('You must be connected to a socket before sending user information.');
   }
