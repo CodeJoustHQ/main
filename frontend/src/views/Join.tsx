@@ -1,7 +1,6 @@
 import React, { useState, ReactElement } from 'react';
-import { PrimaryButton } from '../components/core/Button';
-import { Text } from '../components/core/Text';
-import Input from '../components/core/Input';
+import { LargeText, Text } from '../components/core/Text';
+import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
 import {
   connect, disconnect, sendUser, SOCKET_ENDPOINT,
 } from '../api/Socket';
@@ -26,15 +25,15 @@ function JoinGamePage() {
       // Render the "Enter nickname" state.
       joinPageContent = (
         <div>
-          <Input placeholder="Enter your nickname" onChange={(event) => setNickname(event.target.value)} />
-          <PrimaryButton
+          <LargeText>Enter a nickname to join the game!</LargeText>
+          <LargeCenterInputText placeholder="Your nickname" onChange={(event: any) => setNickname(event.target.value)} />
+          <LargeInputButton
             onClick={() => {
               connect(SOCKET_ENDPOINT, nickname);
               setPageState(1);
             }}
-          >
-            Enter
-          </PrimaryButton>
+            value="Enter"
+          />
         </div>
       );
       break;
