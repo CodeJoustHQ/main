@@ -2,7 +2,6 @@ import React from 'react';
 import { ThemeProvider } from 'styled-components';
 
 export const ThemeConfig: any = {
-  // Can be extended in the future to support dark mode
   colors: {
     text: '#444',
     background: '#f0f4f8',
