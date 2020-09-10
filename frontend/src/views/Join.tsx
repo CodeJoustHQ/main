@@ -2,10 +2,9 @@ import React, { useState, ReactElement } from 'react';
 import { PrimaryButton } from '../components/core/Button';
 import { Text } from '../components/core/Text';
 import Input from '../components/core/Input';
-import { connect, disconnect, sendUser } from '../api/Socket';
-
-// Create constants for the subscription and send message URLs.
-const SOCKET_ENDPOINT:string = '/api/v1/socket/join-room-endpoint';
+import {
+  connect, disconnect, sendUser, SOCKET_ENDPOINT,
+} from '../api/Socket';
 
 function JoinGamePage() {
   // Declare nickname state variable.

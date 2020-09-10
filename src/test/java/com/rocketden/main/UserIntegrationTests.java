@@ -52,6 +52,16 @@ public class UserIntegrationTests {
         this.stompClient.setMessageConverter(new MappingJackson2MessageConverter());
     }
 
+    /**
+     * This test creates a test STOMP session, connects the user to the 
+     * socket endpoint, subscribes the user to the '.../subscribe-user' URL,
+     * and then sends a message to '.../user', which will be formatted on 
+     * the backend and subsequently sent to the '.../subscribe-user' URL.
+     * 
+     * This method then tests that the message sent to '.../user' is formatted
+     * and passed on as expected to the '.../subscribe-user' URL (and thus, to
+     * all users who are subscribed to this URL on this socket endpoint).
+     */
     @Test
     public void getUser() throws Exception {
 
