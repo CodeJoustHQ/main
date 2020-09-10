@@ -10,7 +10,8 @@ type User = {
 // Variable to hold the current connected state.
 let connected = false;
 
-// Create constants for the subscription and send message URLs.
+// Create constants for the connection, subscription, and send message URLs.
+export const SOCKET_ENDPOINT:string = '/api/v1/socket/join-room-endpoint';
 const SUBSCRIBE_URL:string = '/api/v1/socket/subscribe-user';
 const SEND_USER_URL:string = '/api/v1/socket/user';
 
