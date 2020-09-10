@@ -1,7 +1,7 @@
 import SockJS from 'sockjs-client';
-import Stomp from 'stompjs';
+import Stomp, { Client, Message } from 'stompjs';
 
-let stompClient:any = null;
+let stompClient: Client;
 
 type User = {
   nickname: string;
@@ -25,10 +25,10 @@ export const sendUser = (nickname:string) => {
 export const connect = (endpoint:string, nickname:string) => {
   if (!connected) {
     // Connect to given endpoint, subscribe to future messages, and send user message.
-    const socket:any = new SockJS(endpoint);
+    const socket: WebSocket = new SockJS(endpoint);
     stompClient = Stomp.over(socket);
     stompClient.connect({}, () => {
-      stompClient.subscribe(SUBSCRIBE_URL, (user:any) => {
+      stompClient.subscribe(SUBSCRIBE_URL, (user: Message) => {
         const userObject:User = JSON.parse(user.body);
         console.log(`Welcome ${userObject.nickname} to the page!`);
       });
@@ -43,10 +43,10 @@ export const connect = (endpoint:string, nickname:string) => {
 
 export const disconnect = () => {
   if (connected) {
-    stompClient.disconnect();
-    stompClient = null;
-    // Reassign connected variable.
-    connected = false;
+    stompClient.disconnect(() => {
+      // Reassign connected variable.
+      connected = false;
+    });
   } else {
     console.error('You cannot disconnect because you are not connected to any socket.');
   }
