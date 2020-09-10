@@ -33,6 +33,7 @@ function JoinGamePage() {
               setPageState(1);
             }}
             value="Enter"
+            disabled={pageState === 1}
           />
         </div>
       );

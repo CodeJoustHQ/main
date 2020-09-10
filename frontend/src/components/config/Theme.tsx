@@ -5,6 +5,7 @@ export const ThemeConfig: any = {
   colors: {
     text: '#444',
     background: '#f0f4f8',
+    lightBlue: '#AED2EA',
     blue: '#3E93CD',
     darkBlue: '#2E7DB2',
     gray: 'gray',
