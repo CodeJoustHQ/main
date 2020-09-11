@@ -3,6 +3,7 @@ package com.rocketden.main;
 import com.rocketden.main.dto.room.CreateRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
+import com.rocketden.main.model.User;
 import com.rocketden.main.util.Utility;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -34,10 +38,13 @@ public class RoomTests {
 
     @Test
     public void joinNonExistentRoom() throws Exception {
+        User user = new User();
+        user.setNickname("rocket");
+
         // PUT request to join non-existent room should fail
         JoinRoomRequest request = new JoinRoomRequest();
         request.setRoomId("012345");
-        request.setPlayerName("Rocket");
+        request.setUser(user);
 
         JoinRoomResponse expected = new JoinRoomResponse();
         expected.setMessage(JoinRoomResponse.ERROR_NOT_FOUND);
@@ -91,14 +98,20 @@ public class RoomTests {
         // Get id of created room to join
         String roomId = createActual.getRoomId();
 
+        // Create User and Set<User> for PUT request
+        User user = new User();
+        user.setNickname("rocket");
+        Set<User> users = new HashSet<>();
+        users.add(user);
+
         // 2. Send PUT request and verify room was joined
         JoinRoomRequest request = new JoinRoomRequest();
         request.setRoomId(roomId);
-        request.setPlayerName("Rocket");
+        request.setUser(user);
 
         JoinRoomResponse expected = new JoinRoomResponse();
         expected.setMessage(JoinRoomResponse.SUCCESS);
-        expected.setPlayerName("Rocket");
+        expected.setUsers(users);
         expected.setRoomId(roomId);
 
         result = this.mockMvc.perform(put(PUT_ROOM)
@@ -111,7 +124,7 @@ public class RoomTests {
         JoinRoomResponse actual = Utility.toObject(jsonResponse, JoinRoomResponse.class);
 
         assertEquals(expected.getMessage(), actual.getMessage());
-        assertEquals(expected.getPlayerName(), actual.getPlayerName());
+        assertEquals(expected.getUsers(), actual.getUsers());
         assertEquals(expected.getRoomId(), actual.getRoomId());
     }
 }

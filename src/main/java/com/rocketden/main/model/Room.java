@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -21,4 +22,8 @@ public class Room {
     private String roomId;
 
     private LocalDateTime createdDateTime = LocalDateTime.now();
+
+    private User host;
+
+    private Set<User> users;
 }
