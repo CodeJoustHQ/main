@@ -55,6 +55,12 @@ public class RoomServiceTests {
         // Verify join room request succeeds and returns correct response
         String roomId = "012345";
 
+        // Create host and users objects.
+        User host = new User();
+        host.setNickname("host");
+        Set<User> users = new HashSet<>();
+        users.add(host);
+
         User user = new User();
         user.setNickname("rocket");
         JoinRoomRequest request = new JoinRoomRequest();
@@ -63,6 +69,8 @@ public class RoomServiceTests {
 
         Room room = new Room();
         room.setRoomId(roomId);
+        room.setHost(host);
+        room.setUsers(users);
 
         // Mock repository to return room when called
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
