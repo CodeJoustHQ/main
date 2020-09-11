@@ -8,10 +8,6 @@ const Input = styled.input`
   margin: 1rem auto;
   outline: none;
   font-weight: 700;
-
-  &:focus {
-    border: 3px solid ${({ theme }) => theme.colors.darkBlue};
-  }
 `;
 
 export const LargeCenterInputText = styled(Input).attrs(() => ({
@@ -22,6 +18,10 @@ export const LargeCenterInputText = styled(Input).attrs(() => ({
   font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
   padding: 1rem;
   color: #444;
+
+  &:focus {
+    border: 3px solid ${({ theme }) => theme.colors.darkBlue};
+  }
 `;
 
 export const LargeInputButton = styled(Input).attrs(() => ({

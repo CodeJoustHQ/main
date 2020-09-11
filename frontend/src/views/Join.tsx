@@ -53,7 +53,7 @@ function JoinGamePage() {
           <LargeInputButton
             onClick={() => {
               connect(SOCKET_ENDPOINT, nickname);
-              setPageState(1);
+              setPageState(2);
             }}
             value="Enter"
             // Input is disabled if no nickname exists, has a space, or is too long.
