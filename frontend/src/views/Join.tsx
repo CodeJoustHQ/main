@@ -38,7 +38,7 @@ function JoinGamePage() {
           <LargeText>Enter a nickname to join the game!</LargeText>
           <LargeCenterInputText
             placeholder="Your nickname"
-            onChange={(event: any) => {
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setNickname(event.target.value);
             }}
             onFocus={() => {
