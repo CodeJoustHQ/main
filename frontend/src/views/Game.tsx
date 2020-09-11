@@ -11,22 +11,16 @@ interface GameState {
 
 interface GameProps {}
 
-const ProblemPanel = styled.div`
-  position: absolute;
-  top: 80px;
-  left: 0;
-  bottom: 0;
-  width: 50vw;
-  background-color: #e3e3e3;
-  padding: 50px;
+const FlexContainer = styled.div`
+  display: flex;
 `;
 
-const EditorPanel = styled.div`
-  position: absolute;
-  top: 80px;
-  right: 0;
-  bottom: 0;
-  width: 50vw;
+const FlexPanel = styled.div`
+  flex: 1;
+  padding: 1rem;
+  background-color: #e3e3e3;
+  overflow: none;
+  height: 100vh;
 `;
 
 class GamePage extends React.Component<GameProps, GameState> {
@@ -49,13 +43,15 @@ class GamePage extends React.Component<GameProps, GameState> {
     return (
       <div>
         <Header />
-        <ProblemPanel>
-          <ProblemHeaderText>{ firstProblem?.name }</ProblemHeaderText>
-          <Text>{ firstProblem?.description}</Text>
-        </ProblemPanel>
-        <EditorPanel>
-          <Editor height="90vh" language="javascript" />
-        </EditorPanel>
+        <FlexContainer>
+          <FlexPanel>
+            <ProblemHeaderText>{ firstProblem?.name }</ProblemHeaderText>
+            <Text>{ firstProblem?.description}</Text>
+          </FlexPanel>
+          <FlexPanel>
+            <Editor height="100vh" language="javascript" />
+          </FlexPanel>
+        </FlexContainer>
       </div>
     );
   }
