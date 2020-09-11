@@ -38,5 +38,6 @@ export const LargeInputButton = styled(Input).attrs(() => ({
   &:disabled {
     background-color: ${({ theme }) => theme.colors.lightBlue};
     border: 3px solid ${({ theme }) => theme.colors.lightBlue};
+    cursor: default;
   }
 `;
