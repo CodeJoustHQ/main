@@ -49,6 +49,12 @@ function JoinGamePage() {
             onBlur={() => {
               setFocusInput(false);
             }}
+            onKeyPress={(event) => {
+              if (event.key === 'Enter' && !validNickname) {
+                connect(SOCKET_ENDPOINT, nickname);
+                setPageState(2);
+              }
+            }}
           />
           <LargeInputButton
             onClick={() => {
@@ -59,7 +65,11 @@ function JoinGamePage() {
             // Input is disabled if no nickname exists, has a space, or is too long.
             disabled={!validNickname}
           />
-          { focusInput && !validNickname ? <Text>The nickname must be non-empty, have no spaces, and be less than 16 characters.</Text> : null}
+          { focusInput && !validNickname ? (
+            <Text>
+              The nickname must be non-empty, have no spaces, and be less than 16 characters.
+            </Text>
+          ) : null}
         </div>
       );
       break;
