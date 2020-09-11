@@ -33,6 +33,6 @@ public class Room {
     @JoinColumn(name = "user_id")
     private User host;
 
-    @OneToMany(targetEntity=User.class, cascade=CascadeType.ALL, mappedBy="id", fetch=FetchType.LAZY)
+    @OneToMany(targetEntity=User.class, cascade=CascadeType.ALL, mappedBy="room", fetch = FetchType.LAZY)
     private Set<User> users;
 }

@@ -35,4 +35,17 @@ public class UserService {
 
         return response;
     }
+
+    // Generate numeric String with length User_ID_LENGTH
+    protected String generateUserId() {
+        String numbers = "1234567890";
+        char[] values = new char[USER_ID_LENGTH];
+
+        for (int i = 0; i < values.length; i++) {
+            int index = random.nextInt(numbers.length());
+            values[i] = numbers.charAt(index);
+        }
+
+        return new String(values);
+    }
 }
