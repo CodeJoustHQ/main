@@ -29,10 +29,10 @@ public class Room {
 
     private LocalDateTime createdDateTime = LocalDateTime.now();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User host;
 
-    @OneToMany(targetEntity=User.class, cascade=CascadeType.ALL, mappedBy="room", fetch = FetchType.LAZY)
+    @OneToMany(targetEntity = User.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<User> users;
 }

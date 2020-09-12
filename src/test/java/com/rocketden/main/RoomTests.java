@@ -4,7 +4,6 @@ import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.CreateRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
-import com.rocketden.main.dto.user.CreateUserRequest;
 import com.rocketden.main.model.User;
 import com.rocketden.main.util.Utility;
 import org.junit.jupiter.api.Test;
@@ -86,7 +85,7 @@ public class RoomTests {
         assertEquals(expected.getMessage(), actual.getMessage());
     }
 
-    // @Test
+    @Test
     public void createAndJoinRoom() throws Exception {
         // POST request to create room and PUT request to join room should succeed
         User host = new User();
