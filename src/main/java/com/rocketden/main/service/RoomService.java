@@ -6,6 +6,7 @@ import com.rocketden.main.dto.room.CreateRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
 import com.rocketden.main.dto.room.RoomMapper;
+import com.rocketden.main.dto.user.CreateUserResponse;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 
@@ -42,9 +43,14 @@ public class RoomService {
         // Get the user who initialized the request.
         User user = request.getUser();
 
+        // Return error if user is invalid or not provided
         if (user == null) {
             JoinRoomResponse response = new JoinRoomResponse();
             response.setMessage(JoinRoomResponse.ERROR_NO_USER_FOUND);
+            return response;
+        } else if (UserService.validNickname(user.getNickname())) {
+            JoinRoomResponse response = new JoinRoomResponse();
+            response.setMessage(CreateUserResponse.ERROR_INVALID_NICKNAME);
             return response;
         }
 
@@ -69,6 +75,23 @@ public class RoomService {
     }
 
     public CreateRoomResponse createRoom(CreateRoomRequest request) {
+        User host = request.getHost();
+
+        // Do not create room if provided host is invalid.
+        if (host == null) {
+            CreateRoomResponse response = new CreateRoomResponse();
+            response.setMessage(CreateRoomResponse.ERROR_NO_HOST);
+            return response;
+        } else if (host.getNickname() == null) {
+            CreateRoomResponse response = new CreateRoomResponse();
+            response.setMessage(CreateUserResponse.ERROR_NO_NICKNAME);
+            return response;
+        } else if (UserService.validNickname(host.getNickname())) {
+            CreateRoomResponse response = new CreateRoomResponse();
+            response.setMessage(CreateUserResponse.ERROR_INVALID_NICKNAME);
+            return response;
+        }
+
         // Add the host to a new user set.
         Set<User> users = new HashSet<>();
         users.add(request.getHost());

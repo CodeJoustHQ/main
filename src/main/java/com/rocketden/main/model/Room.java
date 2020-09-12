@@ -30,7 +30,7 @@ public class Room {
     private LocalDateTime createdDateTime = LocalDateTime.now();
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "host_id")
     private User host;
 
     @OneToMany(targetEntity = User.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
