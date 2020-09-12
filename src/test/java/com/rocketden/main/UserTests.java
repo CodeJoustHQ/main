@@ -1,6 +1,5 @@
 package com.rocketden.main;
 
-import com.rocketden.main.dto.room.JoinRoomResponse;
 import com.rocketden.main.dto.user.CreateUserRequest;
 import com.rocketden.main.dto.user.CreateUserResponse;
 import com.rocketden.main.util.Utility;
