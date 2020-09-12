@@ -28,14 +28,3 @@ export const PrimaryButton = styled(DefaultButton)<any>`
   min-width: 280px;
   min-height: 70px;
 `;
-
-export const PrimaryButtonMedium = styled(DefaultButton)<any>`
-  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
-  font-weight: bold;
-  background-color: ${({ theme }) => theme.colors.blue};
-  color: ${({ theme }) => theme.colors.white};
-  width: ${({ width }) => width || '24vw'};
-  height: ${({ height }) => height || '6vw'};
-  min-width: 210px;
-  min-height: 55px;
-`;

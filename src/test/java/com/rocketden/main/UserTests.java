@@ -31,7 +31,8 @@ public class UserTests {
     private static final String POST_USER = "/api/v1/user";
 
     @Test
-    public void createNewUser() throws Exception {// PUT request to join non-existent room should fail
+    public void createNewUser() throws Exception {
+        // PUT request to join non-existent room should fail
         CreateUserRequest request = new CreateUserRequest();
         request.setNickname("rocket");
 
