@@ -25,12 +25,6 @@ const FlexPanel = styled.div`
   width: 50vw;
 `;
 
-const ResizeHandle = styled.div`
-  height: 100vh;
-  width: 12px;
-  cursor: ew-resize;
-`;
-
 class GamePage extends React.Component<GameProps, GameState> {
   constructor(props: GameProps) {
     super(props);
@@ -56,7 +50,6 @@ class GamePage extends React.Component<GameProps, GameState> {
             <ProblemHeaderText>{ firstProblem?.name }</ProblemHeaderText>
             <Text>{ firstProblem?.description}</Text>
           </FlexPanel>
-          <ResizeHandle />
           <FlexPanel>
             <Editor height="100vh" language="javascript" />
           </FlexPanel>
