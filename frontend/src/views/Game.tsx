@@ -13,6 +13,7 @@ interface GameProps {}
 
 const FlexContainer = styled.div`
   display: flex;
+  top: 50px;
 `;
 
 const FlexPanel = styled.div`
@@ -21,6 +22,13 @@ const FlexPanel = styled.div`
   background-color: #e3e3e3;
   overflow: none;
   height: 100vh;
+  width: 50vw;
+`;
+
+const ResizeHandle = styled.div`
+  height: 100vh;
+  width: 12px;
+  cursor: ew-resize;
 `;
 
 class GamePage extends React.Component<GameProps, GameState> {
@@ -48,6 +56,7 @@ class GamePage extends React.Component<GameProps, GameState> {
             <ProblemHeaderText>{ firstProblem?.name }</ProblemHeaderText>
             <Text>{ firstProblem?.description}</Text>
           </FlexPanel>
+          <ResizeHandle />
           <FlexPanel>
             <Editor height="100vh" language="javascript" />
           </FlexPanel>
