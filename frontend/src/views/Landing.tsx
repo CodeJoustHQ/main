@@ -9,10 +9,12 @@ import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 
 function LandingPage() {
+  // Get history object to be able to move between different pages
   const history = useHistory();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Callback used to create a new room and redirect to game page
   const createNewRoom = useCallback(() => {
     const redirectToGame = (room: Room) => {
       history.push('/game', { room });
@@ -22,6 +24,7 @@ function LandingPage() {
     createRoom()
       .then((res) => {
         setLoading(false);
+        // Type guard used to differentiate between success/failure responses
         if (isError(res)) {
           setError(res.message);
         } else {

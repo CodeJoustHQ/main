@@ -20,8 +20,8 @@ function GamePage() {
 
   return (
     <div>
-      Game page
       Room:
+      {' '}
       {room ? room.roomId : 'No room joined'}
       <Editor height="90vh" language="javascript" />
     </div>

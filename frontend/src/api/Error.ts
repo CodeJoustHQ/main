@@ -15,7 +15,7 @@ export const errorHandler = (err: AxiosError): ErrorResponse => {
   if (!err.response) {
     return {
       error: true,
-      status: 'XXX',
+      status: 'XXX', // Request didn't initiate; no status returned
       message: 'An error occurred initiating the REST request',
     };
   }
