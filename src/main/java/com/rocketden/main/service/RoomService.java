@@ -48,7 +48,11 @@ public class RoomService {
             JoinRoomResponse response = new JoinRoomResponse();
             response.setMessage(JoinRoomResponse.ERROR_NO_USER_FOUND);
             return response;
-        } else if (UserService.validNickname(user.getNickname())) {
+        } else if (user.getNickname() == null) {
+            JoinRoomResponse response = new JoinRoomResponse();
+            response.setMessage(CreateUserResponse.ERROR_NO_NICKNAME);
+            return response;
+        } else if (!UserService.validNickname(user.getNickname())) {
             JoinRoomResponse response = new JoinRoomResponse();
             response.setMessage(CreateUserResponse.ERROR_INVALID_NICKNAME);
             return response;
@@ -86,7 +90,7 @@ public class RoomService {
             CreateRoomResponse response = new CreateRoomResponse();
             response.setMessage(CreateUserResponse.ERROR_NO_NICKNAME);
             return response;
-        } else if (UserService.validNickname(host.getNickname())) {
+        } else if (!UserService.validNickname(host.getNickname())) {
             CreateRoomResponse response = new CreateRoomResponse();
             response.setMessage(CreateUserResponse.ERROR_INVALID_NICKNAME);
             return response;

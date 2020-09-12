@@ -52,7 +52,7 @@ public class UserService {
      */
     public static boolean validNickname(String nickname) {
         return nickname.length() > 0 && nickname.length() <= 16 
-            && nickname.contains(" ");
+            && !nickname.contains(" ");
     }
 
 }

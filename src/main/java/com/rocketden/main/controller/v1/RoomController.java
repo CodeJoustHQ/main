@@ -36,6 +36,8 @@ public class RoomController extends BaseRestController {
             return new ResponseEntity<>(response, HttpStatus.CONFLICT);
         } else if (response.getMessage().equals(JoinRoomResponse.ERROR_NO_USER_FOUND)) {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        } else if (response.getMessage().equals(CreateUserResponse.ERROR_NO_NICKNAME)) {
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else if (response.getMessage().equals(CreateUserResponse.ERROR_INVALID_NICKNAME)) {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
