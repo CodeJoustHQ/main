@@ -86,6 +86,26 @@ public class RoomTests {
     }
 
     @Test
+    public void createValidRoomNoHost() throws Exception {
+        // POST request to create valid room should return successful response
+        CreateRoomRequest createRequest = new CreateRoomRequest();
+        
+        CreateRoomResponse expected = new CreateRoomResponse();
+        expected.setMessage(CreateRoomResponse.ERROR_NO_HOST);
+
+        MvcResult result = this.mockMvc.perform(post(POST_ROOM)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(createRequest)))
+                .andDo(print()).andExpect(status().isBadRequest())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        CreateRoomResponse actual = Utility.toObject(jsonResponse, CreateRoomResponse.class);
+
+        assertEquals(expected.getMessage(), actual.getMessage());
+    }
+
+    @Test
     public void createAndJoinRoom() throws Exception {
         // POST request to create room and PUT request to join room should succeed
         User host = new User();
@@ -132,6 +152,101 @@ public class RoomTests {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(joinRequest)))
                 .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        JoinRoomResponse actual = Utility.toObject(jsonResponse, JoinRoomResponse.class);
+
+        assertEquals(expected.getMessage(), actual.getMessage());
+        assertEquals(expected.getUsers(), actual.getUsers());
+        assertEquals(expected.getRoomId(), actual.getRoomId());
+    }
+
+    @Test
+    public void createAndJoinRoomUserAlreadyExists() throws Exception {
+        // POST request to create room and PUT request to join room should succeed
+        User host = new User();
+        host.setNickname("host");
+        CreateRoomRequest createRequest = new CreateRoomRequest();
+        createRequest.setHost(host);
+
+        // 1. Send POST request and verify room was created
+        CreateRoomResponse createExpected = new CreateRoomResponse();
+        createExpected.setMessage(CreateRoomResponse.SUCCESS);
+
+        MvcResult result = this.mockMvc.perform(post(POST_ROOM)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(createRequest)))
+                .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        CreateRoomResponse createActual = Utility.toObject(jsonResponse, CreateRoomResponse.class);
+
+        assertEquals(createExpected.getMessage(), createActual.getMessage());
+
+        // Get id of created room to join
+        String roomId = createActual.getRoomId();
+
+        // 2. Send PUT request and verify room was joined
+        JoinRoomRequest joinRequest = new JoinRoomRequest();
+        joinRequest.setRoomId(roomId);
+        joinRequest.setUser(host);
+
+        JoinRoomResponse expected = new JoinRoomResponse();
+        expected.setMessage(JoinRoomResponse.ERROR_USER_ALREADY_PRESENT);
+
+        result = this.mockMvc.perform(put(PUT_ROOM)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(joinRequest)))
+                .andDo(print()).andExpect(status().isConflict())
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        JoinRoomResponse actual = Utility.toObject(jsonResponse, JoinRoomResponse.class);
+
+        assertEquals(expected.getMessage(), actual.getMessage());
+        assertEquals(expected.getUsers(), actual.getUsers());
+        assertEquals(expected.getRoomId(), actual.getRoomId());
+    }
+
+    @Test
+    public void createAndJoinRoomNoUser() throws Exception {
+        // POST request to create room and PUT request to join room should succeed
+        User host = new User();
+        host.setNickname("host");
+        CreateRoomRequest createRequest = new CreateRoomRequest();
+        createRequest.setHost(host);
+
+        // 1. Send POST request and verify room was created
+        CreateRoomResponse createExpected = new CreateRoomResponse();
+        createExpected.setMessage(CreateRoomResponse.SUCCESS);
+
+        MvcResult result = this.mockMvc.perform(post(POST_ROOM)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(createRequest)))
+                .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        CreateRoomResponse createActual = Utility.toObject(jsonResponse, CreateRoomResponse.class);
+
+        assertEquals(createExpected.getMessage(), createActual.getMessage());
+
+        // Get id of created room to join
+        String roomId = createActual.getRoomId();
+
+        // 2. Send PUT request and verify room was joined
+        JoinRoomRequest joinRequest = new JoinRoomRequest();
+        joinRequest.setRoomId(roomId);
+
+        JoinRoomResponse expected = new JoinRoomResponse();
+        expected.setMessage(JoinRoomResponse.ERROR_NO_USER_FOUND);
+
+        result = this.mockMvc.perform(put(PUT_ROOM)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(joinRequest)))
+                .andDo(print()).andExpect(status().isNotFound())
                 .andReturn();
 
         jsonResponse = result.getResponse().getContentAsString();

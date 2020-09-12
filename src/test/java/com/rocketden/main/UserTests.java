@@ -31,17 +31,97 @@ public class UserTests {
 
     @Test
     public void createNewUser() throws Exception {
-        // PUT request to join non-existent room should fail
         CreateUserRequest request = new CreateUserRequest();
         request.setNickname("rocket");
 
         CreateUserResponse expected = new CreateUserResponse();
         expected.setMessage(CreateUserResponse.SUCCESS);
+        expected.setNickname("rocket");
 
         MvcResult result = this.mockMvc.perform(post(POST_USER)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        CreateUserResponse actual = Utility.toObject(jsonResponse, CreateUserResponse.class);
+
+        assertEquals(expected.getMessage(), actual.getMessage());
+        assertEquals(expected.getNickname(), actual.getNickname());
+    }
+
+    @Test
+    public void createNewUserNoNickname() throws Exception {
+        CreateUserRequest request = new CreateUserRequest();
+
+        CreateUserResponse expected = new CreateUserResponse();
+        expected.setMessage(CreateUserResponse.ERROR_NO_NICKNAME);
+
+        MvcResult result = this.mockMvc.perform(post(POST_USER)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().isNotFound())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        CreateUserResponse actual = Utility.toObject(jsonResponse, CreateUserResponse.class);
+
+        assertEquals(expected.getMessage(), actual.getMessage());
+    }
+
+    @Test
+    public void createNewUserEmptyNickname() throws Exception {
+        CreateUserRequest request = new CreateUserRequest();
+        request.setNickname("");
+
+        CreateUserResponse expected = new CreateUserResponse();
+        expected.setMessage(CreateUserResponse.ERROR_INVALID_NICKNAME);
+
+        MvcResult result = this.mockMvc.perform(post(POST_USER)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().isBadRequest())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        CreateUserResponse actual = Utility.toObject(jsonResponse, CreateUserResponse.class);
+
+        assertEquals(expected.getMessage(), actual.getMessage());
+    }
+
+    @Test
+    public void createNewUserTooLongNickname() throws Exception {
+        CreateUserRequest request = new CreateUserRequest();
+        request.setNickname("rocketrocketrocketrocket");
+
+        CreateUserResponse expected = new CreateUserResponse();
+        expected.setMessage(CreateUserResponse.ERROR_INVALID_NICKNAME);
+
+        MvcResult result = this.mockMvc.perform(post(POST_USER)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().isBadRequest())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        CreateUserResponse actual = Utility.toObject(jsonResponse, CreateUserResponse.class);
+
+        assertEquals(expected.getMessage(), actual.getMessage());
+    }
+
+    @Test
+    public void createNewUserNicknameContainsSpaces() throws Exception {
+        CreateUserRequest request = new CreateUserRequest();
+        request.setNickname("rocket rocket");
+
+        CreateUserResponse expected = new CreateUserResponse();
+        expected.setMessage(CreateUserResponse.ERROR_INVALID_NICKNAME);
+
+        MvcResult result = this.mockMvc.perform(post(POST_USER)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().isBadRequest())
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
