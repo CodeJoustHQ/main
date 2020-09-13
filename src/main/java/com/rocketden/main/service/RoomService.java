@@ -68,7 +68,6 @@ public class RoomService {
 
         // Add the user to the room.
         users.add(user);
-        room.setUsers(users);
         repository.save(room);
 
         JoinRoomResponse response = RoomMapper.entityToJoinResponse(room);
@@ -108,7 +107,6 @@ public class RoomService {
 
         CreateRoomResponse response = RoomMapper.entityToCreateResponse(room);
         response.setMessage(CreateRoomResponse.SUCCESS);
-        response.setHost(request.getHost());
 
         return response;
     }
