@@ -7,6 +7,8 @@ import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.user.CreateUserResponse;
+import com.rocketden.main.exception.RoomErrors;
+import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 
@@ -35,9 +37,7 @@ public class RoomService {
 
         // Return error if room could not be found
         if (room == null) {
-            JoinRoomResponse response = new JoinRoomResponse();
-            response.setMessage(JoinRoomResponse.ERROR_NOT_FOUND);
-            return response;
+            throw new ApiException(RoomErrors.ROOM_NOT_FOUND);
         }
 
         // Get the user who initialized the request.

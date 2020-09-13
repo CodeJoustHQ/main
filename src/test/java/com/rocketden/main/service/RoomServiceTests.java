@@ -5,6 +5,8 @@ import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.CreateRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
+import com.rocketden.main.exception.RoomErrors;
+import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 
@@ -18,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
@@ -94,10 +97,12 @@ public class RoomServiceTests {
 
         // Mock repository to return room when called
         Mockito.doReturn(null).when(repository).findRoomByRoomId(eq(roomId));
-        JoinRoomResponse response = service.joinRoom(request);
+
+        // Assert that service.joinRoom(request) throws the correct exception
+        ApiException exception = assertThrows(ApiException.class, () -> service.joinRoom(request));
 
         verify(repository).findRoomByRoomId(roomId);
-        assertEquals(JoinRoomResponse.ERROR_NOT_FOUND, response.getMessage());
+        assertEquals(RoomErrors.ROOM_NOT_FOUND, exception.getError());
     }
 
     @Test

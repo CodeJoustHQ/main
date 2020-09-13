@@ -29,10 +29,7 @@ public class RoomController extends BaseRestController {
     public ResponseEntity<JoinRoomResponse> joinRoom(@RequestBody JoinRoomRequest request) {
         JoinRoomResponse response = service.joinRoom(request);
 
-        // Return 404 error if response message is invalid
-        if (response.getMessage().equals(JoinRoomResponse.ERROR_NOT_FOUND)) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        } else if (response.getMessage().equals(JoinRoomResponse.ERROR_USER_ALREADY_PRESENT)) {
+        if (response.getMessage().equals(JoinRoomResponse.ERROR_USER_ALREADY_PRESENT)) {
             return new ResponseEntity<>(response, HttpStatus.CONFLICT);
         } else if (response.getMessage().equals(JoinRoomResponse.ERROR_NO_USER_FOUND)) {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
