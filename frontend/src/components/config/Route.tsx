@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
 
-export function CustomRoute(props: any) {
+function CustomRoute(props: any) {
   const { component: Component, layout: Layout, ...rest } = props;
   return (
     <Route
@@ -14,3 +14,5 @@ export function CustomRoute(props: any) {
     />
   );
 }
+
+export default CustomRoute;
