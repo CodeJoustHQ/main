@@ -11,10 +11,6 @@ export type AxiosError = {
   },
 };
 
-export type SocketError = {
-  error?: string,
-};
-
 export const errorHandler = (err: AxiosError): ErrorResponse => {
   if (!err.response) {
     return {

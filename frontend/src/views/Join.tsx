@@ -1,5 +1,4 @@
 import React, { useState, useEffect, ReactElement } from 'react';
-import { SocketError } from '../api/Error';
 import ErrorMessage from '../components/core/Error';
 import { LargeText, Text, UserNicknameText } from '../components/core/Text';
 import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
@@ -59,27 +58,21 @@ function JoinGamePage() {
             }}
             onKeyPress={(event) => {
               if (event.key === 'Enter' && validNickname) {
-                const response: SocketError | undefined = connect(
-                  SOCKET_ENDPOINT, nickname, setUsers,
-                );
-                if (response && response.error) {
-                  setError(response.error);
-                } else {
+                connect(SOCKET_ENDPOINT, nickname, setUsers).then(() => {
                   setPageState(2);
-                }
+                }).catch((response) => {
+                  setError(response.message);
+                });
               }
             }}
           />
           <LargeInputButton
             onClick={() => {
-              const response: SocketError | undefined = connect(
-                SOCKET_ENDPOINT, nickname, setUsers,
-              );
-              if (response && response.error) {
-                setError(response.error);
-              } else {
+              connect(SOCKET_ENDPOINT, nickname, setUsers).then(() => {
                 setPageState(2);
-              }
+              }).catch((response) => {
+                setError(response.message);
+              });
             }}
             value="Enter"
             // Input is disabled if no nickname exists, has a space, or is too long.
@@ -90,7 +83,7 @@ function JoinGamePage() {
               The nickname must be non-empty, have no spaces, and be less than 16 characters.
             </Text>
           ) : null}
-          {error ? <ErrorMessage message={error} /> : null}
+          { error ? <ErrorMessage message={error} /> : null }
         </div>
       );
       break;
