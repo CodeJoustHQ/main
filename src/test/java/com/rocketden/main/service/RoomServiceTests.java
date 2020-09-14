@@ -49,7 +49,6 @@ public class RoomServiceTests {
         CreateRoomResponse response = service.createRoom(request);
 
         verify(repository).save(Mockito.any(Room.class));
-        assertEquals(CreateRoomResponse.SUCCESS, response.getMessage());
         assertEquals("012345", response.getRoomId());
     }
 
@@ -79,7 +78,6 @@ public class RoomServiceTests {
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
         JoinRoomResponse response = service.joinRoom(request);
 
-        assertEquals(JoinRoomResponse.SUCCESS, response.getMessage());
         assertEquals(roomId, response.getRoomId());
         assertTrue(response.getUsers().contains(request.getUser()));
     }
@@ -129,10 +127,10 @@ public class RoomServiceTests {
 
         // Mock repository to return room when called
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
-        JoinRoomResponse response = service.joinRoom(request);
+        ApiException exception = assertThrows(ApiException.class, () -> service.joinRoom(request));
 
         verify(repository).findRoomByRoomId(roomId);
-        assertEquals(JoinRoomResponse.ERROR_USER_ALREADY_PRESENT, response.getMessage());
+        assertEquals(RoomErrors.USER_ALREADY_PRESENT, exception.getError());
     }
 
     @Test
