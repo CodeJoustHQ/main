@@ -46,13 +46,13 @@ public class UserService {
 
     /**
      * The requirements for validity are as follows:
-     * 1. Non-empty
+     * 1. Non-null and non-empty
      * 2. Less than or equal to sixteen characters
      * 3. Contains no spaces
      */
     public static boolean validNickname(String nickname) {
-        return nickname.length() > 0 && nickname.length() <= 16 
-            && !nickname.contains(" ");
+        return nickname != null && nickname.length() > 0
+                && nickname.length() <= 16 && !nickname.contains(" ");
     }
 
 }
