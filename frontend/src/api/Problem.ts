@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 type Problem = {
   id: number,
   name: string;
@@ -10,7 +12,7 @@ const routes = {
   postProblem: `${basePath}/`,
 };
 
-const getProblems = (): Promise<Problem[]> => fetch(routes.getProblems)
-  .then((response) => response.json());
+export const getProblems = (): Promise<Problem[]> => axios.get<Problem[]>(routes.getProblems)
+  .then((res) => res.data);
 
 export default getProblems;

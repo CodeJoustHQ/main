@@ -4,6 +4,10 @@ export const Text = styled.p`
   font-size: ${({ theme }) => theme.fontSize.default};
 `;
 
+export const ErrorText = styled(Text)`
+   color: ${({ theme }) => theme.colors.red};
+`;
+
 export const LargeText = styled.h3`
   font-size: ${({ theme }) => theme.fontSize.xLarge};
 `;
