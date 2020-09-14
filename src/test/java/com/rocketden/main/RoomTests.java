@@ -5,6 +5,7 @@ import com.rocketden.main.dto.room.CreateRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
 import com.rocketden.main.exception.RoomErrors;
+import com.rocketden.main.exception.UserErrors;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.model.User;
@@ -73,7 +74,7 @@ public class RoomTests {
         createRequest.setHost(host);
         
         CreateRoomResponse expected = new CreateRoomResponse();
-        expected.setMessage(CreateRoomResponse.SUCCESS);
+        expected.setHost(host);
 
         MvcResult result = this.mockMvc.perform(post(POST_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -84,7 +85,7 @@ public class RoomTests {
         String jsonResponse = result.getResponse().getContentAsString();
         CreateRoomResponse actual = Utility.toObject(jsonResponse, CreateRoomResponse.class);
 
-        assertEquals(expected.getMessage(), actual.getMessage());
+        assertEquals(expected.getHost(), actual.getHost());
     }
 
     @Test
@@ -92,19 +93,18 @@ public class RoomTests {
         // POST request to create valid room should return successful response
         CreateRoomRequest createRequest = new CreateRoomRequest();
         
-        CreateRoomResponse expected = new CreateRoomResponse();
-        expected.setMessage(CreateRoomResponse.ERROR_NO_HOST);
+        ApiError ERROR = RoomErrors.NO_HOST;
 
         MvcResult result = this.mockMvc.perform(post(POST_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(createRequest)))
-                .andDo(print()).andExpect(status().isBadRequest())
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        CreateRoomResponse actual = Utility.toObject(jsonResponse, CreateRoomResponse.class);
+        ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
 
-        assertEquals(expected.getMessage(), actual.getMessage());
+        assertEquals(ERROR.getResponse(), actual);
     }
 
     @Test
@@ -117,7 +117,7 @@ public class RoomTests {
 
         // 1. Send POST request and verify room was created
         CreateRoomResponse createExpected = new CreateRoomResponse();
-        createExpected.setMessage(CreateRoomResponse.SUCCESS);
+        createExpected.setHost(host);
 
         MvcResult result = this.mockMvc.perform(post(POST_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -128,7 +128,7 @@ public class RoomTests {
         String jsonResponse = result.getResponse().getContentAsString();
         CreateRoomResponse createActual = Utility.toObject(jsonResponse, CreateRoomResponse.class);
 
-        assertEquals(createExpected.getMessage(), createActual.getMessage());
+        assertEquals(createExpected.getHost(), createActual.getHost());
 
         // Get id of created room to join
         String roomId = createActual.getRoomId();
@@ -146,7 +146,6 @@ public class RoomTests {
         joinRequest.setUser(user);
 
         JoinRoomResponse expected = new JoinRoomResponse();
-        expected.setMessage(JoinRoomResponse.SUCCESS);
         expected.setUsers(users);
         expected.setRoomId(roomId);
 
@@ -159,7 +158,6 @@ public class RoomTests {
         jsonResponse = result.getResponse().getContentAsString();
         JoinRoomResponse actual = Utility.toObject(jsonResponse, JoinRoomResponse.class);
 
-        assertEquals(expected.getMessage(), actual.getMessage());
         assertEquals(expected.getUsers(), actual.getUsers());
         assertEquals(expected.getRoomId(), actual.getRoomId());
     }
@@ -174,7 +172,7 @@ public class RoomTests {
 
         // 1. Send POST request and verify room was created
         CreateRoomResponse createExpected = new CreateRoomResponse();
-        createExpected.setMessage(CreateRoomResponse.SUCCESS);
+        createExpected.setHost(host);
 
         MvcResult result = this.mockMvc.perform(post(POST_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -185,7 +183,7 @@ public class RoomTests {
         String jsonResponse = result.getResponse().getContentAsString();
         CreateRoomResponse createActual = Utility.toObject(jsonResponse, CreateRoomResponse.class);
 
-        assertEquals(createExpected.getMessage(), createActual.getMessage());
+        assertEquals(createExpected.getHost(), createActual.getHost());
 
         // Get id of created room to join
         String roomId = createActual.getRoomId();
@@ -195,21 +193,18 @@ public class RoomTests {
         joinRequest.setRoomId(roomId);
         joinRequest.setUser(host);
 
-        JoinRoomResponse expected = new JoinRoomResponse();
-        expected.setMessage(JoinRoomResponse.ERROR_USER_ALREADY_PRESENT);
+        ApiError ERROR = RoomErrors.USER_ALREADY_PRESENT;
 
         result = this.mockMvc.perform(put(PUT_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(joinRequest)))
-                .andDo(print()).andExpect(status().isConflict())
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 
         jsonResponse = result.getResponse().getContentAsString();
-        JoinRoomResponse actual = Utility.toObject(jsonResponse, JoinRoomResponse.class);
+        ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
 
-        assertEquals(expected.getMessage(), actual.getMessage());
-        assertEquals(expected.getUsers(), actual.getUsers());
-        assertEquals(expected.getRoomId(), actual.getRoomId());
+        assertEquals(ERROR.getResponse(), actual);
     }
 
     @Test
@@ -222,7 +217,7 @@ public class RoomTests {
 
         // 1. Send POST request and verify room was created
         CreateRoomResponse createExpected = new CreateRoomResponse();
-        createExpected.setMessage(CreateRoomResponse.SUCCESS);
+        createExpected.setHost(host);
 
         MvcResult result = this.mockMvc.perform(post(POST_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -233,7 +228,7 @@ public class RoomTests {
         String jsonResponse = result.getResponse().getContentAsString();
         CreateRoomResponse createActual = Utility.toObject(jsonResponse, CreateRoomResponse.class);
 
-        assertEquals(createExpected.getMessage(), createActual.getMessage());
+        assertEquals(createExpected.getHost(), createActual.getHost());
 
         // Get id of created room to join
         String roomId = createActual.getRoomId();
@@ -242,20 +237,17 @@ public class RoomTests {
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setRoomId(roomId);
 
-        JoinRoomResponse expected = new JoinRoomResponse();
-        expected.setMessage(JoinRoomResponse.ERROR_NO_USER_FOUND);
+        ApiError ERROR = UserErrors.INVALID_USER;
 
         result = this.mockMvc.perform(put(PUT_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(joinRequest)))
-                .andDo(print()).andExpect(status().isNotFound())
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 
         jsonResponse = result.getResponse().getContentAsString();
-        JoinRoomResponse actual = Utility.toObject(jsonResponse, JoinRoomResponse.class);
+        ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
 
-        assertEquals(expected.getMessage(), actual.getMessage());
-        assertEquals(expected.getUsers(), actual.getUsers());
-        assertEquals(expected.getRoomId(), actual.getRoomId());
+        assertEquals(ERROR.getResponse(), actual);
     }
 }
