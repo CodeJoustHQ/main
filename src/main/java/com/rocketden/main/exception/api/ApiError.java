@@ -3,7 +3,7 @@ package com.rocketden.main.exception.api;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-// Error object holding message and status details
+// Error object holding response message and status details
 @Getter
 public class ApiError {
     private final HttpStatus status;
@@ -15,16 +15,6 @@ public class ApiError {
     }
 
     public String getMessage() {
-        return this.response.message;
-    }
-
-    // Response object returned to client containing message
-    @Getter
-    public static class ApiErrorResponse {
-        private final String message;
-
-        public ApiErrorResponse(String message) {
-            this.message = message;
-        }
+        return this.response.getMessage();
     }
 }

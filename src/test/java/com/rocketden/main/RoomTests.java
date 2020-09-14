@@ -4,6 +4,9 @@ import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.CreateRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
+import com.rocketden.main.exception.RoomErrors;
+import com.rocketden.main.exception.api.ApiError;
+import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.model.User;
 import com.rocketden.main.util.Utility;
 import org.junit.jupiter.api.Test;
@@ -47,19 +50,18 @@ public class RoomTests {
         request.setRoomId("012345");
         request.setUser(user);
 
-        JoinRoomResponse expected = new JoinRoomResponse();
-        expected.setMessage(JoinRoomResponse.ERROR_NOT_FOUND);
+        ApiError ERROR = RoomErrors.ROOM_NOT_FOUND;
 
         MvcResult result = this.mockMvc.perform(put(PUT_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().isNotFound())
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        JoinRoomResponse actual = Utility.toObject(jsonResponse, JoinRoomResponse.class);
+        ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
 
-        assertEquals(expected.getMessage(), actual.getMessage());
+        assertEquals(ERROR.getResponse(), actual);
     }
 
     @Test
