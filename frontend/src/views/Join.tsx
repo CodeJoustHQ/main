@@ -1,7 +1,7 @@
 import React, { useState, useEffect, ReactElement } from 'react';
 import { LargeText, Text } from '../components/core/Text';
 import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
-import { connect, SOCKET_ENDPOINT } from '../api/Socket';
+import { connect, User, SOCKET_ENDPOINT } from '../api/Socket';
 
 function JoinGamePage() {
   // Declare nickname state variable.
@@ -18,6 +18,9 @@ function JoinGamePage() {
 
   // Variable to hold whether the user is focused on the text input field.
   const [focusInput, setFocusInput] = useState(false);
+
+  // Variable to hold the users on the page.
+  const [users, setUsers] = useState<User[]>([]);
 
   /**
    * Stores the current page state, where:
@@ -49,14 +52,14 @@ function JoinGamePage() {
             }}
             onKeyPress={(event) => {
               if (event.key === 'Enter' && validNickname) {
-                connect(SOCKET_ENDPOINT, nickname);
+                connect(SOCKET_ENDPOINT, nickname, setUsers);
                 setPageState(2);
               }
             }}
           />
           <LargeInputButton
             onClick={() => {
-              connect(SOCKET_ENDPOINT, nickname);
+              connect(SOCKET_ENDPOINT, nickname, setUsers);
               setPageState(2);
             }}
             value="Enter"
@@ -79,6 +82,11 @@ function JoinGamePage() {
             You have entered the waiting room! Your nickname is &quot;
             {nickname}
             &quot;.
+
+            The list of users is:
+            {' '}
+            {console.log(users)}
+            .
           </LargeText>
         </div>
       );
