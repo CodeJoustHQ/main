@@ -14,6 +14,8 @@ import com.rocketden.main.model.User;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -32,6 +34,8 @@ import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserIntegrationTests {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserIntegrationTests.class);
 
     @LocalServerPort
     private int port;
@@ -63,7 +67,65 @@ public class UserIntegrationTests {
      * all users who are subscribed to this URL on this socket endpoint).
      */
     @Test
-    public void getUser() throws Exception {
+    public void addUser() throws Exception {
+
+        // Latch allows threads to wait until remaining operations complete.
+        final CountDownLatch latch = new CountDownLatch(1);
+        final AtomicReference<Throwable> failure = new AtomicReference<>();
+
+        
+
+        // Test session handler for STOMP (created below).
+        StompSessionHandler handler = new TestSessionHandler(failure) {
+
+            @Override
+            public void afterConnected(final StompSession session, StompHeaders connectedHeaders) {
+                // After the socket is connected, subscribe and send message.
+                session.subscribe(BaseRestController.BASE_SOCKET_URL + "/subscribe-user", new StompFrameHandler() {
+                    @Override
+                    public Type getPayloadType(StompHeaders headers) {
+                        return ArrayList.class;
+                    }
+
+                    @Override
+                    public void handleFrame(StompHeaders headers, Object payload) {
+                        List<User> users = (ArrayList<User>) payload;
+                        try {
+                            // Verify that the subscription received the expected message.
+                            assertEquals(1, users.size());
+                            assertEquals("Chris", users.get(0).getNickname());
+                        } catch (Throwable t) {
+                            failure.set(t);
+                        } finally {
+                            session.disconnect();
+                            latch.countDown();
+                        }
+                    }
+                });
+                try {
+                    session.send(BaseRestController.BASE_SOCKET_URL + "/add-user", "Chris");
+                } catch (Throwable t) {
+                    failure.set(t);
+                    latch.countDown();
+                }
+            }
+        };
+
+        // Connect to the socket with the STOMP client.
+        this.stompClient.connect("ws://localhost:{port}" + BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint", this.headers, handler, this.port);
+
+        if (latch.await(3, TimeUnit.SECONDS)) {
+            if (failure.get() != null) {
+                throw new AssertionError("", failure.get());
+            }
+        } else {
+            fail("User response not received");
+        }
+
+    }
+
+    @Test
+    public void addMultipleAndDeleteUser() throws Exception {
 
         // Latch allows threads to wait until remaining operations complete.
         final CountDownLatch latch = new CountDownLatch(1);
@@ -78,15 +140,17 @@ public class UserIntegrationTests {
                 session.subscribe(BaseRestController.BASE_SOCKET_URL + "/subscribe-user", new StompFrameHandler() {
                     @Override
                     public Type getPayloadType(StompHeaders headers) {
-                        return User.class;
+                        return ArrayList.class;
                     }
 
                     @Override
                     public void handleFrame(StompHeaders headers, Object payload) {
-                        User user = (User) payload;
+                        List<User> users = (ArrayList<User>) payload;
                         try {
                             // Verify that the subscription received the expected message.
-                            assertEquals("Chris", user.getNickname());
+                            assertEquals(2, users.size());
+                            assertEquals("Chris", users.get(0).getNickname());
+                            assertEquals("Aaron", users.get(1).getNickname());
                         } catch (Throwable t) {
                             failure.set(t);
                         } finally {
@@ -96,7 +160,10 @@ public class UserIntegrationTests {
                     }
                 });
                 try {
-                    session.send(BaseRestController.BASE_SOCKET_URL + "/user", "Chris");
+                    session.send(BaseRestController.BASE_SOCKET_URL + "/add-user", "Chris");
+                    session.send(BaseRestController.BASE_SOCKET_URL + "/add-user", "John");
+                    session.send(BaseRestController.BASE_SOCKET_URL + "/add-user", "Aaron");
+                    session.send(BaseRestController.BASE_SOCKET_URL + "/delete-user", "John");
                 } catch (Throwable t) {
                     failure.set(t);
                     latch.countDown();

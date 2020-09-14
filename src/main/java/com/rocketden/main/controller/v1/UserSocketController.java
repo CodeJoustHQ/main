@@ -1,7 +1,7 @@
 package com.rocketden.main.controller.v1;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.rocketden.main.model.User;
 
@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserSocketController extends BaseRestController {
 
-    Set<User> users = new HashSet<>();
+    List<User> users = new ArrayList<>();
 
     @MessageMapping("/add-user")
     @SendTo(BaseRestController.BASE_SOCKET_URL + "/subscribe-user")
-    public Set<User> addUser(String nickname) {
+    public List<User> addUser(String nickname) {
         User user = new User();
         user.setNickname(nickname);
         users.add(user);
@@ -25,7 +25,7 @@ public class UserSocketController extends BaseRestController {
 
     @MessageMapping("/delete-user")
     @SendTo(BaseRestController.BASE_SOCKET_URL + "/subscribe-user")
-    public Set<User> deleteUser(String nickname) {
+    public List<User> deleteUser(String nickname) {
         User user = new User();
         user.setNickname(nickname);
         users.remove(user);

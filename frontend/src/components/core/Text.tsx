@@ -12,7 +12,7 @@ export const LandingHeaderText = styled.h1`
   font-size: ${({ theme }) => theme.fontSize.xxLarge};
 `;
 
-export const UserNameContainer = styled(LargeText)`
+export const UserNicknameText = styled(LargeText)`
   display: inline-block;
   margin: 10px;
   padding: 10px;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ReactElement } from 'react';
-import { LargeText, Text, UserNameContainer } from '../components/core/Text';
+import { LargeText, Text, UserNicknameText } from '../components/core/Text';
 import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
 import {
   isValidNickname, connect, deleteUser, User, SOCKET_ENDPOINT,
@@ -88,12 +88,12 @@ function JoinGamePage() {
           <div>
             {
               users.map((user) => (
-                <UserNameContainer onClick={(event) => {
+                <UserNicknameText onClick={(event) => {
                   deleteUser((event.target as HTMLElement).innerText);
                 }}
                 >
                   {user.nickname}
-                </UserNameContainer>
+                </UserNicknameText>
               ))
             }
           </div>

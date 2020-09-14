@@ -24,20 +24,12 @@ export const isValidNickname = (nickname: string) => {
 export const addUser = (nickname:string) => {
   if (connected && isValidNickname(nickname)) {
     stompClient.send(ADD_USER_URL, {}, nickname);
-  } else if (!connected) {
-    console.error('You must be connected to a socket before adding a user.');
-  } else {
-    console.error('The nickname must be non-empty, have no spaces, and be less than 16 characters.');
   }
 };
 
 export const deleteUser = (nickname:string) => {
   if (connected && isValidNickname(nickname)) {
     stompClient.send(DELETE_USER_URL, {}, nickname);
-  } else if (!connected) {
-    console.error('You must be connected to a socket before adding a user.');
-  } else {
-    console.error('The nickname must be non-empty, have no spaces, and be less than 16 characters.');
   }
 };
 
@@ -49,8 +41,6 @@ export const connect = (endpoint:string, nickname:string,
     stompClient = Stomp.over(socket);
     stompClient.connect({}, () => {
       stompClient.subscribe(SUBSCRIBE_URL, (users: Message) => {
-        console.log(users);
-        console.log(JSON.parse(users.body));
         const userObjects:User[] = JSON.parse(users.body);
         setUsers(userObjects);
       });
@@ -58,8 +48,6 @@ export const connect = (endpoint:string, nickname:string,
     });
     // Reassign connected variable.
     connected = true;
-  } else {
-    console.error('You are already connected to a socket.');
   }
 };
 
@@ -69,7 +57,5 @@ export const disconnect = () => {
       // Reassign connected variable.
       connected = false;
     });
-  } else {
-    console.error('You cannot disconnect because you are not connected to any socket.');
   }
 };
