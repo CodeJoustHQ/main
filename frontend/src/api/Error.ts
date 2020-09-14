@@ -4,11 +4,15 @@ export type ErrorResponse = {
   message: string;
 };
 
-type AxiosError = {
+export type AxiosError = {
   response?: {
     status: string,
     data: any,
   },
+};
+
+export type SocketError = {
+  error?: string,
 };
 
 export const errorHandler = (err: AxiosError): ErrorResponse => {

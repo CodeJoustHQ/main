@@ -1,4 +1,6 @@
 import React, { useState, useEffect, ReactElement } from 'react';
+import { SocketError } from '../api/Error';
+import ErrorMessage from '../components/core/Error';
 import { LargeText, Text, UserNicknameText } from '../components/core/Text';
 import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
 import {
@@ -8,6 +10,9 @@ import {
 function JoinGamePage() {
   // Declare nickname state variable.
   const [nickname, setNickname] = useState('');
+
+  // Hold error text.
+  const [error, setError] = useState('');
 
   /**
    * The nickname is valid if it is non-empty, has no spaces, and
@@ -54,15 +59,27 @@ function JoinGamePage() {
             }}
             onKeyPress={(event) => {
               if (event.key === 'Enter' && validNickname) {
-                connect(SOCKET_ENDPOINT, nickname, setUsers);
-                setPageState(2);
+                const response: SocketError | undefined = connect(
+                  SOCKET_ENDPOINT, nickname, setUsers,
+                );
+                if (response && response.error) {
+                  setError(response.error);
+                } else {
+                  setPageState(2);
+                }
               }
             }}
           />
           <LargeInputButton
             onClick={() => {
-              connect(SOCKET_ENDPOINT, nickname, setUsers);
-              setPageState(2);
+              const response: SocketError | undefined = connect(
+                SOCKET_ENDPOINT, nickname, setUsers,
+              );
+              if (response && response.error) {
+                setError(response.error);
+              } else {
+                setPageState(2);
+              }
             }}
             value="Enter"
             // Input is disabled if no nickname exists, has a space, or is too long.
@@ -73,6 +90,7 @@ function JoinGamePage() {
               The nickname must be non-empty, have no spaces, and be less than 16 characters.
             </Text>
           ) : null}
+          {error ? <ErrorMessage message={error} /> : null}
         </div>
       );
       break;

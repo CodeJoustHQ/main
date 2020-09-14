@@ -13,6 +13,6 @@ const routes = {
 };
 
 export const getProblems = (): Promise<Problem[]> => axios.get<Problem[]>(routes.getProblems)
-  .then((res) => res.data);
+  .then((res: { data: Problem[]; }) => res.data);
 
 export default getProblems;
