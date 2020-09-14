@@ -3,12 +3,12 @@ import Stomp, { Client, Message } from 'stompjs';
 
 let stompClient: Client;
 
-type User = {
+export type User = {
   nickname: string;
 }
 
 // Variable to hold the current connected state.
-let connected = false;
+let connected: boolean = false;
 
 // Create constants for the connection, subscription, and send message URLs.
 export const SOCKET_ENDPOINT:string = '/api/v1/socket/join-room-endpoint';
@@ -23,15 +23,19 @@ export const sendUser = (nickname:string) => {
   }
 };
 
-export const connect = (endpoint:string, nickname:string) => {
+export const connect = (endpoint:string, nickname:string,
+  setUsers: React.Dispatch<React.SetStateAction<User[]>>) => {
   if (!connected) {
     // Connect to given endpoint, subscribe to future messages, and send user message.
     const socket: WebSocket = new SockJS(endpoint);
     stompClient = Stomp.over(socket);
     stompClient.connect({}, () => {
-      stompClient.subscribe(SUBSCRIBE_URL, (user: Message) => {
-        const userObject:User = JSON.parse(user.body);
-        console.log(`Welcome ${userObject.nickname} to the page!`);
+      stompClient.subscribe(SUBSCRIBE_URL, (users: Message) => {
+        console.log(users);
+        console.log(JSON.parse(users.body));
+        const userObjects:User[] = JSON.parse(users.body);
+        setUsers(userObjects);
+        // console.log(`Welcome ${userObject.nickname} to the page!`);
       });
       sendUser(nickname);
     });
