@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-type Problem = {
+export type Problem = {
   id: number,
   name: string;
   description: string;
@@ -14,5 +14,3 @@ const routes = {
 
 export const getProblems = (): Promise<Problem[]> => axios.get<Problem[]>(routes.getProblems)
   .then((res) => res.data);
-
-export default getProblems;
