@@ -8,9 +8,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
+    // Catches all ApiExceptions and returns proper error response to client
     @ExceptionHandler(ApiException.class)
-    protected ResponseEntity<ApiError> handleApiException(ApiException e) {
+    protected ResponseEntity<ApiError.ApiErrorResponse> handleApiException(ApiException e) {
         ApiError apiError = e.getError();
-        return new ResponseEntity<>(apiError, apiError.getStatus());
+        return new ResponseEntity<>(apiError.getResponse(), apiError.getStatus());
     }
 }
