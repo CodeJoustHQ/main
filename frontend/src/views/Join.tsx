@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ReactElement } from 'react';
-import { LargeText, Text } from '../components/core/Text';
+import { LargeText, Text, UserNameContainer } from '../components/core/Text';
 import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
 import { connect, User, SOCKET_ENDPOINT } from '../api/Socket';
 
@@ -82,12 +82,16 @@ function JoinGamePage() {
             You have entered the waiting room! Your nickname is &quot;
             {nickname}
             &quot;.
-
-            The list of users is:
-            {' '}
-            {console.log(users)}
-            .
           </LargeText>
+          <div>
+            {
+              users.map((user) => (
+                <UserNameContainer onClick={(event) => { console.log(event.target); }}>
+                  {user.nickname}
+                </UserNameContainer>
+              ))
+            }
+          </div>
         </div>
       );
       break;
