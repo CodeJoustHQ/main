@@ -1,7 +1,9 @@
 import React, { useState, useEffect, ReactElement } from 'react';
 import { LargeText, Text, UserNameContainer } from '../components/core/Text';
 import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
-import { connect, User, SOCKET_ENDPOINT } from '../api/Socket';
+import {
+  isValidNickname, connect, deleteUser, User, SOCKET_ENDPOINT,
+} from '../api/Socket';
 
 function JoinGamePage() {
   // Declare nickname state variable.
@@ -13,7 +15,7 @@ function JoinGamePage() {
    */
   const [validNickname, setValidNickname] = useState(false);
   useEffect(() => {
-    setValidNickname(nickname.length > 0 && !nickname.includes(' ') && nickname.length <= 16);
+    setValidNickname(isValidNickname(nickname));
   }, [nickname]);
 
   // Variable to hold whether the user is focused on the text input field.
@@ -86,7 +88,10 @@ function JoinGamePage() {
           <div>
             {
               users.map((user) => (
-                <UserNameContainer onClick={(event) => { console.log(event.target); }}>
+                <UserNameContainer onClick={(event) => {
+                  deleteUser((event.target as HTMLElement).innerText);
+                }}
+                >
                   {user.nickname}
                 </UserNameContainer>
               ))
