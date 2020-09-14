@@ -23,15 +23,6 @@ public class UserController extends BaseRestController {
 
     @PostMapping("/user")
     public ResponseEntity<CreateUserResponse> createUser(@RequestBody CreateUserRequest request) {
-        CreateUserResponse response = service.createUser(request);
-
-        // Return 404 error if response message is invalid
-        if (response.getMessage().equals(CreateUserResponse.ERROR_NO_NICKNAME)) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        } else if (response.getMessage().equals(CreateUserResponse.ERROR_INVALID_NICKNAME)) {
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(service.createUser(request), HttpStatus.CREATED);
     }
 }

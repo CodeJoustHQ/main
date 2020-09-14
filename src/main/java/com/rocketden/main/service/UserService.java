@@ -4,6 +4,8 @@ import com.rocketden.main.dao.UserRepository;
 import com.rocketden.main.dto.user.CreateUserRequest;
 import com.rocketden.main.dto.user.CreateUserResponse;
 import com.rocketden.main.dto.user.UserMapper;
+import com.rocketden.main.exception.UserErrors;
+import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,24 +26,15 @@ public class UserService {
         String nickname = request.getNickname();
 
         // If the provided nickname is null or invalid, do not add the user.
-        if (nickname == null) {
-            CreateUserResponse response = new CreateUserResponse();
-            response.setMessage(CreateUserResponse.ERROR_NO_NICKNAME);
-            return response;
-        } else if (!validNickname(nickname)) {
-            CreateUserResponse response = new CreateUserResponse();
-            response.setMessage(CreateUserResponse.ERROR_INVALID_NICKNAME);
-            return response;
+        if (!validNickname(nickname)) {
+            throw new ApiException(UserErrors.INVALID_USER);
         }
         
         User user = new User();
         user.setNickname(nickname);
         repository.save(user);
 
-        CreateUserResponse response = UserMapper.entityToCreateResponse(user);
-        response.setMessage(CreateUserResponse.SUCCESS);
-
-        return response;
+        return UserMapper.entityToCreateResponse(user);
     }
 
     /**
