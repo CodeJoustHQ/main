@@ -10,8 +10,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -29,7 +29,7 @@ public class Room {
 
     private LocalDateTime createdDateTime = LocalDateTime.now();
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "host_id")
     private User host;
 

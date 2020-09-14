@@ -17,7 +17,7 @@ export const LargeCenterInputText = styled(Input).attrs(() => ({
   text-align: center;
   font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
   padding: 1rem;
-  color: #444;
+  color: ${({ theme }) => theme.colors.text};
 
   &:focus {
     border: 3px solid ${({ theme }) => theme.colors.darkBlue};
@@ -31,7 +31,7 @@ export const LargeInputButton = styled(Input).attrs(() => ({
   font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
   padding: 1rem;
   color: white;
-  background-color: #3E93CD;
+  background-color: ${({ theme }) => theme.colors.blue};
   font-weight: 700;
   cursor: pointer;
 
