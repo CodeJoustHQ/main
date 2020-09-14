@@ -47,22 +47,21 @@ export default function GamePage() {
 
   return (
     <div>
-      Room:
-      {' '}
-      {room ? room.roomId : 'No room joined'}
-      <Editor height="90vh" language="javascript" />
-      <div>
-        <Header />
-        <FlexContainer>
-          <FlexPanel>
-            <ProblemHeaderText>{ firstProblem?.name }</ProblemHeaderText>
-            <Text>{ firstProblem?.description }</Text>
-          </FlexPanel>
-          <FlexPanel>
-            <Editor height="100vh" language="javascript" />
-          </FlexPanel>
-        </FlexContainer>
-      </div>
+      <Header />
+      <Text>
+        Room:
+        {' '}
+        {room ? room.roomId : 'No room joined'}
+      </Text>
+      <FlexContainer>
+        <FlexPanel>
+          <ProblemHeaderText>{ firstProblem?.name }</ProblemHeaderText>
+          <Text>{ firstProblem?.description }</Text>
+        </FlexPanel>
+        <FlexPanel>
+          <Editor height="100vh" language="javascript" />
+        </FlexPanel>
+      </FlexContainer>
     </div>
   );
 }
