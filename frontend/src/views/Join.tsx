@@ -1,32 +1,31 @@
-import React, { useState, useEffect, ReactElement } from 'react';
-import ErrorMessage from '../components/core/Error';
-import { LargeText, Text, UserNicknameText } from '../components/core/Text';
-import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
+import React, { useState, ReactElement } from 'react';
+import { useLocation } from 'react-router-dom';
+import { LargeText, UserNicknameText } from '../components/core/Text';
+import { ENTER_NICKNAME_PAGE, EnterNicknamePage } from '../components/core/EnterNickname';
 import {
-  isValidNickname, connect, deleteUser, User, SOCKET_ENDPOINT,
+  connect, deleteUser, SOCKET_ENDPOINT, User,
 } from '../api/Socket';
 
+type JoinGamePageProps = {
+  initialUsers?: User[],
+  initialPageState?: number,
+  initialNickname?: string;
+}
+
 function JoinGamePage() {
-  // Declare nickname state variable.
-  const [nickname, setNickname] = useState('');
-
-  // Hold error text.
-  const [error, setError] = useState('');
-
-  /**
-   * The nickname is valid if it is non-empty, has no spaces, and
-   * is <= 16 characters. This is updated whenever the nickname changes.
-   */
-  const [validNickname, setValidNickname] = useState(false);
-  useEffect(() => {
-    setValidNickname(isValidNickname(nickname));
-  }, [nickname]);
-
-  // Variable to hold whether the user is focused on the text input field.
-  const [focusInput, setFocusInput] = useState(false);
+  const location = useLocation<JoinGamePageProps>();
+  console.log(location);
+  let joinGamePageProps: JoinGamePageProps = {};
+  if (location && location.state) {
+    joinGamePageProps = {
+      initialUsers: location.state.initialUsers,
+      initialPageState: location.state.initialPageState,
+      initialNickname: location.state.initialNickname,
+    };
+  }
 
   // Variable to hold the users on the page.
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<User[]>(joinGamePageProps.initialUsers || []);
 
   /**
    * Stores the current page state, where:
@@ -34,7 +33,20 @@ function JoinGamePage() {
    * 1 = Enter nickname state
    * 2 = Waiting room state
    */
-  const [pageState, setPageState] = useState(1);
+  const [pageState, setPageState] = useState(joinGamePageProps.initialPageState || 1);
+
+  // Declare nickname state variable.
+  const [nickname, setNickname] = useState(joinGamePageProps.initialNickname || '');
+
+  // This function will be called after the nickname is entered.
+  const enterNicknameAction = (() => {
+    connect(SOCKET_ENDPOINT, nickname).then(() => {
+      setPageState(2);
+    }).catch((response) => {
+      // Test this.
+      console.error(response.message);
+    });
+  });
 
   // Create variable to hold the "Join Page" content.
   let joinPageContent: ReactElement | undefined;
@@ -43,48 +55,12 @@ function JoinGamePage() {
     case 1:
       // Render the "Enter nickname" state.
       joinPageContent = (
-        <div>
-          <LargeText>Enter a nickname to join the game!</LargeText>
-          <LargeCenterInputText
-            placeholder="Your nickname"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setNickname(event.target.value);
-            }}
-            onFocus={() => {
-              setFocusInput(true);
-            }}
-            onBlur={() => {
-              setFocusInput(false);
-            }}
-            onKeyPress={(event) => {
-              if (event.key === 'Enter' && validNickname) {
-                connect(SOCKET_ENDPOINT, nickname, setUsers).then(() => {
-                  setPageState(2);
-                }).catch((response) => {
-                  setError(response.message);
-                });
-              }
-            }}
-          />
-          <LargeInputButton
-            onClick={() => {
-              connect(SOCKET_ENDPOINT, nickname, setUsers).then(() => {
-                setPageState(2);
-              }).catch((response) => {
-                setError(response.message);
-              });
-            }}
-            value="Enter"
-            // Input is disabled if no nickname exists, has a space, or is too long.
-            disabled={!validNickname}
-          />
-          { focusInput && !validNickname ? (
-            <Text>
-              The nickname must be non-empty, have no spaces, and be less than 16 characters.
-            </Text>
-          ) : null}
-          { error ? <ErrorMessage message={error} /> : null }
-        </div>
+        <EnterNicknamePage
+          nickname={nickname}
+          setNickname={setNickname}
+          enterNicknamePage={ENTER_NICKNAME_PAGE.JOIN}
+          enterNicknameAction={enterNicknameAction}
+        />
       );
       break;
     case 2:
