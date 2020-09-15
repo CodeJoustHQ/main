@@ -28,7 +28,6 @@ export const FlexInfoBar = styled.div`
 export const FlexPanel = styled.div`
   flex: 1;
   padding: 1rem;
-  background-color: #e3e3e3;
 `;
 
 const StyledMainContainer = styled.div`

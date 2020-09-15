@@ -4,7 +4,7 @@ import styled from 'styled-components';
 const Content = styled.div`
   width: 100%;
   min-height: 100vh;
-  // Add styling for game page layout
+  background-color: ${({ theme }) => theme.colors.background};
 `;
 
 type MyProps = {
