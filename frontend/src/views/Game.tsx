@@ -2,9 +2,11 @@ import Editor from '@monaco-editor/react';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
+import { ErrorResponse, isError } from '../api/Error';
 import { Problem, getProblems } from '../api/Problem';
 import { Room } from '../api/Room';
-import { Text, ProblemHeaderText } from '../components/core/Text';
+import ErrorMessage from '../components/core/Error';
+import { ErrorText, ProblemHeaderText, Text } from '../components/core/Text';
 import Header from '../components/navigation/Header';
 
 type LocationState = {
@@ -25,7 +27,7 @@ const FlexPanel = styled.div`
 function GamePage() {
   const location = useLocation<LocationState>();
   const [room, setRoom] = useState<Room | null>(null);
-
+  const [error, setError] = useState<string | null>(null);
   const [problems, setProblems] = useState<Problem[] | null>(null);
 
   // Called every time location changes
@@ -33,10 +35,14 @@ function GamePage() {
     if (location && location.state && location.state.room) {
       setRoom(location.state.room);
     }
-    getProblems().then((response) => {
-      setProblems(response);
-    }).catch((error) => {
-      console.log(error);
+    getProblems().then((res) => {
+      if (isError(res)) {
+        setError((res as ErrorResponse).message);
+        setProblems(null);
+      } else {
+        setProblems(res as Problem[]);
+        setError(null);
+      }
     });
   }, [location]);
 
@@ -54,6 +60,7 @@ function GamePage() {
         <FlexPanel>
           <ProblemHeaderText>{ firstProblem?.name }</ProblemHeaderText>
           <Text>{ firstProblem?.description }</Text>
+          <ErrorText>{error ? <ErrorMessage message={error} /> : null}</ErrorText>
         </FlexPanel>
         <FlexPanel>
           <Editor height="100vh" language="javascript" />
