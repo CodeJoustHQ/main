@@ -1,8 +1,9 @@
 import axios from 'axios';
+import { ErrorResponse, errorHandler } from './Error';
 
-type Problem = {
+export type Problem = {
   id: number,
-  name: string;
+  name: string,
   description: string;
 }
 
@@ -12,7 +13,14 @@ const routes = {
   postProblem: `${basePath}/`,
 };
 
+<<<<<<< HEAD
 export const getProblems = (): Promise<Problem[]> => axios.get<Problem[]>(routes.getProblems)
   .then((res: { data: Problem[]; }) => res.data);
 
 export default getProblems;
+=======
+export const getProblems = (): Promise<Problem[] | ErrorResponse> => axios
+  .get<Problem[]>(routes.getProblems)
+  .then((res) => res.data)
+  .catch((err) => errorHandler(err));
+>>>>>>> master

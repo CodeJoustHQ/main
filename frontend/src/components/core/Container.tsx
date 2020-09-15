@@ -10,6 +10,26 @@ const createContainer = (Container: any, props: MyProps) => {
   return <Container>{children}</Container>;
 };
 
+export const FlexContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  max-height: 100vh;
+  overflow: hidden;
+`;
+
+export const FlexInfoBar = styled.div`
+  flex: 1 0 100%;
+  padding: 0.5rem;
+  height: 15px;
+  line-height: 15px;
+  text-align: center;
+`;
+
+export const FlexPanel = styled.div`
+  flex: 1;
+  padding: 1rem;
+`;
+
 const StyledMainContainer = styled.div`
   margin: 0 auto;
   padding: 10vw 0;
