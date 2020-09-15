@@ -13,7 +13,6 @@ type LocationState = {
 
 const FlexContainer = styled.div`
   display: flex;
-  top: 50px;
 `;
 
 const FlexPanel = styled.div`
@@ -21,15 +20,13 @@ const FlexPanel = styled.div`
   padding: 1rem;
   background-color: #e3e3e3;
   overflow: none;
-  height: 100vh;
-  width: 50vw;
 `;
 
-export default function GamePage() {
+function GamePage() {
   const location = useLocation<LocationState>();
   const [room, setRoom] = useState<Room | null>(null);
 
-  const [problems, setProblems] = useState<Problem[] | null>(null)
+  const [problems, setProblems] = useState<Problem[] | null>(null);
 
   // Called every time location changes
   useEffect(() => {
@@ -65,3 +62,5 @@ export default function GamePage() {
     </div>
   );
 }
+
+export default GamePage;
