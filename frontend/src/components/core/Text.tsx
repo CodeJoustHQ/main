@@ -17,5 +17,5 @@ export const LandingHeaderText = styled.h1`
 `;
 
 export const ProblemHeaderText = styled.h3`
-  font-size: ${({ theme }) => theme.fontSize.Medium};
+  font-size: ${({ theme }) => theme.fontSize.default};
 `;

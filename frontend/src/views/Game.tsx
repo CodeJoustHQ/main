@@ -6,7 +6,7 @@ import { Problem, getProblems } from '../api/Problem';
 import { Room } from '../api/Room';
 import { FlexContainer, FlexInfoBar, FlexPanel } from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
-import { ErrorText, ProblemHeaderText, Text } from '../components/core/Text';
+import { ProblemHeaderText, Text } from '../components/core/Text';
 import Header from '../components/navigation/Header';
 
 type LocationState = {
@@ -16,8 +16,8 @@ type LocationState = {
 function GamePage() {
   const location = useLocation<LocationState>();
   const [room, setRoom] = useState<Room | null>(null);
-  const [problems, setProblems] = useState<Problem[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [problems, setProblems] = useState<Problem[]>([]);
+  const [error, setError] = useState<string>('');
 
   // Called every time location changes
   useEffect(() => {
@@ -27,10 +27,10 @@ function GamePage() {
     getProblems().then((res) => {
       if (isError(res)) {
         setError((res as ErrorResponse).message);
-        setProblems(null);
+        setProblems([]);
       } else {
         setProblems(res as Problem[]);
-        setError(null);
+        setError('');
       }
     });
   }, [location]);
@@ -49,7 +49,7 @@ function GamePage() {
         <FlexPanel>
           <ProblemHeaderText>{ firstProblem?.name }</ProblemHeaderText>
           <Text>{ firstProblem?.description }</Text>
-          <ErrorText>{error ? <ErrorMessage message={error} /> : null}</ErrorText>
+          { error ? <ErrorMessage message={error} /> : null }
         </FlexPanel>
         <FlexPanel>
           <Editor height="100vh" language="javascript" />
