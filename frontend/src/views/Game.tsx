@@ -7,7 +7,6 @@ import { Room } from '../api/Room';
 import { FlexContainer, FlexInfoBar, FlexPanel } from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
 import { ProblemHeaderText, Text } from '../components/core/Text';
-import Header from '../components/navigation/Header';
 
 type LocationState = {
   room: Room,
