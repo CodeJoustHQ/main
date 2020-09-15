@@ -16,7 +16,6 @@ export const LandingHeaderText = styled.h1`
   font-size: ${({ theme }) => theme.fontSize.xxLarge};
 `;
 
-<<<<<<< HEAD
 export const UserNicknameText = styled(LargeText)`
   display: inline-block;
   margin: 10px;
@@ -28,8 +27,8 @@ export const UserNicknameText = styled(LargeText)`
     text-decoration: line-through;
     cursor: pointer;
   }
-=======
+`;
+
 export const ProblemHeaderText = styled.h3`
   font-size: ${({ theme }) => theme.fontSize.default};
->>>>>>> master
 `;

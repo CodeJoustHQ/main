@@ -13,14 +13,7 @@ const routes = {
   postProblem: `${basePath}/`,
 };
 
-<<<<<<< HEAD
-export const getProblems = (): Promise<Problem[]> => axios.get<Problem[]>(routes.getProblems)
-  .then((res: { data: Problem[]; }) => res.data);
-
-export default getProblems;
-=======
 export const getProblems = (): Promise<Problem[] | ErrorResponse> => axios
   .get<Problem[]>(routes.getProblems)
   .then((res) => res.data)
   .catch((err) => errorHandler(err));
->>>>>>> master
