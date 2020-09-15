@@ -13,6 +13,8 @@ const createContainer = (Container: any, props: MyProps) => {
 export const FlexContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
+  max-height: 100vh;
+  overflow: hidden;
 `;
 
 export const FlexInfoBar = styled.div`
@@ -27,7 +29,6 @@ export const FlexPanel = styled.div`
   flex: 1;
   padding: 1rem;
   background-color: #e3e3e3;
-  overflow: none;
 `;
 
 const StyledMainContainer = styled.div`
