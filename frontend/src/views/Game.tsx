@@ -42,7 +42,6 @@ function GamePage() {
   return (
     <div>
       <FlexContainer>
-        <Header />
         <FlexInfoBar>
           Room:
           {' '}
