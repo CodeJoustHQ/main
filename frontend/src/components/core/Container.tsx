@@ -19,9 +19,9 @@ export const FlexContainer = styled.div`
 
 export const FlexInfoBar = styled.div`
   flex: 1 0 100%;
-  padding: 1rem;
-  height: 30px;
-  line-height: 30px;
+  padding: 0.5rem;
+  height: 15px;
+  line-height: 15px;
   text-align: center;
 `;
 
