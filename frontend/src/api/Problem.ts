@@ -2,7 +2,6 @@ import axios from 'axios';
 import { ErrorResponse, errorHandler } from './Error';
 
 export type Problem = {
-  message: string,
   id: number,
   name: string,
   description: string;
