@@ -12,9 +12,6 @@ function CreateGamePage() {
   const history = useHistory();
   const [error, setError] = useState('');
 
-  // Variable to hold the users on the page.
-  const [users, setUsers] = useState<User[]>([]);
-
   // Declare nickname state variable.
   const [nickname, setNickname] = useState('');
 
@@ -32,8 +29,10 @@ function CreateGamePage() {
         if (isError(res)) {
           setError(res.message);
         } else {
-          connect(SOCKET_ENDPOINT, nickname, setUsers).then(() => {
+          connect(SOCKET_ENDPOINT, nickname).then((result) => {
+            console.log(result);
             const pageState: number = 2;
+            const users: User[] = result;
             redirectToWaitingRoom(res as Room, users, pageState, nickname);
           }).catch((response) => {
             setError(response.message);

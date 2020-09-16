@@ -40,7 +40,10 @@ function JoinGamePage() {
 
   // This function will be called after the nickname is entered.
   const enterNicknameAction = (() => {
-    connect(SOCKET_ENDPOINT, nickname).then(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    connect(SOCKET_ENDPOINT, nickname).then((result) => {
+      console.log(result);
+      setUsers(result);
       setPageState(2);
     }).catch((response) => {
       // Test this.
