@@ -1,39 +1,38 @@
-import React, { useState, ReactElement, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { ENTER_NICKNAME_PAGE, EnterNicknamePage } from '../components/core/EnterNickname';
 import { connect, SOCKET_ENDPOINT, User } from '../api/Socket';
 import { createRoom, Room } from '../api/Room';
 import { isError } from '../api/Error';
-import ErrorMessage from '../components/core/Error';
-import Loading from '../components/core/Loading';
 
 function CreateGamePage() {
   // Get history object to be able to move between different pages
   const history = useHistory();
-  const [error, setError] = useState('');
 
   // Declare nickname state variable.
   const [nickname, setNickname] = useState('');
 
   // Callback used to create a new room and redirect to game page
-  const enterNicknameAction = () => {
+  const enterNicknameAction = (
+    setError: React.Dispatch<React.SetStateAction<string>>,
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  ) => {
     const redirectToWaitingRoom = (room: Room, initialUsers: User[],
       initialPageState: number, initialNickname: string) => {
       history.push(`/game/join?room=${room.roomId}`,
         { initialUsers, initialPageState, initialNickname });
     };
 
+    setLoading(true);
     createRoom()
       .then((res) => {
+        setLoading(false);
         // Type guard used to differentiate between success/failure responses
         if (isError(res)) {
           setError(res.message);
         } else {
-          connect(SOCKET_ENDPOINT, nickname).then((result) => {
-            console.log(result);
-            const pageState: number = 2;
-            const users: User[] = result;
-            redirectToWaitingRoom(res as Room, users, pageState, nickname);
+          connect(SOCKET_ENDPOINT, nickname).then((connectUsers) => {
+            redirectToWaitingRoom(res as Room, connectUsers, 2, nickname);
           }).catch((response) => {
             setError(response.message);
           });
@@ -47,6 +46,7 @@ function CreateGamePage() {
       <EnterNicknamePage
         nickname={nickname}
         setNickname={setNickname}
+
         enterNicknamePage={ENTER_NICKNAME_PAGE.CREATE}
         enterNicknameAction={enterNicknameAction}
       />

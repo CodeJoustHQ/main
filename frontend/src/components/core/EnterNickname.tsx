@@ -1,7 +1,8 @@
 import React, {
   useState, useEffect, SetStateAction, Dispatch,
 } from 'react';
-// import ErrorMessage from './Error';
+import ErrorMessage from './Error';
+import Loading from './Loading';
 import { LargeText, Text } from './Text';
 import { LargeCenterInputText, LargeInputButton } from './Input';
 import { isValidNickname } from '../../api/Socket';
@@ -26,7 +27,10 @@ export function EnterNicknamePage(props: EnterNicknameProps) {
   } = props;
 
   // Hold error text.
-  // const [error, setError] = useState('');
+  const [error, setError] = useState('');
+
+  // Hold loading boolean, triggered upon entering nickname.
+  const [loading, setLoading] = useState(false);
 
   /**
    * The nickname is valid if it is non-empty, has no spaces, and
@@ -62,13 +66,13 @@ export function EnterNicknamePage(props: EnterNicknameProps) {
         }}
         onKeyPress={(event) => {
           if (event.key === 'Enter' && validNickname) {
-            enterNicknameAction();
+            enterNicknameAction(setError, setLoading);
           }
         }}
       />
       <LargeInputButton
         onClick={() => {
-          enterNicknameAction();
+          enterNicknameAction(setError, setLoading);
         }}
         value="Enter"
         // Input is disabled if no nickname exists, has a space, or is too long.
@@ -79,7 +83,8 @@ export function EnterNicknamePage(props: EnterNicknameProps) {
           The nickname must be non-empty, have no spaces, and be less than 16 characters.
         </Text>
       ) : null}
-      { /* error ? <ErrorMessage message={error} /> : null */ }
+      { loading ? <Loading /> : null }
+      { error ? <ErrorMessage message={error} /> : null }
     </div>
   );
 }

@@ -13,8 +13,8 @@ type JoinGamePageProps = {
 }
 
 function JoinGamePage() {
+  // Grab initial state variables if navigated from the create page.
   const location = useLocation<JoinGamePageProps>();
-  console.log(location);
   let joinGamePageProps: JoinGamePageProps = {};
   if (location && location.state) {
     joinGamePageProps = {
@@ -39,17 +39,21 @@ function JoinGamePage() {
   const [nickname, setNickname] = useState(joinGamePageProps.initialNickname || '');
 
   // This function will be called after the nickname is entered.
-  const enterNicknameAction = (() => {
+  const enterNicknameAction = (
+    setError: React.Dispatch<React.SetStateAction<string>>,
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  ) => {
+    setLoading(true);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     connect(SOCKET_ENDPOINT, nickname).then((result) => {
-      console.log(result);
+      setLoading(false);
       setUsers(result);
       setPageState(2);
     }).catch((response) => {
-      // Test this.
-      console.error(response.message);
+      setLoading(false);
+      setError(response.message);
     });
-  });
+  };
 
   // Create variable to hold the "Join Page" content.
   let joinPageContent: ReactElement | undefined;
