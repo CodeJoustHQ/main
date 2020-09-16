@@ -3,6 +3,8 @@ package com.rocketden.main.service;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.CreateRoomResponse;
+import com.rocketden.main.dto.room.GetRoomRequest;
+import com.rocketden.main.dto.room.GetRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
 import com.rocketden.main.dto.room.RoomMapper;
@@ -84,6 +86,10 @@ public class RoomService {
         repository.save(room);
 
         return RoomMapper.entityToCreateResponse(room);
+    }
+
+    public GetRoomResponse createRoom(GetRoomRequest request) {
+        return null;
     }
 
     // Generate numeric String with length ROOM_ID_LENGTH

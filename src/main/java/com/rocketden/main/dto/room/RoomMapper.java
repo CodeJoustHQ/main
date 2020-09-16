@@ -16,4 +16,8 @@ public class RoomMapper {
     public static JoinRoomResponse entityToJoinResponse(Room entity) {
         return mapper.map(entity, JoinRoomResponse.class);
     }
+
+    public static GetRoomResponse entityToGetResponse(Room entity) {
+        return mapper.map(entity, GetRoomResponse.class);
+    }
 }

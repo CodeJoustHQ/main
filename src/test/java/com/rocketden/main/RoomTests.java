@@ -42,6 +42,11 @@ public class RoomTests {
     private static final String POST_ROOM = "/api/v1/rooms";
 
     @Test
+    public void getNonExistentRoom() {
+
+    }
+
+    @Test
     public void joinNonExistentRoom() throws Exception {
         User user = new User();
         user.setNickname("rocket");
@@ -66,7 +71,7 @@ public class RoomTests {
     }
 
     @Test
-    public void createValidRoom() throws Exception {
+    public void createAndGetValidRoom() throws Exception {
         // POST request to create valid room should return successful response
         User host = new User();
         host.setNickname("host");
@@ -86,6 +91,8 @@ public class RoomTests {
         CreateRoomResponse actual = Utility.toObject(jsonResponse, CreateRoomResponse.class);
 
         assertEquals(expected.getHost(), actual.getHost());
+
+        // TODO: get room succeeds
     }
 
     @Test
