@@ -2,6 +2,8 @@ package com.rocketden.main;
 
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.CreateRoomResponse;
+import com.rocketden.main.dto.room.GetRoomRequest;
+import com.rocketden.main.dto.room.GetRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
 import com.rocketden.main.exception.RoomErrors;
@@ -38,12 +40,27 @@ public class RoomTests {
     @Autowired
     private MockMvc mockMvc;
 
+    private static final String GET_ROOM = "/api/v1/rooms";
     private static final String PUT_ROOM = "/api/v1/rooms";
     private static final String POST_ROOM = "/api/v1/rooms";
 
     @Test
-    public void getNonExistentRoom() {
+    public void getNonExistentRoom() throws Exception {
+        GetRoomRequest request = new GetRoomRequest();
+        request.setRoomId("012345");
 
+        ApiError ERROR = RoomErrors.ROOM_NOT_FOUND;
+
+        MvcResult result = this.mockMvc.perform(put(GET_ROOM)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
     }
 
     @Test
@@ -91,6 +108,27 @@ public class RoomTests {
         CreateRoomResponse actual = Utility.toObject(jsonResponse, CreateRoomResponse.class);
 
         assertEquals(expected.getHost(), actual.getHost());
+
+        // Send GET request to validate that room exists
+
+        String roomId = actual.getRoomId();
+
+        GetRoomRequest request = new GetRoomRequest();
+        request.setRoomId(roomId);
+
+        GetRoomResponse expectedGet = new GetRoomResponse();
+        expectedGet.setRoomId(roomId);
+
+        result = this.mockMvc.perform(put(GET_ROOM)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        GetRoomResponse actualGet = Utility.toObject(jsonResponse, GetRoomResponse.class);
+
+        assertEquals(expectedGet.getRoomId(), actualGet.getRoomId());
 
         // TODO: get room succeeds
     }
