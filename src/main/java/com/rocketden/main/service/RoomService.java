@@ -88,8 +88,14 @@ public class RoomService {
         return RoomMapper.entityToCreateResponse(room);
     }
 
-    public GetRoomResponse createRoom(GetRoomRequest request) {
-        return null;
+    public GetRoomResponse getRoom(GetRoomRequest request) {
+        Room room = repository.findRoomByRoomId(request.getRoomId());
+
+        if (room == null) {
+            throw new ApiException(RoomErrors.ROOM_NOT_FOUND);
+        }
+
+        return RoomMapper.entityToGetResponse(room);
     }
 
     // Generate numeric String with length ROOM_ID_LENGTH

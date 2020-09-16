@@ -151,7 +151,7 @@ public class RoomServiceTests {
     }
 
     @Test
-    public void getRoomSuccess() {
+    public void getRoomFailure() {
         GetRoomRequest request = new GetRoomRequest();
         request.setRoomId("987654");
 

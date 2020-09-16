@@ -12,6 +12,7 @@ import com.rocketden.main.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,7 +29,7 @@ public class RoomController extends BaseRestController {
         this.service = service;
     }
 
-    @PutMapping("/rooms")
+    @GetMapping("/rooms")
     public ResponseEntity<GetRoomResponse> joinRoom(@RequestParam GetRoomRequest request) {
         return new ResponseEntity<>(service.getRoom(request), HttpStatus.OK);
     }
