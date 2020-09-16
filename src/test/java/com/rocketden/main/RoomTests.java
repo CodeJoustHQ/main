@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -46,14 +47,11 @@ public class RoomTests {
 
     @Test
     public void getNonExistentRoom() throws Exception {
-        GetRoomRequest request = new GetRoomRequest();
-        request.setRoomId("012345");
-
         ApiError ERROR = RoomErrors.ROOM_NOT_FOUND;
 
-        MvcResult result = this.mockMvc.perform(put(GET_ROOM)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(Utility.convertObjectToJsonString(request)))
+        // Passing in nonexistent roomId should return 404
+        MvcResult result = this.mockMvc.perform(get(GET_ROOM)
+                .param("roomId", "012345"))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 
@@ -61,6 +59,18 @@ public class RoomTests {
         ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
 
         assertEquals(ERROR.getResponse(), actual);
+
+        // Passing in no roomId should result in same 404 error
+        result = this.mockMvc.perform(get(GET_ROOM))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+
+
     }
 
     @Test
@@ -119,9 +129,8 @@ public class RoomTests {
         GetRoomResponse expectedGet = new GetRoomResponse();
         expectedGet.setRoomId(roomId);
 
-        result = this.mockMvc.perform(put(GET_ROOM)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(Utility.convertObjectToJsonString(request)))
+        result = this.mockMvc.perform(get(GET_ROOM)
+                .param("roomId", roomId))
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
@@ -129,8 +138,6 @@ public class RoomTests {
         GetRoomResponse actualGet = Utility.toObject(jsonResponse, GetRoomResponse.class);
 
         assertEquals(expectedGet.getRoomId(), actualGet.getRoomId());
-
-        // TODO: get room succeeds
     }
 
     @Test
