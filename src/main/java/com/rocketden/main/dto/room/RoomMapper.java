@@ -10,6 +10,9 @@ public class RoomMapper {
     private static final ModelMapper mapper = new ModelMapper();
 
     public static RoomDto toDto(Room entity) {
+        if (entity == null) {
+            return null;
+        }
         return mapper.map(entity, RoomDto.class);
     }
 }

@@ -2,7 +2,6 @@ package com.rocketden.main.mapper;
 
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
-import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
@@ -12,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,14 +39,19 @@ public class RoomMapperTests {
         assertNotNull(response);
         assertEquals(room.getRoomId(), response.getRoomId());
 
-        UserDto expectedHost = UserMapper.toDto(room.getHost());
-        assertEquals(expectedHost, response.getHost());
+        User actualHost = UserMapper.toEntity(response.getHost());
+        assertEquals(room.getHost(), actualHost);
 
-        // Map set of Users to set of UserDtos
-        Set<UserDto> expectedUsers = room.getUsers()
+        // Map set of UserDtos to set of Users
+        Set<User> actualUsers = response.getUsers()
                 .stream()
-                .map(UserMapper::toDto)
+                .map(UserMapper::toEntity)
                 .collect(Collectors.toSet());
-        assertEquals(expectedUsers, response.getUsers());
+        assertEquals(room.getUsers(), actualUsers);
+    }
+
+    @Test
+    public void nullRoomMappings() {
+        assertNull(RoomMapper.toDto(null));
     }
 }

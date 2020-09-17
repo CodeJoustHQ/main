@@ -9,12 +9,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 @SpringBootTest
 public class UserMapperTests {
 
     @Test
-    public void entityToCreateUserResponse() {
+    public void entityToDto() {
         User user = new User();
         user.setNickname("rocket");
 
@@ -22,5 +23,22 @@ public class UserMapperTests {
 
         assertNotNull(response);
         assertEquals(user.getNickname(), response.getNickname());
+    }
+
+    @Test
+    public void dtoToEntity() {
+        UserDto user = new UserDto();
+        user.setNickname("rocket");
+
+        User response = UserMapper.toEntity(user);
+
+        assertNotNull(response);
+        assertEquals(user.getNickname(), response.getNickname());
+    }
+
+    @Test
+    public void nullUserMappings() {
+        assertNull(UserMapper.toDto(null));
+        assertNull(UserMapper.toEntity(null));
     }
 }
