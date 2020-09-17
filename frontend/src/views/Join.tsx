@@ -2,6 +2,7 @@ import React, { useState, ReactElement } from 'react';
 import { useLocation } from 'react-router-dom';
 import { LargeText, UserNicknameText } from '../components/core/Text';
 import { ENTER_NICKNAME_PAGE, EnterNicknamePage } from '../components/core/EnterNickname';
+import { errorHandler } from '../api/Error';
 import {
   connect, deleteUser, SOCKET_ENDPOINT, User,
 } from '../api/Socket';
@@ -39,21 +40,16 @@ function JoinGamePage() {
   const [nickname, setNickname] = useState(joinGamePageProps.initialNickname || '');
 
   // This function will be called after the nickname is entered.
-  const enterNicknameAction = (
-    setError: React.Dispatch<React.SetStateAction<string>>,
-    setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-  ) => {
-    setLoading(true);
+  const enterNicknameAction = () => new Promise<undefined>((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     connect(SOCKET_ENDPOINT, nickname).then((result) => {
-      setLoading(false);
       setUsers(result);
       setPageState(2);
+      resolve();
     }).catch((response) => {
-      setLoading(false);
-      setError(response.message);
+      reject(errorHandler(response.message));
     });
-  };
+  });
 
   // Create variable to hold the "Join Page" content.
   let joinPageContent: ReactElement | undefined;

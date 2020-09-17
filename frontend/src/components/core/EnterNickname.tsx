@@ -5,6 +5,7 @@ import ErrorMessage from './Error';
 import Loading from './Loading';
 import { LargeText, Text } from './Text';
 import { LargeCenterInputText, LargeInputButton } from './Input';
+import { ErrorResponse } from '../../api/Error';
 import { isValidNickname } from '../../api/Socket';
 
 // The type of enter nickname page (create or join).
@@ -66,18 +67,25 @@ export function EnterNicknamePage(props: EnterNicknameProps) {
         }}
         onKeyPress={(event) => {
           if (event.key === 'Enter' && validNickname) {
-            // setLoading();
-            // enterNicknameAction().catch((err) => {
-            //   setError(err);
-            // });
-            // setLoading(false);
-            enterNicknameAction(setError, setLoading);
+            setLoading(true);
+            enterNicknameAction().then(() => {
+              setLoading(false);
+            }).catch((err: ErrorResponse) => {
+              setLoading(false);
+              setError(err.message);
+            });
           }
         }}
       />
       <LargeInputButton
         onClick={() => {
-          enterNicknameAction(setError, setLoading);
+          setLoading(true);
+          enterNicknameAction().then(() => {
+            setLoading(false);
+          }).catch((err: ErrorResponse) => {
+            setLoading(false);
+            setError(err.message);
+          });
         }}
         value="Enter"
         // Input is disabled if no nickname exists, has a space, or is too long.

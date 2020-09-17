@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { ENTER_NICKNAME_PAGE, EnterNicknamePage } from '../components/core/EnterNickname';
+import { errorHandler } from '../api/Error';
 import { connect, SOCKET_ENDPOINT, User } from '../api/Socket';
 import { createRoom, Room } from '../api/Room';
 
@@ -25,10 +26,10 @@ function CreateGamePage() {
           redirectToWaitingRoom(res as Room, connectUsers, 2, nickname);
           resolve();
         }).catch((err) => {
-          reject(err.message);
+          reject(errorHandler(err.message));
         });
       }).catch((err) => {
-        reject(err.message);
+        reject(errorHandler(err.message));
       });
   });
 
