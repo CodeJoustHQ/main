@@ -1,12 +1,16 @@
 import Editor from '@monaco-editor/react';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import SplitterLayout from 'react-splitter-layout';
 import { ErrorResponse, isError } from '../api/Error';
 import { Problem, getProblems } from '../api/Problem';
 import { Room } from '../api/Room';
-import { FlexContainer, FlexInfoBar, FlexPanel } from '../components/core/Container';
+import {
+  FlexContainer, FlexInfoBar, Panel, SplitterContainer,
+} from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
 import { ProblemHeaderText, Text } from '../components/core/Text';
+import 'react-splitter-layout/lib/index.css';
 
 type LocationState = {
   room: Room,
@@ -39,23 +43,26 @@ function GamePage() {
   const firstProblem = problems?.[0];
 
   return (
-    <div>
-      <FlexContainer>
-        <FlexInfoBar>
-          Room:
-          {' '}
-          {room ? room.roomId : 'No room joined'}
-        </FlexInfoBar>
-        <FlexPanel>
-          <ProblemHeaderText>{ firstProblem?.name }</ProblemHeaderText>
-          <Text>{ firstProblem?.description }</Text>
-          { error ? <ErrorMessage message={error} /> : null }
-        </FlexPanel>
-        <FlexPanel>
-          <Editor height="100vh" language="javascript" />
-        </FlexPanel>
-      </FlexContainer>
-    </div>
+    <FlexContainer>
+      <FlexInfoBar>
+        Room:
+        {' '}
+        {room ? room.roomId : 'No room joined'}
+      </FlexInfoBar>
+      <SplitterContainer>
+        <SplitterLayout>
+          <Panel>
+            <ProblemHeaderText>{firstProblem?.name}</ProblemHeaderText>
+            <Text>{firstProblem?.description}</Text>
+            {error ? <ErrorMessage message={error} /> : null}
+          </Panel>
+          <Panel>
+            <Editor height="100vh" language="javascript" />
+          </Panel>
+        </SplitterLayout>
+      </SplitterContainer>
+
+    </FlexContainer>
   );
 }
 

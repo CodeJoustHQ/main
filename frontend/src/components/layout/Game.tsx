@@ -3,8 +3,10 @@ import styled from 'styled-components';
 import Header from '../navigation/Header';
 
 const Content = styled.div`
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
   background-color: ${({ theme }) => theme.colors.background};
 `;
 
