@@ -1,7 +1,7 @@
 package com.rocketden.main;
 
 import com.rocketden.main.dto.user.CreateUserRequest;
-import com.rocketden.main.dto.user.CreateUserResponse;
+import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.exception.UserErrors;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
@@ -37,7 +37,7 @@ public class UserTests {
         CreateUserRequest request = new CreateUserRequest();
         request.setNickname("rocket");
 
-        CreateUserResponse expected = new CreateUserResponse();
+        UserDto expected = new UserDto();
         expected.setNickname("rocket");
 
         MvcResult result = this.mockMvc.perform(post(POST_USER)
@@ -47,7 +47,7 @@ public class UserTests {
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        CreateUserResponse actual = Utility.toObject(jsonResponse, CreateUserResponse.class);
+        UserDto actual = Utility.toObject(jsonResponse, UserDto.class);
 
         assertEquals(expected.getNickname(), actual.getNickname());
     }

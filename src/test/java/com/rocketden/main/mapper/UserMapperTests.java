@@ -1,6 +1,6 @@
 package com.rocketden.main.mapper;
 
-import com.rocketden.main.dto.user.CreateUserResponse;
+import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.model.User;
 
@@ -18,7 +18,7 @@ public class UserMapperTests {
         User user = new User();
         user.setNickname("rocket");
 
-        CreateUserResponse response = UserMapper.entityToCreateResponse(user);
+        UserDto response = UserMapper.toDto(user);
 
         assertNotNull(response);
         assertEquals(user.getNickname(), response.getNickname());

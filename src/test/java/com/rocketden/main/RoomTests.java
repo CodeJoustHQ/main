@@ -153,6 +153,7 @@ public class RoomTests {
         joinRequest.setUser(user);
 
         RoomDto expected = new RoomDto();
+        expected.setHost(host);
         expected.setUsers(users);
         expected.setRoomId(roomId);
 
