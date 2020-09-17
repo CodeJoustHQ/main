@@ -3,11 +3,11 @@ package com.rocketden.main;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
+import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.exception.RoomErrors;
 import com.rocketden.main.exception.UserErrors;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
-import com.rocketden.main.model.User;
 import com.rocketden.main.util.Utility;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ public class RoomTests {
 
     @Test
     public void joinNonExistentRoom() throws Exception {
-        User user = new User();
+        UserDto user = new UserDto();
         user.setNickname("rocket");
 
         // PUT request to join non-existent room should fail
@@ -67,14 +67,14 @@ public class RoomTests {
     @Test
     public void createValidRoom() throws Exception {
         // POST request to create valid room should return successful response
-        User host = new User();
+        UserDto host = new UserDto();
         host.setNickname("host");
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
         RoomDto expected = new RoomDto();
         expected.setHost(host);
-        Set<User> users = new HashSet<>();
+        Set<UserDto> users = new HashSet<>();
         users.add(host);
         expected.setUsers(users);
 
@@ -113,7 +113,7 @@ public class RoomTests {
     @Test
     public void createAndJoinRoom() throws Exception {
         // POST request to create room and PUT request to join room should succeed
-        User host = new User();
+        UserDto host = new UserDto();
         host.setNickname("host");
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
@@ -121,7 +121,7 @@ public class RoomTests {
         // 1. Send POST request and verify room was created
         RoomDto createExpected = new RoomDto();
         createExpected.setHost(host);
-        Set<User> users = new HashSet<>();
+        Set<UserDto> users = new HashSet<>();
         users.add(host);
         createExpected.setUsers(users);
 
@@ -141,7 +141,7 @@ public class RoomTests {
         String roomId = createActual.getRoomId();
 
         // Create User and Set<User> for PUT request
-        User user = new User();
+        UserDto user = new UserDto();
         user.setNickname("rocket");
         users = new HashSet<>();
         users.add(host);
@@ -174,7 +174,7 @@ public class RoomTests {
     @Test
     public void createAndJoinRoomUserAlreadyExists() throws Exception {
         // POST request to create room and PUT request to join room should succeed
-        User host = new User();
+        UserDto host = new UserDto();
         host.setNickname("host");
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
@@ -182,7 +182,7 @@ public class RoomTests {
         // 1. Send POST request and verify room was created
         RoomDto createExpected = new RoomDto();
         createExpected.setHost(host);
-        Set<User> users = new HashSet<>();
+        Set<UserDto> users = new HashSet<>();
         users.add(host);
         createExpected.setUsers(users);
 
@@ -223,7 +223,7 @@ public class RoomTests {
     @Test
     public void createAndJoinRoomNoUser() throws Exception {
         // POST request to create room and PUT request to join room should succeed
-        User host = new User();
+        UserDto host = new UserDto();
         host.setNickname("host");
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
@@ -231,7 +231,7 @@ public class RoomTests {
         // 1. Send POST request and verify room was created
         RoomDto createExpected = new RoomDto();
         createExpected.setHost(host);
-        Set<User> users = new HashSet<>();
+        Set<UserDto> users = new HashSet<>();
         users.add(host);
         createExpected.setUsers(users);
 

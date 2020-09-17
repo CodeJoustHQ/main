@@ -1,6 +1,6 @@
 package com.rocketden.main.dto.room;
 
-import com.rocketden.main.model.User;
+import com.rocketden.main.dto.user.UserDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +11,6 @@ import java.util.Set;
 public class RoomDto {
 
     private String roomId;
-    private User host;
-    private Set<User> users;
+    private UserDto host;
+    private Set<UserDto> users;
 }

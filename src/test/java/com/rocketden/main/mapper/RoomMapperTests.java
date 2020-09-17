@@ -2,6 +2,8 @@ package com.rocketden.main.mapper;
 
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
+import com.rocketden.main.dto.user.UserDto;
+import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 
@@ -13,6 +15,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @SpringBootTest
 public class RoomMapperTests {
@@ -35,7 +38,15 @@ public class RoomMapperTests {
 
         assertNotNull(response);
         assertEquals(room.getRoomId(), response.getRoomId());
-        assertEquals(room.getHost(), response.getHost());
-        assertEquals(room.getUsers(), response.getUsers());
+
+        UserDto expectedHost = UserMapper.toDto(room.getHost());
+        assertEquals(expectedHost, response.getHost());
+
+        // Map set of Users to set of UserDtos
+        Set<UserDto> expectedUsers = room.getUsers()
+                .stream()
+                .map(UserMapper::toDto)
+                .collect(Collectors.toSet());
+        assertEquals(expectedUsers, response.getUsers());
     }
 }
