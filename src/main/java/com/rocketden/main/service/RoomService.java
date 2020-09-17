@@ -3,6 +3,7 @@ package com.rocketden.main.service;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
+import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.exception.RoomErrors;
 import com.rocketden.main.exception.UserErrors;
@@ -30,7 +31,7 @@ public class RoomService {
         this.repository = repository;
     }
 
-    public JoinRoomResponse joinRoom(JoinRoomRequest request) {
+    public RoomDto joinRoom(JoinRoomRequest request) {
         Room room = repository.findRoomByRoomId(request.getRoomId());
 
         // Return error if room could not be found
@@ -57,10 +58,10 @@ public class RoomService {
         room.setUsers(users);
         repository.save(room);
 
-        return RoomMapper.entityToJoinResponse(room);
+        return RoomMapper.toDto(room);
     }
 
-    public CreateRoomResponse createRoom(CreateRoomRequest request) {
+    public RoomDto createRoom(CreateRoomRequest request) {
         User host = request.getHost();
 
         // Do not create room if provided host is invalid.
@@ -81,7 +82,7 @@ public class RoomService {
         room.setUsers(users);
         repository.save(room);
 
-        return RoomMapper.entityToCreateResponse(room);
+        return RoomMapper.toDto(room);
     }
 
     // Generate numeric String with length ROOM_ID_LENGTH

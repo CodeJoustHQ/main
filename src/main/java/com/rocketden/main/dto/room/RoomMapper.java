@@ -9,11 +9,7 @@ public class RoomMapper {
 
     private static final ModelMapper mapper = new ModelMapper();
 
-    public static CreateRoomResponse entityToCreateResponse(Room entity) {
-        return mapper.map(entity, CreateRoomResponse.class);
-    }
-
-    public static JoinRoomResponse entityToJoinResponse(Room entity) {
-        return mapper.map(entity, JoinRoomResponse.class);
+    public static RoomDto toDto(Room entity) {
+        return mapper.map(entity, RoomDto.class);
     }
 }
