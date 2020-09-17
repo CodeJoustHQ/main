@@ -2,7 +2,7 @@ package com.rocketden.main;
 
 import com.rocketden.main.dto.user.CreateUserRequest;
 import com.rocketden.main.dto.user.CreateUserResponse;
-import com.rocketden.main.exception.UserErrors;
+import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.util.Utility;
@@ -56,7 +56,7 @@ public class UserTests {
     public void createNewUserNoNickname() throws Exception {
         CreateUserRequest request = new CreateUserRequest();
 
-        ApiError ERROR = UserErrors.INVALID_USER;
+        ApiError ERROR = UserError.INVALID_USER;
 
         MvcResult result = this.mockMvc.perform(post(POST_USER)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -75,7 +75,7 @@ public class UserTests {
         CreateUserRequest request = new CreateUserRequest();
         request.setNickname("");
 
-        ApiError ERROR = UserErrors.INVALID_USER;
+        ApiError ERROR = UserError.INVALID_USER;
 
         MvcResult result = this.mockMvc.perform(post(POST_USER)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -94,7 +94,7 @@ public class UserTests {
         CreateUserRequest request = new CreateUserRequest();
         request.setNickname("rocketrocketrocketrocket");
 
-        ApiError ERROR = UserErrors.INVALID_USER;
+        ApiError ERROR = UserError.INVALID_USER;
 
         MvcResult result = this.mockMvc.perform(post(POST_USER)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -113,7 +113,7 @@ public class UserTests {
         CreateUserRequest request = new CreateUserRequest();
         request.setNickname("rocket rocket");
 
-        ApiError ERROR = UserErrors.INVALID_USER;
+        ApiError ERROR = UserError.INVALID_USER;
 
         MvcResult result = this.mockMvc.perform(post(POST_USER)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
