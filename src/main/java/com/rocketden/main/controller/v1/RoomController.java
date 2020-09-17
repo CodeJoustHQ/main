@@ -1,10 +1,7 @@
 package com.rocketden.main.controller.v1;
 
 import com.rocketden.main.dto.room.CreateRoomRequest;
-import com.rocketden.main.dto.room.CreateRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
-import com.rocketden.main.dto.room.JoinRoomResponse;
-import com.rocketden.main.dto.user.CreateUserResponse;
 import com.rocketden.main.service.RoomService;
 
 import org.springframework.beans.factory.annotation.Autowired;

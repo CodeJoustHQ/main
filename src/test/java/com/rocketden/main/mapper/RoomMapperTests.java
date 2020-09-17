@@ -1,7 +1,5 @@
 package com.rocketden.main.mapper;
 
-import com.rocketden.main.dto.room.CreateRoomResponse;
-import com.rocketden.main.dto.room.JoinRoomResponse;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;

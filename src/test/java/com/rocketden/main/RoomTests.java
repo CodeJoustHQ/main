@@ -1,9 +1,7 @@
 package com.rocketden.main;
 
 import com.rocketden.main.dto.room.CreateRoomRequest;
-import com.rocketden.main.dto.room.CreateRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
-import com.rocketden.main.dto.room.JoinRoomResponse;
 import com.rocketden.main.exception.RoomErrors;
 import com.rocketden.main.exception.UserErrors;
 import com.rocketden.main.exception.api.ApiError;
