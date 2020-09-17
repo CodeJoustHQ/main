@@ -1,5 +1,6 @@
 package com.rocketden.main.mapper;
 
+import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
@@ -17,38 +18,24 @@ import java.util.Set;
 public class RoomMapperTests {
 
     @Test
-    public void entityToCreateRoomResponse() {
+    public void entityToDto() {
         User host = new User();
         host.setNickname("rocket");
-        Set<User> users = new HashSet<User>();
+
+        Set<User> users = new HashSet<>();
         users.add(host);
+        users.add(new User());
+
         Room room = new Room();
         room.setRoomId("012345");
         room.setHost(host);
         room.setUsers(users);
 
-        CreateRoomResponse response = RoomMapper.entityToCreateResponse(room);
+        RoomDto response = RoomMapper.toDto(room);
 
         assertNotNull(response);
         assertEquals(room.getRoomId(), response.getRoomId());
         assertEquals(room.getHost(), response.getHost());
-    }
-
-    @Test
-    public void entityToJoinRoomResponse() {
-        User host = new User();
-        host.setNickname("rocket");
-        Set<User> users = new HashSet<User>();
-        users.add(host);
-        Room room = new Room();
-        room.setRoomId("012345");
-        room.setHost(host);
-        room.setUsers(users);
-
-        JoinRoomResponse response = RoomMapper.entityToJoinResponse(room);
-
-        assertNotNull(response);
-        assertEquals(room.getRoomId(), response.getRoomId());
         assertEquals(room.getUsers(), response.getUsers());
     }
 }

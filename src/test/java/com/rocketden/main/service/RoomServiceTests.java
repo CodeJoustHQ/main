@@ -3,6 +3,7 @@ package com.rocketden.main.service;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
+import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.exception.RoomErrors;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Room;
@@ -44,7 +45,7 @@ public class RoomServiceTests {
         // Verify create room request succeeds and returns correct response
         // Mock generateRoomId to return a custom room id
         Mockito.doReturn("012345").when(service).generateRoomId();
-        CreateRoomResponse response = service.createRoom(request);
+        RoomDto response = service.createRoom(request);
 
         verify(repository).save(Mockito.any(Room.class));
         assertEquals("012345", response.getRoomId());
@@ -74,7 +75,7 @@ public class RoomServiceTests {
 
         // Mock repository to return room when called
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
-        JoinRoomResponse response = service.joinRoom(request);
+        RoomDto response = service.joinRoom(request);
 
         assertEquals(roomId, response.getRoomId());
         assertTrue(response.getUsers().contains(request.getUser()));
