@@ -66,6 +66,11 @@ export function EnterNicknamePage(props: EnterNicknameProps) {
         }}
         onKeyPress={(event) => {
           if (event.key === 'Enter' && validNickname) {
+            // setLoading();
+            // enterNicknameAction().catch((err) => {
+            //   setError(err);
+            // });
+            // setLoading(false);
             enterNicknameAction(setError, setLoading);
           }
         }}

@@ -3,7 +3,6 @@ import { useHistory } from 'react-router-dom';
 import { ENTER_NICKNAME_PAGE, EnterNicknamePage } from '../components/core/EnterNickname';
 import { connect, SOCKET_ENDPOINT, User } from '../api/Socket';
 import { createRoom, Room } from '../api/Room';
-import { isError } from '../api/Error';
 
 function CreateGamePage() {
   // Get history object to be able to move between different pages
@@ -13,32 +12,25 @@ function CreateGamePage() {
   const [nickname, setNickname] = useState('');
 
   // Callback used to create a new room and redirect to game page
-  const enterNicknameAction = (
-    setError: React.Dispatch<React.SetStateAction<string>>,
-    setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-  ) => {
+  const enterNicknameAction = () => new Promise<undefined>((resolve, reject) => {
     const redirectToWaitingRoom = (room: Room, initialUsers: User[],
       initialPageState: number, initialNickname: string) => {
       history.push(`/game/join?room=${room.roomId}`,
         { initialUsers, initialPageState, initialNickname });
     };
 
-    setLoading(true);
     createRoom()
       .then((res) => {
-        setLoading(false);
-        // Type guard used to differentiate between success/failure responses
-        if (isError(res)) {
-          setError(res.message);
-        } else {
-          connect(SOCKET_ENDPOINT, nickname).then((connectUsers) => {
-            redirectToWaitingRoom(res as Room, connectUsers, 2, nickname);
-          }).catch((response) => {
-            setError(response.message);
-          });
-        }
+        connect(SOCKET_ENDPOINT, nickname).then((connectUsers) => {
+          redirectToWaitingRoom(res as Room, connectUsers, 2, nickname);
+          resolve();
+        }).catch((err) => {
+          reject(err.message);
+        });
+      }).catch((err) => {
+        reject(err.message);
       });
-  };
+  });
 
   // Render the "Enter nickname" state.
   return (
@@ -46,7 +38,6 @@ function CreateGamePage() {
       <EnterNicknamePage
         nickname={nickname}
         setNickname={setNickname}
-
         enterNicknamePage={ENTER_NICKNAME_PAGE.CREATE}
         enterNicknameAction={enterNicknameAction}
       />
