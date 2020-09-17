@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from 'react';
 /* eslint-disable consistent-return */
 import SockJS from 'sockjs-client';
 import Stomp, { Client, Message } from 'stompjs';
@@ -53,7 +54,8 @@ export const deleteUser = (nickname:string): Error | undefined => {
  * Connect and subscribe the user via socket.
  * @returns error, if present
 */
-export const connect = (endpoint:string, nickname:string):
+export const connect = (endpoint:string, nickname:string,
+  setUsers?: Dispatch<SetStateAction<User[]>>):
   Promise<User[]> => new Promise<User[]>((resolve, reject) => {
     if (!connected) {
       // Connect to given endpoint, subscribe to future messages, and send user message.
@@ -62,6 +64,10 @@ export const connect = (endpoint:string, nickname:string):
       stompClient.connect({}, () => {
         stompClient.subscribe(SUBSCRIBE_URL, (users: Message) => {
           const userObjects:User[] = JSON.parse(users.body);
+          // Set the users for the join page.
+          if (setUsers) {
+            setUsers(userObjects);
+          }
           resolve(userObjects);
         });
         // Reassign connected variable.

@@ -23,7 +23,7 @@ function CreateGamePage() {
     createRoom()
       .then((res) => {
         connect(SOCKET_ENDPOINT, nickname).then((connectUsers) => {
-          redirectToWaitingRoom(res as Room, connectUsers, 2, nickname);
+          redirectToWaitingRoom(res, connectUsers, 2, nickname);
           resolve();
         }).catch((err) => {
           reject(errorHandler(err.message));
