@@ -120,7 +120,6 @@ public class RoomTests {
         assertEquals(expected.getHost(), actual.getHost());
 
         // Send GET request to validate that room exists
-
         String roomId = actual.getRoomId();
 
         GetRoomRequest request = new GetRoomRequest();

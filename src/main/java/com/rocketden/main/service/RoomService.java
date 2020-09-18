@@ -91,6 +91,7 @@ public class RoomService {
     public GetRoomResponse getRoom(GetRoomRequest request) {
         Room room = repository.findRoomByRoomId(request.getRoomId());
 
+        // Throw an error if room could not be found
         if (room == null) {
             throw new ApiException(RoomErrors.ROOM_NOT_FOUND);
         }
