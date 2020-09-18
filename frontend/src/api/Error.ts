@@ -4,14 +4,14 @@ export type ErrorResponse = {
   message: string;
 };
 
-type AxiosError = {
+export type AxiosError = {
   response?: {
     status: string,
     data: any,
   },
 };
 
-export const errorHandler = (err: AxiosError): ErrorResponse => {
+export const axiosErrorHandler = (err: AxiosError): ErrorResponse => {
   if (!err.response) {
     return {
       error: true,
@@ -27,4 +27,8 @@ export const errorHandler = (err: AxiosError): ErrorResponse => {
   };
 };
 
-export const isError = (res: any): boolean => res && res.error;
+export const errorHandler = (message: string): ErrorResponse => ({
+  error: true,
+  status: 'XXX',
+  message: message || 'An error occurred; please try again later.',
+});

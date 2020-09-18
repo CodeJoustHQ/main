@@ -1,23 +1,33 @@
 import React, { useState, useEffect, ReactElement } from 'react';
-import { LargeText, Text } from '../components/core/Text';
+import { Message } from 'stompjs';
+import ErrorMessage from '../components/core/Error';
+import { LargeText, Text, UserNicknameText } from '../components/core/Text';
 import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
-import { connect, SOCKET_ENDPOINT } from '../api/Socket';
+import {
+  isValidNickname, connect, subscribe, deleteUser, User,
+  SOCKET_ENDPOINT, SUBSCRIBE_URL, addUser,
+} from '../api/Socket';
 
 function JoinGamePage() {
   // Declare nickname state variable.
   const [nickname, setNickname] = useState('');
 
+  // Hold error text.
+  const [error, setError] = useState('');
+
   /**
-   * The nickname is valid if it is non-empty, has no spaces, and
-   * is <= 16 characters. This is updated whenever the nickname changes.
+   * This is updated whenever the nickname changes.
    */
   const [validNickname, setValidNickname] = useState(false);
   useEffect(() => {
-    setValidNickname(nickname.length > 0 && !nickname.includes(' ') && nickname.length <= 16);
+    setValidNickname(isValidNickname(nickname));
   }, [nickname]);
 
   // Variable to hold whether the user is focused on the text input field.
   const [focusInput, setFocusInput] = useState(false);
+
+  // Variable to hold the users on the page.
+  const [users, setUsers] = useState<User[]>([]);
 
   /**
    * Stores the current page state, where:
@@ -26,6 +36,41 @@ function JoinGamePage() {
    * 2 = Waiting room state
    */
   const [pageState, setPageState] = useState(1);
+
+  /**
+   * Subscribe callback that will be triggered on every message.
+   * Update the users list.
+   */
+  const subscribeCallback = (result: Message) => {
+    const userObjects:User[] = JSON.parse(result.body);
+    setUsers(userObjects);
+  };
+
+  /**
+   * Add the user to the waiting room through the following steps.
+   * 1. Connect the user to the socket.
+   * 2. Subscribe the user to future messages.
+   * 3. Send the user nickname to the room.
+   * 4. Update the room layout to the "waiting room" page.
+   * This method also handles any relevant errors.
+   */
+  const addUserToWaitingRoom = (socketEndpoint: string,
+    subscribeUrl: string, nicknameParam: string) => {
+    connect(socketEndpoint).then(() => {
+      subscribe(subscribeUrl, subscribeCallback).then(() => {
+        try {
+          addUser(nicknameParam);
+          setPageState(2);
+        } catch (err) {
+          setError(err.message);
+        }
+      }).catch((err) => {
+        setError(err.message);
+      });
+    }).catch((err) => {
+      setError(err.message);
+    });
+  };
 
   // Create variable to hold the "Join Page" content.
   let joinPageContent: ReactElement | undefined;
@@ -49,15 +94,13 @@ function JoinGamePage() {
             }}
             onKeyPress={(event) => {
               if (event.key === 'Enter' && validNickname) {
-                connect(SOCKET_ENDPOINT, nickname);
-                setPageState(2);
+                addUserToWaitingRoom(SOCKET_ENDPOINT, SUBSCRIBE_URL, nickname);
               }
             }}
           />
           <LargeInputButton
             onClick={() => {
-              connect(SOCKET_ENDPOINT, nickname);
-              setPageState(2);
+              addUserToWaitingRoom(SOCKET_ENDPOINT, SUBSCRIBE_URL, nickname);
             }}
             value="Enter"
             // Input is disabled if no nickname exists, has a space, or is too long.
@@ -68,6 +111,7 @@ function JoinGamePage() {
               The nickname must be non-empty, have no spaces, and be less than 16 characters.
             </Text>
           ) : null}
+          { error ? <ErrorMessage message={error} /> : null }
         </div>
       );
       break;
@@ -80,6 +124,18 @@ function JoinGamePage() {
             {nickname}
             &quot;.
           </LargeText>
+          <div>
+            {
+              users.map((user) => (
+                <UserNicknameText onClick={(event) => {
+                  deleteUser((event.target as HTMLElement).innerText);
+                }}
+                >
+                  {user.nickname}
+                </UserNicknameText>
+              ))
+            }
+          </div>
         </div>
       );
       break;
