@@ -14,8 +14,8 @@ export const FlexContainer = styled.div`
   display: flex;
   flex: auto;
   flex-direction: column;
-  align-items: stretch;
   overflow: hidden;
+  position: relative;
 `;
 
 export const FlexInfoBar = styled.div`
@@ -31,6 +31,7 @@ export const Panel = styled.div`
 
 export const SplitterContainer = styled.div`
   flex: auto;
+  overflow: hidden;
 `;
 
 const StyledMainContainer = styled.div`

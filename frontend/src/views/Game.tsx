@@ -1,7 +1,7 @@
-import Editor from '@monaco-editor/react';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
+import Editor from '../components/core/Editor';
 import { ErrorResponse, isError } from '../api/Error';
 import { Problem, getProblems } from '../api/Problem';
 import { Room } from '../api/Room';
@@ -42,6 +42,11 @@ function GamePage() {
 
   const firstProblem = problems?.[0];
 
+  const onSecondaryPanelSizeChange = () => {
+    const event = new Event('secondaryPanelSizeChange');
+    window.dispatchEvent(event);
+  };
+
   return (
     <FlexContainer>
       <FlexInfoBar>
@@ -50,7 +55,12 @@ function GamePage() {
         {room ? room.roomId : 'No room joined'}
       </FlexInfoBar>
       <SplitterContainer>
-        <SplitterLayout>
+        <SplitterLayout
+          onSecondaryPaneSizeChange={onSecondaryPanelSizeChange}
+          percentage
+          primaryMinSize={20}
+          secondaryMinSize={35}
+        >
           <Panel>
             <ProblemHeaderText>{firstProblem?.name}</ProblemHeaderText>
             <Text>{firstProblem?.description}</Text>
