@@ -1,7 +1,7 @@
 import Editor from '@monaco-editor/react';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ErrorResponse, isError } from '../api/Error';
+import { ErrorResponse } from '../api/Error';
 import { Problem, getProblems } from '../api/Problem';
 import { Room } from '../api/Room';
 import { FlexContainer, FlexInfoBar, FlexPanel } from '../components/core/Container';
@@ -24,15 +24,15 @@ function GamePage() {
       setRoom(location.state.room);
     }
     getProblems().then((res) => {
-      if (isError(res)) {
-        setError((res as ErrorResponse).message);
-        setProblems([]);
-      } else if (!(res as Problem[]).length) {
+      if (!(res as Problem[]).length) {
         setError('Problem cannot be found');
       } else {
         setProblems(res as Problem[]);
         setError('');
       }
+    }).catch((err) => {
+      setError((err as ErrorResponse).message);
+      setProblems([]);
     });
   }, [location]);
 

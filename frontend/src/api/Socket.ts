@@ -1,6 +1,7 @@
 /* eslint-disable consistent-return */
 import SockJS from 'sockjs-client';
 import Stomp, { Client, Message } from 'stompjs';
+import { errorHandler } from './Error';
 
 let stompClient: Client;
 
@@ -69,13 +70,15 @@ export const connect = (endpoint:string, nickname:string,
         stompClient.subscribe(SUBSCRIBE_URL, subscribeCallback);
         // Reassign connected variable.
         connected = true;
-        addUser(nickname);
+        if (addUser(nickname) !== undefined) {
+          reject(errorHandler('The socket failed to add the user.'));
+        }
         resolve();
       }, () => {
-        reject(new Error('The socket failed to connect.'));
+        reject(errorHandler('The socket failed to connect.'));
       });
     } else {
-      reject(new Error('The socket is already connected.'));
+      reject(errorHandler('The socket is already connected.'));
     }
   });
 
@@ -83,13 +86,17 @@ export const connect = (endpoint:string, nickname:string,
  * Disconnect the user by sending a message via socket.
  * @returns error, if present
 */
-export const disconnect = (): Error | undefined => {
-  if (connected) {
-    stompClient.disconnect(() => {
-      // Reassign connected variable.
-      connected = false;
-    });
-  } else {
-    return new Error('The socket is not connected.');
-  }
-};
+export const disconnect = ():
+  Promise<undefined> => new Promise<undefined>((resolve, reject) => {
+    if (connected) {
+      const socket: WebSocket = new SockJS('/api/v1/socket/join-room-endpoint');
+      stompClient = Stomp.over(socket);
+      stompClient.disconnect(() => {
+        // Reassign connected variable.
+        connected = false;
+        resolve();
+      });
+    } else {
+      reject(errorHandler('The socket is not connected.'));
+    }
+  });
