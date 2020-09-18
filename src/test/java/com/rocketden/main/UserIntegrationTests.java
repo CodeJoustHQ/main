@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -63,7 +65,7 @@ public class UserIntegrationTests {
      * all users who are subscribed to this URL on this socket endpoint).
      */
     @Test
-    public void getUser() throws Exception {
+    public void addUser() throws Exception {
 
         // Latch allows threads to wait until remaining operations complete.
         final CountDownLatch latch = new CountDownLatch(1);
@@ -78,15 +80,15 @@ public class UserIntegrationTests {
                 session.subscribe(BaseRestController.BASE_SOCKET_URL + "/subscribe-user", new StompFrameHandler() {
                     @Override
                     public Type getPayloadType(StompHeaders headers) {
-                        return User.class;
+                        return HashSet.class;
                     }
 
                     @Override
                     public void handleFrame(StompHeaders headers, Object payload) {
-                        User user = (User) payload;
+                        Set<User> users = (HashSet<User>) payload;
                         try {
                             // Verify that the subscription received the expected message.
-                            assertEquals("Chris", user.getNickname());
+                            assertEquals(1, users.size());
                         } catch (Throwable t) {
                             failure.set(t);
                         } finally {
@@ -96,7 +98,62 @@ public class UserIntegrationTests {
                     }
                 });
                 try {
-                    session.send(BaseRestController.BASE_SOCKET_URL + "/user", "Chris");
+                    session.send(BaseRestController.BASE_SOCKET_URL + "/add-user", "Chris");
+                } catch (Throwable t) {
+                    failure.set(t);
+                    latch.countDown();
+                }
+            }
+        };
+
+        // Connect to the socket with the STOMP client.
+        this.stompClient.connect("ws://localhost:{port}" + BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint", this.headers, handler, this.port);
+
+        if (latch.await(3, TimeUnit.SECONDS)) {
+            if (failure.get() != null) {
+                throw new AssertionError("", failure.get());
+            }
+        } else {
+            fail("User response not received");
+        }
+
+    }
+
+    @Test
+    public void deleteUser() throws Exception {
+
+        // Latch allows threads to wait until remaining operations complete.
+        final CountDownLatch latch = new CountDownLatch(1);
+        final AtomicReference<Throwable> failure = new AtomicReference<>();
+
+        // Test session handler for STOMP (created below).
+        StompSessionHandler handler = new TestSessionHandler(failure) {
+
+            @Override
+            public void afterConnected(final StompSession session, StompHeaders connectedHeaders) {
+                // After the socket is connected, subscribe and send message.
+                session.subscribe(BaseRestController.BASE_SOCKET_URL + "/subscribe-user", new StompFrameHandler() {
+                    @Override
+                    public Type getPayloadType(StompHeaders headers) {
+                        return HashSet.class;
+                    }
+
+                    @Override
+                    public void handleFrame(StompHeaders headers, Object payload) {
+                        Set<User> users = (HashSet<User>) payload;
+                        try {
+                            // Verify that the subscription received the expected message.
+                            assertEquals(0, users.size());
+                        } catch (Throwable t) {
+                            failure.set(t);
+                        } finally {
+                            session.disconnect();
+                            latch.countDown();
+                        }
+                    }
+                });
+                try {
+                    session.send(BaseRestController.BASE_SOCKET_URL + "/delete-user", "Chris");
                 } catch (Throwable t) {
                     failure.set(t);
                     latch.countDown();

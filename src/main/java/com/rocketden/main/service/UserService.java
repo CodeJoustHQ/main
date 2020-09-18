@@ -4,7 +4,7 @@ import com.rocketden.main.dao.UserRepository;
 import com.rocketden.main.dto.user.CreateUserRequest;
 import com.rocketden.main.dto.user.CreateUserResponse;
 import com.rocketden.main.dto.user.UserMapper;
-import com.rocketden.main.exception.UserErrors;
+import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.User;
 
@@ -27,7 +27,7 @@ public class UserService {
 
         // If the provided nickname is null or invalid, do not add the user.
         if (!validNickname(nickname)) {
-            throw new ApiException(UserErrors.INVALID_USER);
+            throw new ApiException(UserError.INVALID_USER);
         }
         
         User user = new User();

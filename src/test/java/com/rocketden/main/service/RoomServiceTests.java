@@ -7,7 +7,7 @@ import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.dto.room.GetRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
-import com.rocketden.main.exception.RoomErrors;
+import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
@@ -102,7 +102,7 @@ public class RoomServiceTests {
         ApiException exception = assertThrows(ApiException.class, () -> service.joinRoom(request));
 
         verify(repository).findRoomByRoomId(roomId);
-        assertEquals(RoomErrors.ROOM_NOT_FOUND, exception.getError());
+        assertEquals(RoomError.NOT_FOUND, exception.getError());
     }
 
     @Test
@@ -132,7 +132,7 @@ public class RoomServiceTests {
         ApiException exception = assertThrows(ApiException.class, () -> service.joinRoom(request));
 
         verify(repository).findRoomByRoomId(roomId);
-        assertEquals(RoomErrors.USER_ALREADY_PRESENT, exception.getError());
+        assertEquals(RoomError.USER_ALREADY_PRESENT, exception.getError());
     }
 
     @Test

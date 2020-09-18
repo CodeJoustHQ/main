@@ -6,8 +6,8 @@ import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.dto.room.GetRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
-import com.rocketden.main.exception.RoomErrors;
-import com.rocketden.main.exception.UserErrors;
+import com.rocketden.main.exception.RoomError;
+import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.model.User;
@@ -83,7 +83,7 @@ public class RoomTests {
         request.setRoomId("012345");
         request.setUser(user);
 
-        ApiError ERROR = RoomErrors.ROOM_NOT_FOUND;
+        ApiError ERROR = RoomError.NOT_FOUND;
 
         MvcResult result = this.mockMvc.perform(put(PUT_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -144,7 +144,7 @@ public class RoomTests {
         // POST request to create valid room should return successful response
         CreateRoomRequest createRequest = new CreateRoomRequest();
         
-        ApiError ERROR = RoomErrors.NO_HOST;
+        ApiError ERROR = RoomError.NO_HOST;
 
         MvcResult result = this.mockMvc.perform(post(POST_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -244,7 +244,7 @@ public class RoomTests {
         joinRequest.setRoomId(roomId);
         joinRequest.setUser(host);
 
-        ApiError ERROR = RoomErrors.USER_ALREADY_PRESENT;
+        ApiError ERROR = RoomError.USER_ALREADY_PRESENT;
 
         result = this.mockMvc.perform(put(PUT_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -288,7 +288,7 @@ public class RoomTests {
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setRoomId(roomId);
 
-        ApiError ERROR = UserErrors.INVALID_USER;
+        ApiError ERROR = UserError.INVALID_USER;
 
         result = this.mockMvc.perform(put(PUT_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
