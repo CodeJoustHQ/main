@@ -47,7 +47,7 @@ public class RoomTests {
 
     @Test
     public void getNonExistentRoom() throws Exception {
-        ApiError ERROR = RoomErrors.ROOM_NOT_FOUND;
+        ApiError ERROR = RoomError.NOT_FOUND;
 
         // Passing in nonexistent roomId should return 404
         MvcResult result = this.mockMvc.perform(get(GET_ROOM)

@@ -157,7 +157,7 @@ public class RoomServiceTests {
 
         ApiException exception = assertThrows(ApiException.class, () -> service.getRoom(request));
 
-        assertEquals(RoomErrors.ROOM_NOT_FOUND, exception.getError());
+        assertEquals(RoomError.NOT_FOUND, exception.getError());
     }
 
     @Test

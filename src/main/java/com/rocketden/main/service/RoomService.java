@@ -93,7 +93,7 @@ public class RoomService {
 
         // Throw an error if room could not be found
         if (room == null) {
-            throw new ApiException(RoomErrors.ROOM_NOT_FOUND);
+            throw new ApiException(RoomError.NOT_FOUND);
         }
 
         return RoomMapper.entityToGetResponse(room);
