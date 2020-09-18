@@ -1,4 +1,5 @@
 import React, { useState, useEffect, ReactElement } from 'react';
+import { Message } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
 import { LargeText, Text, UserNicknameText } from '../components/core/Text';
 import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
@@ -58,7 +59,10 @@ function JoinGamePage() {
             }}
             onKeyPress={(event) => {
               if (event.key === 'Enter' && validNickname) {
-                connect(SOCKET_ENDPOINT, nickname, setUsers).then(() => {
+                connect(SOCKET_ENDPOINT, nickname, (result: Message) => {
+                  const userObjects:User[] = JSON.parse(result.body);
+                  setUsers(userObjects);
+                }).then(() => {
                   setPageState(2);
                 }).catch((response) => {
                   setError(response.message);
@@ -68,7 +72,10 @@ function JoinGamePage() {
           />
           <LargeInputButton
             onClick={() => {
-              connect(SOCKET_ENDPOINT, nickname, setUsers).then(() => {
+              connect(SOCKET_ENDPOINT, nickname, (result: Message) => {
+                const userObjects:User[] = JSON.parse(result.body);
+                setUsers(userObjects);
+              }).then(() => {
                 setPageState(2);
               }).catch((response) => {
                 setError(response.message);

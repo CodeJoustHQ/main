@@ -53,17 +53,14 @@ export const deleteUser = (nickname:string): Error | undefined => {
  * @returns error, if present
 */
 export const connect = (endpoint:string, nickname:string,
-  setUsers: React.Dispatch<React.SetStateAction<User[]>>):
+  subscribeCallback: (users: Message) => void):
   Promise<Error | undefined> => new Promise<Error | undefined>((resolve, reject) => {
     if (!connected) {
       // Connect to given endpoint, subscribe to future messages, and send user message.
       const socket: WebSocket = new SockJS(endpoint);
       stompClient = Stomp.over(socket);
       stompClient.connect({}, () => {
-        stompClient.subscribe(SUBSCRIBE_URL, (users: Message) => {
-          const userObjects:User[] = JSON.parse(users.body);
-          setUsers(userObjects);
-        });
+        stompClient.subscribe(SUBSCRIBE_URL, subscribeCallback);
         // Reassign connected variable.
         connected = true;
         addUser(nickname);
