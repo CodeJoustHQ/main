@@ -33,7 +33,6 @@ public class UserServiceTests {
 
         CreateUserResponse response = service.createUser(request);
         verify(repository).save(Mockito.any(User.class));
-        assertEquals(CreateUserResponse.SUCCESS, response.getMessage());
         assertEquals("rocket", response.getNickname());
     }
 }
