@@ -4,7 +4,8 @@ import ErrorMessage from '../components/core/Error';
 import { LargeText, Text, UserNicknameText } from '../components/core/Text';
 import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
 import {
-  isValidNickname, connect, deleteUser, User, SOCKET_ENDPOINT,
+  isValidNickname, connect, subscribe, deleteUser, User,
+  SOCKET_ENDPOINT, SUBSCRIBE_URL, addUser,
 } from '../api/Socket';
 
 function JoinGamePage() {
@@ -58,26 +59,36 @@ function JoinGamePage() {
             }}
             onKeyPress={(event) => {
               if (event.key === 'Enter' && validNickname) {
-                connect(SOCKET_ENDPOINT, nickname, (result: Message) => {
-                  const userObjects:User[] = JSON.parse(result.body);
-                  setUsers(userObjects);
-                }).then(() => {
-                  setPageState(2);
-                }).catch((response) => {
-                  setError(response.message);
+                connect(SOCKET_ENDPOINT).then(() => {
+                  subscribe(SUBSCRIBE_URL, (result: Message) => {
+                    const userObjects:User[] = JSON.parse(result.body);
+                    setUsers(userObjects);
+                  }).then(() => {
+                    addUser(nickname);
+                    setPageState(2);
+                  }).catch((err) => {
+                    setError(err.message);
+                  });
+                }).catch((err) => {
+                  setError(err.message);
                 });
               }
             }}
           />
           <LargeInputButton
             onClick={() => {
-              connect(SOCKET_ENDPOINT, nickname, (result: Message) => {
-                const userObjects:User[] = JSON.parse(result.body);
-                setUsers(userObjects);
-              }).then(() => {
-                setPageState(2);
-              }).catch((response) => {
-                setError(response.message);
+              connect(SOCKET_ENDPOINT).then(() => {
+                subscribe(SUBSCRIBE_URL, (result: Message) => {
+                  const userObjects:User[] = JSON.parse(result.body);
+                  setUsers(userObjects);
+                }).then(() => {
+                  addUser(nickname);
+                  setPageState(2);
+                }).catch((err) => {
+                  setError(err.message);
+                });
+              }).catch((err) => {
+                setError(err.message);
               });
             }}
             value="Enter"
