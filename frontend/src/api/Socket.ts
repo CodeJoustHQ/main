@@ -17,6 +17,12 @@ const SUBSCRIBE_URL:string = '/api/v1/socket/subscribe-user';
 const ADD_USER_URL:string = '/api/v1/socket/add-user';
 const DELETE_USER_URL:string = '/api/v1/socket/delete-user';
 
+/**
+ * The requirements for validity are as follows:
+ * 1. Non-empty
+ * 2. Less than or equal to sixteen characters
+ * 3. Contains no spaces
+ */
 export const isValidNickname = (nickname: string) => nickname.length > 0
   && !nickname.includes(' ') && nickname.length <= 16;
 
@@ -25,7 +31,7 @@ export const isValidNickname = (nickname: string) => nickname.length > 0
  * @returns error, if present
 */
 export const addUser = (nickname:string): Error | undefined => {
-  if (connected && isValidNickname(nickname)) {
+  if (connected) {
     stompClient.send(ADD_USER_URL, {}, nickname);
   } else if (!connected) {
     return new Error('The socket is not connected.');
@@ -39,7 +45,7 @@ export const addUser = (nickname:string): Error | undefined => {
  * @returns error, if present
 */
 export const deleteUser = (nickname:string): Error | undefined => {
-  if (connected && isValidNickname(nickname)) {
+  if (connected) {
     stompClient.send(DELETE_USER_URL, {}, nickname);
   } else if (!connected) {
     return new Error('The socket is not connected.');

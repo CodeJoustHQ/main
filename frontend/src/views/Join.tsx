@@ -15,8 +15,7 @@ function JoinGamePage() {
   const [error, setError] = useState('');
 
   /**
-   * The nickname is valid if it is non-empty, has no spaces, and
-   * is <= 16 characters. This is updated whenever the nickname changes.
+   * This is updated whenever the nickname changes.
    */
   const [validNickname, setValidNickname] = useState(false);
   useEffect(() => {
