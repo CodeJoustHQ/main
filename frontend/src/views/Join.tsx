@@ -37,6 +37,41 @@ function JoinGamePage() {
    */
   const [pageState, setPageState] = useState(1);
 
+  /**
+   * Subscribe callback that will be triggered on every message.
+   * Update the users list.
+   */
+  const subscribeCallback = (result: Message) => {
+    const userObjects:User[] = JSON.parse(result.body);
+    setUsers(userObjects);
+  };
+
+  /**
+   * Add the user to the waiting room through the following steps.
+   * 1. Connect the user to the socket.
+   * 2. Subscribe the user to future messages.
+   * 3. Send the user nickname to the room.
+   * 4. Update the room layout to the "waiting room" page.
+   * This method also handles any relevant errors.
+   */
+  const addUserToWaitingRoom = (socketEndpoint: string,
+    subscribeUrl: string, nicknameParam: string) => {
+    connect(socketEndpoint).then(() => {
+      subscribe(subscribeUrl, subscribeCallback).then(() => {
+        try {
+          addUser(nicknameParam);
+          setPageState(2);
+        } catch (err) {
+          setError(err.message);
+        }
+      }).catch((err) => {
+        setError(err.message);
+      });
+    }).catch((err) => {
+      setError(err.message);
+    });
+  };
+
   // Create variable to hold the "Join Page" content.
   let joinPageContent: ReactElement | undefined;
 
@@ -59,37 +94,13 @@ function JoinGamePage() {
             }}
             onKeyPress={(event) => {
               if (event.key === 'Enter' && validNickname) {
-                connect(SOCKET_ENDPOINT).then(() => {
-                  subscribe(SUBSCRIBE_URL, (result: Message) => {
-                    const userObjects:User[] = JSON.parse(result.body);
-                    setUsers(userObjects);
-                  }).then(() => {
-                    addUser(nickname);
-                    setPageState(2);
-                  }).catch((err) => {
-                    setError(err.message);
-                  });
-                }).catch((err) => {
-                  setError(err.message);
-                });
+                addUserToWaitingRoom(SOCKET_ENDPOINT, SUBSCRIBE_URL, nickname);
               }
             }}
           />
           <LargeInputButton
             onClick={() => {
-              connect(SOCKET_ENDPOINT).then(() => {
-                subscribe(SUBSCRIBE_URL, (result: Message) => {
-                  const userObjects:User[] = JSON.parse(result.body);
-                  setUsers(userObjects);
-                }).then(() => {
-                  addUser(nickname);
-                  setPageState(2);
-                }).catch((err) => {
-                  setError(err.message);
-                });
-              }).catch((err) => {
-                setError(err.message);
-              });
+              addUserToWaitingRoom(SOCKET_ENDPOINT, SUBSCRIBE_URL, nickname);
             }}
             value="Enter"
             // Input is disabled if no nickname exists, has a space, or is too long.

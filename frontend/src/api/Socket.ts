@@ -56,7 +56,7 @@ export const deleteUser = (nickname:string): void => {
 };
 
 /**
- * Connect and subscribe the user via socket.
+ * Connect the user via socket.
  * @returns error, if present
 */
 export const connect = (endpoint:string):
