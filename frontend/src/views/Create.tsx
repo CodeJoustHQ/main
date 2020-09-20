@@ -2,7 +2,7 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { ENTER_NICKNAME_PAGE, EnterNicknamePage } from '../components/core/EnterNickname';
 import { errorHandler } from '../api/Error';
-import { createRoom, Room } from '../api/Room';
+import { createRoom, Room, RoomParams } from '../api/Room';
 
 function CreateGamePage() {
   // Get history object to be able to move between different pages
@@ -16,7 +16,12 @@ function CreateGamePage() {
         { initialPageState, initialNickname });
     };
 
-    createRoom()
+    const roomHost: RoomParams = {
+      host: {
+        nickname,
+      },
+    };
+    createRoom(roomHost)
       .then((res) => {
         redirectToWaitingRoom(res, 2, nickname);
       }).catch((err) => {
