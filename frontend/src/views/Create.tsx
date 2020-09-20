@@ -8,8 +8,8 @@ function CreateGamePage() {
   // Get history object to be able to move between different pages
   const history = useHistory();
 
-  // Callback used to create a new room and redirect to game page
-  const enterNicknameAction = (nickname: string) => new Promise<undefined>((resolve, reject) => {
+  // Creates a room with the user as the host, and joins that same waiting room.
+  const createJoinWaitingRoom = (nickname: string) => new Promise<undefined>((resolve, reject) => {
     const redirectToWaitingRoom = (room: Room, initialPageState: number,
       initialNickname: string) => {
       history.push(`/game/join?room=${room.roomId}`,
@@ -24,6 +24,7 @@ function CreateGamePage() {
     createRoom(roomHost)
       .then((res) => {
         redirectToWaitingRoom(res, 2, nickname);
+        resolve();
       }).catch((err) => {
         reject(errorHandler(err.message));
       });
@@ -34,7 +35,7 @@ function CreateGamePage() {
     <div>
       <EnterNicknamePage
         enterNicknamePageType={ENTER_NICKNAME_PAGE.CREATE}
-        enterNicknameAction={enterNicknameAction}
+        enterNicknameAction={createJoinWaitingRoom}
       />
     </div>
   );

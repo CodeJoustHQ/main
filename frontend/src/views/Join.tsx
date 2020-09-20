@@ -93,6 +93,7 @@ function JoinGamePage() {
   /**
    * If the user is on the waiting room page state but not connected:
    * add the user to the waiting room (which connects them to the socket).
+   * (This occurs when the create page redirects the user to the waiting page.)
    */
   if (!socketConnected && pageState === 2 && nickname) {
     addUserToWaitingRoom(SOCKET_ENDPOINT, SUBSCRIBE_URL, nickname);
