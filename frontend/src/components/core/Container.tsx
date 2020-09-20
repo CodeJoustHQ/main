@@ -25,13 +25,11 @@ export const FlexInfoBar = styled.div`
   text-align: center;
 `;
 
-export const Panel = styled.div`
-  padding: 1rem;
-`;
-
 export const SplitterContainer = styled.div`
   flex: auto;
-  overflow: hidden;
+  margin-left: 25px;
+  margin-right: 25px;
+  margin-top: 10px;
 `;
 
 const StyledMainContainer = styled.div`

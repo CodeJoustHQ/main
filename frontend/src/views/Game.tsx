@@ -6,7 +6,7 @@ import { ErrorResponse, isError } from '../api/Error';
 import { Problem, getProblems } from '../api/Problem';
 import { Room } from '../api/Room';
 import {
-  FlexContainer, FlexInfoBar, Panel, SplitterContainer,
+  FlexContainer, FlexInfoBar, SplitterContainer,
 } from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
 import { ProblemHeaderText, Text } from '../components/core/Text';
@@ -61,17 +61,16 @@ function GamePage() {
           primaryMinSize={20}
           secondaryMinSize={35}
         >
-          <Panel>
+          <div>
             <ProblemHeaderText>{firstProblem?.name}</ProblemHeaderText>
             <Text>{firstProblem?.description}</Text>
             {error ? <ErrorMessage message={error} /> : null}
-          </Panel>
-          <Panel>
+          </div>
+          <div>
             <Editor height="100vh" language="javascript" />
-          </Panel>
+          </div>
         </SplitterLayout>
       </SplitterContainer>
-
     </FlexContainer>
   );
 }
