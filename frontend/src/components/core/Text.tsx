@@ -28,3 +28,7 @@ export const UserNicknameText = styled(LargeText)`
     cursor: pointer;
   }
 `;
+
+export const ProblemHeaderText = styled.h3`
+  font-size: ${({ theme }) => theme.fontSize.default};
+`;

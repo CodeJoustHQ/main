@@ -5,6 +5,8 @@ import org.modelmapper.ModelMapper;
 
 public class RoomMapper {
 
+    protected RoomMapper() {}
+
     private static final ModelMapper mapper = new ModelMapper();
 
     public static CreateRoomResponse entityToCreateResponse(Room entity) {

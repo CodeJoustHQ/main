@@ -1,14 +1,22 @@
 package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
+import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.CreateRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
 import com.rocketden.main.dto.room.RoomMapper;
+import com.rocketden.main.exception.RoomError;
+import com.rocketden.main.exception.UserError;
+import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Room;
+import com.rocketden.main.model.User;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Random;
 
 @Service
@@ -29,27 +37,53 @@ public class RoomService {
 
         // Return error if room could not be found
         if (room == null) {
-            JoinRoomResponse response = new JoinRoomResponse();
-            response.setMessage(JoinRoomResponse.ERROR_NOT_FOUND);
-            return response;
+            throw new ApiException(RoomError.NOT_FOUND);
         }
 
-        JoinRoomResponse response = RoomMapper.entityToJoinResponse(room);
-        response.setMessage(JoinRoomResponse.SUCCESS);
-        response.setPlayerName(request.getPlayerName());
+        // Get the user who initialized the request.
+        User user = request.getUser();
 
-        return response;
-    }
+        // Return error if user is invalid or not provided
+        if (user == null || !UserService.validNickname(user.getNickname())) {
+            throw new ApiException(UserError.INVALID_USER);
+        }
 
-    public CreateRoomResponse createRoom() {
-        Room room = new Room();
-        room.setRoomId(generateRoomId());
+        // Return error if user is already in the room
+        Set<User> users = room.getUsers();
+        if (users.contains(user)) {
+            throw new ApiException(RoomError.USER_ALREADY_PRESENT);
+        }
+
+        // Add the user to the room.
+        users.add(user);
+        room.setUsers(users);
         repository.save(room);
 
-        CreateRoomResponse response = RoomMapper.entityToCreateResponse(room);
-        response.setMessage(CreateRoomResponse.SUCCESS);
+        return RoomMapper.entityToJoinResponse(room);
+    }
 
-        return response;
+    public CreateRoomResponse createRoom(CreateRoomRequest request) {
+        User host = request.getHost();
+
+        // Do not create room if provided host is invalid.
+        if (host == null) {
+            throw new ApiException(RoomError.NO_HOST);
+        }
+        if (!UserService.validNickname(host.getNickname())) {
+            throw new ApiException(UserError.INVALID_USER);
+        }
+
+        // Add the host to a new user set.
+        Set<User> users = new HashSet<>();
+        users.add(request.getHost());
+
+        Room room = new Room();
+        room.setRoomId(generateRoomId());
+        room.setHost(request.getHost());
+        room.setUsers(users);
+        repository.save(room);
+
+        return RoomMapper.entityToCreateResponse(room);
     }
 
     // Generate numeric String with length ROOM_ID_LENGTH
