@@ -11,7 +11,6 @@ import {
 import ErrorMessage from '../components/core/Error';
 
 type JoinGamePageProps = {
-  initialUsers?: User[],
   initialPageState?: number,
   initialNickname?: string;
 }
@@ -22,7 +21,6 @@ function JoinGamePage() {
   let joinGamePageProps: JoinGamePageProps = {};
   if (location && location.state) {
     joinGamePageProps = {
-      initialUsers: location.state.initialUsers,
       initialPageState: location.state.initialPageState,
       initialNickname: location.state.initialNickname,
     };
@@ -32,7 +30,7 @@ function JoinGamePage() {
   const [error, setError] = useState('');
 
   // Variable to hold the users on the page.
-  const [users, setUsers] = useState<User[]>(joinGamePageProps.initialUsers || []);
+  const [users, setUsers] = useState<User[]>([]);
 
   /**
    * Stores the current page state, where:
@@ -46,8 +44,8 @@ function JoinGamePage() {
    * Nickname that is populated if the join page is on the waiting room stage.
    * Set error if no nickname is passed in despite the waiting room stage.
    */
-  const nickname: string | undefined = joinGamePageProps.initialNickname;
-  if (pageState === 2 && !nickname) {
+  const { initialNickname } = joinGamePageProps;
+  if (pageState === 2 && !initialNickname) {
     setError('No nickname was provided for the user in the waiting room.');
   }
 
@@ -88,6 +86,14 @@ function JoinGamePage() {
       });
     });
 
+  /**
+   * If the user is on the waiting room page state, connect to the socket,
+   * subscribe to future messages, and add themselves to the room.
+   */
+  if (pageState === 2 && initialNickname) {
+    addUserToWaitingRoom(SOCKET_ENDPOINT, SUBSCRIBE_URL, initialNickname);
+  }
+
   // Create variable to hold the "Join Page" content.
   let joinPageContent: ReactElement | undefined;
 
@@ -99,10 +105,8 @@ function JoinGamePage() {
           enterNicknamePageType={ENTER_NICKNAME_PAGE.JOIN}
           // Partial application of addUserToWaitingRoom function.
           enterNicknameAction={
-            (nicknameParam: string) => {
-              addUserToWaitingRoom(SOCKET_ENDPOINT, SUBSCRIBE_URL,
-                nicknameParam);
-            }
+            (nickname: string) => addUserToWaitingRoom(SOCKET_ENDPOINT,
+              SUBSCRIBE_URL, nickname)
           }
         />
       );
@@ -113,7 +117,7 @@ function JoinGamePage() {
         <div>
           <LargeText>
             You have entered the waiting room! Your nickname is &quot;
-            {nickname}
+            {initialNickname}
             &quot;.
           </LargeText>
           { error ? <ErrorMessage message={error} /> : null }

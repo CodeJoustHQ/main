@@ -14,7 +14,7 @@ export const ENTER_NICKNAME_PAGE = Object.freeze({
 
 type EnterNicknameProps = {
   enterNicknamePageType: string,
-  enterNicknameAction: any;
+  enterNicknameAction: (nickname: string) => Promise<undefined>;
 }
 
 export function EnterNicknamePage(props: EnterNicknameProps) {
