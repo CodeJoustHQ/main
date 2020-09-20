@@ -18,12 +18,10 @@ type JoinGamePageProps = {
 function JoinGamePage() {
   // Grab initial state variables if navigated from the create page.
   const location = useLocation<JoinGamePageProps>();
-  let joinGamePageProps: JoinGamePageProps = {};
+  const joinGamePageProps: JoinGamePageProps = {};
   if (location && location.state) {
-    joinGamePageProps = {
-      initialPageState: location.state.initialPageState,
-      initialNickname: location.state.initialNickname,
-    };
+    joinGamePageProps.initialPageState = location.state.initialPageState;
+    joinGamePageProps.initialNickname = location.state.initialNickname;
   }
 
   // Hold error text.
@@ -31,6 +29,9 @@ function JoinGamePage() {
 
   // Variable to hold the users on the page.
   const [users, setUsers] = useState<User[]>([]);
+
+  // Variable to hold whether the user is connected to the socket.
+  const [socketConnected, setSocketConnected] = useState(false);
 
   /**
    * Stores the current page state, where:
@@ -44,8 +45,8 @@ function JoinGamePage() {
    * Nickname that is populated if the join page is on the waiting room stage.
    * Set error if no nickname is passed in despite the waiting room stage.
    */
-  const { initialNickname } = joinGamePageProps;
-  if (pageState === 2 && !initialNickname) {
+  const [nickname, setNickname] = useState(joinGamePageProps.initialNickname || '');
+  if (pageState === 2 && !nickname && !error) {
     setError('No nickname was provided for the user in the waiting room.');
   }
 
@@ -73,6 +74,9 @@ function JoinGamePage() {
         subscribe(subscribeUrl, subscribeCallback).then(() => {
           try {
             addUser(nicknameParam);
+            // Set the necessary variables for the waiting room page.
+            setNickname(nicknameParam);
+            setSocketConnected(true);
             setPageState(2);
             resolve();
           } catch (err) {
@@ -87,11 +91,11 @@ function JoinGamePage() {
     });
 
   /**
-   * If the user is on the waiting room page state, connect to the socket,
-   * subscribe to future messages, and add themselves to the room.
+   * If the user is on the waiting room page state but not connected:
+   * add the user to the waiting room (which connects them to the socket).
    */
-  if (pageState === 2 && initialNickname) {
-    addUserToWaitingRoom(SOCKET_ENDPOINT, SUBSCRIBE_URL, initialNickname);
+  if (!socketConnected && pageState === 2 && nickname) {
+    addUserToWaitingRoom(SOCKET_ENDPOINT, SUBSCRIBE_URL, nickname);
   }
 
   // Create variable to hold the "Join Page" content.
@@ -105,8 +109,8 @@ function JoinGamePage() {
           enterNicknamePageType={ENTER_NICKNAME_PAGE.JOIN}
           // Partial application of addUserToWaitingRoom function.
           enterNicknameAction={
-            (nickname: string) => addUserToWaitingRoom(SOCKET_ENDPOINT,
-              SUBSCRIBE_URL, nickname)
+            (nicknameParam: string) => addUserToWaitingRoom(SOCKET_ENDPOINT,
+              SUBSCRIBE_URL, nicknameParam)
           }
         />
       );
@@ -117,7 +121,7 @@ function JoinGamePage() {
         <div>
           <LargeText>
             You have entered the waiting room! Your nickname is &quot;
-            {initialNickname}
+            {nickname}
             &quot;.
           </LargeText>
           { error ? <ErrorMessage message={error} /> : null }
