@@ -74,7 +74,11 @@ function JoinGamePage() {
         subscribe(subscribeUrl, subscribeCallback).then(() => {
           try {
             addUser(nicknameParam);
-            // Set the necessary variables for the waiting room page.
+            /**
+             * Set the necessary variables for the waiting room page.
+             * The socket connection must be set before updating the page state,
+             * otherwise this whole method will re-run.
+             */
             setNickname(nicknameParam);
             setSocketConnected(true);
             setPageState(2);

@@ -32,12 +32,10 @@ function CreateGamePage() {
 
   // Render the "Enter nickname" state.
   return (
-    <div>
-      <EnterNicknamePage
-        enterNicknamePageType={ENTER_NICKNAME_PAGE.CREATE}
-        enterNicknameAction={createJoinWaitingRoom}
-      />
-    </div>
+    <EnterNicknamePage
+      enterNicknamePageType={ENTER_NICKNAME_PAGE.CREATE}
+      enterNicknameAction={createJoinWaitingRoom}
+    />
   );
 }
 
