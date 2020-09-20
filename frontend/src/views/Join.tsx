@@ -1,46 +1,20 @@
-<<<<<<< HEAD
 import React, { useState, ReactElement } from 'react';
 import { useLocation } from 'react-router-dom';
+import { Message } from 'stompjs';
 import { LargeText, UserNicknameText } from '../components/core/Text';
 import { ENTER_NICKNAME_PAGE, EnterNicknamePage } from '../components/core/EnterNickname';
 import { errorHandler } from '../api/Error';
 import {
-  addUser,
+  addUser, SUBSCRIBE_URL,
   connect, deleteUser, SOCKET_ENDPOINT, subscribe, User,
 } from '../api/Socket';
-import { Message } from 'stompjs';
+import ErrorMessage from '../components/core/Error';
 
 type JoinGamePageProps = {
   initialUsers?: User[],
   initialPageState?: number,
   initialNickname?: string;
 }
-=======
-import React, { useState, useEffect, ReactElement } from 'react';
-import { Message } from 'stompjs';
-import ErrorMessage from '../components/core/Error';
-import { LargeText, Text, UserNicknameText } from '../components/core/Text';
-import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
-import {
-  isValidNickname, connect, subscribe, deleteUser, User,
-  SOCKET_ENDPOINT, SUBSCRIBE_URL, addUser,
-} from '../api/Socket';
-
-function JoinGamePage() {
-  // Declare nickname state variable.
-  const [nickname, setNickname] = useState('');
-
-  // Hold error text.
-  const [error, setError] = useState('');
-
-  /**
-   * This is updated whenever the nickname changes.
-   */
-  const [validNickname, setValidNickname] = useState(false);
-  useEffect(() => {
-    setValidNickname(isValidNickname(nickname));
-  }, [nickname]);
->>>>>>> 8275e6e5a3333165a943f6cd139f3f6e3733df35
 
 function JoinGamePage() {
   // Grab initial state variables if navigated from the create page.
@@ -54,6 +28,9 @@ function JoinGamePage() {
     };
   }
 
+  // Hold error text.
+  const [error, setError] = useState('');
+
   // Variable to hold the users on the page.
   const [users, setUsers] = useState<User[]>(joinGamePageProps.initialUsers || []);
 
@@ -65,19 +42,14 @@ function JoinGamePage() {
    */
   const [pageState, setPageState] = useState(joinGamePageProps.initialPageState || 1);
 
-  // Declare nickname state variable.
-  const [nickname, setNickname] = useState(joinGamePageProps.initialNickname || '');
-
-  // This function will be called after the nickname is entered.
-  const enterNicknameAction = () => new Promise<undefined>((resolve, reject) => {
-    connect(SOCKET_ENDPOINT, nickname, setUsers).then((result) => {
-      setUsers(result);
-      setPageState(2);
-      resolve();
-    }).catch((response) => {
-      reject(errorHandler(response.message));
-    });
-  });
+  /**
+   * Nickname that is populated if the join page is on the waiting room stage.
+   * Set error if no nickname is passed in despite the waiting room stage.
+   */
+  const nickname: string | undefined = joinGamePageProps.initialNickname;
+  if (pageState === 2 && !nickname) {
+    setError('No nickname was provided for the user in the waiting room.');
+  }
 
   /**
    * Subscribe callback that will be triggered on every message.
@@ -94,25 +66,27 @@ function JoinGamePage() {
    * 2. Subscribe the user to future messages.
    * 3. Send the user nickname to the room.
    * 4. Update the room layout to the "waiting room" page.
-   * This method also handles any relevant errors.
+   * This method returns a Promise which is used to trigger setLoading
+   * and setError on the EnterNickname page following this function.
    */
   const addUserToWaitingRoom = (socketEndpoint: string,
-    subscribeUrl: string, nicknameParam: string) => {
-    connect(socketEndpoint).then(() => {
-      subscribe(subscribeUrl, subscribeCallback).then(() => {
-        try {
-          addUser(nicknameParam);
-          setPageState(2);
-        } catch (err) {
-          setError(err.message);
-        }
+    subscribeUrl: string, nicknameParam: string) => new Promise<undefined>((resolve, reject) => {
+      connect(socketEndpoint).then(() => {
+        subscribe(subscribeUrl, subscribeCallback).then(() => {
+          try {
+            addUser(nicknameParam);
+            setPageState(2);
+            resolve();
+          } catch (err) {
+            reject(errorHandler(err.message));
+          }
+        }).catch((err) => {
+          reject(errorHandler(err.message));
+        });
       }).catch((err) => {
-        setError(err.message);
+        reject(errorHandler(err.message));
       });
-    }).catch((err) => {
-      setError(err.message);
     });
-  };
 
   // Create variable to hold the "Join Page" content.
   let joinPageContent: ReactElement | undefined;
@@ -122,10 +96,14 @@ function JoinGamePage() {
       // Render the "Enter nickname" state.
       joinPageContent = (
         <EnterNicknamePage
-          nickname={nickname}
-          setNickname={setNickname}
-          enterNicknamePage={ENTER_NICKNAME_PAGE.JOIN}
-          enterNicknameAction={enterNicknameAction}
+          enterNicknamePageType={ENTER_NICKNAME_PAGE.JOIN}
+          // Partial application of addUserToWaitingRoom function.
+          enterNicknameAction={
+            (nicknameParam: string) => {
+              addUserToWaitingRoom(SOCKET_ENDPOINT, SUBSCRIBE_URL,
+                nicknameParam);
+            }
+          }
         />
       );
       break;
@@ -138,6 +116,7 @@ function JoinGamePage() {
             {nickname}
             &quot;.
           </LargeText>
+          { error ? <ErrorMessage message={error} /> : null }
           <div>
             {
               users.map((user) => (

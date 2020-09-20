@@ -1,6 +1,4 @@
-import React, {
-  useState, useEffect, SetStateAction, Dispatch,
-} from 'react';
+import React, { useState, useEffect } from 'react';
 import ErrorMessage from './Error';
 import Loading from './Loading';
 import { LargeText, Text } from './Text';
@@ -15,16 +13,14 @@ export const ENTER_NICKNAME_PAGE = Object.freeze({
 });
 
 type EnterNicknameProps = {
-  nickname: string,
-  setNickname: Dispatch<SetStateAction<string>>,
-  enterNicknamePage: string,
+  enterNicknamePageType: string,
   enterNicknameAction: any;
 }
 
 export function EnterNicknamePage(props: EnterNicknameProps) {
   // Grab props variables.
   const {
-    nickname, setNickname, enterNicknamePage, enterNicknameAction,
+    enterNicknamePageType, enterNicknameAction,
   } = props;
 
   // Hold error text.
@@ -32,6 +28,9 @@ export function EnterNicknamePage(props: EnterNicknameProps) {
 
   // Hold loading boolean, triggered upon entering nickname.
   const [loading, setLoading] = useState(false);
+
+  // Variable to hold the user's current nickname input.
+  const [nickname, setNickname] = useState('');
 
   /**
    * The nickname is valid if it is non-empty, has no spaces, and
@@ -50,7 +49,7 @@ export function EnterNicknamePage(props: EnterNicknameProps) {
       <LargeText>
         Enter a nickname to
         {' '}
-        {enterNicknamePage}
+        {enterNicknamePageType}
         {' '}
         the game!
       </LargeText>
@@ -68,7 +67,7 @@ export function EnterNicknamePage(props: EnterNicknameProps) {
         onKeyPress={(event) => {
           if (event.key === 'Enter' && validNickname) {
             setLoading(true);
-            enterNicknameAction().then(() => {
+            enterNicknameAction(nickname).then(() => {
               setLoading(false);
             }).catch((err: ErrorResponse) => {
               setLoading(false);
@@ -80,7 +79,7 @@ export function EnterNicknamePage(props: EnterNicknameProps) {
       <LargeInputButton
         onClick={() => {
           setLoading(true);
-          enterNicknameAction().then(() => {
+          enterNicknameAction(nickname).then(() => {
             setLoading(false);
           }).catch((err: ErrorResponse) => {
             setLoading(false);
