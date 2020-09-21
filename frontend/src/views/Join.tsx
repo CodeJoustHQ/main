@@ -2,7 +2,7 @@ import React, { useState, ReactElement } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Message } from 'stompjs';
 import { LargeText, UserNicknameText } from '../components/core/Text';
-import { ENTER_NICKNAME_PAGE, EnterNicknamePage } from '../components/core/EnterNickname';
+import EnterNicknamePage from '../components/core/EnterNickname';
 import { errorHandler } from '../api/Error';
 import {
   addUser, SUBSCRIBE_URL,
@@ -111,7 +111,7 @@ function JoinGamePage() {
       // Render the "Enter nickname" state.
       joinPageContent = (
         <EnterNicknamePage
-          enterNicknamePageType={ENTER_NICKNAME_PAGE.JOIN}
+          enterNicknameHeaderText="Enter a nickname to join the game!"
           // Partial application of addUserToWaitingRoom function.
           enterNicknameAction={
             (nicknameParam: string) => addUserToWaitingRoom(SOCKET_ENDPOINT,

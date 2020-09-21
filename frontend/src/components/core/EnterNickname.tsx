@@ -6,21 +6,15 @@ import { LargeCenterInputText, LargeInputButton } from './Input';
 import { ErrorResponse } from '../../api/Error';
 import { isValidNickname } from '../../api/Socket';
 
-// The type of enter nickname page (create or join).
-export const ENTER_NICKNAME_PAGE = Object.freeze({
-  CREATE: 'create',
-  JOIN: 'join',
-});
-
 type EnterNicknameProps = {
-  enterNicknamePageType: string,
+  enterNicknameHeaderText: string,
   enterNicknameAction: (nickname: string) => Promise<undefined>;
 }
 
-export function EnterNicknamePage(props: EnterNicknameProps) {
+export default function EnterNicknamePage(props: EnterNicknameProps) {
   // Grab props variables.
   const {
-    enterNicknamePageType, enterNicknameAction,
+    enterNicknameHeaderText, enterNicknameAction,
   } = props;
 
   // Hold error text.
@@ -47,11 +41,7 @@ export function EnterNicknamePage(props: EnterNicknameProps) {
   return (
     <div>
       <LargeText>
-        Enter a nickname to
-        {' '}
-        {enterNicknamePageType}
-        {' '}
-        the game!
+        {enterNicknameHeaderText}
       </LargeText>
       <LargeCenterInputText
         placeholder="Your nickname"

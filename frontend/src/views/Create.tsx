@@ -1,6 +1,6 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { ENTER_NICKNAME_PAGE, EnterNicknamePage } from '../components/core/EnterNickname';
+import EnterNicknamePage from '../components/core/EnterNickname';
 import { errorHandler } from '../api/Error';
 import { createRoom, Room, RoomParams } from '../api/Room';
 
@@ -33,7 +33,7 @@ function CreateGamePage() {
   // Render the "Enter nickname" state.
   return (
     <EnterNicknamePage
-      enterNicknamePageType={ENTER_NICKNAME_PAGE.CREATE}
+      enterNicknameHeaderText="Enter a nickname to create the game!"
       enterNicknameAction={createJoinWaitingRoom}
     />
   );
