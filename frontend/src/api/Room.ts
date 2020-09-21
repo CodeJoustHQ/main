@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ErrorResponse, errorHandler } from './Error';
+import { axiosErrorHandler } from './Error';
 
 export type Room = {
   message: string,
@@ -12,6 +12,8 @@ const routes = {
   joinRoom: `${basePath}/`,
 };
 
-export const createRoom = (): Promise<Room | ErrorResponse> => axios.post<Room>(routes.createRoom)
+export const createRoom = (): Promise<Room> => axios.post<Room>(routes.createRoom)
   .then((res) => res.data)
-  .catch((err) => errorHandler(err));
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });

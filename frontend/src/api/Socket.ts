@@ -1,54 +1,110 @@
+/* eslint-disable consistent-return */
 import SockJS from 'sockjs-client';
 import Stomp, { Client, Message } from 'stompjs';
+import { errorHandler } from './Error';
 
 let stompClient: Client;
 
-type User = {
+export type User = {
   nickname: string;
 }
 
 // Variable to hold the current connected state.
-let connected = false;
+let connected: boolean = false;
 
 // Create constants for the connection, subscription, and send message URLs.
 export const SOCKET_ENDPOINT:string = '/api/v1/socket/join-room-endpoint';
-const SUBSCRIBE_URL:string = '/api/v1/socket/subscribe-user';
-const SEND_USER_URL:string = '/api/v1/socket/user';
+export const SUBSCRIBE_URL:string = '/api/v1/socket/subscribe-user';
+const ADD_USER_URL:string = '/api/v1/socket/add-user';
+const DELETE_USER_URL:string = '/api/v1/socket/delete-user';
 
-export const sendUser = (nickname:string) => {
+/**
+ * The requirements for validity are as follows:
+ * 1. Non-empty
+ * 2. Less than or equal to sixteen characters
+ * 3. Contains no spaces
+ */
+export const isValidNickname = (nickname: string) => nickname.length > 0
+  && !nickname.includes(' ') && nickname.length <= 16;
+
+/**
+ * Add the user by sending a message via socket.
+ * @returns error, if present
+*/
+export const addUser = (nickname:string): void => {
   if (connected) {
-    stompClient.send(SEND_USER_URL, {}, nickname || 'Anonymous');
+    stompClient.send(ADD_USER_URL, {}, nickname);
+  } else if (!connected) {
+    throw errorHandler('The socket is not connected.');
   } else {
-    console.error('You must be connected to a socket before sending user information.');
+    throw errorHandler('The provided nickname is invalid.');
   }
 };
 
-export const connect = (endpoint:string, nickname:string) => {
-  if (!connected) {
-    // Connect to given endpoint, subscribe to future messages, and send user message.
-    const socket: WebSocket = new SockJS(endpoint);
-    stompClient = Stomp.over(socket);
-    stompClient.connect({}, () => {
-      stompClient.subscribe(SUBSCRIBE_URL, (user: Message) => {
-        const userObject:User = JSON.parse(user.body);
-        console.log(`Welcome ${userObject.nickname} to the page!`);
+/**
+ * Delete the user by sending a message via socket.
+ * @returns error, if present
+*/
+export const deleteUser = (nickname:string): void => {
+  if (connected) {
+    stompClient.send(DELETE_USER_URL, {}, nickname);
+  } else if (!connected) {
+    throw errorHandler('The socket is not connected.');
+  } else {
+    throw errorHandler('The provided nickname is invalid.');
+  }
+};
+
+/**
+ * Connect the user via socket.
+ * @returns error, if present
+*/
+export const connect = (endpoint:string):
+  Promise<void> => new Promise<void>((resolve, reject) => {
+    if (!connected) {
+      // Connect to given endpoint, subscribe to future messages, and send user message.
+      const socket: WebSocket = new SockJS(endpoint);
+      stompClient = Stomp.over(socket);
+      stompClient.connect({}, () => {
+        // Reassign connected variable.
+        connected = true;
+        resolve();
+      }, () => {
+        reject(errorHandler('The socket failed to connect.'));
       });
-      sendUser(nickname);
-    });
-    // Reassign connected variable.
-    connected = true;
-  } else {
-    console.error('You are already connected to a socket.');
-  }
-};
+    } else {
+      reject(errorHandler('The socket is already connected.'));
+    }
+  });
 
-export const disconnect = () => {
+/**
+ * Subscribe the user via socket.
+ * @returns error, if user is not connected
+ */
+export const subscribe = (subscribeUrl: string,
+  subscribeCallback: (users: Message) => void):
+  Promise<void> => new Promise<void>((resolve, reject) => {
+    if (connected) {
+      stompClient.subscribe(subscribeUrl, subscribeCallback);
+      resolve();
+    } else {
+      reject(errorHandler('The socket is not connected.'));
+    }
+  });
+
+/**
+ * Disconnect the user by sending a message via socket.
+ * @returns error, if present
+*/
+export const disconnect = (): void => {
   if (connected) {
+    const socket: WebSocket = new SockJS('/api/v1/socket/join-room-endpoint');
+    stompClient = Stomp.over(socket);
     stompClient.disconnect(() => {
       // Reassign connected variable.
       connected = false;
     });
   } else {
-    console.error('You cannot disconnect because you are not connected to any socket.');
+    throw errorHandler('The socket is not connected.');
   }
 };

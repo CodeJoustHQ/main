@@ -2,12 +2,15 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
+
+import com.rocketden.main.dto.room.GetRoomRequest;
+import com.rocketden.main.dto.room.GetRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.user.UserMapper;
-import com.rocketden.main.exception.RoomErrors;
-import com.rocketden.main.exception.UserErrors;
+import com.rocketden.main.exception.RoomError;
+import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
@@ -37,7 +40,7 @@ public class RoomService {
 
         // Return error if room could not be found
         if (room == null) {
-            throw new ApiException(RoomErrors.ROOM_NOT_FOUND);
+            throw new ApiException(RoomError.NOT_FOUND);
         }
 
         // Get the user who initialized the request.
@@ -45,13 +48,13 @@ public class RoomService {
 
         // Return error if user is invalid or not provided
         if (user == null || !UserService.validNickname(user.getNickname())) {
-            throw new ApiException(UserErrors.INVALID_USER);
+            throw new ApiException(UserError.INVALID_USER);
         }
 
         // Return error if user is already in the room
         Set<User> users = room.getUsers();
         if (users.contains(user)) {
-            throw new ApiException(RoomErrors.USER_ALREADY_PRESENT);
+            throw new ApiException(RoomError.USER_ALREADY_PRESENT);
         }
 
         // Add the user to the room.
@@ -67,10 +70,10 @@ public class RoomService {
 
         // Do not create room if provided host is invalid.
         if (host == null) {
-            throw new ApiException(RoomErrors.NO_HOST);
+            throw new ApiException(RoomError.NO_HOST);
         }
         if (!UserService.validNickname(host.getNickname())) {
-            throw new ApiException(UserErrors.INVALID_USER);
+            throw new ApiException(UserError.INVALID_USER);
         }
 
         // Add the host to a new user set.
@@ -84,6 +87,17 @@ public class RoomService {
         repository.save(room);
 
         return RoomMapper.toDto(room);
+    }
+
+    public GetRoomResponse getRoom(GetRoomRequest request) {
+        Room room = repository.findRoomByRoomId(request.getRoomId());
+
+        // Throw an error if room could not be found
+        if (room == null) {
+            throw new ApiException(RoomError.NOT_FOUND);
+        }
+
+        return RoomMapper.entityToGetResponse(room);
     }
 
     // Generate numeric String with length ROOM_ID_LENGTH

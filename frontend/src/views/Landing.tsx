@@ -4,7 +4,6 @@ import { TextButton } from '../components/core/Button';
 import { PrimaryButtonLink } from '../components/core/Link';
 import { LandingHeaderText } from '../components/core/Text';
 import { createRoom, Room } from '../api/Room';
-import { isError } from '../api/Error';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 
@@ -24,12 +23,10 @@ function LandingPage() {
     createRoom()
       .then((res) => {
         setLoading(false);
-        // Type guard used to differentiate between success/failure responses
-        if (isError(res)) {
-          setError(res.message);
-        } else {
-          redirectToGame(res as Room);
-        }
+        redirectToGame(res);
+      }).catch((err) => {
+        setLoading(false);
+        setError(err.message);
       });
   }, [history]);
 

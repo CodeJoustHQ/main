@@ -4,8 +4,10 @@ import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.user.UserDto;
-import com.rocketden.main.exception.RoomErrors;
-import com.rocketden.main.exception.UserErrors;
+import com.rocketden.main.dto.room.GetRoomRequest;
+import com.rocketden.main.dto.room.GetRoomResponse;
+import com.rocketden.main.exception.RoomError;
+import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.util.Utility;
@@ -20,6 +22,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -37,8 +40,37 @@ public class RoomTests {
     @Autowired
     private MockMvc mockMvc;
 
+    private static final String GET_ROOM = "/api/v1/rooms";
     private static final String PUT_ROOM = "/api/v1/rooms";
     private static final String POST_ROOM = "/api/v1/rooms";
+
+    @Test
+    public void getNonExistentRoom() throws Exception {
+        ApiError ERROR = RoomError.NOT_FOUND;
+
+        // Passing in nonexistent roomId should return 404
+        MvcResult result = this.mockMvc.perform(get(GET_ROOM)
+                .param("roomId", "012345"))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+
+        // Passing in no roomId should result in same 404 error
+        result = this.mockMvc.perform(get(GET_ROOM))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+
+
+    }
 
     @Test
     public void joinNonExistentRoom() throws Exception {
@@ -50,7 +82,7 @@ public class RoomTests {
         request.setRoomId("012345");
         request.setUser(user);
 
-        ApiError ERROR = RoomErrors.ROOM_NOT_FOUND;
+        ApiError ERROR = RoomError.NOT_FOUND;
 
         MvcResult result = this.mockMvc.perform(put(PUT_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -65,7 +97,7 @@ public class RoomTests {
     }
 
     @Test
-    public void createValidRoom() throws Exception {
+    public void createAndGetValidRoom() throws Exception {
         // POST request to create valid room should return successful response
         UserDto host = new UserDto();
         host.setNickname("host");
@@ -89,6 +121,25 @@ public class RoomTests {
 
         assertEquals(expected.getHost(), actual.getHost());
         assertEquals(expected.getUsers(), actual.getUsers());
+
+        // Send GET request to validate that room exists
+        String roomId = actual.getRoomId();
+
+        GetRoomRequest request = new GetRoomRequest();
+        request.setRoomId(roomId);
+
+        GetRoomResponse expectedGet = new GetRoomResponse();
+        expectedGet.setRoomId(roomId);
+
+        result = this.mockMvc.perform(get(GET_ROOM)
+                .param("roomId", roomId))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        GetRoomResponse actualGet = Utility.toObject(jsonResponse, GetRoomResponse.class);
+
+        assertEquals(expectedGet.getRoomId(), actualGet.getRoomId());
     }
 
     @Test
@@ -96,7 +147,7 @@ public class RoomTests {
         // POST request to create valid room should return successful response
         CreateRoomRequest createRequest = new CreateRoomRequest();
         
-        ApiError ERROR = RoomErrors.NO_HOST;
+        ApiError ERROR = RoomError.NO_HOST;
 
         MvcResult result = this.mockMvc.perform(post(POST_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -206,7 +257,7 @@ public class RoomTests {
         joinRequest.setRoomId(roomId);
         joinRequest.setUser(host);
 
-        ApiError ERROR = RoomErrors.USER_ALREADY_PRESENT;
+        ApiError ERROR = RoomError.USER_ALREADY_PRESENT;
 
         result = this.mockMvc.perform(put(PUT_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -254,7 +305,7 @@ public class RoomTests {
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setRoomId(roomId);
 
-        ApiError ERROR = UserErrors.INVALID_USER;
+        ApiError ERROR = UserError.INVALID_USER;
 
         result = this.mockMvc.perform(put(PUT_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
