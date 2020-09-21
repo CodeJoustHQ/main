@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { ThemeType } from '../config/Theme';
 
 export const DefaultButton = styled.button`
   border: none;
@@ -27,4 +28,16 @@ export const PrimaryButton = styled(DefaultButton)<any>`
   height: ${({ height }) => height || '8vw'};
   min-width: 280px;
   min-height: 70px;
+`;
+
+export const TextButton = styled.button<ThemeType>`
+  background: none;
+  border: none;
+  color: ${({ theme }) => theme.colors.gray};
+  font-size: ${({ theme }) => theme.fontSize.default};
+  cursor: pointer;
+  
+  &:focus {
+    outline: none;
+  }
 `;
