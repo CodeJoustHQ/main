@@ -38,6 +38,21 @@ export default function EnterNicknamePage(props: EnterNicknameProps) {
   // Variable to hold whether the user is focused on the text input field.
   const [focusInput, setFocusInput] = useState(false);
 
+  /**
+   * Function to call upon user entering their nickname.
+   * This calls the enterNicknameAction as well as updating the page
+   * with loading or error messages as necessary.
+   */
+  const enterNicknameActionUpdatePage = (nicknameParam: string): void => {
+    setLoading(true);
+    enterNicknameAction(nicknameParam).then(() => {
+      setLoading(false);
+    }).catch((err: ErrorResponse) => {
+      setLoading(false);
+      setError(err.message);
+    });
+  };
+
   return (
     <div>
       <LargeText>
@@ -56,25 +71,13 @@ export default function EnterNicknamePage(props: EnterNicknameProps) {
         }}
         onKeyPress={(event) => {
           if (event.key === 'Enter' && validNickname) {
-            setLoading(true);
-            enterNicknameAction(nickname).then(() => {
-              setLoading(false);
-            }).catch((err: ErrorResponse) => {
-              setLoading(false);
-              setError(err.message);
-            });
+            enterNicknameActionUpdatePage(nickname);
           }
         }}
       />
       <LargeInputButton
         onClick={() => {
-          setLoading(true);
-          enterNicknameAction(nickname).then(() => {
-            setLoading(false);
-          }).catch((err: ErrorResponse) => {
-            setLoading(false);
-            setError(err.message);
-          });
+          enterNicknameActionUpdatePage(nickname);
         }}
         value="Enter"
         // Input is disabled if no nickname exists, has a space, or is too long.
