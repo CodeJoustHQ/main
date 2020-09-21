@@ -3,10 +3,14 @@ package com.rocketden.main.service;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.CreateRoomResponse;
+import com.rocketden.main.dto.room.GetRoomRequest;
+import com.rocketden.main.dto.room.GetRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
 import com.rocketden.main.dto.room.RoomMapper;
-import com.rocketden.main.dto.user.CreateUserResponse;
+import com.rocketden.main.exception.RoomError;
+import com.rocketden.main.exception.UserError;
+import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 
@@ -35,46 +39,29 @@ public class RoomService {
 
         // Return error if room could not be found
         if (room == null) {
-            JoinRoomResponse response = new JoinRoomResponse();
-            response.setMessage(JoinRoomResponse.ERROR_NOT_FOUND);
-            return response;
+            throw new ApiException(RoomError.NOT_FOUND);
         }
 
         // Get the user who initialized the request.
         User user = request.getUser();
 
         // Return error if user is invalid or not provided
-        if (user == null) {
-            JoinRoomResponse response = new JoinRoomResponse();
-            response.setMessage(JoinRoomResponse.ERROR_NO_USER_FOUND);
-            return response;
-        } else if (user.getNickname() == null) {
-            JoinRoomResponse response = new JoinRoomResponse();
-            response.setMessage(CreateUserResponse.ERROR_NO_NICKNAME);
-            return response;
-        } else if (!UserService.validNickname(user.getNickname())) {
-            JoinRoomResponse response = new JoinRoomResponse();
-            response.setMessage(CreateUserResponse.ERROR_INVALID_NICKNAME);
-            return response;
+        if (user == null || !UserService.validNickname(user.getNickname())) {
+            throw new ApiException(UserError.INVALID_USER);
         }
 
         // Return error if user is already in the room
         Set<User> users = room.getUsers();
         if (users.contains(user)) {
-            JoinRoomResponse response = new JoinRoomResponse();
-            response.setMessage(JoinRoomResponse.ERROR_USER_ALREADY_PRESENT);
-            return response;
+            throw new ApiException(RoomError.USER_ALREADY_PRESENT);
         }
 
         // Add the user to the room.
         users.add(user);
+        room.setUsers(users);
         repository.save(room);
 
-        JoinRoomResponse response = RoomMapper.entityToJoinResponse(room);
-        response.setMessage(JoinRoomResponse.SUCCESS);
-        response.setUsers(users);
-
-        return response;
+        return RoomMapper.entityToJoinResponse(room);
     }
 
     public CreateRoomResponse createRoom(CreateRoomRequest request) {
@@ -82,17 +69,10 @@ public class RoomService {
 
         // Do not create room if provided host is invalid.
         if (host == null) {
-            CreateRoomResponse response = new CreateRoomResponse();
-            response.setMessage(CreateRoomResponse.ERROR_NO_HOST);
-            return response;
-        } else if (host.getNickname() == null) {
-            CreateRoomResponse response = new CreateRoomResponse();
-            response.setMessage(CreateUserResponse.ERROR_NO_NICKNAME);
-            return response;
-        } else if (!UserService.validNickname(host.getNickname())) {
-            CreateRoomResponse response = new CreateRoomResponse();
-            response.setMessage(CreateUserResponse.ERROR_INVALID_NICKNAME);
-            return response;
+            throw new ApiException(RoomError.NO_HOST);
+        }
+        if (!UserService.validNickname(host.getNickname())) {
+            throw new ApiException(UserError.INVALID_USER);
         }
 
         // Add the host to a new user set.
@@ -105,10 +85,18 @@ public class RoomService {
         room.setUsers(users);
         repository.save(room);
 
-        CreateRoomResponse response = RoomMapper.entityToCreateResponse(room);
-        response.setMessage(CreateRoomResponse.SUCCESS);
+        return RoomMapper.entityToCreateResponse(room);
+    }
 
-        return response;
+    public GetRoomResponse getRoom(GetRoomRequest request) {
+        Room room = repository.findRoomByRoomId(request.getRoomId());
+
+        // Throw an error if room could not be found
+        if (room == null) {
+            throw new ApiException(RoomError.NOT_FOUND);
+        }
+
+        return RoomMapper.entityToGetResponse(room);
     }
 
     // Generate numeric String with length ROOM_ID_LENGTH

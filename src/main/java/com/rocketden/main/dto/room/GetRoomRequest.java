@@ -1,13 +1,10 @@
 package com.rocketden.main.dto.room;
 
-import com.rocketden.main.model.User;
-
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class CreateRoomResponse {
+public class GetRoomRequest {
     private String roomId;
-    private User host;
 }

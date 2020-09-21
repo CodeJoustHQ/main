@@ -2,6 +2,9 @@ package com.rocketden.main;
 
 import com.rocketden.main.dto.user.CreateUserRequest;
 import com.rocketden.main.dto.user.CreateUserResponse;
+import com.rocketden.main.exception.UserError;
+import com.rocketden.main.exception.api.ApiError;
+import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.util.Utility;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +38,6 @@ public class UserTests {
         request.setNickname("rocket");
 
         CreateUserResponse expected = new CreateUserResponse();
-        expected.setMessage(CreateUserResponse.SUCCESS);
         expected.setNickname("rocket");
 
         MvcResult result = this.mockMvc.perform(post(POST_USER)
@@ -47,7 +49,6 @@ public class UserTests {
         String jsonResponse = result.getResponse().getContentAsString();
         CreateUserResponse actual = Utility.toObject(jsonResponse, CreateUserResponse.class);
 
-        assertEquals(expected.getMessage(), actual.getMessage());
         assertEquals(expected.getNickname(), actual.getNickname());
     }
 
@@ -55,19 +56,18 @@ public class UserTests {
     public void createNewUserNoNickname() throws Exception {
         CreateUserRequest request = new CreateUserRequest();
 
-        CreateUserResponse expected = new CreateUserResponse();
-        expected.setMessage(CreateUserResponse.ERROR_NO_NICKNAME);
+        ApiError ERROR = UserError.INVALID_USER;
 
         MvcResult result = this.mockMvc.perform(post(POST_USER)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().isNotFound())
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        CreateUserResponse actual = Utility.toObject(jsonResponse, CreateUserResponse.class);
+        ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
 
-        assertEquals(expected.getMessage(), actual.getMessage());
+        assertEquals(ERROR.getResponse(), actual);
     }
 
     @Test
@@ -75,19 +75,18 @@ public class UserTests {
         CreateUserRequest request = new CreateUserRequest();
         request.setNickname("");
 
-        CreateUserResponse expected = new CreateUserResponse();
-        expected.setMessage(CreateUserResponse.ERROR_INVALID_NICKNAME);
+        ApiError ERROR = UserError.INVALID_USER;
 
         MvcResult result = this.mockMvc.perform(post(POST_USER)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().isBadRequest())
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        CreateUserResponse actual = Utility.toObject(jsonResponse, CreateUserResponse.class);
+        ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
 
-        assertEquals(expected.getMessage(), actual.getMessage());
+        assertEquals(ERROR.getResponse(), actual);
     }
 
     @Test
@@ -95,19 +94,18 @@ public class UserTests {
         CreateUserRequest request = new CreateUserRequest();
         request.setNickname("rocketrocketrocketrocket");
 
-        CreateUserResponse expected = new CreateUserResponse();
-        expected.setMessage(CreateUserResponse.ERROR_INVALID_NICKNAME);
+        ApiError ERROR = UserError.INVALID_USER;
 
         MvcResult result = this.mockMvc.perform(post(POST_USER)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().isBadRequest())
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        CreateUserResponse actual = Utility.toObject(jsonResponse, CreateUserResponse.class);
+        ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
 
-        assertEquals(expected.getMessage(), actual.getMessage());
+        assertEquals(ERROR.getResponse(), actual);
     }
 
     @Test
@@ -115,18 +113,17 @@ public class UserTests {
         CreateUserRequest request = new CreateUserRequest();
         request.setNickname("rocket rocket");
 
-        CreateUserResponse expected = new CreateUserResponse();
-        expected.setMessage(CreateUserResponse.ERROR_INVALID_NICKNAME);
+        ApiError ERROR = UserError.INVALID_USER;
 
         MvcResult result = this.mockMvc.perform(post(POST_USER)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().isBadRequest())
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        CreateUserResponse actual = Utility.toObject(jsonResponse, CreateUserResponse.class);
+        ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
 
-        assertEquals(expected.getMessage(), actual.getMessage());
+        assertEquals(ERROR.getResponse(), actual);
     }
 }

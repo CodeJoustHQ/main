@@ -1,9 +1,15 @@
 import axios from 'axios';
-import { ErrorResponse, errorHandler } from './Error';
+import { axiosErrorHandler } from './Error';
 
 export type Room = {
   message: string,
   roomId: string;
+};
+
+export type RoomParams = {
+  host: {
+    nickname: string;
+  };
 };
 
 const basePath = '/api/v1/rooms';
@@ -12,6 +18,9 @@ const routes = {
   joinRoom: `${basePath}/`,
 };
 
-export const createRoom = (): Promise<Room | ErrorResponse> => axios.post<Room>(routes.createRoom)
+export const createRoom = (roomParams: RoomParams):
+  Promise<Room> => axios.post<Room>(routes.createRoom, roomParams)
   .then((res) => res.data)
-  .catch((err) => errorHandler(err));
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });

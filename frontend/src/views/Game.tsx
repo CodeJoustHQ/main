@@ -28,15 +28,15 @@ function GamePage() {
       setRoom(location.state.room);
     }
     getProblems().then((res) => {
-      if (isError(res)) {
-        setError((res as ErrorResponse).message);
-        setProblems([]);
-      } else if (!(res as Problem[]).length) {
+      if (!(res as Problem[]).length) {
         setError('Problem cannot be found');
       } else {
         setProblems(res as Problem[]);
         setError('');
       }
+    }).catch((err) => {
+      setError((err as ErrorResponse).message);
+      setProblems([]);
     });
   }, [location]);
 
