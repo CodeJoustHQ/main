@@ -3,6 +3,8 @@ package com.rocketden.main.service;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.CreateRoomResponse;
+import com.rocketden.main.dto.room.GetRoomRequest;
+import com.rocketden.main.dto.room.GetRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomResponse;
 import com.rocketden.main.exception.RoomError;
@@ -131,6 +133,31 @@ public class RoomServiceTests {
 
         verify(repository).findRoomByRoomId(roomId);
         assertEquals(RoomError.USER_ALREADY_PRESENT, exception.getError());
+    }
+
+    @Test
+    public void getRoomSuccess() {
+        String roomId = "012345";
+        Room room = new Room();
+        room.setRoomId(roomId);
+
+        GetRoomRequest request = new GetRoomRequest();
+        request.setRoomId(roomId);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
+        GetRoomResponse response = service.getRoom(request);
+
+        assertEquals(roomId, response.getRoomId());
+    }
+
+    @Test
+    public void getRoomFailure() {
+        GetRoomRequest request = new GetRoomRequest();
+        request.setRoomId("987654");
+
+        ApiException exception = assertThrows(ApiException.class, () -> service.getRoom(request));
+
+        assertEquals(RoomError.NOT_FOUND, exception.getError());
     }
 
     @Test
