@@ -29,7 +29,7 @@ export const isValidNickname = (nickname: string) => nickname.length > 0
 
 /**
  * Add the user by sending a message via socket.
- * @returns error, if present
+ * @returns void, or error if socket is not connected or nickname is invalid.
 */
 export const addUser = (nickname:string): void => {
   if (connected) {
@@ -43,7 +43,7 @@ export const addUser = (nickname:string): void => {
 
 /**
  * Delete the user by sending a message via socket.
- * @returns error, if present
+ * @returns void, or error if socket is not connected or nickname is invalid.
 */
 export const deleteUser = (nickname:string): void => {
   if (connected) {
@@ -57,7 +57,8 @@ export const deleteUser = (nickname:string): void => {
 
 /**
  * Connect the user via socket.
- * @returns error, if present
+ * @returns void Promise, reject if socket is already connected
+ * or fails to connect.
 */
 export const connect = (endpoint:string):
   Promise<void> => new Promise<void>((resolve, reject) => {
@@ -79,7 +80,7 @@ export const connect = (endpoint:string):
 
 /**
  * Subscribe the user via socket.
- * @returns error, if user is not connected
+ * @returns void Promise, reject if socket is not connected.
  */
 export const subscribe = (subscribeUrl: string,
   subscribeCallback: (users: Message) => void):
@@ -94,7 +95,7 @@ export const subscribe = (subscribeUrl: string,
 
 /**
  * Disconnect the user by sending a message via socket.
- * @returns error, if present
+ * @returns void, or error if socket is not connected.
 */
 export const disconnect = (): void => {
   if (connected) {
