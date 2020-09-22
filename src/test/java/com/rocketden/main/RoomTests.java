@@ -69,8 +69,6 @@ public class RoomTests {
         actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
 
         assertEquals(ERROR.getResponse(), actual);
-
-
     }
 
     @Test
@@ -211,6 +209,8 @@ public class RoomTests {
 
         assertEquals(expected.getUsers(), actual.getUsers());
         assertEquals(expected.getRoomId(), actual.getRoomId());
+
+        // TODO: verify socket message is sent
     }
 
     @Test

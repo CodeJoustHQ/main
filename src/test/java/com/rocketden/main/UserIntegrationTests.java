@@ -44,6 +44,8 @@ public class UserIntegrationTests {
 
     private final WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
 
+    private static final String CONNECT_ENDPOINT = "ws://localhost:{port}" + BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint";
+
     @BeforeEach
     public void setup() {
         // Create variables to model message transport, the SockJS client, and the STOMP client.
@@ -107,7 +109,7 @@ public class UserIntegrationTests {
         };
 
         // Connect to the socket with the STOMP client.
-        this.stompClient.connect("ws://localhost:{port}" + BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint", this.headers, handler, this.port);
+        this.stompClient.connect(CONNECT_ENDPOINT, this.headers, handler, this.port);
 
         if (latch.await(3, TimeUnit.SECONDS)) {
             if (failure.get() != null) {
@@ -162,7 +164,7 @@ public class UserIntegrationTests {
         };
 
         // Connect to the socket with the STOMP client.
-        this.stompClient.connect("ws://localhost:{port}" + BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint", this.headers, handler, this.port);
+        this.stompClient.connect(CONNECT_ENDPOINT, this.headers, handler, this.port);
 
         if (latch.await(3, TimeUnit.SECONDS)) {
             if (failure.get() != null) {

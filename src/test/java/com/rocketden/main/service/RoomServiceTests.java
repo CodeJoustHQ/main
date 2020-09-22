@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -34,6 +35,9 @@ public class RoomServiceTests {
 
     @Mock
     private RoomRepository repository;
+
+    @Mock
+    private SimpMessagingTemplate template;
 
     @Spy
     @InjectMocks
@@ -82,6 +86,8 @@ public class RoomServiceTests {
 
         assertEquals(roomId, response.getRoomId());
         assertTrue(response.getUsers().contains(request.getUser()));
+
+        // TODO: verify socket message is sent
     }
 
     @Test
@@ -159,6 +165,8 @@ public class RoomServiceTests {
 
         assertEquals(RoomError.NOT_FOUND, exception.getError());
     }
+
+    // TODO: add test for sending socket messages
 
     @Test
     public void generateValidRoomId() {
