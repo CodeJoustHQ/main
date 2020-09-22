@@ -32,9 +32,11 @@ export const Panel = styled.div`
   border-width: 2px;
   border-radius: 10px;
   border-color: #ccc;
+  background-color: #fff;
 `;
 
 export const SplitterContainer = styled.div`
+  flex: auto;
   position: relative;
 `;
 
