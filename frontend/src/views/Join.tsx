@@ -7,10 +7,10 @@ function JoinGamePage() {
   const history = useHistory();
 
   /**
-   * Redirect the user to the waiting room.
+   * Redirect the user to the lobby.
    */
-  const redirectToWaitingRoom = (nickname: string) => new Promise<undefined>((resolve) => {
-    history.push('/game/waiting', { nickname });
+  const redirectToLobby = (nickname: string) => new Promise<undefined>((resolve) => {
+    history.push('/game/lobby', { nickname });
     resolve();
   });
 
@@ -18,8 +18,8 @@ function JoinGamePage() {
   return (
     <EnterNicknamePage
       enterNicknameHeaderText="Enter a nickname to join the game!"
-      // Partial application of addUserToWaitingRoom function.
-      enterNicknameAction={redirectToWaitingRoom}
+      // Partial application of addUserToLobby function.
+      enterNicknameAction={redirectToLobby}
     />
   );
 }

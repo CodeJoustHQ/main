@@ -8,13 +8,16 @@ import {
 } from '../api/Socket';
 import ErrorMessage from '../components/core/Error';
 
-type WaitingRoomPageProps = {
+type LobbyPageProps = {
   nickname: string;
 }
 
-function WaitingRoomPage() {
-  const location = useLocation<WaitingRoomPageProps>();
-  const { nickname } = location.state;
+function LobbyPage() {
+  const location = useLocation<LobbyPageProps>();
+  let nickname: string = '';
+  if (location && location.state && location.state.nickname) {
+    nickname = location.state.nickname;
+  }
 
   // Hold error text.
   const [error, setError] = useState('');
@@ -26,11 +29,11 @@ function WaitingRoomPage() {
   const [socketConnected, setSocketConnected] = useState(false);
 
   /**
-   * Nickname that is populated if the join page is on the waiting room stage.
-   * Set error if no nickname is passed in despite the waiting room stage.
+   * Nickname that is populated if the join page is on the lobby stage.
+   * Set error if no nickname is passed in despite the lobby stage.
    */
-  if ((!location || !location.state || !location.state.nickname) && !error) {
-    setError('No nickname was provided for the user in the waiting room.');
+  if (!nickname && !error) {
+    setError('No nickname was provided for the user in the lobby.');
   }
 
   /**
@@ -43,11 +46,11 @@ function WaitingRoomPage() {
   };
 
   /**
-   * Add the user to the waiting room through the following steps.
+   * Add the user to the lobby through the following steps.
    * 1. Connect the user to the socket.
    * 2. Subscribe the user to future messages.
    * 3. Send the user nickname to the room.
-   * 4. Update the room layout to the "waiting room" page.
+   * 4. Update the room layout to the "lobby" page.
    * This method returns a Promise which is used to trigger setLoading
    * and setError on the EnterNickname page following this function.
    */
@@ -70,19 +73,19 @@ function WaitingRoomPage() {
   };
 
   /**
-   * If the user is on the waiting room page state but not connected:
-   * add the user to the waiting room (which connects them to the socket).
-   * (This occurs when the create page redirects the user to the waiting page.)
+   * If the user is on the lobby page state but not connected:
+   * add the user to the lobby (which connects them to the socket).
+   * (This occurs when the create page redirects the user to the lobby.)
    */
   if (!socketConnected && nickname) {
     connectUserToRoom(SOCKET_ENDPOINT, SUBSCRIBE_URL, nickname);
   }
 
-  // Render the Waiting room state.
+  // Render the lobby.
   return (
     <div>
       <LargeText>
-        You have entered the waiting room! Your nickname is &quot;
+        You have entered the lobby! Your nickname is &quot;
         {nickname}
         &quot;.
       </LargeText>
@@ -103,4 +106,4 @@ function WaitingRoomPage() {
   );
 }
 
-export default WaitingRoomPage;
+export default LobbyPage;
