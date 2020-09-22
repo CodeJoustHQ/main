@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Message } from 'stompjs';
 import { LargeText, UserNicknameText } from '../components/core/Text';
@@ -14,10 +14,9 @@ type LobbyPageLocation = {
 
 function LobbyPage() {
   const location = useLocation<LobbyPageLocation>();
-  let nickname: string = '';
-  if (location && location.state && location.state.nickname) {
-    nickname = location.state.nickname;
-  }
+
+  // Set the nickname variable.
+  const [nickname, setNickname] = useState('');
 
   // Hold error text.
   const [error, setError] = useState('');
@@ -27,14 +26,6 @@ function LobbyPage() {
 
   // Variable to hold whether the user is connected to the socket.
   const [socketConnected, setSocketConnected] = useState(false);
-
-  /**
-   * Nickname that is populated if the join page is on the lobby stage.
-   * Set error if no nickname is passed in despite the lobby stage.
-   */
-  if (!nickname && !error) {
-    setError('No nickname was provided for the user in the lobby.');
-  }
 
   /**
    * Subscribe callback that will be triggered on every message.
@@ -72,14 +63,23 @@ function LobbyPage() {
     });
   };
 
-  /**
-   * If the user is on the lobby page state but not connected:
-   * add the user to the lobby (which connects them to the socket).
-   * (This occurs when the create page redirects the user to the lobby.)
-   */
-  if (!socketConnected && nickname) {
-    connectUserToRoom(SOCKET_ENDPOINT, SUBSCRIBE_URL, nickname);
-  }
+  // Grab the nickname variable and add the user to the lobby.
+  useEffect(() => {
+    // Grab the nickname variable; otherwise, set an error.
+    if (location && location.state && location.state.nickname) {
+      setNickname(location.state.nickname);
+    } else {
+      setError('No nickname was provided for the user in the lobby.');
+    }
+  }, [location]);
+
+  // Check if the socket should be connected when the nickname is updated.
+  useEffect(() => {
+    // Connect the user to the room.
+    if (!socketConnected && nickname) {
+      connectUserToRoom(SOCKET_ENDPOINT, SUBSCRIBE_URL, nickname);
+    }
+  }, [nickname]);
 
   // Render the lobby.
   return (
