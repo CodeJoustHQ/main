@@ -79,7 +79,7 @@ function LobbyPage() {
     if (!socketConnected && nickname) {
       connectUserToRoom(SOCKET_ENDPOINT, SUBSCRIBE_URL, nickname);
     }
-  }, [nickname]);
+  }, [socketConnected, nickname, connectUserToRoom]);
 
   // Render the lobby.
   return (
