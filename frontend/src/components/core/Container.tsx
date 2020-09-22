@@ -14,8 +14,7 @@ export const FlexContainer = styled.div`
   display: flex;
   flex: auto;
   flex-direction: column;
-  width: 95%;
-  position: relative;
+  margin: 15px;
 `;
 
 export const FlexInfoBar = styled.div`
@@ -28,17 +27,15 @@ export const FlexInfoBar = styled.div`
 export const Panel = styled.div`
   height: 100%;
   padding: 15px;
+  box-sizing: border-box;
   border-style: solid;
-  border-width: medium;
+  border-width: 2px;
   border-radius: 10px;
-  border-color: gray;
+  border-color: #ccc;
 `;
 
 export const SplitterContainer = styled.div`
-  flex: auto;
-  margin-left: 35px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  position: relative;
 `;
 
 const StyledMainContainer = styled.div`
