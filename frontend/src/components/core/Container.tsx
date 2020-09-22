@@ -14,25 +14,22 @@ export const FlexContainer = styled.div`
   display: flex;
   flex: auto;
   flex-direction: column;
-  margin: 15px;
+  margin: 1rem;
 `;
 
 export const FlexInfoBar = styled.div`
   padding: 0.5rem;
-  height: 15px;
-  line-height: 15px;
+  height: 1rem;
   text-align: center;
 `;
 
 export const Panel = styled.div`
   height: 100%;
-  padding: 15px;
+  padding: 1rem;
   box-sizing: border-box;
-  border-style: solid;
-  border-width: 2px;
+  border: 2px solid ${({ theme }) => theme.colors.border};
   border-radius: 10px;
-  border-color: #ccc;
-  background-color: #fff;
+  background-color: white;
 `;
 
 export const SplitterContainer = styled.div`
