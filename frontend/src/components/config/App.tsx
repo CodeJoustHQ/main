@@ -9,6 +9,7 @@ import GameLayout from '../layout/Game';
 import JoinGamePage from '../../views/Join';
 import CreateGamePage from '../../views/Create';
 import GameResultsPage from '../../views/Results';
+import WaitingRoomPage from '../../views/Waiting';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <CustomRoute path="/game" component={GamePage} layout={GameLayout} exact />
       <CustomRoute path="/game/join" component={JoinGamePage} layout={MainLayout} exact />
       <CustomRoute path="/game/create" component={CreateGamePage} layout={MainLayout} exact />
+      <CustomRoute path="/game/waiting" component={WaitingRoomPage} layout={MainLayout} exact />
       <CustomRoute path="/game/results" component={GameResultsPage} layout={GameLayout} exact />
       <CustomRoute path="*" component={NotFound} layout={MainLayout} />
     </Switch>

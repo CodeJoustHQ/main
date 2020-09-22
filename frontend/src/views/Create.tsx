@@ -10,10 +10,8 @@ function CreateGamePage() {
 
   // Creates a room with the user as the host, and joins that same waiting room.
   const createJoinWaitingRoom = (nickname: string) => new Promise<undefined>((resolve, reject) => {
-    const redirectToWaitingRoom = (room: Room, initialPageState: number,
-      initialNickname: string) => {
-      history.push(`/game/join?room=${room.roomId}`,
-        { initialPageState, initialNickname });
+    const redirectToWaitingRoom = (room: Room) => {
+      history.push(`/game/waiting?room=${room.roomId}`, { nickname });
     };
 
     const roomHost: RoomParams = {
@@ -23,7 +21,7 @@ function CreateGamePage() {
     };
     createRoom(roomHost)
       .then((res) => {
-        redirectToWaitingRoom(res, 2, nickname);
+        redirectToWaitingRoom(res);
         resolve();
       }).catch((err) => {
         reject(errorHandler(err.message));
