@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Message } from 'stompjs';
 import { LargeText, UserNicknameText } from '../components/core/Text';
@@ -41,12 +41,11 @@ function LobbyPage() {
    * 1. Connect the user to the socket.
    * 2. Subscribe the user to future messages.
    * 3. Send the user nickname to the room.
-   * 4. Update the room layout to the "lobby" page.
-   * This method returns a Promise which is used to trigger setLoading
-   * and setError on the EnterNickname page following this function.
+   * This method uses useCallback so it is not re-built in
+   * the useEffect function.
    */
-  const connectUserToRoom = (socketEndpoint: string, subscribeUrl: string,
-    nicknameParam: string) => {
+  const connectUserToRoom = useCallback((socketEndpoint: string,
+    subscribeUrl: string, nicknameParam: string) => {
     connect(socketEndpoint).then(() => {
       subscribe(subscribeUrl, subscribeCallback).then(() => {
         try {
@@ -61,7 +60,7 @@ function LobbyPage() {
     }).catch((err) => {
       setError(err.message);
     });
-  };
+  }, []);
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
@@ -71,15 +70,12 @@ function LobbyPage() {
     } else {
       setError('No nickname was provided for the user in the lobby.');
     }
-  }, [location]);
 
-  // Check if the socket should be connected when the nickname is updated.
-  useEffect(() => {
     // Connect the user to the room.
     if (!socketConnected && nickname) {
       connectUserToRoom(SOCKET_ENDPOINT, SUBSCRIBE_URL, nickname);
     }
-  }, [socketConnected, nickname, connectUserToRoom]);
+  }, [location, socketConnected, nickname, connectUserToRoom]);
 
   // Render the lobby.
   return (
