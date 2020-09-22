@@ -28,6 +28,10 @@ const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
     margin: 0;
     height: 100%;
   }
+  
+  #root {
+    height: 100%
+  }
 `;
 
 ReactDOM.render(

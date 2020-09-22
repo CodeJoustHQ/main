@@ -1,9 +1,7 @@
-import React, { ComponentProps } from 'react';
-import MonacoEditor from 'react-monaco-editor';
+import React from 'react';
+import MonacoEditor, { MonacoEditorProps } from 'react-monaco-editor';
 
-type EditorProps = ComponentProps<typeof MonacoEditor>
-
-function ResizableMonacoEditor(props: EditorProps) {
+function ResizableMonacoEditor(props: MonacoEditorProps) {
   const handleEditorDidMount = (editor: any) => {
     window.addEventListener('resize', () => {
       editor.layout();

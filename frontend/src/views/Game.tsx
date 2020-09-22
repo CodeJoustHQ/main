@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
 import Editor from '../components/core/Editor';
-import { ErrorResponse, isError } from '../api/Error';
+import { ErrorResponse } from '../api/Error';
 import { Problem, getProblems } from '../api/Problem';
 import { Room } from '../api/Room';
 import {
-  FlexContainer, FlexInfoBar, SplitterContainer,
+  FlexContainer, FlexInfoBar, Panel, SplitterContainer,
 } from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
 import { ProblemHeaderText, Text } from '../components/core/Text';
@@ -61,14 +61,14 @@ function GamePage() {
           primaryMinSize={20}
           secondaryMinSize={35}
         >
-          <div>
+          <Panel>
             <ProblemHeaderText>{firstProblem?.name}</ProblemHeaderText>
             <Text>{firstProblem?.description}</Text>
             {error ? <ErrorMessage message={error} /> : null}
-          </div>
-          <div>
-            <Editor height="100vh" language="javascript" />
-          </div>
+          </Panel>
+          <Panel>
+            <Editor height="100%" language="javascript" />
+          </Panel>
         </SplitterLayout>
       </SplitterContainer>
     </FlexContainer>

@@ -14,7 +14,7 @@ export const FlexContainer = styled.div`
   display: flex;
   flex: auto;
   flex-direction: column;
-  overflow: hidden;
+  width: 95%;
   position: relative;
 `;
 
@@ -25,11 +25,20 @@ export const FlexInfoBar = styled.div`
   text-align: center;
 `;
 
+export const Panel = styled.div`
+  height: 100%;
+  padding: 15px;
+  border-style: solid;
+  border-width: medium;
+  border-radius: 10px;
+  border-color: gray;
+`;
+
 export const SplitterContainer = styled.div`
   flex: auto;
-  margin-left: 25px;
-  margin-right: 25px;
+  margin-left: 35px;
   margin-top: 10px;
+  margin-bottom: 10px;
 `;
 
 const StyledMainContainer = styled.div`
