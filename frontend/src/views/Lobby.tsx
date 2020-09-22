@@ -8,12 +8,12 @@ import {
 } from '../api/Socket';
 import ErrorMessage from '../components/core/Error';
 
-type LobbyPageProps = {
+type LobbyPageLocation = {
   nickname: string;
 }
 
 function LobbyPage() {
-  const location = useLocation<LobbyPageProps>();
+  const location = useLocation<LobbyPageLocation>();
   let nickname: string = '';
   if (location && location.state && location.state.nickname) {
     nickname = location.state.nickname;
