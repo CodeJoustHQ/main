@@ -1,5 +1,6 @@
 package com.rocketden.main.service;
 
+import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.CreateRoomResponse;
@@ -15,6 +16,7 @@ import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -25,13 +27,16 @@ import java.util.Random;
 public class RoomService {
 
     public static final int ROOM_ID_LENGTH = 6;
+    private static final Random random = new Random();
+    private static final String SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user";
 
     private final RoomRepository repository;
-    private static final Random random = new Random();
+    private final SimpMessagingTemplate template;
 
     @Autowired
-    public RoomService(RoomRepository repository) {
+    public RoomService(RoomRepository repository, SimpMessagingTemplate template) {
         this.repository = repository;
+        this.template = template;
     }
 
     public JoinRoomResponse joinRoom(JoinRoomRequest request) {
@@ -61,6 +66,7 @@ public class RoomService {
         room.setUsers(users);
         repository.save(room);
 
+        sendSocketUpdate(room.getRoomId(), room.getUsers());
         return RoomMapper.entityToJoinResponse(room);
     }
 
@@ -97,6 +103,11 @@ public class RoomService {
         }
 
         return RoomMapper.entityToGetResponse(room);
+    }
+
+    public void sendSocketUpdate(String roomId, Set<User> users) {
+        String socketPath = String.format(SOCKET_PATH, roomId);
+        template.convertAndSend(socketPath, users);
     }
 
     // Generate numeric String with length ROOM_ID_LENGTH

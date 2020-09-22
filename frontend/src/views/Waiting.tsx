@@ -25,7 +25,7 @@ function WaitingRoomPage() {
   const [socketConnected, setSocketConnected] = useState(false);
 
   // Dummy room id for dynamic room endpoint purposes
-  const socketRoomId = '123456';
+  const socketRoomId = '791894';
 
   /**
    * Nickname that is populated if the join page is on the waiting room stage.

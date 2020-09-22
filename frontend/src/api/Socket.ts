@@ -18,7 +18,7 @@ let socketRoomId: string;
 export const routes = (roomId: string) => {
   socketRoomId = roomId;
   return {
-    connect: `${basePath}/${roomId}/join-room-endpoint`,
+    connect: `${basePath}/join-room-endpoint`,
     subscribe: `${basePath}/${roomId}/subscribe-user`,
     addUser: `${basePath}/${roomId}/add-user`,
     deleteUser: `${basePath}/${roomId}/delete-user`,
