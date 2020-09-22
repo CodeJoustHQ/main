@@ -12,11 +12,18 @@ export type User = {
 // Variable to hold the current connected state.
 let connected: boolean = false;
 
-// Create constants for the connection, subscription, and send message URLs.
-export const SOCKET_ENDPOINT:string = '/api/v1/socket/join-room-endpoint';
-export const SUBSCRIBE_URL:string = '/api/v1/socket/subscribe-user';
-const ADD_USER_URL:string = '/api/v1/socket/add-user';
-const DELETE_USER_URL:string = '/api/v1/socket/delete-user';
+// Dynamic route endpoints that depend on the room id
+const basePath = '/api/v1/socket';
+let socketRoomId: string;
+export const routes = (roomId: string) => {
+  socketRoomId = roomId;
+  return {
+    connect: `${basePath}/${roomId}/join-room-endpoint`,
+    subscribe: `${basePath}/${roomId}/subscribe-user`,
+    addUser: `${basePath}/${roomId}/add-user`,
+    deleteUser: `${basePath}/${roomId}/delete-user`,
+  };
+};
 
 /**
  * The requirements for validity are as follows:
@@ -33,7 +40,7 @@ export const isValidNickname = (nickname: string) => nickname.length > 0
 */
 export const addUser = (nickname:string): void => {
   if (connected) {
-    stompClient.send(ADD_USER_URL, {}, nickname);
+    stompClient.send(routes(socketRoomId).addUser, {}, nickname);
   } else if (!connected) {
     throw errorHandler('The socket is not connected.');
   } else {
@@ -47,7 +54,7 @@ export const addUser = (nickname:string): void => {
 */
 export const deleteUser = (nickname:string): void => {
   if (connected) {
-    stompClient.send(DELETE_USER_URL, {}, nickname);
+    stompClient.send(routes(socketRoomId).deleteUser, {}, nickname);
   } else if (!connected) {
     throw errorHandler('The socket is not connected.');
   } else {
@@ -60,11 +67,12 @@ export const deleteUser = (nickname:string): void => {
  * @returns void Promise, reject if socket is already connected
  * or fails to connect.
 */
-export const connect = (endpoint:string):
+export const connect = (roomId:string):
   Promise<void> => new Promise<void>((resolve, reject) => {
     if (!connected) {
       // Connect to given endpoint, subscribe to future messages, and send user message.
-      const socket: WebSocket = new SockJS(endpoint);
+      socketRoomId = roomId;
+      const socket: WebSocket = new SockJS(routes(socketRoomId).connect);
       stompClient = Stomp.over(socket);
       stompClient.connect({}, () => {
         // Reassign connected variable.
@@ -99,7 +107,7 @@ export const subscribe = (subscribeUrl: string,
 */
 export const disconnect = (): void => {
   if (connected) {
-    const socket: WebSocket = new SockJS('/api/v1/socket/join-room-endpoint');
+    const socket: WebSocket = new SockJS(routes(socketRoomId).connect);
     stompClient = Stomp.over(socket);
     stompClient.disconnect(() => {
       // Reassign connected variable.

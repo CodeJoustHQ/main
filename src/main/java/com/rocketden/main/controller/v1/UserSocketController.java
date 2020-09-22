@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.rocketden.main.model.User;
 
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,20 +13,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserSocketController extends BaseRestController {
 
-    Set<User> users = new HashSet<>();
+    private static final String SEND_TO_PATH = BaseRestController.BASE_SOCKET_URL + "/{roomId}/subscribe-user";
 
-    @MessageMapping("/add-user")
-    @SendTo(BaseRestController.BASE_SOCKET_URL + "/subscribe-user")
-    public Set<User> addUser(String nickname) {
+    private Set<User> users = new HashSet<>();
+
+    @MessageMapping("/{roomId}/add-user")
+    @SendTo(SEND_TO_PATH)
+    public Set<User> addUser(@DestinationVariable String roomId, String nickname) {
         User user = new User();
         user.setNickname(nickname);
         users.add(user);
         return users;
     }
 
-    @MessageMapping("/delete-user")
-    @SendTo(BaseRestController.BASE_SOCKET_URL + "/subscribe-user")
-    public Set<User> deleteUser(String nickname) {
+    @MessageMapping("{roomId}/delete-user")
+    @SendTo(SEND_TO_PATH)
+    public Set<User> deleteUser(@DestinationVariable String roomId, String nickname) {
         User user = new User();
         user.setNickname(nickname);
         users.remove(user);

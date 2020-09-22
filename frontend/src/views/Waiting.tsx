@@ -3,8 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Message } from 'stompjs';
 import { LargeText, UserNicknameText } from '../components/core/Text';
 import {
-  addUser, SUBSCRIBE_URL, connect,
-  deleteUser, SOCKET_ENDPOINT, subscribe, User,
+  addUser, deleteUser, connect, routes, subscribe, User,
 } from '../api/Socket';
 import ErrorMessage from '../components/core/Error';
 
@@ -24,6 +23,9 @@ function WaitingRoomPage() {
 
   // Variable to hold whether the user is connected to the socket.
   const [socketConnected, setSocketConnected] = useState(false);
+
+  // Dummy room id for dynamic room endpoint purposes
+  const socketRoomId = '123456';
 
   /**
    * Nickname that is populated if the join page is on the waiting room stage.
@@ -51,10 +53,9 @@ function WaitingRoomPage() {
    * This method returns a Promise which is used to trigger setLoading
    * and setError on the EnterNickname page following this function.
    */
-  const connectUserToRoom = (socketEndpoint: string, subscribeUrl: string,
-    nicknameParam: string) => {
-    connect(socketEndpoint).then(() => {
-      subscribe(subscribeUrl, subscribeCallback).then(() => {
+  const connectUserToRoom = (roomId: string, nicknameParam: string) => {
+    connect(roomId).then(() => {
+      subscribe(routes(roomId).subscribe, subscribeCallback).then(() => {
         try {
           addUser(nicknameParam);
           setSocketConnected(true);
@@ -75,7 +76,7 @@ function WaitingRoomPage() {
    * (This occurs when the create page redirects the user to the waiting page.)
    */
   if (!socketConnected && nickname) {
-    connectUserToRoom(SOCKET_ENDPOINT, SUBSCRIBE_URL, nickname);
+    connectUserToRoom(socketRoomId, nickname);
   }
 
   // Render the Waiting room state.

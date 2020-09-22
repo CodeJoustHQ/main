@@ -77,7 +77,7 @@ public class UserIntegrationTests {
             @Override
             public void afterConnected(final StompSession session, StompHeaders connectedHeaders) {
                 // After the socket is connected, subscribe and send message.
-                session.subscribe(BaseRestController.BASE_SOCKET_URL + "/subscribe-user", new StompFrameHandler() {
+                session.subscribe(BaseRestController.BASE_SOCKET_URL + "/123456/subscribe-user", new StompFrameHandler() {
                     @Override
                     public Type getPayloadType(StompHeaders headers) {
                         return HashSet.class;
@@ -98,7 +98,7 @@ public class UserIntegrationTests {
                     }
                 });
                 try {
-                    session.send(BaseRestController.BASE_SOCKET_URL + "/add-user", "Chris");
+                    session.send(BaseRestController.BASE_SOCKET_URL + "/123456/add-user", "Chris");
                 } catch (Throwable t) {
                     failure.set(t);
                     latch.countDown();
@@ -132,7 +132,7 @@ public class UserIntegrationTests {
             @Override
             public void afterConnected(final StompSession session, StompHeaders connectedHeaders) {
                 // After the socket is connected, subscribe and send message.
-                session.subscribe(BaseRestController.BASE_SOCKET_URL + "/subscribe-user", new StompFrameHandler() {
+                session.subscribe(BaseRestController.BASE_SOCKET_URL + "/123456/subscribe-user", new StompFrameHandler() {
                     @Override
                     public Type getPayloadType(StompHeaders headers) {
                         return HashSet.class;
@@ -153,7 +153,7 @@ public class UserIntegrationTests {
                     }
                 });
                 try {
-                    session.send(BaseRestController.BASE_SOCKET_URL + "/delete-user", "Chris");
+                    session.send(BaseRestController.BASE_SOCKET_URL + "/123456/delete-user", "Chris");
                 } catch (Throwable t) {
                     failure.set(t);
                     latch.countDown();
