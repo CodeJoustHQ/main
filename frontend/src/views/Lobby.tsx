@@ -27,7 +27,7 @@ function LobbyPage() {
   const [socketConnected, setSocketConnected] = useState(false);
 
   // Dummy room id for dynamic room endpoint purposes
-  const socketRoomId = '791894';
+  const socketRoomId: string = '791894';
 
   /**
    * Subscribe callback that will be triggered on every message.
