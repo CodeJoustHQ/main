@@ -34,18 +34,21 @@ function JoinGamePage() {
   const [focusInput, setFocusInput] = useState(false);
 
   /**
-   * Redirect the user to the lobby.
+   * The local storage is updated when the page state updates.
    */
-  const redirectToLobby = (nickname: string) => new Promise<undefined>((resolve) => {
-    history.push('/game/lobby', { nickname });
-    resolve();
-  });
-
-  // The local storage is updated when the page state updates.
   const updateLocalStorage = (pageStateParam: string, roomIdParam: string) => {
     localStorage.setItem('pageState', pageStateParam);
     localStorage.setItem('roomId', roomIdParam);
   };
+
+  /**
+   * Update local storage and redirect the user to the lobby.
+   */
+  const redirectToLobby = (nickname: string) => new Promise<undefined>((resolve) => {
+    updateLocalStorage('1', '');
+    history.push('/game/lobby', { nickname });
+    resolve();
+  });
 
   let joinPageContent: ReactElement | undefined;
 
