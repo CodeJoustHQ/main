@@ -14,10 +14,10 @@ function JoinGamePage() {
    * 1 = Enter Room ID (default)
    * 2 = Enter Nickname
    */
-  const [pageState, setPageState] = useState(parseInt(localStorage.getItem('pageState') || '1', 10));
+  const [pageState, setPageState] = useState(1);
 
   // Variable to hold the user's current room ID input (default empty string).
-  const [roomId, setRoomId] = useState(localStorage.getItem('roomId') || '');
+  const [roomId, setRoomId] = useState('');
 
   /**
    * The nickname is valid if it is non-empty and has exactly
@@ -33,18 +33,9 @@ function JoinGamePage() {
   const [focusInput, setFocusInput] = useState(false);
 
   /**
-   * The local storage is updated when the page state updates.
-   */
-  const updateLocalStorage = (pageStateParam: string, roomIdParam: string) => {
-    localStorage.setItem('pageState', pageStateParam);
-    localStorage.setItem('roomId', roomIdParam);
-  };
-
-  /**
-   * Update local storage and redirect the user to the lobby.
+   * Redirect the user to the lobby.
    */
   const redirectToLobby = (nickname: string) => new Promise<undefined>((resolve) => {
-    updateLocalStorage('1', '');
     history.push(`/game/lobby?room=${roomId}`, { nickname });
     resolve();
   });
@@ -76,17 +67,13 @@ function JoinGamePage() {
                 event.preventDefault();
               }
               if (event.key === 'Enter' && validRoomId) {
-                // TODO: Add room ID to location or whatnot.
                 setPageState(2);
-                updateLocalStorage('2', roomId);
               }
             }}
           />
           <LargeInputButton
             onClick={() => {
-              // TODO: Add room ID to location or whatnot.
               setPageState(2);
-              updateLocalStorage('2', roomId);
             }}
             value="Enter"
             // Input is disabled if no nickname exists, has a space, or is too long.
