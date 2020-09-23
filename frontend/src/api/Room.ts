@@ -1,15 +1,18 @@
 import axios from 'axios';
 import { axiosErrorHandler } from './Error';
 
+export type User = {
+  nickname: string,
+}
+
 export type Room = {
-  message: string,
   roomId: string;
+  host: User;
+  users: [User],
 };
 
 export type RoomParams = {
-  host: {
-    nickname: string;
-  };
+  host: User;
 };
 
 const basePath = '/api/v1/rooms';

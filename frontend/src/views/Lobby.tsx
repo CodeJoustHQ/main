@@ -1,18 +1,21 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
 import { LargeText, UserNicknameText } from '../components/core/Text';
 import {
-  addUser, deleteUser, connect, routes, subscribe, User,
+  deleteUser, connect, routes, subscribe, User,
 } from '../api/Socket';
 import ErrorMessage from '../components/core/Error';
+import { Room } from '../api/Room';
 
 type LobbyPageLocation = {
-  nickname: string;
+  user: User,
+  room: Room
 }
 
 function LobbyPage() {
   const location = useLocation<LobbyPageLocation>();
+  const history = useHistory();
 
   // Set the nickname variable.
   const [nickname, setNickname] = useState('');
@@ -46,15 +49,10 @@ function LobbyPage() {
    * This method uses useCallback so it is not re-built in
    * the useEffect function.
    */
-  const connectUserToRoom = useCallback((roomId: string, nicknameParam: string) => {
+  const connectUserToRoom = useCallback((roomId: string) => {
     connect(roomId).then(() => {
       subscribe(routes(roomId).subscribe, subscribeCallback).then(() => {
-        try {
-          addUser(nicknameParam);
-          setSocketConnected(true);
-        } catch (err) {
-          setError(err.message);
-        }
+        setSocketConnected(true);
       }).catch((err) => {
         setError(err.message);
       });
@@ -65,16 +63,17 @@ function LobbyPage() {
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
-    // Grab the nickname variable; otherwise, set an error.
-    if (location && location.state && location.state.nickname) {
-      setNickname(location.state.nickname);
+    // Grab the user and room information; otherwise, redirect to the join page
+    if (location && location.state && location.state.user && location.state.room) {
+      setNickname(location.state.user.nickname);
+      setUsers(location.state.room.users);
     } else {
-      setError('No nickname was provided for the user in the lobby.');
+      history.push('/game/join');
     }
 
     // Connect the user to the room.
     if (!socketConnected && nickname) {
-      connectUserToRoom(socketRoomId, nickname);
+      connectUserToRoom(socketRoomId);
     }
   }, [location, socketConnected, nickname, connectUserToRoom]);
 
