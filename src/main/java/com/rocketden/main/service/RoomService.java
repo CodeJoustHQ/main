@@ -9,6 +9,7 @@ import com.rocketden.main.dto.room.GetRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
+import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 public class RoomService {
@@ -106,9 +108,11 @@ public class RoomService {
         return RoomMapper.entityToGetResponse(room);
     }
 
+    // Send updates about new users to the client through sockets
     public void sendSocketUpdate(String roomId, Set<User> users) {
+        Set<UserDto> userDtos = users.stream().map(UserMapper::toDto).collect(Collectors.toSet());
         String socketPath = String.format(SOCKET_PATH, roomId);
-        template.convertAndSend(socketPath, users);
+        template.convertAndSend(socketPath, userDtos);
     }
 
     // Generate numeric String with length ROOM_ID_LENGTH

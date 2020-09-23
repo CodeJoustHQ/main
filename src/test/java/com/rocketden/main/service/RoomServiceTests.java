@@ -172,11 +172,20 @@ public class RoomServiceTests {
 
     @Test
     public void sendSocketUpdate() {
+        User user = new User();
+        user.setNickname("test");
         Set<User> users = new HashSet<>();
+        users.add(user);
+
+        UserDto userDto = new UserDto();
+        userDto.setNickname("test");
+        Set<UserDto> expected = new HashSet<>();
+        expected.add(userDto);
+
         service.sendSocketUpdate("123456", users);
         verify(template).convertAndSend(
                 eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", "123456")),
-                eq(users));
+                eq(expected));
     }
 
     @Test
