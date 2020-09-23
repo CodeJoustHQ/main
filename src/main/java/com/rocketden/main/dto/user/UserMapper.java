@@ -9,7 +9,17 @@ public class UserMapper {
 
     private static final ModelMapper mapper = new ModelMapper();
 
-    public static CreateUserResponse entityToCreateResponse(User entity) {
-        return mapper.map(entity, CreateUserResponse.class);
+    public static UserDto toDto(User entity) {
+        if (entity == null) {
+            return null;
+        }
+        return mapper.map(entity, UserDto.class);
+    }
+
+    public static User toEntity(UserDto dto) {
+        if (dto == null) {
+            return null;
+        }
+        return mapper.map(dto, User.class);
     }
 }

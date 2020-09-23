@@ -1,6 +1,7 @@
 package com.rocketden.main;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -12,8 +13,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.rocketden.main.controller.v1.BaseRestController;
-import com.rocketden.main.model.User;
 
+import com.rocketden.main.dto.user.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -85,7 +86,7 @@ public class UserIntegrationTests {
 
                     @Override
                     public void handleFrame(StompHeaders headers, Object payload) {
-                        Set<User> users = (HashSet<User>) payload;
+                        Set<UserDto> users = (HashSet<UserDto>) payload;
                         try {
                             // Verify that the subscription received the expected message.
                             assertEquals(1, users.size());
@@ -140,7 +141,7 @@ public class UserIntegrationTests {
 
                     @Override
                     public void handleFrame(StompHeaders headers, Object payload) {
-                        Set<User> users = (HashSet<User>) payload;
+                        Set<UserDto> users = (HashSet<UserDto>) payload;
                         try {
                             // Verify that the subscription received the expected message.
                             assertEquals(0, users.size());

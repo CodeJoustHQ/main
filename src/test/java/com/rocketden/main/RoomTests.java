@@ -1,16 +1,15 @@
 package com.rocketden.main;
 
 import com.rocketden.main.dto.room.CreateRoomRequest;
-import com.rocketden.main.dto.room.CreateRoomResponse;
+import com.rocketden.main.dto.room.JoinRoomRequest;
+import com.rocketden.main.dto.room.RoomDto;
+import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.dto.room.GetRoomResponse;
-import com.rocketden.main.dto.room.JoinRoomRequest;
-import com.rocketden.main.dto.room.JoinRoomResponse;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
-import com.rocketden.main.model.User;
 import com.rocketden.main.util.Utility;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +74,7 @@ public class RoomTests {
 
     @Test
     public void joinNonExistentRoom() throws Exception {
-        User user = new User();
+        UserDto user = new UserDto();
         user.setNickname("rocket");
 
         // PUT request to join non-existent room should fail
@@ -100,13 +99,16 @@ public class RoomTests {
     @Test
     public void createAndGetValidRoom() throws Exception {
         // POST request to create valid room should return successful response
-        User host = new User();
+        UserDto host = new UserDto();
         host.setNickname("host");
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
-        
-        CreateRoomResponse expected = new CreateRoomResponse();
+
+        RoomDto expected = new RoomDto();
         expected.setHost(host);
+        Set<UserDto> users = new HashSet<>();
+        users.add(host);
+        expected.setUsers(users);
 
         MvcResult result = this.mockMvc.perform(post(POST_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -115,9 +117,10 @@ public class RoomTests {
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        CreateRoomResponse actual = Utility.toObject(jsonResponse, CreateRoomResponse.class);
+        RoomDto actual = Utility.toObject(jsonResponse, RoomDto.class);
 
         assertEquals(expected.getHost(), actual.getHost());
+        assertEquals(expected.getUsers(), actual.getUsers());
 
         // Send GET request to validate that room exists
         String roomId = actual.getRoomId();
@@ -161,14 +164,17 @@ public class RoomTests {
     @Test
     public void createAndJoinRoom() throws Exception {
         // POST request to create room and PUT request to join room should succeed
-        User host = new User();
+        UserDto host = new UserDto();
         host.setNickname("host");
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
         // 1. Send POST request and verify room was created
-        CreateRoomResponse createExpected = new CreateRoomResponse();
+        RoomDto createExpected = new RoomDto();
         createExpected.setHost(host);
+        Set<UserDto> users = new HashSet<>();
+        users.add(host);
+        createExpected.setUsers(users);
 
         MvcResult result = this.mockMvc.perform(post(POST_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -177,17 +183,18 @@ public class RoomTests {
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        CreateRoomResponse createActual = Utility.toObject(jsonResponse, CreateRoomResponse.class);
+        RoomDto createActual = Utility.toObject(jsonResponse, RoomDto.class);
 
         assertEquals(createExpected.getHost(), createActual.getHost());
+        assertEquals(createExpected.getUsers(), createActual.getUsers());
 
         // Get id of created room to join
         String roomId = createActual.getRoomId();
 
         // Create User and Set<User> for PUT request
-        User user = new User();
+        UserDto user = new UserDto();
         user.setNickname("rocket");
-        Set<User> users = new HashSet<>();
+        users = new HashSet<>();
         users.add(host);
         users.add(user);
 
@@ -196,7 +203,8 @@ public class RoomTests {
         joinRequest.setRoomId(roomId);
         joinRequest.setUser(user);
 
-        JoinRoomResponse expected = new JoinRoomResponse();
+        RoomDto expected = new RoomDto();
+        expected.setHost(host);
         expected.setUsers(users);
         expected.setRoomId(roomId);
 
@@ -207,23 +215,27 @@ public class RoomTests {
                 .andReturn();
 
         jsonResponse = result.getResponse().getContentAsString();
-        JoinRoomResponse actual = Utility.toObject(jsonResponse, JoinRoomResponse.class);
+        RoomDto actual = Utility.toObject(jsonResponse, RoomDto.class);
 
-        assertEquals(expected.getUsers(), actual.getUsers());
         assertEquals(expected.getRoomId(), actual.getRoomId());
+        assertEquals(expected.getHost(), actual.getHost());
+        assertEquals(expected.getUsers(), actual.getUsers());
     }
 
     @Test
     public void createAndJoinRoomUserAlreadyExists() throws Exception {
         // POST request to create room and PUT request to join room should succeed
-        User host = new User();
+        UserDto host = new UserDto();
         host.setNickname("host");
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
         // 1. Send POST request and verify room was created
-        CreateRoomResponse createExpected = new CreateRoomResponse();
+        RoomDto createExpected = new RoomDto();
         createExpected.setHost(host);
+        Set<UserDto> users = new HashSet<>();
+        users.add(host);
+        createExpected.setUsers(users);
 
         MvcResult result = this.mockMvc.perform(post(POST_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -232,9 +244,10 @@ public class RoomTests {
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        CreateRoomResponse createActual = Utility.toObject(jsonResponse, CreateRoomResponse.class);
+        RoomDto createActual = Utility.toObject(jsonResponse, RoomDto.class);
 
         assertEquals(createExpected.getHost(), createActual.getHost());
+        assertEquals(createExpected.getUsers(), createActual.getUsers());
 
         // Get id of created room to join
         String roomId = createActual.getRoomId();
@@ -261,14 +274,17 @@ public class RoomTests {
     @Test
     public void createAndJoinRoomNoUser() throws Exception {
         // POST request to create room and PUT request to join room should succeed
-        User host = new User();
+        UserDto host = new UserDto();
         host.setNickname("host");
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
         // 1. Send POST request and verify room was created
-        CreateRoomResponse createExpected = new CreateRoomResponse();
+        RoomDto createExpected = new RoomDto();
         createExpected.setHost(host);
+        Set<UserDto> users = new HashSet<>();
+        users.add(host);
+        createExpected.setUsers(users);
 
         MvcResult result = this.mockMvc.perform(post(POST_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -277,9 +293,10 @@ public class RoomTests {
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        CreateRoomResponse createActual = Utility.toObject(jsonResponse, CreateRoomResponse.class);
+        RoomDto createActual = Utility.toObject(jsonResponse, RoomDto.class);
 
         assertEquals(createExpected.getHost(), createActual.getHost());
+        assertEquals(createExpected.getUsers(), createActual.getUsers());
 
         // Get id of created room to join
         String roomId = createActual.getRoomId();

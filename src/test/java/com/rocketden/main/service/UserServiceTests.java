@@ -2,7 +2,7 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.UserRepository;
 import com.rocketden.main.dto.user.CreateUserRequest;
-import com.rocketden.main.dto.user.CreateUserResponse;
+import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.model.User;
 
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ public class UserServiceTests {
         CreateUserRequest request = new CreateUserRequest();
         request.setNickname("rocket");
 
-        CreateUserResponse response = service.createUser(request);
+        UserDto response = service.createUser(request);
         verify(repository).save(Mockito.any(User.class));
         assertEquals("rocket", response.getNickname());
     }

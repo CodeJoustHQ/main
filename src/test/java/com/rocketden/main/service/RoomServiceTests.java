@@ -2,16 +2,17 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
-import com.rocketden.main.dto.room.CreateRoomResponse;
+import com.rocketden.main.dto.room.JoinRoomRequest;
+import com.rocketden.main.dto.room.RoomDto;
+import com.rocketden.main.dto.user.UserDto;
+import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.dto.room.GetRoomResponse;
-import com.rocketden.main.dto.room.JoinRoomRequest;
-import com.rocketden.main.dto.room.JoinRoomResponse;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Room;
-import com.rocketden.main.model.User;
 
+import com.rocketden.main.model.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,14 +42,14 @@ public class RoomServiceTests {
 
     @Test
     public void createRoomSuccess() {
-        User user = new User();
+        UserDto user = new UserDto();
         user.setNickname("rocket");
         CreateRoomRequest request = new CreateRoomRequest();
         request.setHost(user);
         // Verify create room request succeeds and returns correct response
         // Mock generateRoomId to return a custom room id
         Mockito.doReturn("012345").when(service).generateRoomId();
-        CreateRoomResponse response = service.createRoom(request);
+        RoomDto response = service.createRoom(request);
 
         verify(repository).save(Mockito.any(Room.class));
         assertEquals("012345", response.getRoomId());
@@ -68,7 +69,7 @@ public class RoomServiceTests {
         User user = new User();
         user.setNickname("rocket");
         JoinRoomRequest request = new JoinRoomRequest();
-        request.setUser(user);
+        request.setUser(UserMapper.toDto(user));
         request.setRoomId(roomId);
 
         Room room = new Room();
@@ -78,7 +79,7 @@ public class RoomServiceTests {
 
         // Mock repository to return room when called
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
-        JoinRoomResponse response = service.joinRoom(request);
+        RoomDto response = service.joinRoom(request);
 
         assertEquals(roomId, response.getRoomId());
         assertTrue(response.getUsers().contains(request.getUser()));
@@ -92,7 +93,7 @@ public class RoomServiceTests {
         User user = new User();
         user.setNickname("rocket");
         JoinRoomRequest request = new JoinRoomRequest();
-        request.setUser(user);
+        request.setUser(UserMapper.toDto(user));
         request.setRoomId(roomId);
 
         // Mock repository to return room when called
@@ -119,7 +120,7 @@ public class RoomServiceTests {
         users.add(firstUser);
         
         JoinRoomRequest request = new JoinRoomRequest();
-        request.setUser(secondUser);
+        request.setUser(UserMapper.toDto(secondUser));
         request.setRoomId(roomId);
 
         Room room = new Room();
