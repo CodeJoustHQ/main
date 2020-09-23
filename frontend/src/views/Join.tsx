@@ -92,7 +92,7 @@ function JoinGamePage() {
       joinPageContent = (
         <div>
           <EnterNicknamePage
-            enterNicknameHeaderText={`Enter a nickname to join room ${roomId}!`}
+            enterNicknameHeaderText={`Enter a nickname to join room #${roomId}!`}
             // Partial application of addUserToLobby function.
             enterNicknameAction={redirectToLobby}
           />
