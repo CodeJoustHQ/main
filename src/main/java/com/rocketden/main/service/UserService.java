@@ -2,6 +2,7 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.UserRepository;
 import com.rocketden.main.dto.user.CreateUserRequest;
+import com.rocketden.main.dto.user.DeleteUserRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.UserError;
@@ -35,6 +36,17 @@ public class UserService {
         repository.save(user);
 
         return UserMapper.toDto(user);
+    }
+
+    public boolean deleteUser(DeleteUserRequest request) {
+        User user = repository.findUserByNickname(request.getNickname());
+
+        if (user == null) {
+            return false;
+        }
+
+        repository.delete(user);
+        return true;
     }
 
     /**

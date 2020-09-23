@@ -1,6 +1,7 @@
 package com.rocketden.main;
 
 import com.rocketden.main.dto.user.CreateUserRequest;
+import com.rocketden.main.dto.user.DeleteUserRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiError;
@@ -17,7 +18,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -125,5 +129,36 @@ public class UserTests {
         ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
 
         assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @Test
+    public void deleteExistingUser() throws Exception {
+        CreateUserRequest createRequest = new CreateUserRequest();
+        createRequest.setNickname("rocket");
+        
+        DeleteUserRequest request = new DeleteUserRequest();
+        request.setNickname("rocket");
+
+        this.mockMvc.perform(post(POST_USER)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(request)));
+
+        this.mockMvc.perform(delete(POST_USER)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(request)))
+                .andExpect(status().isAccepted())
+                .andExpect(content().string("true"));
+    }
+
+    @Test
+    public void deleteNonExistingtUser() throws Exception {
+        DeleteUserRequest request = new DeleteUserRequest();
+        request.setNickname("rocket");
+
+        this.mockMvc.perform(delete(POST_USER)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(request)))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("false"));
     }
 }
