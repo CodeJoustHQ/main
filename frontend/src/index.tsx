@@ -26,6 +26,11 @@ const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
   
   body {
     margin: 0;
+    height: 100%;
+  }
+  
+  #root {
+    height: 100%
   }
 `;
 

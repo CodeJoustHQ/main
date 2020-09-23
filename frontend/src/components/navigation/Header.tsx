@@ -3,10 +3,6 @@ import styled from 'styled-components';
 import { NavbarLink } from '../core/Link';
 
 const Content = styled.div`
-  flex: 1 0 100%;
-  top: 0;
-  left: 0;
-  right: 0;
   height: 50px;
   padding: 20px;
   text-align: center;
