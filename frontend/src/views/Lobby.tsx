@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useLocation, Redirect } from 'react-router-dom';
 import { Message } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
 import { LargeText, UserNicknameText } from '../components/core/Text';
@@ -11,21 +11,23 @@ import { User } from '../api/User';
 
 type LobbyPageLocation = {
   user: User,
-  room: Room
-}
+  room: Room,
+};
 
 function LobbyPage() {
   const location = useLocation<LobbyPageLocation>();
-  const history = useHistory();
 
   // Set the nickname variable.
-  const [nickname, setNickname] = useState('');
+  const [user, setUser] = useState<User | null>(null);
 
   // Hold error text.
   const [error, setError] = useState('');
 
+  // Variable to determine whether to redirect back to join page
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+
   // Variable to hold the users on the page.
-  const [users, setUsers] = useState<User[]>([]);
+  const [room, setRoom] = useState<Room | null>(null);
 
   // Variable to hold whether the user is connected to the socket.
   const [socketConnected, setSocketConnected] = useState(false);
@@ -35,8 +37,8 @@ function LobbyPage() {
    * Update the users list.
    */
   const subscribeCallback = (result: Message) => {
-    const userObjects:User[] = JSON.parse(result.body);
-    setUsers(userObjects);
+    const newRoom:Room = JSON.parse(result.body);
+    setRoom(newRoom);
   };
 
   /**
@@ -63,35 +65,39 @@ function LobbyPage() {
   useEffect(() => {
     // Grab the user and room information; otherwise, redirect to the join page
     if (location && location.state && location.state.user && location.state.room) {
-      setNickname(location.state.user.nickname);
-      setUsers(location.state.room.users);
+      setUser(location.state.user);
+      setRoom(location.state.room);
     } else {
-      history.push('/game/join');
+      setShouldRedirect(true);
     }
 
     // Connect the user to the room.
-    if (!socketConnected && nickname) {
-      connectUserToRoom(location.state.room.roomId);
+    if (!socketConnected && room !== null) {
+      connectUserToRoom(room.roomId);
     }
-  }, [location, socketConnected, nickname, connectUserToRoom]);
+  }, [location, socketConnected, room, connectUserToRoom]);
 
   // Render the lobby.
   return (
     <div>
+      { shouldRedirect ? <Redirect to="/game/join" /> : null}
       <LargeText>
-        You have entered the lobby! Your nickname is &quot;
-        {nickname}
+        You have entered the lobby for room
+        {' '}
+        {room?.roomId}
+        ! Your nickname is &quot;
+        {user?.nickname}
         &quot;.
       </LargeText>
       { error ? <ErrorMessage message={error} /> : null }
       <div>
         {
-          users.map((user) => (
+          room?.users.map((u) => (
             <UserNicknameText onClick={(event) => {
               deleteUser((event.target as HTMLElement).innerText);
             }}
             >
-              {user.nickname}
+              {u.nickname}
             </UserNicknameText>
           ))
         }
