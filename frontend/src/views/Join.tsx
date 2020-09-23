@@ -45,7 +45,7 @@ function JoinGamePage() {
    */
   const redirectToLobby = (nickname: string) => new Promise<undefined>((resolve) => {
     updateLocalStorage('1', '');
-    history.push('/game/lobby', { nickname });
+    history.push(`/game/lobby?room=${roomId}`, { nickname });
     resolve();
   });
 
