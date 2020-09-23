@@ -2,7 +2,8 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import EnterNicknamePage from '../components/core/EnterNickname';
 import { errorHandler } from '../api/Error';
-import { createRoom, Room, RoomParams, User } from '../api/Room';
+import { createRoom, Room, RoomParams } from '../api/Room';
+import { User } from '../api/User';
 
 function CreateGamePage() {
   // Get history object to be able to move between different pages

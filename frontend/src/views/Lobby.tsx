@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
+import ErrorMessage from '../components/core/Error';
 import { LargeText, UserNicknameText } from '../components/core/Text';
 import {
-  deleteUser, connect, routes, subscribe, User,
+  deleteUser, connect, routes, subscribe,
 } from '../api/Socket';
-import ErrorMessage from '../components/core/Error';
 import { Room } from '../api/Room';
+import { User } from '../api/User';
 
 type LobbyPageLocation = {
   user: User,

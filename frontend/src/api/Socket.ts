@@ -5,10 +5,6 @@ import { errorHandler } from './Error';
 
 let stompClient: Client;
 
-export type User = {
-  nickname: string;
-}
-
 // Variable to hold the current connected state.
 let connected: boolean = false;
 

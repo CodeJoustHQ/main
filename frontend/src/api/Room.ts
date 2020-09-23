@@ -1,9 +1,6 @@
 import axios from 'axios';
 import { axiosErrorHandler } from './Error';
-
-export type User = {
-  nickname: string,
-}
+import { User } from './User';
 
 export type Room = {
   roomId: string;
