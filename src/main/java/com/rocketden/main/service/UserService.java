@@ -2,7 +2,7 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.UserRepository;
 import com.rocketden.main.dto.user.CreateUserRequest;
-import com.rocketden.main.dto.user.CreateUserResponse;
+import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
@@ -22,7 +22,7 @@ public class UserService {
         this.repository = repository;
     }
 
-    public CreateUserResponse createUser(CreateUserRequest request) {
+    public UserDto createUser(CreateUserRequest request) {
         String nickname = request.getNickname();
 
         // If the provided nickname is null or invalid, do not add the user.
@@ -34,7 +34,7 @@ public class UserService {
         user.setNickname(nickname);
         repository.save(user);
 
-        return UserMapper.entityToCreateResponse(user);
+        return UserMapper.toDto(user);
     }
 
     /**

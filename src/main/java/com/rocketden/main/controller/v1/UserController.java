@@ -1,7 +1,7 @@
 package com.rocketden.main.controller.v1;
 
 import com.rocketden.main.dto.user.CreateUserRequest;
-import com.rocketden.main.dto.user.CreateUserResponse;
+import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class UserController extends BaseRestController {
     }
 
     @PostMapping("/user")
-    public ResponseEntity<CreateUserResponse> createUser(@RequestBody CreateUserRequest request) {
+    public ResponseEntity<UserDto> createUser(@RequestBody CreateUserRequest request) {
         return new ResponseEntity<>(service.createUser(request), HttpStatus.CREATED);
     }
 }

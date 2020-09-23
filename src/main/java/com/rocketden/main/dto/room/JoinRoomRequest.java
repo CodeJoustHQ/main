@@ -1,6 +1,6 @@
 package com.rocketden.main.dto.room;
 
-import com.rocketden.main.model.User;
+import com.rocketden.main.dto.user.UserDto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,5 +9,5 @@ import lombok.Setter;
 @Setter
 public class JoinRoomRequest {
     private String roomId;
-    private User user;
+    private UserDto user;
 }

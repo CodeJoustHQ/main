@@ -3,12 +3,13 @@ package com.rocketden.main.service;
 import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
-import com.rocketden.main.dto.room.CreateRoomResponse;
+
 import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.dto.room.GetRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
-import com.rocketden.main.dto.room.JoinRoomResponse;
+import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
+import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
@@ -39,7 +40,7 @@ public class RoomService {
         this.template = template;
     }
 
-    public JoinRoomResponse joinRoom(JoinRoomRequest request) {
+    public RoomDto joinRoom(JoinRoomRequest request) {
         Room room = repository.findRoomByRoomId(request.getRoomId());
 
         // Return error if room could not be found
@@ -48,7 +49,7 @@ public class RoomService {
         }
 
         // Get the user who initialized the request.
-        User user = request.getUser();
+        User user = UserMapper.toEntity(request.getUser());
 
         // Return error if user is invalid or not provided
         if (user == null || !UserService.validNickname(user.getNickname())) {
@@ -67,11 +68,11 @@ public class RoomService {
         repository.save(room);
 
         sendSocketUpdate(room.getRoomId(), room.getUsers());
-        return RoomMapper.entityToJoinResponse(room);
+        return RoomMapper.toDto(room);
     }
 
-    public CreateRoomResponse createRoom(CreateRoomRequest request) {
-        User host = request.getHost();
+    public RoomDto createRoom(CreateRoomRequest request) {
+        User host = UserMapper.toEntity(request.getHost());
 
         // Do not create room if provided host is invalid.
         if (host == null) {
@@ -83,15 +84,15 @@ public class RoomService {
 
         // Add the host to a new user set.
         Set<User> users = new HashSet<>();
-        users.add(request.getHost());
+        users.add(host);
 
         Room room = new Room();
         room.setRoomId(generateRoomId());
-        room.setHost(request.getHost());
+        room.setHost(host);
         room.setUsers(users);
         repository.save(room);
 
-        return RoomMapper.entityToCreateResponse(room);
+        return RoomMapper.toDto(room);
     }
 
     public GetRoomResponse getRoom(GetRoomRequest request) {

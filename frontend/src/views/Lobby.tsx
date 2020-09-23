@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Message } from 'stompjs';
 import { LargeText, UserNicknameText } from '../components/core/Text';
 import {
-  addUser, deleteUser, connect, routes, subscribe, User,
+  addUser, SUBSCRIBE_URL, connect,
+  deleteUser, SOCKET_ENDPOINT, subscribe, User,
 } from '../api/Socket';
 import ErrorMessage from '../components/core/Error';
 
-type WaitingRoomPageProps = {
+type LobbyPageLocation = {
   nickname: string;
 }
 
-function WaitingRoomPage() {
-  const location = useLocation<WaitingRoomPageProps>();
-  const { nickname } = location.state;
+function LobbyPage() {
+  const location = useLocation<LobbyPageLocation>();
+
+  // Set the nickname variable.
+  const [nickname, setNickname] = useState('');
 
   // Hold error text.
   const [error, setError] = useState('');
@@ -23,17 +26,6 @@ function WaitingRoomPage() {
 
   // Variable to hold whether the user is connected to the socket.
   const [socketConnected, setSocketConnected] = useState(false);
-
-  // Dummy room id for dynamic room endpoint purposes
-  const socketRoomId = '791894';
-
-  /**
-   * Nickname that is populated if the join page is on the waiting room stage.
-   * Set error if no nickname is passed in despite the waiting room stage.
-   */
-  if ((!location || !location.state || !location.state.nickname) && !error) {
-    setError('No nickname was provided for the user in the waiting room.');
-  }
 
   /**
    * Subscribe callback that will be triggered on every message.
@@ -45,17 +37,17 @@ function WaitingRoomPage() {
   };
 
   /**
-   * Add the user to the waiting room through the following steps.
+   * Add the user to the lobby through the following steps.
    * 1. Connect the user to the socket.
    * 2. Subscribe the user to future messages.
    * 3. Send the user nickname to the room.
-   * 4. Update the room layout to the "waiting room" page.
-   * This method returns a Promise which is used to trigger setLoading
-   * and setError on the EnterNickname page following this function.
+   * This method uses useCallback so it is not re-built in
+   * the useEffect function.
    */
-  const connectUserToRoom = (roomId: string, nicknameParam: string) => {
-    connect(roomId).then(() => {
-      subscribe(routes(roomId).subscribe, subscribeCallback).then(() => {
+  const connectUserToRoom = useCallback((socketEndpoint: string,
+    subscribeUrl: string, nicknameParam: string) => {
+    connect(socketEndpoint).then(() => {
+      subscribe(subscribeUrl, subscribeCallback).then(() => {
         try {
           addUser(nicknameParam);
           setSocketConnected(true);
@@ -68,22 +60,28 @@ function WaitingRoomPage() {
     }).catch((err) => {
       setError(err.message);
     });
-  };
+  }, []);
 
-  /**
-   * If the user is on the waiting room page state but not connected:
-   * add the user to the waiting room (which connects them to the socket).
-   * (This occurs when the create page redirects the user to the waiting page.)
-   */
-  if (!socketConnected && nickname) {
-    connectUserToRoom(socketRoomId, nickname);
-  }
+  // Grab the nickname variable and add the user to the lobby.
+  useEffect(() => {
+    // Grab the nickname variable; otherwise, set an error.
+    if (location && location.state && location.state.nickname) {
+      setNickname(location.state.nickname);
+    } else {
+      setError('No nickname was provided for the user in the lobby.');
+    }
 
-  // Render the Waiting room state.
+    // Connect the user to the room.
+    if (!socketConnected && nickname) {
+      connectUserToRoom(SOCKET_ENDPOINT, SUBSCRIBE_URL, nickname);
+    }
+  }, [location, socketConnected, nickname, connectUserToRoom]);
+
+  // Render the lobby.
   return (
     <div>
       <LargeText>
-        You have entered the waiting room! Your nickname is &quot;
+        You have entered the lobby! Your nickname is &quot;
         {nickname}
         &quot;.
       </LargeText>
@@ -104,4 +102,4 @@ function WaitingRoomPage() {
   );
 }
 
-export default WaitingRoomPage;
+export default LobbyPage;

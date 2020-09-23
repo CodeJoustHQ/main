@@ -8,10 +8,10 @@ function CreateGamePage() {
   // Get history object to be able to move between different pages
   const history = useHistory();
 
-  // Creates a room with the user as the host, and joins that same waiting room.
-  const createJoinWaitingRoom = (nickname: string) => new Promise<undefined>((resolve, reject) => {
-    const redirectToWaitingRoom = (room: Room) => {
-      history.push(`/game/waiting?room=${room.roomId}`, { nickname });
+  // Creates a room with the user as the host, and joins that same lobby.
+  const createJoinLobby = (nickname: string) => new Promise<undefined>((resolve, reject) => {
+    const redirectToLobby = (room: Room) => {
+      history.push(`/game/lobby?room=${room.roomId}`, { nickname });
     };
 
     const roomHost: RoomParams = {
@@ -21,7 +21,7 @@ function CreateGamePage() {
     };
     createRoom(roomHost)
       .then((res) => {
-        redirectToWaitingRoom(res);
+        redirectToLobby(res);
         resolve();
       }).catch((err) => {
         reject(errorHandler(err.message));
@@ -32,7 +32,7 @@ function CreateGamePage() {
   return (
     <EnterNicknamePage
       enterNicknameHeaderText="Enter a nickname to create the game!"
-      enterNicknameAction={createJoinWaitingRoom}
+      enterNicknameAction={createJoinLobby}
     />
   );
 }
