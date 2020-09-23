@@ -42,6 +42,7 @@ function GamePage() {
 
   const firstProblem = problems?.[0];
 
+  // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {
     const event = new Event('secondaryPanelSizeChange');
     window.dispatchEvent(event);
