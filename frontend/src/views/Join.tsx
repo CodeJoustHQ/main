@@ -1,7 +1,6 @@
 import React, { ReactElement, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import EnterNicknamePage from '../components/core/EnterNickname';
-import ErrorMessage from '../components/core/Error';
 import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
 import { LargeText, Text } from '../components/core/Text';
 
@@ -98,7 +97,6 @@ function JoinGamePage() {
               The room ID must have exactly six digits (numbers 0 through 9).
             </Text>
           ) : null}
-          { /* error ? <ErrorMessage message={error} /> : null */ }
         </div>
       );
       break;
