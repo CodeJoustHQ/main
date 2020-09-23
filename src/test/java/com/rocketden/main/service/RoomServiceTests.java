@@ -1,5 +1,6 @@
 package com.rocketden.main.service;
 
+import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.CreateRoomResponse;
@@ -87,7 +88,9 @@ public class RoomServiceTests {
         assertEquals(roomId, response.getRoomId());
         assertTrue(response.getUsers().contains(request.getUser()));
 
-        // TODO: verify socket message is sent
+        verify(template).convertAndSend(
+                 eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", roomId)),
+                 eq(response.getUsers()));
     }
 
     @Test
@@ -166,7 +169,14 @@ public class RoomServiceTests {
         assertEquals(RoomError.NOT_FOUND, exception.getError());
     }
 
-    // TODO: add test for sending socket messages
+    @Test
+    public void sendSocketUpdate() {
+        Set<User> users = new HashSet<>();
+        service.sendSocketUpdate("123456", users);
+        verify(template).convertAndSend(
+                eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", "123456")),
+                eq(users));
+    }
 
     @Test
     public void generateValidRoomId() {

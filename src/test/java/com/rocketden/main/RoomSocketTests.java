@@ -13,6 +13,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
@@ -57,6 +58,7 @@ public class RoomSocketTests {
     public void setup() {
         this.stompClient = new WebSocketStompClient(new SockJsClient(
                 List.of(new WebSocketTransport(new StandardWebSocketClient()))));
+        this.stompClient.setMessageConverter(new MappingJackson2MessageConverter());
     }
 
     @Test
@@ -112,8 +114,9 @@ public class RoomSocketTests {
         expected.add(host);
         expected.add(newUser);
 
-        assertEquals(expected, blockingQueue.poll(5, SECONDS));
-
+        Set<User> actual = blockingQueue.poll(5, SECONDS);
+        assertNotNull(actual);
+        assertEquals(expected.size(), actual.size());
     }
 
 }

@@ -209,8 +209,6 @@ public class RoomTests {
 
         assertEquals(expected.getUsers(), actual.getUsers());
         assertEquals(expected.getRoomId(), actual.getRoomId());
-
-        // TODO: verify socket message is sent
     }
 
     @Test
