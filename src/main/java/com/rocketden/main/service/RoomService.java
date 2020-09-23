@@ -69,8 +69,9 @@ public class RoomService {
         room.setUsers(users);
         repository.save(room);
 
-        sendSocketUpdate(room.getRoomId(), room.getUsers());
-        return RoomMapper.toDto(room);
+        RoomDto roomDto = RoomMapper.toDto(room);
+        sendSocketUpdate(roomDto);
+        return roomDto;
     }
 
     public RoomDto createRoom(CreateRoomRequest request) {
@@ -109,10 +110,9 @@ public class RoomService {
     }
 
     // Send updates about new users to the client through sockets
-    public void sendSocketUpdate(String roomId, Set<User> users) {
-        Set<UserDto> userDtos = users.stream().map(UserMapper::toDto).collect(Collectors.toSet());
-        String socketPath = String.format(SOCKET_PATH, roomId);
-        template.convertAndSend(socketPath, userDtos);
+    public void sendSocketUpdate(RoomDto roomDto) {
+        String socketPath = String.format(SOCKET_PATH, roomDto.getRoomId());
+        template.convertAndSend(socketPath, roomDto);
     }
 
     // Generate numeric String with length ROOM_ID_LENGTH

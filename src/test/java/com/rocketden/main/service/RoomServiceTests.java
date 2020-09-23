@@ -90,8 +90,8 @@ public class RoomServiceTests {
         assertTrue(response.getUsers().contains(request.getUser()));
 
         verify(template).convertAndSend(
-                 eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", roomId)),
-                 eq(response.getUsers()));
+                 eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", response.getRoomId())),
+                 eq(response));
     }
 
     @Test
@@ -172,20 +172,14 @@ public class RoomServiceTests {
 
     @Test
     public void sendSocketUpdate() {
-        User user = new User();
-        user.setNickname("test");
-        Set<User> users = new HashSet<>();
-        users.add(user);
+        RoomDto roomDto = new RoomDto();
+        roomDto.setHost(new UserDto());
+        roomDto.setRoomId("123456");
 
-        UserDto userDto = new UserDto();
-        userDto.setNickname("test");
-        Set<UserDto> expected = new HashSet<>();
-        expected.add(userDto);
-
-        service.sendSocketUpdate("123456", users);
+        service.sendSocketUpdate(roomDto);
         verify(template).convertAndSend(
-                eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", "123456")),
-                eq(expected));
+                eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", roomDto.getRoomId())),
+                eq(roomDto));
     }
 
     @Test

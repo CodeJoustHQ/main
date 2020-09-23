@@ -79,7 +79,7 @@ public class RoomSocketTests {
 
         // Next, set up the socket connection and subscription
         // BlockingQueue will hold the responses from the socket subscribe endpoint
-        BlockingQueue<Set<UserDto>> blockingQueue = new ArrayBlockingQueue<>(1);
+        BlockingQueue<RoomDto> blockingQueue = new ArrayBlockingQueue<>(1);
 
         // Connect to the socket endpoint
         StompSession session = stompClient
@@ -90,12 +90,12 @@ public class RoomSocketTests {
         session.subscribe(String.format(SUBSCRIBE_ENDPOINT, response.getRoomId()), new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
-                return Set.class;
+                return RoomDto.class;
             }
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                blockingQueue.add((Set<UserDto>) payload);
+                blockingQueue.add((RoomDto) payload);
             }
         });
 
@@ -107,16 +107,15 @@ public class RoomSocketTests {
         joinRequest.setUser(newUser);
 
         HttpEntity<JoinRoomRequest> joinEntity = new HttpEntity<>(joinRequest);
-        template.exchange(REST_ENDPOINTS, HttpMethod.PUT, joinEntity, Object.class);
+        RoomDto expected = template.exchange(REST_ENDPOINTS, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
 
         // Finally, verify the socket message we received is as we'd expect
-        Set<UserDto> expected = new HashSet<>();
-        expected.add(host);
-        expected.add(newUser);
-
-        Set<UserDto> actual = blockingQueue.poll(5, SECONDS);
+        RoomDto actual = blockingQueue.poll(5, SECONDS);
+        assertNotNull(expected);
         assertNotNull(actual);
-        assertEquals(expected.size(), actual.size());
+        assertEquals(expected.getRoomId(), actual.getRoomId());
+        assertEquals(expected.getHost(), actual.getHost());
+        assertEquals(expected.getUsers(), actual.getUsers());
     }
 
 }

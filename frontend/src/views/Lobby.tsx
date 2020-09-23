@@ -30,9 +30,6 @@ function LobbyPage() {
   // Variable to hold whether the user is connected to the socket.
   const [socketConnected, setSocketConnected] = useState(false);
 
-  // Dummy room id for dynamic room endpoint purposes
-  const socketRoomId = '791894';
-
   /**
    * Subscribe callback that will be triggered on every message.
    * Update the users list.
@@ -74,7 +71,7 @@ function LobbyPage() {
 
     // Connect the user to the room.
     if (!socketConnected && nickname) {
-      connectUserToRoom(socketRoomId);
+      connectUserToRoom(location.state.room.roomId);
     }
   }, [location, socketConnected, nickname, connectUserToRoom]);
 
