@@ -68,8 +68,6 @@ public class RoomTests {
         actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
 
         assertEquals(ERROR.getResponse(), actual);
-
-
     }
 
     @Test

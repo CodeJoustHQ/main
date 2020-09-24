@@ -1,5 +1,6 @@
 package com.rocketden.main.service;
 
+import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
@@ -20,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -35,6 +37,9 @@ public class RoomServiceTests {
 
     @Mock
     private RoomRepository repository;
+
+    @Mock
+    private SimpMessagingTemplate template;
 
     @Spy
     @InjectMocks
@@ -83,6 +88,10 @@ public class RoomServiceTests {
 
         assertEquals(roomId, response.getRoomId());
         assertTrue(response.getUsers().contains(request.getUser()));
+
+        verify(template).convertAndSend(
+                 eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", roomId)),
+                 eq(response.getUsers()));
     }
 
     @Test
@@ -159,6 +168,24 @@ public class RoomServiceTests {
         ApiException exception = assertThrows(ApiException.class, () -> service.getRoom(request));
 
         assertEquals(RoomError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void sendSocketUpdate() {
+        User user = new User();
+        user.setNickname("test");
+        Set<User> users = new HashSet<>();
+        users.add(user);
+
+        UserDto userDto = new UserDto();
+        userDto.setNickname("test");
+        Set<UserDto> expected = new HashSet<>();
+        expected.add(userDto);
+
+        service.sendSocketUpdate("123456", users);
+        verify(template).convertAndSend(
+                eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", "123456")),
+                eq(expected));
     }
 
     @Test

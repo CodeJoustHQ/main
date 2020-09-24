@@ -45,6 +45,8 @@ public class UserIntegrationTests {
 
     private final WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
 
+    private static final String CONNECT_ENDPOINT = "ws://localhost:{port}" + BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint";
+
     @BeforeEach
     public void setup() {
         // Create variables to model message transport, the SockJS client, and the STOMP client.
@@ -78,7 +80,7 @@ public class UserIntegrationTests {
             @Override
             public void afterConnected(final StompSession session, StompHeaders connectedHeaders) {
                 // After the socket is connected, subscribe and send message.
-                session.subscribe(BaseRestController.BASE_SOCKET_URL + "/subscribe-user", new StompFrameHandler() {
+                session.subscribe(BaseRestController.BASE_SOCKET_URL + "/123456/subscribe-user", new StompFrameHandler() {
                     @Override
                     public Type getPayloadType(StompHeaders headers) {
                         return HashSet.class;
@@ -99,7 +101,7 @@ public class UserIntegrationTests {
                     }
                 });
                 try {
-                    session.send(BaseRestController.BASE_SOCKET_URL + "/add-user", "Chris");
+                    session.send(BaseRestController.BASE_SOCKET_URL + "/123456/add-user", "Chris");
                 } catch (Throwable t) {
                     failure.set(t);
                     latch.countDown();
@@ -108,7 +110,7 @@ public class UserIntegrationTests {
         };
 
         // Connect to the socket with the STOMP client.
-        this.stompClient.connect("ws://localhost:{port}" + BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint", this.headers, handler, this.port);
+        this.stompClient.connect(CONNECT_ENDPOINT, this.headers, handler, this.port);
 
         if (latch.await(3, TimeUnit.SECONDS)) {
             if (failure.get() != null) {
@@ -133,7 +135,7 @@ public class UserIntegrationTests {
             @Override
             public void afterConnected(final StompSession session, StompHeaders connectedHeaders) {
                 // After the socket is connected, subscribe and send message.
-                session.subscribe(BaseRestController.BASE_SOCKET_URL + "/subscribe-user", new StompFrameHandler() {
+                session.subscribe(BaseRestController.BASE_SOCKET_URL + "/123456/subscribe-user", new StompFrameHandler() {
                     @Override
                     public Type getPayloadType(StompHeaders headers) {
                         return HashSet.class;
@@ -154,7 +156,7 @@ public class UserIntegrationTests {
                     }
                 });
                 try {
-                    session.send(BaseRestController.BASE_SOCKET_URL + "/delete-user", "Chris");
+                    session.send(BaseRestController.BASE_SOCKET_URL + "/123456/delete-user", "Chris");
                 } catch (Throwable t) {
                     failure.set(t);
                     latch.countDown();
@@ -163,7 +165,7 @@ public class UserIntegrationTests {
         };
 
         // Connect to the socket with the STOMP client.
-        this.stompClient.connect("ws://localhost:{port}" + BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint", this.headers, handler, this.port);
+        this.stompClient.connect(CONNECT_ENDPOINT, this.headers, handler, this.port);
 
         if (latch.await(3, TimeUnit.SECONDS)) {
             if (failure.get() != null) {

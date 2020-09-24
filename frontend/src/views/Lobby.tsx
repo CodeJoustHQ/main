@@ -3,8 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Message } from 'stompjs';
 import { LargeText, UserNicknameText } from '../components/core/Text';
 import {
-  addUser, SUBSCRIBE_URL, connect,
-  deleteUser, SOCKET_ENDPOINT, subscribe, User,
+  addUser, deleteUser, connect, routes, subscribe, User,
 } from '../api/Socket';
 import ErrorMessage from '../components/core/Error';
 
@@ -27,6 +26,9 @@ function LobbyPage() {
   // Variable to hold whether the user is connected to the socket.
   const [socketConnected, setSocketConnected] = useState(false);
 
+  // Dummy room id for dynamic room endpoint purposes
+  const socketRoomId: string = '791894';
+
   /**
    * Subscribe callback that will be triggered on every message.
    * Update the users list.
@@ -44,10 +46,9 @@ function LobbyPage() {
    * This method uses useCallback so it is not re-built in
    * the useEffect function.
    */
-  const connectUserToRoom = useCallback((socketEndpoint: string,
-    subscribeUrl: string, nicknameParam: string) => {
-    connect(socketEndpoint).then(() => {
-      subscribe(subscribeUrl, subscribeCallback).then(() => {
+  const connectUserToRoom = useCallback((roomId: string, nicknameParam: string) => {
+    connect(roomId).then(() => {
+      subscribe(routes(roomId).subscribe, subscribeCallback).then(() => {
         try {
           addUser(nicknameParam);
           setSocketConnected(true);
@@ -73,7 +74,7 @@ function LobbyPage() {
 
     // Connect the user to the room.
     if (!socketConnected && nickname) {
-      connectUserToRoom(SOCKET_ENDPOINT, SUBSCRIBE_URL, nickname);
+      connectUserToRoom(socketRoomId, nickname);
     }
   }, [location, socketConnected, nickname, connectUserToRoom]);
 
