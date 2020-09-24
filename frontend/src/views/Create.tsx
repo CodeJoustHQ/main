@@ -1,7 +1,6 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import EnterNicknamePage from '../components/core/EnterNickname';
-import { errorHandler } from '../api/Error';
 import { createRoom, Room, CreateRoomParams } from '../api/Room';
 
 function CreateGamePage() {
@@ -23,9 +22,7 @@ function CreateGamePage() {
       .then((res) => {
         redirectToLobby(res);
         resolve();
-      }).catch((err) => {
-        reject(errorHandler(err.message));
-      });
+      }).catch((err) => reject(err));
   });
 
   // Render the "Enter nickname" state.

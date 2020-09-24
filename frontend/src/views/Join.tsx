@@ -4,8 +4,7 @@ import EnterNicknamePage from '../components/core/EnterNickname';
 import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
 import { LargeText, Text } from '../components/core/Text';
 import { User } from '../api/Socket';
-import { joinRoom } from '../api/Room';
-import { errorHandler } from '../api/Error';
+import { joinRoom, verifyRoomExists } from '../api/Room';
 
 function JoinGamePage() {
   // Get history object to be able to move between different pages
@@ -22,6 +21,12 @@ function JoinGamePage() {
   // Variable to hold the user's current room ID input (default empty string).
   const [roomId, setRoomId] = useState('');
 
+  // Hold loading boolean, triggered upon entering nickname.
+  const [loading, setLoading] = useState(false);
+
+  // Set error if one exists
+  const [error, setError] = useState('');
+
   /**
    * The nickname is valid if it is non-empty and has exactly
    * six nonalphanumeric characters.
@@ -36,6 +41,15 @@ function JoinGamePage() {
   const [focusInput, setFocusInput] = useState(false);
 
   /**
+   * Check if a room exists with the current roomId.
+   */
+  const checkRoom = () => {
+    verifyRoomExists(roomId)
+      .then(() => setPageState(1))
+      .catch((err) => setError(err.message));
+  };
+
+  /**
    * Join the room and redirect the user to the lobby.
    */
   const redirectToLobby = (nickname: string) => new Promise<undefined>((resolve, reject) => {
@@ -46,9 +60,7 @@ function JoinGamePage() {
       .then((res) => {
         history.push(`/game/lobby?room=${roomId}`, { res, user });
       })
-      .catch((err) => {
-        reject(errorHandler(err.message));
-      });
+      .catch((err) => reject(err));
   });
 
   let joinPageContent: ReactElement | undefined;
@@ -78,13 +90,13 @@ function JoinGamePage() {
                 event.preventDefault();
               }
               if (event.key === 'Enter' && validRoomId) {
-                setPageState(2);
+                checkRoom();
               }
             }}
           />
           <LargeInputButton
             onClick={() => {
-              setPageState(2);
+              checkRoom();
             }}
             value="Enter"
             // Input is disabled if no nickname exists, has a space, or is too long.
