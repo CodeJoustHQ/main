@@ -3,6 +3,9 @@ import { useHistory } from 'react-router-dom';
 import EnterNicknamePage from '../components/core/EnterNickname';
 import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
 import { LargeText, Text } from '../components/core/Text';
+import { User } from '../api/Socket';
+import { joinRoom } from '../api/Room';
+import { errorHandler } from '../api/Error';
 
 function JoinGamePage() {
   // Get history object to be able to move between different pages
@@ -33,11 +36,19 @@ function JoinGamePage() {
   const [focusInput, setFocusInput] = useState(false);
 
   /**
-   * Redirect the user to the lobby.
+   * Join the room and redirect the user to the lobby.
    */
-  const redirectToLobby = (nickname: string) => new Promise<undefined>((resolve) => {
-    history.push(`/game/lobby?room=${roomId}`, { nickname });
-    resolve();
+  const redirectToLobby = (nickname: string) => new Promise<undefined>((resolve, reject) => {
+    const user: User = { nickname };
+    const roomParams = { roomId, user };
+
+    joinRoom(roomParams)
+      .then((res) => {
+        history.push(`/game/lobby?room=${roomId}`, { res, user });
+      })
+      .catch((err) => {
+        reject(errorHandler(err.message));
+      });
   });
 
   let joinPageContent: ReactElement | undefined;

@@ -2,7 +2,7 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import EnterNicknamePage from '../components/core/EnterNickname';
 import { errorHandler } from '../api/Error';
-import { createRoom, Room, RoomParams } from '../api/Room';
+import { createRoom, Room, CreateRoomParams } from '../api/Room';
 
 function CreateGamePage() {
   // Get history object to be able to move between different pages
@@ -14,7 +14,7 @@ function CreateGamePage() {
       history.push(`/game/lobby?room=${room.roomId}`, { nickname });
     };
 
-    const roomHost: RoomParams = {
+    const roomHost: CreateRoomParams = {
       host: {
         nickname,
       },
