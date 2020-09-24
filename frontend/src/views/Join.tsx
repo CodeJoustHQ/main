@@ -5,6 +5,8 @@ import { LargeCenterInputText, LargeInputButton } from '../components/core/Input
 import { LargeText, Text } from '../components/core/Text';
 import { User } from '../api/Socket';
 import { joinRoom, verifyRoomExists } from '../api/Room';
+import Loading from '../components/core/Loading';
+import ErrorMessage from '../components/core/Error';
 
 function JoinGamePage() {
   // Get history object to be able to move between different pages
@@ -44,9 +46,19 @@ function JoinGamePage() {
    * Check if a room exists with the current roomId.
    */
   const checkRoom = () => {
+    // Don't verify if previous REST call is still running
+    if (loading) return;
+
+    setLoading(true);
     verifyRoomExists(roomId)
-      .then(() => setPageState(1))
-      .catch((err) => setError(err.message));
+      .then(() => {
+        setLoading(false);
+        setPageState(1);
+      })
+      .catch((err) => {
+        setLoading(false);
+        setError(err.message);
+      });
   };
 
   /**
@@ -99,14 +111,16 @@ function JoinGamePage() {
               checkRoom();
             }}
             value="Enter"
-            // Input is disabled if no nickname exists, has a space, or is too long.
-            disabled={!validRoomId}
+            // Input is disabled if loading or if no nickname exists, has a space, or is too long.
+            disabled={!validRoomId || loading}
           />
           { focusInput && !validRoomId ? (
             <Text>
               The room ID must have exactly six digits (numbers 0 through 9).
             </Text>
           ) : null}
+          { loading ? <Loading /> : null }
+          { error ? <ErrorMessage message={error} /> : null }
         </div>
       );
       break;
