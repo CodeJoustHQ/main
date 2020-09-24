@@ -3,9 +3,7 @@ import { useLocation, Redirect } from 'react-router-dom';
 import { Message } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
 import { LargeText, UserNicknameText } from '../components/core/Text';
-import {
-  deleteUser, connect, routes, subscribe,
-} from '../api/Socket';
+import { connect, routes, subscribe } from '../api/Socket';
 import { Room } from '../api/Room';
 import { User } from '../api/User';
 
@@ -39,6 +37,11 @@ function LobbyPage() {
   const subscribeCallback = (result: Message) => {
     const newRoom:Room = JSON.parse(result.body);
     setRoom(newRoom);
+  };
+
+  const deleteUser = (u: User) => {
+    // Make rest call to delete user from room
+    console.log(u);
   };
 
   /**
@@ -93,10 +96,7 @@ function LobbyPage() {
       <div>
         {
           room?.users.map((u) => (
-            <UserNicknameText onClick={(event) => {
-              deleteUser((event.target as HTMLElement).innerText);
-            }}
-            >
+            <UserNicknameText onClick={() => deleteUser(u)}>
               {u.nickname}
             </UserNicknameText>
           ))

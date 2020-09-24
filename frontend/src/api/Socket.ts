@@ -16,8 +16,6 @@ export const routes = (roomId: string) => {
   return {
     connect: `${basePath}/join-room-endpoint`,
     subscribe: `${basePath}/${roomId}/subscribe-user`,
-    addUser: `${basePath}/${roomId}/add-user`,
-    deleteUser: `${basePath}/${roomId}/delete-user`,
   };
 };
 
@@ -29,34 +27,6 @@ export const routes = (roomId: string) => {
  */
 export const isValidNickname = (nickname: string) => nickname.length > 0
   && !nickname.includes(' ') && nickname.length <= 16;
-
-/**
- * Add the user by sending a message via socket.
- * @returns void, or error if socket is not connected or nickname is invalid.
-*/
-export const addUser = (nickname:string): void => {
-  if (connected) {
-    stompClient.send(routes(socketRoomId).addUser, {}, nickname);
-  } else if (!connected) {
-    throw errorHandler('The socket is not connected.');
-  } else {
-    throw errorHandler('The provided nickname is invalid.');
-  }
-};
-
-/**
- * Delete the user by sending a message via socket.
- * @returns void, or error if socket is not connected or nickname is invalid.
-*/
-export const deleteUser = (nickname:string): void => {
-  if (connected) {
-    stompClient.send(routes(socketRoomId).deleteUser, {}, nickname);
-  } else if (!connected) {
-    throw errorHandler('The socket is not connected.');
-  } else {
-    throw errorHandler('The provided nickname is invalid.');
-  }
-};
 
 /**
  * Connect the user via socket.
