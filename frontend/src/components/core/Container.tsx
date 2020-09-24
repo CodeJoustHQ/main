@@ -12,22 +12,29 @@ const createContainer = (Container: any, props: MyProps) => {
 
 export const FlexContainer = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  max-height: 100vh;
-  overflow: hidden;
+  flex: auto;
+  flex-direction: column;
+  margin: 1rem;
 `;
 
 export const FlexInfoBar = styled.div`
-  flex: 1 0 100%;
   padding: 0.5rem;
-  height: 15px;
-  line-height: 15px;
+  height: 1rem;
   text-align: center;
 `;
 
-export const FlexPanel = styled.div`
-  flex: 1;
+export const Panel = styled.div`
+  height: 100%;
   padding: 1rem;
+  box-sizing: border-box;
+  border: 2px solid ${({ theme }) => theme.colors.border};
+  border-radius: 10px;
+  background-color: white;
+`;
+
+export const SplitterContainer = styled.div`
+  flex: auto;
+  position: relative;
 `;
 
 const StyledMainContainer = styled.div`
