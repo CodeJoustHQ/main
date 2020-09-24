@@ -73,6 +73,7 @@ export default function EnterNicknamePage(props: EnterNicknameProps) {
           setFocusInput(false);
         }}
         onKeyPress={(event) => {
+          setError('');
           if (event.key === 'Enter' && validNickname) {
             enterNicknameActionUpdatePage(nickname);
           }

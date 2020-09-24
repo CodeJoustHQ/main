@@ -53,7 +53,7 @@ function JoinGamePage() {
     verifyRoomExists(roomId)
       .then(() => {
         setLoading(false);
-        setPageState(1);
+        setPageState(2);
       })
       .catch((err) => {
         setLoading(false);
@@ -88,6 +88,7 @@ function JoinGamePage() {
           <LargeCenterInputText
             placeholder="123456"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setError('');
               setRoomId(event.target.value);
             }}
             onFocus={() => {
