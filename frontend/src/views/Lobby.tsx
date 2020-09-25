@@ -16,7 +16,7 @@ function LobbyPage() {
   const location = useLocation<LobbyPageLocation>();
 
   // Set the nickname variable.
-  const [user, setUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   // Hold error text.
   const [error, setError] = useState('');
@@ -39,9 +39,9 @@ function LobbyPage() {
     setRoom(newRoom);
   };
 
-  const deleteUser = (u: User) => {
+  const deleteUser = (user: User) => {
     // Make rest call to delete user from room
-    console.log(u);
+    console.log(user);
   };
 
   /**
@@ -68,7 +68,7 @@ function LobbyPage() {
   useEffect(() => {
     // Grab the user and room information; otherwise, redirect to the join page
     if (location && location.state && location.state.user && location.state.room) {
-      setUser(location.state.user);
+      setCurrentUser(location.state.user);
       setRoom(location.state.room);
     } else {
       setShouldRedirect(true);
@@ -89,15 +89,15 @@ function LobbyPage() {
         {' '}
         {room?.roomId}
         ! Your nickname is &quot;
-        {user?.nickname}
+        {currentUser?.nickname}
         &quot;.
       </LargeText>
       { error ? <ErrorMessage message={error} /> : null }
       <div>
         {
-          room?.users.map((u) => (
-            <UserNicknameText onClick={() => deleteUser(u)}>
-              {u.nickname}
+          room?.users.map((user) => (
+            <UserNicknameText onClick={() => deleteUser(user)}>
+              {user.nickname}
             </UserNicknameText>
           ))
         }
