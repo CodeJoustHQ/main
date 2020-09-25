@@ -46,19 +46,19 @@ function JoinGamePage() {
    * Check if a room exists with the current roomId.
    */
   const checkRoom = () => {
-    // Don't verify if previous REST call is still running
-    if (loading) return;
-
-    setLoading(true);
-    verifyRoomExists(roomId)
-      .then(() => {
-        setLoading(false);
-        setPageState(2);
-      })
-      .catch((err) => {
-        setLoading(false);
-        setError(err.message);
-      });
+    // Only verify if previous REST call is not still running
+    if (!loading) {
+      setLoading(true);
+      verifyRoomExists(roomId)
+        .then(() => {
+          setLoading(false);
+          setPageState(2);
+        })
+        .catch((err) => {
+          setLoading(false);
+          setError(err.message);
+        });
+    }
   };
 
   /**

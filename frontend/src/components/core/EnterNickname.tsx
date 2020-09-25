@@ -44,16 +44,16 @@ export default function EnterNicknamePage(props: EnterNicknameProps) {
    * with loading or error messages as necessary.
    */
   const enterNicknameActionUpdatePage = (nicknameParam: string): void => {
-    // Don't perform action if previous action is still running
-    if (loading) return;
-
-    setLoading(true);
-    enterNicknameAction(nicknameParam).then(() => {
-      setLoading(false);
-    }).catch((err: ErrorResponse) => {
-      setLoading(false);
-      setError(err.message);
-    });
+    // Only perform action if previous action is not still running
+    if (!loading) {
+      setLoading(true);
+      enterNicknameAction(nicknameParam).then(() => {
+        setLoading(false);
+      }).catch((err: ErrorResponse) => {
+        setLoading(false);
+        setError(err.message);
+      });
+    }
   };
 
   return (
