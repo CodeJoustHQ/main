@@ -173,8 +173,10 @@ public class RoomServiceTests {
     @Test
     public void sendSocketUpdate() {
         RoomDto roomDto = new RoomDto();
-        roomDto.setHost(new UserDto());
         roomDto.setRoomId("123456");
+        UserDto userDto = new UserDto();
+        userDto.setNickname("test");
+        roomDto.setHost(userDto);
 
         service.sendSocketUpdate(roomDto);
         verify(template).convertAndSend(
