@@ -53,8 +53,7 @@ function JoinGamePage() {
         .then(() => {
           setLoading(false);
           setPageState(2);
-        })
-        .catch((err) => {
+        }).catch((err) => {
           setLoading(false);
           setError(err.message);
         });
@@ -64,15 +63,14 @@ function JoinGamePage() {
   /**
    * Join the room and redirect the user to the lobby.
    */
-  const redirectToLobby = (nickname: string) => new Promise<undefined>((resolve, reject) => {
+  const redirectToLobby = (nickname: string) => new Promise<undefined>((_, reject) => {
     const user: User = { nickname };
     const roomParams = { roomId, user };
 
     joinRoom(roomParams)
       .then((res) => {
         history.push(`/game/lobby?room=${roomId}`, { res, user });
-      })
-      .catch((err) => reject(err));
+      }).catch((err) => reject(err));
   });
 
   let joinPageContent: ReactElement | undefined;
