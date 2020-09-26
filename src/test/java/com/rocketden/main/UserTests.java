@@ -146,8 +146,7 @@ public class UserTests {
         this.mockMvc.perform(delete(POST_USER)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
-                .andExpect(status().isAccepted())
-                .andExpect(content().string("true"));
+                .andExpect(status().isAccepted());
     }
 
     @Test
@@ -158,7 +157,6 @@ public class UserTests {
         this.mockMvc.perform(delete(POST_USER)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("false"));
+                .andExpect(status().isNotFound());
     }
 }

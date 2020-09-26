@@ -29,8 +29,7 @@ public class UserController extends BaseRestController {
     }
 
     @DeleteMapping("/user")
-    public ResponseEntity<Boolean> deleteUser(@RequestBody DeleteUserRequest request) {
-        boolean response = service.deleteUser(request);
-        return new ResponseEntity<>(response, response ? HttpStatus.ACCEPTED : HttpStatus.NOT_FOUND);
+    public ResponseEntity<UserDto> deleteUser(@RequestBody DeleteUserRequest request) {
+        return new ResponseEntity<>(service.deleteUser(request), HttpStatus.ACCEPTED);
     }
 }

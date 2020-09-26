@@ -38,15 +38,17 @@ public class UserService {
         return UserMapper.toDto(user);
     }
 
-    public boolean deleteUser(DeleteUserRequest request) {
+    public UserDto deleteUser(DeleteUserRequest request) {
         User user = repository.findUserByNickname(request.getNickname());
 
         if (user == null) {
-            return false;
+            throw new ApiException(UserError.NOT_FOUND);
         }
 
+        UserDto ret = UserMapper.toDto(user);
         repository.delete(user);
-        return true;
+
+        return ret;
     }
 
     /**
