@@ -83,7 +83,15 @@ function LobbyPage() {
   // Render the lobby.
   return (
     <div>
-      { shouldRedirect ? <Redirect to="/game/join" /> : null}
+      { shouldRedirect ? (
+        // Using redirect instead of history prevents the back button from breaking
+        <Redirect
+          to={{
+            pathname: '/game/join',
+            state: { error: 'Please join a room to access the lobby page.' },
+          }}
+        />
+      ) : null}
       <LargeText>
         You have entered the lobby for room
         {' '}
