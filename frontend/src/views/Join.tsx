@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import EnterNicknamePage from '../components/core/EnterNickname';
 import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
 import { LargeText, Text } from '../components/core/Text';
@@ -7,10 +7,16 @@ import { User } from '../api/Socket';
 import { joinRoom, verifyRoomExists } from '../api/Room';
 import Loading from '../components/core/Loading';
 import ErrorMessage from '../components/core/Error';
+import { ErrorResponse } from '../api/Error';
+
+type JoinPageLocation = {
+  error: ErrorResponse,
+};
 
 function JoinGamePage() {
   // Get history object to be able to move between different pages
   const history = useHistory();
+  const location = useLocation<JoinPageLocation>();
 
   /**
    * Page state variable that defines whether the user is
@@ -29,8 +35,17 @@ function JoinGamePage() {
   // Set error if one exists
   const [error, setError] = useState('');
 
+  // If redirected with an error, display that error
+  useEffect(() => {
+    if (location && location.state && location.state.error) {
+      setError(location.state.error.message);
+      // Clear error to prevent re-displaying on refresh
+      history.replace('', null);
+    }
+  }, [location]);
+
   /**
-   * The nickname is valid if it is non-empty and has exactly
+   * The roomId is valid if it is non-empty and has exactly
    * six numeric characters.
    */
   const isValidRoomId = (roomIdParam: string) => (roomIdParam.length === 6) && /^\d+$/.test(roomIdParam);
@@ -96,8 +111,10 @@ function JoinGamePage() {
               setFocusInput(false);
             }}
             onKeyPress={(event) => {
-              // If the key pressed is not a number or the roomId is
-              // already at length 6, do not add it to the input.
+              /**
+               * If the key pressed is not a number or the roomId is
+               * already at length 6, do not add it to the input.
+               */
               if (event.key < '0' || event.key > '9' || roomId.length >= 6) {
                 event.preventDefault();
               }
