@@ -149,7 +149,7 @@ public class UserTests {
         MvcResult result = this.mockMvc.perform(delete(POST_USER)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
-                .andExpect(status().isAccepted())
+                .andExpect(status().isOk())
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
