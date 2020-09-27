@@ -135,7 +135,10 @@ public class UserTests {
     public void deleteExistingUser() throws Exception {
         CreateUserRequest createRequest = new CreateUserRequest();
         createRequest.setNickname("rocket");
-        
+
+        UserDto expected = new UserDto();
+        expected.setNickname("rocket");
+
         DeleteUserRequest request = new DeleteUserRequest();
         request.setNickname("rocket");
 
@@ -143,20 +146,34 @@ public class UserTests {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)));
 
-        this.mockMvc.perform(delete(POST_USER)
+        MvcResult result = this.mockMvc.perform(delete(POST_USER)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
-                .andExpect(status().isAccepted());
+                .andExpect(status().isAccepted())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        UserDto actual = Utility.toObject(jsonResponse, UserDto.class);
+
+        assertEquals(expected.getNickname(), actual.getNickname());
     }
 
     @Test
-    public void deleteNonExistingtUser() throws Exception {
+    public void deleteNonExistentUser() throws Exception {
         DeleteUserRequest request = new DeleteUserRequest();
         request.setNickname("rocket");
 
-        this.mockMvc.perform(delete(POST_USER)
+        ApiError ERROR = UserError.NOT_FOUND;
+
+        MvcResult result = this.mockMvc.perform(delete(POST_USER)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
     }
 }

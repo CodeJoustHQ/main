@@ -45,10 +45,9 @@ public class UserService {
             throw new ApiException(UserError.NOT_FOUND);
         }
 
-        UserDto ret = UserMapper.toDto(user);
         repository.delete(user);
 
-        return ret;
+        return UserMapper.toDto(user);
     }
 
     /**

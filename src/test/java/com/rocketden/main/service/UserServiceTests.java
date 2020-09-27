@@ -4,6 +4,8 @@ import com.rocketden.main.dao.UserRepository;
 import com.rocketden.main.dto.user.CreateUserRequest;
 import com.rocketden.main.dto.user.DeleteUserRequest;
 import com.rocketden.main.dto.user.UserDto;
+import com.rocketden.main.exception.RoomError;
+import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.User;
 
@@ -15,7 +17,8 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,9 +47,11 @@ public class UserServiceTests {
         CreateUserRequest request = new CreateUserRequest();
         request.setNickname("rocket rocket");
 
-        assertThrows(ApiException.class, () -> {
+        ApiException exception = assertThrows(ApiException.class, () -> {
             service.createUser(request);
         });
+
+        assertEquals(UserError.INVALID_USER, exception.getError());
     }
 
     @Test
@@ -64,14 +69,16 @@ public class UserServiceTests {
     }
 
     @Test
-    public void deleteNonExistingUser() {
+    public void deleteNonExistentUser() {
         when(repository.findUserByNickname("rocket")).thenReturn(null);
 
         DeleteUserRequest request = new DeleteUserRequest();
         request.setNickname("rocket");
 
-        assertThrows(ApiException.class, () -> {
+        ApiException exception = assertThrows(ApiException.class, () -> {
             service.deleteUser(request);
         });
+
+        assertEquals(UserError.NOT_FOUND, exception.getError());
     }
 }
