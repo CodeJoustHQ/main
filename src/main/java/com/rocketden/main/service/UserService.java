@@ -41,6 +41,7 @@ public class UserService {
     public UserDto deleteUser(DeleteUserRequest request) {
         User user = repository.findUserByNickname(request.getNickname());
 
+        // If requested user does not exist in database, throw an exception. 
         if (user == null) {
             throw new ApiException(UserError.NOT_FOUND);
         }

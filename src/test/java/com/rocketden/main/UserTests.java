@@ -34,7 +34,7 @@ public class UserTests {
     @Autowired
     private MockMvc mockMvc;
 
-    private static final String POST_USER = "/api/v1/user";
+    private static final String USER_URI = "/api/v1/user";
 
     @Test
     public void createNewUser() throws Exception {
@@ -44,7 +44,7 @@ public class UserTests {
         UserDto expected = new UserDto();
         expected.setNickname("rocket");
 
-        MvcResult result = this.mockMvc.perform(post(POST_USER)
+        MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().isCreated())
@@ -62,7 +62,7 @@ public class UserTests {
 
         ApiError ERROR = UserError.INVALID_USER;
 
-        MvcResult result = this.mockMvc.perform(post(POST_USER)
+        MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
@@ -81,7 +81,7 @@ public class UserTests {
 
         ApiError ERROR = UserError.INVALID_USER;
 
-        MvcResult result = this.mockMvc.perform(post(POST_USER)
+        MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
@@ -100,7 +100,7 @@ public class UserTests {
 
         ApiError ERROR = UserError.INVALID_USER;
 
-        MvcResult result = this.mockMvc.perform(post(POST_USER)
+        MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
@@ -119,7 +119,7 @@ public class UserTests {
 
         ApiError ERROR = UserError.INVALID_USER;
 
-        MvcResult result = this.mockMvc.perform(post(POST_USER)
+        MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
@@ -142,11 +142,11 @@ public class UserTests {
         DeleteUserRequest request = new DeleteUserRequest();
         request.setNickname("rocket");
 
-        this.mockMvc.perform(post(POST_USER)
+        this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)));
 
-        MvcResult result = this.mockMvc.perform(delete(POST_USER)
+        MvcResult result = this.mockMvc.perform(delete(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
                 .andExpect(status().isOk())
@@ -165,7 +165,7 @@ public class UserTests {
 
         ApiError ERROR = UserError.NOT_FOUND;
 
-        MvcResult result = this.mockMvc.perform(delete(POST_USER)
+        MvcResult result = this.mockMvc.perform(delete(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
                 .andExpect(status().isNotFound())
