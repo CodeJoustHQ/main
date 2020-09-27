@@ -74,7 +74,12 @@ export const connect = (roomId:string):
       socketRoomId = roomId;
       const socket: WebSocket = new SockJS(routes(socketRoomId).connect);
       stompClient = Stomp.over(socket);
-      stompClient.connect({}, () => {
+      const headers: any = {
+        roomId,
+        nickname: 'Chris',
+        userId: '123052',
+      };
+      stompClient.connect(headers, () => {
         // Reassign connected variable.
         connected = true;
         resolve();
@@ -109,10 +114,15 @@ export const disconnect = (): void => {
   if (connected) {
     const socket: WebSocket = new SockJS(routes(socketRoomId).connect);
     stompClient = Stomp.over(socket);
+    const headers: any = {
+      roomId: '581023',
+      nickname: 'Chris',
+      userId: '123052',
+    };
     stompClient.disconnect(() => {
       // Reassign connected variable.
       connected = false;
-    });
+    }, headers);
   } else {
     throw errorHandler('The socket is not connected.');
   }
