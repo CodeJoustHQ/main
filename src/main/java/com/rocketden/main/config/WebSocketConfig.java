@@ -24,6 +24,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private static final Logger logger = LoggerFactory.getLogger(WebSocketConfig.class);
 
+    private static final String CONNECT_MESSAGE = "simpConnectMessage";
+    private static final String NATIVE_HEADERS = "nativeHeaders";
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         // Sets the base URL for message subscription and sending, respectively.
@@ -40,14 +43,18 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @EventListener
     public void onSocketConnected(SessionConnectedEvent event) {
-        StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
-        logger.info("Connected");
-        logger.info(event.toString());
-        GenericMessage gm = (GenericMessage) event.getMessage().getHeaders().get("simpConnectMessage");
-        Map<String, LinkedList<String>> map = (Map) gm.getHeaders().get("nativeHeaders");
-        logger.info(map.get("roomId").toString());
-        logger.info(map.get("nickname").toString());
-        logger.info(map.get("userId").toString());
+        // Grab the custom headers on connection.
+        GenericMessage genericMessage = (GenericMessage) event.getMessage().getHeaders().get(CONNECT_MESSAGE);
+        Map<String, LinkedList<String>> customHeaderMap = (Map<String, LinkedList<String>>) genericMessage.getHeaders().get(NATIVE_HEADERS);
+
+        // Retrieve the relevant variables
+        String roomId = customHeaderMap.get("roomId").get(0);
+        String nickname = customHeaderMap.get("nickname").get(0);
+        String userId = customHeaderMap.get("userId").get(0);
+        // unique ID from event
+
+        // Add the user to the database.
+
     }
 
     // roomId: '581023',
@@ -56,10 +63,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @EventListener
     public void onSocketDisconnected(SessionDisconnectEvent event) {
-        StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
-        logger.info("Disconnected");
-        logger.info(event.getMessage().getHeaders().get("roomId").toString());
-        logger.info(event.getMessage().getHeaders().get("nickname").toString());
-        logger.info(event.getMessage().getHeaders().get("userId").toString());
+        // Grab the custom headers on connection.
+        GenericMessage genericMessage = (GenericMessage) event.getMessage().getHeaders().get(CONNECT_MESSAGE);
+        Map<String, LinkedList<String>> customHeaderMap = (Map) genericMessage.getHeaders().get(NATIVE_HEADERS);
+
+        // Retrieve the relevant variables.
+        String roomId = customHeaderMap.get("roomId").get(0);
+        String nickname = customHeaderMap.get("nickname").get(0);
+        String userId = customHeaderMap.get("userId").get(0);
+
+        // Remove the user from the database and send socket update.
     }
 }
