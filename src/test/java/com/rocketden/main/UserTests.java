@@ -1,6 +1,7 @@
 package com.rocketden.main;
 
 import com.rocketden.main.dto.user.CreateUserRequest;
+import com.rocketden.main.dto.user.DeleteUserRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiError;
@@ -17,7 +18,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,7 +34,7 @@ public class UserTests {
     @Autowired
     private MockMvc mockMvc;
 
-    private static final String POST_USER = "/api/v1/user";
+    private static final String USER_URI = "/api/v1/user";
 
     @Test
     public void createNewUser() throws Exception {
@@ -40,7 +44,7 @@ public class UserTests {
         UserDto expected = new UserDto();
         expected.setNickname("rocket");
 
-        MvcResult result = this.mockMvc.perform(post(POST_USER)
+        MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().isCreated())
@@ -58,7 +62,7 @@ public class UserTests {
 
         ApiError ERROR = UserError.INVALID_USER;
 
-        MvcResult result = this.mockMvc.perform(post(POST_USER)
+        MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
@@ -77,7 +81,7 @@ public class UserTests {
 
         ApiError ERROR = UserError.INVALID_USER;
 
-        MvcResult result = this.mockMvc.perform(post(POST_USER)
+        MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
@@ -96,7 +100,7 @@ public class UserTests {
 
         ApiError ERROR = UserError.INVALID_USER;
 
-        MvcResult result = this.mockMvc.perform(post(POST_USER)
+        MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
@@ -115,10 +119,56 @@ public class UserTests {
 
         ApiError ERROR = UserError.INVALID_USER;
 
-        MvcResult result = this.mockMvc.perform(post(POST_USER)
+        MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @Test
+    public void deleteExistingUser() throws Exception {
+        CreateUserRequest createRequest = new CreateUserRequest();
+        createRequest.setNickname("rocket");
+
+        UserDto expected = new UserDto();
+        expected.setNickname("rocket");
+
+        DeleteUserRequest request = new DeleteUserRequest();
+        request.setNickname("rocket");
+
+        this.mockMvc.perform(post(USER_URI)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(request)));
+
+        MvcResult result = this.mockMvc.perform(delete(USER_URI)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(request)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        UserDto actual = Utility.toObject(jsonResponse, UserDto.class);
+
+        assertEquals(expected.getNickname(), actual.getNickname());
+    }
+
+    @Test
+    public void deleteNonExistentUser() throws Exception {
+        DeleteUserRequest request = new DeleteUserRequest();
+        request.setNickname("rocket");
+
+        ApiError ERROR = UserError.NOT_FOUND;
+
+        MvcResult result = this.mockMvc.perform(delete(USER_URI)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(request)))
+                .andExpect(status().isNotFound())
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();

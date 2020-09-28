@@ -1,5 +1,6 @@
 package com.rocketden.main.service;
 
+import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 
@@ -8,6 +9,7 @@ import com.rocketden.main.dto.room.GetRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
+import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
@@ -16,23 +18,28 @@ import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 public class RoomService {
 
     public static final int ROOM_ID_LENGTH = 6;
+    private static final Random random = new Random();
+    private static final String SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user";
 
     private final RoomRepository repository;
-    private static final Random random = new Random();
+    private final SimpMessagingTemplate template;
 
     @Autowired
-    public RoomService(RoomRepository repository) {
+    public RoomService(RoomRepository repository, SimpMessagingTemplate template) {
         this.repository = repository;
+        this.template = template;
     }
 
     public RoomDto joinRoom(JoinRoomRequest request) {
@@ -62,7 +69,9 @@ public class RoomService {
         room.setUsers(users);
         repository.save(room);
 
-        return RoomMapper.toDto(room);
+        RoomDto roomDto = RoomMapper.toDto(room);
+        sendSocketUpdate(roomDto);
+        return roomDto;
     }
 
     public RoomDto createRoom(CreateRoomRequest request) {
@@ -98,6 +107,12 @@ public class RoomService {
         }
 
         return RoomMapper.entityToGetResponse(room);
+    }
+
+    // Send updates about new users to the client through sockets
+    public void sendSocketUpdate(RoomDto roomDto) {
+        String socketPath = String.format(SOCKET_PATH, roomDto.getRoomId());
+        template.convertAndSend(socketPath, roomDto);
     }
 
     // Generate numeric String with length ROOM_ID_LENGTH

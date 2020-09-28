@@ -1,16 +1,15 @@
 import axios from 'axios';
 import { axiosErrorHandler } from './Error';
-import { User } from './Socket';
+import { User } from './User';
 
 export type Room = {
-  message: string,
   roomId: string;
+  host: User;
+  users: [User],
 };
 
 export type CreateRoomParams = {
-  host: {
-    nickname: string;
-  };
+  host: User;
 };
 
 export type JoinRoomParams = {

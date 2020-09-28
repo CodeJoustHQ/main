@@ -42,7 +42,7 @@ function JoinGamePage() {
       // Clear error to prevent re-displaying on refresh
       history.replace('', null);
     }
-  }, [location]);
+  }, [location, history]);
 
   /**
    * The roomId is valid if it is non-empty and has exactly
