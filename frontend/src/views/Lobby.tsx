@@ -1,41 +1,47 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Redirect } from 'react-router-dom';
 import { Message } from 'stompjs';
-import { LargeText, UserNicknameText } from '../components/core/Text';
-import {
-  addUser, deleteUser, connect, routes, subscribe, User,
-} from '../api/Socket';
 import ErrorMessage from '../components/core/Error';
+import { LargeText, UserNicknameText } from '../components/core/Text';
+import { connect, routes, subscribe } from '../api/Socket';
+import { Room } from '../api/Room';
+import { User } from '../api/User';
 
 type LobbyPageLocation = {
-  nickname: string;
-}
+  user: User,
+  room: Room,
+};
 
 function LobbyPage() {
   const location = useLocation<LobbyPageLocation>();
 
   // Set the nickname variable.
-  const [nickname, setNickname] = useState('');
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   // Hold error text.
   const [error, setError] = useState('');
 
+  // Variable to determine whether to redirect back to join page
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+
   // Variable to hold the users on the page.
-  const [users, setUsers] = useState<User[]>([]);
+  const [room, setRoom] = useState<Room | null>(null);
 
   // Variable to hold whether the user is connected to the socket.
   const [socketConnected, setSocketConnected] = useState(false);
-
-  // Dummy room id for dynamic room endpoint purposes
-  const socketRoomId: string = '791894';
 
   /**
    * Subscribe callback that will be triggered on every message.
    * Update the users list.
    */
   const subscribeCallback = (result: Message) => {
-    const userObjects:User[] = JSON.parse(result.body);
-    setUsers(userObjects);
+    const newRoom:Room = JSON.parse(result.body);
+    setRoom(newRoom);
+  };
+
+  const deleteUser = (user: User) => {
+    // Make rest call to delete user from room
+    console.log(user);
   };
 
   /**
@@ -46,15 +52,10 @@ function LobbyPage() {
    * This method uses useCallback so it is not re-built in
    * the useEffect function.
    */
-  const connectUserToRoom = useCallback((roomId: string, nicknameParam: string) => {
+  const connectUserToRoom = useCallback((roomId: string) => {
     connect(roomId).then(() => {
       subscribe(routes(roomId).subscribe, subscribeCallback).then(() => {
-        try {
-          addUser(nicknameParam);
-          setSocketConnected(true);
-        } catch (err) {
-          setError(err.message);
-        }
+        setSocketConnected(true);
       }).catch((err) => {
         setError(err.message);
       });
@@ -65,35 +66,45 @@ function LobbyPage() {
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
-    // Grab the nickname variable; otherwise, set an error.
-    if (location && location.state && location.state.nickname) {
-      setNickname(location.state.nickname);
+    // Grab the user and room information; otherwise, redirect to the join page
+    if (location && location.state && location.state.user && location.state.room) {
+      setCurrentUser(location.state.user);
+      setRoom(location.state.room);
     } else {
-      setError('No nickname was provided for the user in the lobby.');
+      setShouldRedirect(true);
     }
 
     // Connect the user to the room.
-    if (!socketConnected && nickname) {
-      connectUserToRoom(socketRoomId, nickname);
+    if (!socketConnected && room !== null) {
+      connectUserToRoom(room.roomId);
     }
-  }, [location, socketConnected, nickname, connectUserToRoom]);
+  }, [location, socketConnected, room, connectUserToRoom]);
 
   // Render the lobby.
   return (
     <div>
+      { shouldRedirect ? (
+        // Using redirect instead of history prevents the back button from breaking
+        <Redirect
+          to={{
+            pathname: '/game/join',
+            state: { error: 'Please join a room to access the lobby page.' },
+          }}
+        />
+      ) : null}
       <LargeText>
-        You have entered the lobby! Your nickname is &quot;
-        {nickname}
+        You have entered the lobby for room
+        {' '}
+        {room?.roomId}
+        ! Your nickname is &quot;
+        {currentUser?.nickname}
         &quot;.
       </LargeText>
       { error ? <ErrorMessage message={error} /> : null }
       <div>
         {
-          users.map((user) => (
-            <UserNicknameText onClick={(event) => {
-              deleteUser((event.target as HTMLElement).innerText);
-            }}
-            >
+          room?.users.map((user) => (
+            <UserNicknameText onClick={() => deleteUser(user)}>
               {user.nickname}
             </UserNicknameText>
           ))
