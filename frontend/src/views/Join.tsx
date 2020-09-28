@@ -3,7 +3,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import EnterNicknamePage from '../components/core/EnterNickname';
 import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
 import { LargeText, Text } from '../components/core/Text';
-import { User } from '../api/Socket';
+import { User } from '../api/User';
 import { joinRoom, verifyRoomExists } from '../api/Room';
 import Loading from '../components/core/Loading';
 import ErrorMessage from '../components/core/Error';
@@ -40,7 +40,7 @@ function JoinGamePage() {
     if (location && location.state && location.state.error) {
       setError(location.state.error.message);
       // Clear error to prevent re-displaying on refresh
-      history.replace('', null);
+      history.replace('/game/join', null);
     }
   }, [location, history]);
 
@@ -84,7 +84,7 @@ function JoinGamePage() {
 
     joinRoom(roomParams)
       .then((res) => {
-        history.push(`/game/lobby?room=${roomId}`, { res, user });
+        history.push(`/game/lobby?room=${roomId}`, { room: res, user });
       }).catch((err) => reject(err));
   });
 
