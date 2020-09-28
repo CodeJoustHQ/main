@@ -42,14 +42,6 @@ function LobbyPage() {
     setRoomId(room.roomId);
   };
 
-  /**
-   * Subscribe callback that will be triggered on every message.
-   * Update the users list.
-   */
-  const subscribeCallback = (result: Message) => {
-    setStateFromRoom(JSON.parse(result.body));
-  };
-
   const deleteUser = (user: User) => {
     // Make rest call to delete user from room
     console.log(user);
@@ -64,6 +56,14 @@ function LobbyPage() {
    * the useEffect function.
    */
   const connectUserToRoom = useCallback((roomId: string) => {
+    /**
+     * Subscribe callback that will be triggered on every message.
+     * Update the users list and other room info.
+     */
+    const subscribeCallback = (result: Message) => {
+      setStateFromRoom(JSON.parse(result.body));
+    };
+
     connect(roomId).then(() => {
       subscribe(routes(roomId).subscribe, subscribeCallback).then(() => {
         setSocketConnected(true);
@@ -73,7 +73,7 @@ function LobbyPage() {
     }).catch((err) => {
       setError(err.message);
     });
-  }, [subscribeCallback]);
+  }, []);
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
