@@ -73,7 +73,7 @@ function LobbyPage() {
     }).catch((err) => {
       setError(err.message);
     });
-  }, []);
+  }, [subscribeCallback]);
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
