@@ -4,9 +4,10 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import com.rocketden.main.controller.v1.BaseRestController;
+import com.rocketden.main.dao.UserRepository;
+import com.rocketden.main.model.User;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -22,7 +23,12 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketConfig.class);
+    private final UserRepository repository;
+
+    @Autowired
+    public WebSocketConfig(UserRepository repository) {
+        this.repository = repository;
+    }
 
     private static final String CONNECT_MESSAGE = "simpConnectMessage";
     private static final String NATIVE_HEADERS = "nativeHeaders";
@@ -36,42 +42,45 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // This should be replaced with the actual room name.
-        // See https://stackoverflow.com/questions/32843788/websocket-dynamically-add-and-remove-endpoints.
         registry.addEndpoint(BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint").withSockJS();
     }
 
     @EventListener
+    @SuppressWarnings("unchecked")
     public void onSocketConnected(SessionConnectedEvent event) {
-        // Grab the custom headers on connection.
-        GenericMessage genericMessage = (GenericMessage) event.getMessage().getHeaders().get(CONNECT_MESSAGE);
-        Map<String, LinkedList<String>> customHeaderMap = (Map<String, LinkedList<String>>) genericMessage.getHeaders().get(NATIVE_HEADERS);
+        /**
+         * Grab the custom headers on connection. Unchecked cast warnings are
+         * suppressed: see method header.
+         */
+        StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
+        GenericMessage<byte[]> genericMessage = 
+            (GenericMessage<byte[]>) event.getMessage().getHeaders().get(CONNECT_MESSAGE);
+        Map<String, LinkedList<String>> customHeaderMap = 
+            (Map<String, LinkedList<String>>) genericMessage.getHeaders().get(NATIVE_HEADERS);
 
-        // Retrieve the relevant variables
-        String roomId = customHeaderMap.get("roomId").get(0);
-        String nickname = customHeaderMap.get("nickname").get(0);
-        String userId = customHeaderMap.get("userId").get(0);
-        // unique ID from event
+        // Retrieve the ID of the user to update.
+        Integer userId =
+            Integer.parseInt(customHeaderMap.get("nickname").get(0));
 
-        // Add the user to the database.
+        // Get the unique auto-generated session ID for this connection.
+        String sessionId = sha.getSessionId();
 
+        // Update the session ID of the relevant user.
+        User user = repository.findUserByUserId(userId);
+        user.setSessionId(sessionId);
+        user.setConnected(true);
     }
-
-    // roomId: '581023',
-    // nickname: 'Chris',
-    // userId: '123052',
 
     @EventListener
     public void onSocketDisconnected(SessionDisconnectEvent event) {
         // Grab the custom headers on connection.
-        GenericMessage genericMessage = (GenericMessage) event.getMessage().getHeaders().get(CONNECT_MESSAGE);
-        Map<String, LinkedList<String>> customHeaderMap = (Map) genericMessage.getHeaders().get(NATIVE_HEADERS);
-
-        // Retrieve the relevant variables.
-        String roomId = customHeaderMap.get("roomId").get(0);
-        String nickname = customHeaderMap.get("nickname").get(0);
-        String userId = customHeaderMap.get("userId").get(0);
+        StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
+        sha.getSessionId();
+        String sessionId = sha.getSessionId();
 
         // Remove the user from the database and send socket update.
+        User user = repository.findUserBySessionId(sessionId);
+        user.setSessionId(null);
+        user.setConnected(false);
     }
 }

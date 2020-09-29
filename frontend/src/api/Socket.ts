@@ -67,19 +67,19 @@ export const deleteUser = (nickname:string): void => {
  * @returns void Promise, reject if socket is already connected
  * or fails to connect.
 */
-export const connect = (roomId:string):
+export const connect = (roomId: string, userId: number):
   Promise<void> => new Promise<void>((resolve, reject) => {
     if (!connected) {
       // Connect to given endpoint, subscribe to future messages, and send user message.
       socketRoomId = roomId;
       const socket: WebSocket = new SockJS(routes(socketRoomId).connect);
       stompClient = Stomp.over(socket);
-      const headers: any = {
-        roomId,
-        nickname: 'Chris',
-        userId: '123052',
+
+      // Headers to be retrieved on the backend to update the user information.
+      const connectHeaders: any = {
+        userId,
       };
-      stompClient.connect(headers, () => {
+      stompClient.connect(connectHeaders, () => {
         // Reassign connected variable.
         connected = true;
         resolve();
@@ -114,15 +114,10 @@ export const disconnect = (): void => {
   if (connected) {
     const socket: WebSocket = new SockJS(routes(socketRoomId).connect);
     stompClient = Stomp.over(socket);
-    const headers: any = {
-      roomId: '581023',
-      nickname: 'Chris',
-      userId: '123052',
-    };
     stompClient.disconnect(() => {
       // Reassign connected variable.
       connected = false;
-    }, headers);
+    });
   } else {
     throw errorHandler('The socket is not connected.');
   }
