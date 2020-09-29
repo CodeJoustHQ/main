@@ -4,11 +4,11 @@ import EnterNicknamePage from '../components/core/EnterNickname';
 import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
 import { LargeText, Text } from '../components/core/Text';
 import { User } from '../api/User';
-import { joinRoom, verifyRoomExists } from '../api/Room';
+import { joinRoom, getRoom } from '../api/Room';
 import Loading from '../components/core/Loading';
 import ErrorMessage from '../components/core/Error';
 import { ErrorResponse } from '../api/Error';
-import {checkLocationState} from '../util/Utility';
+import { checkLocationState } from '../util/Utility';
 
 type JoinPageLocation = {
   error: ErrorResponse,
@@ -65,7 +65,7 @@ function JoinGamePage() {
     // Only verify if previous REST call is not still running
     if (!loading) {
       setLoading(true);
-      verifyRoomExists(roomId)
+      getRoom(roomId)
         .then(() => {
           setLoading(false);
           setPageState(2);
@@ -84,8 +84,8 @@ function JoinGamePage() {
     const roomParams = { roomId, user };
 
     joinRoom(roomParams)
-      .then((res) => {
-        history.push(`/game/lobby?room=${roomId}`, { room: res, user });
+      .then(() => {
+        history.push(`/game/lobby?room=${roomId}`, { roomId, user });
       }).catch((err) => reject(err));
   });
 

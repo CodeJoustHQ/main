@@ -4,14 +4,14 @@ import { Message } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
 import { LargeText, UserNicknameText } from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
-import { Room } from '../api/Room';
+import { getRoom, Room } from '../api/Room';
 import { User } from '../api/User';
 import { errorHandler } from '../api/Error';
 import { checkLocationState } from '../util/Utility';
 
 type LobbyPageLocation = {
   user: User,
-  room: Room,
+  roomId: string,
 };
 
 function LobbyPage() {
@@ -79,9 +79,13 @@ function LobbyPage() {
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
     // Grab the user and room information; otherwise, redirect to the join page
-    if (checkLocationState(location, 'user', 'room')) {
+    if (checkLocationState(location, 'user', 'roomId')) {
       setCurrentUser(location.state.user);
-      setStateFromRoom(location.state.room);
+
+      // Call GET endpoint to get latest room info
+      getRoom(location.state.roomId)
+        .then((res) => setStateFromRoom(res))
+        .catch((err) => setError(err));
     } else {
       setShouldRedirect(true);
     }

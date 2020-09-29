@@ -17,10 +17,6 @@ export type JoinRoomParams = {
   user: User,
 };
 
-type GetResponse = {
-  roomId: string;
-};
-
 const basePath = '/api/v1/rooms';
 const routes = {
   createRoom: `${basePath}/`,
@@ -42,8 +38,8 @@ export const joinRoom = (roomParams: JoinRoomParams):
     throw axiosErrorHandler(err);
   });
 
-export const verifyRoomExists = (roomId: string):
-  Promise<GetResponse> => axios.get<GetResponse>(`${routes.getRoom}?roomId=${roomId}`)
+export const getRoom = (roomId: string):
+  Promise<Room> => axios.get<Room>(`${routes.getRoom}?roomId=${roomId}`)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
