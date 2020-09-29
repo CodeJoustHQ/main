@@ -57,7 +57,7 @@ export const connect = (roomId:string):
  * @returns void Promise, reject if socket is not connected.
  */
 export const subscribe = (subscribeUrl: string,
-  subscribeCallback: (users: Message) => void):
+  subscribeCallback: (room: Message) => void):
   Promise<void> => new Promise<void>((resolve, reject) => {
     if (connected) {
       stompClient.subscribe(subscribeUrl, subscribeCallback);

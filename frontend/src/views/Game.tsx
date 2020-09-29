@@ -11,6 +11,7 @@ import {
 import ErrorMessage from '../components/core/Error';
 import { ProblemHeaderText, Text } from '../components/core/Text';
 import 'react-splitter-layout/lib/index.css';
+import { checkLocationState } from '../util/Utility';
 
 type LocationState = {
   room: Room,
@@ -24,7 +25,7 @@ function GamePage() {
 
   // Called every time location changes
   useEffect(() => {
-    if (location && location.state && location.state.room) {
+    if (checkLocationState(location, 'room')) {
       setRoom(location.state.room);
     }
     getProblems().then((res) => {
