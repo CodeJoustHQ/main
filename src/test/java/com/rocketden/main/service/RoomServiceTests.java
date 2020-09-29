@@ -8,7 +8,6 @@ import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.dto.room.GetRoomRequest;
-import com.rocketden.main.dto.room.GetRoomResponse;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Room;
@@ -31,6 +30,7 @@ import static org.mockito.Mockito.verify;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @ExtendWith(MockitoExtension.class)
 public class RoomServiceTests {
@@ -151,13 +151,25 @@ public class RoomServiceTests {
         Room room = new Room();
         room.setRoomId(roomId);
 
+        User host = new User();
+        host.setNickname("test");
+
+        room.setHost(host);
+        room.setUsers(new HashSet<>());
+        room.getUsers().add(host);
+
         GetRoomRequest request = new GetRoomRequest();
         request.setRoomId(roomId);
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
-        GetRoomResponse response = service.getRoom(request);
+        RoomDto response = service.getRoom(request);
 
         assertEquals(roomId, response.getRoomId());
+        assertEquals(room.getHost(), UserMapper.toEntity(response.getHost()));
+
+        Set<User> actual = response.getUsers().stream()
+                .map(UserMapper::toEntity).collect(Collectors.toSet());
+        assertEquals(room.getUsers(), actual);
     }
 
     @Test

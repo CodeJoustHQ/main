@@ -2,7 +2,6 @@ package com.rocketden.main.controller.v1;
 
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.GetRoomRequest;
-import com.rocketden.main.dto.room.GetRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.service.RoomService;
@@ -27,7 +26,7 @@ public class RoomController extends BaseRestController {
     }
 
     @GetMapping("/rooms")
-    public ResponseEntity<GetRoomResponse> getRoom(GetRoomRequest request) {
+    public ResponseEntity<RoomDto> getRoom(GetRoomRequest request) {
         return new ResponseEntity<>(service.getRoom(request), HttpStatus.OK);
     }
 

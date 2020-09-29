@@ -15,8 +15,4 @@ public class RoomMapper {
         }
         return mapper.map(entity, RoomDto.class);
     }
-
-    public static GetRoomResponse entityToGetResponse(Room entity) {
-        return mapper.map(entity, GetRoomResponse.class);
-    }
 }
