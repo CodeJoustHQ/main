@@ -8,6 +8,7 @@ import { joinRoom, verifyRoomExists } from '../api/Room';
 import Loading from '../components/core/Loading';
 import ErrorMessage from '../components/core/Error';
 import { ErrorResponse } from '../api/Error';
+import {checkLocationState} from '../util/Utility';
 
 type JoinPageLocation = {
   error: ErrorResponse,
@@ -37,7 +38,7 @@ function JoinGamePage() {
 
   // If redirected with an error, display that error
   useEffect(() => {
-    if (location && location.state && location.state.error) {
+    if (checkLocationState(location, 'error')) {
       setError(location.state.error.message);
       // Clear error to prevent re-displaying on refresh
       history.replace('/game/join', null);

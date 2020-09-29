@@ -7,6 +7,7 @@ import { connect, routes, subscribe } from '../api/Socket';
 import { Room } from '../api/Room';
 import { User } from '../api/User';
 import { errorHandler } from '../api/Error';
+import { checkLocationState } from '../util/Utility';
 
 type LobbyPageLocation = {
   user: User,
@@ -78,7 +79,7 @@ function LobbyPage() {
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
     // Grab the user and room information; otherwise, redirect to the join page
-    if (location && location.state && location.state.user && location.state.room) {
+    if (checkLocationState(location, 'user', 'room')) {
       setCurrentUser(location.state.user);
       setStateFromRoom(location.state.room);
     } else {
