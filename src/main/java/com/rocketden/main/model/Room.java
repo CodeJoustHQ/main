@@ -45,14 +45,13 @@ public class Room {
     @Setter(AccessLevel.PRIVATE)
     private Set<User> users = new HashSet<>();
 
-    // Always use the following methods when dealing modifying a room's users
     public void addUser(User user) {
         users.add(user);
         user.setRoom(this);
     }
 
-    public void removeUser(String nickname) {
-        User userToRemove = new User();
-        users.remove(userToRemove);
+    // Removes user if the nicknames match (based on equals/hashCode implementation)
+    public boolean removeUser(User user) {
+        return users.remove(user);
     }
 }

@@ -1,4 +1,4 @@
-package com.rocketden.main;
+package com.rocketden.main.api;
 
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
