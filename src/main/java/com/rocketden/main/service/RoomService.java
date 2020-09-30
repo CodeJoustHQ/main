@@ -5,11 +5,9 @@ import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 
 import com.rocketden.main.dto.room.GetRoomRequest;
-import com.rocketden.main.dto.room.GetRoomResponse;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
-import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
@@ -24,7 +22,6 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 @Service
 public class RoomService {
@@ -69,8 +66,9 @@ public class RoomService {
         room.setUsers(users);
         repository.save(room);
 
-        sendSocketUpdate(room.getRoomId(), room.getUsers());
-        return RoomMapper.toDto(room);
+        RoomDto roomDto = RoomMapper.toDto(room);
+        sendSocketUpdate(roomDto);
+        return roomDto;
     }
 
     public RoomDto createRoom(CreateRoomRequest request) {
@@ -97,7 +95,7 @@ public class RoomService {
         return RoomMapper.toDto(room);
     }
 
-    public GetRoomResponse getRoom(GetRoomRequest request) {
+    public RoomDto getRoom(GetRoomRequest request) {
         Room room = repository.findRoomByRoomId(request.getRoomId());
 
         // Throw an error if room could not be found
@@ -105,14 +103,13 @@ public class RoomService {
             throw new ApiException(RoomError.NOT_FOUND);
         }
 
-        return RoomMapper.entityToGetResponse(room);
+        return RoomMapper.toDto(room);
     }
 
     // Send updates about new users to the client through sockets
-    public void sendSocketUpdate(String roomId, Set<User> users) {
-        Set<UserDto> userDtos = users.stream().map(UserMapper::toDto).collect(Collectors.toSet());
-        String socketPath = String.format(SOCKET_PATH, roomId);
-        template.convertAndSend(socketPath, userDtos);
+    public void sendSocketUpdate(RoomDto roomDto) {
+        String socketPath = String.format(SOCKET_PATH, roomDto.getRoomId());
+        template.convertAndSend(socketPath, roomDto);
     }
 
     // Generate numeric String with length ROOM_ID_LENGTH

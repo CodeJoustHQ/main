@@ -5,7 +5,6 @@ import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.room.GetRoomRequest;
-import com.rocketden.main.dto.room.GetRoomResponse;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiError;
@@ -122,12 +121,10 @@ public class RoomTests {
 
         // Send GET request to validate that room exists
         String roomId = actual.getRoomId();
+        expected.setRoomId(roomId);
 
         GetRoomRequest request = new GetRoomRequest();
         request.setRoomId(roomId);
-
-        GetRoomResponse expectedGet = new GetRoomResponse();
-        expectedGet.setRoomId(roomId);
 
         result = this.mockMvc.perform(get(GET_ROOM)
                 .param("roomId", roomId))
@@ -135,9 +132,11 @@ public class RoomTests {
                 .andReturn();
 
         jsonResponse = result.getResponse().getContentAsString();
-        GetRoomResponse actualGet = Utility.toObject(jsonResponse, GetRoomResponse.class);
+        RoomDto actualGet = Utility.toObject(jsonResponse, RoomDto.class);
 
-        assertEquals(expectedGet.getRoomId(), actualGet.getRoomId());
+        assertEquals(expected.getRoomId(), actualGet.getRoomId());
+        assertEquals(expected.getHost(), actualGet.getHost());
+        assertEquals(expected.getUsers(), actualGet.getUsers());
     }
 
     @Test

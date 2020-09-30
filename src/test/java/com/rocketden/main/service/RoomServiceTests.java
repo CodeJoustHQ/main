@@ -8,7 +8,6 @@ import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.dto.room.GetRoomRequest;
-import com.rocketden.main.dto.room.GetRoomResponse;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Room;
@@ -31,6 +30,7 @@ import static org.mockito.Mockito.verify;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @ExtendWith(MockitoExtension.class)
 public class RoomServiceTests {
@@ -90,8 +90,8 @@ public class RoomServiceTests {
         assertTrue(response.getUsers().contains(request.getUser()));
 
         verify(template).convertAndSend(
-                 eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", roomId)),
-                 eq(response.getUsers()));
+                 eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", response.getRoomId())),
+                 eq(response));
     }
 
     @Test
@@ -151,13 +151,25 @@ public class RoomServiceTests {
         Room room = new Room();
         room.setRoomId(roomId);
 
+        User host = new User();
+        host.setNickname("test");
+
+        room.setHost(host);
+        room.setUsers(new HashSet<>());
+        room.getUsers().add(host);
+
         GetRoomRequest request = new GetRoomRequest();
         request.setRoomId(roomId);
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
-        GetRoomResponse response = service.getRoom(request);
+        RoomDto response = service.getRoom(request);
 
         assertEquals(roomId, response.getRoomId());
+        assertEquals(room.getHost(), UserMapper.toEntity(response.getHost()));
+
+        Set<User> actual = response.getUsers().stream()
+                .map(UserMapper::toEntity).collect(Collectors.toSet());
+        assertEquals(room.getUsers(), actual);
     }
 
     @Test
@@ -172,20 +184,16 @@ public class RoomServiceTests {
 
     @Test
     public void sendSocketUpdate() {
-        User user = new User();
-        user.setNickname("test");
-        Set<User> users = new HashSet<>();
-        users.add(user);
-
+        RoomDto roomDto = new RoomDto();
+        roomDto.setRoomId("123456");
         UserDto userDto = new UserDto();
         userDto.setNickname("test");
-        Set<UserDto> expected = new HashSet<>();
-        expected.add(userDto);
+        roomDto.setHost(userDto);
 
-        service.sendSocketUpdate("123456", users);
+        service.sendSocketUpdate(roomDto);
         verify(template).convertAndSend(
-                eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", "123456")),
-                eq(expected));
+                eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", roomDto.getRoomId())),
+                eq(roomDto));
     }
 
     @Test
