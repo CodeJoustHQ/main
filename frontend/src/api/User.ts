@@ -1,4 +1,6 @@
 export type User = {
   nickname: string,
-  userId: string,
+  userId?: string,
+  sessionId?: string,
+  connected?: boolean
 };

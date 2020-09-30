@@ -6,6 +6,8 @@ export type Room = {
   roomId: string;
   host: User;
   users: [User],
+  activeUsers: [User],
+  inactiveUsers: [User],
 };
 
 export type CreateRoomParams = {

@@ -9,8 +9,9 @@ import java.util.Set;
 @Getter
 @Setter
 public class RoomDto {
-
     private String roomId;
     private UserDto host;
     private Set<UserDto> users;
+    private Set<UserDto> activeUsers;
+    private Set<UserDto> inactiveUsers;
 }

@@ -82,5 +82,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         User user = repository.findUserBySessionId(sessionId);
         user.setSessionId(null);
         user.setConnected(false);
+
+        // Send socket update.
     }
 }

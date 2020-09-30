@@ -2,7 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, Redirect } from 'react-router-dom';
 import { Message } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
-import { LargeText, UserNicknameText } from '../components/core/Text';
+import {
+  LargeText, UserNicknameText, InactiveUserNicknameText, MediumText,
+} from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
 import { getRoom, Room } from '../api/Room';
 import { User } from '../api/User';
@@ -22,7 +24,8 @@ function LobbyPage() {
 
   // Set all the different variables in the room object
   const [host, setHost] = useState<User | null>(null);
-  const [users, setUsers] = useState<User[] | null>(null);
+  const [activeUsers, setActiveUsers] = useState<User[] | null>(null);
+  const [inactiveUsers, setInactiveUsers] = useState<User[] | null>(null);
   const [currentRoomId, setRoomId] = useState('');
 
   // Hold error text.
@@ -39,7 +42,8 @@ function LobbyPage() {
    */
   const setStateFromRoom = (room: Room) => {
     setHost(room.host);
-    setUsers(room.users);
+    setActiveUsers(room.activeUsers);
+    setInactiveUsers(room.inactiveUsers);
     setRoomId(room.roomId);
   };
 
@@ -91,7 +95,7 @@ function LobbyPage() {
     }
 
     // Connect the user to the room.
-    if (!socketConnected && currentRoomId && currentUser) {
+    if (!socketConnected && currentRoomId && currentUser && currentUser.userId) {
       connectUserToRoom(currentRoomId, currentUser.userId);
     }
   }, [location, socketConnected, currentRoomId, connectUserToRoom]);
@@ -119,11 +123,22 @@ function LobbyPage() {
       { error ? <ErrorMessage message={error} /> : null }
       <div>
         {
-          users?.map((user) => (
+          activeUsers?.map((user) => (
             <UserNicknameText onClick={() => deleteUser(user)}>
               {user.nickname}
               {user.nickname === host?.nickname ? ' (host)' : ''}
             </UserNicknameText>
+          ))
+        }
+      </div>
+      <div>
+        <MediumText>Below is a list of inactive users.</MediumText>
+        {
+          inactiveUsers?.map((user) => (
+            <InactiveUserNicknameText onClick={() => deleteUser(user)}>
+              {user.nickname}
+              {user.nickname === host?.nickname ? ' (host)' : ''}
+            </InactiveUserNicknameText>
           ))
         }
       </div>

@@ -8,6 +8,10 @@ export const ErrorText = styled(Text)`
    color: ${({ theme }) => theme.colors.red};
 `;
 
+export const MediumText = styled.h5`
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+`;
+
 export const LargeText = styled.h3`
   font-size: ${({ theme }) => theme.fontSize.xLarge};
 `;
@@ -22,6 +26,19 @@ export const UserNicknameText = styled(LargeText)`
   padding: 10px;
   background-color: ${({ theme }) => theme.colors.lightBlue};
   border-radius: 5px;
+
+  &:hover {
+    text-decoration: line-through;
+    cursor: pointer;
+  }
+`;
+
+export const InactiveUserNicknameText = styled(Text)`
+  display: inline-block;
+  margin: 5px;
+  padding: 5px;
+  background-color: ${({ theme }) => theme.colors.lightRed};
+  border-radius: 3px;
 
   &:hover {
     text-decoration: line-through;
