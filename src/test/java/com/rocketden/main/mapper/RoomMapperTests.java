@@ -13,7 +13,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -25,14 +24,12 @@ public class RoomMapperTests {
         User host = new User();
         host.setNickname("rocket");
 
-        Set<User> users = new HashSet<>();
-        users.add(host);
-        users.add(new User());
-
         Room room = new Room();
         room.setRoomId("012345");
         room.setHost(host);
-        room.setUsers(users);
+
+        room.addUser(host);
+        room.addUser(new User());
 
         RoomDto response = RoomMapper.toDto(room);
 
