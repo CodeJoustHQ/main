@@ -33,7 +33,7 @@ export const isValidNickname = (nickname: string) => nickname.length > 0
  * @returns void Promise, reject if socket is already connected
  * or fails to connect.
 */
-export const connect = (roomId: string, userId: number):
+export const connect = (roomId: string, userId: string):
   Promise<void> => new Promise<void>((resolve, reject) => {
     if (!connected) {
       // Connect to given endpoint, subscribe to future messages, and send user message.

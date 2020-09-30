@@ -56,7 +56,7 @@ function LobbyPage() {
    * This method uses useCallback so it is not re-built in
    * the useEffect function.
    */
-  const connectUserToRoom = useCallback((roomId: string) => {
+  const connectUserToRoom = useCallback((roomId: string, userId: string) => {
     /**
      * Subscribe callback that will be triggered on every message.
      * Update the users list and other room info.
@@ -65,7 +65,7 @@ function LobbyPage() {
       setStateFromRoom(JSON.parse(result.body));
     };
 
-    connect(roomId).then(() => {
+    connect(roomId, userId).then(() => {
       subscribe(routes(roomId).subscribe, subscribeCallback).then(() => {
         setSocketConnected(true);
       }).catch((err) => {
@@ -91,8 +91,8 @@ function LobbyPage() {
     }
 
     // Connect the user to the room.
-    if (!socketConnected && currentRoomId) {
-      connectUserToRoom(currentRoomId);
+    if (!socketConnected && currentRoomId && currentUser) {
+      connectUserToRoom(currentRoomId, currentUser.userId);
     }
   }, [location, socketConnected, currentRoomId, connectUserToRoom]);
 

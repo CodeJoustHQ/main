@@ -4,7 +4,6 @@ import com.rocketden.main.dao.UserRepository;
 import com.rocketden.main.dto.user.CreateUserRequest;
 import com.rocketden.main.dto.user.DeleteUserRequest;
 import com.rocketden.main.dto.user.UserDto;
-import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.User;
@@ -58,22 +57,24 @@ public class UserServiceTests {
     public void deleteExistingUser() {
         User user = new User();
         user.setNickname("rocket");
-        when(repository.findUserByNickname("rocket")).thenReturn(user);
+        user.setUserId(1);
+        when(repository.findUserByUserId(1)).thenReturn(user);
 
         DeleteUserRequest request = new DeleteUserRequest();
-        request.setNickname("rocket");
+        request.setUserId("1");
 
         UserDto response = service.deleteUser(request);
         verify(repository).delete(user);
         assertEquals("rocket", response.getNickname());
+        assertEquals(Integer.valueOf(1), response.getUserId());
     }
 
     @Test
     public void deleteNonExistentUser() {
-        when(repository.findUserByNickname("rocket")).thenReturn(null);
+        when(repository.findUserByUserId(1)).thenReturn(null);
 
         DeleteUserRequest request = new DeleteUserRequest();
-        request.setNickname("rocket");
+        request.setUserId("1");
 
         ApiException exception = assertThrows(ApiException.class, () -> {
             service.deleteUser(request);

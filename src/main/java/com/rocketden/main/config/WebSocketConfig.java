@@ -60,7 +60,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         // Retrieve the ID of the user to update.
         Integer userId =
-            Integer.parseInt(customHeaderMap.get("nickname").get(0));
+            Integer.parseInt(customHeaderMap.get("userId").get(0));
 
         // Get the unique auto-generated session ID for this connection.
         String sessionId = sha.getSessionId();

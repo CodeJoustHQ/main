@@ -18,10 +18,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -140,7 +138,7 @@ public class UserTests {
         expected.setNickname("rocket");
 
         DeleteUserRequest request = new DeleteUserRequest();
-        request.setNickname("rocket");
+        request.setUserId("1");
 
         this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -161,7 +159,7 @@ public class UserTests {
     @Test
     public void deleteNonExistentUser() throws Exception {
         DeleteUserRequest request = new DeleteUserRequest();
-        request.setNickname("rocket");
+        request.setUserId("1");
 
         ApiError ERROR = UserError.NOT_FOUND;
 

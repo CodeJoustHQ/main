@@ -39,7 +39,7 @@ public class UserService {
     }
 
     public UserDto deleteUser(DeleteUserRequest request) {
-        User user = repository.findUserByNickname(request.getNickname());
+        User user = repository.findUserByUserId(Integer.parseInt(request.getUserId()));
 
         // If requested user does not exist in database, throw an exception. 
         if (user == null) {
