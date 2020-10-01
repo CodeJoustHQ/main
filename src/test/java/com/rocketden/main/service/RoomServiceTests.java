@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -176,6 +175,16 @@ public class RoomServiceTests {
         ApiException exception = assertThrows(ApiException.class, () -> service.getRoom(request));
 
         assertEquals(RoomError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void changeRoomHostSuccess() {
+
+    }
+
+    @Test
+    public void changeRoomHostFailure() {
+
     }
 
     @Test

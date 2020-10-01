@@ -8,6 +8,7 @@ import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
+import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
@@ -19,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Random;
 
 @Service
@@ -98,6 +97,10 @@ public class RoomService {
         }
 
         return RoomMapper.toDto(room);
+    }
+
+    public RoomDto updateRoomHost(UpdateHostRequest request) {
+        return null;
     }
 
     // Send updates about new users to the client through sockets

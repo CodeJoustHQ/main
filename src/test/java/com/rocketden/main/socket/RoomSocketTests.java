@@ -27,9 +27,7 @@ import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 import java.lang.reflect.Type;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -59,6 +57,8 @@ public class RoomSocketTests {
         this.stompClient = new WebSocketStompClient(new SockJsClient(
                 List.of(new WebSocketTransport(new StandardWebSocketClient()))));
         this.stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+
+        // TODO: move room creation and socket connection to here
     }
 
     @Test
@@ -116,6 +116,11 @@ public class RoomSocketTests {
         assertEquals(expected.getRoomId(), actual.getRoomId());
         assertEquals(expected.getHost(), actual.getHost());
         assertEquals(expected.getUsers(), actual.getUsers());
+    }
+
+    @Test
+    public void socketReceivesMessageOnHostChange() {
+
     }
 
 }

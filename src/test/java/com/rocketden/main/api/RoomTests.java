@@ -315,4 +315,14 @@ public class RoomTests {
 
         assertEquals(ERROR.getResponse(), actual);
     }
+
+    @Test
+    public void changeRoomHostSuccess() {
+        // Successfully change the room host
+    }
+
+    @Test
+    public void changeRoomHostFailure() {
+        // Error thrown when request is invalid (bad permissions, nonexistent room)
+    }
 }
