@@ -7,8 +7,6 @@ import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.UserRepository;
 import com.rocketden.main.model.User;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
@@ -25,13 +23,11 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketConfig.class);
-
-    private final UserRepository repository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public WebSocketConfig(UserRepository repository) {
-        this.repository = repository;
+    public WebSocketConfig(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     private static final String CONNECT_MESSAGE = "simpConnectMessage";
@@ -67,23 +63,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         // Get the unique auto-generated session ID for this connection.
         String sessionId = sha.getSessionId();
-        logger.info(sessionId);
 
         // Update the session ID of the relevant user.
-        User user = repository.findUserByUserId(userId);
+        User user = userRepository.findUserByUserId(userId);
         user.setSessionId(sessionId);
         user.setConnected(true);
-
-        repository.save(user);
-
-        // Send socket update.
-        
-
-        logger.info(user.toString());
-        logger.info(user.getNickname());
-        logger.info(user.getSessionId());
-        logger.info("" + user.isConnected());
-        logger.info(user.getUserId().toString());
+        userRepository.save(user);
     }
 
     @EventListener
@@ -94,18 +79,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         String sessionId = sha.getSessionId();
 
         // Remove the user from the database and send socket update.
-        User user = repository.findUserBySessionId(sessionId);
+        // TODO: This could throw a null exception.
+        User user = userRepository.findUserBySessionId(sessionId);
         user.setSessionId(null);
         user.setConnected(false);
+        userRepository.save(user);
 
-        repository.save(user);
-
-        logger.info(user.toString());
-        logger.info(user.getNickname());
-        logger.info(user.getSessionId());
-        logger.info("" + user.isConnected());
-        logger.info(user.getUserId().toString());
-
-        // Send socket update.
+        // Need to be able to get the room in order to send the relevant update.
     }
 }

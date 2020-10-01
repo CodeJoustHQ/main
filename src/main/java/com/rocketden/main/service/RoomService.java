@@ -1,7 +1,6 @@
 package com.rocketden.main.service;
 
 import com.rocketden.main.Utility.Utility;
-import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 
@@ -27,7 +26,6 @@ import java.util.HashSet;
 public class RoomService {
 
     public static final int ROOM_ID_LENGTH = 6;
-    private static final String SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user";
 
     private final RoomRepository repository;
     private final SimpMessagingTemplate template;
@@ -119,7 +117,7 @@ public class RoomService {
 
     // Send updates about new users to the client through sockets
     public void sendSocketUpdate(RoomDto roomDto) {
-        String socketPath = String.format(SOCKET_PATH, roomDto.getRoomId());
+        String socketPath = String.format(Utility.SOCKET_PATH, roomDto.getRoomId());
         template.convertAndSend(socketPath, roomDto);
     }
 }

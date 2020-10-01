@@ -85,7 +85,7 @@ function JoinGamePage() {
 
     joinRoom(roomParams)
       .then(() => {
-        history.push(`/game/lobby?room=${roomId}`, { roomId, user });
+        history.push(`/game/lobby?room=${roomId}`, { user, roomId });
       }).catch((err) => reject(err));
   });
 
