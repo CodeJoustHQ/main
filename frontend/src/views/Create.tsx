@@ -17,7 +17,6 @@ function CreateGamePage() {
     const roomHost: CreateRoomParams = {
       host: {
         nickname,
-        userId: '012345',
       },
     };
     createRoom(roomHost)

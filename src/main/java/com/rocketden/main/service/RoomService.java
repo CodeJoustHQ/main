@@ -54,10 +54,12 @@ public class RoomService {
             throw new ApiException(UserError.INVALID_USER);
         }
 
-        // Return error if user is already in the room
+        // Return error if a user with the same nickname is in the room.
         Set<User> users = room.getUsers();
-        if (users.contains(user)) {
-            throw new ApiException(RoomError.USER_ALREADY_PRESENT);
+        for (User roomUser : users) {
+            if (roomUser.getNickname().equals(user.getNickname())) {
+                throw new ApiException(RoomError.USER_WITH_NICKNAME_ALREADY_PRESENT);
+            };
         }
 
         // Add userId if not already present.
@@ -86,8 +88,10 @@ public class RoomService {
             throw new ApiException(UserError.INVALID_USER);
         }
 
-        // Create user ID for the host.
-        host.setUserId(Utility.generateId(UserService.USER_ID_LENGTH));
+        // Create user ID for the host if not already present.
+        if (host.getUserId() == null) {
+            host.setUserId(Utility.generateId(UserService.USER_ID_LENGTH));
+        }
 
         // Add the host to a new user set.
         Set<User> users = new HashSet<>();

@@ -144,7 +144,7 @@ public class RoomServiceTests {
         ApiException exception = assertThrows(ApiException.class, () -> service.joinRoom(request));
 
         verify(repository).findRoomByRoomId(roomId);
-        assertEquals(RoomError.USER_ALREADY_PRESENT, exception.getError());
+        assertEquals(RoomError.USER_WITH_NICKNAME_ALREADY_PRESENT, exception.getError());
     }
 
     @Test

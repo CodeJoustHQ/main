@@ -76,6 +76,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         repository.save(user);
 
+        // Send socket update.
+        
+
         logger.info(user.toString());
         logger.info(user.getNickname());
         logger.info(user.getSessionId());

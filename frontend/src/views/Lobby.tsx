@@ -84,25 +84,29 @@ function LobbyPage() {
   useEffect(() => {
     // Grab the user and room information; otherwise, redirect to the join page
     if (checkLocationState(location, 'user', 'roomId')) {
-      setCurrentUser(location.state.user);
-
       // Call GET endpoint to get latest room info
       getRoom(location.state.roomId)
-        .then((res) => setStateFromRoom(res))
+        .then((res) => {
+          setStateFromRoom(res);
+          // Reset the user to hold the ID.
+          res.inactiveUsers.forEach((user: User) => {
+            if (user.nickname === location.state.user.nickname) {
+              setCurrentUser(user);
+            }
+          });
+        })
         .catch((err) => setError(err));
     } else {
       setShouldRedirect(true);
     }
+  }, [location, socketConnected, connectUserToRoom]);
 
-    // Connect the user to the room.
-    console.log(!socketConnected && currentRoomId && currentUser && currentUser.userId);
-    console.log(socketConnected);
-    console.log(currentRoomId);
-    console.log(currentUser);
+  // Connect the user to the room.
+  useEffect(() => {
     if (!socketConnected && currentRoomId && currentUser && currentUser.userId) {
       connectUserToRoom(currentRoomId, currentUser.userId);
     }
-  }, [location, socketConnected, currentRoomId, connectUserToRoom]);
+  }, [currentRoomId, currentUser]);
 
   // Render the lobby.
   return (
