@@ -57,24 +57,24 @@ public class UserServiceTests {
     public void deleteExistingUser() {
         User user = new User();
         user.setNickname("rocket");
-        user.setUserId(1);
-        when(repository.findUserByUserId(1)).thenReturn(user);
+        user.setUserId("012345");
+        when(repository.findUserByUserId("012345")).thenReturn(user);
 
         DeleteUserRequest request = new DeleteUserRequest();
-        request.setUserId("1");
+        request.setUserId("012345");
 
         UserDto response = service.deleteUser(request);
         verify(repository).delete(user);
         assertEquals("rocket", response.getNickname());
-        assertEquals(Integer.valueOf(1), response.getUserId());
+        assertEquals("012345", response.getUserId());
     }
 
     @Test
     public void deleteNonExistentUser() {
-        when(repository.findUserByUserId(1)).thenReturn(null);
+        when(repository.findUserByUserId("012345")).thenReturn(null);
 
         DeleteUserRequest request = new DeleteUserRequest();
-        request.setUserId("1");
+        request.setUserId("012345");
 
         ApiException exception = assertThrows(ApiException.class, () -> {
             service.deleteUser(request);

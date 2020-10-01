@@ -95,6 +95,10 @@ function LobbyPage() {
     }
 
     // Connect the user to the room.
+    console.log(!socketConnected && currentRoomId && currentUser && currentUser.userId);
+    console.log(socketConnected);
+    console.log(currentRoomId);
+    console.log(currentUser);
     if (!socketConnected && currentRoomId && currentUser && currentUser.userId) {
       connectUserToRoom(currentRoomId, currentUser.userId);
     }

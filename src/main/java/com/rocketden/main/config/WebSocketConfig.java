@@ -7,6 +7,8 @@ import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.UserRepository;
 import com.rocketden.main.model.User;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
@@ -22,6 +24,8 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketConfig.class);
 
     private final UserRepository repository;
 
@@ -59,16 +63,24 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             (Map<String, LinkedList<String>>) genericMessage.getHeaders().get(NATIVE_HEADERS);
 
         // Retrieve the ID of the user to update.
-        Integer userId =
-            Integer.parseInt(customHeaderMap.get("userId").get(0));
+        String userId = customHeaderMap.get("userId").get(0);
 
         // Get the unique auto-generated session ID for this connection.
         String sessionId = sha.getSessionId();
+        logger.info(sessionId);
 
         // Update the session ID of the relevant user.
         User user = repository.findUserByUserId(userId);
         user.setSessionId(sessionId);
         user.setConnected(true);
+
+        repository.save(user);
+
+        logger.info(user.toString());
+        logger.info(user.getNickname());
+        logger.info(user.getSessionId());
+        logger.info("" + user.isConnected());
+        logger.info(user.getUserId().toString());
     }
 
     @EventListener
@@ -82,6 +94,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         User user = repository.findUserBySessionId(sessionId);
         user.setSessionId(null);
         user.setConnected(false);
+
+        repository.save(user);
+
+        logger.info(user.toString());
+        logger.info(user.getNickname());
+        logger.info(user.getSessionId());
+        logger.info("" + user.isConnected());
+        logger.info(user.getUserId().toString());
 
         // Send socket update.
     }

@@ -1,5 +1,6 @@
 package com.rocketden.main.service;
 
+import com.rocketden.main.Utility.Utility;
 import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
@@ -21,13 +22,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 import java.util.HashSet;
-import java.util.Random;
 
 @Service
 public class RoomService {
 
     public static final int ROOM_ID_LENGTH = 6;
-    private static final Random random = new Random();
     private static final String SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user";
 
     private final RoomRepository repository;
@@ -61,6 +60,11 @@ public class RoomService {
             throw new ApiException(RoomError.USER_ALREADY_PRESENT);
         }
 
+        // Add userId if not already present.
+        if (user.getUserId() == null) {
+            user.setUserId(Utility.generateId(UserService.USER_ID_LENGTH));
+        }
+
         // Add the user to the room.
         users.add(user);
         room.setUsers(users);
@@ -82,12 +86,15 @@ public class RoomService {
             throw new ApiException(UserError.INVALID_USER);
         }
 
+        // Create user ID for the host.
+        host.setUserId(Utility.generateId(UserService.USER_ID_LENGTH));
+
         // Add the host to a new user set.
         Set<User> users = new HashSet<>();
         users.add(host);
 
         Room room = new Room();
-        room.setRoomId(generateRoomId());
+        room.setRoomId(Utility.generateId(ROOM_ID_LENGTH));
         room.setHost(host);
         room.setUsers(users);
         repository.save(room);
@@ -110,18 +117,5 @@ public class RoomService {
     public void sendSocketUpdate(RoomDto roomDto) {
         String socketPath = String.format(SOCKET_PATH, roomDto.getRoomId());
         template.convertAndSend(socketPath, roomDto);
-    }
-
-    // Generate numeric String with length ROOM_ID_LENGTH
-    protected String generateRoomId() {
-        String numbers = "1234567890";
-        char[] values = new char[ROOM_ID_LENGTH];
-
-        for (int i = 0; i < values.length; i++) {
-            int index = random.nextInt(numbers.length());
-            values[i] = numbers.charAt(index);
-        }
-
-        return new String(values);
     }
 }

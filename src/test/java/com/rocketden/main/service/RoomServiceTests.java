@@ -1,5 +1,6 @@
 package com.rocketden.main.service;
 
+import com.rocketden.main.Utility.Utility;
 import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
@@ -53,7 +54,8 @@ public class RoomServiceTests {
         request.setHost(user);
         // Verify create room request succeeds and returns correct response
         // Mock generateRoomId to return a custom room id
-        Mockito.doReturn("012345").when(service).generateRoomId();
+        // TODO: PowerMockito.mockStatic(DriverManager.class);
+        // Mockito.doReturn("012345").when(service).generateId();
         RoomDto response = service.createRoom(request);
 
         verify(repository).save(Mockito.any(Room.class));
@@ -199,7 +201,7 @@ public class RoomServiceTests {
     @Test
     public void generateValidRoomId() {
         // Verify room ids are generated correctly
-        String roomId = service.generateRoomId();
+        String roomId = Utility.generateId(RoomService.ROOM_ID_LENGTH);
 
         assertEquals(RoomService.ROOM_ID_LENGTH, roomId.length());
 

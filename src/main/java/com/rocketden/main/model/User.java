@@ -22,8 +22,7 @@ public class User {
     private Integer id;
 
     // User ID for user identification and accessible from frontend.
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer userId;
+    private String userId;
     
     private String nickname;
 

@@ -1,5 +1,6 @@
 package com.rocketden.main.service;
 
+import com.rocketden.main.Utility.Utility;
 import com.rocketden.main.dao.UserRepository;
 import com.rocketden.main.dto.user.CreateUserRequest;
 import com.rocketden.main.dto.user.DeleteUserRequest;
@@ -17,6 +18,9 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository repository;
+    
+    // The length of the user ID.
+    public static final int USER_ID_LENGTH = 6;
 
     @Autowired
     public UserService(UserRepository repository) {
@@ -33,13 +37,14 @@ public class UserService {
         
         User user = new User();
         user.setNickname(nickname);
+        user.setUserId(Utility.generateId(UserService.USER_ID_LENGTH));
         repository.save(user);
 
         return UserMapper.toDto(user);
     }
 
     public UserDto deleteUser(DeleteUserRequest request) {
-        User user = repository.findUserByUserId(Integer.parseInt(request.getUserId()));
+        User user = repository.findUserByUserId(request.getUserId());
 
         // If requested user does not exist in database, throw an exception. 
         if (user == null) {
