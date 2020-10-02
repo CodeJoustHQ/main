@@ -56,14 +56,12 @@ public class RoomService {
         }
 
         // Return error if user is already in the room
-        Set<User> users = room.getUsers();
-        if (users.contains(user)) {
+        if (room.getUsers().contains(user)) {
             throw new ApiException(RoomError.USER_ALREADY_PRESENT);
         }
 
         // Add the user to the room.
-        users.add(user);
-        room.setUsers(users);
+        room.addUser(user);
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
@@ -82,14 +80,10 @@ public class RoomService {
             throw new ApiException(UserError.INVALID_USER);
         }
 
-        // Add the host to a new user set.
-        Set<User> users = new HashSet<>();
-        users.add(host);
-
         Room room = new Room();
         room.setRoomId(generateRoomId());
         room.setHost(host);
-        room.setUsers(users);
+        room.addUser(host);
         repository.save(room);
 
         return RoomMapper.toDto(room);
