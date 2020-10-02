@@ -2,8 +2,8 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
+import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.room.CreateRoomRequest;
-
 import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
@@ -28,7 +28,8 @@ public class RoomService {
 
     public static final int ROOM_ID_LENGTH = 6;
     private static final Random random = new Random();
-    private static final String SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user";
+    private static final String SUBSCRIBE_USER_SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user";
+    private static final String START_GAME_SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/start-game";
 
     private final RoomRepository repository;
     private final SimpMessagingTemplate template;
@@ -108,8 +109,14 @@ public class RoomService {
 
     // Send updates about new users to the client through sockets
     public void sendSocketUpdate(RoomDto roomDto) {
-        String socketPath = String.format(SOCKET_PATH, roomDto.getRoomId());
+        String socketPath = String.format(SUBSCRIBE_USER_SOCKET_PATH, roomDto.getRoomId());
         template.convertAndSend(socketPath, roomDto);
+    }
+
+    // Send request to redirect users to game when host clicks start
+    public void startGame(StartGameRequest request) {
+        String socketPath = String.format(START_GAME_SOCKET_PATH, request.getRoomId());
+        template.convertAndSend(socketPath, request.getRoomId());
     }
 
     // Generate numeric String with length ROOM_ID_LENGTH

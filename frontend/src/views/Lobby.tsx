@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, Redirect } from 'react-router-dom';
 import { Message } from 'stompjs';
@@ -6,8 +7,9 @@ import { LargeText, UserNicknameText } from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
 import { getRoom, Room } from '../api/Room';
 import { User } from '../api/User';
-import { errorHandler } from '../api/Error';
+import { axiosErrorHandler, errorHandler } from '../api/Error';
 import { checkLocationState } from '../util/Utility';
+import { PrimaryButton } from '../components/core/Button';
 
 type LobbyPageLocation = {
   user: User,
@@ -29,7 +31,10 @@ function LobbyPage() {
   const [error, setError] = useState('');
 
   // Variable to determine whether to redirect back to join page
-  const [shouldRedirect, setShouldRedirect] = useState(false);
+  const [shouldRedirectToJoin, setShouldRedirectToJoin] = useState(false);
+
+  // Variable to determine whether to redirect to game page
+  const [shouldRedirectToGame, setShouldRedirectToGame] = useState(false);
 
   // Variable to hold whether the user is connected to the socket.
   const [socketConnected, setSocketConnected] = useState(false);
@@ -46,6 +51,15 @@ function LobbyPage() {
   const deleteUser = (user: User) => {
     // Make rest call to delete user from room
     console.log(user);
+  };
+
+  const handleClick = (): Promise<void> => {
+    const request = { roomId: currentRoomId, User: currentUser };
+    return axios.post<void>('/api/v1/start', request)
+      .then(() => { console.log('redirect to game'); })
+      .catch((err) => {
+        throw axiosErrorHandler(err);
+      });
   };
 
   /**
@@ -65,8 +79,17 @@ function LobbyPage() {
       setStateFromRoom(JSON.parse(result.body));
     };
 
+    const startGameCallback = () => {
+      setShouldRedirectToGame(true);
+    };
+
     connect(roomId).then(() => {
       subscribe(routes(roomId).subscribe, subscribeCallback).then(() => {
+        setSocketConnected(true);
+      }).catch((err) => {
+        setError(err.message);
+      });
+      subscribe(routes(roomId).start, startGameCallback).then(() => {
         setSocketConnected(true);
       }).catch((err) => {
         setError(err.message);
@@ -87,7 +110,7 @@ function LobbyPage() {
         .then((res) => setStateFromRoom(res))
         .catch((err) => setError(err));
     } else {
-      setShouldRedirect(true);
+      setShouldRedirectToJoin(true);
     }
 
     // Connect the user to the room.
@@ -99,12 +122,19 @@ function LobbyPage() {
   // Render the lobby.
   return (
     <div>
-      { shouldRedirect ? (
+      { shouldRedirectToJoin ? (
         // Using redirect instead of history prevents the back button from breaking
         <Redirect
           to={{
             pathname: '/game/join',
             state: { error: errorHandler('Please join a room to access the lobby page.') },
+          }}
+        />
+      ) : null}
+      { shouldRedirectToGame ? (
+        <Redirect
+          to={{
+            pathname: '/game',
           }}
         />
       ) : null}
@@ -127,6 +157,9 @@ function LobbyPage() {
           ))
         }
       </div>
+      {currentUser?.nickname === host?.nickname
+        ? <PrimaryButton onClick={handleClick}> Start Game </PrimaryButton>
+        : 'Waiting for the host to start the game...'}
     </div>
   );
 }
