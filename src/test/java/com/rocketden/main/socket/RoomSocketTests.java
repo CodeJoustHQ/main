@@ -144,12 +144,12 @@ public class RoomSocketTests {
 
         // A host change request is sent
         UpdateHostRequest updateRequest = new UpdateHostRequest();
-        updateRequest.setRoomId(roomId);
         updateRequest.setInitiator(expected.getHost());
         updateRequest.setNewHost(newUser);
 
         HttpEntity<UpdateHostRequest> updateEntity = new HttpEntity<>(updateRequest);
-        expected = template.exchange(baseRestEndpoint + "/host", HttpMethod.PUT, updateEntity, RoomDto.class).getBody();
+        String updateHostEndpoint = String.format("%s/%s/host", baseRestEndpoint, roomId);
+        expected = template.exchange(updateHostEndpoint, HttpMethod.PUT, updateEntity, RoomDto.class).getBody();
 
         // Verify that the socket receives a message with the updated host
         actual = blockingQueue.poll(3, SECONDS);

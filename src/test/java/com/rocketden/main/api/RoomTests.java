@@ -43,7 +43,7 @@ public class RoomTests {
     private static final String GET_ROOM = "/api/v1/rooms";
     private static final String PUT_ROOM = "/api/v1/rooms";
     private static final String POST_ROOM = "/api/v1/rooms";
-    private static final String PUT_ROOM_HOST = "/api/v1/rooms/host";
+    private static final String PUT_ROOM_HOST = "/api/v1/rooms/%s/host";
 
     @Test
     public void getNonExistentRoom() throws Exception {
@@ -357,11 +357,10 @@ public class RoomTests {
 
         // Host sends request to change hosts
         UpdateHostRequest updateHostRequest = new UpdateHostRequest();
-        updateHostRequest.setRoomId(room.getRoomId());
         updateHostRequest.setInitiator(firstHost);
         updateHostRequest.setNewHost(secondHost);
 
-        result = this.mockMvc.perform(put(PUT_ROOM_HOST)
+        result = this.mockMvc.perform(put(String.format(PUT_ROOM_HOST, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(updateHostRequest)))
                 .andDo(print()).andExpect(status().isOk())
@@ -412,13 +411,12 @@ public class RoomTests {
 
         // Non-host tries to change hosts
         UpdateHostRequest updateHostRequest = new UpdateHostRequest();
-        updateHostRequest.setRoomId(room.getRoomId());
         updateHostRequest.setInitiator(user);
         updateHostRequest.setNewHost(host);
 
         ApiError ERROR = RoomError.INVALID_PERMISSIONS;
 
-        result = this.mockMvc.perform(put(PUT_ROOM_HOST)
+        result = this.mockMvc.perform(put(String.format(PUT_ROOM_HOST, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(updateHostRequest)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
@@ -431,13 +429,12 @@ public class RoomTests {
 
         // Room does not exist
         updateHostRequest = new UpdateHostRequest();
-        updateHostRequest.setRoomId("999999");
         updateHostRequest.setInitiator(host);
         updateHostRequest.setNewHost(user);
 
         ERROR = RoomError.NOT_FOUND;
 
-        result = this.mockMvc.perform(put(PUT_ROOM_HOST)
+        result = this.mockMvc.perform(put(String.format(PUT_ROOM_HOST, "999999"))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(updateHostRequest)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
@@ -450,13 +447,12 @@ public class RoomTests {
 
         // New host does not exist in the room
         updateHostRequest = new UpdateHostRequest();
-        updateHostRequest.setRoomId(room.getRoomId());
         updateHostRequest.setInitiator(host);
         updateHostRequest.setNewHost(new UserDto());
 
         ERROR = UserError.NOT_FOUND;
 
-        result = this.mockMvc.perform(put(PUT_ROOM_HOST)
+        result = this.mockMvc.perform(put(String.format(PUT_ROOM_HOST, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(updateHostRequest)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))

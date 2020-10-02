@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UpdateHostRequest {
-    private String roomId;
     private UserDto initiator;
     private UserDto newHost;
 }

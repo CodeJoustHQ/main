@@ -99,8 +99,8 @@ public class RoomService {
         return RoomMapper.toDto(room);
     }
 
-    public RoomDto updateRoomHost(UpdateHostRequest request) {
-        Room room = repository.findRoomByRoomId(request.getRoomId());
+    public RoomDto updateRoomHost(String roomId, UpdateHostRequest request) {
+        Room room = repository.findRoomByRoomId(roomId);
 
         // Return error if room could not be found
         if (room == null) {
