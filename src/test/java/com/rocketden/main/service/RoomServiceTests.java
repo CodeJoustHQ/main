@@ -5,10 +5,12 @@ import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
+import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.exception.RoomError;
+import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Room;
 
@@ -179,12 +181,77 @@ public class RoomServiceTests {
 
     @Test
     public void changeRoomHostSuccess() {
+        String roomId = "012345";
+        Room room = new Room();
+        room.setRoomId(roomId);
 
+        User host = new User();
+        host.setNickname("host");
+        User user =  new User();
+        user.setNickname("user");
+
+        room.setHost(host);
+        room.addUser(host);
+        room.addUser(user);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
+
+        UpdateHostRequest request = new UpdateHostRequest();
+        request.setRoomId(room.getRoomId());
+        request.setInitiator(UserMapper.toDto(host));
+        request.setNewHost(UserMapper.toDto(user));
+
+        RoomDto response = service.updateRoomHost(request);
+
+        assertEquals(user, UserMapper.toEntity(response.getHost()));
     }
 
     @Test
     public void changeRoomHostFailure() {
+        String roomId = "012345";
+        Room room = new Room();
+        room.setRoomId(roomId);
 
+        User host = new User();
+        host.setNickname("host");
+        User user =  new User();
+        user.setNickname("user");
+
+        room.setHost(host);
+        room.addUser(host);
+        room.addUser(user);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
+
+        // Invalid permissions
+        UpdateHostRequest invalidPermRequest = new UpdateHostRequest();
+        invalidPermRequest.setRoomId(room.getRoomId());
+        invalidPermRequest.setInitiator(UserMapper.toDto(user));
+        invalidPermRequest.setNewHost(UserMapper.toDto(host));
+
+        ApiException exception = assertThrows(ApiException.class, () -> service.updateRoomHost(invalidPermRequest));
+        assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
+
+        // Nonexistent room
+        UpdateHostRequest noRoomRequest = new UpdateHostRequest();
+        noRoomRequest.setRoomId("999999");
+        noRoomRequest.setInitiator(UserMapper.toDto(host));
+        noRoomRequest.setNewHost(UserMapper.toDto(user));
+
+        exception = assertThrows(ApiException.class, () -> service.updateRoomHost(noRoomRequest));
+        assertEquals(RoomError.NOT_FOUND, exception.getError());
+
+        // Nonexistent new host
+        UpdateHostRequest noUserRequest = new UpdateHostRequest();
+        noUserRequest.setRoomId(room.getRoomId());
+        noUserRequest.setInitiator(UserMapper.toDto(host));
+
+        UserDto nonExistentUser = new UserDto();
+        nonExistentUser.setNickname("notfound");
+        noUserRequest.setNewHost(nonExistentUser);
+
+        exception = assertThrows(ApiException.class, () -> service.updateRoomHost(noUserRequest));
+        assertEquals(UserError.NOT_FOUND, exception.getError());
     }
 
     @Test
