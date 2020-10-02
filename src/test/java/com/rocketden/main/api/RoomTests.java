@@ -3,6 +3,7 @@ package com.rocketden.main.api;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
+import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.exception.RoomError;
@@ -42,6 +43,7 @@ public class RoomTests {
     private static final String GET_ROOM = "/api/v1/rooms";
     private static final String PUT_ROOM = "/api/v1/rooms";
     private static final String POST_ROOM = "/api/v1/rooms";
+    private static final String PUT_ROOM_HOST = "/api/v1/rooms/host";
 
     @Test
     public void getNonExistentRoom() throws Exception {
@@ -317,12 +319,152 @@ public class RoomTests {
     }
 
     @Test
-    public void changeRoomHostSuccess() {
-        // Successfully change the room host
+    public void changeRoomHostSuccess() throws Exception {
+        // First, create the room
+        UserDto firstHost = new UserDto();
+        firstHost.setNickname("FirstHost");
+        CreateRoomRequest createRequest = new CreateRoomRequest();
+        createRequest.setHost(firstHost);
+
+        MvcResult result = this.mockMvc.perform(post(POST_ROOM)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(createRequest)))
+                .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        RoomDto room = Utility.toObject(jsonResponse, RoomDto.class);
+
+        // A second user joins the room
+        UserDto secondHost = new UserDto();
+        secondHost.setNickname("SecondHost");
+
+        JoinRoomRequest joinRequest = new JoinRoomRequest();
+        joinRequest.setRoomId(room.getRoomId());
+        joinRequest.setUser(secondHost);
+
+        result = this.mockMvc.perform(put(PUT_ROOM)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(joinRequest)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        room = Utility.toObject(jsonResponse, RoomDto.class);
+
+        assertEquals(firstHost, room.getHost());
+        assertEquals(2, room.getUsers().size());
+
+        // Host sends request to change hosts
+        UpdateHostRequest updateHostRequest = new UpdateHostRequest();
+        updateHostRequest.setRoomId(room.getRoomId());
+        updateHostRequest.setInitiator(firstHost);
+        updateHostRequest.setNewHost(secondHost);
+
+        result = this.mockMvc.perform(put(PUT_ROOM_HOST)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(updateHostRequest)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        room = Utility.toObject(jsonResponse, RoomDto.class);
+
+        assertEquals(secondHost, room.getHost());
+        assertEquals(2, room.getUsers().size());
     }
 
     @Test
-    public void changeRoomHostFailure() {
-        // Error thrown when request is invalid (bad permissions, nonexistent room)
+    public void changeRoomHostFailure() throws Exception {
+        // Error thrown when request is invalid (bad permissions, nonexistent room, etc.)
+        UserDto host = new UserDto();
+        host.setNickname("Host");
+        CreateRoomRequest createRequest = new CreateRoomRequest();
+        createRequest.setHost(host);
+
+        MvcResult result = this.mockMvc.perform(post(POST_ROOM)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(createRequest)))
+                .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        RoomDto room = Utility.toObject(jsonResponse, RoomDto.class);
+
+        UserDto user = new UserDto();
+        user.setNickname("User");
+
+        JoinRoomRequest joinRequest = new JoinRoomRequest();
+        joinRequest.setRoomId(room.getRoomId());
+        joinRequest.setUser(user);
+
+        result = this.mockMvc.perform(put(PUT_ROOM)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(joinRequest)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        room = Utility.toObject(jsonResponse, RoomDto.class);
+
+        // Verify that we have created a room with 2 users
+        assertEquals(2, room.getUsers().size());
+
+        // Non-host tries to change hosts
+        UpdateHostRequest updateHostRequest = new UpdateHostRequest();
+        updateHostRequest.setRoomId(room.getRoomId());
+        updateHostRequest.setInitiator(user);
+        updateHostRequest.setNewHost(host);
+
+        ApiError ERROR = RoomError.INVALID_PERMISSIONS;
+
+        result = this.mockMvc.perform(put(PUT_ROOM_HOST)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(updateHostRequest)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+
+        // Room does not exist
+        updateHostRequest = new UpdateHostRequest();
+        updateHostRequest.setRoomId("999999");
+        updateHostRequest.setInitiator(host);
+        updateHostRequest.setNewHost(user);
+
+        ERROR = RoomError.NOT_FOUND;
+
+        result = this.mockMvc.perform(put(PUT_ROOM_HOST)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(updateHostRequest)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+
+        // New host does not exist in the room
+        updateHostRequest = new UpdateHostRequest();
+        updateHostRequest.setRoomId(room.getRoomId());
+        updateHostRequest.setInitiator(host);
+        updateHostRequest.setNewHost(new UserDto());
+
+        ERROR = UserError.NOT_FOUND;
+
+        result = this.mockMvc.perform(put(PUT_ROOM_HOST)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(updateHostRequest)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
     }
 }
