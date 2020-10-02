@@ -131,6 +131,8 @@ public class RoomService {
          */
         room.setHost(newHost);
 
+        RoomDto roomDto = RoomMapper.toDto(room);
+        sendSocketUpdate(roomDto);
         return RoomMapper.toDto(room);
     }
 

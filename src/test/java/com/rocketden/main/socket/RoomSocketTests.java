@@ -149,7 +149,7 @@ public class RoomSocketTests {
         updateRequest.setNewHost(newUser);
 
         HttpEntity<UpdateHostRequest> updateEntity = new HttpEntity<>(updateRequest);
-        expected = template.exchange(baseRestEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
+        expected = template.exchange(baseRestEndpoint + "/host", HttpMethod.PUT, updateEntity, RoomDto.class).getBody();
 
         // Verify that the socket receives a message with the updated host
         actual = blockingQueue.poll(3, SECONDS);
