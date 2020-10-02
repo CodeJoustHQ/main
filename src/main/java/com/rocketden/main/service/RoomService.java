@@ -130,6 +130,7 @@ public class RoomService {
          * to duplicate users in the database.
          */
         room.setHost(newHost);
+        repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
         sendSocketUpdate(roomDto);

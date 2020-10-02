@@ -27,6 +27,6 @@ public class User {
 
     // room_id column in user table holds the primary key of the room
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id")
+    @JoinColumn(name = "room_table_id")
     private Room room;
 }
