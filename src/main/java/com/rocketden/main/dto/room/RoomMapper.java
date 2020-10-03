@@ -31,7 +31,7 @@ public class RoomMapper {
         logger.info("3");
         for (UserDto userDto : roomDto.getUsers()) {
             logger.info(userDto.getNickname());
-            if (userDto.isConnected()) {
+            if (userDto.getSessionId() != null) {
                 activeUsers.add(userDto);
             } else {
                 inactiveUsers.add(userDto);
