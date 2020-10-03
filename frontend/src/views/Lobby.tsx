@@ -103,7 +103,7 @@ function LobbyPage() {
         // Using redirect instead of history prevents the back button from breaking
         <Redirect
           to={{
-            pathname: `/game/join${currentRoomId ? `room=${currentRoomId}` : null}`,
+            pathname: `/game/join${currentRoomId ? `room=${currentRoomId}` : ''}`,
             state: { error: errorHandler('Please join a room to access the lobby page.') },
           }}
         />
