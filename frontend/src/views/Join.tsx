@@ -61,11 +61,11 @@ function JoinGamePage() {
   /**
    * Check if a room exists with the current roomId.
    */
-  const checkRoom = () => {
+  const checkRoom = (roomIdParam: string) => {
     // Only verify if previous REST call is not still running
     if (!loading) {
       setLoading(true);
-      getRoom(roomId)
+      getRoom(roomIdParam)
         .then(() => {
           setLoading(false);
           setPageState(2);
@@ -88,6 +88,13 @@ function JoinGamePage() {
         history.push(`/game/lobby?room=${roomId}`, { roomId, user });
       }).catch((err) => reject(err));
   });
+
+  // Get URL query params to determine if the roomId is provided.
+  const urlParams = new URLSearchParams(window.location.search);
+  const roomIdQueryParam = urlParams.get('room');
+  if (roomIdQueryParam && isValidRoomId(roomIdQueryParam)) {
+    checkRoom(roomIdQueryParam);
+  }
 
   let joinPageContent: ReactElement | undefined;
 
@@ -120,13 +127,13 @@ function JoinGamePage() {
                 event.preventDefault();
               }
               if (event.key === 'Enter' && validRoomId && !loading) {
-                checkRoom();
+                checkRoom(roomId);
               }
             }}
           />
           <LargeInputButton
             onClick={() => {
-              checkRoom();
+              checkRoom(roomId);
             }}
             value="Enter"
             // Input is disabled if loading or if no nickname exists, has a space, or is too long.
