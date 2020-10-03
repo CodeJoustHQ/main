@@ -116,7 +116,7 @@ function LobbyPage() {
       ) : null}
       <LargeText>
         You have entered the lobby for room
-        {' '}
+        {' #'}
         {currentRoomId}
         ! Your nickname is &quot;
         {currentUser?.nickname}

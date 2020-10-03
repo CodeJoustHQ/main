@@ -91,7 +91,9 @@ function JoinGamePage() {
   // Get URL query params to determine if the roomId is provided.
   const urlParams = new URLSearchParams(window.location.search);
   const roomIdQueryParam = urlParams.get('room');
-  if (roomIdQueryParam && isValidRoomId(roomIdQueryParam)) {
+  if (!roomId && roomIdQueryParam && isValidRoomId(roomIdQueryParam)) {
+    console.log(roomIdQueryParam);
+    setRoomId(roomIdQueryParam);
     checkRoom(roomIdQueryParam);
   }
 
