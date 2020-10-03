@@ -1,4 +1,4 @@
-package com.rocketden.main;
+package com.rocketden.main.socket;
 
 import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dto.room.CreateRoomRequest;

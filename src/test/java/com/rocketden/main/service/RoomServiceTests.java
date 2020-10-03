@@ -67,12 +67,6 @@ public class RoomServiceTests {
         // Verify join room request succeeds and returns correct response
         String roomId = "012345";
 
-        // Create host and users objects.
-        User host = new User();
-        host.setNickname("host");
-        Set<User> users = new HashSet<>();
-        users.add(host);
-
         User user = new User();
         user.setNickname("rocket");
         JoinRoomRequest request = new JoinRoomRequest();
@@ -81,14 +75,19 @@ public class RoomServiceTests {
 
         Room room = new Room();
         room.setRoomId(roomId);
+
+        // Create host
+        User host = new User();
+        host.setNickname("host");
+        room.addUser(host);
         room.setHost(host);
-        room.setUsers(users);
 
         // Mock repository to return room when called
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
         RoomDto response = service.joinRoom(request);
 
         assertEquals(roomId, response.getRoomId());
+        assertEquals(2, response.getUsers().size());
         assertTrue(response.getUsers().contains(request.getUser()));
 
         verify(template).convertAndSend(
@@ -125,19 +124,17 @@ public class RoomServiceTests {
         // Define two identical, and make the first one the host and second one the joiner
         User firstUser = new User();
         firstUser.setNickname("rocket");
-        User secondUser = new User();
-        secondUser.setNickname("rocket");
-        Set<User> users = new HashSet<>();
-        users.add(firstUser);
-        
+        UserDto newUser = new UserDto();
+        newUser.setNickname("rocket");
+
         JoinRoomRequest request = new JoinRoomRequest();
-        request.setUser(UserMapper.toDto(secondUser));
+        request.setUser(newUser);
         request.setRoomId(roomId);
 
         Room room = new Room();
         room.setRoomId(roomId);
         room.setHost(firstUser);
-        room.setUsers(users);
+        room.addUser(firstUser);
 
         // Mock repository to return room when called
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
@@ -157,8 +154,7 @@ public class RoomServiceTests {
         host.setNickname("test");
 
         room.setHost(host);
-        room.setUsers(new HashSet<>());
-        room.getUsers().add(host);
+        room.addUser(host);
 
         GetRoomRequest request = new GetRoomRequest();
         request.setRoomId(roomId);

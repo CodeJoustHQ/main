@@ -52,6 +52,7 @@ public class RoomService {
             throw new ApiException(UserError.INVALID_USER);
         }
 
+<<<<<<< HEAD
         // Return error if a user with the same nickname is in the room.
         Set<User> users = room.getUsers();
         for (User roomUser : users) {
@@ -63,11 +64,15 @@ public class RoomService {
         // Add userId if not already present.
         if (user.getUserId() == null) {
             user.setUserId(Utility.generateId(UserService.USER_ID_LENGTH));
+=======
+        // Return error if user is already in the room
+        if (room.getUsers().contains(user)) {
+            throw new ApiException(RoomError.USER_ALREADY_PRESENT);
+>>>>>>> 3605c2ebac31420df9f5c0d6fa0ba2fd2c74952a
         }
 
         // Add the user to the room.
-        users.add(user);
-        room.setUsers(users);
+        room.addUser(user);
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
@@ -86,6 +91,7 @@ public class RoomService {
             throw new ApiException(UserError.INVALID_USER);
         }
 
+<<<<<<< HEAD
         // Create user ID for the host if not already present.
         if (host.getUserId() == null) {
             host.setUserId(Utility.generateId(UserService.USER_ID_LENGTH));
@@ -95,10 +101,12 @@ public class RoomService {
         Set<User> users = new HashSet<>();
         users.add(host);
 
+=======
+>>>>>>> 3605c2ebac31420df9f5c0d6fa0ba2fd2c74952a
         Room room = new Room();
         room.setRoomId(Utility.generateId(ROOM_ID_LENGTH));
         room.setHost(host);
-        room.setUsers(users);
+        room.addUser(host);
         repository.save(room);
 
         return RoomMapper.toDto(room);

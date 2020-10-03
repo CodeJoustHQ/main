@@ -1,4 +1,4 @@
-package com.rocketden.main;
+package com.rocketden.main.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
