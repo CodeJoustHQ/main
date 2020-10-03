@@ -45,17 +45,6 @@ public class Room {
     @Setter(AccessLevel.PRIVATE)
     private Set<User> users = new HashSet<>();
 
-    // Update a user's features with a new session ID.
-    public void updateUser(User user, String sessionId) {
-        users.remove(user);
-        if (sessionId != null) {
-            user.setSessionId(sessionId);
-            user.setConnected(true);
-        }
-        users.add(user);
-        user.setRoom(this);
-    }
-
     public void addUser(User user) {
         users.add(user);
         user.setRoom(this);
