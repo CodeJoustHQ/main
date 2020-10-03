@@ -25,6 +25,9 @@ public class User {
     @EqualsAndHashCode.Include
     private String nickname;
 
+    @EqualsAndHashCode.Include
+    private boolean connected;
+
     // This column holds the primary key of the room (not the roomId variable)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_table_id")
