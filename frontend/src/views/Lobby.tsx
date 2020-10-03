@@ -7,7 +7,7 @@ import { connect, routes, subscribe } from '../api/Socket';
 import { getRoom, Room } from '../api/Room';
 import { User } from '../api/User';
 import { errorHandler } from '../api/Error';
-import { checkLocationState } from '../util/Utility';
+import { checkLocationState, isValidRoomId } from '../util/Utility';
 
 type LobbyPageLocation = {
   user: User,
@@ -87,11 +87,17 @@ function LobbyPage() {
         .then((res) => setStateFromRoom(res))
         .catch((err) => setError(err));
     } else {
+      // Get URL query params to determine if the roomId is provided.
+      const urlParams = new URLSearchParams(window.location.search);
+      const roomIdQueryParam: string | null = urlParams.get('room');
+      if (roomIdQueryParam && isValidRoomId(roomIdQueryParam)) {
+        setRoomId(roomIdQueryParam);
+      }
       setShouldRedirect(true);
     }
 
     // Connect the user to the room.
-    if (!socketConnected && currentRoomId) {
+    if (!socketConnected && currentRoomId && currentUser) {
       connectUserToRoom(currentRoomId);
     }
   }, [location, socketConnected, currentRoomId, connectUserToRoom]);
@@ -103,7 +109,7 @@ function LobbyPage() {
         // Using redirect instead of history prevents the back button from breaking
         <Redirect
           to={{
-            pathname: `/game/join${currentRoomId ? `room=${currentRoomId}` : ''}`,
+            pathname: `/game/join${currentRoomId ? `?room=${currentRoomId}` : ''}`,
             state: { error: errorHandler('Please join a room to access the lobby page.') },
           }}
         />

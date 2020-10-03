@@ -8,7 +8,7 @@ import { joinRoom, getRoom } from '../api/Room';
 import Loading from '../components/core/Loading';
 import ErrorMessage from '../components/core/Error';
 import { ErrorResponse } from '../api/Error';
-import { checkLocationState } from '../util/Utility';
+import { checkLocationState, isValidRoomId } from '../util/Utility';
 
 type JoinPageLocation = {
   error: ErrorResponse,
@@ -49,7 +49,6 @@ function JoinGamePage() {
    * The roomId is valid if it is non-empty and has exactly
    * six numeric characters.
    */
-  const isValidRoomId = (roomIdParam: string) => (roomIdParam.length === 6) && /^\d+$/.test(roomIdParam);
   const [validRoomId, setValidRoomId] = useState(false);
   useEffect(() => {
     setValidRoomId(isValidRoomId(roomId));
