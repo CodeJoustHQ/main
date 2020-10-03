@@ -66,6 +66,7 @@ function LobbyPage() {
      * Update the users list and other room info.
      */
     const subscribeCallback = (result: Message) => {
+      console.log(result);
       setStateFromRoom(JSON.parse(result.body));
     };
 

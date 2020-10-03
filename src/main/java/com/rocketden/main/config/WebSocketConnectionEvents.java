@@ -61,12 +61,11 @@ public class WebSocketConnectionEvents {
         // Update the session ID of the relevant user.
         User user = userRepository.findUserByUserId(userId);
         user.setSessionId(sessionId);
+        user.setConnected(true);
+        userRepository.save(user);
 
         // Get room and send socket update.
         Room room = user.getRoom();
-        room.updateUser(user, sessionId);
-        roomRepository.save(room);
-        
         RoomDto roomDto = RoomMapper.toDto(room);
         sendSocketUpdate(roomDto);
     }
