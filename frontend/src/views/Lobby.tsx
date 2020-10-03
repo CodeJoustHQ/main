@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useLocation, Redirect } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
 import { LargeText, UserNicknameText } from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
 import { getRoom, Room } from '../api/Room';
 import { User } from '../api/User';
-import { errorHandler } from '../api/Error';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
 
 type LobbyPageLocation = {
@@ -15,6 +14,8 @@ type LobbyPageLocation = {
 };
 
 function LobbyPage() {
+  // Get history object to be able to move between different pages
+  const history = useHistory();
   const location = useLocation<LobbyPageLocation>();
 
   // Set the current user
@@ -27,9 +28,6 @@ function LobbyPage() {
 
   // Hold error text.
   const [error, setError] = useState('');
-
-  // Variable to determine whether to redirect back to join page
-  const [shouldRedirect, setShouldRedirect] = useState(false);
 
   // Variable to hold whether the user is connected to the socket.
   const [socketConnected, setSocketConnected] = useState(false);
@@ -92,8 +90,10 @@ function LobbyPage() {
       const roomIdQueryParam: string | null = urlParams.get('room');
       if (roomIdQueryParam && isValidRoomId(roomIdQueryParam)) {
         setRoomId(roomIdQueryParam);
+        history.push(`/game/join?room=${roomIdQueryParam}`, { roomIdQueryParam });
+      } else {
+        history.push('/game/join', {});
       }
-      setShouldRedirect(true);
     }
 
     // Connect the user to the room.
@@ -105,15 +105,6 @@ function LobbyPage() {
   // Render the lobby.
   return (
     <div>
-      { shouldRedirect ? (
-        // Using redirect instead of history prevents the back button from breaking
-        <Redirect
-          to={{
-            pathname: `/game/join${currentRoomId ? `?room=${currentRoomId}` : ''}`,
-            state: { error: errorHandler('Please join a room to access the lobby page.') },
-          }}
-        />
-      ) : null}
       <LargeText>
         You have entered the lobby for room
         {' #'}

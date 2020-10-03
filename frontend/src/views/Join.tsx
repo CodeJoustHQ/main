@@ -92,7 +92,6 @@ function JoinGamePage() {
   const urlParams = new URLSearchParams(window.location.search);
   const roomIdQueryParam = urlParams.get('room');
   if (!roomId && roomIdQueryParam && isValidRoomId(roomIdQueryParam)) {
-    console.log(roomIdQueryParam);
     setRoomId(roomIdQueryParam);
     checkRoom(roomIdQueryParam);
   }
