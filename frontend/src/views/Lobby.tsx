@@ -90,9 +90,9 @@ function LobbyPage() {
       const roomIdQueryParam: string | null = urlParams.get('room');
       if (roomIdQueryParam && isValidRoomId(roomIdQueryParam)) {
         setRoomId(roomIdQueryParam);
-        history.push(`/game/join?room=${roomIdQueryParam}`, { roomIdQueryParam });
+        history.replace(`/game/join?room=${roomIdQueryParam}`, { roomIdQueryParam });
       } else {
-        history.push('/game/join', {});
+        history.replace('/game/join', {});
       }
     }
 
