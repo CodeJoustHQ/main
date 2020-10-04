@@ -92,7 +92,7 @@ function LobbyPage() {
         setRoomId(roomIdQueryParam);
         history.replace(`/game/join?room=${roomIdQueryParam}`, { roomIdQueryParam });
       } else {
-        history.replace('/game/join', {});
+        history.replace('/game/join');
       }
     }
 
