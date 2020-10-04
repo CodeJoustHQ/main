@@ -13,25 +13,25 @@ const Content = styled.div`
 
 type PlayerCardProps = {
   user: User,
-  isHost: boolean,
+  currentUser: User,
+  host: User,
   onMakeHost: (newHost: User) => void,
   onDeleteUser: (userToDelete: User) => void,
-  showActions: boolean,
 };
 
 function PlayerCard(props: PlayerCardProps) {
   const {
-    user, isHost, onMakeHost, onDeleteUser, showActions,
+    user, currentUser, host, onMakeHost, onDeleteUser,
   } = props;
 
   return (
     <Content>
       <UserNicknameText>
         {user.nickname}
-        {isHost ? ' (host)' : ''}
+        {user.nickname === host.nickname ? ' (host)' : ''}
       </UserNicknameText>
 
-      {showActions ? (
+      {currentUser.nickname === host.nickname ? (
         <div>
           <SmallActionText onClick={() => onMakeHost(user)}>Make host</SmallActionText>
           <SmallActionText onClick={() => onDeleteUser(user)}>Kick</SmallActionText>

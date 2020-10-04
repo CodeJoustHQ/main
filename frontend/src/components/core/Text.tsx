@@ -17,7 +17,7 @@ export const LandingHeaderText = styled.h1`
 `;
 
 export const UserNicknameText = styled(LargeText)`
-  
+  margin: 0;
 `;
 
 export const ProblemHeaderText = styled.h3`
@@ -25,7 +25,8 @@ export const ProblemHeaderText = styled.h3`
 `;
 
 export const SmallActionText = styled.p`
-  font-size: ${({ theme }) => theme.fontSize.small};
+  font-size: ${({ theme }) => theme.fontSize.mediumSmall};
+  display: inline;
   text-decoration: underline;
   margin: 3px 5px;
 

@@ -134,10 +134,10 @@ function LobbyPage() {
           users?.map((user) => (
             <PlayerCard
               user={user}
-              isHost={user.nickname === host?.nickname}
+              currentUser={currentUser!}
+              host={host!}
               onMakeHost={changeHosts}
               onDeleteUser={deleteUser}
-              showActions={currentUser?.nickname === host?.nickname}
             />
           ))
         }
