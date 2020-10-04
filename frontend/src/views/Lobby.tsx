@@ -4,7 +4,7 @@ import { Message } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
 import { LargeText, UserNicknameText } from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
-import { getRoom, Room } from '../api/Room';
+import { getRoom, Room, changeRoomHost } from '../api/Room';
 import { User } from '../api/User';
 import { errorHandler } from '../api/Error';
 import { checkLocationState } from '../util/Utility';
@@ -46,6 +46,17 @@ function LobbyPage() {
   const deleteUser = (user: User) => {
     // Make rest call to delete user from room
     console.log(user);
+  };
+
+  const changeHosts = (newHost: User) => {
+    const request = {
+      initiator: currentUser!,
+      newHost,
+    };
+
+    changeRoomHost(currentRoomId, request)
+      .then((res) => console.log(res))
+      .catch((err) => setError(err));
   };
 
   /**
