@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @SpringBootTest
@@ -40,10 +40,10 @@ public class RoomMapperTests {
         assertEquals(room.getHost(), actualHost);
 
         // Map set of UserDtos to set of Users
-        Set<User> actualUsers = response.getUsers()
+        List<User> actualUsers = response.getUsers()
                 .stream()
                 .map(UserMapper::toEntity)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
         assertEquals(room.getUsers(), actualUsers);
     }
 

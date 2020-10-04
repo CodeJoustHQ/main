@@ -109,7 +109,7 @@ public class RoomService {
 
         // Get the initiator and proposed new host from the request
         User initiator = UserMapper.toEntity(request.getInitiator());
-        User newHost = UserMapper.toEntity(request.getNewHost());
+        User proposedNewHost = UserMapper.toEntity(request.getNewHost());
 
         // Return error if the initiator is not the host
         if (!room.getHost().equals(initiator)) {
@@ -117,18 +117,12 @@ public class RoomService {
         }
 
         // Return error if the proposed new host is not in the room
-        if (!room.getUsers().contains(newHost)) {
+        if (!room.getUsers().contains(proposedNewHost)) {
             throw new ApiException(UserError.NOT_FOUND);
         }
 
-        /*
-         * Possible bug: newHost (provided by client) is not exactly the
-         * same as the user in room.users (primary key mismatch), so this
-         * is essentially adding a new user as host instead of the one
-         * already in the room. This might work ok throughout the codebase
-         * due to the equals/hashCode implementation, but would likely lead
-         * to duplicate users in the database.
-         */
+        // Change the host to the new user
+        User newHost = room.getEquivalentUser(proposedNewHost);
         room.setHost(newHost);
         repository.save(room);
 

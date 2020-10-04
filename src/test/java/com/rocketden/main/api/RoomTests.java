@@ -27,8 +27,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
 @AutoConfigureMockMvc
@@ -104,7 +104,7 @@ public class RoomTests {
 
         RoomDto expected = new RoomDto();
         expected.setHost(host);
-        Set<UserDto> users = new HashSet<>();
+        List<UserDto> users = new ArrayList<>();
         users.add(host);
         expected.setUsers(users);
 
@@ -167,7 +167,7 @@ public class RoomTests {
         // 1. Send POST request and verify room was created
         RoomDto createExpected = new RoomDto();
         createExpected.setHost(host);
-        Set<UserDto> users = new HashSet<>();
+        List<UserDto> users = new ArrayList<>();
         users.add(host);
         createExpected.setUsers(users);
 
@@ -186,10 +186,10 @@ public class RoomTests {
         // Get id of created room to join
         String roomId = createActual.getRoomId();
 
-        // Create User and Set<User> for PUT request
+        // Create User and List<User> for PUT request
         UserDto user = new UserDto();
         user.setNickname("rocket");
-        users = new HashSet<>();
+        users = new ArrayList<>();
         users.add(host);
         users.add(user);
 
@@ -228,7 +228,7 @@ public class RoomTests {
         // 1. Send POST request and verify room was created
         RoomDto createExpected = new RoomDto();
         createExpected.setHost(host);
-        Set<UserDto> users = new HashSet<>();
+        List<UserDto> users = new ArrayList<>();
         users.add(host);
         createExpected.setUsers(users);
 
@@ -277,7 +277,7 @@ public class RoomTests {
         // 1. Send POST request and verify room was created
         RoomDto createExpected = new RoomDto();
         createExpected.setHost(host);
-        Set<UserDto> users = new HashSet<>();
+        List<UserDto> users = new ArrayList<>();
         users.add(host);
         createExpected.setUsers(users);
 

@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @ExtendWith(MockitoExtension.class)
@@ -164,8 +164,8 @@ public class RoomServiceTests {
         assertEquals(roomId, response.getRoomId());
         assertEquals(room.getHost(), UserMapper.toEntity(response.getHost()));
 
-        Set<User> actual = response.getUsers().stream()
-                .map(UserMapper::toEntity).collect(Collectors.toSet());
+        List<User> actual = response.getUsers().stream()
+                .map(UserMapper::toEntity).collect(Collectors.toList());
         assertEquals(room.getUsers(), actual);
     }
 
