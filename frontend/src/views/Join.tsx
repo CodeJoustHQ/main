@@ -98,7 +98,7 @@ function JoinGamePage() {
     if (roomIdQueryParam && isValidRoomId(roomIdQueryParam)) {
       setRoomId(roomIdQueryParam);
     }
-  }, [isValidRoomId, setRoomId]);
+  }, [setRoomId]);
 
   let joinPageContent: ReactElement | undefined;
 
