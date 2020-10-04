@@ -42,16 +42,41 @@ public class RoomEntityTests {
 
         User user = new User();
         user.setNickname("test");
+        user.setId(1);
         room.addUser(user);
         
         User userToRemove = new User();
-
         userToRemove.setNickname("nonexistent");
+        user.setId(2);
+
         assertFalse(room.removeUser(userToRemove));
         assertTrue(room.getUsers().contains(user));
 
         userToRemove.setNickname("test");
         assertTrue(room.removeUser(userToRemove));
         assertFalse(room.getUsers().contains(user));
+    }
+
+    @Test
+    public void getEquivalentUserSucceeds() {
+        Room room = new Room();
+
+        User user = new User();
+        user.setNickname("test");
+        user.setId(1);
+        room.addUser(user);
+
+        User userToGet = new User();
+        userToGet.setNickname("nonexistent");
+        user.setId(2);
+
+        assertNull(room.getEquivalentUser(userToGet));
+
+        userToGet.setNickname("test");
+
+        User actual = room.getEquivalentUser(userToGet);
+
+        assertEquals(user.getNickname(), actual.getNickname());
+        assertEquals(user.getId(), actual.getId());
     }
 }
