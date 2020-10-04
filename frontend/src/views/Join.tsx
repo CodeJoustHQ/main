@@ -88,12 +88,17 @@ function JoinGamePage() {
       }).catch((err) => reject(err));
   });
 
-  // Get URL query params to determine if the roomId is provided.
-  const urlParams = new URLSearchParams(window.location.search);
-  const roomIdQueryParam = urlParams.get('room') || '';
-  if (!roomId && roomIdQueryParam && isValidRoomId(roomIdQueryParam)) {
-    setRoomId(roomIdQueryParam);
-  }
+  /**
+   * Get URL query params to determine if the roomId is provided.
+   * Only run on initial page load.
+   */
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomIdQueryParam = urlParams.get('room') || '';
+    if (roomIdQueryParam && isValidRoomId(roomIdQueryParam)) {
+      setRoomId(roomIdQueryParam);
+    }
+  }, [isValidRoomId, setRoomId]);
 
   let joinPageContent: ReactElement | undefined;
 
