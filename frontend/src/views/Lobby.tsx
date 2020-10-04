@@ -8,6 +8,7 @@ import { getRoom, Room, changeRoomHost } from '../api/Room';
 import { User } from '../api/User';
 import { errorHandler } from '../api/Error';
 import { checkLocationState } from '../util/Utility';
+import PlayerCard from '../components/card/PlayerCard';
 
 type LobbyPageLocation = {
   user: User,
@@ -131,10 +132,13 @@ function LobbyPage() {
       <div>
         {
           users?.map((user) => (
-            <UserNicknameText onClick={() => deleteUser(user)}>
-              {user.nickname}
-              {user.nickname === host?.nickname ? ' (host)' : ''}
-            </UserNicknameText>
+            <PlayerCard
+              user={user}
+              isHost={user.nickname === host?.nickname}
+              onMakeHost={changeHosts}
+              onDeleteUser={deleteUser}
+              showActions={currentUser?.nickname === host?.nickname}
+            />
           ))
         }
       </div>

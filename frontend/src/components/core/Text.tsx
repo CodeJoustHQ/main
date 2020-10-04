@@ -22,11 +22,6 @@ export const UserNicknameText = styled(LargeText)`
   padding: 10px;
   background-color: ${({ theme }) => theme.colors.lightBlue};
   border-radius: 5px;
-
-  &:hover {
-    text-decoration: line-through;
-    cursor: pointer;
-  }
 `;
 
 export const ProblemHeaderText = styled.h3`
