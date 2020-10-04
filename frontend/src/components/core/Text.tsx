@@ -17,11 +17,7 @@ export const LandingHeaderText = styled.h1`
 `;
 
 export const UserNicknameText = styled(LargeText)`
-  display: inline-block;
-  margin: 10px;
-  padding: 10px;
-  background-color: ${({ theme }) => theme.colors.lightBlue};
-  border-radius: 5px;
+  
 `;
 
 export const ProblemHeaderText = styled.h3`
@@ -30,6 +26,8 @@ export const ProblemHeaderText = styled.h3`
 
 export const SmallActionText = styled.p`
   font-size: ${({ theme }) => theme.fontSize.small};
+  text-decoration: underline;
+  margin: 3px 5px;
 
   &:hover {
     cursor: pointer;
