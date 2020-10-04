@@ -47,7 +47,7 @@ public class RoomEntityTests {
         
         User userToRemove = new User();
         userToRemove.setNickname("nonexistent");
-        user.setId(2);
+        userToRemove.setId(2);
 
         assertFalse(room.removeUser(userToRemove));
         assertTrue(room.getUsers().contains(user));
@@ -68,7 +68,7 @@ public class RoomEntityTests {
 
         User userToGet = new User();
         userToGet.setNickname("nonexistent");
-        user.setId(2);
+        userToGet.setId(2);
 
         assertNull(room.getEquivalentUser(userToGet));
 
