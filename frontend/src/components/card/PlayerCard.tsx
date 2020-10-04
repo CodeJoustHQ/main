@@ -1,13 +1,6 @@
 import React from 'react';
-import styled from 'styled-components';
 import { UserNicknameText } from '../core/Text';
 import { User } from '../../api/User';
-
-const Content = styled.div`
-  &:hover {
-    cursor: pointer;
-  }
-`;
 
 type PlayerCardProps = {
   user: User,
@@ -23,12 +16,12 @@ function PlayerCard(props: PlayerCardProps) {
   } = props;
 
   return (
-    <Content>
+    <div>
       <UserNicknameText>
         {user.nickname}
         {isHost ? ' (host)' : ''}
       </UserNicknameText>
-    </Content>
+    </div>
   );
 }
 

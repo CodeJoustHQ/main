@@ -27,3 +27,11 @@ export const UserNicknameText = styled(LargeText)`
 export const ProblemHeaderText = styled.h3`
   font-size: ${({ theme }) => theme.fontSize.default};
 `;
+
+export const SmallActionText = styled.p`
+  font-size: ${({ theme }) => theme.fontSize.small};
+
+  &:hover {
+    cursor: pointer;
+  }
+`;
