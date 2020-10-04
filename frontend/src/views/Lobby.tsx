@@ -100,7 +100,7 @@ function LobbyPage() {
     if (!socketConnected && currentRoomId && currentUser) {
       connectUserToRoom(currentRoomId);
     }
-  }, [location, socketConnected, currentRoomId, connectUserToRoom]);
+  }, [location, socketConnected, currentRoomId, history, currentUser, connectUserToRoom]);
 
   // Render the lobby.
   return (
