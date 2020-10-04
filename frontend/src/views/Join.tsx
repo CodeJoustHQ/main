@@ -90,11 +90,9 @@ function JoinGamePage() {
 
   // Get URL query params to determine if the roomId is provided.
   const urlParams = new URLSearchParams(window.location.search);
-  const roomIdQueryParam = urlParams.get('room');
+  const roomIdQueryParam = urlParams.get('room') || '';
   if (!roomId && roomIdQueryParam && isValidRoomId(roomIdQueryParam)) {
-    console.log('Test');
     setRoomId(roomIdQueryParam);
-    checkRoom(roomIdQueryParam);
   }
 
   let joinPageContent: ReactElement | undefined;
@@ -108,11 +106,13 @@ function JoinGamePage() {
             Enter the six-digit room ID to join the game!
           </LargeText>
           <LargeCenterInputText
+            id="roomIdInput"
             placeholder="123456"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setError('');
               setRoomId(event.target.value);
             }}
+            value={roomId}
             onFocus={() => {
               setFocusInput(true);
             }}
@@ -124,7 +124,7 @@ function JoinGamePage() {
                * If the key pressed is not a number or the roomId is
                * already at length 6, do not add it to the input.
                */
-              if (event.key < '0' || event.key > '9') {
+              if (event.key < '0' || event.key > '9' || roomId.length >= 6) {
                 event.preventDefault();
               }
               if (event.key === 'Enter' && validRoomId && !loading) {
