@@ -64,9 +64,8 @@ public class Room {
      * correct user object that's equal at both the application and database levels.
      *
      * @param userToFind the desired user to find
-     * @return the equivalent user in the database
+     * @return the equivalent user in the database, or null if none exists
      */
-
     public User getEquivalentUser(User userToFind) {
         int index = users.indexOf(userToFind);
         if (index >= 0) {

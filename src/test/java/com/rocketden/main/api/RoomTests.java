@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -481,6 +482,7 @@ public class RoomTests {
 
         assertEquals(host, room.getHost());
         assertEquals(2, room.getUsers().size());
+        assertTrue(room.getUsers().contains(user));
 
         return room;
     }
