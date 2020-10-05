@@ -62,7 +62,11 @@ public class Room {
      * "equal" a user in the room at the application level, they are not the same at
      * the database level (different primary keys). This method therefore returns the
      * correct user object that's equal at both the application and database levels.
+     *
+     * @param userToFind the desired user to find
+     * @return the equivalent user in the database
      */
+    
     public User getEquivalentUser(User userToFind) {
         int index = users.indexOf(userToFind);
         if (index >= 0) {
