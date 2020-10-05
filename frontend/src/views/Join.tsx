@@ -8,7 +8,7 @@ import { joinRoom, getRoom } from '../api/Room';
 import Loading from '../components/core/Loading';
 import ErrorMessage from '../components/core/Error';
 import { ErrorResponse } from '../api/Error';
-import { checkLocationState } from '../util/Utility';
+import { checkLocationState, isValidRoomId } from '../util/Utility';
 
 type JoinPageLocation = {
   error: ErrorResponse,
@@ -49,7 +49,6 @@ function JoinGamePage() {
    * The roomId is valid if it is non-empty and has exactly
    * six numeric characters.
    */
-  const isValidRoomId = (roomIdParam: string) => (roomIdParam.length === 6) && /^\d+$/.test(roomIdParam);
   const [validRoomId, setValidRoomId] = useState(false);
   useEffect(() => {
     setValidRoomId(isValidRoomId(roomId));
@@ -61,11 +60,11 @@ function JoinGamePage() {
   /**
    * Check if a room exists with the current roomId.
    */
-  const checkRoom = () => {
+  const checkRoom = (roomIdParam: string) => {
     // Only verify if previous REST call is not still running
     if (!loading) {
       setLoading(true);
-      getRoom(roomId)
+      getRoom(roomIdParam)
         .then(() => {
           setLoading(false);
           setPageState(2);
@@ -89,6 +88,18 @@ function JoinGamePage() {
       }).catch((err) => reject(err));
   });
 
+  /**
+   * Get URL query params to determine if the roomId is provided.
+   * Only run on initial page load.
+   */
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomIdQueryParam = urlParams.get('room') || '';
+    if (roomIdQueryParam && isValidRoomId(roomIdQueryParam)) {
+      setRoomId(roomIdQueryParam);
+    }
+  }, [setRoomId]);
+
   let joinPageContent: ReactElement | undefined;
 
   switch (pageState) {
@@ -100,11 +111,13 @@ function JoinGamePage() {
             Enter the six-digit room ID to join the game!
           </LargeText>
           <LargeCenterInputText
+            id="roomIdInput"
             placeholder="123456"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setError('');
               setRoomId(event.target.value);
             }}
+            value={roomId}
             onFocus={() => {
               setFocusInput(true);
             }}
@@ -120,13 +133,13 @@ function JoinGamePage() {
                 event.preventDefault();
               }
               if (event.key === 'Enter' && validRoomId && !loading) {
-                checkRoom();
+                checkRoom(roomId);
               }
             }}
           />
           <LargeInputButton
             onClick={() => {
-              checkRoom();
+              checkRoom(roomId);
             }}
             value="Enter"
             // Input is disabled if loading or if no nickname exists, has a space, or is too long.

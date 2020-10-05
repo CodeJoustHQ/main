@@ -4,12 +4,14 @@ import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
+import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.service.RoomService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,5 +40,11 @@ public class RoomController extends BaseRestController {
     @PostMapping("/rooms")
     public ResponseEntity<RoomDto> createRoom(@RequestBody CreateRoomRequest request) {
         return new ResponseEntity<>(service.createRoom(request), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/rooms/{roomId}/host")
+    public ResponseEntity<RoomDto> updateRoomHost(@PathVariable String roomId,
+                                                  @RequestBody UpdateHostRequest request) {
+        return new ResponseEntity<>(service.updateRoomHost(roomId, request), HttpStatus.OK);
     }
 }

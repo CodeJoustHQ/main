@@ -8,6 +8,7 @@ import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
+import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
@@ -19,8 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class RoomService {
@@ -53,7 +54,7 @@ public class RoomService {
         }
 
         // Return error if a user with the same nickname is in the room.
-        Set<User> users = room.getUsers();
+        List<User> users = room.getUsers();
         for (User roomUser : users) {
             if (roomUser.getNickname().equals(user.getNickname())) {
                 throw new ApiException(RoomError.USER_WITH_NICKNAME_ALREADY_PRESENT);
@@ -90,8 +91,8 @@ public class RoomService {
             host.setUserId(Utility.generateId(UserService.USER_ID_LENGTH));
         }
 
-        // Add the host to a new user set.
-        Set<User> users = new HashSet<>();
+        // Add the host to a new user list.
+        List<User> users = new ArrayList<>();
         users.add(host);
 
         Room room = new Room();
@@ -111,6 +112,38 @@ public class RoomService {
             throw new ApiException(RoomError.NOT_FOUND);
         }
 
+        return RoomMapper.toDto(room);
+    }
+
+    public RoomDto updateRoomHost(String roomId, UpdateHostRequest request) {
+        Room room = repository.findRoomByRoomId(roomId);
+
+        // Return error if room could not be found
+        if (room == null) {
+            throw new ApiException(RoomError.NOT_FOUND);
+        }
+
+        // Get the initiator and proposed new host from the request
+        User initiator = UserMapper.toEntity(request.getInitiator());
+        User proposedNewHost = UserMapper.toEntity(request.getNewHost());
+
+        // Return error if the initiator is not the host
+        if (!room.getHost().equals(initiator)) {
+            throw new ApiException(RoomError.INVALID_PERMISSIONS);
+        }
+
+        // Return error if the proposed new host is not in the room
+        if (!room.getUsers().contains(proposedNewHost)) {
+            throw new ApiException(UserError.NOT_FOUND);
+        }
+
+        // Change the host to the new user
+        User newHost = room.getEquivalentUser(proposedNewHost);
+        room.setHost(newHost);
+        repository.save(room);
+
+        RoomDto roomDto = RoomMapper.toDto(room);
+        sendSocketUpdate(roomDto);
         return RoomMapper.toDto(room);
     }
 

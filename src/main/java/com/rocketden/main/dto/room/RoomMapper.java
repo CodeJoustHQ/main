@@ -1,7 +1,7 @@
 package com.rocketden.main.dto.room;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.model.Room;
@@ -20,8 +20,8 @@ public class RoomMapper {
         RoomDto roomDto = mapper.map(entity, RoomDto.class);
 
         // Separate users into active and inactive ones.
-        Set<UserDto> activeUsers = new HashSet<>();
-        Set<UserDto> inactiveUsers = new HashSet<>();
+        List<UserDto> activeUsers = new ArrayList<>();
+        List<UserDto> inactiveUsers = new ArrayList<>();
         for (UserDto userDto : roomDto.getUsers()) {
             if (userDto.getSessionId() != null) {
                 activeUsers.add(userDto);
