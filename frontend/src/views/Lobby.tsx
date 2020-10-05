@@ -3,13 +3,14 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, Redirect } from 'react-router-dom';
 import { Message } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
-import { LargeText, UserNicknameText } from '../components/core/Text';
+import { LargeText, MediumText, UserNicknameText } from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
 import { getRoom, Room } from '../api/Room';
 import { User } from '../api/User';
-import { axiosErrorHandler, errorHandler } from '../api/Error';
+import { errorHandler } from '../api/Error';
 import { checkLocationState } from '../util/Utility';
 import { PrimaryButton } from '../components/core/Button';
+import Loading from '../components/core/Loading';
 
 type LobbyPageLocation = {
   user: User,
@@ -29,7 +30,10 @@ function LobbyPage() {
 
   // Hold error text.
   const [error, setError] = useState('');
-
+  
+  // Hold loading boolean.
+  const [loading, setLoading] = useState(false);
+  
   // Variable to determine whether to redirect back to join page
   const [shouldRedirectToJoin, setShouldRedirectToJoin] = useState(false);
 
@@ -54,11 +58,11 @@ function LobbyPage() {
   };
 
   const handleClick = (): Promise<void> => {
-    const request = { roomId: currentRoomId, User: currentUser };
+    const request = { roomId: currentRoomId, user: currentUser };
     return axios.post<void>('/api/v1/start', request)
-      .then(() => { console.log('redirect to game'); })
+      .then(() => { setLoading(true); })
       .catch((err) => {
-        throw axiosErrorHandler(err);
+        setError(err.message);
       });
   };
 
@@ -138,6 +142,7 @@ function LobbyPage() {
           }}
         />
       ) : null}
+      { loading ? <Loading /> : null }
       <LargeText>
         You have entered the lobby for room
         {' '}
@@ -159,7 +164,7 @@ function LobbyPage() {
       </div>
       {currentUser?.nickname === host?.nickname
         ? <PrimaryButton onClick={handleClick}> Start Game </PrimaryButton>
-        : 'Waiting for the host to start the game...'}
+        : <MediumText>Waiting for the host to start the game...</MediumText>}
     </div>
   );
 }
