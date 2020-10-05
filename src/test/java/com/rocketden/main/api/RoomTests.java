@@ -316,53 +316,26 @@ public class RoomTests {
 
     @Test
     public void changeRoomHostSuccess() throws Exception {
-        // First, create the room
         UserDto firstHost = new UserDto();
         firstHost.setNickname("FirstHost");
-        CreateRoomRequest createRequest = new CreateRoomRequest();
-        createRequest.setHost(firstHost);
 
-        MvcResult result = this.mockMvc.perform(post(POST_ROOM)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(Utility.convertObjectToJsonString(createRequest)))
-                .andDo(print()).andExpect(status().isCreated())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        RoomDto room = Utility.toObject(jsonResponse, RoomDto.class);
-
-        // A second user joins the room
         UserDto secondHost = new UserDto();
         secondHost.setNickname("SecondHost");
 
-        JoinRoomRequest joinRequest = new JoinRoomRequest();
-        joinRequest.setRoomId(room.getRoomId());
-        joinRequest.setUser(secondHost);
-
-        result = this.mockMvc.perform(put(PUT_ROOM)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(Utility.convertObjectToJsonString(joinRequest)))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
-
-        jsonResponse = result.getResponse().getContentAsString();
-        room = Utility.toObject(jsonResponse, RoomDto.class);
-
-        assertEquals(firstHost, room.getHost());
-        assertEquals(2, room.getUsers().size());
+        RoomDto room = setUpRoomWithTwoUsers(firstHost, secondHost);
 
         // Host sends request to change hosts
         UpdateHostRequest updateHostRequest = new UpdateHostRequest();
         updateHostRequest.setInitiator(firstHost);
         updateHostRequest.setNewHost(secondHost);
 
-        result = this.mockMvc.perform(put(String.format(PUT_ROOM_HOST, room.getRoomId()))
+        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_HOST, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(Utility.convertObjectToJsonString(updateHostRequest)))
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
-        jsonResponse = result.getResponse().getContentAsString();
+        String jsonResponse = result.getResponse().getContentAsString();
         room = Utility.toObject(jsonResponse, RoomDto.class);
 
         assertEquals(secondHost, room.getHost());
@@ -471,5 +444,46 @@ public class RoomTests {
         actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
 
         assertEquals(ERROR.getResponse(), actual);
+    }
+
+    /**
+     * Helper method that creates a room with two users
+     * @param host the host of the room
+     * @param user the second user who joins the room
+     * @return the resulting RoomDto object
+     * @throws Exception any error that occurs
+     */
+    private RoomDto setUpRoomWithTwoUsers(UserDto host, UserDto user) throws Exception {
+        // First, create the room
+        CreateRoomRequest createRequest = new CreateRoomRequest();
+        createRequest.setHost(host);
+
+        MvcResult result = this.mockMvc.perform(post(POST_ROOM)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(createRequest)))
+                .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        RoomDto room = Utility.toObject(jsonResponse, RoomDto.class);
+
+        // A second user joins the room
+        JoinRoomRequest joinRequest = new JoinRoomRequest();
+        joinRequest.setRoomId(room.getRoomId());
+        joinRequest.setUser(user);
+
+        result = this.mockMvc.perform(put(PUT_ROOM)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(joinRequest)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        room = Utility.toObject(jsonResponse, RoomDto.class);
+
+        assertEquals(host, room.getHost());
+        assertEquals(2, room.getUsers().size());
+
+        return room;
     }
 }

@@ -66,7 +66,7 @@ public class Room {
      * @param userToFind the desired user to find
      * @return the equivalent user in the database
      */
-    
+
     public User getEquivalentUser(User userToFind) {
         int index = users.indexOf(userToFind);
         if (index >= 0) {
