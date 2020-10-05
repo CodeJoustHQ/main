@@ -27,8 +27,15 @@ function PlayerCard(props: PlayerCardProps) {
 
   const [showActionCard, setShowActionCard] = useState(false);
 
+  const toggleActionCard = () => {
+    // Only toggle showActionCard if this user is the host
+    if (actionCard) {
+      setShowActionCard(!showActionCard);
+    }
+  };
+
   return (
-    <Content onClick={() => setShowActionCard(!showActionCard)}>
+    <Content onClick={toggleActionCard}>
       <UserNicknameText>
         {user.nickname}
         {isHost ? ' (host)' : ''}

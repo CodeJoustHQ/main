@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, Redirect } from 'react-router-dom';
 import { Message } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
-import { LargeText, UserNicknameText } from '../components/core/Text';
+import { LargeText } from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
 import { getRoom, Room, changeRoomHost } from '../api/Room';
 import { User } from '../api/User';
@@ -10,6 +10,7 @@ import { errorHandler } from '../api/Error';
 import { checkLocationState } from '../util/Utility';
 import PlayerCard from '../components/card/PlayerCard';
 import HostActionCard from '../components/card/HostActionCard';
+import Loading from '../components/core/Loading';
 
 type LobbyPageLocation = {
   user: User,
@@ -29,6 +30,8 @@ function LobbyPage() {
 
   // Hold error text.
   const [error, setError] = useState('');
+
+  const [loading, setLoading] = useState(false);
 
   // Variable to determine whether to redirect back to join page
   const [shouldRedirect, setShouldRedirect] = useState(false);
@@ -56,9 +59,15 @@ function LobbyPage() {
       newHost,
     };
 
-    changeRoomHost(currentRoomId, request)
-      .then((res) => console.log(res))
-      .catch((err) => setError(err));
+    if (!loading) {
+      setLoading(true);
+      changeRoomHost(currentRoomId, request)
+        .then(() => setLoading(false))
+        .catch((err) => {
+          setError(err);
+          setLoading(false);
+        });
+    }
   };
 
   /**
@@ -130,6 +139,7 @@ function LobbyPage() {
         &quot;.
       </LargeText>
       { error ? <ErrorMessage message={error} /> : null }
+      { loading ? <Loading /> : null }
 
       <div>
         {
@@ -138,8 +148,9 @@ function LobbyPage() {
               user={user}
               isHost={user.nickname === host?.nickname}
             >
-              {currentUser?.nickname === host?.nickname ? (
-                // If host, pass in an action card (appears on click)
+              {currentUser?.nickname === host?.nickname
+              && !(user.nickname === currentUser?.nickname) ? (
+                // If currentUser is host, pass in an on-click action card for all other users
                 <HostActionCard
                   user={user}
                   onMakeHost={changeHosts}
