@@ -114,9 +114,12 @@ public class RoomService {
     }
 
     // Send request to redirect users to game when host clicks start
-    public void startGame(StartGameRequest request) {
+    public RoomDto startGame(StartGameRequest request) {
         String socketPath = String.format(START_GAME_SOCKET_PATH, request.getRoomId());
         template.convertAndSend(socketPath, request.getRoomId());
+
+        Room room = repository.findRoomByRoomId(request.getRoomId());
+        return RoomMapper.toDto(room);
     }
 
     // Generate numeric String with length ROOM_ID_LENGTH

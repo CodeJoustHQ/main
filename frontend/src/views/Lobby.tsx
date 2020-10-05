@@ -60,7 +60,9 @@ function LobbyPage() {
   const handleClick = (): Promise<void> => {
     const request = { roomId: currentRoomId, user: currentUser };
     return axios.post<void>('/api/v1/start', request)
-      .then(() => { setLoading(true); })
+      .then(() => {
+        setLoading(true);
+      })
       .catch((err) => {
         setError(err.message);
       });
