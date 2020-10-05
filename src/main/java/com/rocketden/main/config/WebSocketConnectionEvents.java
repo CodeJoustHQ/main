@@ -4,42 +4,37 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import com.rocketden.main.Utility.Utility;
-import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dao.UserRepository;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.GenericMessage;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 @Configuration
 @EnableWebSocketMessageBroker
+@Transactional
 public class WebSocketConnectionEvents {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketConnectionEvents.class);
-
     private final UserRepository userRepository;
-    private final RoomRepository roomRepository;
     private final SimpMessagingTemplate template;
 
     private static final String CONNECT_MESSAGE = "simpConnectMessage";
     private static final String NATIVE_HEADERS = "nativeHeaders";
 
     @Autowired
-    public WebSocketConnectionEvents(UserRepository userRepository, RoomRepository roomRepository, SimpMessagingTemplate template) {
+    public WebSocketConnectionEvents(UserRepository userRepository, SimpMessagingTemplate template) {
         this.userRepository = userRepository;
-        this.roomRepository = roomRepository;
         this.template = template;
     }
 
@@ -62,8 +57,6 @@ public class WebSocketConnectionEvents {
         // Get the unique auto-generated session ID for this connection.
         String sessionId = sha.getSessionId();
 
-        logger.info(sessionId);
-
         // Update the session ID of the relevant user.
         User user = userRepository.findUserByUserId(userId);
         user.setSessionId(sessionId);
@@ -82,8 +75,6 @@ public class WebSocketConnectionEvents {
         sha.getSessionId();
         String sessionId = sha.getSessionId();
 
-        logger.info(sessionId);
-
         // Remove the user from the database and send socket update.
         // TODO: This could throw a null exception.
         User user = userRepository.findUserBySessionId(sessionId);
@@ -98,9 +89,7 @@ public class WebSocketConnectionEvents {
 
     // Send updates about new users to the client through sockets
     public void sendSocketUpdate(RoomDto roomDto) {
-        logger.info(roomDto.getRoomId());
         String socketPath = String.format(Utility.SOCKET_PATH, roomDto.getRoomId());
-        logger.info(socketPath);
         template.convertAndSend(socketPath, roomDto);
     }
 }

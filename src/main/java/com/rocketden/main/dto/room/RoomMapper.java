@@ -6,12 +6,8 @@ import java.util.Set;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.model.Room;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class RoomMapper {
-
-    private static final Logger logger = LoggerFactory.getLogger(RoomMapper.class);
 
     protected RoomMapper() {}
 
