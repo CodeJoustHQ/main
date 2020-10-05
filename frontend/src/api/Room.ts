@@ -52,7 +52,7 @@ export const getRoom = (roomId: string):
   });
 
 export const changeRoomHost = (roomId: string, roomParams: ChangeHostParams):
-  Promise<Room> => axios.post<Room>(routes.changeRoomHost(roomId), roomParams)
+  Promise<Room> => axios.put<Room>(routes.changeRoomHost(roomId), roomParams)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
