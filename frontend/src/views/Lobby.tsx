@@ -6,7 +6,6 @@ import { LargeText } from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
 import { getRoom, Room, changeRoomHost } from '../api/Room';
 import { User } from '../api/User';
-import { errorHandler } from '../api/Error';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
 import PlayerCard from '../components/card/PlayerCard';
 import HostActionCard from '../components/card/HostActionCard';
@@ -34,9 +33,6 @@ function LobbyPage() {
   const [error, setError] = useState('');
 
   const [loading, setLoading] = useState(false);
-
-  // Variable to determine whether to redirect back to join page
-  const [shouldRedirect, setShouldRedirect] = useState(false);
 
   // Variable to hold whether the user is connected to the socket.
   const [socketConnected, setSocketConnected] = useState(false);
