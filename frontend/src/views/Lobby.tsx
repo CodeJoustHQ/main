@@ -66,7 +66,6 @@ function LobbyPage() {
      * Update the users list and other room info.
      */
     const subscribeCallback = (result: Message) => {
-      console.log(result);
       setStateFromRoom(JSON.parse(result.body));
     };
 
@@ -141,7 +140,11 @@ function LobbyPage() {
         }
       </div>
       <div>
-        <MediumText>Below is a list of inactive users.</MediumText>
+        {
+          (inactiveUsers !== null && inactiveUsers.length > 0) ? (
+            <MediumText>Below is a list of inactive users.</MediumText>
+          ) : <MediumText>There are no inactive users.</MediumText>
+        }
         {
           inactiveUsers?.map((user) => (
             <InactiveUserNicknameText onClick={() => deleteUser(user)}>
