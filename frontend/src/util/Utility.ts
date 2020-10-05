@@ -13,3 +13,9 @@ export const checkLocationState = (location: any, ...params: string[]) => {
 
   return valid;
 };
+
+/**
+ * The roomId is valid if it is non-empty and has exactly six
+ * numeric characters.
+ */
+export const isValidRoomId = (roomIdParam: string): boolean => (roomIdParam.length === 6) && /^\d+$/.test(roomIdParam);
