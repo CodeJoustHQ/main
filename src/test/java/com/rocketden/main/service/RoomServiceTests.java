@@ -78,8 +78,8 @@ public class RoomServiceTests {
         // Create host
         User host = new User();
         host.setNickname("host");
-        room.setHost(host);
         room.addUser(host);
+        room.setHost(host);
 
         // Mock repository to return room when called
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
@@ -123,11 +123,11 @@ public class RoomServiceTests {
         // Define two identical, and make the first one the host and second one the joiner
         User firstUser = new User();
         firstUser.setNickname("rocket");
-        User secondUser = new User();
-        secondUser.setNickname("rocket");
+        UserDto newUser = new UserDto();
+        newUser.setNickname("rocket");
 
         JoinRoomRequest request = new JoinRoomRequest();
-        request.setUser(UserMapper.toDto(secondUser));
+        request.setUser(newUser);
         request.setRoomId(roomId);
 
         Room room = new Room();

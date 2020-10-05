@@ -23,13 +23,15 @@ public class RoomMapperTests {
     public void entityToDto() {
         User host = new User();
         host.setNickname("rocket");
+        User user = new User();
+        user.setNickname("test");
 
         Room room = new Room();
         room.setRoomId("012345");
         room.setHost(host);
 
         room.addUser(host);
-        room.addUser(new User());
+        room.addUser(user);
 
         RoomDto response = RoomMapper.toDto(room);
 
