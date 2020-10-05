@@ -7,7 +7,6 @@ import { LargeText, MediumText, UserNicknameText } from '../components/core/Text
 import { connect, routes, subscribe } from '../api/Socket';
 import { getRoom, Room } from '../api/Room';
 import { User } from '../api/User';
-import { errorHandler } from '../api/Error';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
 import { PrimaryButton } from '../components/core/Button';
 import Loading from '../components/core/Loading';
