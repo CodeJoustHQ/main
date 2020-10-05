@@ -1,4 +1,4 @@
-package com.rocketden.main;
+package com.rocketden.main.api;
 
 import com.rocketden.main.dto.user.CreateUserRequest;
 import com.rocketden.main.dto.user.DeleteUserRequest;

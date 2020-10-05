@@ -13,8 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @SpringBootTest
@@ -24,15 +23,15 @@ public class RoomMapperTests {
     public void entityToDto() {
         User host = new User();
         host.setNickname("rocket");
-
-        Set<User> users = new HashSet<>();
-        users.add(host);
-        users.add(new User());
+        User user = new User();
+        user.setNickname("test");
 
         Room room = new Room();
         room.setRoomId("012345");
         room.setHost(host);
-        room.setUsers(users);
+
+        room.addUser(host);
+        room.addUser(user);
 
         RoomDto response = RoomMapper.toDto(room);
 
@@ -43,10 +42,10 @@ public class RoomMapperTests {
         assertEquals(room.getHost(), actualHost);
 
         // Map set of UserDtos to set of Users
-        Set<User> actualUsers = response.getUsers()
+        List<User> actualUsers = response.getUsers()
                 .stream()
                 .map(UserMapper::toEntity)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
         assertEquals(room.getUsers(), actualUsers);
     }
 

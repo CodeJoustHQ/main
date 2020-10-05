@@ -4,13 +4,9 @@ import com.rocketden.main.dto.user.UserDto;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
-public class RoomDto {
-
-    private String roomId;
-    private UserDto host;
-    private List<UserDto> users;
+public class UpdateHostRequest {
+    private UserDto initiator;
+    private UserDto newHost;
 }
