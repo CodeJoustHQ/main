@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { SmallActionText, UserNicknameText } from '../core/Text';
+import { UserNicknameText } from '../core/Text';
 import { User } from '../../api/User';
 
 const Content = styled.div`
@@ -13,30 +13,23 @@ const Content = styled.div`
 
 type PlayerCardProps = {
   user: User,
-  currentUser: User,
-  host: User,
-  onMakeHost: (newHost: User) => void,
-  onDeleteUser: (userToDelete: User) => void,
+  isHost: boolean,
+  children: React.ReactNode,
 };
 
 function PlayerCard(props: PlayerCardProps) {
-  const {
-    user, currentUser, host, onMakeHost, onDeleteUser,
-  } = props;
+  const { user, isHost, children: actionCard } = props;
+
+  const [showActionCard, setShowActionCard] = useState(false);
 
   return (
-    <Content>
+    <Content onClick={() => setShowActionCard(!showActionCard)}>
       <UserNicknameText>
         {user.nickname}
-        {user.nickname === host.nickname ? ' (host)' : ''}
+        {isHost ? ' (host)' : ''}
       </UserNicknameText>
 
-      {currentUser.nickname === host.nickname ? (
-        <div>
-          <SmallActionText onClick={() => onMakeHost(user)}>Make host</SmallActionText>
-          <SmallActionText onClick={() => onDeleteUser(user)}>Kick</SmallActionText>
-        </div>
-      ) : null}
+      {showActionCard ? actionCard : null}
     </Content>
   );
 }

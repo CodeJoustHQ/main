@@ -9,6 +9,7 @@ import { User } from '../api/User';
 import { errorHandler } from '../api/Error';
 import { checkLocationState } from '../util/Utility';
 import PlayerCard from '../components/card/PlayerCard';
+import HostActionCard from '../components/card/HostActionCard';
 
 type LobbyPageLocation = {
   user: User,
@@ -129,16 +130,23 @@ function LobbyPage() {
         &quot;.
       </LargeText>
       { error ? <ErrorMessage message={error} /> : null }
+
       <div>
         {
           users?.map((user) => (
             <PlayerCard
               user={user}
-              currentUser={currentUser!}
-              host={host!}
-              onMakeHost={changeHosts}
-              onDeleteUser={deleteUser}
-            />
+              isHost={user.nickname === host?.nickname}
+            >
+              {currentUser?.nickname === host?.nickname ? (
+                // If host, pass in an action card (appears on click)
+                <HostActionCard
+                  user={user}
+                  onMakeHost={changeHosts}
+                  onDeleteUser={deleteUser}
+                />
+              ) : null}
+            </PlayerCard>
           ))
         }
       </div>
