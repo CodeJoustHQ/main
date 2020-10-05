@@ -24,25 +24,17 @@ public class RoomMapper {
         RoomDto roomDto = mapper.map(entity, RoomDto.class);
 
         // Separate users into active and inactive ones.
-        logger.info("1");
         Set<UserDto> activeUsers = new HashSet<>();
-        logger.info("2");
         Set<UserDto> inactiveUsers = new HashSet<>();
-        logger.info("3");
         for (UserDto userDto : roomDto.getUsers()) {
-            logger.info(userDto.getNickname());
             if (userDto.getSessionId() != null) {
                 activeUsers.add(userDto);
             } else {
                 inactiveUsers.add(userDto);
             }
         }
-        logger.info("5");
         roomDto.setActiveUsers(activeUsers);
-        logger.info("6");
         roomDto.setInactiveUsers(inactiveUsers);
-        logger.info("7");
-        logger.info(roomDto.toString());
 
         return roomDto;
     }
