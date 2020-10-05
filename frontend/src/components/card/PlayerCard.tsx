@@ -5,10 +5,15 @@ import { User } from '../../api/User';
 
 const Content = styled.div`
   display: inline-block;
+  position: relative;
   margin: 10px;
   padding: 10px;
   background-color: ${({ theme }) => theme.colors.lightBlue};
   border-radius: 5px;
+  
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 type PlayerCardProps = {

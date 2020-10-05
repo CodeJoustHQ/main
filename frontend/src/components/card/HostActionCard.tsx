@@ -4,6 +4,12 @@ import { SmallActionText } from '../core/Text';
 import { User } from '../../api/User';
 
 const Content = styled.div`
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  
   padding: 10px;
   background-color: ${({ theme }) => theme.colors.white};
   border-radius: 5px;
