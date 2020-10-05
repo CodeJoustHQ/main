@@ -35,12 +35,6 @@ function LobbyPage() {
   
   // Hold loading boolean.
   const [loading, setLoading] = useState(false);
-  
-  // Variable to determine whether to redirect back to join page
-  const [shouldRedirectToJoin, setShouldRedirectToJoin] = useState(false);
-
-  // Variable to determine whether to redirect to game page
-  const [shouldRedirectToGame, setShouldRedirectToGame] = useState(false);
 
   // Variable to hold whether the user is connected to the socket.
   const [socketConnected, setSocketConnected] = useState(false);
@@ -88,7 +82,7 @@ function LobbyPage() {
     };
 
     const startGameCallback = () => {
-      setShouldRedirectToGame(true);
+      history.replace('/game');
     };
 
     connect(roomId).then(() => {
@@ -138,13 +132,6 @@ function LobbyPage() {
   // Render the lobby.
   return (
     <div>
-      { shouldRedirectToGame ? (
-        <Redirect
-          to={{
-            pathname: '/game',
-          }}
-        />
-      ) : null}
       { loading ? <Loading /> : null }
       <LargeText>
         You have entered the lobby for room
