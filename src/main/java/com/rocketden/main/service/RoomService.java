@@ -2,7 +2,6 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
-import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
@@ -28,7 +27,6 @@ public class RoomService {
     public static final int ROOM_ID_LENGTH = 6;
     private static final Random random = new Random();
     private static final String SUBSCRIBE_USER_SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user";
-    private static final String START_GAME_SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/start-game";
 
     private final RoomRepository repository;
     private final SimpMessagingTemplate template;
@@ -136,26 +134,6 @@ public class RoomService {
     public void sendSocketUpdate(RoomDto roomDto) {
         String socketPath = String.format(SUBSCRIBE_USER_SOCKET_PATH, roomDto.getRoomId());
         template.convertAndSend(socketPath, roomDto);
-    }
-
-    // Send request to redirect users to game when host clicks start
-    public RoomDto startGame(StartGameRequest request) {
-        String socketPath = String.format(START_GAME_SOCKET_PATH, request.getRoomId());
-        template.convertAndSend(socketPath, request.getRoomId());
-
-        Room room = repository.findRoomByRoomId(request.getRoomId());
-
-        // If requested room does not exist in database, throw an exception.
-        if (room == null) {
-            throw new ApiException(RoomError.NOT_FOUND);
-        }
-
-        // if user making request is not the host, throw an exception.
-        if (request.getUser().getNickname() != room.getHost().getNickname()) {
-            throw new ApiException(UserError.ACCESS_DENIED);
-        }
-
-        return RoomMapper.toDto(room);
     }
 
     // Generate numeric String with length ROOM_ID_LENGTH

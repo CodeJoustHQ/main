@@ -269,39 +269,6 @@ public class RoomServiceTests {
     }
 
     @Test
-    public void startGameSuccess() {
-        String roomId = "123456";
-        User host = new User();
-        host.setNickname("rocket");
-
-        Room room = new Room();
-        room.setRoomId(roomId);
-        room.setHost(host);
-
-        StartGameRequest request = new StartGameRequest();
-        request.setRoomId(roomId);
-        request.setUser(UserMapper.toDto(host));
-
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(request.getRoomId());
-        RoomDto response = service.startGame(request);
-
-        assertEquals(roomId, response.getRoomId());
-    }
-
-    @Test
-    public void startGameNonexistentRoom() {
-        UserDto user = new UserDto();
-        user.setNickname("rocket");
-        StartGameRequest request = new StartGameRequest();
-        request.setRoomId("123456");
-        request.setUser(user);
-
-        Mockito.doReturn(null).when(repository).findRoomByRoomId(request.getRoomId());
-        ApiException exception = assertThrows(ApiException.class, () -> service.startGame(request));
-        assertEquals(RoomError.NOT_FOUND, exception.getError());
-    }
-
-    @Test
     public void generateValidRoomId() {
         // Verify room ids are generated correctly
         String roomId = service.generateRoomId();

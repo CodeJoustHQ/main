@@ -36,7 +36,7 @@ public class GameTests {
 	private RoomRepository repository;
 
 	private static final String POST_ROOM = "/api/v1/rooms";
-	private static final String START_GAME = "/api/v1/start";
+	private static final String START_GAME = "/api/v1/rooms/%s/start";
 
 	@Test
 	public void startGameWrongHost() throws Exception {
@@ -61,7 +61,7 @@ public class GameTests {
 		request.setRoomId(roomDto.getRoomId());
 		request.setUser(user);
 
-		this.mockMvc.perform(post(START_GAME)
+		this.mockMvc.perform(post(String.format(START_GAME, roomDto.getRoomId()))
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.content(Utility.convertObjectToJsonString(request)))
 				.andExpect(status().isForbidden());

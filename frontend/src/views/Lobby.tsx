@@ -10,6 +10,7 @@ import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
 import { PrimaryButton } from '../components/core/Button';
 import Loading from '../components/core/Loading';
+import { startGame } from '../api/Game';
 
 type LobbyPageLocation = {
   user: User,
@@ -52,9 +53,9 @@ function LobbyPage() {
     console.log(user);
   };
 
-  const handleClick = (): Promise<void> => {
-    const request = { roomId: currentRoomId, user: currentUser };
-    return axios.post<void>('/api/v1/start', request)
+  const handleClick = () => {
+    const request = { roomId: currentRoomId, user: currentUser as User };
+    startGame(request)
       .then(() => {
         setLoading(true);
       })
@@ -81,7 +82,7 @@ function LobbyPage() {
     };
 
     const startGameCallback = () => {
-      history.replace('/game');
+      history.push('/game');
     };
 
     connect(roomId).then(() => {
