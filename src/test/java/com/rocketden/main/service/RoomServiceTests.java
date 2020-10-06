@@ -2,6 +2,7 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
+import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
@@ -265,6 +266,39 @@ public class RoomServiceTests {
         verify(template).convertAndSend(
                 eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", roomDto.getRoomId())),
                 eq(roomDto));
+    }
+
+    @Test
+    public void startGameSuccess() {
+        String roomId = "123456";
+        User host = new User();
+        host.setNickname("rocket");
+
+        Room room = new Room();
+        room.setRoomId(roomId);
+        room.setHost(host);
+
+        StartGameRequest request = new StartGameRequest();
+        request.setRoomId(roomId);
+        request.setUser(UserMapper.toDto(host));
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(request.getRoomId());
+        RoomDto response = service.startGame(request);
+
+        assertEquals(roomId, response.getRoomId());
+    }
+
+    @Test
+    public void startGameNonexistentRoom() {
+        UserDto user = new UserDto();
+        user.setNickname("rocket");
+        StartGameRequest request = new StartGameRequest();
+        request.setRoomId("123456");
+        request.setUser(user);
+
+        Mockito.doReturn(null).when(repository).findRoomByRoomId(request.getRoomId());
+        ApiException exception = assertThrows(ApiException.class, () -> service.startGame(request));
+        assertEquals(RoomError.NOT_FOUND, exception.getError());
     }
 
     @Test

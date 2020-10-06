@@ -144,6 +144,17 @@ public class RoomService {
         template.convertAndSend(socketPath, request.getRoomId());
 
         Room room = repository.findRoomByRoomId(request.getRoomId());
+
+        // If requested room does not exist in database, throw an exception.
+        if (room == null) {
+            throw new ApiException(RoomError.NOT_FOUND);
+        }
+
+        // if user making request is not the host, throw an exception.
+        if (request.getUser().getNickname() != room.getHost().getNickname()) {
+            throw new ApiException(UserError.ACCESS_DENIED);
+        }
+
         return RoomMapper.toDto(room);
     }
 
