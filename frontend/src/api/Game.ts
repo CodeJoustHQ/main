@@ -10,7 +10,7 @@ export type Room = {
 
 export type StartGameParams = {
   roomId: string,
-  user: User,
+  initiator: User,
 };
 
 export const startGame = (params: StartGameParams):

@@ -59,7 +59,7 @@ public class GameTests {
 		user.setNickname("rocketrocket");
 		StartGameRequest request = new StartGameRequest();
 		request.setRoomId(roomDto.getRoomId());
-		request.setUser(user);
+		request.setInitiator(user);
 
 		this.mockMvc.perform(post(String.format(START_GAME, roomDto.getRoomId()))
 				.contentType(MediaType.APPLICATION_JSON_VALUE)

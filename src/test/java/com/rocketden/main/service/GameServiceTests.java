@@ -46,7 +46,7 @@ public class GameServiceTests {
 
 		StartGameRequest request = new StartGameRequest();
 		request.setRoomId(roomId);
-		request.setUser(UserMapper.toDto(host));
+		request.setInitiator(UserMapper.toDto(host));
 
 		Mockito.doReturn(room).when(repository).findRoomByRoomId(request.getRoomId());
 		RoomDto response = gameService.startGame(request);
@@ -60,7 +60,7 @@ public class GameServiceTests {
 		user.setNickname("rocket");
 		StartGameRequest request = new StartGameRequest();
 		request.setRoomId("123456");
-		request.setUser(user);
+		request.setInitiator(user);
 
 		Mockito.doReturn(null).when(repository).findRoomByRoomId(request.getRoomId());
 		ApiException exception = assertThrows(ApiException.class, () -> gameService.startGame(request));

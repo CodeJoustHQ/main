@@ -9,5 +9,5 @@ import lombok.Setter;
 @Setter
 public class StartGameRequest {
     private String roomId;
-    private UserDto user;
+    private UserDto initiator;
 }

@@ -54,7 +54,7 @@ function LobbyPage() {
   };
 
   const handleClick = () => {
-    const request = { roomId: currentRoomId, user: currentUser as User };
+    const request = { roomId: currentRoomId, initiator: currentUser as User };
     startGame(request)
       .then(() => {
         setLoading(true);

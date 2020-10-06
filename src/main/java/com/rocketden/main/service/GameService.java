@@ -40,7 +40,7 @@ public class GameService {
 		}
 
 		// if user making request is not the host, throw an exception.
-		if (request.getUser().getNickname() != room.getHost().getNickname()) {
+		if (request.getInitiator().getNickname() != room.getHost().getNickname()) {
 			throw new ApiException(UserError.ACCESS_DENIED);
 		}
 
