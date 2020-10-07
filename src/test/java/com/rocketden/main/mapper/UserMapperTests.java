@@ -18,22 +18,30 @@ public class UserMapperTests {
     public void entityToDto() {
         User user = new User();
         user.setNickname("rocket");
+        user.setUserId("678910");
+        user.setSessionId("012345");
 
         UserDto response = UserMapper.toDto(user);
 
         assertNotNull(response);
         assertEquals(user.getNickname(), response.getNickname());
+        assertEquals(user.getUserId(), response.getUserId());
+        assertEquals(user.getSessionId(), response.getSessionId());
     }
 
     @Test
     public void dtoToEntity() {
         UserDto user = new UserDto();
         user.setNickname("rocket");
+        user.setUserId("6798910");
+        user.setSessionId("012345");
 
         User response = UserMapper.toEntity(user);
 
         assertNotNull(response);
         assertEquals(user.getNickname(), response.getNickname());
+        assertEquals(user.getUserId(), response.getUserId());
+        assertEquals(user.getSessionId(), response.getSessionId());
     }
 
     @Test

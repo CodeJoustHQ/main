@@ -394,7 +394,7 @@ public class RoomTests {
         UserDto user = new UserDto();
         user.setNickname("User");
 
-        RoomDto room = setUpRoomWithTwoUsers(host, user);
+        setUpRoomWithTwoUsers(host, user);
 
         // Room does not exist
         UpdateHostRequest updateHostRequest = new UpdateHostRequest();
