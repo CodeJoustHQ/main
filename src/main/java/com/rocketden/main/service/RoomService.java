@@ -133,7 +133,26 @@ public class RoomService {
     }
 
     public RoomDto updateRoomSettings(String roomId, UpdateSettingsRequest request) {
-        return null;
+        Room room = repository.findRoomByRoomId(roomId);
+
+        // Return error if room could not be found
+        if (room == null) {
+            throw new ApiException(RoomError.NOT_FOUND);
+        }
+
+        // Return error if the initiator is not the host
+        User initiator = UserMapper.toEntity(request.getInitiator());
+        if (!room.getHost().equals(initiator)) {
+            throw new ApiException(RoomError.INVALID_PERMISSIONS);
+        }
+
+        // Set new difficulty value
+        room.setDifficulty(request.getDifficulty());
+        repository.save(room);
+
+        RoomDto roomDto = RoomMapper.toDto(room);
+        sendSocketUpdate(roomDto);
+        return RoomMapper.toDto(room);
     }
 
     // Send updates about new users to the client through sockets

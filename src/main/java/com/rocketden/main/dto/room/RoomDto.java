@@ -13,4 +13,5 @@ public class RoomDto {
     private String roomId;
     private UserDto host;
     private List<UserDto> users;
+    private String difficulty;
 }

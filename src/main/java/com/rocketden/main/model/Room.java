@@ -45,6 +45,8 @@ public class Room {
     @Setter(AccessLevel.PRIVATE)
     private List<User> users = new ArrayList<>();
 
+    private String difficulty;
+
     public void addUser(User user) {
         users.add(user);
         user.setRoom(this);
