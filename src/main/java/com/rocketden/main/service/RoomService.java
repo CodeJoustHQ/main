@@ -9,6 +9,7 @@ import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.room.UpdateHostRequest;
+import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
@@ -129,6 +130,10 @@ public class RoomService {
         RoomDto roomDto = RoomMapper.toDto(room);
         sendSocketUpdate(roomDto);
         return RoomMapper.toDto(room);
+    }
+
+    public RoomDto updateRoomSettings(String roomId, UpdateSettingsRequest request) {
+        return null;
     }
 
     // Send updates about new users to the client through sockets
