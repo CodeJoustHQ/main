@@ -37,7 +37,7 @@ public class GameService {
 		}
 
 		// if user making request is not the host, throw an exception.
-		if (!request.getInitiator().getNickname().equals(room.getHost().getNickname())) {
+		if (!request.getInitiator().equals(room.getHost())) {
 			throw new ApiException(RoomError.INVALID_PERMISSIONS);
 		}
 
