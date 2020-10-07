@@ -129,7 +129,7 @@ public class RoomService {
 
         RoomDto roomDto = RoomMapper.toDto(room);
         sendSocketUpdate(roomDto);
-        return RoomMapper.toDto(room);
+        return roomDto;
     }
 
     public RoomDto updateRoomSettings(String roomId, UpdateSettingsRequest request) {
@@ -152,7 +152,7 @@ public class RoomService {
 
         RoomDto roomDto = RoomMapper.toDto(room);
         sendSocketUpdate(roomDto);
-        return RoomMapper.toDto(room);
+        return roomDto;
     }
 
     // Send updates about new users to the client through sockets
