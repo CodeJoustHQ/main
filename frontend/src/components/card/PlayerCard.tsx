@@ -6,10 +6,17 @@ import { User } from '../../api/User';
 const Content = styled.div`
   display: inline-block;
   position: relative;
-  margin: 10px;
   padding: 10px;
   background-color: ${({ theme }) => theme.colors.lightBlue};
-  border-radius: 5px;
+  background-clip: padding-box;
+  
+  // Invisible border to make hover effect last longer
+  border: 15px solid transparent;
+  
+  // Add above border width from margin for actual effect
+  margin: -5px;
+  // Subtract above border width from border-radius for actual effect 
+  border-radius: 20px;
   
   &:hover {
     cursor: pointer;
@@ -27,15 +34,11 @@ function PlayerCard(props: PlayerCardProps) {
 
   const [showActionCard, setShowActionCard] = useState(false);
 
-  const toggleActionCard = () => {
-    // Only toggle showActionCard if this user is the host
-    if (actionCard) {
-      setShowActionCard(!showActionCard);
-    }
-  };
-
   return (
-    <Content onClick={toggleActionCard}>
+    <Content
+      onMouseEnter={() => setShowActionCard(true)}
+      onMouseLeave={() => setShowActionCard(false)}
+    >
       <UserNicknameText>
         {user.nickname}
         {isHost ? ' (host)' : ''}
