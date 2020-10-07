@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { axiosErrorHandler } from './Error';
+import { Room } from './Room';
 import { User } from './User';
 
 export type StartGameParams = {
@@ -7,7 +8,7 @@ export type StartGameParams = {
 };
 
 export const startGame = (params: StartGameParams):
-  Promise<void> => axios.post<void>('/api/v1/rooms/{currentRoomId}/start', params)
+  Promise<Room> => axios.post<Room>('/api/v1/rooms/{currentRoomId}/start', params)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

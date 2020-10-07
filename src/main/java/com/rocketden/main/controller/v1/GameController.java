@@ -1,6 +1,5 @@
 package com.rocketden.main.controller.v1;
 
-import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.game.StartGameRequest;
 
