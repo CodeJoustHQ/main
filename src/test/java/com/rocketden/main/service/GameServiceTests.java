@@ -61,7 +61,7 @@ public class GameServiceTests {
 	}
 
 	@Test
-	public void startGameNonexistentRoom() {
+	public void startGameRoomNotFound() {
 		UserDto user = new UserDto();
 		user.setNickname("rocket");
 		String roomId = "123456";
@@ -72,5 +72,26 @@ public class GameServiceTests {
 		Mockito.doReturn(null).when(repository).findRoomByRoomId(roomId);
 		ApiException exception = assertThrows(ApiException.class, () -> gameService.startGame(roomId, request));
 		assertEquals(RoomError.NOT_FOUND, exception.getError());
+	}
+
+	@Test
+	public void startGameWrongInitiator() {
+		String roomId = "123456";
+		User host = new User();
+		host.setNickname("rocket");
+
+		Room room = new Room();
+		room.setRoomId(roomId);
+		room.setHost(host);
+
+		UserDto initiator = new UserDto();
+		initiator.setNickname("rocketrocket");
+
+		StartGameRequest request = new StartGameRequest();
+		request.setInitiator(initiator);
+
+		Mockito.doReturn(room).when(repository).findRoomByRoomId(roomId);
+		ApiException exception = assertThrows(ApiException.class, () -> gameService.startGame(roomId, request));
+		assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
 	}
 }
