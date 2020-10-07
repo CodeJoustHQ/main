@@ -28,11 +28,8 @@ public class GameService {
 	}
 
 	// Send request to redirect users to game when host clicks start
-	public RoomDto startGame(StartGameRequest request) {
-		String socketPath = String.format(START_GAME_SOCKET_PATH, request.getRoomId());
-		template.convertAndSend(socketPath, request.getRoomId());
-
-		Room room = repository.findRoomByRoomId(request.getRoomId());
+	public RoomDto startGame(String roomId, StartGameRequest request) {
+		Room room = repository.findRoomByRoomId(roomId);
 
 		// If requested room does not exist in database, throw an exception.
 		if (room == null) {
@@ -40,10 +37,15 @@ public class GameService {
 		}
 
 		// if user making request is not the host, throw an exception.
-		if (request.getInitiator().getNickname() != room.getHost().getNickname()) {
-			throw new ApiException(UserError.ACCESS_DENIED);
+		if (!request.getInitiator().getNickname().equals(room.getHost().getNickname())) {
+			throw new ApiException(RoomError.INVALID_PERMISSIONS);
 		}
 
-		return RoomMapper.toDto(room);
+		RoomDto roomDto = RoomMapper.toDto(room);
+
+		String socketPath = String.format(START_GAME_SOCKET_PATH, roomId);
+		template.convertAndSend(socketPath, roomDto);
+
+		return roomDto;
 	}
 }

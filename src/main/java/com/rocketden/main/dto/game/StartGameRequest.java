@@ -8,6 +8,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class StartGameRequest {
-    private String roomId;
     private UserDto initiator;
 }

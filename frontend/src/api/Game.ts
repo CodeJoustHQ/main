@@ -2,14 +2,7 @@ import axios from 'axios';
 import { axiosErrorHandler } from './Error';
 import { User } from './User';
 
-export type Room = {
-  roomId: string;
-  host: User;
-  users: [User],
-};
-
 export type StartGameParams = {
-  roomId: string,
   initiator: User,
 };
 
