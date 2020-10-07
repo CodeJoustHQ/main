@@ -4,6 +4,7 @@ import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
+import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
@@ -44,6 +45,7 @@ public class RoomTests {
     private static final String PUT_ROOM = "/api/v1/rooms";
     private static final String POST_ROOM = "/api/v1/rooms";
     private static final String PUT_ROOM_HOST = "/api/v1/rooms/%s/host";
+    private static final String PUT_ROOM_SETTINGS = "/api/v1/rooms/%s/settings";
 
     @Test
     public void getNonExistentRoom() throws Exception {
@@ -453,22 +455,115 @@ public class RoomTests {
 
     @Test
     public void updateRoomSettingsSuccess() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname("host");
+        UserDto user = new UserDto();
+        user.setNickname("test");
 
+        RoomDto room = setUpRoomWithTwoUsers(host, user);
+
+        UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
+        updateRequest.setInitiator(host);
+        updateRequest.setDifficulty("TODO -- ENUMS?"); // TODO
+
+        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(updateRequest)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        room = Utility.toObject(jsonResponse, RoomDto.class);
+
+        assertEquals(updateRequest.getDifficulty(), room.getDifficulty());
+
+        // Confirm with a GET that the room has actually been updated in the database
+        result = this.mockMvc.perform(get(GET_ROOM)
+                .param("roomId", room.getRoomId()))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        RoomDto actual = Utility.toObject(jsonResponse, RoomDto.class);
+
+        assertEquals(updateRequest.getDifficulty(), actual.getDifficulty());
     }
 
     @Test
     public void updateRoomSettingsNonExistentRoom() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname("host");
 
+        UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
+        updateRequest.setInitiator(host);
+        updateRequest.setDifficulty("TODO -- ENUMS?"); // TODO
+
+        ApiError ERROR = RoomError.NOT_FOUND;
+
+        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, "999999"))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(updateRequest)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
     }
 
     @Test
     public void updateRoomSettingsInvalidPermissions() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname("host");
+        UserDto user = new UserDto();
+        user.setNickname("test");
 
+        RoomDto room = setUpRoomWithTwoUsers(host, user);
+
+        UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
+        updateRequest.setInitiator(user);
+        updateRequest.setDifficulty("TODO -- ENUMS?"); // TODO
+
+        ApiError ERROR = RoomError.INVALID_PERMISSIONS;
+
+        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(updateRequest)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
     }
 
     @Test
     public void updateRoomSettingsInvalidSettings() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname("host");
+        UserDto user = new UserDto();
+        user.setNickname("test");
 
+        RoomDto room = setUpRoomWithTwoUsers(host, user);
+
+        UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
+        updateRequest.setInitiator(user);
+        updateRequest.setDifficulty("TODO INVALID DIFFICULTY-- ENUMS?"); // TODO
+
+        ApiError ERROR = RoomError.BAD_SETTING;
+
+        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(updateRequest)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
     }
 
     /**
