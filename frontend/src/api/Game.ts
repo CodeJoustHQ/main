@@ -7,8 +7,8 @@ export type StartGameParams = {
   initiator: User,
 };
 
-export const startGame = (params: StartGameParams):
-  Promise<Room> => axios.post<Room>('/api/v1/rooms/{currentRoomId}/start', params)
+export const startGame = (roomId: string, params: StartGameParams):
+  Promise<Room> => axios.post<Room>(`/api/v1/rooms/${roomId}/start`, params)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
