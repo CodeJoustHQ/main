@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -123,6 +124,7 @@ public class RoomTests {
 
         assertEquals(expected.getHost(), actual.getHost());
         assertEquals(expected.getUsers(), actual.getUsers());
+        assertNull(actual.getDifficulty());
 
         // Send GET request to validate that room exists
         String roomId = actual.getRoomId();
@@ -139,6 +141,7 @@ public class RoomTests {
         assertEquals(expected.getRoomId(), actualGet.getRoomId());
         assertEquals(expected.getHost(), actualGet.getHost());
         assertEquals(expected.getUsers(), actualGet.getUsers());
+        assertNull(actual.getDifficulty());
     }
 
     @Test
@@ -481,6 +484,30 @@ public class RoomTests {
         RoomDto actual = Utility.toObject(jsonResponse, RoomDto.class);
 
         assertEquals(updateRequest.getDifficulty(), actual.getDifficulty());
+    }
+
+    @Test
+    public void updateRoomSettingsNullValue() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname("host");
+        UserDto user = new UserDto();
+        user.setNickname("test");
+
+        RoomDto room = setUpRoomWithTwoUsers(host, user);
+
+        UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
+        updateRequest.setInitiator(host);
+
+        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(Utility.convertObjectToJsonString(updateRequest)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        room = Utility.toObject(jsonResponse, RoomDto.class);
+
+        assertNull(room.getDifficulty());
     }
 
     @Test

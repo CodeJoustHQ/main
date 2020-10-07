@@ -27,6 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -61,6 +62,8 @@ public class RoomServiceTests {
 
         verify(repository).save(Mockito.any(Room.class));
         assertEquals("012345", response.getRoomId());
+        assertEquals(user, response.getHost());
+        assertNull(response.getDifficulty());
     }
 
     @Test
@@ -90,6 +93,7 @@ public class RoomServiceTests {
         assertEquals(roomId, response.getRoomId());
         assertEquals(2, response.getUsers().size());
         assertTrue(response.getUsers().contains(request.getUser()));
+        assertNull(response.getDifficulty());
 
         verify(template).convertAndSend(
                  eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", response.getRoomId())),

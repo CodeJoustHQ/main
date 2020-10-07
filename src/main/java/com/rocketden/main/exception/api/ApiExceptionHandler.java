@@ -25,7 +25,13 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
                                                                   HttpHeaders headers, HttpStatus status,
                                                                   WebRequest request) {
-        ApiError apiError = RoomError.BAD_SETTING;
-        return new ResponseEntity<>(apiError.getResponse(), apiError.getStatus());
+
+        // Check for a RoomError.BAD_SETTING triggered in the Difficulty.fromString method
+        if (ex.getCause() != null && ex.getCause().getCause() instanceof ApiException) {
+            ApiError apiError = RoomError.BAD_SETTING;
+            return new ResponseEntity<>(apiError.getResponse(), apiError.getStatus());
+        }
+
+        return super.handleHttpMessageNotReadable(ex, headers, status, request);
     }
 }
