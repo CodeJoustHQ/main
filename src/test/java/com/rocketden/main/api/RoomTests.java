@@ -10,6 +10,7 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
+import com.rocketden.main.model.Difficulty;
 import com.rocketden.main.util.Utility;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,8 +139,6 @@ public class RoomTests {
         assertEquals(expected.getRoomId(), actualGet.getRoomId());
         assertEquals(expected.getHost(), actualGet.getHost());
         assertEquals(expected.getUsers(), actualGet.getUsers());
-
-        // TODO: add assert for room settings
     }
 
     @Test
@@ -220,8 +219,6 @@ public class RoomTests {
         assertEquals(expected.getRoomId(), actual.getRoomId());
         assertEquals(expected.getHost(), actual.getHost());
         assertEquals(expected.getUsers(), actual.getUsers());
-
-        // TODO: add assert for room settings
     }
 
     @Test
@@ -360,8 +357,6 @@ public class RoomTests {
         assertEquals(room.getRoomId(), actual.getRoomId());
         assertEquals(room.getHost(), actual.getHost());
         assertEquals(room.getUsers(), actual.getUsers());
-
-        // TODO: add assert for room settings
     }
 
     @Test
@@ -391,7 +386,6 @@ public class RoomTests {
         ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
 
         assertEquals(ERROR.getResponse(), actual);
-
     }
 
     @Test
@@ -464,7 +458,7 @@ public class RoomTests {
 
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(host);
-        updateRequest.setDifficulty("TODO -- ENUMS?"); // TODO
+        updateRequest.setDifficulty(Difficulty.EASY);
 
         MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -496,7 +490,7 @@ public class RoomTests {
 
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(host);
-        updateRequest.setDifficulty("TODO -- ENUMS?"); // TODO
+        updateRequest.setDifficulty(Difficulty.MEDIUM);
 
         ApiError ERROR = RoomError.NOT_FOUND;
 
@@ -523,7 +517,7 @@ public class RoomTests {
 
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(user);
-        updateRequest.setDifficulty("TODO -- ENUMS?"); // TODO
+        updateRequest.setDifficulty(Difficulty.HARD);
 
         ApiError ERROR = RoomError.INVALID_PERMISSIONS;
 
@@ -548,15 +542,13 @@ public class RoomTests {
 
         RoomDto room = setUpRoomWithTwoUsers(host, user);
 
-        UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
-        updateRequest.setInitiator(user);
-        updateRequest.setDifficulty("TODO INVALID DIFFICULTY-- ENUMS?"); // TODO
+        String jsonRequest = "{\"initiator\": {\"nickname\": \"host\"}, \"difficulty\": \"invalid\"}";
 
         ApiError ERROR = RoomError.BAD_SETTING;
 
         MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(Utility.convertObjectToJsonString(updateRequest)))
+                .content(jsonRequest))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 
@@ -564,6 +556,29 @@ public class RoomTests {
         ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
 
         assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @Test
+    public void updateRoomSettingsDifferentCase() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname("host");
+        UserDto user = new UserDto();
+        user.setNickname("test");
+
+        RoomDto room = setUpRoomWithTwoUsers(host, user);
+
+        String jsonRequest = "{\"initiator\": {\"nickname\": \"host\"}, \"difficulty\": \"medIUM\"}";
+
+        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(jsonRequest))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        room = Utility.toObject(jsonResponse, RoomDto.class);
+
+        assertEquals(Difficulty.MEDIUM, room.getDifficulty());
     }
 
     /**

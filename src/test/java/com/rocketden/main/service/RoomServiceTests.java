@@ -13,6 +13,7 @@ import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
+import com.rocketden.main.model.Difficulty;
 import com.rocketden.main.model.Room;
 
 import com.rocketden.main.model.User;
@@ -60,8 +61,6 @@ public class RoomServiceTests {
 
         verify(repository).save(Mockito.any(Room.class));
         assertEquals("012345", response.getRoomId());
-
-        // TODO: add asserts for other RoomDto params
     }
 
     @Test
@@ -91,8 +90,6 @@ public class RoomServiceTests {
         assertEquals(roomId, response.getRoomId());
         assertEquals(2, response.getUsers().size());
         assertTrue(response.getUsers().contains(request.getUser()));
-
-        // TODO: add asserts for other RoomDto params
 
         verify(template).convertAndSend(
                  eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", response.getRoomId())),
@@ -172,8 +169,6 @@ public class RoomServiceTests {
         List<User> actual = response.getUsers().stream()
                 .map(UserMapper::toEntity).collect(Collectors.toList());
         assertEquals(room.getUsers(), actual);
-
-        // TODO: add asserts for other RoomDto params
     }
 
     @Test
@@ -280,7 +275,7 @@ public class RoomServiceTests {
 
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(host));
-        request.setDifficulty("TODO -- enums?"); // TODO
+        request.setDifficulty(Difficulty.EASY);
 
         RoomDto response = service.updateRoomSettings(room.getRoomId(), request);
 
@@ -311,7 +306,7 @@ public class RoomServiceTests {
         // Invalid permissions
         UpdateSettingsRequest invalidPermRequest = new UpdateSettingsRequest();
         invalidPermRequest.setInitiator(UserMapper.toDto(user));
-        invalidPermRequest.setDifficulty("TODO -- enums?"); // TODO
+        invalidPermRequest.setDifficulty(Difficulty.MEDIUM);
 
         ApiException exception = assertThrows(ApiException.class, () ->
                 service.updateRoomSettings(room.getRoomId(), invalidPermRequest));
@@ -320,20 +315,11 @@ public class RoomServiceTests {
         // Non-existent room
         UpdateSettingsRequest noRoomRequest = new UpdateSettingsRequest();
         noRoomRequest.setInitiator(UserMapper.toDto(host));
-        noRoomRequest.setDifficulty("TODO -- enums?"); // TODO
+        noRoomRequest.setDifficulty(Difficulty.HARD);
 
         exception = assertThrows(ApiException.class, () ->
                 service.updateRoomSettings("999999", noRoomRequest));
         assertEquals(RoomError.NOT_FOUND, exception.getError());
-
-        // Invalid settings
-        UpdateSettingsRequest badSettingsRequest = new UpdateSettingsRequest();
-        badSettingsRequest.setInitiator(UserMapper.toDto(host));
-        badSettingsRequest.setDifficulty("TODO INVALID -- enums?"); // TODO
-
-        exception = assertThrows(ApiException.class, () ->
-                service.updateRoomSettings(room.getRoomId(), badSettingsRequest));
-        assertEquals(RoomError.BAD_SETTING, exception.getError());
     }
 
     @Test
