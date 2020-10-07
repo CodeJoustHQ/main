@@ -6,6 +6,8 @@ import lombok.Setter;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -45,7 +47,8 @@ public class Room {
     @Setter(AccessLevel.PRIVATE)
     private List<User> users = new ArrayList<>();
 
-    private String difficulty;
+    @Enumerated(EnumType.STRING)
+    private Difficulty difficulty;
 
     public void addUser(User user) {
         users.add(user);
