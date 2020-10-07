@@ -17,10 +17,6 @@ const Content = styled.div`
   margin: -5px;
   // Subtract above border width from border-radius for actual effect 
   border-radius: 20px;
-  
-  &:hover {
-    cursor: pointer;
-  }
 `;
 
 type PlayerCardProps = {
