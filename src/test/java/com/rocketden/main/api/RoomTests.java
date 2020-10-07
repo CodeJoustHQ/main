@@ -136,6 +136,8 @@ public class RoomTests {
         assertEquals(expected.getRoomId(), actualGet.getRoomId());
         assertEquals(expected.getHost(), actualGet.getHost());
         assertEquals(expected.getUsers(), actualGet.getUsers());
+
+        // TODO: add assert for room settings
     }
 
     @Test
@@ -216,6 +218,8 @@ public class RoomTests {
         assertEquals(expected.getRoomId(), actual.getRoomId());
         assertEquals(expected.getHost(), actual.getHost());
         assertEquals(expected.getUsers(), actual.getUsers());
+
+        // TODO: add assert for room settings
     }
 
     @Test
@@ -354,6 +358,8 @@ public class RoomTests {
         assertEquals(room.getRoomId(), actual.getRoomId());
         assertEquals(room.getHost(), actual.getHost());
         assertEquals(room.getUsers(), actual.getUsers());
+
+        // TODO: add assert for room settings
     }
 
     @Test
@@ -443,6 +449,26 @@ public class RoomTests {
         ApiErrorResponse actual = Utility.toObject(jsonResponse, ApiErrorResponse.class);
 
         assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @Test
+    public void updateRoomSettingsSuccess() throws Exception {
+
+    }
+
+    @Test
+    public void updateRoomSettingsNonExistentRoom() throws Exception {
+
+    }
+
+    @Test
+    public void updateRoomSettingsInvalidPermissions() throws Exception {
+
+    }
+
+    @Test
+    public void updateRoomSettingsInvalidSettings() throws Exception {
+
     }
 
     /**

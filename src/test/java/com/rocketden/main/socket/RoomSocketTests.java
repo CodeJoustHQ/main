@@ -120,6 +120,7 @@ public class RoomSocketTests {
         assertEquals(expected.getRoomId(), actual.getRoomId());
         assertEquals(expected.getHost(), actual.getHost());
         assertEquals(expected.getUsers(), actual.getUsers());
+        // TODO: add asserts for other RoomDto params
     }
 
     @Test
@@ -159,4 +160,8 @@ public class RoomSocketTests {
         assertEquals(expected.getUsers(), actual.getUsers());
     }
 
+    @Test
+    public void socketReceivesMessageOnSettingsChange() throws Exception {
+
+    }
 }

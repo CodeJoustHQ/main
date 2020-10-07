@@ -59,6 +59,8 @@ public class RoomServiceTests {
 
         verify(repository).save(Mockito.any(Room.class));
         assertEquals("012345", response.getRoomId());
+
+        // TODO: add asserts for other RoomDto params
     }
 
     @Test
@@ -88,6 +90,8 @@ public class RoomServiceTests {
         assertEquals(roomId, response.getRoomId());
         assertEquals(2, response.getUsers().size());
         assertTrue(response.getUsers().contains(request.getUser()));
+
+        // TODO: add asserts for other RoomDto params
 
         verify(template).convertAndSend(
                  eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", response.getRoomId())),
@@ -167,6 +171,8 @@ public class RoomServiceTests {
         List<User> actual = response.getUsers().stream()
                 .map(UserMapper::toEntity).collect(Collectors.toList());
         assertEquals(room.getUsers(), actual);
+
+        // TODO: add asserts for other RoomDto params
     }
 
     @Test
@@ -251,6 +257,16 @@ public class RoomServiceTests {
         exception = assertThrows(ApiException.class, () ->
                 service.updateRoomHost(room.getRoomId(), noUserRequest));
         assertEquals(UserError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void updateRoomSettingsSuccess() {
+
+    }
+
+    @Test
+    public void updateRoomSettingsFailure() {
+
     }
 
     @Test
