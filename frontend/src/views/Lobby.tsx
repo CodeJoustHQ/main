@@ -4,11 +4,12 @@ import { Message } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
 import { LargeText, UserNicknameText } from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
-import { getRoom, Room } from '../api/Room';
+import { getRoom, Room, updateRoomSettings } from '../api/Room';
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
 import Difficulty from '../api/Difficulty';
 import { DifficultyButton } from '../components/core/Button';
+import Loading from '../components/core/Loading';
 
 type LobbyPageLocation = {
   user: User,
@@ -31,6 +32,7 @@ function LobbyPage() {
 
   // Hold error text.
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // Variable to hold whether the user is connected to the socket.
   const [socketConnected, setSocketConnected] = useState(false);
@@ -48,6 +50,33 @@ function LobbyPage() {
   const deleteUser = (user: User) => {
     // Make rest call to delete user from room
     console.log(user);
+  };
+
+  /**
+   * Update the difficulty setting of the room (EASY, MEDIUM, HARD, or none)
+   */
+  const updateDifficultySetting = (key: string) => {
+    if (currentUser?.nickname === host?.nickname && !loading) {
+      setLoading(true);
+      let newDifficulty: Difficulty | null = Difficulty[key as keyof typeof Difficulty];
+
+      // Set new difficulty to none if previous setting was toggled off
+      if (newDifficulty === difficulty) {
+        newDifficulty = null;
+      }
+
+      const newSettings = {
+        initiator: currentUser!,
+        difficulty: newDifficulty,
+      };
+
+      updateRoomSettings(currentRoomId, newSettings)
+        .then(() => setLoading(false))
+        .catch((err) => {
+          setLoading(false);
+          setError(err.message);
+        });
+    }
   };
 
   /**
@@ -118,6 +147,7 @@ function LobbyPage() {
         &quot;.
       </LargeText>
       { error ? <ErrorMessage message={error} /> : null }
+      { loading ? <Loading /> : null }
       <div>
         {
           users?.map((user) => (
@@ -131,6 +161,7 @@ function LobbyPage() {
 
       {Object.keys(Difficulty).map((key) => (
         <DifficultyButton
+          onClick={() => updateDifficultySetting(key)}
           active={difficulty === Difficulty[key as keyof typeof Difficulty]}
           enabled={currentUser?.nickname === host?.nickname}
         >
