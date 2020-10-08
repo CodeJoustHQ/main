@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
-import { LargeText, UserNicknameText } from '../components/core/Text';
+import { LargeText, MediumText, UserNicknameText } from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
 import { getRoom, Room, updateRoomSettings } from '../api/Room';
 import { User } from '../api/User';
@@ -159,6 +159,7 @@ function LobbyPage() {
         }
       </div>
 
+      <MediumText>Difficulty Settings</MediumText>
       {Object.keys(Difficulty).map((key) => (
         <DifficultyButton
           onClick={() => updateDifficultySetting(key)}

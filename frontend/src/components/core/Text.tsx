@@ -12,6 +12,10 @@ export const LargeText = styled.h3`
   font-size: ${({ theme }) => theme.fontSize.xLarge};
 `;
 
+export const MediumText = styled.p`
+  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+`;
+
 export const LandingHeaderText = styled.h1`
   font-size: ${({ theme }) => theme.fontSize.xxLarge};
 `;

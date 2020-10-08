@@ -50,6 +50,7 @@ type DifficultyProps = {
 export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`  
   color: ${({ theme, active }) => (active ? theme.colors.white : theme.colors.font)};
   background-color: ${({ theme, active }) => (active ? theme.colors.blue : theme.colors.white)};
+  padding: 8px 16px;
   
   &:hover {
     ${({ theme, enabled }) => enabled && `
