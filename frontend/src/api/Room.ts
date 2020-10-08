@@ -17,11 +17,17 @@ export type JoinRoomParams = {
   user: User,
 };
 
+export type UpdateSettingsParams = {
+  initiator: User,
+  difficulty: string,
+}
+
 const basePath = '/api/v1/rooms';
 const routes = {
   createRoom: `${basePath}/`,
   joinRoom: `${basePath}/`,
   getRoom: `${basePath}/`,
+  updateRoomSettings: (roomId: string) => `${basePath}/${roomId}/settings`,
 };
 
 export const createRoom = (roomParams: CreateRoomParams):
@@ -40,6 +46,13 @@ export const joinRoom = (roomParams: JoinRoomParams):
 
 export const getRoom = (roomId: string):
   Promise<Room> => axios.get<Room>(`${routes.getRoom}?roomId=${roomId}`)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const updateRoomSettings = (roomId: string, roomParams: UpdateSettingsParams):
+  Promise<Room> => axios.put<Room>(routes.updateRoomSettings(roomId), roomParams)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
