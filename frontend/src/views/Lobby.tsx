@@ -8,7 +8,7 @@ import { getRoom, Room } from '../api/Room';
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
 import Difficulty from '../api/Difficulty';
-import {DifficultyButton} from '../components/core/Button';
+import { DifficultyButton } from '../components/core/Button';
 
 type LobbyPageLocation = {
   user: User,
@@ -128,10 +128,15 @@ function LobbyPage() {
           ))
         }
       </div>
-      { currentUser?.nickname === host?.nickname ? (
-        // Object.keys(Difficulty).map(key => MyEnum[key])
-        <DifficultyButton active={false} />
-      ) : null }
+
+      {Object.keys(Difficulty).map((key) => (
+        <DifficultyButton
+          active={difficulty === Difficulty[key as keyof typeof Difficulty]}
+          enabled={currentUser?.nickname === host?.nickname}
+        >
+          {key}
+        </DifficultyButton>
+      ))}
     </div>
   );
 }

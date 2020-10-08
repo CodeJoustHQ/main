@@ -44,6 +44,7 @@ export const TextButton = styled.button<ThemeType>`
 
 type DifficultyProps = {
   active: boolean,
+  enabled: boolean,
 }
 
 export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`  
@@ -51,7 +52,11 @@ export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`
   background-color: ${({ theme, active }) => (active ? theme.colors.blue : theme.colors.white)};
   
   &:hover {
-    color: ${({ theme }) => theme.colors.white};
-    background-color: ${({ theme }) => theme.colors.blue};
+    ${({ theme, enabled }) => enabled && `
+      color: ${theme.colors.white};
+      background-color: ${theme.colors.blue};
+    `};
+    
+    cursor: ${({ enabled }) => (enabled ? 'pointer' : 'default')};
   }
 `;
