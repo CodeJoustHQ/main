@@ -8,6 +8,10 @@ export const ErrorText = styled(Text)`
    color: ${({ theme }) => theme.colors.red};
 `;
 
+export const MediumText = styled.p`
+  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+`;
+
 export const LargeText = styled.h3`
   font-size: ${({ theme }) => theme.fontSize.xLarge};
 `;

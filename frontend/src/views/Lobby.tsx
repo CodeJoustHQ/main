@@ -2,11 +2,14 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
-import { LargeText, UserNicknameText } from '../components/core/Text';
+import { LargeText, MediumText, UserNicknameText } from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
 import { getRoom, Room } from '../api/Room';
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
+import { PrimaryButton } from '../components/core/Button';
+import Loading from '../components/core/Loading';
+import { startGame } from '../api/Game';
 
 type LobbyPageLocation = {
   user: User,
@@ -28,6 +31,9 @@ function LobbyPage() {
 
   // Hold error text.
   const [error, setError] = useState('');
+  
+  // Hold loading boolean.
+  const [loading, setLoading] = useState(false);
 
   // Variable to hold whether the user is connected to the socket.
   const [socketConnected, setSocketConnected] = useState(false);
@@ -44,6 +50,17 @@ function LobbyPage() {
   const deleteUser = (user: User) => {
     // Make rest call to delete user from room
     console.log(user);
+  };
+
+  const handleClick = () => {
+    const request = { initiator: currentUser as User };
+    startGame(currentRoomId, request)
+      .then(() => {
+        setLoading(true);
+      })
+      .catch((err) => {
+        setError(err.message);
+      });
   };
 
   /**
@@ -63,8 +80,17 @@ function LobbyPage() {
       setStateFromRoom(JSON.parse(result.body));
     };
 
+    const startGameCallback = () => {
+      history.push('/game');
+    };
+
     connect(roomId).then(() => {
       subscribe(routes(roomId).subscribe, subscribeCallback).then(() => {
+        setSocketConnected(true);
+      }).catch((err) => {
+        setError(err.message);
+      });
+      subscribe(routes(roomId).start, startGameCallback).then(() => {
         setSocketConnected(true);
       }).catch((err) => {
         setError(err.message);
@@ -72,7 +98,7 @@ function LobbyPage() {
     }).catch((err) => {
       setError(err.message);
     });
-  }, []);
+  }, [history]);
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
@@ -105,6 +131,7 @@ function LobbyPage() {
   // Render the lobby.
   return (
     <div>
+      { loading ? <Loading /> : null }
       <LargeText>
         You have entered the lobby for room
         {' #'}
@@ -124,6 +151,9 @@ function LobbyPage() {
           ))
         }
       </div>
+      {currentUser?.nickname === host?.nickname
+        ? <PrimaryButton onClick={handleClick}> Start Game </PrimaryButton>
+        : <MediumText>Waiting for the host to start the game...</MediumText>}
     </div>
   );
 }

@@ -2,6 +2,7 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
+import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
