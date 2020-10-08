@@ -7,6 +7,8 @@ import { connect, routes, subscribe } from '../api/Socket';
 import { getRoom, Room } from '../api/Room';
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
+import Difficulty from '../api/Difficulty';
+import {DifficultyButton} from '../components/core/Button';
 
 type LobbyPageLocation = {
   user: User,
@@ -25,6 +27,7 @@ function LobbyPage() {
   const [host, setHost] = useState<User | null>(null);
   const [users, setUsers] = useState<User[] | null>(null);
   const [currentRoomId, setRoomId] = useState('');
+  const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
 
   // Hold error text.
   const [error, setError] = useState('');
@@ -39,6 +42,7 @@ function LobbyPage() {
     setHost(room.host);
     setUsers(room.users);
     setRoomId(room.roomId);
+    setDifficulty(room.difficulty);
   };
 
   const deleteUser = (user: User) => {
@@ -124,6 +128,10 @@ function LobbyPage() {
           ))
         }
       </div>
+      { currentUser?.nickname === host?.nickname ? (
+        // Object.keys(Difficulty).map(key => MyEnum[key])
+        <DifficultyButton active={false} />
+      ) : null }
     </div>
   );
 }

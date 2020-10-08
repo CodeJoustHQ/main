@@ -1,11 +1,13 @@
 import axios from 'axios';
 import { axiosErrorHandler } from './Error';
 import { User } from './User';
+import Difficulty from './Difficulty';
 
 export type Room = {
   roomId: string;
   host: User;
   users: [User],
+  difficulty: Difficulty | null,
 };
 
 export type CreateRoomParams = {
@@ -19,7 +21,7 @@ export type JoinRoomParams = {
 
 export type UpdateSettingsParams = {
   initiator: User,
-  difficulty: string,
+  difficulty: Difficulty | null,
 }
 
 const basePath = '/api/v1/rooms';

@@ -41,3 +41,17 @@ export const TextButton = styled.button<ThemeType>`
     outline: none;
   }
 `;
+
+type DifficultyProps = {
+  active: boolean,
+}
+
+export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`  
+  color: ${({ theme, active }) => (active ? theme.colors.white : theme.colors.font)};
+  background-color: ${({ theme, active }) => (active ? theme.colors.blue : theme.colors.white)};
+  
+  &:hover {
+    color: ${({ theme }) => theme.colors.white};
+    background-color: ${({ theme }) => theme.colors.blue};
+  }
+`;
