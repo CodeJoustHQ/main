@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
-import { LargeText } from '../components/core/Text';
+import { LargeText, MediumText } from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
 import { getRoom, Room, changeRoomHost } from '../api/Room';
 import { User } from '../api/User';
@@ -10,6 +10,8 @@ import { checkLocationState, isValidRoomId } from '../util/Utility';
 import PlayerCard from '../components/card/PlayerCard';
 import HostActionCard from '../components/card/HostActionCard';
 import Loading from '../components/core/Loading';
+import { PrimaryButton } from '../components/core/Button';
+import { startGame } from '../api/Game';
 
 type LobbyPageLocation = {
   user: User,
@@ -68,6 +70,17 @@ function LobbyPage() {
     }
   };
 
+  const handleStartGame = () => {
+    const request = { initiator: currentUser as User };
+    startGame(currentRoomId, request)
+      .then(() => {
+        setLoading(true);
+      })
+      .catch((err) => {
+        setError(err.message);
+      });
+  };
+
   /**
    * Add the user to the lobby through the following steps.
    * 1. Connect the user to the socket.
@@ -85,8 +98,17 @@ function LobbyPage() {
       setStateFromRoom(JSON.parse(result.body));
     };
 
+    const startGameCallback = () => {
+      history.push('/game');
+    };
+
     connect(roomId).then(() => {
       subscribe(routes(roomId).subscribe, subscribeCallback).then(() => {
+        setSocketConnected(true);
+      }).catch((err) => {
+        setError(err.message);
+      });
+      subscribe(routes(roomId).start, startGameCallback).then(() => {
         setSocketConnected(true);
       }).catch((err) => {
         setError(err.message);
@@ -94,7 +116,7 @@ function LobbyPage() {
     }).catch((err) => {
       setError(err.message);
     });
-  }, []);
+  }, [history]);
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
@@ -158,6 +180,9 @@ function LobbyPage() {
           ))
         }
       </div>
+      {currentUser?.nickname === host?.nickname
+        ? <PrimaryButton onClick={handleStartGame}> Start Game </PrimaryButton>
+        : <MediumText>Waiting for the host to start the game...</MediumText>}
     </div>
   );
 }

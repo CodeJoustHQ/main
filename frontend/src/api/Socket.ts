@@ -16,6 +16,7 @@ export const routes = (roomId: string) => {
   return {
     connect: `${basePath}/join-room-endpoint`,
     subscribe: `${basePath}/${roomId}/subscribe-user`,
+    start: `${basePath}/${roomId}/start-game`,
   };
 };
 
