@@ -291,7 +291,7 @@ public class RoomServiceTests {
     }
 
     @Test
-    public void updateRoomSettingsFailure() {
+    public void updateRoomSettingsInvalidPermissions() {
         String roomId = "012345";
         Room room = new Room();
         room.setRoomId(roomId);
@@ -315,16 +315,23 @@ public class RoomServiceTests {
         ApiException exception = assertThrows(ApiException.class, () ->
                 service.updateRoomSettings(room.getRoomId(), invalidPermRequest));
         assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
+    }
+
+    @Test
+    public void updateRoomSettingsNoRoomFound() {
+        UserDto userDto = new UserDto();
+        userDto.setNickname("test");
 
         // Non-existent room
         UpdateSettingsRequest noRoomRequest = new UpdateSettingsRequest();
-        noRoomRequest.setInitiator(UserMapper.toDto(host));
+        noRoomRequest.setInitiator(userDto);
         noRoomRequest.setDifficulty(ProbemDifficulty.HARD);
 
-        exception = assertThrows(ApiException.class, () ->
+        ApiException exception = assertThrows(ApiException.class, () ->
                 service.updateRoomSettings("999999", noRoomRequest));
         assertEquals(RoomError.NOT_FOUND, exception.getError());
     }
+
 
     @Test
     public void sendSocketUpdate() {
