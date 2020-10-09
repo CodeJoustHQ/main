@@ -31,8 +31,8 @@ export const ProblemHeaderText = styled.h3`
 export const SmallActionText = styled.p`
   font-size: ${({ theme }) => theme.fontSize.mediumSmall};
   display: inline;
-  margin: 1px 6px;
-  padding: 2px 6px;
+  margin: 1px 4px;
+  padding: 2px 4px;
 
   &:hover {
     cursor: pointer;
