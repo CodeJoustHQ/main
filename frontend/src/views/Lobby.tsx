@@ -2,13 +2,15 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
-import { LargeText, MediumText, UserNicknameText } from '../components/core/Text';
+import { LargeText, MediumText } from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
-import { getRoom, Room } from '../api/Room';
+import { getRoom, Room, changeRoomHost } from '../api/Room';
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
-import { PrimaryButton } from '../components/core/Button';
+import PlayerCard from '../components/card/PlayerCard';
+import HostActionCard from '../components/card/HostActionCard';
 import Loading from '../components/core/Loading';
+import { PrimaryButton } from '../components/core/Button';
 import { startGame } from '../api/Game';
 
 type LobbyPageLocation = {
@@ -31,8 +33,7 @@ function LobbyPage() {
 
   // Hold error text.
   const [error, setError] = useState('');
-  
-  // Hold loading boolean.
+
   const [loading, setLoading] = useState(false);
 
   // Variable to hold whether the user is connected to the socket.
@@ -52,7 +53,24 @@ function LobbyPage() {
     console.log(user);
   };
 
-  const handleClick = () => {
+  const changeHosts = (newHost: User) => {
+    const request = {
+      initiator: currentUser!,
+      newHost,
+    };
+
+    if (!loading) {
+      setLoading(true);
+      changeRoomHost(currentRoomId, request)
+        .then(() => setLoading(false))
+        .catch((err) => {
+          setError(err);
+          setLoading(false);
+        });
+    }
+  };
+
+  const handleStartGame = () => {
     const request = { initiator: currentUser as User };
     startGame(currentRoomId, request)
       .then(() => {
@@ -131,7 +149,6 @@ function LobbyPage() {
   // Render the lobby.
   return (
     <div>
-      { loading ? <Loading /> : null }
       <LargeText>
         You have entered the lobby for room
         {' #'}
@@ -141,18 +158,30 @@ function LobbyPage() {
         &quot;.
       </LargeText>
       { error ? <ErrorMessage message={error} /> : null }
+      { loading ? <Loading /> : null }
+
       <div>
         {
           users?.map((user) => (
-            <UserNicknameText onClick={() => deleteUser(user)}>
-              {user.nickname}
-              {user.nickname === host?.nickname ? ' (host)' : ''}
-            </UserNicknameText>
+            <PlayerCard
+              user={user}
+              isHost={user.nickname === host?.nickname}
+            >
+              {currentUser?.nickname === host?.nickname
+              && !(user.nickname === currentUser?.nickname) ? (
+                // If currentUser is host, pass in an on-click action card for all other users
+                <HostActionCard
+                  user={user}
+                  onMakeHost={changeHosts}
+                  onDeleteUser={deleteUser}
+                />
+              ) : null}
+            </PlayerCard>
           ))
         }
       </div>
       {currentUser?.nickname === host?.nickname
-        ? <PrimaryButton onClick={handleClick}> Start Game </PrimaryButton>
+        ? <PrimaryButton onClick={handleStartGame}> Start Game </PrimaryButton>
         : <MediumText>Waiting for the host to start the game...</MediumText>}
     </div>
   );

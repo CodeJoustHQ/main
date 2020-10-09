@@ -21,18 +21,22 @@ export const LandingHeaderText = styled.h1`
 `;
 
 export const UserNicknameText = styled(LargeText)`
-  display: inline-block;
-  margin: 10px;
-  padding: 10px;
-  background-color: ${({ theme }) => theme.colors.lightBlue};
-  border-radius: 5px;
-
-  &:hover {
-    text-decoration: line-through;
-    cursor: pointer;
-  }
+  margin: 0;
 `;
 
 export const ProblemHeaderText = styled.h3`
   font-size: ${({ theme }) => theme.fontSize.default};
+`;
+
+export const SmallActionText = styled.p`
+  font-size: ${({ theme }) => theme.fontSize.mediumSmall};
+  display: inline;
+  margin: 1px 4px;
+  padding: 2px 4px;
+
+  &:hover {
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: underline;
+  }
 `;
