@@ -13,7 +13,7 @@ import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
-import com.rocketden.main.model.Difficulty;
+import com.rocketden.main.model.ProbemDifficulty;
 import com.rocketden.main.model.Room;
 
 import com.rocketden.main.model.User;
@@ -279,7 +279,7 @@ public class RoomServiceTests {
 
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(host));
-        request.setDifficulty(Difficulty.EASY);
+        request.setDifficulty(ProbemDifficulty.EASY);
 
         RoomDto response = service.updateRoomSettings(room.getRoomId(), request);
 
@@ -310,7 +310,7 @@ public class RoomServiceTests {
         // Invalid permissions
         UpdateSettingsRequest invalidPermRequest = new UpdateSettingsRequest();
         invalidPermRequest.setInitiator(UserMapper.toDto(user));
-        invalidPermRequest.setDifficulty(Difficulty.MEDIUM);
+        invalidPermRequest.setDifficulty(ProbemDifficulty.MEDIUM);
 
         ApiException exception = assertThrows(ApiException.class, () ->
                 service.updateRoomSettings(room.getRoomId(), invalidPermRequest));
@@ -319,7 +319,7 @@ public class RoomServiceTests {
         // Non-existent room
         UpdateSettingsRequest noRoomRequest = new UpdateSettingsRequest();
         noRoomRequest.setInitiator(UserMapper.toDto(host));
-        noRoomRequest.setDifficulty(Difficulty.HARD);
+        noRoomRequest.setDifficulty(ProbemDifficulty.HARD);
 
         exception = assertThrows(ApiException.class, () ->
                 service.updateRoomSettings("999999", noRoomRequest));

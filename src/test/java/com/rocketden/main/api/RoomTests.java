@@ -10,7 +10,7 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
-import com.rocketden.main.model.Difficulty;
+import com.rocketden.main.model.ProbemDifficulty;
 import com.rocketden.main.util.Utility;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -461,7 +461,7 @@ public class RoomTests {
 
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(host);
-        updateRequest.setDifficulty(Difficulty.EASY);
+        updateRequest.setDifficulty(ProbemDifficulty.EASY);
 
         MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -517,7 +517,7 @@ public class RoomTests {
 
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(host);
-        updateRequest.setDifficulty(Difficulty.MEDIUM);
+        updateRequest.setDifficulty(ProbemDifficulty.MEDIUM);
 
         ApiError ERROR = RoomError.NOT_FOUND;
 
@@ -544,7 +544,7 @@ public class RoomTests {
 
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(user);
-        updateRequest.setDifficulty(Difficulty.HARD);
+        updateRequest.setDifficulty(ProbemDifficulty.HARD);
 
         ApiError ERROR = RoomError.INVALID_PERMISSIONS;
 
@@ -605,7 +605,7 @@ public class RoomTests {
         String jsonResponse = result.getResponse().getContentAsString();
         room = Utility.toObject(jsonResponse, RoomDto.class);
 
-        assertEquals(Difficulty.MEDIUM, room.getDifficulty());
+        assertEquals(ProbemDifficulty.MEDIUM, room.getDifficulty());
     }
 
     /**
