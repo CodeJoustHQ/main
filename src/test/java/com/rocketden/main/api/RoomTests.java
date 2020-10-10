@@ -100,6 +100,7 @@ public class RoomTests {
         // POST request to create valid room should return successful response
         UserDto host = new UserDto();
         host.setNickname("host");
+        host.setUserId("012345");
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
@@ -162,6 +163,7 @@ public class RoomTests {
         // POST request to create room and PUT request to join room should succeed
         UserDto host = new UserDto();
         host.setNickname("host");
+        host.setUserId("012345");
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
@@ -190,6 +192,7 @@ public class RoomTests {
         // Create User and List<User> for PUT request
         UserDto user = new UserDto();
         user.setNickname("rocket");
+        user.setUserId("678910");
         users = new ArrayList<>();
         users.add(host);
         users.add(user);
@@ -223,6 +226,7 @@ public class RoomTests {
         // POST request to create room and PUT request to join room should succeed
         UserDto host = new UserDto();
         host.setNickname("host");
+        host.setUserId("012345");
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
@@ -272,6 +276,7 @@ public class RoomTests {
         // POST request to create room and PUT request to join room should succeed
         UserDto host = new UserDto();
         host.setNickname("host");
+        host.setUserId("012345");
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
@@ -319,9 +324,11 @@ public class RoomTests {
     public void changeRoomHostSuccess() throws Exception {
         UserDto firstHost = new UserDto();
         firstHost.setNickname("FirstHost");
+        firstHost.setUserId("012345");
 
         UserDto secondHost = new UserDto();
         secondHost.setNickname("SecondHost");
+        secondHost.setUserId("678910");
 
         RoomDto room = setUpRoomWithTwoUsers(firstHost, secondHost);
 
@@ -360,9 +367,11 @@ public class RoomTests {
     public void changeRoomHostInvalidPermissions() throws Exception {
         UserDto host = new UserDto();
         host.setNickname("Host");
+        host.setUserId("012345");
 
         UserDto user = new UserDto();
         user.setNickname("User");
+        user.setUserId("678910");
 
         RoomDto room = setUpRoomWithTwoUsers(host, user);
 
@@ -390,9 +399,11 @@ public class RoomTests {
     public void changeRoomHostNonExistentRoom() throws Exception {
         UserDto host = new UserDto();
         host.setNickname("Host");
+        host.setUserId("012345");
 
         UserDto user = new UserDto();
         user.setNickname("User");
+        user.setUserId("012345");
 
         setUpRoomWithTwoUsers(host, user);
 
@@ -420,9 +431,11 @@ public class RoomTests {
     public void changeRoomHostNewHostNotFound() throws Exception {
         UserDto host = new UserDto();
         host.setNickname("Host");
+        host.setUserId("012345");
 
         UserDto user = new UserDto();
         user.setNickname("User");
+        user.setUserId("678910");
 
         RoomDto room = setUpRoomWithTwoUsers(host, user);
 

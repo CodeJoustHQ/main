@@ -37,7 +37,12 @@ public class UserService {
         
         User user = new User();
         user.setNickname(nickname);
-        user.setUserId(Utility.generateId(UserService.USER_ID_LENGTH));
+
+        // If no user ID is present set a new automatically-generated user ID.
+        if (user.getUserId() == null) {
+            user.setUserId(Utility.generateId(UserService.USER_ID_LENGTH));
+        }
+        
         repository.save(user);
 
         return UserMapper.toDto(user);

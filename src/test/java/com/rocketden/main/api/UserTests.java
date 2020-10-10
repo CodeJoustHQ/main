@@ -133,12 +133,14 @@ public class UserTests {
     public void deleteExistingUser() throws Exception {
         CreateUserRequest createRequest = new CreateUserRequest();
         createRequest.setNickname("rocket");
+        createRequest.setUserId("012345");
 
         UserDto expected = new UserDto();
         expected.setNickname("rocket");
+        expected.setUserId("012345");
 
         DeleteUserRequest request = new DeleteUserRequest();
-        request.setUserId("1");
+        request.setUserId("012345");
 
         this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
