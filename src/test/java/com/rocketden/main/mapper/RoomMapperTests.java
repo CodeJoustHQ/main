@@ -61,7 +61,7 @@ public class RoomMapperTests {
 
         // Map set of UserDtos on active users to a set of Users
         List<User> expectedActiveUsers = new ArrayList<>();
-        expectedInactiveUsers.add(user);
+        expectedActiveUsers.add(user);
         List<User> actualActiveUsers = response.getActiveUsers()
                 .stream()
                 .map(UserMapper::toEntity)

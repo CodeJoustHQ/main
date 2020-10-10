@@ -139,16 +139,16 @@ public class UserTests {
         expected.setNickname("rocket");
         expected.setUserId("012345");
 
-        DeleteUserRequest request = new DeleteUserRequest();
-        request.setUserId("012345");
+        DeleteUserRequest deleteRequest = new DeleteUserRequest();
+        deleteRequest.setUserId("012345");
 
         this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(Utility.convertObjectToJsonString(request)));
+                .content(Utility.convertObjectToJsonString(createRequest)));
 
         MvcResult result = this.mockMvc.perform(delete(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(Utility.convertObjectToJsonString(request)))
+                .content(Utility.convertObjectToJsonString(deleteRequest)))
                 .andExpect(status().isOk())
                 .andReturn();
 
