@@ -7,7 +7,7 @@ import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.user.UserDto;
-import com.rocketden.main.model.ProbemDifficulty;
+import com.rocketden.main.model.ProblemDifficulty;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,7 +165,7 @@ public class RoomSocketTests {
     public void socketReceivesMessageOnSettingsChange() throws Exception {
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(room.getHost());
-        updateRequest.setDifficulty(ProbemDifficulty.HARD);
+        updateRequest.setDifficulty(ProblemDifficulty.HARD);
 
         HttpEntity<UpdateSettingsRequest> updateEntity = new HttpEntity<>(updateRequest);
         String updateSettingsEndpoint = String.format("%s/%s/settings", baseRestEndpoint, room.getRoomId());
