@@ -1,6 +1,5 @@
 package com.rocketden.main.service;
 
-import com.rocketden.main.Utility.Utility;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 
@@ -15,6 +14,7 @@ import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
+import com.rocketden.main.util.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -37,7 +37,7 @@ public class RoomService {
         this.template = template;
     }
 
-    public RoomDto joinRoom(JoinRoomRequest request) {
+    public RoomDto joinRoom(JoinRoomRequest request, Utility utility) {
         Room room = repository.findRoomByRoomId(request.getRoomId());
 
         // Return error if room could not be found
@@ -63,7 +63,7 @@ public class RoomService {
 
         // Add userId if not already present.
         if (user.getUserId() == null) {
-            user.setUserId(Utility.generateId(UserService.USER_ID_LENGTH));
+            user.setUserId(utility.generateId(UserService.USER_ID_LENGTH));
         }
 
         // Add the user to the room.
@@ -75,7 +75,7 @@ public class RoomService {
         return roomDto;
     }
 
-    public RoomDto createRoom(CreateRoomRequest request) {
+    public RoomDto createRoom(CreateRoomRequest request, Utility utility) {
         User host = UserMapper.toEntity(request.getHost());
 
         // Do not create room if provided host is invalid.
@@ -88,7 +88,7 @@ public class RoomService {
 
         // Create user ID for the host if not already present.
         if (host.getUserId() == null) {
-            host.setUserId(Utility.generateId(UserService.USER_ID_LENGTH));
+            host.setUserId(utility.generateId(UserService.USER_ID_LENGTH));
         }
 
         // Add the host to a new user list.
@@ -96,7 +96,7 @@ public class RoomService {
         users.add(host);
 
         Room room = new Room();
-        room.setRoomId(Utility.generateId(ROOM_ID_LENGTH));
+        room.setRoomId(utility.generateId(ROOM_ID_LENGTH));
         room.setHost(host);
         room.addUser(host);
         repository.save(room);

@@ -3,12 +3,12 @@ package com.rocketden.main.config;
 import java.util.LinkedList;
 import java.util.Map;
 
-import com.rocketden.main.Utility.Utility;
 import com.rocketden.main.dao.UserRepository;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
+import com.rocketden.main.util.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

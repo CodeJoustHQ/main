@@ -1,6 +1,5 @@
 package com.rocketden.main.service;
 
-import com.rocketden.main.Utility.Utility;
 import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
@@ -16,31 +15,25 @@ import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Room;
 
 import com.rocketden.main.model.User;
+import com.rocketden.main.util.Utility;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({Utility.class})
 @ExtendWith(MockitoExtension.class)
 public class RoomServiceTests {
 
@@ -54,8 +47,8 @@ public class RoomServiceTests {
     @InjectMocks
     private RoomService service;
 
-    // Set a fianl variable for the length of the user ID.
-    private static final int userIdLength = 6;
+    @Mock
+    private static Utility utility;
 
     @Test
     public void createRoomSuccess() {
@@ -65,33 +58,31 @@ public class RoomServiceTests {
         request.setHost(user);
         
         // Mock generateId to return a custom room id
-        PowerMockito.mockStatic(Utility.class);
-        PowerMockito.when(Utility.generateId(any())).thenReturn("012345");
+        Mockito.doReturn("678910").when(utility).generateId(eq(UserService.USER_ID_LENGTH));
 
         // Verify create room request succeeds and returns correct response
-        RoomDto response = service.createRoom(request);
+        RoomDto response = service.createRoom(request, utility);
 
         verify(repository).save(Mockito.any(Room.class));
-        assertEquals("012345", response.getRoomId());
+        assertEquals("678910", response.getRoomId());
     }
 
     @Test
     public void joinRoomSuccess() {
         // Verify join room request succeeds and returns correct response
-        String roomId = "012345";
+        String id = "012345";
 
         User user = new User();
         user.setNickname("rocket");
         JoinRoomRequest request = new JoinRoomRequest();
         request.setUser(UserMapper.toDto(user));
-        request.setRoomId(roomId);
+        request.setRoomId(id);
 
         // Mock generateId to return a custom room id
-        PowerMockito.mockStatic(Utility.class);
-        PowerMockito.when(Utility.generateId(any())).thenReturn("678910");
+        Mockito.doReturn(id).when(utility).generateId(eq(UserService.USER_ID_LENGTH));
 
         Room room = new Room();
-        room.setRoomId(roomId);
+        room.setRoomId(id);
 
         // Create host
         User host = new User();
@@ -100,12 +91,14 @@ public class RoomServiceTests {
         room.setHost(host);
 
         // Mock repository to return room when called
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
-        RoomDto response = service.joinRoom(request);
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(id));
+        RoomDto response = service.joinRoom(request, utility);
 
-        assertEquals(roomId, response.getRoomId());
+        assertEquals(id, response.getRoomId());
         assertEquals(2, response.getUsers().size());
-        assertTrue(response.getUsers().contains(request.getUser()));
+        assertEquals(host.getNickname(), response.getUsers().get(0).getNickname());
+        assertEquals(user.getNickname(), response.getUsers().get(1).getNickname());
+        assertEquals(id, response.getUsers().get(1).getUserId());
 
         verify(template).convertAndSend(
                  eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", response.getRoomId())),
@@ -127,7 +120,7 @@ public class RoomServiceTests {
         Mockito.doReturn(null).when(repository).findRoomByRoomId(eq(roomId));
 
         // Assert that service.joinRoom(request) throws the correct exception
-        ApiException exception = assertThrows(ApiException.class, () -> service.joinRoom(request));
+        ApiException exception = assertThrows(ApiException.class, () -> service.joinRoom(request, utility));
 
         verify(repository).findRoomByRoomId(roomId);
         assertEquals(RoomError.NOT_FOUND, exception.getError());
@@ -155,7 +148,7 @@ public class RoomServiceTests {
 
         // Mock repository to return room when called
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
-        ApiException exception = assertThrows(ApiException.class, () -> service.joinRoom(request));
+        ApiException exception = assertThrows(ApiException.class, () -> service.joinRoom(request, utility));
 
         verify(repository).findRoomByRoomId(roomId);
         assertEquals(RoomError.USER_WITH_NICKNAME_ALREADY_PRESENT, exception.getError());
@@ -283,18 +276,5 @@ public class RoomServiceTests {
         verify(template).convertAndSend(
                 eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", roomDto.getRoomId())),
                 eq(roomDto));
-    }
-
-    @Test
-    public void generateValidRoomId() {
-        // Verify room ids are generated correctly
-        String roomId = Utility.generateId(RoomService.ROOM_ID_LENGTH);
-
-        assertEquals(RoomService.ROOM_ID_LENGTH, roomId.length());
-
-        for (char c : roomId.toCharArray()) {
-            assertTrue(c >= '0');
-            assertTrue(c <= '9');
-        }
     }
 }

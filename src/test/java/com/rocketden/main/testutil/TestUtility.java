@@ -1,8 +1,8 @@
-package com.rocketden.main.util;
+package com.rocketden.main.testutil;
 
 import com.google.gson.Gson;
 
-public class Utility {
+public class TestUtility {
 
     public static String convertObjectToJsonString(Object o) {
         Gson gson = new Gson();

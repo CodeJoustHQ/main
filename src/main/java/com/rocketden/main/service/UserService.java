@@ -1,6 +1,5 @@
 package com.rocketden.main.service;
 
-import com.rocketden.main.Utility.Utility;
 import com.rocketden.main.dao.UserRepository;
 import com.rocketden.main.dto.user.CreateUserRequest;
 import com.rocketden.main.dto.user.DeleteUserRequest;
@@ -9,6 +8,7 @@ import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.User;
+import com.rocketden.main.util.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository repository;
+
+    private static Utility utility = new Utility();
     
     // The length of the user ID.
     public static final int USER_ID_LENGTH = 6;
@@ -40,7 +42,7 @@ public class UserService {
 
         // If no user ID is present set a new automatically-generated user ID.
         if (user.getUserId() == null) {
-            user.setUserId(Utility.generateId(UserService.USER_ID_LENGTH));
+            user.setUserId(utility.generateId(UserService.USER_ID_LENGTH));
         }
         
         repository.save(user);
