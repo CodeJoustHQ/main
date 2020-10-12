@@ -5,7 +5,9 @@ import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
+import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.user.UserDto;
+import com.rocketden.main.model.ProblemDifficulty;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +58,7 @@ public class RoomSocketTests {
 
     private BlockingQueue<RoomDto> blockingQueue;
     private String baseRestEndpoint;
-    private String roomId;
+    private RoomDto room;
 
     @BeforeEach
     public void setup() throws Exception {
@@ -77,7 +79,7 @@ public class RoomSocketTests {
         RoomDto response = template.postForObject(baseRestEndpoint, createEntity, RoomDto.class);
 
         assertNotNull(response);
-        roomId = response.getRoomId();
+        room = response;
 
         // Next, set up the socket connection and subscription
         // BlockingQueue will hold the responses from the socket subscribe endpoint
@@ -112,7 +114,7 @@ public class RoomSocketTests {
         UserDto newUser = new UserDto();
         newUser.setNickname("test");
         JoinRoomRequest joinRequest = new JoinRoomRequest();
-        joinRequest.setRoomId(roomId);
+        joinRequest.setRoomId(room.getRoomId());
         joinRequest.setUser(newUser);
 
         HttpEntity<JoinRoomRequest> joinEntity = new HttpEntity<>(joinRequest);
@@ -133,7 +135,7 @@ public class RoomSocketTests {
         UserDto newUser = new UserDto();
         newUser.setNickname("test");
         JoinRoomRequest joinRequest = new JoinRoomRequest();
-        joinRequest.setRoomId(roomId);
+        joinRequest.setRoomId(room.getRoomId());
         joinRequest.setUser(newUser);
 
         HttpEntity<JoinRoomRequest> joinEntity = new HttpEntity<>(joinRequest);
@@ -156,7 +158,7 @@ public class RoomSocketTests {
         updateRequest.setNewHost(newUser);
 
         HttpEntity<UpdateHostRequest> updateEntity = new HttpEntity<>(updateRequest);
-        String updateHostEndpoint = String.format("%s/%s/host", baseRestEndpoint, roomId);
+        String updateHostEndpoint = String.format("%s/%s/host", baseRestEndpoint, room.getRoomId());
         expected = template.exchange(updateHostEndpoint, HttpMethod.PUT, updateEntity, RoomDto.class).getBody();
 
         // Verify that the socket receives a message with the updated host
@@ -167,9 +169,26 @@ public class RoomSocketTests {
         assertEquals(expected.getUsers(), actual.getUsers());
     }
 
+    public void socketReceivesMessageOnSettingsChange() throws Exception {
+        UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
+        updateRequest.setInitiator(room.getHost());
+        updateRequest.setDifficulty(ProblemDifficulty.HARD);
+
+        HttpEntity<UpdateSettingsRequest> updateEntity = new HttpEntity<>(updateRequest);
+        String updateSettingsEndpoint = String.format("%s/%s/settings", baseRestEndpoint, room.getRoomId());
+        RoomDto actual = template.exchange(updateSettingsEndpoint, HttpMethod.PUT, updateEntity, RoomDto.class).getBody();
+
+        assertNotNull(actual);
+        assertEquals(updateRequest.getDifficulty(), actual.getDifficulty());
+
+        // Verify that the socket receives a message with the updated settings
+        actual = blockingQueue.poll(3, SECONDS);
+        assertNotNull(actual);
+        assertEquals(updateRequest.getDifficulty(), actual.getDifficulty());
+    }
+
     @Test
     public void socketRecievesMessageOnDisconnection() throws Exception {
         assertNotNull(new String(""));
     }
-
 }

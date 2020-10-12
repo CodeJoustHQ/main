@@ -7,6 +7,7 @@ import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.room.UpdateHostRequest;
+import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
@@ -143,7 +144,30 @@ public class RoomService {
 
         RoomDto roomDto = RoomMapper.toDto(room);
         sendSocketUpdate(roomDto);
-        return RoomMapper.toDto(room);
+        return roomDto;
+    }
+
+    public RoomDto updateRoomSettings(String roomId, UpdateSettingsRequest request) {
+        Room room = repository.findRoomByRoomId(roomId);
+
+        // Return error if room could not be found
+        if (room == null) {
+            throw new ApiException(RoomError.NOT_FOUND);
+        }
+
+        // Return error if the initiator is not the host
+        User initiator = UserMapper.toEntity(request.getInitiator());
+        if (!room.getHost().equals(initiator)) {
+            throw new ApiException(RoomError.INVALID_PERMISSIONS);
+        }
+
+        // Set new difficulty value
+        room.setDifficulty(request.getDifficulty());
+        repository.save(room);
+
+        RoomDto roomDto = RoomMapper.toDto(room);
+        sendSocketUpdate(roomDto);
+        return roomDto;
     }
 
     // Send updates about new users to the client through sockets
