@@ -23,6 +23,8 @@ function GamePage() {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [error, setError] = useState<string>('');
 
+  const [codeLanguage, setCodeLanguage] = useState('java');
+
   // Called every time location changes
   useEffect(() => {
     if (checkLocationState(location, 'room')) {
@@ -69,7 +71,16 @@ function GamePage() {
             {error ? <ErrorMessage message={error} /> : null}
           </Panel>
           <Panel>
-            <Editor height="100%" language="javascript" />
+            <select
+              onChange={(e) => setCodeLanguage(e.target.value)}
+              value={codeLanguage}
+            >
+              <option value="java">Java</option>
+              <option value="python">Python</option>
+              <option value="javascript">JavaScript</option>
+              <option value="csharp">C#</option>
+            </select>
+            <Editor height="100%" language={codeLanguage} />
           </Panel>
         </SplitterLayout>
       </SplitterContainer>
