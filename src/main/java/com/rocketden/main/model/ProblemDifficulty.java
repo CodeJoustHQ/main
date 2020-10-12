@@ -4,14 +4,14 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 
-public enum Difficulty {
+public enum ProblemDifficulty {
     EASY, MEDIUM, HARD;
 
     // Convert a matching string (ignoring case) to enum object
     @JsonCreator
-    public static Difficulty fromString(String value) {
+    public static ProblemDifficulty fromString(String value) {
         try {
-            return Difficulty.valueOf(value.toUpperCase());
+            return ProblemDifficulty.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new ApiException(RoomError.BAD_SETTING);
         }

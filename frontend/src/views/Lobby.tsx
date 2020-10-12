@@ -2,14 +2,19 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
-import { LargeText, MediumText, UserNicknameText } from '../components/core/Text';
+import { LargeText, MediumText } from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
-import { getRoom, Room, updateRoomSettings } from '../api/Room';
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
 import Difficulty from '../api/Difficulty';
-import { DifficultyButton } from '../components/core/Button';
+import { PrimaryButton, DifficultyButton } from '../components/core/Button';
 import Loading from '../components/core/Loading';
+import PlayerCard from '../components/card/PlayerCard';
+import HostActionCard from '../components/card/HostActionCard';
+import { startGame } from '../api/Game';
+import {
+  getRoom, Room, changeRoomHost, updateRoomSettings,
+} from '../api/Room';
 
 type LobbyPageLocation = {
   user: User,
@@ -50,6 +55,34 @@ function LobbyPage() {
   const deleteUser = (user: User) => {
     // Make rest call to delete user from room
     console.log(user);
+  };
+
+  const changeHosts = (newHost: User) => {
+    const request = {
+      initiator: currentUser!,
+      newHost,
+    };
+
+    if (!loading) {
+      setLoading(true);
+      changeRoomHost(currentRoomId, request)
+        .then(() => setLoading(false))
+        .catch((err) => {
+          setError(err);
+          setLoading(false);
+        });
+    }
+  };
+
+  const handleStartGame = () => {
+    const request = { initiator: currentUser as User };
+    startGame(currentRoomId, request)
+      .then(() => {
+        setLoading(true);
+      })
+      .catch((err) => {
+        setError(err.message);
+      });
   };
 
   /**
@@ -96,8 +129,17 @@ function LobbyPage() {
       setStateFromRoom(JSON.parse(result.body));
     };
 
+    const startGameCallback = () => {
+      history.push('/game');
+    };
+
     connect(roomId).then(() => {
       subscribe(routes(roomId).subscribe, subscribeCallback).then(() => {
+        setSocketConnected(true);
+      }).catch((err) => {
+        setError(err.message);
+      });
+      subscribe(routes(roomId).start, startGameCallback).then(() => {
         setSocketConnected(true);
       }).catch((err) => {
         setError(err.message);
@@ -105,7 +147,7 @@ function LobbyPage() {
     }).catch((err) => {
       setError(err.message);
     });
-  }, []);
+  }, [history]);
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
@@ -148,13 +190,24 @@ function LobbyPage() {
       </LargeText>
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
+
       <div>
-        {
+        { // Show list of users in the room
           users?.map((user) => (
-            <UserNicknameText onClick={() => deleteUser(user)}>
-              {user.nickname}
-              {user.nickname === host?.nickname ? ' (host)' : ''}
-            </UserNicknameText>
+            <PlayerCard
+              user={user}
+              isHost={user.nickname === host?.nickname}
+            >
+              {currentUser?.nickname === host?.nickname
+              && !(user.nickname === currentUser?.nickname) ? (
+                // If currentUser is host, pass in an on-click action card for all other users
+                <HostActionCard
+                  user={user}
+                  onMakeHost={changeHosts}
+                  onDeleteUser={deleteUser}
+                />
+              ) : null}
+            </PlayerCard>
           ))
         }
       </div>
@@ -169,6 +222,10 @@ function LobbyPage() {
           {key}
         </DifficultyButton>
       ))}
+
+      {currentUser?.nickname === host?.nickname
+        ? <PrimaryButton onClick={handleStartGame}> Start Game </PrimaryButton>
+        : <MediumText>Waiting for the host to start the game...</MediumText>}
     </div>
   );
 }

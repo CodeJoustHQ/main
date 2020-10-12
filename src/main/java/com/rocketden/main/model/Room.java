@@ -48,7 +48,7 @@ public class Room {
     private List<User> users = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    private Difficulty difficulty;
+    private ProblemDifficulty difficulty;
 
     public void addUser(User user) {
         users.add(user);

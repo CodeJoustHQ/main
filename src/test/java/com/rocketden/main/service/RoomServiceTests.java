@@ -2,6 +2,7 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
+import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
@@ -13,7 +14,7 @@ import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
-import com.rocketden.main.model.Difficulty;
+import com.rocketden.main.model.ProblemDifficulty;
 import com.rocketden.main.model.Room;
 
 import com.rocketden.main.model.User;
@@ -279,7 +280,7 @@ public class RoomServiceTests {
 
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(host));
-        request.setDifficulty(Difficulty.EASY);
+        request.setDifficulty(ProblemDifficulty.EASY);
 
         RoomDto response = service.updateRoomSettings(room.getRoomId(), request);
 
@@ -291,7 +292,7 @@ public class RoomServiceTests {
     }
 
     @Test
-    public void updateRoomSettingsFailure() {
+    public void updateRoomSettingsInvalidPermissions() {
         String roomId = "012345";
         Room room = new Room();
         room.setRoomId(roomId);
@@ -310,21 +311,28 @@ public class RoomServiceTests {
         // Invalid permissions
         UpdateSettingsRequest invalidPermRequest = new UpdateSettingsRequest();
         invalidPermRequest.setInitiator(UserMapper.toDto(user));
-        invalidPermRequest.setDifficulty(Difficulty.MEDIUM);
+        invalidPermRequest.setDifficulty(ProblemDifficulty.MEDIUM);
 
         ApiException exception = assertThrows(ApiException.class, () ->
                 service.updateRoomSettings(room.getRoomId(), invalidPermRequest));
         assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
+    }
+
+    @Test
+    public void updateRoomSettingsNoRoomFound() {
+        UserDto userDto = new UserDto();
+        userDto.setNickname("test");
 
         // Non-existent room
         UpdateSettingsRequest noRoomRequest = new UpdateSettingsRequest();
-        noRoomRequest.setInitiator(UserMapper.toDto(host));
-        noRoomRequest.setDifficulty(Difficulty.HARD);
+        noRoomRequest.setInitiator(userDto);
+        noRoomRequest.setDifficulty(ProblemDifficulty.HARD);
 
-        exception = assertThrows(ApiException.class, () ->
+        ApiException exception = assertThrows(ApiException.class, () ->
                 service.updateRoomSettings("999999", noRoomRequest));
         assertEquals(RoomError.NOT_FOUND, exception.getError());
     }
+
 
     @Test
     public void sendSocketUpdate() {
