@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
-import Editor, {languages} from '../components/core/Editor';
+import Editor from '../components/core/Editor';
 import { ErrorResponse } from '../api/Error';
 import { Problem, getProblems } from '../api/Problem';
 import { Room } from '../api/Room';
@@ -22,8 +22,6 @@ function GamePage() {
   const [room, setRoom] = useState<Room | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
   const [error, setError] = useState<string>('');
-
-  const [codeLanguage, setCodeLanguage] = useState('java');
 
   // Called every time location changes
   useEffect(() => {
@@ -71,16 +69,7 @@ function GamePage() {
             {error ? <ErrorMessage message={error} /> : null}
           </Panel>
           <Panel>
-            <select
-              onChange={(e) => setCodeLanguage(e.target.value)}
-              value={codeLanguage}
-            >
-              <option value="java">Java</option>
-              <option value="python">Python</option>
-              <option value="javascript">JavaScript</option>
-              <option value="csharp">C#</option>
-            </select>
-            <Editor height="100%" language={codeLanguage} />
+            <Editor />
           </Panel>
         </SplitterLayout>
       </SplitterContainer>
