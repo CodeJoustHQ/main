@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
-import Editor from '../components/core/Editor';
+import Editor, {languages} from '../components/core/Editor';
 import { ErrorResponse } from '../api/Error';
 import { Problem, getProblems } from '../api/Problem';
 import { Room } from '../api/Room';
