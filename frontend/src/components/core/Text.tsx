@@ -9,7 +9,7 @@ export const ErrorText = styled(Text)`
 `;
 
 export const MediumText = styled.h5`
-  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
 `;
 
 export const LargeText = styled.h3`
