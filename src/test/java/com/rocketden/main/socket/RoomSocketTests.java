@@ -142,6 +142,9 @@ public class RoomSocketTests {
         assertEquals(expected.getHost(), actual.getHost());
         assertEquals(expected.getUsers(), actual.getUsers());
 
+        // Update newUser with the created userId and updated information.
+        newUser = expected.getUsers().get(1);
+
         // A host change request is sent
         UpdateHostRequest updateRequest = new UpdateHostRequest();
         updateRequest.setInitiator(expected.getHost());
@@ -155,9 +158,9 @@ public class RoomSocketTests {
         actual = blockingQueue.poll(3, SECONDS);
         assertNotNull(expected);
         // TODO: This line throws an error, and I don't understand why.
-        // assertNotNull(actual);
-        // assertEquals(newUser, actual.getHost());
-        // assertEquals(expected.getUsers(), actual.getUsers());
+        assertNotNull(actual);
+        assertEquals(newUser, actual.getHost());
+        assertEquals(expected.getUsers(), actual.getUsers());
     }
 
 }
