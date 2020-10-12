@@ -52,8 +52,10 @@ const Content = styled.div`
 // This function refreshes the width of Monaco editor upon change in container size
 function ResizableMonacoEditor() {
   const [codeLanguage, setCodeLanguage] = useState('java');
+  const [codeEditor, setCodeEditor] = useState<any>(null);
 
   const handleEditorDidMount = (editor: any) => {
+    setCodeEditor(editor);
     window.addEventListener('resize', () => {
       editor.layout();
     });
@@ -62,10 +64,15 @@ function ResizableMonacoEditor() {
     });
   };
 
+  const handleLanguageChange = (language: string) => {
+    codeEditor!.setValue(languages[language].defaultCode);
+    setCodeLanguage(language);
+  };
+
   return (
     <Content>
       <select
-        onChange={(e) => setCodeLanguage(e.target.value)}
+        onChange={(e) => handleLanguageChange(e.target.value)}
         value={codeLanguage}
       >
         {
