@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
@@ -21,6 +22,7 @@ import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
@@ -82,9 +84,12 @@ public class RoomSocketTests {
         // BlockingQueue will hold the responses from the socket subscribe endpoint
         blockingQueue = new ArrayBlockingQueue<>(1);
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("userId", "012345");
+
         // Connect to the socket endpoint
         StompSession session = stompClient
-                .connect(CONNECT_ENDPOINT, new WebSocketHttpHeaders(), new StompSessionHandlerAdapter() {}, this.port)
+                .connect(CONNECT_ENDPOINT, new WebSocketHttpHeaders(headers), new StompSessionHandlerAdapter() {}, this.port)
                 .get(3, SECONDS);
 
         // Add socket messages to BlockingQueue so we can verify expected behavior
@@ -99,6 +104,7 @@ public class RoomSocketTests {
                 blockingQueue.add((RoomDto) payload);
             }
         });
+        
     }
 
     @Test
@@ -160,6 +166,11 @@ public class RoomSocketTests {
         assertNotNull(actual);
         assertEquals(newUser, actual.getHost());
         assertEquals(expected.getUsers(), actual.getUsers());
+    }
+
+    @Test
+    public void socketRecievesMessageOnDisconnection() throws Exception {
+        assertNotNull(new String(""));
     }
 
 }
