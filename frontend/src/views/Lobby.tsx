@@ -222,6 +222,7 @@ function LobbyPage() {
           {key}
         </DifficultyButton>
       ))}
+      <br />
 
       {currentUser?.nickname === host?.nickname
         ? <PrimaryButton onClick={handleStartGame}> Start Game </PrimaryButton>
