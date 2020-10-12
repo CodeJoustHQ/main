@@ -7,12 +7,14 @@ import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
+import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
+import com.rocketden.main.model.ProblemDifficulty;
 import com.rocketden.main.model.Room;
 
 import com.rocketden.main.model.User;
@@ -26,6 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -60,6 +63,8 @@ public class RoomServiceTests {
 
         verify(repository).save(Mockito.any(Room.class));
         assertEquals("012345", response.getRoomId());
+        assertEquals(user, response.getHost());
+        assertNull(response.getDifficulty());
     }
 
     @Test
@@ -89,6 +94,7 @@ public class RoomServiceTests {
         assertEquals(roomId, response.getRoomId());
         assertEquals(2, response.getUsers().size());
         assertTrue(response.getUsers().contains(request.getUser()));
+        assertNull(response.getDifficulty());
 
         verify(template).convertAndSend(
                  eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", response.getRoomId())),
@@ -204,6 +210,10 @@ public class RoomServiceTests {
         RoomDto response = service.updateRoomHost(room.getRoomId(), request);
 
         assertEquals(user, UserMapper.toEntity(response.getHost()));
+
+        verify(template).convertAndSend(
+                eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", response.getRoomId())),
+                eq(response));
     }
 
     @Test
@@ -253,6 +263,76 @@ public class RoomServiceTests {
                 service.updateRoomHost(room.getRoomId(), noUserRequest));
         assertEquals(UserError.NOT_FOUND, exception.getError());
     }
+
+    @Test
+    public void updateRoomSettingsSuccess() {
+        String roomId = "012345";
+        Room room = new Room();
+        room.setRoomId(roomId);
+
+        User host = new User();
+        host.setNickname("host");
+
+        room.setHost(host);
+        room.addUser(host);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
+
+        UpdateSettingsRequest request = new UpdateSettingsRequest();
+        request.setInitiator(UserMapper.toDto(host));
+        request.setDifficulty(ProblemDifficulty.EASY);
+
+        RoomDto response = service.updateRoomSettings(room.getRoomId(), request);
+
+        assertEquals(request.getDifficulty(), response.getDifficulty());
+
+        verify(template).convertAndSend(
+                eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", response.getRoomId())),
+                eq(response));
+    }
+
+    @Test
+    public void updateRoomSettingsInvalidPermissions() {
+        String roomId = "012345";
+        Room room = new Room();
+        room.setRoomId(roomId);
+
+        User host = new User();
+        host.setNickname("host");
+        User user =  new User();
+        user.setNickname("user");
+
+        room.setHost(host);
+        room.addUser(host);
+        room.addUser(user);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
+
+        // Invalid permissions
+        UpdateSettingsRequest invalidPermRequest = new UpdateSettingsRequest();
+        invalidPermRequest.setInitiator(UserMapper.toDto(user));
+        invalidPermRequest.setDifficulty(ProblemDifficulty.MEDIUM);
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                service.updateRoomSettings(room.getRoomId(), invalidPermRequest));
+        assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
+    }
+
+    @Test
+    public void updateRoomSettingsNoRoomFound() {
+        UserDto userDto = new UserDto();
+        userDto.setNickname("test");
+
+        // Non-existent room
+        UpdateSettingsRequest noRoomRequest = new UpdateSettingsRequest();
+        noRoomRequest.setInitiator(userDto);
+        noRoomRequest.setDifficulty(ProblemDifficulty.HARD);
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                service.updateRoomSettings("999999", noRoomRequest));
+        assertEquals(RoomError.NOT_FOUND, exception.getError());
+    }
+
 
     @Test
     public void sendSocketUpdate() {
