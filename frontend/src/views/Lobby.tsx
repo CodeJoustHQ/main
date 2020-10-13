@@ -229,7 +229,7 @@ function LobbyPage() {
       <br />
 
       {currentUser?.nickname === host?.nickname
-        ? <PrimaryButton onClick={handleStartGame}> Start Game </PrimaryButton>
+        ? <PrimaryButton onClick={handleStartGame} disabled={loading}>Start Game</PrimaryButton>
         : <MediumText>Waiting for the host to start the game...</MediumText>}
     </div>
   );
