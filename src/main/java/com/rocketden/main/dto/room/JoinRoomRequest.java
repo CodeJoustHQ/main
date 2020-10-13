@@ -8,6 +8,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class JoinRoomRequest {
-    private String roomId;
     private UserDto user;
 }

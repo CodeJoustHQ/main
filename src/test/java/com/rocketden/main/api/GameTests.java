@@ -39,7 +39,7 @@ public class GameTests {
 	@Mock
 	private RoomRepository repository;
 
-	private static final String POST_ROOM = "/api/v1/rooms";
+	private static final String POST_ROOM = "/api/v1/rooms/create";
 	private static final String START_GAME = "/api/v1/rooms/%s/start";
 
 	@Test
