@@ -64,7 +64,7 @@ public class RoomServiceTests {
         verify(repository).save(Mockito.any(Room.class));
         assertEquals("012345", response.getRoomId());
         assertEquals(user, response.getHost());
-        assertNull(response.getDifficulty());
+        assertEquals(ProblemDifficulty.RANDOM, response.getDifficulty());
     }
 
     @Test
@@ -94,7 +94,7 @@ public class RoomServiceTests {
         assertEquals(roomId, response.getRoomId());
         assertEquals(2, response.getUsers().size());
         assertTrue(response.getUsers().contains(request.getUser()));
-        assertNull(response.getDifficulty());
+        assertEquals(ProblemDifficulty.RANDOM, response.getDifficulty());
 
         verify(template).convertAndSend(
                  eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", response.getRoomId())),

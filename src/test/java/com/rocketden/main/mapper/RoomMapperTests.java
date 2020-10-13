@@ -28,6 +28,7 @@ public class RoomMapperTests {
 
         Room room = new Room();
         room.setRoomId("012345");
+        room.setDifficulty(ProblemDifficulty.MEDIUM);
         room.setHost(host);
 
         room.addUser(host);

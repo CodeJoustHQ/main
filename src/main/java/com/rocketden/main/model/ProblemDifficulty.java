@@ -5,7 +5,7 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 
 public enum ProblemDifficulty {
-    EASY, MEDIUM, HARD;
+    EASY, MEDIUM, HARD, RANDOM;
 
     // Convert a matching string (ignoring case) to enum object
     @JsonCreator
