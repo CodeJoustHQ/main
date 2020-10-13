@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { InactiveUserNicknameText, UserNicknameText } from '../core/Text';
+import { UserNicknameText } from '../core/Text';
 import { User } from '../../api/User';
 
 const Content = styled.div`
@@ -19,6 +19,10 @@ const Content = styled.div`
   border-radius: 20px;
 `;
 
+const ContentInactive = styled(Content)`
+  background-color: ${({ theme }) => theme.colors.lightRed};
+`;
+
 type PlayerCardProps = {
   user: User,
   isActive: boolean,
@@ -34,26 +38,31 @@ function PlayerCard(props: PlayerCardProps) {
   const [showActionCard, setShowActionCard] = useState(false);
 
   return (
-    <Content
-      onMouseEnter={() => setShowActionCard(true)}
-      onMouseLeave={() => setShowActionCard(false)}
-    >
-      {
-      isActive ? (
+    isActive ? (
+      <Content
+        onMouseEnter={() => setShowActionCard(true)}
+        onMouseLeave={() => setShowActionCard(false)}
+      >
         <UserNicknameText>
           {user.nickname}
           {isHost ? ' (host)' : ''}
         </UserNicknameText>
-      ) : (
-        <InactiveUserNicknameText>
+
+        {showActionCard ? actionCard : null}
+      </Content>
+    ) : (
+      <ContentInactive
+        onMouseEnter={() => setShowActionCard(true)}
+        onMouseLeave={() => setShowActionCard(false)}
+      >
+        <UserNicknameText>
           {user.nickname}
           {isHost ? ' (host)' : ''}
-        </InactiveUserNicknameText>
-      )
-      }
+        </UserNicknameText>
 
-      {showActionCard ? actionCard : null}
-    </Content>
+        {showActionCard ? actionCard : null}
+      </ContentInactive>
+    )
   );
 }
 

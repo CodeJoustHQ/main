@@ -24,19 +24,6 @@ export const UserNicknameText = styled(LargeText)`
   margin: 0;
 `;
 
-export const InactiveUserNicknameText = styled(Text)`
-  display: inline-block;
-  margin: 5px;
-  padding: 5px;
-  background-color: ${({ theme }) => theme.colors.lightRed};
-  border-radius: 3px;
-
-  &:hover {
-    text-decoration: line-through;
-    cursor: pointer;
-  }
-`;
-
 export const ProblemHeaderText = styled.h3`
   font-size: ${({ theme }) => theme.fontSize.default};
 `;
