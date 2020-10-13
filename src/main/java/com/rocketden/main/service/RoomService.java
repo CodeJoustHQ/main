@@ -145,8 +145,10 @@ public class RoomService {
             throw new ApiException(RoomError.INVALID_PERMISSIONS);
         }
 
-        // Set new difficulty value
-        room.setDifficulty(request.getDifficulty());
+        // Set new difficulty value if not null
+        if (request.getDifficulty() != null) {
+            room.setDifficulty(request.getDifficulty());
+        }
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);

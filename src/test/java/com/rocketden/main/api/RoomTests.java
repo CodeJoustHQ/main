@@ -502,6 +502,7 @@ public class RoomTests {
         String jsonResponse = result.getResponse().getContentAsString();
         room = Utility.toObject(jsonResponse, RoomDto.class);
 
+        // Difficulty remains unchanged from default
         assertEquals(ProblemDifficulty.RANDOM, room.getDifficulty());
     }
 

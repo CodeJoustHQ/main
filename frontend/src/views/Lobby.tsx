@@ -220,7 +220,7 @@ function LobbyPage() {
           onClick={() => updateDifficultySetting(key)}
           active={difficulty === Difficulty[key as keyof typeof Difficulty]}
           enabled={currentUser?.nickname === host?.nickname}
-          title={currentUser?.nickname === host?.nickname
+          title={currentUser?.nickname !== host?.nickname
             ? 'Only the host can change these settings' : undefined}
         >
           {key}

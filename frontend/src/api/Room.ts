@@ -7,7 +7,7 @@ export type Room = {
   roomId: string;
   host: User;
   users: [User],
-  difficulty: Difficulty | null,
+  difficulty: Difficulty,
 };
 
 export type CreateRoomParams = {
@@ -21,7 +21,7 @@ export type JoinRoomParams = {
 
 export type UpdateSettingsParams = {
   initiator: User,
-  difficulty: Difficulty | null,
+  difficulty: Difficulty,
 }
 
 export type ChangeHostParams = {
