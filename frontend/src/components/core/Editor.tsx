@@ -77,7 +77,7 @@ function ResizableMonacoEditor() {
       >
         {
           Object.keys(languages).map((language) => (
-            <option value={language}>{languages[language].name}</option>
+            <option key={language} value={language}>{languages[language].name}</option>
           ))
         }
       </select>
