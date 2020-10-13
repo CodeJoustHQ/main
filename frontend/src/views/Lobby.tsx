@@ -192,7 +192,8 @@ function LobbyPage() {
       { loading ? <Loading /> : null }
 
       <div>
-        { // Show list of users in the room
+        {
+          // Show list of users in the room
           users?.map((user) => (
             <PlayerCard
               user={user}
@@ -218,6 +219,8 @@ function LobbyPage() {
           onClick={() => updateDifficultySetting(key)}
           active={difficulty === Difficulty[key as keyof typeof Difficulty]}
           enabled={currentUser?.nickname === host?.nickname}
+          title={currentUser?.nickname === host?.nickname
+            ? 'Only the host can change these settings' : undefined}
         >
           {key}
         </DifficultyButton>
