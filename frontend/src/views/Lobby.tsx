@@ -86,7 +86,7 @@ function LobbyPage() {
   };
 
   /**
-   * Update the difficulty setting of the room (EASY, MEDIUM, HARD, or none)
+   * Update the difficulty setting of the room (EASY, MEDIUM, HARD, or RANDOM)
    */
   const updateDifficultySetting = (key: string) => {
     if (currentUser?.nickname === host?.nickname && !loading) {
