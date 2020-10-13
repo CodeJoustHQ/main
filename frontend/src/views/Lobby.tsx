@@ -90,13 +90,12 @@ function LobbyPage() {
    */
   const updateDifficultySetting = (key: string) => {
     if (currentUser?.nickname === host?.nickname && !loading) {
-      setLoading(true);
-      let newDifficulty: Difficulty | null = Difficulty[key as keyof typeof Difficulty];
+      const oldDifficulty = difficulty;
+      const newDifficulty = Difficulty[key as keyof typeof Difficulty];
 
-      // Set new difficulty to none if previous setting was toggled off
-      if (newDifficulty === difficulty) {
-        newDifficulty = null;
-      }
+      setLoading(true);
+      // Preemptively set new difficulty value
+      setDifficulty(newDifficulty);
 
       const newSettings = {
         initiator: currentUser!,
@@ -108,6 +107,8 @@ function LobbyPage() {
         .catch((err) => {
           setLoading(false);
           setError(err.message);
+          // Set difficulty back to original if REST call failed
+          setDifficulty(oldDifficulty);
         });
     }
   };
