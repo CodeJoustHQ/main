@@ -3,9 +3,9 @@ package com.rocketden.main.service;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
+import com.rocketden.main.config.WebSocketConfig;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.user.UserDto;
-import com.rocketden.main.util.Utility;
 
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -32,7 +32,7 @@ public class SocketServiceTests {
 
         socketService.sendSocketUpdate(roomDto);
         verify(template).convertAndSend(
-                eq(String.format(Utility.SOCKET_PATH, roomDto.getRoomId())),
+                eq(String.format(WebSocketConfig.SOCKET_PATH, roomDto.getRoomId())),
                 eq(roomDto));
     }
     
