@@ -2,6 +2,9 @@ package com.rocketden.main.util;
 
 import java.util.Random;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class Utility {
 
     private static final Random random = new Random();

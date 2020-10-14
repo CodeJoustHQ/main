@@ -39,9 +39,33 @@ public class UserTests {
     public void createNewUser() throws Exception {
         CreateUserRequest request = new CreateUserRequest();
         request.setNickname("rocket");
+        request.setUserId("012345");
 
         UserDto expected = new UserDto();
         expected.setNickname("rocket");
+        expected.setUserId("012345");
+
+        MvcResult result = this.mockMvc.perform(post(USER_URI)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(TestUtility.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        UserDto actual = TestUtility.toObject(jsonResponse, UserDto.class);
+
+        assertEquals(expected.getNickname(), actual.getNickname());
+        assertEquals(expected.getUserId(), actual.getUserId());
+    }
+
+    @Test
+    public void createNewUserNoUserIdSuccess() throws Exception {
+        CreateUserRequest request = new CreateUserRequest();
+        request.setNickname("rocket");
+
+        UserDto expected = new UserDto();
+        expected.setNickname("rocket");
+        expected.setUserId("012345");
 
         MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

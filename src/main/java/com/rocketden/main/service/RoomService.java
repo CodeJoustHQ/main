@@ -16,8 +16,6 @@ import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 import com.rocketden.main.util.Utility;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,16 +26,16 @@ public class RoomService {
 
     private final RoomRepository repository;
     private final SocketService socketService;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(RoomService.class);
+    private final Utility utility;
 
     @Autowired
-    public RoomService(RoomRepository repository, SocketService socketService) {
+    public RoomService(RoomRepository repository, SocketService socketService, Utility utility) {
         this.repository = repository;
         this.socketService = socketService;
+        this.utility = utility;
     }
 
-    public RoomDto joinRoom(JoinRoomRequest request, Utility utility) {
+    public RoomDto joinRoom(JoinRoomRequest request) {
         Room room = repository.findRoomByRoomId(request.getRoomId());
 
         // Return error if room could not be found
@@ -68,13 +66,11 @@ public class RoomService {
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
-        LOGGER.info("dinosaur");
-        LOGGER.info("" + socketService);
         socketService.sendSocketUpdate(roomDto);
         return roomDto;
     }
 
-    public RoomDto createRoom(CreateRoomRequest request, Utility utility) {
+    public RoomDto createRoom(CreateRoomRequest request) {
         User host = UserMapper.toEntity(request.getHost());
 
         // Do not create room if provided host is invalid.
