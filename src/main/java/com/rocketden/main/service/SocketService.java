@@ -1,7 +1,7 @@
 package com.rocketden.main.service;
 
+import com.rocketden.main.config.WebSocketConfig;
 import com.rocketden.main.dto.room.RoomDto;
-import com.rocketden.main.util.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -19,7 +19,7 @@ public class SocketService {
 
     // Send updates about new users to the client through sockets
     public void sendSocketUpdate(RoomDto roomDto) {
-        String socketPath = String.format(Utility.SOCKET_PATH, roomDto.getRoomId());
+        String socketPath = String.format(WebSocketConfig.SOCKET_PATH, roomDto.getRoomId());
         template.convertAndSend(socketPath, roomDto);
     }
     

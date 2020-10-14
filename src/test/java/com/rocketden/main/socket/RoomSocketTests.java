@@ -169,6 +169,7 @@ public class RoomSocketTests {
         assertEquals(expected.getUsers(), actual.getUsers());
     }
 
+    @Test
     public void socketReceivesMessageOnSettingsChange() throws Exception {
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(room.getHost());

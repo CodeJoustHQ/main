@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import javax.sql.DataSource;
 
 import com.rocketden.main.dto.problem.ProblemDto;
-import com.rocketden.main.testutil.TestUtility;
+import com.rocketden.main.util.TestUtility;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.rocketden.main.testutil;
+package com.rocketden.main.util;
 
 import com.google.gson.Gson;
 

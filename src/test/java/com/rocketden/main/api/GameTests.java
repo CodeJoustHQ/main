@@ -10,7 +10,8 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.model.User;
-import com.rocketden.main.testutil.TestUtility;
+import com.rocketden.main.util.TestUtility;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;

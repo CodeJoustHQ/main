@@ -21,9 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
 public class RoomService {
 
@@ -92,10 +89,6 @@ public class RoomService {
         if (host.getUserId() == null) {
             host.setUserId(utility.generateId(UserService.USER_ID_LENGTH));
         }
-
-        // Add the host to a new user list.
-        List<User> users = new ArrayList<>();
-        users.add(host);
 
         Room room = new Room();
         room.setRoomId(utility.generateId(ROOM_ID_LENGTH));

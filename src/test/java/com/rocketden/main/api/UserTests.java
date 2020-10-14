@@ -6,7 +6,7 @@ import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
-import com.rocketden.main.testutil.TestUtility;
+import com.rocketden.main.util.TestUtility;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
