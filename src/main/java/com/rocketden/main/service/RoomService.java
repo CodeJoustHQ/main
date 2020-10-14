@@ -57,11 +57,8 @@ public class RoomService {
         }
 
         // Return error if a user with the same nickname is in the room.
-        List<User> users = room.getUsers();
-        for (User roomUser : users) {
-            if (roomUser.getNickname().equals(user.getNickname())) {
-                throw new ApiException(RoomError.USER_WITH_NICKNAME_ALREADY_PRESENT);
-            }
+        if (room.containsUserWithNickname(user.getNickname())) {
+            throw new ApiException(RoomError.USER_WITH_NICKNAME_ALREADY_PRESENT);
         }
 
         // Add userId if not already present.
