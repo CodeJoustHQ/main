@@ -3,11 +3,15 @@ import styled from 'styled-components';
 import { UserNicknameText } from '../core/Text';
 import { User } from '../../api/User';
 
-const Content = styled.div`
+type ContentProps = {
+  isActive: boolean,
+};
+
+const Content = styled.div<ContentProps>`
   display: inline-block;
   position: relative;
   padding: 10px;
-  background-color: ${({ theme }) => theme.colors.lightBlue};
+  background-color: ${({ theme, isActive }) => (isActive ? theme.colors.lightBlue : theme.colors.lightRed)};
   background-clip: padding-box;
   
   // Invisible border to make hover effect last longer
@@ -38,31 +42,18 @@ function PlayerCard(props: PlayerCardProps) {
   const [showActionCard, setShowActionCard] = useState(false);
 
   return (
-    isActive ? (
-      <Content
-        onMouseEnter={() => setShowActionCard(true)}
-        onMouseLeave={() => setShowActionCard(false)}
-      >
-        <UserNicknameText>
-          {user.nickname}
-          {isHost ? ' (host)' : ''}
-        </UserNicknameText>
+    <ContentInactive
+      onMouseEnter={() => setShowActionCard(true)}
+      onMouseLeave={() => setShowActionCard(false)}
+      isActive={isActive}
+    >
+      <UserNicknameText>
+        {user.nickname}
+        {isHost ? ' (host)' : ''}
+      </UserNicknameText>
 
-        {showActionCard ? actionCard : null}
-      </Content>
-    ) : (
-      <ContentInactive
-        onMouseEnter={() => setShowActionCard(true)}
-        onMouseLeave={() => setShowActionCard(false)}
-      >
-        <UserNicknameText>
-          {user.nickname}
-          {isHost ? ' (host)' : ''}
-        </UserNicknameText>
-
-        {showActionCard ? actionCard : null}
-      </ContentInactive>
-    )
+      {showActionCard ? actionCard : null}
+    </ContentInactive>
   );
 }
 

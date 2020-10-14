@@ -148,7 +148,7 @@ function LobbyPage() {
         history.replace('/game/join');
       }
     }
-  }, [location, socketConnected, history, connectUserToRoom]);
+  }, [location, socketConnected, history]);
 
   // Connect the user to the room.
   useEffect(() => {

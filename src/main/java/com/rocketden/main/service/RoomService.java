@@ -16,8 +16,9 @@ import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 import com.rocketden.main.util.Utility;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,12 +30,14 @@ public class RoomService {
     public static final int ROOM_ID_LENGTH = 6;
 
     private final RoomRepository repository;
-    private final SimpMessagingTemplate template;
+    private final SocketService socketService;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RoomService.class);
 
     @Autowired
-    public RoomService(RoomRepository repository, SimpMessagingTemplate template) {
+    public RoomService(RoomRepository repository, SocketService socketService) {
         this.repository = repository;
-        this.template = template;
+        this.socketService = socketService;
     }
 
     public RoomDto joinRoom(JoinRoomRequest request, Utility utility) {
@@ -58,7 +61,7 @@ public class RoomService {
         for (User roomUser : users) {
             if (roomUser.getNickname().equals(user.getNickname())) {
                 throw new ApiException(RoomError.USER_WITH_NICKNAME_ALREADY_PRESENT);
-            };
+            }
         }
 
         // Add userId if not already present.
@@ -71,7 +74,9 @@ public class RoomService {
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
-        sendSocketUpdate(roomDto);
+        LOGGER.info("dinosaur");
+        LOGGER.info("" + socketService);
+        socketService.sendSocketUpdate(roomDto);
         return roomDto;
     }
 
@@ -143,7 +148,7 @@ public class RoomService {
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
-        sendSocketUpdate(roomDto);
+        socketService.sendSocketUpdate(roomDto);
         return roomDto;
     }
 
@@ -166,13 +171,7 @@ public class RoomService {
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
-        sendSocketUpdate(roomDto);
+        socketService.sendSocketUpdate(roomDto);
         return roomDto;
-    }
-
-    // Send updates about new users to the client through sockets
-    public void sendSocketUpdate(RoomDto roomDto) {
-        String socketPath = String.format(Utility.SOCKET_PATH, roomDto.getRoomId());
-        template.convertAndSend(socketPath, roomDto);
     }
 }

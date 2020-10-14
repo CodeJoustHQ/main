@@ -1,4 +1,4 @@
-package com.rocketden.main.config;
+package com.rocketden.main.socket;
 
 import java.util.LinkedList;
 import java.util.Map;
@@ -8,12 +8,11 @@ import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
-import com.rocketden.main.util.Utility;
+import com.rocketden.main.service.SocketService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,15 +26,15 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 public class WebSocketConnectionEvents {
 
     private final UserRepository userRepository;
-    private final SimpMessagingTemplate template;
+    private final SocketService socketService;
 
     private static final String CONNECT_MESSAGE = "simpConnectMessage";
     private static final String NATIVE_HEADERS = "nativeHeaders";
 
     @Autowired
-    public WebSocketConnectionEvents(UserRepository userRepository, SimpMessagingTemplate template) {
+    public WebSocketConnectionEvents(UserRepository userRepository, SocketService socketService) {
         this.userRepository = userRepository;
-        this.template = template;
+        this.socketService = socketService;
     }
 
     @EventListener
@@ -65,7 +64,7 @@ public class WebSocketConnectionEvents {
         // Get room and send socket update.
         Room room = user.getRoom();
         RoomDto roomDto = RoomMapper.toDto(room);
-        sendSocketUpdate(roomDto);
+        socketService.sendSocketUpdate(roomDto);
     }
 
     @EventListener
@@ -84,12 +83,6 @@ public class WebSocketConnectionEvents {
         // Get room and send socket update.
         Room room = user.getRoom();
         RoomDto roomDto = RoomMapper.toDto(room);
-        sendSocketUpdate(roomDto);
-    }
-
-    // Send updates about new users to the client through sockets
-    public void sendSocketUpdate(RoomDto roomDto) {
-        String socketPath = String.format(Utility.SOCKET_PATH, roomDto.getRoomId());
-        template.convertAndSend(socketPath, roomDto);
+        socketService.sendSocketUpdate(roomDto);
     }
 }

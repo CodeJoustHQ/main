@@ -342,19 +342,4 @@ public class RoomServiceTests {
                 service.updateRoomSettings("999999", noRoomRequest));
         assertEquals(RoomError.NOT_FOUND, exception.getError());
     }
-
-
-    @Test
-    public void sendSocketUpdate() {
-        RoomDto roomDto = new RoomDto();
-        roomDto.setRoomId("123456");
-        UserDto userDto = new UserDto();
-        userDto.setNickname("test");
-        roomDto.setHost(userDto);
-
-        service.sendSocketUpdate(roomDto);
-        verify(template).convertAndSend(
-                eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", roomDto.getRoomId())),
-                eq(roomDto));
-    }
 }
