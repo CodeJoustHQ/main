@@ -46,12 +46,12 @@ public class RoomServiceTests {
     @Mock
     private SimpMessagingTemplate template;
 
+    @Mock
+    private static Utility utility;
+
     @Spy
     @InjectMocks
     private RoomService service;
-
-    @Mock
-    private static Utility utility;
 
     @Test
     public void createRoomSuccess() {
@@ -157,7 +157,7 @@ public class RoomServiceTests {
         ApiException exception = assertThrows(ApiException.class, () -> service.joinRoom(request, utility));
 
         verify(repository).findRoomByRoomId(roomId);
-        assertEquals(RoomError.USER_WITH_NICKNAME_ALREADY_PRESENT, exception.getError());
+        assertEquals(RoomError.DUPLICATE_USERNAME, exception.getError());
     }
 
     @Test

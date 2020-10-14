@@ -191,13 +191,6 @@ function LobbyPage() {
             </PlayerCard>
           ))
         }
-      </div>
-      <div>
-        {
-          (inactiveUsers !== null && inactiveUsers.length > 0) ? (
-            <MediumText>Below is a list of inactive users.</MediumText>
-          ) : <MediumText>There are no inactive users.</MediumText>
-        }
         {
           inactiveUsers?.map((user) => (
             <PlayerCard

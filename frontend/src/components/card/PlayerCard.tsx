@@ -11,7 +11,7 @@ const Content = styled.div<ContentProps>`
   display: inline-block;
   position: relative;
   padding: 10px;
-  background-color: ${({ theme, isActive }) => (isActive ? theme.colors.lightBlue : theme.colors.lightRed)};
+  background-color: ${({ theme, isActive }) => (isActive ? theme.colors.lightBlue : theme.colors.lightGray)};
   background-clip: padding-box;
   
   // Invisible border to make hover effect last longer
@@ -21,10 +21,6 @@ const Content = styled.div<ContentProps>`
   margin: -5px;
   // Subtract above border width from border-radius for actual effect 
   border-radius: 20px;
-`;
-
-const ContentInactive = styled(Content)`
-  background-color: ${({ theme }) => theme.colors.lightRed};
 `;
 
 type PlayerCardProps = {
@@ -42,7 +38,7 @@ function PlayerCard(props: PlayerCardProps) {
   const [showActionCard, setShowActionCard] = useState(false);
 
   return (
-    <ContentInactive
+    <Content
       onMouseEnter={() => setShowActionCard(true)}
       onMouseLeave={() => setShowActionCard(false)}
       isActive={isActive}
@@ -53,7 +49,7 @@ function PlayerCard(props: PlayerCardProps) {
       </UserNicknameText>
 
       {showActionCard ? actionCard : null}
-    </ContentInactive>
+    </Content>
   );
 }
 

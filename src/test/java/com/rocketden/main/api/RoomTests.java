@@ -262,7 +262,7 @@ public class RoomTests {
         joinRequest.setRoomId(roomId);
         joinRequest.setUser(host);
 
-        ApiError ERROR = RoomError.USER_WITH_NICKNAME_ALREADY_PRESENT;
+        ApiError ERROR = RoomError.DUPLICATE_USERNAME;
 
         result = this.mockMvc.perform(put(PUT_ROOM)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
