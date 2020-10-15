@@ -47,7 +47,7 @@ public class Room {
     @Setter(AccessLevel.PRIVATE)
     private List<User> users = new ArrayList<>();
 
-    private boolean isActive;
+    private Boolean isActive;
 
     @Enumerated(EnumType.STRING)
     private ProblemDifficulty difficulty = ProblemDifficulty.RANDOM;
