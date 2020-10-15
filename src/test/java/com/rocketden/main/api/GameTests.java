@@ -10,7 +10,7 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.model.User;
-import com.rocketden.main.util.TestUtility;
+import com.rocketden.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -53,24 +53,24 @@ public class GameTests {
 
 		MvcResult result = this.mockMvc.perform(post(POST_ROOM)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.content(TestUtility.convertObjectToJsonString(createRequest)))
+				.content(UtilityTestMethods.convertObjectToJsonString(createRequest)))
 				.andDo(print()).andExpect(status().isCreated())
 				.andReturn();
 
 		String jsonResponse = result.getResponse().getContentAsString();
-		RoomDto roomDto = TestUtility.toObject(jsonResponse, RoomDto.class);
+		RoomDto roomDto = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
 		StartGameRequest request = new StartGameRequest();
 		request.setInitiator(host);
 
 		result = this.mockMvc.perform(post(String.format(START_GAME, roomDto.getRoomId()))
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.content(TestUtility.convertObjectToJsonString(request)))
+				.content(UtilityTestMethods.convertObjectToJsonString(request)))
 				.andDo(print()).andExpect(status().isOk())
 				.andReturn();
 
 		jsonResponse = result.getResponse().getContentAsString();
-		RoomDto actual = TestUtility.toObject(jsonResponse, RoomDto.class);
+		RoomDto actual = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
 		assertEquals(roomDto.getRoomId(), actual.getRoomId());
 	}
@@ -88,12 +88,12 @@ public class GameTests {
 
 		MvcResult result = this.mockMvc.perform(post(String.format(START_GAME, roomId))
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.content(TestUtility.convertObjectToJsonString(request)))
+				.content(UtilityTestMethods.convertObjectToJsonString(request)))
 				.andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
 				.andReturn();
 
 		String jsonResponse = result.getResponse().getContentAsString();
-		ApiErrorResponse actual = TestUtility.toObject(jsonResponse, ApiErrorResponse.class);
+		ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
 
 		assertEquals(ERROR.getResponse(), actual);
 	}
@@ -108,12 +108,12 @@ public class GameTests {
 
 		MvcResult result = this.mockMvc.perform(post(POST_ROOM)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.content(TestUtility.convertObjectToJsonString(createRequest)))
+				.content(UtilityTestMethods.convertObjectToJsonString(createRequest)))
 				.andDo(print()).andExpect(status().isCreated())
 				.andReturn();
 
 		String jsonResponse = result.getResponse().getContentAsString();
-		RoomDto roomDto = TestUtility.toObject(jsonResponse, RoomDto.class);
+		RoomDto roomDto = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
 		UserDto user = new UserDto();
 		user.setNickname("rocketrocket");
@@ -124,12 +124,12 @@ public class GameTests {
 
 		result = this.mockMvc.perform(post(String.format(START_GAME, roomDto.getRoomId()))
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.content(TestUtility.convertObjectToJsonString(request)))
+				.content(UtilityTestMethods.convertObjectToJsonString(request)))
 				.andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
 				.andReturn();
 
 		jsonResponse = result.getResponse().getContentAsString();
-		ApiErrorResponse actual = TestUtility.toObject(jsonResponse, ApiErrorResponse.class);
+		ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
 
 		assertEquals(ERROR.getResponse(), actual);
 	}

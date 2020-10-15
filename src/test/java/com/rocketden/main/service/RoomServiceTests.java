@@ -49,7 +49,7 @@ public class RoomServiceTests {
     private SimpMessagingTemplate template;
 
     @Mock
-    private static Utility utility;
+    private Utility utility;
 
     @Spy
     @InjectMocks

@@ -6,7 +6,7 @@ import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
-import com.rocketden.main.util.TestUtility;
+import com.rocketden.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +47,12 @@ public class UserTests {
 
         MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(TestUtility.convertObjectToJsonString(request)))
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().isCreated())
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        UserDto actual = TestUtility.toObject(jsonResponse, UserDto.class);
+        UserDto actual = UtilityTestMethods.toObject(jsonResponse, UserDto.class);
 
         assertEquals(expected.getNickname(), actual.getNickname());
         assertEquals(expected.getUserId(), actual.getUserId());
@@ -69,12 +69,12 @@ public class UserTests {
 
         MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(TestUtility.convertObjectToJsonString(request)))
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().isCreated())
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        UserDto actual = TestUtility.toObject(jsonResponse, UserDto.class);
+        UserDto actual = UtilityTestMethods.toObject(jsonResponse, UserDto.class);
 
         assertEquals(expected.getNickname(), actual.getNickname());
     }
@@ -87,12 +87,12 @@ public class UserTests {
 
         MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(TestUtility.convertObjectToJsonString(request)))
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = TestUtility.toObject(jsonResponse, ApiErrorResponse.class);
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
 
         assertEquals(ERROR.getResponse(), actual);
     }
@@ -106,12 +106,12 @@ public class UserTests {
 
         MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(TestUtility.convertObjectToJsonString(request)))
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = TestUtility.toObject(jsonResponse, ApiErrorResponse.class);
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
 
         assertEquals(ERROR.getResponse(), actual);
     }
@@ -125,12 +125,12 @@ public class UserTests {
 
         MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(TestUtility.convertObjectToJsonString(request)))
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = TestUtility.toObject(jsonResponse, ApiErrorResponse.class);
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
 
         assertEquals(ERROR.getResponse(), actual);
     }
@@ -144,12 +144,12 @@ public class UserTests {
 
         MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(TestUtility.convertObjectToJsonString(request)))
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = TestUtility.toObject(jsonResponse, ApiErrorResponse.class);
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
 
         assertEquals(ERROR.getResponse(), actual);
     }
@@ -170,16 +170,16 @@ public class UserTests {
 
         this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(TestUtility.convertObjectToJsonString(createRequest)));
+                .content(UtilityTestMethods.convertObjectToJsonString(createRequest)));
 
         MvcResult result = this.mockMvc.perform(delete(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(TestUtility.convertObjectToJsonString(deleteRequest)))
+                .content(UtilityTestMethods.convertObjectToJsonString(deleteRequest)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        UserDto actual = TestUtility.toObject(jsonResponse, UserDto.class);
+        UserDto actual = UtilityTestMethods.toObject(jsonResponse, UserDto.class);
 
         assertEquals(expected.getNickname(), actual.getNickname());
     }
@@ -193,12 +193,12 @@ public class UserTests {
 
         MvcResult result = this.mockMvc.perform(delete(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(TestUtility.convertObjectToJsonString(request)))
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andExpect(status().isNotFound())
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = TestUtility.toObject(jsonResponse, ApiErrorResponse.class);
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
 
         assertEquals(ERROR.getResponse(), actual);
     }
