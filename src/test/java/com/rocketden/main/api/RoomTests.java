@@ -42,8 +42,8 @@ public class RoomTests {
     private MockMvc mockMvc;
 
     private static final String GET_ROOM = "/api/v1/rooms/%s";
-    private static final String PUT_ROOM_JOIN = "/api/v1/rooms/%s/join";
-    private static final String POST_ROOM_CREATE = "/api/v1/rooms/create";
+    private static final String PUT_ROOM_JOIN = "/api/v1/rooms/%s/users";
+    private static final String POST_ROOM_CREATE = "/api/v1/rooms";
     private static final String PUT_ROOM_HOST = "/api/v1/rooms/%s/host";
     private static final String PUT_ROOM_SETTINGS = "/api/v1/rooms/%s/settings";
 

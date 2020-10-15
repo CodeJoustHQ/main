@@ -32,12 +32,12 @@ public class RoomController extends BaseRestController {
         return new ResponseEntity<>(service.getRoom(roomId), HttpStatus.OK);
     }
 
-    @PutMapping("/rooms/{roomId}/join")
+    @PutMapping("/rooms/{roomId}/users")
     public ResponseEntity<RoomDto> joinRoom(@PathVariable String roomId,@RequestBody JoinRoomRequest request) {
         return new ResponseEntity<>(service.joinRoom(roomId, request), HttpStatus.OK);
     }
 
-    @PostMapping("/rooms/create")
+    @PostMapping("/rooms")
     public ResponseEntity<RoomDto> createRoom(@RequestBody CreateRoomRequest request) {
         return new ResponseEntity<>(service.createRoom(request), HttpStatus.CREATED);
     }

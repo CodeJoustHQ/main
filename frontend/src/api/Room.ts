@@ -23,8 +23,8 @@ export type ChangeHostParams = {
 
 const basePath = '/api/v1/rooms';
 const routes = {
-  createRoom: `${basePath}/create`,
-  joinRoom: (roomId: string) => `${basePath}/${roomId}/join`,
+  createRoom: `${basePath}`,
+  joinRoom: (roomId: string) => `${basePath}/${roomId}/users`,
   getRoom: (roomId: string) => `${basePath}/${roomId}`,
   changeRoomHost: (roomId: string) => `${basePath}/${roomId}/host`,
 };

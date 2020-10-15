@@ -75,8 +75,7 @@ public class RoomSocketTests {
 
         // Create room first
         HttpEntity<CreateRoomRequest> createEntity = new HttpEntity<>(createRequest);
-        String createRoomEndpoint = String.format("%s/create", baseRestEndpoint);
-        RoomDto response = template.postForObject(createRoomEndpoint, createEntity, RoomDto.class);
+        RoomDto response = template.postForObject(baseRestEndpoint, createEntity, RoomDto.class);
 
         assertNotNull(response);
         room = response;
@@ -113,7 +112,7 @@ public class RoomSocketTests {
         joinRequest.setUser(newUser);
 
         HttpEntity<JoinRoomRequest> joinEntity = new HttpEntity<>(joinRequest);
-        String joinRoomEndpoint = String.format("%s/%s/join", baseRestEndpoint, room.getRoomId());
+        String joinRoomEndpoint = String.format("%s/%s/users", baseRestEndpoint, room.getRoomId());
         RoomDto expected = template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
 
         // Verify the socket message we received is as we'd expect
@@ -134,7 +133,7 @@ public class RoomSocketTests {
         joinRequest.setUser(newUser);
 
         HttpEntity<JoinRoomRequest> joinEntity = new HttpEntity<>(joinRequest);
-        String joinRoomEndpoint = String.format("%s/%s/join", baseRestEndpoint, room.getRoomId());
+        String joinRoomEndpoint = String.format("%s/%s/users", baseRestEndpoint, room.getRoomId());
         RoomDto expected = template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
 
         // Socket message is sent and is as expected
