@@ -124,7 +124,7 @@ public class RoomTests {
 
         assertEquals(expected.getHost(), actual.getHost());
         assertEquals(expected.getUsers(), actual.getUsers());
-        assertNull(actual.getDifficulty());
+        assertEquals(ProblemDifficulty.RANDOM, actual.getDifficulty());
 
         // Send GET request to validate that room exists
         String roomId = actual.getRoomId();
@@ -141,7 +141,7 @@ public class RoomTests {
         assertEquals(expected.getRoomId(), actualGet.getRoomId());
         assertEquals(expected.getHost(), actualGet.getHost());
         assertEquals(expected.getUsers(), actualGet.getUsers());
-        assertNull(actual.getDifficulty());
+        assertEquals(ProblemDifficulty.RANDOM, actual.getDifficulty());
     }
 
     @Test
@@ -469,6 +469,7 @@ public class RoomTests {
         host.setUserId("012345");
 
         RoomDto room = setUpRoomWithOneUser(host);
+        assertEquals(ProblemDifficulty.RANDOM, room.getDifficulty());
 
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(host);
@@ -517,7 +518,8 @@ public class RoomTests {
         String jsonResponse = result.getResponse().getContentAsString();
         room = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
-        assertNull(room.getDifficulty());
+        // Difficulty remains unchanged from default
+        assertEquals(ProblemDifficulty.RANDOM, room.getDifficulty());
     }
 
     @Test
