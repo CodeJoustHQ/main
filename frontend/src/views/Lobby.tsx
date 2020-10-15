@@ -220,7 +220,7 @@ function LobbyPage() {
     if (isActive) {
       history.push('/game');
     }
-  }, [socketConnected, connectUserToRoom, currentRoomId, currentUser]);
+  }, [socketConnected, connectUserToRoom, currentRoomId, currentUser, history, isActive]);
 
   // Render the lobby.
   return (
