@@ -80,9 +80,9 @@ function JoinGamePage() {
    */
   const redirectToLobby = (nickname: string) => new Promise<undefined>((_, reject) => {
     const user: User = { nickname };
-    const roomParams = { roomId, user };
+    const roomParams = { user };
 
-    joinRoom(roomParams)
+    joinRoom(roomId, roomParams)
       .then(() => {
         history.push(`/game/lobby?room=${roomId}`, { user, roomId });
       }).catch((err) => reject(err));
