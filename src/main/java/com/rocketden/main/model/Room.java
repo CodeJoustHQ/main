@@ -48,7 +48,7 @@ public class Room {
     private List<User> users = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    private ProblemDifficulty difficulty;
+    private ProblemDifficulty difficulty = ProblemDifficulty.RANDOM;
 
     public void addUser(User user) {
         users.add(user);

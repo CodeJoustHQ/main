@@ -28,6 +28,15 @@ export const PrimaryButton = styled(DefaultButton)<any>`
   height: ${({ height }) => height || '8vw'};
   min-width: 280px;
   min-height: 70px;
+
+  &:disabled {
+    background-color: ${({ theme }) => theme.colors.gray};
+
+    &:hover {
+      cursor: default;
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
+    }
+  }
 `;
 
 export const TextButton = styled.button<ThemeType>`
@@ -39,5 +48,25 @@ export const TextButton = styled.button<ThemeType>`
   
   &:focus {
     outline: none;
+  }
+`;
+
+type DifficultyProps = {
+  active: boolean,
+  enabled: boolean,
+}
+
+export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`  
+  color: ${({ theme, active }) => (active ? theme.colors.white : theme.colors.font)};
+  background-color: ${({ theme, active }) => (active ? theme.colors.blue : theme.colors.white)};
+  padding: 8px 16px;
+  
+  &:hover {
+    ${({ theme, enabled }) => enabled && `
+      color: ${theme.colors.white};
+      background-color: ${theme.colors.blue};
+    `};
+    
+    cursor: ${({ enabled }) => (enabled ? 'pointer' : 'default')};
   }
 `;

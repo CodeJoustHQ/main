@@ -3,6 +3,7 @@ package com.rocketden.main.mapper;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.user.UserMapper;
+import com.rocketden.main.model.ProblemDifficulty;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 
@@ -28,6 +29,7 @@ public class RoomMapperTests {
 
         Room room = new Room();
         room.setRoomId("012345");
+        room.setDifficulty(ProblemDifficulty.MEDIUM);
         room.setHost(host);
 
         room.addUser(host);
