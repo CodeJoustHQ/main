@@ -118,6 +118,33 @@ function LobbyPage() {
   };
 
   /**
+   * Display the passed-in list of users on the UI, either as
+   * active or inactive.
+   */
+  const displayUsers = (userList: User[] | null, active: boolean) => {
+    if (userList) {
+      return userList.map((user) => (
+        <PlayerCard
+          user={user}
+          isHost={user.nickname === host?.nickname}
+          isActive={active}
+        >
+          {currentUser?.nickname === host?.nickname
+            && (user.nickname !== currentUser?.nickname) ? (
+              // If currentUser is host, pass in an on-click action card for all other users
+              <HostActionCard
+                user={user}
+                onMakeHost={changeHosts}
+                onDeleteUser={deleteUser}
+              />
+            ) : null}
+        </PlayerCard>
+      ));
+    }
+    return null;
+  };
+
+  /**
    * Add the user to the lobby through the following steps.
    * 1. Connect the user to the socket.
    * 2. Subscribe the user to future messages.
@@ -206,42 +233,10 @@ function LobbyPage() {
 
       <div>
         {
-          activeUsers?.map((user) => (
-            <PlayerCard
-              user={user}
-              isHost={user.nickname === host?.nickname}
-              isActive
-            >
-              {currentUser?.nickname === host?.nickname
-              && (user.nickname !== currentUser?.nickname) ? (
-                // If currentUser is host, pass in an on-click action card for all other users
-                <HostActionCard
-                  user={user}
-                  onMakeHost={changeHosts}
-                  onDeleteUser={deleteUser}
-                />
-              ) : null}
-            </PlayerCard>
-          ))
+          displayUsers(activeUsers, true)
         }
         {
-          inactiveUsers?.map((user) => (
-            <PlayerCard
-              user={user}
-              isHost={user.nickname === host?.nickname}
-              isActive={false}
-            >
-              {currentUser?.nickname === host?.nickname
-              && (user.nickname !== currentUser?.nickname) ? (
-                // If currentUser is host, pass in an on-click action card for all other users
-                <HostActionCard
-                  user={user}
-                  onMakeHost={changeHosts}
-                  onDeleteUser={deleteUser}
-                />
-              ) : null}
-            </PlayerCard>
-          ))
+          displayUsers(inactiveUsers, false)
         }
       </div>
 
