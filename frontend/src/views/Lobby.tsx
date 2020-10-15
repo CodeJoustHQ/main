@@ -4,14 +4,17 @@ import { Message } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
 import { LargeText, MediumText } from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
-import { getRoom, Room, changeRoomHost } from '../api/Room';
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
+import Difficulty from '../api/Difficulty';
+import { PrimaryButton, DifficultyButton } from '../components/core/Button';
+import Loading from '../components/core/Loading';
 import PlayerCard from '../components/card/PlayerCard';
 import HostActionCard from '../components/card/HostActionCard';
-import Loading from '../components/core/Loading';
-import { PrimaryButton } from '../components/core/Button';
 import { startGame } from '../api/Game';
+import {
+  getRoom, Room, changeRoomHost, updateRoomSettings,
+} from '../api/Room';
 
 type LobbyPageLocation = {
   user: User,
@@ -30,10 +33,10 @@ function LobbyPage() {
   const [host, setHost] = useState<User | null>(null);
   const [users, setUsers] = useState<User[] | null>(null);
   const [currentRoomId, setRoomId] = useState('');
+  const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
 
   // Hold error text.
   const [error, setError] = useState('');
-
   const [loading, setLoading] = useState(false);
 
   // Variable to hold whether the user is connected to the socket.
@@ -46,6 +49,7 @@ function LobbyPage() {
     setHost(room.host);
     setUsers(room.users);
     setRoomId(room.roomId);
+    setDifficulty(room.difficulty);
   };
 
   const deleteUser = (user: User) => {
@@ -79,6 +83,34 @@ function LobbyPage() {
       .catch((err) => {
         setError(err.message);
       });
+  };
+
+  /**
+   * Update the difficulty setting of the room (EASY, MEDIUM, HARD, or RANDOM)
+   */
+  const updateDifficultySetting = (key: string) => {
+    if (currentUser?.nickname === host?.nickname && !loading) {
+      const oldDifficulty = difficulty;
+      const newDifficulty = Difficulty[key as keyof typeof Difficulty];
+
+      setLoading(true);
+      // Preemptively set new difficulty value
+      setDifficulty(newDifficulty);
+
+      const newSettings = {
+        initiator: currentUser!,
+        difficulty: newDifficulty,
+      };
+
+      updateRoomSettings(currentRoomId, newSettings)
+        .then(() => setLoading(false))
+        .catch((err) => {
+          setLoading(false);
+          setError(err.message);
+          // Set difficulty back to original if REST call failed
+          setDifficulty(oldDifficulty);
+        });
+    }
   };
 
   /**
@@ -162,6 +194,7 @@ function LobbyPage() {
 
       <div>
         {
+          // Show list of users in the room
           users?.map((user) => (
             <PlayerCard
               user={user}
@@ -180,8 +213,23 @@ function LobbyPage() {
           ))
         }
       </div>
+
+      <MediumText>Difficulty Settings</MediumText>
+      {Object.keys(Difficulty).map((key) => (
+        <DifficultyButton
+          onClick={() => updateDifficultySetting(key)}
+          active={difficulty === Difficulty[key as keyof typeof Difficulty]}
+          enabled={currentUser?.nickname === host?.nickname}
+          title={currentUser?.nickname !== host?.nickname
+            ? 'Only the host can change these settings' : undefined}
+        >
+          {key}
+        </DifficultyButton>
+      ))}
+      <br />
+
       {currentUser?.nickname === host?.nickname
-        ? <PrimaryButton onClick={handleStartGame}> Start Game </PrimaryButton>
+        ? <PrimaryButton onClick={handleStartGame} disabled={loading}>Start Game</PrimaryButton>
         : <MediumText>Waiting for the host to start the game...</MediumText>}
     </div>
   );
