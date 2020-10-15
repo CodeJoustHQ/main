@@ -38,6 +38,7 @@ import java.util.concurrent.BlockingQueue;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
@@ -195,6 +196,18 @@ public class RoomSocketTests {
 
     @Test
     public void socketRecievesMessageOnDisconnection() throws Exception {
-        assertNotNull(new String(""));
+        UserDto user = room.getHost();
+
+        // Session ID has not been set yet
+        assertNull(user.getSessionId());
+
+        // Wait 3 seconds for connection to finish
+        blockingQueue.poll(3, SECONDS);
+
+        // Get the actual room to check if the sessionId has been saved
+        RoomDto actual = template.getForObject(String.format("%s/%s", baseRestEndpoint, room.getRoomId()), RoomDto.class);
+
+        assertNotNull(actual.getHost().getSessionId());
+
     }
 }
