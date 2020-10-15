@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class BaseRestController {
 
     /**
-     * Protected empty constructor to allow visability from extended classes,
+     * Protected empty constructor to allow visibility from extended classes,
      * but also remove warning on Utility class having no constructor to hide
      * the implicit public one.
      */

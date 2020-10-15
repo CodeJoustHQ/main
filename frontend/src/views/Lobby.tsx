@@ -34,6 +34,7 @@ function LobbyPage() {
   const [activeUsers, setActiveUsers] = useState<User[] | null>(null);
   const [inactiveUsers, setInactiveUsers] = useState<User[] | null>(null);
   const [currentRoomId, setRoomId] = useState('');
+  const [isActive, setIsActive] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
 
   // Hold error text.
@@ -53,6 +54,7 @@ function LobbyPage() {
     setActiveUsers(room.activeUsers);
     setInactiveUsers(room.inactiveUsers);
     setRoomId(room.roomId);
+    setIsActive(room.isActive);
     setDifficulty(room.difficulty);
   };
 
@@ -214,6 +216,9 @@ function LobbyPage() {
   useEffect(() => {
     if (!socketConnected && currentRoomId && currentUser && currentUser.userId) {
       connectUserToRoom(currentRoomId, currentUser.userId);
+    }
+    if (isActive) {
+      history.push('/game');
     }
   }, [socketConnected, connectUserToRoom, currentRoomId, currentUser]);
 

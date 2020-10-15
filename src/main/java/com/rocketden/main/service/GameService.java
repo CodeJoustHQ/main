@@ -39,6 +39,8 @@ public class GameService {
 		if (!request.getInitiator().getNickname().equals(room.getHost().getNickname())) {
 			throw new ApiException(RoomError.INVALID_PERMISSIONS);
 		}
+		room.setIsActive(true);
+		repository.save(room);
 
 		RoomDto roomDto = RoomMapper.toDto(room);
 

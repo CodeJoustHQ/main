@@ -9,6 +9,7 @@ export type Room = {
   users: [User],
   activeUsers: [User],
   inactiveUsers: [User],
+  isActive: boolean;
   difficulty: Difficulty,
 };
 
