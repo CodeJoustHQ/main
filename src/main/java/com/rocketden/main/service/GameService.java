@@ -6,7 +6,6 @@ import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.exception.RoomError;
-import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Room;
 import org.springframework.beans.factory.annotation.Autowired;

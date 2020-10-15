@@ -3,7 +3,6 @@ package com.rocketden.main.service;
 import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
-import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
@@ -38,8 +37,8 @@ public class RoomService {
         this.template = template;
     }
 
-    public RoomDto joinRoom(JoinRoomRequest request) {
-        Room room = repository.findRoomByRoomId(request.getRoomId());
+    public RoomDto joinRoom(String roomId, JoinRoomRequest request) {
+        Room room = repository.findRoomByRoomId(roomId);
 
         // Return error if room could not be found
         if (room == null) {
@@ -88,8 +87,8 @@ public class RoomService {
         return RoomMapper.toDto(room);
     }
 
-    public RoomDto getRoom(GetRoomRequest request) {
-        Room room = repository.findRoomByRoomId(request.getRoomId());
+    public RoomDto getRoom(String roomId) {
+        Room room = repository.findRoomByRoomId(roomId);
 
         // Throw an error if room could not be found
         if (room == null) {

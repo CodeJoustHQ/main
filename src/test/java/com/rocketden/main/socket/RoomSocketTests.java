@@ -109,11 +109,11 @@ public class RoomSocketTests {
         UserDto newUser = new UserDto();
         newUser.setNickname("test");
         JoinRoomRequest joinRequest = new JoinRoomRequest();
-        joinRequest.setRoomId(room.getRoomId());
         joinRequest.setUser(newUser);
 
         HttpEntity<JoinRoomRequest> joinEntity = new HttpEntity<>(joinRequest);
-        RoomDto expected = template.exchange(baseRestEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
+        String joinRoomEndpoint = String.format("%s/%s/users", baseRestEndpoint, room.getRoomId());
+        RoomDto expected = template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
 
         // Verify the socket message we received is as we'd expect
         RoomDto actual = blockingQueue.poll(3, SECONDS);
@@ -130,11 +130,11 @@ public class RoomSocketTests {
         UserDto newUser = new UserDto();
         newUser.setNickname("test");
         JoinRoomRequest joinRequest = new JoinRoomRequest();
-        joinRequest.setRoomId(room.getRoomId());
         joinRequest.setUser(newUser);
 
         HttpEntity<JoinRoomRequest> joinEntity = new HttpEntity<>(joinRequest);
-        RoomDto expected = template.exchange(baseRestEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
+        String joinRoomEndpoint = String.format("%s/%s/users", baseRestEndpoint, room.getRoomId());
+        RoomDto expected = template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
 
         // Socket message is sent and is as expected
         RoomDto actual = blockingQueue.poll(3, SECONDS);

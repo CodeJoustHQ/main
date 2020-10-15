@@ -2,7 +2,6 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
-import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
@@ -10,7 +9,6 @@ import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
-import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
@@ -76,7 +74,6 @@ public class RoomServiceTests {
         user.setNickname("rocket");
         JoinRoomRequest request = new JoinRoomRequest();
         request.setUser(UserMapper.toDto(user));
-        request.setRoomId(roomId);
 
         Room room = new Room();
         room.setRoomId(roomId);
@@ -89,7 +86,7 @@ public class RoomServiceTests {
 
         // Mock repository to return room when called
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
-        RoomDto response = service.joinRoom(request);
+        RoomDto response = service.joinRoom(roomId, request);
 
         assertEquals(roomId, response.getRoomId());
         assertEquals(2, response.getUsers().size());
@@ -110,13 +107,12 @@ public class RoomServiceTests {
         user.setNickname("rocket");
         JoinRoomRequest request = new JoinRoomRequest();
         request.setUser(UserMapper.toDto(user));
-        request.setRoomId(roomId);
 
         // Mock repository to return room when called
         Mockito.doReturn(null).when(repository).findRoomByRoomId(eq(roomId));
 
         // Assert that service.joinRoom(request) throws the correct exception
-        ApiException exception = assertThrows(ApiException.class, () -> service.joinRoom(request));
+        ApiException exception = assertThrows(ApiException.class, () -> service.joinRoom(roomId, request));
 
         verify(repository).findRoomByRoomId(roomId);
         assertEquals(RoomError.NOT_FOUND, exception.getError());
@@ -135,7 +131,6 @@ public class RoomServiceTests {
 
         JoinRoomRequest request = new JoinRoomRequest();
         request.setUser(newUser);
-        request.setRoomId(roomId);
 
         Room room = new Room();
         room.setRoomId(roomId);
@@ -144,7 +139,7 @@ public class RoomServiceTests {
 
         // Mock repository to return room when called
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
-        ApiException exception = assertThrows(ApiException.class, () -> service.joinRoom(request));
+        ApiException exception = assertThrows(ApiException.class, () -> service.joinRoom(roomId, request));
 
         verify(repository).findRoomByRoomId(roomId);
         assertEquals(RoomError.USER_ALREADY_PRESENT, exception.getError());
@@ -162,11 +157,8 @@ public class RoomServiceTests {
         room.setHost(host);
         room.addUser(host);
 
-        GetRoomRequest request = new GetRoomRequest();
-        request.setRoomId(roomId);
-
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
-        RoomDto response = service.getRoom(request);
+        RoomDto response = service.getRoom(roomId);
 
         assertEquals(roomId, response.getRoomId());
         assertEquals(room.getHost(), UserMapper.toEntity(response.getHost()));
@@ -178,10 +170,7 @@ public class RoomServiceTests {
 
     @Test
     public void getRoomFailure() {
-        GetRoomRequest request = new GetRoomRequest();
-        request.setRoomId("987654");
-
-        ApiException exception = assertThrows(ApiException.class, () -> service.getRoom(request));
+        ApiException exception = assertThrows(ApiException.class, () -> service.getRoom("987654"));
 
         assertEquals(RoomError.NOT_FOUND, exception.getError());
     }
