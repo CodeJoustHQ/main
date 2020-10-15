@@ -17,14 +17,14 @@ public class GameService {
 
 	private static final String START_GAME_SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/start-game";
 
-	private final RoomRepository repository;
-	private final SimpMessagingTemplate template;
+    private final RoomRepository repository;
+    private final SimpMessagingTemplate template;
 
-	@Autowired
-	public GameService(RoomRepository repository, SimpMessagingTemplate template) {
-		this.repository = repository;
-		this.template = template;
-	}
+    @Autowired
+    public GameService(RoomRepository repository, SimpMessagingTemplate template) {
+        this.repository = repository;
+        this.template = template;
+    }
 
 	// Send request to redirect users to game when host clicks start
 	public RoomDto startGame(String roomId, StartGameRequest request) {

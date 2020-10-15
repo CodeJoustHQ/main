@@ -3,11 +3,15 @@ import styled from 'styled-components';
 import { UserNicknameText } from '../core/Text';
 import { User } from '../../api/User';
 
-const Content = styled.div`
+type ContentProps = {
+  isActive: boolean,
+};
+
+const Content = styled.div<ContentProps>`
   display: inline-block;
   position: relative;
   padding: 10px;
-  background-color: ${({ theme }) => theme.colors.lightBlue};
+  background-color: ${({ theme, isActive }) => (isActive ? theme.colors.lightBlue : theme.colors.lightGray)};
   background-clip: padding-box;
   
   // Invisible border to make hover effect last longer
@@ -21,12 +25,15 @@ const Content = styled.div`
 
 type PlayerCardProps = {
   user: User,
+  isActive: boolean,
   isHost: boolean,
   children: React.ReactNode,
 };
 
 function PlayerCard(props: PlayerCardProps) {
-  const { user, isHost, children: actionCard } = props;
+  const {
+    user, isActive, isHost, children: actionCard,
+  } = props;
 
   const [showActionCard, setShowActionCard] = useState(false);
 
@@ -34,6 +41,7 @@ function PlayerCard(props: PlayerCardProps) {
     <Content
       onMouseEnter={() => setShowActionCard(true)}
       onMouseLeave={() => setShowActionCard(false)}
+      isActive={isActive}
     >
       <UserNicknameText>
         {user.nickname}

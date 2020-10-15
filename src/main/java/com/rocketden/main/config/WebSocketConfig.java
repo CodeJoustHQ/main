@@ -12,6 +12,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    public static final String SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user";
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         // Sets the base URL for message subscription and sending, respectively.
@@ -21,8 +23,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // This should be replaced with the actual room name.
-        // See https://stackoverflow.com/questions/32843788/websocket-dynamically-add-and-remove-endpoints.
         registry.addEndpoint(BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint").withSockJS();
     }
 }

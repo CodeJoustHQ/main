@@ -8,12 +8,12 @@ export const ErrorText = styled(Text)`
    color: ${({ theme }) => theme.colors.red};
 `;
 
-export const LargeText = styled.h3`
-  font-size: ${({ theme }) => theme.fontSize.xLarge};
+export const MediumText = styled.h5`
+  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
 `;
 
-export const MediumText = styled.p`
-  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+export const LargeText = styled.h3`
+  font-size: ${({ theme }) => theme.fontSize.xLarge};
 `;
 
 export const LandingHeaderText = styled.h1`

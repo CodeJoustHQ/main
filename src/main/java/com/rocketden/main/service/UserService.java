@@ -8,6 +8,7 @@ import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.User;
+import com.rocketden.main.util.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,10 +18,15 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository repository;
+    private final Utility utility;
+    
+    // The length of the user ID.
+    public static final int USER_ID_LENGTH = 6;
 
     @Autowired
-    public UserService(UserRepository repository) {
+    public UserService(UserRepository repository, Utility utility) {
         this.repository = repository;
+        this.utility = utility;
     }
 
     public UserDto createUser(CreateUserRequest request) {
@@ -33,13 +39,21 @@ public class UserService {
         
         User user = new User();
         user.setNickname(nickname);
+
+        // If no user ID is present set a new automatically-generated user ID.
+        if (request.getUserId() == null) {
+            user.setUserId(utility.generateId(UserService.USER_ID_LENGTH));
+        } else {
+            user.setUserId(request.getUserId());
+        }
+        
         repository.save(user);
 
         return UserMapper.toDto(user);
     }
 
     public UserDto deleteUser(DeleteUserRequest request) {
-        User user = repository.findUserByNickname(request.getNickname());
+        User user = repository.findUserByUserId(request.getUserId());
 
         // If requested user does not exist in database, throw an exception. 
         if (user == null) {

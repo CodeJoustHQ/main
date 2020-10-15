@@ -11,6 +11,7 @@ export const ThemeConfig: any = {
     darkBlue: '#2E7DB2',
     red: 'red',
     gray: 'gray',
+    lightGray: 'lightgray',
     white: 'white',
   },
   font: 'Roboto',

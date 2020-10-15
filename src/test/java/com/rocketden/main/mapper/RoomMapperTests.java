@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,7 @@ public class RoomMapperTests {
         host.setNickname("rocket");
         User user = new User();
         user.setNickname("test");
+        user.setSessionId("678910");
 
         Room room = new Room();
         room.setRoomId("012345");
@@ -50,6 +52,24 @@ public class RoomMapperTests {
                 .map(UserMapper::toEntity)
                 .collect(Collectors.toList());
         assertEquals(room.getUsers(), actualUsers);
+
+        // Map set of UserDtos on inactive users to a set of Users
+        List<User> expectedInactiveUsers = new ArrayList<>();
+        expectedInactiveUsers.add(host);
+        List<User> actualInactiveUsers = response.getInactiveUsers()
+                .stream()
+                .map(UserMapper::toEntity)
+                .collect(Collectors.toList());
+        assertEquals(expectedInactiveUsers, actualInactiveUsers);
+
+        // Map set of UserDtos on active users to a set of Users
+        List<User> expectedActiveUsers = new ArrayList<>();
+        expectedActiveUsers.add(user);
+        List<User> actualActiveUsers = response.getActiveUsers()
+                .stream()
+                .map(UserMapper::toEntity)
+                .collect(Collectors.toList());
+        assertEquals(expectedActiveUsers, actualActiveUsers);
     }
 
     @Test

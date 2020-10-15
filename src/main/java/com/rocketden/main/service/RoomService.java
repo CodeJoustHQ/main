@@ -1,6 +1,5 @@
 package com.rocketden.main.service;
 
-import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
@@ -14,27 +13,25 @@ import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
+import com.rocketden.main.util.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-
-import java.util.Random;
 
 @Service
 public class RoomService {
 
     public static final int ROOM_ID_LENGTH = 6;
-    private static final Random random = new Random();
-    private static final String SUBSCRIBE_USER_SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user";
 
     private final RoomRepository repository;
-    private final SimpMessagingTemplate template;
+    private final SocketService socketService;
+    private final Utility utility;
 
     @Autowired
-    public RoomService(RoomRepository repository, SimpMessagingTemplate template) {
+    public RoomService(RoomRepository repository, SocketService socketService, Utility utility) {
         this.repository = repository;
-        this.template = template;
+        this.socketService = socketService;
+        this.utility = utility;
     }
 
     public RoomDto joinRoom(String roomId, JoinRoomRequest request) {
@@ -53,9 +50,14 @@ public class RoomService {
             throw new ApiException(UserError.INVALID_USER);
         }
 
-        // Return error if user is already in the room
-        if (room.getUsers().contains(user)) {
-            throw new ApiException(RoomError.USER_ALREADY_PRESENT);
+        // Return error if a user with the same nickname is in the room.
+        if (room.containsUserWithNickname(user.getNickname())) {
+            throw new ApiException(RoomError.DUPLICATE_USERNAME);
+        }
+
+        // Add userId if not already present.
+        if (user.getUserId() == null) {
+            user.setUserId(utility.generateId(UserService.USER_ID_LENGTH));
         }
 
         // Add the user to the room.
@@ -63,7 +65,7 @@ public class RoomService {
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
-        sendSocketUpdate(roomDto);
+        socketService.sendSocketUpdate(roomDto);
         return roomDto;
     }
 
@@ -78,8 +80,13 @@ public class RoomService {
             throw new ApiException(UserError.INVALID_USER);
         }
 
+        // Create user ID for the host if not already present.
+        if (host.getUserId() == null) {
+            host.setUserId(utility.generateId(UserService.USER_ID_LENGTH));
+        }
+
         Room room = new Room();
-        room.setRoomId(generateRoomId());
+        room.setRoomId(utility.generateId(ROOM_ID_LENGTH));
         room.setHost(host);
         room.addUser(host);
         repository.save(room);
@@ -126,7 +133,7 @@ public class RoomService {
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
-        sendSocketUpdate(roomDto);
+        socketService.sendSocketUpdate(roomDto);
         return roomDto;
     }
 
@@ -151,26 +158,7 @@ public class RoomService {
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
-        sendSocketUpdate(roomDto);
+        socketService.sendSocketUpdate(roomDto);
         return roomDto;
-    }
-
-    // Send updates about new users to the client through sockets
-    public void sendSocketUpdate(RoomDto roomDto) {
-        String socketPath = String.format(SUBSCRIBE_USER_SOCKET_PATH, roomDto.getRoomId());
-        template.convertAndSend(socketPath, roomDto);
-    }
-
-    // Generate numeric String with length ROOM_ID_LENGTH
-    protected String generateRoomId() {
-        String numbers = "1234567890";
-        char[] values = new char[ROOM_ID_LENGTH];
-
-        for (int i = 0; i < values.length; i++) {
-            int index = random.nextInt(numbers.length());
-            values[i] = numbers.charAt(index);
-        }
-
-        return new String(values);
     }
 }

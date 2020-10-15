@@ -31,12 +31,15 @@ function LobbyPage() {
 
   // Set all the different variables in the room object
   const [host, setHost] = useState<User | null>(null);
-  const [users, setUsers] = useState<User[] | null>(null);
+  const [activeUsers, setActiveUsers] = useState<User[] | null>(null);
+  const [inactiveUsers, setInactiveUsers] = useState<User[] | null>(null);
   const [currentRoomId, setRoomId] = useState('');
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
 
   // Hold error text.
   const [error, setError] = useState('');
+
+  // Hold loading boolean.
   const [loading, setLoading] = useState(false);
 
   // Variable to hold whether the user is connected to the socket.
@@ -47,7 +50,8 @@ function LobbyPage() {
    */
   const setStateFromRoom = (room: Room) => {
     setHost(room.host);
-    setUsers(room.users);
+    setActiveUsers(room.activeUsers);
+    setInactiveUsers(room.inactiveUsers);
     setRoomId(room.roomId);
     setDifficulty(room.difficulty);
   };
@@ -114,6 +118,33 @@ function LobbyPage() {
   };
 
   /**
+   * Display the passed-in list of users on the UI, either as
+   * active or inactive.
+   */
+  const displayUsers = (userList: User[] | null, active: boolean) => {
+    if (userList) {
+      return userList.map((user) => (
+        <PlayerCard
+          user={user}
+          isHost={user.nickname === host?.nickname}
+          isActive={active}
+        >
+          {currentUser?.nickname === host?.nickname
+            && (user.nickname !== currentUser?.nickname) ? (
+              // If currentUser is host, pass in an on-click action card for all other users
+              <HostActionCard
+                user={user}
+                onMakeHost={changeHosts}
+                onDeleteUser={deleteUser}
+              />
+            ) : null}
+        </PlayerCard>
+      ));
+    }
+    return null;
+  };
+
+  /**
    * Add the user to the lobby through the following steps.
    * 1. Connect the user to the socket.
    * 2. Subscribe the user to future messages.
@@ -121,7 +152,7 @@ function LobbyPage() {
    * This method uses useCallback so it is not re-built in
    * the useEffect function.
    */
-  const connectUserToRoom = useCallback((roomId: string) => {
+  const connectUserToRoom = useCallback((roomId: string, userId: string) => {
     /**
      * Subscribe callback that will be triggered on every message.
      * Update the users list and other room info.
@@ -134,7 +165,7 @@ function LobbyPage() {
       history.push('/game');
     };
 
-    connect(roomId).then(() => {
+    connect(roomId, userId).then(() => {
       subscribe(routes(roomId).subscribe, subscribeCallback).then(() => {
         setSocketConnected(true);
       }).catch((err) => {
@@ -154,11 +185,17 @@ function LobbyPage() {
   useEffect(() => {
     // Grab the user and room information; otherwise, redirect to the join page
     if (checkLocationState(location, 'user', 'roomId')) {
-      setCurrentUser(location.state.user);
-
       // Call GET endpoint to get latest room info
       getRoom(location.state.roomId)
-        .then((res) => setStateFromRoom(res))
+        .then((res) => {
+          setStateFromRoom(res);
+          // Reset the user to hold the ID.
+          res.inactiveUsers.forEach((user: User) => {
+            if (user.nickname === location.state.user.nickname) {
+              setCurrentUser(user);
+            }
+          });
+        })
         .catch((err) => setError(err));
     } else {
       // Get URL query params to determine if the roomId is provided.
@@ -171,12 +208,14 @@ function LobbyPage() {
         history.replace('/game/join');
       }
     }
+  }, [location, socketConnected, history]);
 
-    // Connect the user to the room.
-    if (!socketConnected && currentRoomId && currentUser) {
-      connectUserToRoom(currentRoomId);
+  // Connect the user to the room.
+  useEffect(() => {
+    if (!socketConnected && currentRoomId && currentUser && currentUser.userId) {
+      connectUserToRoom(currentRoomId, currentUser.userId);
     }
-  }, [location, socketConnected, currentRoomId, history, currentUser, connectUserToRoom]);
+  }, [socketConnected, connectUserToRoom, currentRoomId, currentUser]);
 
   // Render the lobby.
   return (
@@ -194,23 +233,10 @@ function LobbyPage() {
 
       <div>
         {
-          // Show list of users in the room
-          users?.map((user) => (
-            <PlayerCard
-              user={user}
-              isHost={user.nickname === host?.nickname}
-            >
-              {currentUser?.nickname === host?.nickname
-              && !(user.nickname === currentUser?.nickname) ? (
-                // If currentUser is host, pass in an on-click action card for all other users
-                <HostActionCard
-                  user={user}
-                  onMakeHost={changeHosts}
-                  onDeleteUser={deleteUser}
-                />
-              ) : null}
-            </PlayerCard>
-          ))
+          displayUsers(activeUsers, true)
+        }
+        {
+          displayUsers(inactiveUsers, false)
         }
       </div>
 

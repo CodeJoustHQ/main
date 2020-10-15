@@ -2,7 +2,7 @@ package com.rocketden.main.util;
 
 import com.google.gson.Gson;
 
-public class Utility {
+public class UtilityTestMethods {
 
     public static String convertObjectToJsonString(Object o) {
         Gson gson = new Gson();
