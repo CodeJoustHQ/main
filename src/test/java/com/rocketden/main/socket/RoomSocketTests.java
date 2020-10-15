@@ -72,6 +72,7 @@ public class RoomSocketTests {
 
         UserDto host = new UserDto();
         host.setNickname("host");
+        host.setUserId("012345");
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
@@ -86,12 +87,12 @@ public class RoomSocketTests {
         // BlockingQueue will hold the responses from the socket subscribe endpoint
         blockingQueue = new ArrayBlockingQueue<>(1);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("userId", "012345");
+        StompHeaders headers = new StompHeaders();
+        headers.add("userId", host.getUserId());
 
         // Connect to the socket endpoint
         StompSession session = stompClient
-                .connect(CONNECT_ENDPOINT, new WebSocketHttpHeaders(headers), new StompSessionHandlerAdapter() {}, this.port)
+                .connect(CONNECT_ENDPOINT, new WebSocketHttpHeaders(), headers, new StompSessionHandlerAdapter() {}, this.port)
                 .get(3, SECONDS);
 
         // Add socket messages to BlockingQueue so we can verify expected behavior
@@ -195,19 +196,14 @@ public class RoomSocketTests {
      */ 
 
     @Test
-    public void socketRecievesMessageOnDisconnection() throws Exception {
-        UserDto user = room.getHost();
-
+    public void socketRecievesMessageOnConnection() throws Exception {
         // Session ID has not been set yet
-        assertNull(user.getSessionId());
+        assertNull(room.getHost().getSessionId());
 
-        // Wait 3 seconds for connection to finish
-        blockingQueue.poll(3, SECONDS);
+        // Get the room to verify that the sessionId has been saved in the database
+        RoomDto actual = template.getForObject(String.format(baseRestEndpoint, room.getRoomId()), RoomDto.class);
 
-        // Get the actual room to check if the sessionId has been saved
-        RoomDto actual = template.getForObject(String.format("%s/%s", baseRestEndpoint, room.getRoomId()), RoomDto.class);
-
+        assertNotNull(actual);
         assertNotNull(actual.getHost().getSessionId());
-
     }
 }
