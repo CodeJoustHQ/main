@@ -1,13 +1,15 @@
 package com.rocketden.main.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import com.rocketden.main.service.RoomService;
 import com.rocketden.main.service.UserService;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+@SpringBootTest
 public class UtilityTests {
 
     private final Utility utility = new Utility();
@@ -37,5 +39,4 @@ public class UtilityTests {
             assertTrue(c <= '9');
         }
     }
-    
 }
