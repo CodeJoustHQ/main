@@ -188,6 +188,11 @@ public class RoomSocketTests {
         assertEquals(updateRequest.getDifficulty(), actual.getDifficulty());
     }
 
+    /**
+     * TODO: We need to add tests to verify that the appropriate socket message
+     * is sent on client connection and disconnection.
+     */ 
+
     @Test
     public void socketRecievesMessageOnDisconnection() throws Exception {
         assertNotNull(new String(""));
