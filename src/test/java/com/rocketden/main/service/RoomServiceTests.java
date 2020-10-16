@@ -219,8 +219,10 @@ public class RoomServiceTests {
 
         User host = new User();
         host.setNickname("host");
+        host.setSessionId("active");
         User user =  new User();
         user.setNickname("user");
+        user.setSessionId("alsoActive");
 
         room.setHost(host);
         room.addUser(host);
@@ -257,6 +259,16 @@ public class RoomServiceTests {
         exception = assertThrows(ApiException.class, () ->
                 roomService.updateRoomHost(room.getRoomId(), noUserRequest));
         assertEquals(UserError.NOT_FOUND, exception.getError());
+
+        // New host inactive
+        UpdateHostRequest inactiveUserRequest = new UpdateHostRequest();
+        user.setSessionId(null);
+        noRoomRequest.setInitiator(UserMapper.toDto(host));
+        noRoomRequest.setNewHost(UserMapper.toDto(user));
+
+        exception = assertThrows(ApiException.class, () ->
+                roomService.updateRoomHost(room.getRoomId(), inactiveUserRequest));
+        assertEquals(RoomError.INACTIVE_USER, exception.getError());
     }
 
     @Test

@@ -456,6 +456,11 @@ public class RoomTests {
     }
 
     @Test
+    public void changeRoomHostInactiveUser() throws Exception {
+
+    }
+
+    @Test
     public void updateRoomSettingsSuccess() throws Exception {
         UserDto host = new UserDto();
         host.setNickname("host");
