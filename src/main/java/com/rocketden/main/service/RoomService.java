@@ -127,8 +127,14 @@ public class RoomService {
             throw new ApiException(UserError.NOT_FOUND);
         }
 
-        // Change the host to the new user
         User newHost = room.getEquivalentUser(proposedNewHost);
+
+        // Return error if the proposed new host is currently inactive
+        if (newHost.getSessionId() == null) {
+            throw new ApiException(RoomError.INACTIVE_USER);
+        }
+
+        // Change the host to the new user
         room.setHost(newHost);
         repository.save(room);
 
