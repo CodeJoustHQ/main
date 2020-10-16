@@ -50,13 +50,13 @@ public class WebSocketConnectionEvents {
         Map<String, LinkedList<String>> customHeaderMap = 
             (Map<String, LinkedList<String>>) genericMessage.getHeaders().get(NATIVE_HEADERS);
 
-        // Retrieve the ID of the user to update.
+        // Retrieve the ID of the user to update. TODO: this can throw a null pointer exception
         String userId = customHeaderMap.get("userId").get(0);
 
         // Get the unique auto-generated session ID for this connection.
         String sessionId = sha.getSessionId();
 
-        // Update the session ID of the relevant user.
+        // Update the session ID of the relevant user. TODO: this can throw a null pointer exception
         User user = userRepository.findUserByUserId(userId);
         user.setSessionId(sessionId);
         userRepository.save(user);

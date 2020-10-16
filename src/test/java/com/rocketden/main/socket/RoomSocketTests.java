@@ -193,7 +193,7 @@ public class RoomSocketTests {
     /**
      * TODO: We need to add tests to verify that the appropriate socket message
      * is sent on client connection and disconnection.
-     */ 
+     */
 
     @Test
     public void socketRecievesMessageOnConnection() throws Exception {
@@ -232,12 +232,56 @@ public class RoomSocketTests {
         StompHeaders headers = new StompHeaders();
         headers.add("userId", user.getUserId());
 
-        stompClient.connect(CONNECT_ENDPOINT, new WebSocketHttpHeaders(), headers, new StompSessionHandlerAdapter() {}, this.port)
+        newStompClient.connect(CONNECT_ENDPOINT, new WebSocketHttpHeaders(), headers, new StompSessionHandlerAdapter() {}, this.port)
                 .get(3, SECONDS);
 
         // After connecting, the new user's sessionId should no longer be null
         actual = blockingQueue.poll(3, SECONDS);
         assertNotNull(actual);
         assertNotNull(actual.getUsers().get(1).getSessionId());
+    }
+
+    @Test
+    public void socketRecievesMessageOnDisconnection() throws Exception {
+        // Have someone join the room
+        UserDto user = new UserDto();
+        user.setNickname("test");
+        JoinRoomRequest joinRequest = new JoinRoomRequest();
+        joinRequest.setUser(user);
+
+        HttpEntity<JoinRoomRequest> joinEntity = new HttpEntity<>(joinRequest);
+        String joinRoomEndpoint = String.format("%s/%s/users", baseRestEndpoint, room.getRoomId());
+        template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
+
+        // Initially, the new user is not connected, so their sessionId should be null
+        RoomDto actual = blockingQueue.poll(3, SECONDS);
+        assertNotNull(actual);
+        user = actual.getUsers().get(1);
+        assertNull(user.getSessionId());
+
+        // The user then connects to the stomp client
+        WebSocketStompClient newStompClient = new WebSocketStompClient(new SockJsClient(
+                List.of(new WebSocketTransport(new StandardWebSocketClient()))));
+        newStompClient.setMessageConverter(new MappingJackson2MessageConverter());
+
+        StompHeaders headers = new StompHeaders();
+        headers.add("userId", user.getUserId());
+
+        StompSession session = newStompClient
+                .connect(CONNECT_ENDPOINT, new WebSocketHttpHeaders(), headers, new StompSessionHandlerAdapter() {}, this.port)
+                .get(3, SECONDS);
+
+        // After connecting, the new user's sessionId should no longer be null
+        actual = blockingQueue.poll(3, SECONDS);
+        assertNotNull(actual);
+        assertNotNull(actual.getUsers().get(1).getSessionId());
+
+        // When the user disconnects, the sessionId should be reset to null
+        session.disconnect();
+
+        actual = blockingQueue.poll(3, SECONDS);
+        assertNotNull(actual);
+        user = actual.getUsers().get(1);
+        assertNull(user.getSessionId());
     }
 }
