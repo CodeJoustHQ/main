@@ -21,16 +21,26 @@ import java.util.stream.Collectors;
 @SpringBootTest
 public class RoomMapperTests {
 
+    // Predefine user and room attributes.
+    private static final String NICKNAME = "rocket";
+    private static final String USER_ID = "012345";
+    private static final String NICKNAME_2 = "rocketrocket";
+    private static final String USER_ID_2 = "678910";
+    private static final String SESSION_ID = "234567";
+    private static final String ROOM_ID = "012345";
+
     @Test
     public void entityToDto() {
         User host = new User();
-        host.setNickname("rocket");
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
         User user = new User();
-        user.setNickname("test");
-        user.setSessionId("678910");
+        user.setNickname(NICKNAME_2);
+        user.setNickname(USER_ID_2);
+        user.setSessionId(SESSION_ID);
 
         Room room = new Room();
-        room.setRoomId("012345");
+        room.setRoomId(ROOM_ID);
         room.setDifficulty(ProblemDifficulty.MEDIUM);
         room.setHost(host);
 

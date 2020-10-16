@@ -43,7 +43,7 @@ public class GameTests {
 	private static final String POST_ROOM = "/api/v1/rooms";
     private static final String START_GAME = "/api/v1/rooms/%s/start";
 
-    // Predefine user attributes.
+    // Predefine user and room attributes.
     private static final String NICKNAME = "rocket";
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String ROOM_ID = "012345";

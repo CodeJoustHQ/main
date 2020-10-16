@@ -48,11 +48,11 @@ public class RoomTests {
     private static final String PUT_ROOM_HOST = "/api/v1/rooms/%s/host";
     private static final String PUT_ROOM_SETTINGS = "/api/v1/rooms/%s/settings";
 
-    // Predefine user attributes.
+    // Predefine user and room attributes.
     private static final String NICKNAME = "rocket";
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String USER_ID = "012345";
-    private static final String USER_ID_2 = "012345";
+    private static final String USER_ID_2 = "678910";
     private static final String ROOM_ID = "012345";
 
     @Test

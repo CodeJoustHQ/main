@@ -14,11 +14,11 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest
 public class RoomEntityTests {
 
-    // Predefine user attributes.
+    // Predefine user and room attributes.
     private static final String NICKNAME = "rocket";
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String USER_ID = "012345";
-    private static final String USER_ID_2 = "012345";
+    private static final String USER_ID_2 = "678910";
 
     @Test
     public void roomInitialization() {
