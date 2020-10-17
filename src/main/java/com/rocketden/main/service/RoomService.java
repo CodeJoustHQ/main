@@ -2,7 +2,6 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
-import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
@@ -17,11 +16,7 @@ import com.rocketden.main.model.User;
 import com.rocketden.main.util.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class RoomService {
@@ -29,16 +24,18 @@ public class RoomService {
     public static final int ROOM_ID_LENGTH = 6;
 
     private final RoomRepository repository;
-    private final SimpMessagingTemplate template;
+    private final SocketService socketService;
+    private final Utility utility;
 
     @Autowired
-    public RoomService(RoomRepository repository, SimpMessagingTemplate template) {
+    public RoomService(RoomRepository repository, SocketService socketService, Utility utility) {
         this.repository = repository;
-        this.template = template;
+        this.socketService = socketService;
+        this.utility = utility;
     }
 
-    public RoomDto joinRoom(JoinRoomRequest request, Utility utility) {
-        Room room = repository.findRoomByRoomId(request.getRoomId());
+    public RoomDto joinRoom(String roomId, JoinRoomRequest request) {
+        Room room = repository.findRoomByRoomId(roomId);
 
         // Return error if room could not be found
         if (room == null) {
@@ -54,11 +51,8 @@ public class RoomService {
         }
 
         // Return error if a user with the same nickname is in the room.
-        List<User> users = room.getUsers();
-        for (User roomUser : users) {
-            if (roomUser.getNickname().equals(user.getNickname())) {
-                throw new ApiException(RoomError.USER_WITH_NICKNAME_ALREADY_PRESENT);
-            };
+        if (room.containsUserWithNickname(user.getNickname())) {
+            throw new ApiException(RoomError.DUPLICATE_USERNAME);
         }
 
         // Add userId if not already present.
@@ -71,11 +65,11 @@ public class RoomService {
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
-        sendSocketUpdate(roomDto);
+        socketService.sendSocketUpdate(roomDto);
         return roomDto;
     }
 
-    public RoomDto createRoom(CreateRoomRequest request, Utility utility) {
+    public RoomDto createRoom(CreateRoomRequest request) {
         User host = UserMapper.toEntity(request.getHost());
 
         // Do not create room if provided host is invalid.
@@ -91,10 +85,6 @@ public class RoomService {
             host.setUserId(utility.generateId(UserService.USER_ID_LENGTH));
         }
 
-        // Add the host to a new user list.
-        List<User> users = new ArrayList<>();
-        users.add(host);
-
         Room room = new Room();
         room.setRoomId(utility.generateId(ROOM_ID_LENGTH));
         room.setHost(host);
@@ -104,8 +94,8 @@ public class RoomService {
         return RoomMapper.toDto(room);
     }
 
-    public RoomDto getRoom(GetRoomRequest request) {
-        Room room = repository.findRoomByRoomId(request.getRoomId());
+    public RoomDto getRoom(String roomId) {
+        Room room = repository.findRoomByRoomId(roomId);
 
         // Throw an error if room could not be found
         if (room == null) {
@@ -143,7 +133,7 @@ public class RoomService {
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
-        sendSocketUpdate(roomDto);
+        socketService.sendSocketUpdate(roomDto);
         return roomDto;
     }
 
@@ -161,18 +151,14 @@ public class RoomService {
             throw new ApiException(RoomError.INVALID_PERMISSIONS);
         }
 
-        // Set new difficulty value
-        room.setDifficulty(request.getDifficulty());
+        // Set new difficulty value if not null
+        if (request.getDifficulty() != null) {
+            room.setDifficulty(request.getDifficulty());
+        }
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
-        sendSocketUpdate(roomDto);
+        socketService.sendSocketUpdate(roomDto);
         return roomDto;
-    }
-
-    // Send updates about new users to the client through sockets
-    public void sendSocketUpdate(RoomDto roomDto) {
-        String socketPath = String.format(Utility.SOCKET_PATH, roomDto.getRoomId());
-        template.convertAndSend(socketPath, roomDto);
     }
 }

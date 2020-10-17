@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import javax.sql.DataSource;
 
 import com.rocketden.main.dto.problem.ProblemDto;
-import com.rocketden.main.testutil.TestUtility;
+import com.rocketden.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,14 +63,14 @@ class ProblemTests {
         sortArrayProblem.setName("Sort an Array");
         sortArrayProblem.setDescription
                 ("Sort an array from lowest to highest value.");
-        sortArrayProblemJson = TestUtility.convertObjectToJsonString(sortArrayProblem);
+        sortArrayProblemJson = UtilityTestMethods.convertObjectToJsonString(sortArrayProblem);
 
         // Create "Find Maximum" problem JSON string.
         findMaxProblem = new ProblemDto();
         findMaxProblem.setName("Find Maximum");
         findMaxProblem.setDescription
                 ("Find the maximum value in an array.");
-        findMaxProblemJson = TestUtility.convertObjectToJsonString(findMaxProblem);
+        findMaxProblemJson = UtilityTestMethods.convertObjectToJsonString(findMaxProblem);
     }
 
     @Test

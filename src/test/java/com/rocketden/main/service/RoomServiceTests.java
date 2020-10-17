@@ -1,6 +1,5 @@
 package com.rocketden.main.service;
 
-import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
@@ -9,7 +8,6 @@ import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
-import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
@@ -29,7 +27,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -44,141 +41,138 @@ public class RoomServiceTests {
     private RoomRepository repository;
 
     @Mock
+    private SocketService socketService;
+
+    @Mock
     private SimpMessagingTemplate template;
+
+    @Mock
+    private Utility utility;
 
     @Spy
     @InjectMocks
-    private RoomService service;
+    private RoomService roomService;
 
-    @Mock
-    private static Utility utility;
+    // Predefine user and room attributes.
+    private static final String NICKNAME = "rocket";
+    private static final String NICKNAME_2 = "rocketrocket";
+    private static final String NICKNAME_3 = "rocketandrocket";
+    private static final String ROOM_ID = "012345";
 
     @Test
     public void createRoomSuccess() {
         UserDto user = new UserDto();
-        user.setNickname("rocket");
+        user.setNickname(NICKNAME);
         CreateRoomRequest request = new CreateRoomRequest();
         request.setHost(user);
         
         // Mock generateId to return a custom room id
-        Mockito.doReturn("678910").when(utility).generateId(eq(UserService.USER_ID_LENGTH));
+        Mockito.doReturn(ROOM_ID).when(utility).generateId(eq(RoomService.ROOM_ID_LENGTH));
 
         // Verify create room request succeeds and returns correct response
-        RoomDto response = service.createRoom(request, utility);
+        RoomDto response = roomService.createRoom(request);
 
         verify(repository).save(Mockito.any(Room.class));
-        assertEquals("678910", response.getRoomId());
+        assertEquals(ROOM_ID, response.getRoomId());
         assertEquals(user.getNickname(), response.getHost().getNickname());
-        assertNull(response.getDifficulty());
+        assertEquals(ProblemDifficulty.RANDOM, response.getDifficulty());
     }
 
     @Test
     public void joinRoomSuccess() {
         // Verify join room request succeeds and returns correct response
-        String id = "012345";
-
         User user = new User();
-        user.setNickname("rocket");
+        user.setNickname(NICKNAME);
         JoinRoomRequest request = new JoinRoomRequest();
         request.setUser(UserMapper.toDto(user));
-        request.setRoomId(id);
 
         // Mock generateId to return a custom room id
-        Mockito.doReturn(id).when(utility).generateId(eq(UserService.USER_ID_LENGTH));
+        Mockito.doReturn(ROOM_ID).when(utility).generateId(eq(RoomService.ROOM_ID_LENGTH));
 
         Room room = new Room();
-        room.setRoomId(id);
+        room.setRoomId(ROOM_ID);
 
         // Create host
         User host = new User();
-        host.setNickname("host");
+        host.setNickname(NICKNAME_2);
         room.addUser(host);
         room.setHost(host);
 
         // Mock repository to return room when called
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(id));
-        RoomDto response = service.joinRoom(request, utility);
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        RoomDto response = roomService.joinRoom(ROOM_ID, request);
 
-        assertEquals(id, response.getRoomId());
+        verify(socketService).sendSocketUpdate(eq(response));
+        assertEquals(ROOM_ID, response.getRoomId());
         assertEquals(2, response.getUsers().size());
         assertEquals(host.getNickname(), response.getUsers().get(0).getNickname());
         assertEquals(user.getNickname(), response.getUsers().get(1).getNickname());
-        assertEquals(id, response.getUsers().get(1).getUserId());
-        assertNull(response.getDifficulty());
-
-        verify(template).convertAndSend(
-                 eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", response.getRoomId())),
-                 eq(response));
+        assertEquals(ROOM_ID, response.getUsers().get(1).getUserId());
+        assertEquals(ProblemDifficulty.RANDOM, response.getDifficulty());
     }
 
     @Test
     public void joinRoomNonexistentFailure() {
         // Verify join room request fails when room does not exist
-        String roomId = "012345";
-
         User user = new User();
-        user.setNickname("rocket");
+        user.setNickname(NICKNAME);
         JoinRoomRequest request = new JoinRoomRequest();
         request.setUser(UserMapper.toDto(user));
-        request.setRoomId(roomId);
 
         // Mock repository to return room when called
-        Mockito.doReturn(null).when(repository).findRoomByRoomId(eq(roomId));
+        Mockito.doReturn(null).when(repository).findRoomByRoomId(eq(ROOM_ID));
 
         // Assert that service.joinRoom(request) throws the correct exception
-        ApiException exception = assertThrows(ApiException.class, () -> service.joinRoom(request, utility));
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.joinRoom(ROOM_ID, request));
 
-        verify(repository).findRoomByRoomId(roomId);
+        verify(repository).findRoomByRoomId(ROOM_ID);
         assertEquals(RoomError.NOT_FOUND, exception.getError());
     }
 
     @Test
     public void joinRoomDuplicateUserFailure() {
-        // Verify join room request fails when user with same features is already present
-        String roomId = "012345";
-
-        // Define two identical, and make the first one the host and second one the joiner
+        /**
+         * Verify join room request fails when user with same features 
+         * is already present
+         * Define two identical, and make the first one the host and 
+         * second one the joiner
+         */
         User firstUser = new User();
-        firstUser.setNickname("rocket");
+        firstUser.setNickname(NICKNAME);
         UserDto newUser = new UserDto();
-        newUser.setNickname("rocket");
+        newUser.setNickname(NICKNAME);
 
         JoinRoomRequest request = new JoinRoomRequest();
         request.setUser(newUser);
-        request.setRoomId(roomId);
 
         Room room = new Room();
-        room.setRoomId(roomId);
+        room.setRoomId(ROOM_ID);
         room.setHost(firstUser);
         room.addUser(firstUser);
 
         // Mock repository to return room when called
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
-        ApiException exception = assertThrows(ApiException.class, () -> service.joinRoom(request, utility));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.joinRoom(ROOM_ID, request));
 
-        verify(repository).findRoomByRoomId(roomId);
-        assertEquals(RoomError.USER_WITH_NICKNAME_ALREADY_PRESENT, exception.getError());
+        verify(repository).findRoomByRoomId(ROOM_ID);
+        assertEquals(RoomError.DUPLICATE_USERNAME, exception.getError());
     }
 
     @Test
     public void getRoomSuccess() {
-        String roomId = "012345";
         Room room = new Room();
-        room.setRoomId(roomId);
+        room.setRoomId(ROOM_ID);
 
         User host = new User();
-        host.setNickname("test");
+        host.setNickname(NICKNAME);
 
         room.setHost(host);
         room.addUser(host);
 
-        GetRoomRequest request = new GetRoomRequest();
-        request.setRoomId(roomId);
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        RoomDto response = roomService.getRoom(ROOM_ID);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
-        RoomDto response = service.getRoom(request);
-
-        assertEquals(roomId, response.getRoomId());
+        assertEquals(ROOM_ID, response.getRoomId());
         assertEquals(room.getHost(), UserMapper.toEntity(response.getHost()));
 
         List<User> actual = response.getUsers().stream()
@@ -188,77 +182,71 @@ public class RoomServiceTests {
 
     @Test
     public void getRoomFailure() {
-        GetRoomRequest request = new GetRoomRequest();
-        request.setRoomId("987654");
-
-        ApiException exception = assertThrows(ApiException.class, () -> service.getRoom(request));
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.getRoom(ROOM_ID));
 
         assertEquals(RoomError.NOT_FOUND, exception.getError());
     }
 
     @Test
     public void changeRoomHostSuccess() {
-        String roomId = "012345";
         Room room = new Room();
-        room.setRoomId(roomId);
+        room.setRoomId(ROOM_ID);
 
         User host = new User();
-        host.setNickname("host");
+        host.setNickname(NICKNAME);
         User user =  new User();
-        user.setNickname("user");
+        user.setNickname(NICKNAME_2);
 
         room.setHost(host);
         room.addUser(host);
         room.addUser(user);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
 
         UpdateHostRequest request = new UpdateHostRequest();
         request.setInitiator(UserMapper.toDto(host));
         request.setNewHost(UserMapper.toDto(user));
 
-        RoomDto response = service.updateRoomHost(room.getRoomId(), request);
+        RoomDto response = roomService.updateRoomHost(room.getRoomId(), request);
 
+        verify(socketService).sendSocketUpdate(eq(response));
         assertEquals(user, UserMapper.toEntity(response.getHost()));
-
-        verify(template).convertAndSend(
-                eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", response.getRoomId())),
-                eq(response));
     }
 
     @Test
     public void changeRoomHostFailure() {
-        String roomId = "012345";
         Room room = new Room();
-        room.setRoomId(roomId);
+        room.setRoomId(ROOM_ID);
 
         User host = new User();
-        host.setNickname("host");
+        host.setNickname(NICKNAME);
         User user =  new User();
-        user.setNickname("user");
+        user.setNickname(NICKNAME_2);
 
         room.setHost(host);
         room.addUser(host);
         room.addUser(user);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
 
         // Invalid permissions
         UpdateHostRequest invalidPermRequest = new UpdateHostRequest();
         invalidPermRequest.setInitiator(UserMapper.toDto(user));
         invalidPermRequest.setNewHost(UserMapper.toDto(host));
 
-        ApiException exception = assertThrows(ApiException.class, () ->
-                service.updateRoomHost(room.getRoomId(), invalidPermRequest));
-        assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
+        try {
+            roomService.updateRoomHost(room.getRoomId(), invalidPermRequest);
+        } catch (ApiException e) {
+            assertEquals(RoomError.INVALID_PERMISSIONS, e.getError());
+        }
 
         // Nonexistent room
         UpdateHostRequest noRoomRequest = new UpdateHostRequest();
         noRoomRequest.setInitiator(UserMapper.toDto(host));
         noRoomRequest.setNewHost(UserMapper.toDto(user));
 
-        exception = assertThrows(ApiException.class, () ->
-                service.updateRoomHost("999999", noRoomRequest));
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.updateRoomHost("999999", noRoomRequest));
         assertEquals(RoomError.NOT_FOUND, exception.getError());
 
         // Nonexistent new host
@@ -266,72 +254,71 @@ public class RoomServiceTests {
         noUserRequest.setInitiator(UserMapper.toDto(host));
 
         UserDto nonExistentUser = new UserDto();
-        nonExistentUser.setNickname("notfound");
+        nonExistentUser.setNickname(NICKNAME_3);
         noUserRequest.setNewHost(nonExistentUser);
 
-        exception = assertThrows(ApiException.class, () ->
-                service.updateRoomHost(room.getRoomId(), noUserRequest));
-        assertEquals(UserError.NOT_FOUND, exception.getError());
+        try {
+            roomService.updateRoomHost(room.getRoomId(), noUserRequest);
+        } catch (ApiException e) {
+            assertEquals(UserError.NOT_FOUND, e.getError());
+        }
     }
 
     @Test
     public void updateRoomSettingsSuccess() {
-        String roomId = "012345";
         Room room = new Room();
-        room.setRoomId(roomId);
+        room.setRoomId(ROOM_ID);
 
         User host = new User();
-        host.setNickname("host");
+        host.setNickname(NICKNAME);
 
         room.setHost(host);
         room.addUser(host);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
 
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(host));
         request.setDifficulty(ProblemDifficulty.EASY);
 
-        RoomDto response = service.updateRoomSettings(room.getRoomId(), request);
+        RoomDto response = roomService.updateRoomSettings(room.getRoomId(), request);
 
+        verify(socketService).sendSocketUpdate(eq(response));
         assertEquals(request.getDifficulty(), response.getDifficulty());
-
-        verify(template).convertAndSend(
-                eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", response.getRoomId())),
-                eq(response));
     }
 
     @Test
     public void updateRoomSettingsInvalidPermissions() {
-        String roomId = "012345";
         Room room = new Room();
-        room.setRoomId(roomId);
+        room.setRoomId(ROOM_ID);
 
         User host = new User();
-        host.setNickname("host");
+        host.setNickname(NICKNAME);
         User user =  new User();
-        user.setNickname("user");
+        user.setNickname(NICKNAME_2);
 
         room.setHost(host);
         room.addUser(host);
         room.addUser(user);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(roomId));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
 
         // Invalid permissions
         UpdateSettingsRequest invalidPermRequest = new UpdateSettingsRequest();
         invalidPermRequest.setInitiator(UserMapper.toDto(user));
         invalidPermRequest.setDifficulty(ProblemDifficulty.MEDIUM);
 
-        ApiException exception = assertThrows(ApiException.class, () ->
-                service.updateRoomSettings(room.getRoomId(), invalidPermRequest));
-        assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
+        try {
+            roomService.updateRoomSettings(room.getRoomId(), invalidPermRequest);
+        } catch (ApiException e) {
+            assertEquals(RoomError.INVALID_PERMISSIONS, e.getError());
+        }
     }
 
     @Test
     public void updateRoomSettingsNoRoomFound() {
         UserDto userDto = new UserDto();
-        userDto.setNickname("test");
+        userDto.setNickname(NICKNAME);
 
         // Non-existent room
         UpdateSettingsRequest noRoomRequest = new UpdateSettingsRequest();
@@ -339,22 +326,7 @@ public class RoomServiceTests {
         noRoomRequest.setDifficulty(ProblemDifficulty.HARD);
 
         ApiException exception = assertThrows(ApiException.class, () ->
-                service.updateRoomSettings("999999", noRoomRequest));
+                roomService.updateRoomSettings("999999", noRoomRequest));
         assertEquals(RoomError.NOT_FOUND, exception.getError());
-    }
-
-
-    @Test
-    public void sendSocketUpdate() {
-        RoomDto roomDto = new RoomDto();
-        roomDto.setRoomId("123456");
-        UserDto userDto = new UserDto();
-        userDto.setNickname("test");
-        roomDto.setHost(userDto);
-
-        service.sendSocketUpdate(roomDto);
-        verify(template).convertAndSend(
-                eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", roomDto.getRoomId())),
-                eq(roomDto));
     }
 }

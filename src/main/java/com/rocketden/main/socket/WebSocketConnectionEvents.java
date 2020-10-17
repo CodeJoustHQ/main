@@ -1,4 +1,4 @@
-package com.rocketden.main.config;
+package com.rocketden.main.socket;
 
 import java.util.LinkedList;
 import java.util.Map;
@@ -11,12 +11,11 @@ import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 import com.rocketden.main.service.RoomService;
-import com.rocketden.main.util.Utility;
+import com.rocketden.main.service.SocketService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,16 +29,17 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 public class WebSocketConnectionEvents {
 
     private final UserRepository userRepository;
-    private final SimpMessagingTemplate template;
+    private final SocketService socketService;
     private final RoomService roomService;
 
     private static final String CONNECT_MESSAGE = "simpConnectMessage";
     private static final String NATIVE_HEADERS = "nativeHeaders";
+    public static final String USER_ID_KEY = "userId";
 
     @Autowired
-    public WebSocketConnectionEvents(UserRepository userRepository, SimpMessagingTemplate template, RoomService roomService) {
+    public WebSocketConnectionEvents(UserRepository userRepository, SocketService socketService, RoomService roomService) {
         this.userRepository = userRepository;
-        this.template = template;
+        this.socketService = socketService;
         this.roomService = roomService;
     }
 
@@ -56,21 +56,27 @@ public class WebSocketConnectionEvents {
         Map<String, LinkedList<String>> customHeaderMap = 
             (Map<String, LinkedList<String>>) genericMessage.getHeaders().get(NATIVE_HEADERS);
 
-        // Retrieve the ID of the user to update.
-        String userId = customHeaderMap.get("userId").get(0);
+        // Retrieve the ID of the user to update. 
+        if (!customHeaderMap.containsKey(USER_ID_KEY)) {
+            // If user ID is not passed in through headers, return.
+            return;
+        }
+        String userId = customHeaderMap.get(USER_ID_KEY).get(0);
 
         // Get the unique auto-generated session ID for this connection.
         String sessionId = sha.getSessionId();
 
-        // Update the session ID of the relevant user.
+        // Update the session ID of the relevant user, if it is found.
         User user = userRepository.findUserByUserId(userId);
-        user.setSessionId(sessionId);
-        userRepository.save(user);
+        if (user != null) {
+            user.setSessionId(sessionId);
+            userRepository.save(user);
 
-        // Get room and send socket update.
-        Room room = user.getRoom();
-        RoomDto roomDto = RoomMapper.toDto(room);
-        sendSocketUpdate(roomDto);
+            // Get room and send socket update.
+            Room room = user.getRoom();
+            RoomDto roomDto = RoomMapper.toDto(room);
+            socketService.sendSocketUpdate(roomDto);
+        }
     }
 
     @EventListener
@@ -80,23 +86,18 @@ public class WebSocketConnectionEvents {
         sha.getSessionId();
         String sessionId = sha.getSessionId();
 
-        // Remove the user from the database and send socket update.
-        // TODO: This could throw a null exception.
+        // Remove the user from the database and send socket update, if user exists.
         User user = userRepository.findUserBySessionId(sessionId);
-        user.setSessionId(null);
-        userRepository.save(user);
+        if (user != null) {
+            user.setSessionId(null);
+            userRepository.save(user);
 
-        // Get room, conditionally update the host, and send socket update.
-        Room room = user.getRoom();
-        conditionallyUpdateRoomHost(room, user);
-        RoomDto roomDto = RoomMapper.toDto(room);
-        sendSocketUpdate(roomDto);
-    }
-
-    // Send updates about new users to the client through sockets
-    public void sendSocketUpdate(RoomDto roomDto) {
-        String socketPath = String.format(Utility.SOCKET_PATH, roomDto.getRoomId());
-        template.convertAndSend(socketPath, roomDto);
+            // Get room, conditionally update the host, and send socket update.
+            Room room = user.getRoom();
+            conditionallyUpdateRoomHost(room, user);
+            RoomDto roomDto = RoomMapper.toDto(room);
+            socketService.sendSocketUpdate(roomDto);
+        }
     }
 
     /**

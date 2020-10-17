@@ -18,15 +18,15 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository repository;
-
-    private static Utility utility = new Utility();
+    private final Utility utility;
     
     // The length of the user ID.
     public static final int USER_ID_LENGTH = 6;
 
     @Autowired
-    public UserService(UserRepository repository) {
+    public UserService(UserRepository repository, Utility utility) {
         this.repository = repository;
+        this.utility = utility;
     }
 
     public UserDto createUser(CreateUserRequest request) {
@@ -41,8 +41,10 @@ public class UserService {
         user.setNickname(nickname);
 
         // If no user ID is present set a new automatically-generated user ID.
-        if (user.getUserId() == null) {
+        if (request.getUserId() == null) {
             user.setUserId(utility.generateId(UserService.USER_ID_LENGTH));
+        } else {
+            user.setUserId(request.getUserId());
         }
         
         repository.save(user);

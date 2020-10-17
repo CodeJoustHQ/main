@@ -4,14 +4,17 @@ import { Message } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
 import { LargeText, MediumText } from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
-import { getRoom, Room, changeRoomHost } from '../api/Room';
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
+import Difficulty from '../api/Difficulty';
+import { PrimaryButton, DifficultyButton } from '../components/core/Button';
+import Loading from '../components/core/Loading';
 import PlayerCard from '../components/card/PlayerCard';
 import HostActionCard from '../components/card/HostActionCard';
-import Loading from '../components/core/Loading';
-import { PrimaryButton } from '../components/core/Button';
 import { startGame } from '../api/Game';
+import {
+  getRoom, Room, changeRoomHost, updateRoomSettings,
+} from '../api/Room';
 
 type LobbyPageLocation = {
   user: User,
@@ -31,6 +34,7 @@ function LobbyPage() {
   const [activeUsers, setActiveUsers] = useState<User[] | null>(null);
   const [inactiveUsers, setInactiveUsers] = useState<User[] | null>(null);
   const [currentRoomId, setRoomId] = useState('');
+  const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
 
   // Hold error text.
   const [error, setError] = useState('');
@@ -49,6 +53,7 @@ function LobbyPage() {
     setActiveUsers(room.activeUsers);
     setInactiveUsers(room.inactiveUsers);
     setRoomId(room.roomId);
+    setDifficulty(room.difficulty);
   };
 
   const deleteUser = (user: User) => {
@@ -82,6 +87,61 @@ function LobbyPage() {
       .catch((err) => {
         setError(err.message);
       });
+  };
+
+  /**
+   * Update the difficulty setting of the room (EASY, MEDIUM, HARD, or RANDOM)
+   */
+  const updateDifficultySetting = (key: string) => {
+    if (currentUser?.nickname === host?.nickname && !loading) {
+      const oldDifficulty = difficulty;
+      const newDifficulty = Difficulty[key as keyof typeof Difficulty];
+
+      setLoading(true);
+      // Preemptively set new difficulty value
+      setDifficulty(newDifficulty);
+
+      const newSettings = {
+        initiator: currentUser!,
+        difficulty: newDifficulty,
+      };
+
+      updateRoomSettings(currentRoomId, newSettings)
+        .then(() => setLoading(false))
+        .catch((err) => {
+          setLoading(false);
+          setError(err.message);
+          // Set difficulty back to original if REST call failed
+          setDifficulty(oldDifficulty);
+        });
+    }
+  };
+
+  /**
+   * Display the passed-in list of users on the UI, either as
+   * active or inactive.
+   */
+  const displayUsers = (userList: User[] | null, active: boolean) => {
+    if (userList) {
+      return userList.map((user) => (
+        <PlayerCard
+          user={user}
+          isHost={user.nickname === host?.nickname}
+          isActive={active}
+        >
+          {currentUser?.nickname === host?.nickname
+            && (user.nickname !== currentUser?.nickname) ? (
+              // If currentUser is host, pass in an on-click action card for all other users
+              <HostActionCard
+                user={user}
+                onMakeHost={changeHosts}
+                onDeleteUser={deleteUser}
+              />
+            ) : null}
+        </PlayerCard>
+      ));
+    }
+    return null;
   };
 
   /**
@@ -148,7 +208,7 @@ function LobbyPage() {
         history.replace('/game/join');
       }
     }
-  }, [location, socketConnected, history, connectUserToRoom]);
+  }, [location, socketConnected, history]);
 
   // Connect the user to the room.
   useEffect(() => {
@@ -173,53 +233,29 @@ function LobbyPage() {
 
       <div>
         {
-          activeUsers?.map((user) => (
-            <PlayerCard
-              user={user}
-              isHost={user.nickname === host?.nickname}
-              isActive
-            >
-              {currentUser?.nickname === host?.nickname
-              && (user.nickname !== currentUser?.nickname) ? (
-                // If currentUser is host, pass in an on-click action card for all other users
-                <HostActionCard
-                  user={user}
-                  onMakeHost={changeHosts}
-                  onDeleteUser={deleteUser}
-                />
-              ) : null}
-            </PlayerCard>
-          ))
-        }
-      </div>
-      <div>
-        {
-          (inactiveUsers !== null && inactiveUsers.length > 0) ? (
-            <MediumText>Below is a list of inactive users.</MediumText>
-          ) : <MediumText>There are no inactive users.</MediumText>
+          displayUsers(activeUsers, true)
         }
         {
-          inactiveUsers?.map((user) => (
-            <PlayerCard
-              user={user}
-              isHost={user.nickname === host?.nickname}
-              isActive={false}
-            >
-              {currentUser?.nickname === host?.nickname
-              && (user.nickname !== currentUser?.nickname) ? (
-                // If currentUser is host, pass in an on-click action card for all other users
-                <HostActionCard
-                  user={user}
-                  onMakeHost={changeHosts}
-                  onDeleteUser={deleteUser}
-                />
-              ) : null}
-            </PlayerCard>
-          ))
+          displayUsers(inactiveUsers, false)
         }
       </div>
+
+      <MediumText>Difficulty Settings</MediumText>
+      {Object.keys(Difficulty).map((key) => (
+        <DifficultyButton
+          onClick={() => updateDifficultySetting(key)}
+          active={difficulty === Difficulty[key as keyof typeof Difficulty]}
+          enabled={currentUser?.nickname === host?.nickname}
+          title={currentUser?.nickname !== host?.nickname
+            ? 'Only the host can change these settings' : undefined}
+        >
+          {key}
+        </DifficultyButton>
+      ))}
+      <br />
+
       {currentUser?.nickname === host?.nickname
-        ? <PrimaryButton onClick={handleStartGame}> Start Game </PrimaryButton>
+        ? <PrimaryButton onClick={handleStartGame} disabled={loading}>Start Game</PrimaryButton>
         : <MediumText>Waiting for the host to start the game...</MediumText>}
     </div>
   );

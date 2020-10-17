@@ -12,6 +12,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    public static final String SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user";
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         // Sets the base URL for message subscription and sending, respectively.

@@ -48,7 +48,7 @@ public class Room {
     private List<User> users = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    private ProblemDifficulty difficulty;
+    private ProblemDifficulty difficulty = ProblemDifficulty.RANDOM;
 
     public void addUser(User user) {
         users.add(user);
@@ -77,5 +77,22 @@ public class Room {
             return users.get(index);
         }
         return null;
+    }
+
+    /**
+     * Determine whether a user with the given nickname already exists
+     * in the room. Capitalization matters.
+     * 
+     * @param nickname The provided nickname we are searching for.
+     * @return true if a user with the provided nickname exists in the room,
+     * false if no user with that nickname is found.
+     */
+    public boolean containsUserWithNickname(String nickname) {
+        for (User roomUser : this.users) {
+            if (roomUser.getNickname().equals(nickname)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

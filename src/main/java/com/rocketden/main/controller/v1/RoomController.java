@@ -1,13 +1,11 @@
 package com.rocketden.main.controller.v1;
 
 import com.rocketden.main.dto.room.CreateRoomRequest;
-import com.rocketden.main.dto.room.GetRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.service.RoomService;
-import com.rocketden.main.util.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,26 +22,24 @@ public class RoomController extends BaseRestController {
 
     private final RoomService service;
 
-    private Utility utility = new Utility();
-
     @Autowired
     public RoomController(RoomService service) {
         this.service = service;
     }
 
-    @GetMapping("/rooms")
-    public ResponseEntity<RoomDto> getRoom(GetRoomRequest request) {
-        return new ResponseEntity<>(service.getRoom(request), HttpStatus.OK);
+    @GetMapping("/rooms/{roomId}")
+    public ResponseEntity<RoomDto> getRoom(@PathVariable String roomId) {
+        return new ResponseEntity<>(service.getRoom(roomId), HttpStatus.OK);
     }
 
-    @PutMapping("/rooms")
-    public ResponseEntity<RoomDto> joinRoom(@RequestBody JoinRoomRequest request) {
-        return new ResponseEntity<>(service.joinRoom(request, utility), HttpStatus.OK);
+    @PutMapping("/rooms/{roomId}/users")
+    public ResponseEntity<RoomDto> joinRoom(@PathVariable String roomId,@RequestBody JoinRoomRequest request) {
+        return new ResponseEntity<>(service.joinRoom(roomId, request), HttpStatus.OK);
     }
 
     @PostMapping("/rooms")
     public ResponseEntity<RoomDto> createRoom(@RequestBody CreateRoomRequest request) {
-        return new ResponseEntity<>(service.createRoom(request, utility), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.createRoom(request), HttpStatus.CREATED);
     }
 
     @PutMapping("/rooms/{roomId}/host")
