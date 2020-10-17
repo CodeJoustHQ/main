@@ -60,6 +60,11 @@ public class RoomSocketTests {
     private String baseRestEndpoint;
     private RoomDto room;
 
+    // Predefine user and room attributes.
+    private static final String NICKNAME = "rocket";
+    private static final String USER_ID = "012345";
+    private static final String NICKNAME_2 = "rocketrocket";
+    
     @BeforeEach
     public void setup() throws Exception {
         this.stompClient = new WebSocketStompClient(new SockJsClient(
@@ -70,8 +75,8 @@ public class RoomSocketTests {
         baseRestEndpoint = "http://localhost:" + port + "/api/v1/rooms";
 
         UserDto host = new UserDto();
-        host.setNickname("host");
-        host.setUserId("012345");
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
@@ -87,7 +92,7 @@ public class RoomSocketTests {
         blockingQueue = new ArrayBlockingQueue<>(2);
 
         StompHeaders headers = new StompHeaders();
-        headers.add("userId", host.getUserId());
+        headers.add(WebSocketConnectionEvents.USER_ID_KEY, host.getUserId());
 
         // Connect to the socket endpoint
         StompSession session = stompClient
@@ -113,7 +118,7 @@ public class RoomSocketTests {
     public void socketReceivesMessageOnJoin() throws Exception {
         // Join the room, which should trigger a socket message to be sent
         UserDto newUser = new UserDto();
-        newUser.setNickname("test");
+        newUser.setNickname(NICKNAME_2);
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(newUser);
 
@@ -134,7 +139,7 @@ public class RoomSocketTests {
     public void socketReceivesMessageOnHostChange() throws Exception {
         // A second user joins the room
         UserDto newUser = new UserDto();
-        newUser.setNickname("test");
+        newUser.setNickname(NICKNAME_2);
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(newUser);
 
@@ -203,7 +208,7 @@ public class RoomSocketTests {
 
         // Have someone else join the room
         UserDto user = new UserDto();
-        user.setNickname("test");
+        user.setNickname(NICKNAME_2);
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(user);
 
@@ -224,7 +229,7 @@ public class RoomSocketTests {
         newStompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
         StompHeaders headers = new StompHeaders();
-        headers.add("userId", user.getUserId());
+        headers.add(WebSocketConnectionEvents.USER_ID_KEY, user.getUserId());
 
         newStompClient.connect(CONNECT_ENDPOINT, new WebSocketHttpHeaders(), headers, new StompSessionHandlerAdapter() {}, this.port)
                 .get(3, SECONDS);
@@ -239,7 +244,7 @@ public class RoomSocketTests {
     public void socketRecievesMessageOnDisconnection() throws Exception {
         // Have someone join the room
         UserDto user = new UserDto();
-        user.setNickname("test");
+        user.setNickname(NICKNAME_2);
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(user);
 
@@ -259,7 +264,7 @@ public class RoomSocketTests {
         newStompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
         StompHeaders headers = new StompHeaders();
-        headers.add("userId", user.getUserId());
+        headers.add(WebSocketConnectionEvents.USER_ID_KEY, user.getUserId());
 
         StompSession session = newStompClient
                 .connect(CONNECT_ENDPOINT, new WebSocketHttpHeaders(), headers, new StompSessionHandlerAdapter() {}, this.port)
