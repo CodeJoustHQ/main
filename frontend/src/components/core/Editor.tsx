@@ -51,7 +51,7 @@ const Content = styled.div`
 
 // This function refreshes the width of Monaco editor upon change in container size
 function ResizableMonacoEditor() {
-  const [codeLanguage, setCodeLanguage] = useState('java');
+  const [currentLanguage, setCurrentLanguage] = useState('java');
   const [codeEditor, setCodeEditor] = useState<any>(null);
 
   const handleEditorDidMount = (editor: any) => {
@@ -65,15 +65,19 @@ function ResizableMonacoEditor() {
   };
 
   const handleLanguageChange = (language: string) => {
+    // Save the code for this language
+    languages[currentLanguage].defaultCode = codeEditor!.getValue();
+
+    // Change the language and initial code for the editor
     codeEditor!.setValue(languages[language].defaultCode);
-    setCodeLanguage(language);
+    setCurrentLanguage(language);
   };
 
   return (
     <Content>
       <select
         onChange={(e) => handleLanguageChange(e.target.value)}
-        value={codeLanguage}
+        value={currentLanguage}
       >
         {
           Object.keys(languages).map((language) => (
@@ -84,8 +88,8 @@ function ResizableMonacoEditor() {
       <MonacoEditor
         height="100%"
         editorDidMount={handleEditorDidMount}
-        language={codeLanguage}
-        defaultValue={languages[codeLanguage].defaultCode}
+        language={currentLanguage}
+        defaultValue={languages[currentLanguage].defaultCode}
       />
     </Content>
   );
