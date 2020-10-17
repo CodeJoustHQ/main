@@ -17,7 +17,10 @@
     "@types/stompjs": "^2.3.4",
     "@types/styled-components": "^5.1.2",
     "axios": "^0.20.0",
+    "monaco-editor": "^0.21.2",
+    "monaco-editor-webpack-plugin": "^2.0.0",
     "react": "^16.13.1",
+    "react-app-rewired": "^2.1.6",
     "react-dom": "^16.13.1",
     "react-monaco-editor": "^0.40.0",
     "react-router-dom": "^5.2.0",
@@ -40,8 +43,8 @@
     "eslint-plugin-react-hooks": "^2.5.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
