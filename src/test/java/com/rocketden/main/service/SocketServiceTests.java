@@ -7,12 +7,10 @@ import com.rocketden.main.config.WebSocketConfig;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.user.UserDto;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -30,11 +28,6 @@ public class SocketServiceTests {
     // Predefine user and room attributes.
     private static final String NICKNAME = "rocket";
     private static final String ROOM_ID = "012345";
-
-    @Before
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-    }
 
     @Test
     public void sendSocketUpdate() {
