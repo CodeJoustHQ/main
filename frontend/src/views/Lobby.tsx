@@ -163,17 +163,8 @@ function LobbyPage() {
       setStateFromRoom(JSON.parse(result.body));
     };
 
-    const startGameCallback = () => {
-      history.push('/game');
-    };
-
     connect(roomId, userId).then(() => {
       subscribe(routes(roomId).subscribe, subscribeCallback).then(() => {
-        setSocketConnected(true);
-      }).catch((err) => {
-        setError(err.message);
-      });
-      subscribe(routes(roomId).start, startGameCallback).then(() => {
         setSocketConnected(true);
       }).catch((err) => {
         setError(err.message);
@@ -217,10 +208,14 @@ function LobbyPage() {
     if (!socketConnected && currentRoomId && currentUser && currentUser.userId) {
       connectUserToRoom(currentRoomId, currentUser.userId);
     }
+  }, [socketConnected, connectUserToRoom, currentRoomId, currentUser, history]);
+  
+  // Redirect user to game page if room is active.
+  useEffect(() => {
     if (isActive) {
       history.push('/game');
     }
-  }, [socketConnected, connectUserToRoom, currentRoomId, currentUser, history, isActive]);
+  }, [isActive]);
 
   // Render the lobby.
   return (

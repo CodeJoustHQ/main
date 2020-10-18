@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class GameService {
 
-	private static final String START_GAME_SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/start-game";
+	private static final String START_GAME_SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user";
 
     private final RoomRepository repository;
     private final SimpMessagingTemplate template;
@@ -26,7 +26,7 @@ public class GameService {
         this.template = template;
     }
 
-	// Send request to redirect users to game when host clicks start
+	// Set room's active state to true
 	public RoomDto startGame(String roomId, StartGameRequest request) {
 		Room room = repository.findRoomByRoomId(roomId);
 
