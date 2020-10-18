@@ -1,12 +1,13 @@
 package com.rocketden.main.controller.v1;
 
 import com.rocketden.main.dao.ProblemRepository;
+import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.model.Problem;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,8 +22,8 @@ public class ProblemController extends BaseRestController {
         this.problemRepository = problemRepository;
     }
 
-    @PostMapping(value = "/problems", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Problem addNewProblem (@RequestBody ProblemDto problem) {
+    @PostMapping("/problems")
+    public Problem addNewProblem(@RequestBody ProblemDto problem) {
         // Map between the problem DTO and the persistent problem object.
         Problem persistentProblem = new Problem();
         persistentProblem.setName(problem.getName());
@@ -31,6 +32,12 @@ public class ProblemController extends BaseRestController {
         // Add the problem to the database, and return the problem JSON.
         problemRepository.save(persistentProblem);
         return persistentProblem;
+    }
+
+    @PostMapping("/problems/{id}/test-case")
+    public ProblemDto createTestCase(@PathVariable Integer id, CreateTestCaseRequest request) {
+        // TODO
+        return null;
     }
 
     @GetMapping("/problems")
