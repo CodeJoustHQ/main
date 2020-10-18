@@ -1,14 +1,12 @@
 package com.rocketden.main.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import javax.sql.DataSource;
 
 import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.util.UtilityTestMethods;
@@ -17,19 +15,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
-import org.junit.Assert;
+import java.util.List;
 
-@SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource"
-)
+@SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @Transactional
@@ -42,16 +36,10 @@ class ProblemTests {
     private static String findMaxProblemJson;
 
     @Autowired
-    private DataSource dataSource;
-
-    @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private TestRestTemplate restTemplate;
-
-    @LocalServerPort
-    private int port;
+    private static final String GET_PROBLEM_ALL = "/api/v1/problems";
+    private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
 
     /**
      * Sets up necessary test fields and fixtures.
@@ -71,12 +59,6 @@ class ProblemTests {
         findMaxProblem.setDescription
                 ("Find the maximum value in an array.");
         findMaxProblemJson = UtilityTestMethods.convertObjectToJsonString(findMaxProblem);
-    }
-
-    @Test
-    public void hikariConnectionPoolIsConfigured() {
-        Assert.assertEquals("com.zaxxer.hikari.HikariDataSource", dataSource.
-                getClass().getName());
     }
 
     @Test
@@ -127,10 +109,16 @@ class ProblemTests {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void restCallGetProblemsEmptyList() throws Exception {
-        assertThat(this.restTemplate.getForObject("http://localhost:" + port
-                + "/api/v1/problems", String.class))
-                .contains("[]");
+        MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_ALL))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        List<ProblemDto> actual = UtilityTestMethods.toObject(jsonResponse, List.class);
+
+        assertTrue(actual.isEmpty());
     }
 
 }
