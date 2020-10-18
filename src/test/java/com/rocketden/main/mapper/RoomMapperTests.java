@@ -36,7 +36,7 @@ public class RoomMapperTests {
         host.setUserId(USER_ID);
         User user = new User();
         user.setNickname(NICKNAME_2);
-        user.setNickname(USER_ID_2);
+        user.setUserId(USER_ID_2);
         user.setSessionId(SESSION_ID);
 
         Room room = new Room();
