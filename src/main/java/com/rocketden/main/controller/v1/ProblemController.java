@@ -1,37 +1,35 @@
 package com.rocketden.main.controller.v1;
 
-import com.rocketden.main.dao.ProblemRepository;
+import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
-import com.rocketden.main.model.Problem;
 
+import com.rocketden.main.service.ProblemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 public class ProblemController extends BaseRestController {
 
-    private ProblemRepository problemRepository;
+    private ProblemService service;
 
     @Autowired
-    public ProblemController(ProblemRepository problemRepository){
-        this.problemRepository = problemRepository;
+    public ProblemController(ProblemService service) {
+        this.service = service;
     }
 
     @PostMapping("/problems")
-    public Problem addNewProblem(@RequestBody ProblemDto problem) {
-        // Map between the problem DTO and the persistent problem object.
-        Problem persistentProblem = new Problem();
-        persistentProblem.setName(problem.getName());
-        persistentProblem.setDescription(problem.getDescription());
+    public ResponseEntity<ProblemDto> createProblem(@RequestBody CreateProblemRequest request) {
+        return new ResponseEntity<>(service.createProblem(request), HttpStatus.CREATED);
 
-        // Add the problem to the database, and return the problem JSON.
-        problemRepository.save(persistentProblem);
-        return persistentProblem;
     }
 
     @PostMapping("/problems/{id}/test-case")
@@ -41,8 +39,7 @@ public class ProblemController extends BaseRestController {
     }
 
     @GetMapping("/problems")
-    public Iterable<Problem> getAllProblems() {
-        // Return a JSON with all problems in the database.
-        return problemRepository.findAll();
+    public ResponseEntity<List<ProblemDto>> getAllProblems() {
+        return new ResponseEntity<>(service.getAllProblems(), HttpStatus.OK);
     }
 }
