@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 public class ProblemController extends BaseRestController {
 
-    private ProblemService service;
+    private final ProblemService service;
 
     @Autowired
     public ProblemController(ProblemService service) {

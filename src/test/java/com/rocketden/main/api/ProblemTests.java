@@ -1,16 +1,18 @@
 package com.rocketden.main.api;
 
-import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.util.UtilityTestMethods;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,6 +23,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
@@ -29,11 +33,8 @@ import java.util.List;
 @Transactional
 class ProblemTests {
 
-    // Constants to hold POST request JSON content. Initialized in constructor.
-    private static ProblemDto sortArrayProblem;
-    private static ProblemDto findMaxProblem;
-    private static String sortArrayProblemJson;
-    private static String findMaxProblemJson;
+    private static ProblemDto problem1;
+    private static ProblemDto problem2;
 
     @Autowired
     private MockMvc mockMvc;
@@ -41,82 +42,71 @@ class ProblemTests {
     private static final String GET_PROBLEM_ALL = "/api/v1/problems";
     private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
 
-    /**
-     * Sets up necessary test fields and fixtures.
-     * (Called once before the rest of the test case methods.)
-     */
-    public ProblemTests() {
-        // Create "Sort Array" problem JSON string.
-        sortArrayProblem = new ProblemDto();
-        sortArrayProblem.setName("Sort an Array");
-        sortArrayProblem.setDescription
-                ("Sort an array from lowest to highest value.");
-        sortArrayProblemJson = UtilityTestMethods.convertObjectToJsonString(sortArrayProblem);
+    @BeforeEach
+    public void setup() {
+        problem1 = new ProblemDto();
+        problem1.setName("Sort an Array");
+        problem1.setDescription("Sort an array from lowest to highest value.");
 
-        // Create "Find Maximum" problem JSON string.
-        findMaxProblem = new ProblemDto();
-        findMaxProblem.setName("Find Maximum");
-        findMaxProblem.setDescription
-                ("Find the maximum value in an array.");
-        findMaxProblemJson = UtilityTestMethods.convertObjectToJsonString(findMaxProblem);
+        problem2 = new ProblemDto();
+        problem2.setName("Find Maximum");
+        problem2.setDescription("Find the maximum value in an array.");
+    }
+
+    @Test
+    public void createProblemSuccess() throws Exception {
+        MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(problem1)))
+                .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ProblemDto actual = UtilityTestMethods.toObject(jsonResponse, ProblemDto.class);
+
+        assertEquals(problem1.getName(), actual.getName());
+        assertEquals(problem1.getDescription(), actual.getDescription());
+    }
+
+    @Test
+    public void createProblemsAndGetProblems() throws Exception {
+        this.mockMvc.perform(post(POST_PROBLEM_CREATE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(problem1)))
+                .andDo(print()).andExpect(status().isCreated());
+
+        this.mockMvc.perform(post(POST_PROBLEM_CREATE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(problem2)))
+                .andDo(print()).andExpect(status().isCreated());
+
+        // After creating two problems, check that the GET request finds them all
+        MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_ALL))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        // Special conversion process for lists of generic type
+        String jsonResponse = result.getResponse().getContentAsString();
+        Type listType = new TypeToken<ArrayList<ProblemDto>>(){}.getType();
+        List<ProblemDto> actual = new Gson().fromJson(jsonResponse, listType);
+
+        assertEquals(2, actual.size());
+        assertEquals(problem1.getName(), actual.get(0).getName());
+        assertEquals(problem1.getDescription(), actual.get(0).getDescription());
+
+        assertEquals(problem2.getName(), actual.get(1).getName());
+        assertEquals(problem2.getDescription(), actual.get(1).getDescription());
     }
 
     @Test
     public void getProblemsEmptyList() throws Exception {
-        this.mockMvc.perform(get("/api/v1/problems"))
-                .andDo(print()).andExpect(status().isOk())
-                .andExpect(content().string(containsString("[]")));
-    }
-
-    @Test
-    public void addProblemReturnProblem() throws Exception {
-        String postAddProblemReturn = "{\"id\":1,\"name\":\"Sort an Array\","
-                + "\"description\":\"Sort an array from lowest to highest value.\"}";
-        this.mockMvc.perform(post("/api/v1/problems")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(sortArrayProblemJson))
-                .andDo(print()).andExpect(status().isOk())
-                .andExpect(content().string(postAddProblemReturn));
-    }
-
-    @Test
-    public void addProblemGetProblemsOne() throws Exception {
-        String getProblemsResult = "[{\"id\":1,\"name\":\"Sort an Array\","
-                + "\"description\":\"Sort an array from lowest to highest value.\"}]";
-        this.mockMvc.perform(post("/api/v1/problems")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(sortArrayProblemJson));
-        this.mockMvc.perform(get("/api/v1/problems"))
-                .andDo(print()).andExpect(status().isOk())
-                .andExpect(content().string(getProblemsResult));
-    }
-
-    @Test
-    public void addProblemGetProblemsTwo() throws Exception {
-        String getProblemsResult = "[{\"id\":1,\"name\":\"Sort an Array\","
-                + "\"description\":\"Sort an array from lowest to highest value.\"},"
-                + "{\"id\":2,\"name\":\"Find Maximum\",\"description\":"
-                + "\"Find the maximum value in an array.\"}]";
-        this.mockMvc.perform(post("/api/v1/problems")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(sortArrayProblemJson));
-        this.mockMvc.perform(post("/api/v1/problems")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(findMaxProblemJson));
-        this.mockMvc.perform(get("/api/v1/problems"))
-                .andDo(print()).andExpect(status().isOk())
-                .andExpect(content().string(containsString(getProblemsResult)));
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void restCallGetProblemsEmptyList() throws Exception {
         MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_ALL))
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        List<ProblemDto> actual = UtilityTestMethods.toObject(jsonResponse, List.class);
+        Type listType = new TypeToken<ArrayList<ProblemDto>>(){}.getType();
+        List<ProblemDto> actual = new Gson().fromJson(jsonResponse, listType);
 
         assertTrue(actual.isEmpty());
     }
