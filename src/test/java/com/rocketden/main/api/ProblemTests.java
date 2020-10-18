@@ -51,7 +51,7 @@ class ProblemTests {
     public void createProblemSuccess() throws Exception {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);
-        request.setName(DESCRIPTION);
+        request.setDescription(DESCRIPTION);
 
         MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -70,7 +70,7 @@ class ProblemTests {
     public void createProblemsAndGetProblems() throws Exception {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);
-        request.setName(DESCRIPTION);
+        request.setDescription(DESCRIPTION);
 
         this.mockMvc.perform(post(POST_PROBLEM_CREATE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -78,7 +78,7 @@ class ProblemTests {
                 .andDo(print()).andExpect(status().isCreated());
 
         request.setName(NAME_2);
-        request.setName(DESCRIPTION_2);
+        request.setDescription(DESCRIPTION_2);
 
         this.mockMvc.perform(post(POST_PROBLEM_CREATE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

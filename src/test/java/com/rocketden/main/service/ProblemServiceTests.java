@@ -75,6 +75,6 @@ public class ProblemServiceTests {
 
         assertEquals(1, response.size());
         assertEquals(NAME, response.get(0).getName());
-        assertEquals(DESCRIPTION, response.get(1).getDescription());
+        assertEquals(DESCRIPTION, response.get(0).getDescription());
     }
 }
