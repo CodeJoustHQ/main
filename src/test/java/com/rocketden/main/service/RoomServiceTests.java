@@ -123,7 +123,6 @@ public class RoomServiceTests {
         // Assert that service.joinRoom(request) throws the correct exception
         ApiException exception = assertThrows(ApiException.class, () -> roomService.joinRoom(roomId, request));
 
-        verify(repository).findRoomByRoomId(roomId);
         assertEquals(RoomError.NOT_FOUND, exception.getError());
     }
 

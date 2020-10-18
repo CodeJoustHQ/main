@@ -3,6 +3,8 @@ package com.rocketden.main.service;
 import com.rocketden.main.dao.ProblemRepository;
 import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.exception.ProblemError;
+import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Problem;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,6 +47,17 @@ public class ProblemServiceTests {
 
         assertEquals(NAME, response.getName());
         assertEquals(DESCRIPTION, response.getDescription());
+    }
+
+    @Test
+    public void createProblemFailureEmptyField() {
+        CreateProblemRequest request = new CreateProblemRequest();
+        request.setDescription(DESCRIPTION);
+
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblem(request));
+
+        verify(repository, never()).save(Mockito.any());
+        assertEquals(ProblemError.EMPTY_FIELD, exception.getError());
     }
 
     @Test
