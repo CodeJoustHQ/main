@@ -6,6 +6,9 @@ import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.user.UserDto;
+import com.rocketden.main.exception.RoomError;
+import com.rocketden.main.exception.api.ApiError;
+import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.util.SocketTestMethods;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +18,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
@@ -101,15 +106,38 @@ public class RoomHostTests {
         request.setNewHost(user);
 
         HttpEntity<UpdateHostRequest> entity = new HttpEntity<>(request);
-        RoomDto response = template.exchange(changeHostsEndpoint, HttpMethod.PUT, entity, RoomDto.class).getBody();
+        ResponseEntity<RoomDto> response = template.exchange(changeHostsEndpoint, HttpMethod.PUT, entity, RoomDto.class);
+        RoomDto actual = response.getBody();
 
-        assertNotNull(response);
-        assertEquals(user, response.getHost());
+        assertNotNull(actual);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(user, actual.getHost());
 
         String getEndpoint = String.format("%s/%s", baseRestEndpoint, room.getRoomId());
-        response = template.getForObject(getEndpoint, RoomDto.class);
+        actual = template.getForObject(getEndpoint, RoomDto.class);
 
-        assertNotNull(response);
-        assertEquals(user, response.getHost());
+        assertNotNull(actual);
+        assertEquals(user, actual.getHost());
+    }
+
+    @Test
+    public void changeRoomHostInvalidPermissions() throws Exception {
+        // Connect second user to the socket
+        SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, USER_ID_2, this.port);
+        UserDto user = room.getUsers().get(1);
+
+        UpdateHostRequest request = new UpdateHostRequest();
+        request.setInitiator(user);
+        request.setNewHost(room.getHost());
+
+        ApiError ERROR = RoomError.INVALID_PERMISSIONS;
+
+        HttpEntity<UpdateHostRequest> entity = new HttpEntity<>(request);
+        ResponseEntity<ApiErrorResponse> response =
+                template.exchange(changeHostsEndpoint, HttpMethod.PUT, entity, ApiErrorResponse.class);
+        ApiErrorResponse actual = response.getBody();
+
+        assertEquals(ERROR.getStatus(), response.getStatusCode());
+        assertEquals(ERROR.getResponse(), actual);
     }
 }
