@@ -54,7 +54,7 @@ public class GameServiceTests {
 		RoomDto response = gameService.startGame(roomId, request);
 
 		verify(template).convertAndSend(
-				eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/start-game", roomId)),
+				eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", roomId)),
 				eq(response));
 
 		assertEquals(roomId, response.getRoomId());

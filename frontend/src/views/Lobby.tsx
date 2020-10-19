@@ -34,7 +34,7 @@ function LobbyPage() {
   const [activeUsers, setActiveUsers] = useState<User[] | null>(null);
   const [inactiveUsers, setInactiveUsers] = useState<User[] | null>(null);
   const [currentRoomId, setRoomId] = useState('');
-  const [isActive, setIsActive] = useState(false);
+  const [active, setActive] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
 
   // Hold error text.
@@ -54,7 +54,7 @@ function LobbyPage() {
     setActiveUsers(room.activeUsers);
     setInactiveUsers(room.inactiveUsers);
     setRoomId(room.roomId);
-    setIsActive(room.isActive);
+    setActive(room.active);
     setDifficulty(room.difficulty);
   };
 
@@ -208,15 +208,15 @@ function LobbyPage() {
     if (!socketConnected && currentRoomId && currentUser && currentUser.userId) {
       connectUserToRoom(currentRoomId, currentUser.userId);
     }
-  }, [socketConnected, connectUserToRoom, currentRoomId, currentUser, history]);
+  }, [socketConnected, connectUserToRoom, currentRoomId, currentUser]);
   
   // Redirect user to game page if room is active.
   useEffect(() => {
-    if (isActive) {
+    if (active) {
       history.push('/game');
     }
-  }, [isActive]);
-
+  }, [history, active]);
+  
   // Render the lobby.
   return (
     <div>
@@ -255,7 +255,7 @@ function LobbyPage() {
       <br />
 
       {currentUser?.nickname === host?.nickname
-        ? <PrimaryButton onClick={handleStartGame} disabled={loading}>Start Game</PrimaryButton>
+        ? <PrimaryButton onClick={handleStartGame}>Start Game</PrimaryButton>
         : <MediumText>Waiting for the host to start the game...</MediumText>}
     </div>
   );

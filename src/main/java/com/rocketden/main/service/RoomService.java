@@ -56,7 +56,7 @@ public class RoomService {
         }
 
         // Return error if room is already active.
-        if (room.getIsActive()) {
+        if (room.getActive()) {
             throw new ApiException(RoomError.ALREADY_ACTIVE);
         }
 
