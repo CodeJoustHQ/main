@@ -55,7 +55,8 @@ public class RoomSocketTests {
     private static final String NICKNAME = "rocket";
     private static final String USER_ID = "012345";
     private static final String NICKNAME_2 = "rocketrocket";
-    
+    private static final String USER_ID_2 = "098765";
+
     @BeforeEach
     public void setup() throws Exception {
         // Set up a room with a single user (the host)
@@ -121,6 +122,7 @@ public class RoomSocketTests {
         // A second user joins the room
         UserDto newUser = new UserDto();
         newUser.setNickname(NICKNAME_2);
+        newUser.setUserId(USER_ID_2);
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(newUser);
 
@@ -136,8 +138,11 @@ public class RoomSocketTests {
         assertEquals(expected.getHost(), actual.getHost());
         assertEquals(expected.getUsers(), actual.getUsers());
 
-        // Update newUser with the created userId and updated information.
+        // Connect the new user to the socket
         newUser = expected.getUsers().get(1);
+
+        SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, newUser.getUserId(), this.port);
+        blockingQueue.poll(5, SECONDS);
 
         // A host change request is sent
         UpdateHostRequest updateRequest = new UpdateHostRequest();
@@ -152,6 +157,7 @@ public class RoomSocketTests {
         actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(expected);
         assertNotNull(actual);
+        assertEquals(newUser, expected.getHost());
         assertEquals(newUser, actual.getHost());
         assertEquals(expected.getUsers(), actual.getUsers());
     }
