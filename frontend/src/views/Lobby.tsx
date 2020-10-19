@@ -72,7 +72,7 @@ function LobbyPage() {
       changeRoomHost(currentRoomId, request)
         .then(() => setLoading(false))
         .catch((err) => {
-          setError(err);
+          setError(err.message);
           setLoading(false);
         });
     }
