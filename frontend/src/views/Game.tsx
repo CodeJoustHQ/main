@@ -69,7 +69,7 @@ function GamePage() {
             {error ? <ErrorMessage message={error} /> : null}
           </Panel>
           <Panel>
-            <Editor height="100%" language="javascript" />
+            <Editor />
           </Panel>
         </SplitterLayout>
       </SplitterContainer>

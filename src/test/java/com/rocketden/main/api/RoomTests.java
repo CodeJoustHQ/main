@@ -24,7 +24,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -48,12 +47,19 @@ public class RoomTests {
     private static final String PUT_ROOM_HOST = "/api/v1/rooms/%s/host";
     private static final String PUT_ROOM_SETTINGS = "/api/v1/rooms/%s/settings";
 
+    // Predefine user and room attributes.
+    private static final String NICKNAME = "rocket";
+    private static final String NICKNAME_2 = "rocketrocket";
+    private static final String USER_ID = "012345";
+    private static final String USER_ID_2 = "678910";
+    private static final String ROOM_ID = "012345";
+
     @Test
     public void getNonExistentRoom() throws Exception {
         ApiError ERROR = RoomError.NOT_FOUND;
 
         // Passing in nonexistent roomId should return 404
-        MvcResult result = this.mockMvc.perform(get(String.format(GET_ROOM, "012345")))
+        MvcResult result = this.mockMvc.perform(get(String.format(GET_ROOM, ROOM_ID)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 
@@ -76,7 +82,7 @@ public class RoomTests {
     @Test
     public void joinNonExistentRoom() throws Exception {
         UserDto user = new UserDto();
-        user.setNickname("rocket");
+        user.setNickname(NICKNAME);
 
         // PUT request to join non-existent room should fail
         JoinRoomRequest request = new JoinRoomRequest();
@@ -84,7 +90,7 @@ public class RoomTests {
 
         ApiError ERROR = RoomError.NOT_FOUND;
 
-        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_HOST, "012345"))
+        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_HOST, NICKNAME))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
@@ -100,8 +106,8 @@ public class RoomTests {
     public void createAndGetValidRoom() throws Exception {
         // POST request to create valid room should return successful response
         UserDto host = new UserDto();
-        host.setNickname("host");
-        host.setUserId("012345");
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
@@ -164,8 +170,8 @@ public class RoomTests {
     public void createAndJoinRoom() throws Exception {
         // POST request to create room and PUT request to join room should succeed
         UserDto host = new UserDto();
-        host.setNickname("host");
-        host.setUserId("012345");
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
@@ -193,8 +199,8 @@ public class RoomTests {
 
         // Create User and List<User> for PUT request
         UserDto user = new UserDto();
-        user.setNickname("rocket");
-        user.setUserId("678910");
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
         users = new ArrayList<>();
         users.add(host);
         users.add(user);
@@ -226,8 +232,8 @@ public class RoomTests {
     public void createAndJoinRoomUserAlreadyExists() throws Exception {
         // POST request to create room and PUT request to join room should succeed
         UserDto host = new UserDto();
-        host.setNickname("host");
-        host.setUserId("012345");
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
@@ -275,8 +281,8 @@ public class RoomTests {
     public void createAndJoinRoomNoUser() throws Exception {
         // POST request to create room and PUT request to join room should succeed
         UserDto host = new UserDto();
-        host.setNickname("host");
-        host.setUserId("012345");
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
@@ -322,12 +328,12 @@ public class RoomTests {
     @Test
     public void changeRoomHostSuccess() throws Exception {
         UserDto firstHost = new UserDto();
-        firstHost.setNickname("FirstHost");
-        firstHost.setUserId("012345");
+        firstHost.setNickname(NICKNAME);
+        firstHost.setUserId(USER_ID);
 
         UserDto secondHost = new UserDto();
-        secondHost.setNickname("SecondHost");
-        secondHost.setUserId("678910");
+        secondHost.setNickname(NICKNAME_2);
+        secondHost.setUserId(USER_ID_2);
 
         RoomDto room = setUpRoomWithTwoUsers(firstHost, secondHost);
 
@@ -364,12 +370,12 @@ public class RoomTests {
     @Test
     public void changeRoomHostInvalidPermissions() throws Exception {
         UserDto host = new UserDto();
-        host.setNickname("Host");
-        host.setUserId("012345");
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
 
         UserDto user = new UserDto();
-        user.setNickname("User");
-        user.setUserId("678910");
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
 
         RoomDto room = setUpRoomWithTwoUsers(host, user);
 
@@ -395,12 +401,12 @@ public class RoomTests {
     @Test
     public void changeRoomHostNonExistentRoom() throws Exception {
         UserDto host = new UserDto();
-        host.setNickname("Host");
-        host.setUserId("012345");
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
 
         UserDto user = new UserDto();
-        user.setNickname("User");
-        user.setUserId("012345");
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
 
         setUpRoomWithTwoUsers(host, user);
 
@@ -427,12 +433,12 @@ public class RoomTests {
     @Test
     public void changeRoomHostNewHostNotFound() throws Exception {
         UserDto host = new UserDto();
-        host.setNickname("Host");
-        host.setUserId("012345");
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
 
         UserDto user = new UserDto();
-        user.setNickname("User");
-        user.setUserId("678910");
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
 
         RoomDto room = setUpRoomWithTwoUsers(host, user);
 
@@ -463,8 +469,8 @@ public class RoomTests {
     @Test
     public void updateRoomSettingsSuccess() throws Exception {
         UserDto host = new UserDto();
-        host.setNickname("host");
-        host.setUserId("012345");
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
 
         RoomDto room = setUpRoomWithOneUser(host);
         assertEquals(ProblemDifficulty.RANDOM, room.getDifficulty());
@@ -498,8 +504,8 @@ public class RoomTests {
     @Test
     public void updateRoomSettingsNullValue() throws Exception {
         UserDto host = new UserDto();
-        host.setNickname("host");
-        host.setUserId("012345");
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
 
         RoomDto room = setUpRoomWithOneUser(host);
 
@@ -522,7 +528,7 @@ public class RoomTests {
     @Test
     public void updateRoomSettingsNonExistentRoom() throws Exception {
         UserDto host = new UserDto();
-        host.setNickname("host");
+        host.setNickname(NICKNAME);
 
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(host);
@@ -545,11 +551,12 @@ public class RoomTests {
     @Test
     public void updateRoomSettingsInvalidPermissions() throws Exception {
         UserDto host = new UserDto();
-        host.setNickname("host");
-        host.setUserId("012345");
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
         UserDto user = new UserDto();
-        user.setNickname("test");
-        user.setUserId("678910");
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
 
         RoomDto room = setUpRoomWithTwoUsers(host, user);
 
@@ -574,7 +581,7 @@ public class RoomTests {
     @Test
     public void updateRoomSettingsInvalidSettings() throws Exception {
         UserDto host = new UserDto();
-        host.setNickname("host");
+        host.setNickname(NICKNAME);
 
         RoomDto room = setUpRoomWithOneUser(host);
 
@@ -597,12 +604,12 @@ public class RoomTests {
     @Test
     public void updateRoomSettingsDifferentCase() throws Exception {
         UserDto host = new UserDto();
-        host.setNickname("host");
-        host.setUserId("012345");
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
 
         RoomDto room = setUpRoomWithOneUser(host);
 
-        String jsonRequest = "{\"initiator\": {\"nickname\": \"host\",\"userId\":\"012345\"}, \"difficulty\": \"medIUM\"}";
+        String jsonRequest = String.format("{\"initiator\": {\"nickname\": \"%s\",\"userId\":\"%s\"}, \"difficulty\": \"medIUM\"}", NICKNAME, USER_ID);
 
         MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
