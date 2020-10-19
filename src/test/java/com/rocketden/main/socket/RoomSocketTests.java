@@ -93,7 +93,6 @@ public class RoomSocketTests {
                 blockingQueue.add((RoomDto) payload);
             }
         });
-        
     }
 
     @Test
