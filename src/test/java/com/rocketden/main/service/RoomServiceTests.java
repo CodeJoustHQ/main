@@ -57,6 +57,8 @@ public class RoomServiceTests {
     private static final String NICKNAME = "rocket";
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String NICKNAME_3 = "rocketandrocket";
+    private static final String SESSION_ID = "session1";
+    private static final String SESSION_ID_2 = "session2";
     private static final String ROOM_ID = "012345";
 
     @Test
@@ -194,8 +196,11 @@ public class RoomServiceTests {
 
         User host = new User();
         host.setNickname(NICKNAME);
+        host.setSessionId(SESSION_ID);
+
         User user =  new User();
         user.setNickname(NICKNAME_2);
+        user.setSessionId(SESSION_ID_2);
 
         room.setHost(host);
         room.addUser(host);
@@ -220,8 +225,11 @@ public class RoomServiceTests {
 
         User host = new User();
         host.setNickname(NICKNAME);
-        User user = new User();
+        host.setSessionId(SESSION_ID);
+
+        User user =  new User();
         user.setNickname(NICKNAME_2);
+        user.setSessionId(SESSION_ID_2);
 
         room.setHost(host);
         room.addUser(host);
@@ -262,8 +270,8 @@ public class RoomServiceTests {
         // New host inactive
         UpdateHostRequest inactiveUserRequest = new UpdateHostRequest();
         user.setSessionId(null);
-        noRoomRequest.setInitiator(UserMapper.toDto(host));
-        noRoomRequest.setNewHost(UserMapper.toDto(user));
+        inactiveUserRequest.setInitiator(UserMapper.toDto(host));
+        inactiveUserRequest.setNewHost(UserMapper.toDto(user));
 
         exception = assertThrows(ApiException.class, () ->
                 roomService.updateRoomHost(ROOM_ID, inactiveUserRequest));
