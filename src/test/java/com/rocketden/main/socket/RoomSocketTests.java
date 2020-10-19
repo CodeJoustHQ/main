@@ -1,6 +1,7 @@
 package com.rocketden.main.socket;
 
 import com.rocketden.main.controller.v1.BaseRestController;
+import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
@@ -17,6 +18,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
@@ -191,5 +193,22 @@ public class RoomSocketTests {
     @Test
     public void socketRecievesMessageOnDisconnection() throws Exception {
         assertNotNull(new String(""));
+    }
+
+    @Test
+    public void socketRecievesMessageOnStartGame() throws Exception {
+        StartGameRequest startGameRequest = new StartGameRequest();
+        startGameRequest.setInitiator(room.getHost());
+
+        HttpEntity<StartGameRequest> startGameEntity = new HttpEntity<>(startGameRequest);
+        String startGameEndpoint = String.format("%s/%s/start", baseRestEndpoint, room.getRoomId());
+        RoomDto expected = template.exchange(startGameEndpoint, HttpMethod.POST, startGameEntity, RoomDto.class).getBody();
+
+        RoomDto actual = blockingQueue.poll(3, SECONDS);
+        assertNotNull(expected);
+        assertNotNull(actual);
+
+        assertEquals(expected.getRoomId(), actual.getRoomId());
+        assertEquals(true, actual.isActive());
     }
 }

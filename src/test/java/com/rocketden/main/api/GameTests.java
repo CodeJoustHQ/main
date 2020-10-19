@@ -73,6 +73,7 @@ public class GameTests {
 		RoomDto actual = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
 		assertEquals(roomDto.getRoomId(), actual.getRoomId());
+		assertEquals(true, actual.isActive());
 	}
 
 	@Test

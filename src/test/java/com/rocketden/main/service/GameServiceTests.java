@@ -60,6 +60,7 @@ public class GameServiceTests {
 		verify(socketService).sendSocketUpdate(eq(response));
 
 		assertEquals(roomId, response.getRoomId());
+		assertEquals(true, response.isActive());
 	}
 
 	@Test
