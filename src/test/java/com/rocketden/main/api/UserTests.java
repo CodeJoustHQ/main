@@ -35,15 +35,19 @@ public class UserTests {
 
     private static final String USER_URI = "/api/v1/user";
 
+    // Predefine user attributes.
+    private static final String NICKNAME = "rocket";
+    private static final String USER_ID = "012345";
+
     @Test
     public void createNewUser() throws Exception {
         CreateUserRequest request = new CreateUserRequest();
-        request.setNickname("rocket");
-        request.setUserId("012345");
+        request.setNickname(NICKNAME);
+        request.setUserId(USER_ID);
 
         UserDto expected = new UserDto();
-        expected.setNickname("rocket");
-        expected.setUserId("012345");
+        expected.setNickname(NICKNAME);
+        expected.setUserId(USER_ID);
 
         MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -61,11 +65,11 @@ public class UserTests {
     @Test
     public void createNewUserNoUserIdSuccess() throws Exception {
         CreateUserRequest request = new CreateUserRequest();
-        request.setNickname("rocket");
+        request.setNickname(NICKNAME);
 
         UserDto expected = new UserDto();
-        expected.setNickname("rocket");
-        expected.setUserId("012345");
+        expected.setNickname(NICKNAME);
+        expected.setUserId(USER_ID);
 
         MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -158,15 +162,15 @@ public class UserTests {
     // @Test
     public void deleteExistingUser() throws Exception {
         CreateUserRequest createRequest = new CreateUserRequest();
-        createRequest.setNickname("rocket");
-        createRequest.setUserId("012345");
+        createRequest.setNickname(NICKNAME);
+        createRequest.setUserId(USER_ID);
 
         UserDto expected = new UserDto();
-        expected.setNickname("rocket");
-        expected.setUserId("012345");
+        expected.setNickname(NICKNAME);
+        expected.setUserId(USER_ID);
 
         DeleteUserRequest deleteRequest = new DeleteUserRequest();
-        deleteRequest.setUserId("012345");
+        deleteRequest.setUserId(USER_ID);
 
         this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -187,7 +191,7 @@ public class UserTests {
     @Test
     public void deleteNonExistentUser() throws Exception {
         DeleteUserRequest request = new DeleteUserRequest();
-        request.setUserId("1");
+        request.setUserId(USER_ID);
 
         ApiError ERROR = UserError.NOT_FOUND;
 
