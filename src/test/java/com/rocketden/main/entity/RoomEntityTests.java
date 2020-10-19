@@ -20,7 +20,7 @@ public class RoomEntityTests {
     private static final Integer ID = 1;
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String USER_ID_2 = "678910";
-    private static final Integer ID_2 = 1;
+    private static final Integer ID_2 = 2;
 
     @Test
     public void roomInitialization() {
@@ -63,7 +63,11 @@ public class RoomEntityTests {
         assertFalse(room.removeUser(userToRemove));
         assertTrue(room.getUsers().contains(user));
 
-        assertTrue(room.removeUser(user));
+        // Update userToRemove to match user in attributes, but not ID.
+        userToRemove.setNickname(NICKNAME);
+        userToRemove.setUserId(USER_ID);
+        assertTrue(room.removeUser(userToRemove));
+        assertFalse(room.getUsers().contains(userToRemove));
         assertFalse(room.getUsers().contains(user));
     }
 
@@ -84,9 +88,13 @@ public class RoomEntityTests {
 
         assertNull(room.getEquivalentUser(userToGet));
 
-        User actual = room.getEquivalentUser(user);
+        // Update userToGet to confirm that user is same despite different ID.
+        userToGet.setNickname(NICKNAME);
+        userToGet.setUserId(USER_ID);
+        User actual = room.getEquivalentUser(userToGet);
 
         assertEquals(user.getNickname(), actual.getNickname());
+        assertEquals(user.getId(), actual.getId());
         assertEquals(user.getUserId(), actual.getUserId());
     }
 }

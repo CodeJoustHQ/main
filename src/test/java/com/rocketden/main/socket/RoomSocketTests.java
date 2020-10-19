@@ -8,6 +8,7 @@ import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.model.ProblemDifficulty;
+import com.rocketden.main.util.SocketTestMethods;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,21 +17,13 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
-import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
-import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.socket.WebSocketHttpHeaders;
-import org.springframework.web.socket.client.standard.StandardWebSocketClient;
-import org.springframework.web.socket.messaging.WebSocketStompClient;
-import org.springframework.web.socket.sockjs.client.SockJsClient;
-import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -47,8 +40,6 @@ public class RoomSocketTests {
 
     @LocalServerPort
     private Integer port;
-
-    private WebSocketStompClient stompClient;
 
     @Autowired
     private TestRestTemplate template;
@@ -68,10 +59,6 @@ public class RoomSocketTests {
     
     @BeforeEach
     public void setup() throws Exception {
-        this.stompClient = new WebSocketStompClient(new SockJsClient(
-                List.of(new WebSocketTransport(new StandardWebSocketClient()))));
-        this.stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-
         // Set up a room with a single user (the host)
         baseRestEndpoint = "http://localhost:" + port + "/api/v1/rooms";
 
@@ -92,13 +79,8 @@ public class RoomSocketTests {
         // BlockingQueue will hold the responses from the socket subscribe endpoint
         blockingQueue = new ArrayBlockingQueue<>(2);
 
-        StompHeaders headers = new StompHeaders();
-        headers.add(WebSocketConnectionEvents.USER_ID_KEY, host.getUserId());
-
         // Connect to the socket endpoint
-        hostSession = stompClient
-                .connect(CONNECT_ENDPOINT, new WebSocketHttpHeaders(), headers, new StompSessionHandlerAdapter() {}, this.port)
-                .get(3, SECONDS);
+        hostSession = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, USER_ID, this.port);
 
         // Add socket messages to BlockingQueue so we can verify expected behavior
         hostSession.subscribe(String.format(SUBSCRIBE_ENDPOINT, response.getRoomId()), new StompFrameHandler() {
@@ -225,15 +207,7 @@ public class RoomSocketTests {
         assertNull(user.getSessionId());
 
         // The user then connects to the stomp client
-        WebSocketStompClient newStompClient = new WebSocketStompClient(new SockJsClient(
-                List.of(new WebSocketTransport(new StandardWebSocketClient()))));
-        newStompClient.setMessageConverter(new MappingJackson2MessageConverter());
-
-        StompHeaders headers = new StompHeaders();
-        headers.add(WebSocketConnectionEvents.USER_ID_KEY, user.getUserId());
-
-        newStompClient.connect(CONNECT_ENDPOINT, new WebSocketHttpHeaders(), headers, new StompSessionHandlerAdapter() {}, this.port)
-                .get(3, SECONDS);
+        SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, user.getUserId(), this.port);
 
         // After connecting, the new user's sessionId should no longer be null
         actual = blockingQueue.poll(3, SECONDS);
@@ -260,16 +234,7 @@ public class RoomSocketTests {
         assertNull(user.getSessionId());
 
         // The user then connects to the stomp client
-        WebSocketStompClient newStompClient = new WebSocketStompClient(new SockJsClient(
-                List.of(new WebSocketTransport(new StandardWebSocketClient()))));
-        newStompClient.setMessageConverter(new MappingJackson2MessageConverter());
-
-        StompHeaders headers = new StompHeaders();
-        headers.add(WebSocketConnectionEvents.USER_ID_KEY, user.getUserId());
-
-        StompSession session = newStompClient
-                .connect(CONNECT_ENDPOINT, new WebSocketHttpHeaders(), headers, new StompSessionHandlerAdapter() {}, this.port)
-                .get(3, SECONDS);
+        StompSession session = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, user.getUserId(), this.port);
 
         // After connecting, the new user's sessionId should no longer be null
         actual = blockingQueue.poll(3, SECONDS);
@@ -304,16 +269,7 @@ public class RoomSocketTests {
         assertNull(user.getSessionId());
 
         // The user then connects to the stomp client
-        WebSocketStompClient newStompClient = new WebSocketStompClient(new SockJsClient(
-                List.of(new WebSocketTransport(new StandardWebSocketClient()))));
-        newStompClient.setMessageConverter(new MappingJackson2MessageConverter());
-
-        StompHeaders headers = new StompHeaders();
-        headers.add(WebSocketConnectionEvents.USER_ID_KEY, user.getUserId());
-
-        StompSession session = newStompClient
-                .connect(CONNECT_ENDPOINT, new WebSocketHttpHeaders(), headers, new StompSessionHandlerAdapter() {}, this.port)
-                .get(3, SECONDS);
+        StompSession session = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, user.getUserId(), this.port);
 
         /**
          * Have the new session subscribe to future messages in order to

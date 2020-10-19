@@ -234,18 +234,16 @@ public class RoomServiceTests {
         invalidPermRequest.setInitiator(UserMapper.toDto(user));
         invalidPermRequest.setNewHost(UserMapper.toDto(host));
 
-        try {
-            roomService.updateRoomHost(room.getRoomId(), invalidPermRequest);
-        } catch (ApiException e) {
-            assertEquals(RoomError.INVALID_PERMISSIONS, e.getError());
-        }
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.updateRoomHost(ROOM_ID, invalidPermRequest));
+        assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
 
         // Nonexistent room
         UpdateHostRequest noRoomRequest = new UpdateHostRequest();
         noRoomRequest.setInitiator(UserMapper.toDto(host));
         noRoomRequest.setNewHost(UserMapper.toDto(user));
 
-        ApiException exception = assertThrows(ApiException.class, () ->
+        exception = assertThrows(ApiException.class, () ->
                 roomService.updateRoomHost("999999", noRoomRequest));
         assertEquals(RoomError.NOT_FOUND, exception.getError());
 
@@ -257,11 +255,9 @@ public class RoomServiceTests {
         nonExistentUser.setNickname(NICKNAME_3);
         noUserRequest.setNewHost(nonExistentUser);
 
-        try {
-            roomService.updateRoomHost(room.getRoomId(), noUserRequest);
-        } catch (ApiException e) {
-            assertEquals(UserError.NOT_FOUND, e.getError());
-        }
+        exception = assertThrows(ApiException.class, () ->
+                roomService.updateRoomHost(ROOM_ID, noUserRequest));
+        assertEquals(UserError.NOT_FOUND, exception.getError());
     }
 
     @Test
@@ -308,11 +304,9 @@ public class RoomServiceTests {
         invalidPermRequest.setInitiator(UserMapper.toDto(user));
         invalidPermRequest.setDifficulty(ProblemDifficulty.MEDIUM);
 
-        try {
-            roomService.updateRoomSettings(room.getRoomId(), invalidPermRequest);
-        } catch (ApiException e) {
-            assertEquals(RoomError.INVALID_PERMISSIONS, e.getError());
-        }
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.updateRoomSettings(ROOM_ID, invalidPermRequest));
+        assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
     }
 
     @Test
