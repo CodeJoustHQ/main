@@ -263,7 +263,7 @@ public class RoomSocketTests {
         template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
 
         // Initially, the new user is not connected, so their sessionId should be null
-        RoomDto actual = blockingQueue.poll(3, SECONDS);
+        RoomDto actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(actual);
         user = actual.getUsers().get(1);
         assertNull(user.getSessionId());
@@ -288,7 +288,7 @@ public class RoomSocketTests {
         });
 
         // After connecting, the new user's sessionId should no longer be null
-        actual = blockingQueue.poll(3, SECONDS);
+        actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(actual);
         assertNotNull(actual.getUsers().get(1).getSessionId());
 
@@ -298,7 +298,7 @@ public class RoomSocketTests {
          */
         hostSession.disconnect();
 
-        actual = blockingQueue.poll(3, SECONDS);
+        actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(actual);
         UserDto host = actual.getUsers().get(0);
         assertNull(host.getSessionId());
