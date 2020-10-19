@@ -7,6 +7,7 @@ import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.exception.RoomError;
+import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.util.SocketTestMethods;
@@ -122,7 +123,6 @@ public class RoomHostTests {
 
     @Test
     public void changeRoomHostInvalidPermissions() throws Exception {
-        // Connect second user to the socket
         SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, USER_ID_2, this.port);
         UserDto user = room.getUsers().get(1);
 
@@ -131,6 +131,68 @@ public class RoomHostTests {
         request.setNewHost(room.getHost());
 
         ApiError ERROR = RoomError.INVALID_PERMISSIONS;
+
+        HttpEntity<UpdateHostRequest> entity = new HttpEntity<>(request);
+        ResponseEntity<ApiErrorResponse> response =
+                template.exchange(changeHostsEndpoint, HttpMethod.PUT, entity, ApiErrorResponse.class);
+        ApiErrorResponse actual = response.getBody();
+
+        assertEquals(ERROR.getStatus(), response.getStatusCode());
+        assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @Test
+    public void changeRoomHostNonExistentRoom() throws Exception {
+        SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, USER_ID_2, this.port);
+        UserDto user = room.getUsers().get(1);
+
+        UpdateHostRequest request = new UpdateHostRequest();
+        request.setInitiator(room.getHost());
+        request.setNewHost(user);
+
+        ApiError ERROR = RoomError.NOT_FOUND;
+
+        HttpEntity<UpdateHostRequest> entity = new HttpEntity<>(request);
+        String badEndpoint = String.format("%s/%s/host", baseRestEndpoint, "999999");
+        ResponseEntity<ApiErrorResponse> response =
+                template.exchange(badEndpoint, HttpMethod.PUT, entity, ApiErrorResponse.class);
+        ApiErrorResponse actual = response.getBody();
+
+        assertEquals(ERROR.getStatus(), response.getStatusCode());
+        assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @Test
+    public void changeRoomHostNewHostNotFound() throws Exception {
+        UserDto user = new UserDto();
+        user.setNickname("unknown");
+        user.setUserId("101010");
+
+        UpdateHostRequest request = new UpdateHostRequest();
+        request.setInitiator(room.getHost());
+        request.setNewHost(user);
+
+        ApiError ERROR = UserError.NOT_FOUND;
+
+        HttpEntity<UpdateHostRequest> entity = new HttpEntity<>(request);
+        ResponseEntity<ApiErrorResponse> response =
+                template.exchange(changeHostsEndpoint, HttpMethod.PUT, entity, ApiErrorResponse.class);
+        ApiErrorResponse actual = response.getBody();
+
+        assertEquals(ERROR.getStatus(), response.getStatusCode());
+        assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @Test
+    public void changeRoomHostInactiveUser() throws Exception {
+        // User has not yet connected to the socket and is thus inactive
+        UserDto user = room.getUsers().get(1);
+
+        UpdateHostRequest request = new UpdateHostRequest();
+        request.setInitiator(room.getHost());
+        request.setNewHost(user);
+
+        ApiError ERROR = RoomError.INACTIVE_USER;
 
         HttpEntity<UpdateHostRequest> entity = new HttpEntity<>(request);
         ResponseEntity<ApiErrorResponse> response =
