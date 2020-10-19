@@ -266,7 +266,7 @@ public class RoomServiceTests {
         noRoomRequest.setNewHost(UserMapper.toDto(user));
 
         exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomHost(room.getRoomId(), inactiveUserRequest));
+                roomService.updateRoomHost(ROOM_ID, inactiveUserRequest));
         assertEquals(RoomError.INACTIVE_USER, exception.getError());
     }
 
