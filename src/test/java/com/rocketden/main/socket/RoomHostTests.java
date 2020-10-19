@@ -4,9 +4,11 @@ import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
+import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.util.SocketTestMethods;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -23,6 +25,7 @@ import java.lang.reflect.Type;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -40,6 +43,7 @@ public class RoomHostTests {
     private static final String CONNECT_ENDPOINT = "ws://localhost:{port}" + BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint";
 
     private String baseRestEndpoint;
+    private String changeHostsEndpoint;
     private RoomDto room;
 
     private static final String NICKNAME = "rocket";
@@ -65,6 +69,8 @@ public class RoomHostTests {
         assertNotNull(response);
         room = response;
 
+        changeHostsEndpoint = String.format("%s/%s/host", baseRestEndpoint, room.getRoomId());
+
         // Connect host to the socket endpoint
         SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, USER_ID, this.port);
 
@@ -78,6 +84,32 @@ public class RoomHostTests {
 
         HttpEntity<JoinRoomRequest> joinEntity = new HttpEntity<>(joinRequest);
         String joinRoomEndpoint = String.format("%s/%s/users", baseRestEndpoint, room.getRoomId());
-        template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
+        response = template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
+
+        assertNotNull(response);
+        room = response;
+    }
+
+    @Test
+    public void changeRoomHostSuccess() throws Exception {
+        // Connect second user to the socket
+        SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, USER_ID_2, this.port);
+        UserDto user = room.getUsers().get(1);
+
+        UpdateHostRequest request = new UpdateHostRequest();
+        request.setInitiator(room.getHost());
+        request.setNewHost(user);
+
+        HttpEntity<UpdateHostRequest> entity = new HttpEntity<>(request);
+        RoomDto response = template.exchange(changeHostsEndpoint, HttpMethod.PUT, entity, RoomDto.class).getBody();
+
+        assertNotNull(response);
+        assertEquals(user, response.getHost());
+
+        String getEndpoint = String.format("%s/%s", baseRestEndpoint, room.getRoomId());
+        response = template.getForObject(getEndpoint, RoomDto.class);
+
+        assertNotNull(response);
+        assertEquals(user, response.getHost());
     }
 }
