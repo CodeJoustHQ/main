@@ -78,9 +78,6 @@ public class RoomSocketTests {
         // BlockingQueue will hold the responses from the socket subscribe endpoint
         blockingQueue = new ArrayBlockingQueue<>(2);
 
-        StompHeaders headers = new StompHeaders();
-        headers.add(WebSocketConnectionEvents.USER_ID_KEY, host.getUserId());
-
         // Connect to the socket endpoint
         StompSession session = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, USER_ID, this.port);
 
@@ -112,7 +109,7 @@ public class RoomSocketTests {
         RoomDto expected = template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
 
         // Verify the socket message we received is as we'd expect
-        RoomDto actual = blockingQueue.poll(3, SECONDS);
+        RoomDto actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(expected);
         assertNotNull(actual);
         assertEquals(expected.getRoomId(), actual.getRoomId());
@@ -133,7 +130,7 @@ public class RoomSocketTests {
         RoomDto expected = template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
 
         // Socket message is sent and is as expected
-        RoomDto actual = blockingQueue.poll(3, SECONDS);
+        RoomDto actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(expected);
         assertNotNull(actual);
         assertEquals(expected.getRoomId(), actual.getRoomId());
@@ -153,7 +150,7 @@ public class RoomSocketTests {
         expected = template.exchange(updateHostEndpoint, HttpMethod.PUT, updateEntity, RoomDto.class).getBody();
 
         // Verify that the socket receives a message with the updated host
-        actual = blockingQueue.poll(3, SECONDS);
+        actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(expected);
         assertNotNull(actual);
         assertEquals(newUser, actual.getHost());
@@ -174,7 +171,7 @@ public class RoomSocketTests {
         assertEquals(updateRequest.getDifficulty(), actual.getDifficulty());
 
         // Verify that the socket receives a message with the updated settings
-        actual = blockingQueue.poll(3, SECONDS);
+        actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(actual);
         assertEquals(updateRequest.getDifficulty(), actual.getDifficulty());
     }
@@ -202,7 +199,7 @@ public class RoomSocketTests {
         template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
 
         // Initially, the new user is not connected, so their sessionId should be null
-        actual = blockingQueue.poll(3, SECONDS);
+        actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(actual);
 
         user = actual.getUsers().get(1);
@@ -212,7 +209,7 @@ public class RoomSocketTests {
         SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, user.getUserId(), this.port);
 
         // After connecting, the new user's sessionId should no longer be null
-        actual = blockingQueue.poll(3, SECONDS);
+        actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(actual);
         assertNotNull(actual.getUsers().get(1).getSessionId());
     }
@@ -230,7 +227,7 @@ public class RoomSocketTests {
         template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
 
         // Initially, the new user is not connected, so their sessionId should be null
-        RoomDto actual = blockingQueue.poll(3, SECONDS);
+        RoomDto actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(actual);
         user = actual.getUsers().get(1);
         assertNull(user.getSessionId());
@@ -239,14 +236,14 @@ public class RoomSocketTests {
         StompSession session = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, user.getUserId(), this.port);
 
         // After connecting, the new user's sessionId should no longer be null
-        actual = blockingQueue.poll(3, SECONDS);
+        actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(actual);
         assertNotNull(actual.getUsers().get(1).getSessionId());
 
         // When the user disconnects, the sessionId should be reset to null
         session.disconnect();
 
-        actual = blockingQueue.poll(3, SECONDS);
+        actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(actual);
         user = actual.getUsers().get(1);
         assertNull(user.getSessionId());
