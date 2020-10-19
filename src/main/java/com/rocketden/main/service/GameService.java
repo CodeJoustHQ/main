@@ -15,8 +15,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class GameService {
 
-	private static final String SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user";
-
     private final RoomRepository repository;
 	private final SocketService socketService;
 

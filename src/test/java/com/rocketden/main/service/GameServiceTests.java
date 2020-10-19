@@ -1,5 +1,6 @@
 package com.rocketden.main.service;
 
+import com.rocketden.main.config.WebSocketConfig;
 import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.StartGameRequest;
@@ -31,6 +32,9 @@ public class GameServiceTests {
 	private RoomRepository repository;
 
 	@Mock
+	private SocketService socketService;
+
+	@Mock
 	private SimpMessagingTemplate template;
 
 	@Spy
@@ -53,9 +57,7 @@ public class GameServiceTests {
 		Mockito.doReturn(room).when(repository).findRoomByRoomId(roomId);
 		RoomDto response = gameService.startGame(roomId, request);
 
-		verify(template).convertAndSend(
-				eq(String.format(BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user", roomId)),
-				eq(response));
+		verify(socketService).sendSocketUpdate(eq(response));
 
 		assertEquals(roomId, response.getRoomId());
 	}
