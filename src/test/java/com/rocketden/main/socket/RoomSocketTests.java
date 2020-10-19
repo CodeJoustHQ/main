@@ -50,6 +50,7 @@ public class RoomSocketTests {
     private BlockingQueue<RoomDto> blockingQueue;
     private String baseRestEndpoint;
     private RoomDto room;
+    private StompSession hostSession;
 
     // Predefine user and room attributes.
     private static final String NICKNAME = "rocket";
@@ -79,10 +80,10 @@ public class RoomSocketTests {
         blockingQueue = new ArrayBlockingQueue<>(2);
 
         // Connect to the socket endpoint
-        StompSession session = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, USER_ID, this.port);
+        hostSession = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, USER_ID, this.port);
 
         // Add socket messages to BlockingQueue so we can verify expected behavior
-        session.subscribe(String.format(SUBSCRIBE_ENDPOINT, response.getRoomId()), new StompFrameHandler() {
+        hostSession.subscribe(String.format(SUBSCRIBE_ENDPOINT, response.getRoomId()), new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
                 return RoomDto.class;
@@ -247,5 +248,63 @@ public class RoomSocketTests {
         assertNotNull(actual);
         user = actual.getUsers().get(1);
         assertNull(user.getSessionId());
+    }
+
+    @Test
+    public void socketChangesHostOnDisconnection() throws Exception {
+        // Have someone join the room
+        UserDto user = new UserDto();
+        user.setNickname(NICKNAME_2);
+        JoinRoomRequest joinRequest = new JoinRoomRequest();
+        joinRequest.setUser(user);
+
+        HttpEntity<JoinRoomRequest> joinEntity = new HttpEntity<>(joinRequest);
+        String joinRoomEndpoint = String.format("%s/%s/users", baseRestEndpoint, room.getRoomId());
+        template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
+
+        // Initially, the new user is not connected, so their sessionId should be null
+        RoomDto actual = blockingQueue.poll(5, SECONDS);
+        assertNotNull(actual);
+        user = actual.getUsers().get(1);
+        assertNull(user.getSessionId());
+
+        // The user then connects to the stomp client
+        StompSession session = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, user.getUserId(), this.port);
+
+        /**
+         * Have the new session subscribe to future messages in order to
+         * receive blockingQueue message after the host disconnects.
+         */
+        session.subscribe(String.format(SUBSCRIBE_ENDPOINT, actual.getRoomId()), new StompFrameHandler() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return RoomDto.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                blockingQueue.add((RoomDto) payload);
+            }
+        });
+
+        // After connecting, the new user's sessionId should no longer be null
+        actual = blockingQueue.poll(5, SECONDS);
+        assertNotNull(actual);
+        assertNotNull(actual.getUsers().get(1).getSessionId());
+
+        /**
+         * When the host disconnects, the sessionId should be reset to null
+         * Change the host to the user
+         */
+        hostSession.disconnect();
+
+        actual = blockingQueue.poll(5, SECONDS);
+        assertNotNull(actual);
+        UserDto host = actual.getUsers().get(0);
+        assertNull(host.getSessionId());
+
+        // Ensure that the second connected user is the new host
+        user = actual.getUsers().get(1);
+        assertEquals(actual.getHost(), user);
     }
 }
