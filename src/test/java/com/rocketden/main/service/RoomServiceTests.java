@@ -70,12 +70,16 @@ public class RoomServiceTests {
         // Mock generateUniqueId to return a custom room id
         Mockito.doReturn(ROOM_ID).when(utility).generateUniqueId(eq(RoomService.ROOM_ID_LENGTH), eq(Utility.ROOM_ID_KEY));
 
+        // Mock generateUniqueId to return a custom user id
+        Mockito.doReturn(USER_ID).when(utility).generateUniqueId(eq(UserService.USER_ID_LENGTH), eq(Utility.USER_ID_KEY));
+
         // Verify create room request succeeds and returns correct response
         RoomDto response = roomService.createRoom(request);
 
         verify(repository).save(Mockito.any(Room.class));
         assertEquals(ROOM_ID, response.getRoomId());
         assertEquals(user.getNickname(), response.getHost().getNickname());
+        assertEquals(USER_ID, response.getHost().getUserId());
         assertEquals(ProblemDifficulty.RANDOM, response.getDifficulty());
     }
 
