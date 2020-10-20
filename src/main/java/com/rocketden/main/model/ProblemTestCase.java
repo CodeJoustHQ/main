@@ -11,13 +11,13 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @Setter
-public class TestCase {
+public class ProblemTestCase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
     private String input;
-    private String expected;
+    private String output;
     private Boolean hidden = false;
 }

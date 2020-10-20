@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class TestCaseDto {
+public class ProblemTestCaseDto {
     private String input;
     private String expected;
 }
