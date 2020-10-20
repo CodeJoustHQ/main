@@ -39,62 +39,64 @@ public class GameServiceTests {
 
 	@Spy
 	@InjectMocks
-	private GameService gameService;
+    private GameService gameService;
+    
+    // Predefine user and room attributes.
+    private static final String NICKNAME = "rocket";
+    private static final String NICKNAME_2 = "rocketrocket";
+    private static final String ROOM_ID = "012345";
 
 	@Test
 	public void startGameSuccess() {
-		String roomId = "123456";
 		User host = new User();
-		host.setNickname("rocket");
+		host.setNickname(NICKNAME);
 
 		Room room = new Room();
-		room.setRoomId(roomId);
+		room.setRoomId(ROOM_ID);
 		room.setHost(host);
 
 		StartGameRequest request = new StartGameRequest();
 		request.setInitiator(UserMapper.toDto(host));
 
-		Mockito.doReturn(room).when(repository).findRoomByRoomId(roomId);
-		RoomDto response = gameService.startGame(roomId, request);
+		Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
+		RoomDto response = gameService.startGame(ROOM_ID, request);
 
 		verify(socketService).sendSocketUpdate(eq(response));
 
-		assertEquals(roomId, response.getRoomId());
+		assertEquals(ROOM_ID, response.getRoomId());
 		assertEquals(true, response.isActive());
 	}
 
 	@Test
 	public void startGameRoomNotFound() {
 		UserDto user = new UserDto();
-		user.setNickname("rocket");
-		String roomId = "123456";
+		user.setNickname(NICKNAME);
 
 		StartGameRequest request = new StartGameRequest();
 		request.setInitiator(user);
 
-		Mockito.doReturn(null).when(repository).findRoomByRoomId(roomId);
-		ApiException exception = assertThrows(ApiException.class, () -> gameService.startGame(roomId, request));
+		Mockito.doReturn(null).when(repository).findRoomByRoomId(ROOM_ID);
+		ApiException exception = assertThrows(ApiException.class, () -> gameService.startGame(ROOM_ID, request));
 		assertEquals(RoomError.NOT_FOUND, exception.getError());
 	}
 
 	@Test
 	public void startGameWrongInitiator() {
-		String roomId = "123456";
 		User host = new User();
-		host.setNickname("rocket");
+		host.setNickname(NICKNAME);
 
 		Room room = new Room();
-		room.setRoomId(roomId);
+		room.setRoomId(ROOM_ID);
 		room.setHost(host);
 
 		UserDto initiator = new UserDto();
-		initiator.setNickname("rocketrocket");
+		initiator.setNickname(NICKNAME_2);
 
 		StartGameRequest request = new StartGameRequest();
 		request.setInitiator(initiator);
 
-		Mockito.doReturn(room).when(repository).findRoomByRoomId(roomId);
-		ApiException exception = assertThrows(ApiException.class, () -> gameService.startGame(roomId, request));
+		Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
+		ApiException exception = assertThrows(ApiException.class, () -> gameService.startGame(ROOM_ID, request));
 		assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
 	}
 }

@@ -41,12 +41,18 @@ public class GameTests {
 	private RoomRepository repository;
 
 	private static final String POST_ROOM = "/api/v1/rooms";
-	private static final String START_GAME = "/api/v1/rooms/%s/start";
+    private static final String START_GAME = "/api/v1/rooms/%s/start";
+
+    // Predefine user and room attributes.
+    private static final String NICKNAME = "rocket";
+    private static final String NICKNAME_2 = "rocketrocket";
+    private static final String ROOM_ID = "012345";
+
 
 	@Test
 	public void startGameSuccess() throws Exception {
 		UserDto host = new UserDto();
-		host.setNickname("rocket");
+		host.setNickname(NICKNAME);
 
 		CreateRoomRequest createRequest = new CreateRoomRequest();
 		createRequest.setHost(host);
@@ -79,15 +85,14 @@ public class GameTests {
 	@Test
 	public void startGameRoomNotFound() throws Exception {
 		UserDto user = new UserDto();
-		user.setNickname("rocket");
-		String roomId = "123456";
+		user.setNickname(NICKNAME);
 
 		StartGameRequest request = new StartGameRequest();
 		request.setInitiator(user);
 
 		ApiError ERROR = RoomError.NOT_FOUND;
 
-		MvcResult result = this.mockMvc.perform(post(String.format(START_GAME, roomId))
+		MvcResult result = this.mockMvc.perform(post(String.format(START_GAME, ROOM_ID))
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.content(UtilityTestMethods.convertObjectToJsonString(request)))
 				.andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
@@ -102,7 +107,7 @@ public class GameTests {
 	@Test
 	public void startGameWrongInitiator() throws Exception {
 		User host = new User();
-		host.setNickname("rocket");
+		host.setNickname(NICKNAME);
 
 		CreateRoomRequest createRequest = new CreateRoomRequest();
 		createRequest.setHost(UserMapper.toDto(host));
@@ -117,7 +122,7 @@ public class GameTests {
 		RoomDto roomDto = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
 		UserDto user = new UserDto();
-		user.setNickname("rocketrocket");
+		user.setNickname(NICKNAME_2);
 		StartGameRequest request = new StartGameRequest();
 		request.setInitiator(user);
 

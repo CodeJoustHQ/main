@@ -14,12 +14,17 @@ import static org.junit.Assert.assertNull;
 @SpringBootTest
 public class UserMapperTests {
 
+    // Predefine user attributes.
+    private static final String NICKNAME = "rocket";
+    private static final String USER_ID = "012345";
+    private static final String SESSION_ID = "234567";
+
     @Test
     public void entityToDto() {
         User user = new User();
-        user.setNickname("rocket");
-        user.setUserId("678910");
-        user.setSessionId("012345");
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        user.setSessionId(SESSION_ID);
 
         UserDto response = UserMapper.toDto(user);
 
@@ -32,9 +37,9 @@ public class UserMapperTests {
     @Test
     public void dtoToEntity() {
         UserDto user = new UserDto();
-        user.setNickname("rocket");
-        user.setUserId("6798910");
-        user.setSessionId("012345");
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        user.setSessionId(SESSION_ID);
 
         User response = UserMapper.toEntity(user);
 
