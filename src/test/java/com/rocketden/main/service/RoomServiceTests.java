@@ -57,8 +57,8 @@ public class RoomServiceTests {
     private static final String NICKNAME = "rocket";
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String NICKNAME_3 = "rocketandrocket";
-    private static final String SESSION_ID = "session1";
-    private static final String SESSION_ID_2 = "session2";
+    private static final String SESSION_ID = "abcdef";
+    private static final String SESSION_ID_2 = "ghijkl";
     private static final String ROOM_ID = "012345";
 
     @Test
