@@ -134,6 +134,7 @@ function LobbyPage() {
               // If currentUser is host, pass in an on-click action card for all other users
               <HostActionCard
                 user={user}
+                userIsActive={Boolean(user.sessionId)}
                 onMakeHost={changeHosts}
                 onDeleteUser={deleteUser}
               />
