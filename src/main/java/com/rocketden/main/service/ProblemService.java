@@ -39,7 +39,7 @@ public class ProblemService {
 
     public List<ProblemDto> getAllProblems() {
         List<ProblemDto> problems = new ArrayList<>();
-        repository.findAll().forEach((problem -> problems.add(ProblemMapper.toDto(problem))));
+        repository.findAll().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
 
         return problems;
     }
