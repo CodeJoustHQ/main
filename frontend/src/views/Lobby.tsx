@@ -123,13 +123,13 @@ function LobbyPage() {
    * Display the passed-in list of users on the UI, either as
    * active or inactive.
    */
-  const displayUsers = (userList: User[] | null, active: boolean) => {
+  const displayUsers = (userList: User[] | null, isActive: boolean) => {
     if (userList) {
       return userList.map((user) => (
         <PlayerCard
           user={user}
           isHost={user.nickname === host?.nickname}
-          isActive={active}
+          isActive={isActive}
         >
           {currentUser?.nickname === host?.nickname
             && (user.nickname !== currentUser?.nickname) ? (

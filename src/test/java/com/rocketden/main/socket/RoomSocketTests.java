@@ -204,7 +204,7 @@ public class RoomSocketTests {
         String startGameEndpoint = String.format("%s/%s/start", baseRestEndpoint, room.getRoomId());
         RoomDto expected = template.exchange(startGameEndpoint, HttpMethod.POST, startGameEntity, RoomDto.class).getBody();
 
-        RoomDto actual = blockingQueue.poll(3, SECONDS);
+        RoomDto actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(expected);
         assertNotNull(actual);
 
