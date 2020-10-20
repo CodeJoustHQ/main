@@ -57,7 +57,7 @@ public class UserServiceTests {
         CreateUserRequest request = new CreateUserRequest();
         request.setNickname(NICKNAME);
 
-        Mockito.doReturn(USER_ID).when(utility).generateId(eq(UserService.USER_ID_LENGTH));
+        Mockito.doReturn(USER_ID).when(utility).generateUniqueId(eq(UserService.USER_ID_LENGTH), eq(Utility.USER_ID_KEY));
 
         UserDto response = service.createUser(request);
         verify(repository).save(Mockito.any(User.class));

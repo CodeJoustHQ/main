@@ -66,8 +66,8 @@ public class RoomServiceTests {
         CreateRoomRequest request = new CreateRoomRequest();
         request.setHost(user);
         
-        // Mock generateId to return a custom room id
-        Mockito.doReturn(ROOM_ID).when(utility).generateId(eq(RoomService.ROOM_ID_LENGTH));
+        // Mock generateUniqueId to return a custom room id
+        Mockito.doReturn(ROOM_ID).when(utility).generateUniqueId(eq(RoomService.ROOM_ID_LENGTH), eq(Utility.ROOM_ID_KEY));
 
         // Verify create room request succeeds and returns correct response
         RoomDto response = roomService.createRoom(request);
@@ -86,8 +86,8 @@ public class RoomServiceTests {
         JoinRoomRequest request = new JoinRoomRequest();
         request.setUser(UserMapper.toDto(user));
 
-        // Mock generateId to return a custom room id
-        Mockito.doReturn(ROOM_ID).when(utility).generateId(eq(RoomService.ROOM_ID_LENGTH));
+        // Mock generateUniqueId to return a custom room id
+        Mockito.doReturn(ROOM_ID).when(utility).generateUniqueId(eq(RoomService.ROOM_ID_LENGTH), eq(Utility.ROOM_ID_KEY));
 
         Room room = new Room();
         room.setRoomId(ROOM_ID);

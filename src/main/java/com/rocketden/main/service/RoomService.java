@@ -57,7 +57,7 @@ public class RoomService {
 
         // Add userId if not already present.
         if (user.getUserId() == null) {
-            user.setUserId(utility.generateId(UserService.USER_ID_LENGTH));
+            user.setUserId(utility.generateUniqueId(UserService.USER_ID_LENGTH, Utility.USER_ID_KEY));
         }
 
         // Add the user to the room.
@@ -82,11 +82,11 @@ public class RoomService {
 
         // Create user ID for the host if not already present.
         if (host.getUserId() == null) {
-            host.setUserId(utility.generateId(UserService.USER_ID_LENGTH));
+            host.setUserId(utility.generateUniqueId(UserService.USER_ID_LENGTH, Utility.USER_ID_KEY));
         }
 
         Room room = new Room();
-        room.setRoomId(utility.generateId(ROOM_ID_LENGTH));
+        room.setRoomId(utility.generateUniqueId(RoomService.ROOM_ID_LENGTH, Utility.ROOM_ID_KEY));
         room.setHost(host);
         room.addUser(host);
         repository.save(room);
