@@ -1,7 +1,5 @@
 package com.rocketden.main.service;
 
-import com.rocketden.main.config.WebSocketConfig;
-import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.room.RoomDto;

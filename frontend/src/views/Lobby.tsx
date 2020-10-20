@@ -209,14 +209,14 @@ function LobbyPage() {
       connectUserToRoom(currentRoomId, currentUser.userId);
     }
   }, [socketConnected, connectUserToRoom, currentRoomId, currentUser]);
-  
+
   // Redirect user to game page if room is active.
   useEffect(() => {
     if (active) {
       history.push('/game');
     }
   }, [history, active]);
-  
+
   // Render the lobby.
   return (
     <div>
