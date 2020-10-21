@@ -55,6 +55,11 @@ public class RoomService {
             throw new ApiException(RoomError.DUPLICATE_USERNAME);
         }
 
+        // Return error if room is already active.
+        if (room.getActive()) {
+            throw new ApiException(RoomError.ALREADY_ACTIVE);
+        }
+
         // Add userId if not already present.
         if (user.getUserId() == null) {
             user.setUserId(utility.generateId(UserService.USER_ID_LENGTH));

@@ -1,6 +1,7 @@
 package com.rocketden.main.socket;
 
 import com.rocketden.main.controller.v1.BaseRestController;
+import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
@@ -311,5 +312,22 @@ public class RoomSocketTests {
         // Ensure that the second connected user is the new host
         user = actual.getUsers().get(1);
         assertEquals(actual.getHost(), user);
+    }
+
+    @Test
+    public void socketRecievesMessageOnStartGame() throws Exception {
+        StartGameRequest startGameRequest = new StartGameRequest();
+        startGameRequest.setInitiator(room.getHost());
+
+        HttpEntity<StartGameRequest> startGameEntity = new HttpEntity<>(startGameRequest);
+        String startGameEndpoint = String.format("%s/%s/start", baseRestEndpoint, room.getRoomId());
+        RoomDto expected = template.exchange(startGameEndpoint, HttpMethod.POST, startGameEntity, RoomDto.class).getBody();
+
+        RoomDto actual = blockingQueue.poll(5, SECONDS);
+        assertNotNull(expected);
+        assertNotNull(actual);
+
+        assertEquals(expected.getRoomId(), actual.getRoomId());
+        assertEquals(true, actual.isActive());
     }
 }
