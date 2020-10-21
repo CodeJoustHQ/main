@@ -39,6 +39,13 @@ public class ProblemService {
         return ProblemMapper.toDto(problem);
     }
 
+    public ProblemDto getProblem(int id) {
+        Problem problem = repository.findById(id)
+                .orElseThrow(() -> new ApiException(ProblemError.NOT_FOUND));
+
+        return ProblemMapper.toDto(problem);
+    }
+
     public List<ProblemDto> getAllProblems() {
         List<ProblemDto> problems = new ArrayList<>();
         repository.findAll().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
