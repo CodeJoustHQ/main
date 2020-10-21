@@ -6,7 +6,7 @@ import Editor from '../components/core/Editor';
 import { errorHandler, ErrorResponse } from '../api/Error';
 import { Problem, getProblems } from '../api/Problem';
 import { Room } from '../api/Room';
-import {
+import MainContainer, {
   FlexContainer, FlexInfoBar, Panel, SplitterContainer,
 } from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
@@ -69,9 +69,13 @@ function GamePage() {
     window.dispatchEvent(event);
   };
 
-  // If the page is loading, return a Loading object.
+  // If the page is loading, return a centered Loading object.
   if (fullPageLoad) {
-    return <Loading />;
+    return (
+      <MainContainer>
+        <Loading />
+      </MainContainer>
+    );
   }
 
   return (
