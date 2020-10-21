@@ -60,16 +60,18 @@ function LobbyPage() {
 
   /**
    * Rebuild the room objet from the current variables.
-   * This method assumes all variables of the Room are included.
+   * This method assumes all variables of the Room are included, and
+   * it uses useCallback so so it is not re-built in
+   * the useEffect function.
    */
-  const rebuildRoom = (): Room => ({
+  const rebuildRoom = useCallback((): Room => ({
     roomId: currentRoomId,
     host: host!,
     users: users!,
     activeUsers: activeUsers!,
     inactiveUsers: inactiveUsers!,
     difficulty: difficulty!,
-  });
+  }), [currentRoomId, host, users, activeUsers, inactiveUsers, difficulty]);
 
   const deleteUser = (user: User) => {
     // Make rest call to delete user from room
@@ -194,7 +196,7 @@ function LobbyPage() {
     }).catch((err) => {
       setError(err.message);
     });
-  }, [history]);
+  }, [history, rebuildRoom]);
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {

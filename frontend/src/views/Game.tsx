@@ -40,6 +40,7 @@ function GamePage() {
   useEffect(() => {
     if (checkLocationState(location, 'room')) {
       setRoom(location.state.room);
+      console.log(location.state.room);
 
       // Get the game problem.
       getProblems().then((res) => {
@@ -59,7 +60,7 @@ function GamePage() {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
       });
     }
-  }, [location]);
+  }, [location, history]);
 
   const firstProblem = problems?.[0];
 
