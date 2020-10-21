@@ -25,7 +25,7 @@ function GamePage() {
   const location = useLocation<LocationState>();
   const [room, setRoom] = useState<Room | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [fullPageLoad, setFullPageLoad] = useState<boolean>(true);
+  const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
   /**
@@ -53,7 +53,7 @@ function GamePage() {
         setError((err as ErrorResponse).message);
         setProblems([]);
       });
-      setFullPageLoad(false);
+      setFullPageLoading(false);
     } else {
       history.push('/game/join', {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
@@ -70,7 +70,7 @@ function GamePage() {
   };
 
   // If the page is loading, return a centered Loading object.
-  if (fullPageLoad) {
+  if (fullPageLoading) {
     return (
       <MainContainer>
         <Loading />
