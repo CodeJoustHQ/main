@@ -177,7 +177,7 @@ function LobbyPage() {
     };
 
     const startGameCallback = () => {
-      history.push('/game', rebuildRoom());
+      history.push('/game', { room: rebuildRoom() });
     };
 
     connect(roomId, userId).then(() => {
