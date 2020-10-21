@@ -15,5 +15,6 @@ public class RoomDto {
     private List<UserDto> users;
     private List<UserDto> activeUsers;
     private List<UserDto> inactiveUsers;
+    private boolean active;
     private ProblemDifficulty difficulty;
 }

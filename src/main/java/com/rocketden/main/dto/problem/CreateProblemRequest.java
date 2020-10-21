@@ -3,13 +3,9 @@ package com.rocketden.main.dto.problem;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Getter
 @Setter
-public class ProblemDto {
+public class CreateProblemRequest {
     private String name;
     private String description;
-//    private List<TestCaseDto> testCases = new ArrayList<>(); TODO: upcoming PR
 }

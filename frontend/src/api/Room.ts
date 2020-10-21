@@ -9,11 +9,12 @@ export type Room = {
   users: User[],
   activeUsers: User[],
   inactiveUsers: User[],
+  active: boolean,
   difficulty: Difficulty,
 };
 
 export type CreateRoomParams = {
-  host: User;
+  host: User,
 };
 
 export type JoinRoomParams = {

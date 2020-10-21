@@ -35,6 +35,7 @@ function LobbyPage() {
   const [activeUsers, setActiveUsers] = useState<User[] | null>(null);
   const [inactiveUsers, setInactiveUsers] = useState<User[] | null>(null);
   const [currentRoomId, setRoomId] = useState('');
+  const [active, setActive] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
 
   // Hold error text.
@@ -55,6 +56,7 @@ function LobbyPage() {
     setActiveUsers(room.activeUsers);
     setInactiveUsers(room.inactiveUsers);
     setRoomId(room.roomId);
+    setActive(room.active);
     setDifficulty(room.difficulty);
   };
 
@@ -70,8 +72,10 @@ function LobbyPage() {
     users: users!,
     activeUsers: activeUsers!,
     inactiveUsers: inactiveUsers!,
+    active,
     difficulty: difficulty!,
-  }), [currentRoomId, host, users, activeUsers, inactiveUsers, difficulty]);
+  }),
+  [currentRoomId, host, users, activeUsers, inactiveUsers, active, difficulty]);
 
   const deleteUser = (user: User) => {
     // Make rest call to delete user from room
@@ -89,7 +93,7 @@ function LobbyPage() {
       changeRoomHost(currentRoomId, request)
         .then(() => setLoading(false))
         .catch((err) => {
-          setError(err);
+          setError(err.message);
           setLoading(false);
         });
     }
@@ -138,19 +142,20 @@ function LobbyPage() {
    * Display the passed-in list of users on the UI, either as
    * active or inactive.
    */
-  const displayUsers = (userList: User[] | null, active: boolean) => {
+  const displayUsers = (userList: User[] | null, isActive: boolean) => {
     if (userList) {
       return userList.map((user) => (
         <PlayerCard
           user={user}
           isHost={user.nickname === host?.nickname}
-          isActive={active}
+          isActive={isActive}
         >
           {currentUser?.nickname === host?.nickname
             && (user.nickname !== currentUser?.nickname) ? (
               // If currentUser is host, pass in an on-click action card for all other users
               <HostActionCard
                 user={user}
+                userIsActive={Boolean(user.sessionId)}
                 onMakeHost={changeHosts}
                 onDeleteUser={deleteUser}
               />
@@ -178,17 +183,8 @@ function LobbyPage() {
       setStateFromRoom(JSON.parse(result.body));
     };
 
-    const startGameCallback = () => {
-      history.push('/game', { room: rebuildRoom() });
-    };
-
     connect(roomId, userId).then(() => {
       subscribe(routes(roomId).subscribe, subscribeCallback).then(() => {
-        setSocketConnected(true);
-      }).catch((err) => {
-        setError(err.message);
-      });
-      subscribe(routes(roomId).start, startGameCallback).then(() => {
         setSocketConnected(true);
       }).catch((err) => {
         setError(err.message);
@@ -196,7 +192,7 @@ function LobbyPage() {
     }).catch((err) => {
       setError(err.message);
     });
-  }, [history, rebuildRoom]);
+  }, []);
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
@@ -233,6 +229,13 @@ function LobbyPage() {
       connectUserToRoom(currentRoomId, currentUser.userId);
     }
   }, [socketConnected, connectUserToRoom, currentRoomId, currentUser]);
+
+  // Redirect user to game page if room is active.
+  useEffect(() => {
+    if (active) {
+      history.push('/game', { room: rebuildRoom() });
+    }
+  }, [history, active, rebuildRoom]);
 
   // Render the lobby.
   return (
