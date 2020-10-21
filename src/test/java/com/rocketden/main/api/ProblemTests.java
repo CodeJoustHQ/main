@@ -88,6 +88,7 @@ class ProblemTests {
 
         assertEquals(NAME, actual.getName());
         assertEquals(DESCRIPTION, actual.getDescription());
+        assertEquals(0, actual.getTestCases().size());
 
         // Get the newly created problem from the database
         result = this.mockMvc.perform(get(String.format(GET_PROBLEM, actual.getId())))
@@ -99,6 +100,7 @@ class ProblemTests {
 
         assertEquals(NAME, actual.getName());
         assertEquals(DESCRIPTION, actual.getDescription());
+        assertEquals(0, actual.getTestCases().size());
     }
 
     @Test
@@ -216,8 +218,75 @@ class ProblemTests {
     }
 
     @Test
+    public void createTestCaseProblemNotFound() throws Exception {
+        CreateTestCaseRequest request = new CreateTestCaseRequest();
+        request.setInput(INPUT);
+        request.setOutput(OUTPUT);
+
+        ApiError ERROR = ProblemError.NOT_FOUND;
+
+        String endpoint = String.format(POST_TEST_CASE_CREATE, 99);
+        MvcResult result = this.mockMvc.perform(post(endpoint)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @Test
     public void createProblemWithTestCasesSuccess() throws Exception {
-        assertTrue(false);
+        ProblemDto problem = createSingleProblem();
+
+        // Create first test case
+        CreateTestCaseRequest request = new CreateTestCaseRequest();
+        request.setInput(INPUT);
+        request.setOutput(OUTPUT);
+        request.setHidden(true);
+
+        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getId());
+        this.mockMvc.perform(post(endpoint)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        // Create second test case
+        request.setInput(INPUT_2);
+        request.setOutput(OUTPUT_2);
+        request.setHidden(false);
+
+        this.mockMvc.perform(post(endpoint)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        // Get problem from database
+        MvcResult result = this.mockMvc.perform(get(String.format(GET_PROBLEM, problem.getId())))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ProblemDto actual = UtilityTestMethods.toObject(jsonResponse, ProblemDto.class);
+
+        List<ProblemTestCaseDto> testCases = actual.getTestCases();
+        assertEquals(2, testCases.size());
+
+        ProblemTestCaseDto case1 = testCases.get(0);
+        ProblemTestCaseDto case2 = testCases.get(1);
+
+        assertEquals(INPUT, case1.getInput());
+        assertEquals(OUTPUT, case1.getOutput());
+        assertTrue(case1.isHidden());
+
+        assertEquals(INPUT_2, case2.getInput());
+        assertEquals(OUTPUT_2, case2.getOutput());
+        assertFalse(case2.isHidden());
     }
 
     /**

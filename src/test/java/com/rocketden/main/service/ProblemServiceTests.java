@@ -36,6 +36,16 @@ public class ProblemServiceTests {
     private static final String DESCRIPTION = "Sort the given list in O(n log n) time.";
 
     @Test
+    public void getProblemSuccess() {
+
+    }
+
+    @Test
+    public void getProblemNotFound() {
+
+    }
+
+    @Test
     public void createProblemSuccess() {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);
@@ -47,6 +57,7 @@ public class ProblemServiceTests {
 
         assertEquals(NAME, response.getName());
         assertEquals(DESCRIPTION, response.getDescription());
+        assertEquals(0, response.getTestCases().size());
     }
 
     @Test
