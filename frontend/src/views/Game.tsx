@@ -40,7 +40,6 @@ function GamePage() {
   useEffect(() => {
     if (checkLocationState(location, 'room')) {
       setRoom(location.state.room);
-      console.log(location.state.room);
 
       // Get the game problem.
       getProblems().then((res) => {
