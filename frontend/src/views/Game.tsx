@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
 import { useBeforeunload } from 'react-beforeunload';
 import Editor from '../components/core/Editor';
-import { ErrorResponse } from '../api/Error';
+import { errorHandler, ErrorResponse } from '../api/Error';
 import { Problem, getProblems } from '../api/Problem';
 import { Room } from '../api/Room';
 import {
@@ -19,6 +19,8 @@ type LocationState = {
 }
 
 function GamePage() {
+  // Get history object to be able to move between different pages
+  const history = useHistory();
   const location = useLocation<LocationState>();
   const [room, setRoom] = useState<Room | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
@@ -36,6 +38,10 @@ function GamePage() {
   useEffect(() => {
     if (checkLocationState(location, 'room')) {
       setRoom(location.state.room);
+    } else {
+      history.push('/game/join', {
+        error: errorHandler('No valid room details were provided, so you could not view the game page.'),
+      });
     }
     getProblems().then((res) => {
       if (!(res as Problem[]).length) {
