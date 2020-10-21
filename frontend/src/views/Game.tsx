@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
+import { useBeforeunload } from 'react-beforeunload';
 import Editor from '../components/core/Editor';
 import { ErrorResponse } from '../api/Error';
 import { Problem, getProblems } from '../api/Problem';
@@ -22,6 +23,14 @@ function GamePage() {
   const [room, setRoom] = useState<Room | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
   const [error, setError] = useState<string>('');
+
+  /**
+   * Display beforeUnload message to inform the user that they may lose
+   * their code / data if they leave the page.
+   * Some browsers will display this message, others will display a fixed
+   * message; see https://github.com/jacobbuck/react-beforeunload.
+   */
+  useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
   // Called every time location changes
   useEffect(() => {
