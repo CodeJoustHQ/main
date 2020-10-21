@@ -41,6 +41,7 @@ class ProblemTests {
 
     private static final String GET_PROBLEM_ALL = "/api/v1/problems";
     private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
+    private static final String POST_TEST_CASE_CREATE = "/api/v1/problems/%s/test-case";
 
     private static final String NAME = "Sort an Array";
     private static final String DESCRIPTION = "Sort an array from lowest to highest value.";
@@ -148,5 +149,30 @@ class ProblemTests {
     @Test
     public void createProblemWithTestCasesSuccess() throws Exception {
         assertTrue(false);
+    }
+
+    /**
+     * Helper method that sends a POST request to create a new problem
+     * @return the created problem
+     * @throws Exception if anything wrong occurs
+     */
+    private ProblemDto createSingleProblem() throws Exception {
+        CreateProblemRequest request = new CreateProblemRequest();
+        request.setName(NAME);
+        request.setDescription(DESCRIPTION);
+
+        MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ProblemDto actual = UtilityTestMethods.toObject(jsonResponse, ProblemDto.class);
+
+        assertEquals(NAME, actual.getName());
+        assertEquals(DESCRIPTION, actual.getDescription());
+
+        return actual;
     }
 }
