@@ -1,6 +1,7 @@
 package com.rocketden.main.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -10,7 +11,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.rocketden.main.dto.problem.CreateProblemRequest;
+import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
@@ -47,6 +50,11 @@ class ProblemTests {
     private static final String DESCRIPTION = "Sort an array from lowest to highest value.";
     private static final String NAME_2 = "Find Maximum";
     private static final String DESCRIPTION_2 = "Find the maximum value in an array.";
+
+    private static final String INPUT = "[1, 2, 8]";
+    private static final String OUTPUT = "8";
+    private static final String INPUT_2 = "[-1, 5, 0, 3]";
+    private static final String OUTPUT_2 = "5";
 
     @Test
     public void createProblemSuccess() throws Exception {
@@ -138,12 +146,47 @@ class ProblemTests {
 
     @Test
     public void createTestCaseSuccess() throws Exception {
-        assertTrue(false);
+        ProblemDto problem = createSingleProblem();
+
+        CreateTestCaseRequest request = new CreateTestCaseRequest();
+        request.setInput(INPUT);
+        request.setOutput(OUTPUT);
+
+        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getId());
+        MvcResult result = this.mockMvc.perform(post(endpoint)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ProblemTestCaseDto actual = UtilityTestMethods.toObject(jsonResponse, ProblemTestCaseDto.class);
+
+        assertEquals(INPUT, actual.getInput());
+        assertEquals(OUTPUT, actual.getOutput());
+        assertFalse(actual.isHidden());
     }
 
     @Test
     public void createTestCaseEmptyField() throws Exception {
-        assertTrue(false);
+        ProblemDto problem = createSingleProblem();
+
+        CreateTestCaseRequest request = new CreateTestCaseRequest();
+        request.setInput(INPUT);
+
+        ApiError ERROR = ProblemError.EMPTY_FIELD;
+
+        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getId());
+        MvcResult result = this.mockMvc.perform(post(endpoint)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
     }
 
     @Test
