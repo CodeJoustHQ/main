@@ -42,6 +42,7 @@ class ProblemTests {
     @Autowired
     private MockMvc mockMvc;
 
+    private static final String GET_PROBLEM = "/api/v1/problems/%s";
     private static final String GET_PROBLEM_ALL = "/api/v1/problems";
     private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
     private static final String POST_TEST_CASE_CREATE = "/api/v1/problems/%s/test-case";
@@ -57,7 +58,21 @@ class ProblemTests {
     private static final String OUTPUT_2 = "5";
 
     @Test
-    public void createProblemSuccess() throws Exception {
+    public void getProblemNonExistent() throws Exception {
+        ApiError ERROR = ProblemError.NOT_FOUND;
+
+        MvcResult result = this.mockMvc.perform(get(String.format(GET_PROBLEM, 99)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @Test
+    public void createAndGetProblemSuccess() throws Exception {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);
         request.setDescription(DESCRIPTION);
@@ -70,6 +85,17 @@ class ProblemTests {
 
         String jsonResponse = result.getResponse().getContentAsString();
         ProblemDto actual = UtilityTestMethods.toObject(jsonResponse, ProblemDto.class);
+
+        assertEquals(NAME, actual.getName());
+        assertEquals(DESCRIPTION, actual.getDescription());
+
+        // Get the newly created problem from the database
+        result = this.mockMvc.perform(get(String.format(GET_PROBLEM, actual.getId())))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        actual = UtilityTestMethods.toObject(jsonResponse, ProblemDto.class);
 
         assertEquals(NAME, actual.getName());
         assertEquals(DESCRIPTION, actual.getDescription());
