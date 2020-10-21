@@ -45,12 +45,13 @@ public class Utility {
             }
             return id;
         } catch (IllegalArgumentException e) {
+            // Throw IllegalArgumentException for invalid id type.
             throw new IllegalArgumentException(e);
         }
     }
 
     // Determine if the id of idType already exists in the database.
-    private boolean idExists(String id, String idType) {
+    public boolean idExists(String id, String idType) {
         switch (idType) {
             case (ROOM_ID_KEY):
                 return roomRepository.findRoomByRoomId(id) != null;
