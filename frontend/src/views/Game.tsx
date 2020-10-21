@@ -13,6 +13,7 @@ import ErrorMessage from '../components/core/Error';
 import { ProblemHeaderText, Text } from '../components/core/Text';
 import 'react-splitter-layout/lib/index.css';
 import { checkLocationState } from '../util/Utility';
+import Loading from '../components/core/Loading';
 
 type LocationState = {
   room: Room,
@@ -24,6 +25,7 @@ function GamePage() {
   const location = useLocation<LocationState>();
   const [room, setRoom] = useState<Room | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
+  const [fullPageLoad, setFullPageLoad] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
   /**
@@ -51,6 +53,7 @@ function GamePage() {
         setError((err as ErrorResponse).message);
         setProblems([]);
       });
+      setFullPageLoad(false);
     } else {
       history.push('/game/join', {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
@@ -65,6 +68,11 @@ function GamePage() {
     const event = new Event('secondaryPanelSizeChange');
     window.dispatchEvent(event);
   };
+
+  // If the page is loading, return a Loading object.
+  if (fullPageLoad) {
+    return <Loading />;
+  }
 
   return (
     <FlexContainer>
