@@ -60,6 +60,7 @@ public class RoomServiceTests {
     private static final String SESSION_ID = "abcdef";
     private static final String SESSION_ID_2 = "ghijkl";
     private static final String ROOM_ID = "012345";
+    private static final String USER_ID = "678910";
 
     @Test
     public void createRoomSuccess() {
@@ -68,8 +69,11 @@ public class RoomServiceTests {
         CreateRoomRequest request = new CreateRoomRequest();
         request.setHost(user);
         
-        // Mock generateId to return a custom room id
-        Mockito.doReturn(ROOM_ID).when(utility).generateId(eq(RoomService.ROOM_ID_LENGTH));
+        // Mock generateUniqueId to return a custom room id
+        Mockito.doReturn(ROOM_ID).when(utility).generateUniqueId(eq(RoomService.ROOM_ID_LENGTH), eq(Utility.ROOM_ID_KEY));
+
+        // Mock generateUniqueId to return a custom user id
+        Mockito.doReturn(USER_ID).when(utility).generateUniqueId(eq(UserService.USER_ID_LENGTH), eq(Utility.USER_ID_KEY));
 
         // Verify create room request succeeds and returns correct response
         RoomDto response = roomService.createRoom(request);
@@ -77,6 +81,7 @@ public class RoomServiceTests {
         verify(repository).save(Mockito.any(Room.class));
         assertEquals(ROOM_ID, response.getRoomId());
         assertEquals(user.getNickname(), response.getHost().getNickname());
+        assertEquals(USER_ID, response.getHost().getUserId());
         assertEquals(ProblemDifficulty.RANDOM, response.getDifficulty());
     }
 
@@ -88,8 +93,8 @@ public class RoomServiceTests {
         JoinRoomRequest request = new JoinRoomRequest();
         request.setUser(UserMapper.toDto(user));
 
-        // Mock generateId to return a custom room id
-        Mockito.doReturn(ROOM_ID).when(utility).generateId(eq(RoomService.ROOM_ID_LENGTH));
+        // Mock generateUniqueId to return a custom user id
+        Mockito.doReturn(USER_ID).when(utility).generateUniqueId(eq(UserService.USER_ID_LENGTH), eq(Utility.USER_ID_KEY));
 
         Room room = new Room();
         room.setRoomId(ROOM_ID);
@@ -109,7 +114,7 @@ public class RoomServiceTests {
         assertEquals(2, response.getUsers().size());
         assertEquals(host.getNickname(), response.getUsers().get(0).getNickname());
         assertEquals(user.getNickname(), response.getUsers().get(1).getNickname());
-        assertEquals(ROOM_ID, response.getUsers().get(1).getUserId());
+        assertEquals(USER_ID, response.getUsers().get(1).getUserId());
         assertEquals(ProblemDifficulty.RANDOM, response.getDifficulty());
     }
 
