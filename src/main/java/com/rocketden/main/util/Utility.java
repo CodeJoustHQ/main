@@ -35,25 +35,29 @@ public class Utility {
          * Note: This loop could technically run forever, but there are 9^6
          * (531,441) possible combinations, so this works for now (10/20/2020).
          */
-        while (id == null || idExists(id, idType)) {
-            for (int i = 0; i < values.length; i++) {
-                int index = random.nextInt(numbers.length());
-                values[i] = numbers.charAt(index);
+        try {
+            while (id == null || idExists(id, idType)) {
+                for (int i = 0; i < values.length; i++) {
+                    int index = random.nextInt(numbers.length());
+                    values[i] = numbers.charAt(index);
+                }
+                id = new String(values);
             }
-            id = new String(values);
+            return id;
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(e);
         }
-        return id;
     }
 
     // Determine if the id of idType already exists in the database.
     private boolean idExists(String id, String idType) {
-        if (idType.equals(ROOM_ID_KEY)) {
-            return roomRepository.findRoomByRoomId(id) != null;
-        } else if (idType.equals(USER_ID_KEY)) {
-            return userRepository.findUserByUserId(id) != null; 
+        switch (idType) {
+            case (ROOM_ID_KEY):
+                return roomRepository.findRoomByRoomId(id) != null;
+            case (USER_ID_KEY):
+                return userRepository.findUserByUserId(id) != null; 
+            default:
+                throw new IllegalArgumentException(String.format("The provided id type of %s is invalid.", idType));
         }
-        
-        // Return false for case where invalid or not present idType is given.
-        return true;
     }
 }
