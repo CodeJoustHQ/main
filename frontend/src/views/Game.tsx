@@ -38,22 +38,24 @@ function GamePage() {
   useEffect(() => {
     if (checkLocationState(location, 'room')) {
       setRoom(location.state.room);
+
+      // Get the game problem.
+      getProblems().then((res) => {
+        if (!(res as Problem[]).length) {
+          setError('Problem cannot be found.');
+        } else {
+          setProblems(res as Problem[]);
+          setError('');
+        }
+      }).catch((err) => {
+        setError((err as ErrorResponse).message);
+        setProblems([]);
+      });
     } else {
       history.push('/game/join', {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
       });
     }
-    getProblems().then((res) => {
-      if (!(res as Problem[]).length) {
-        setError('Problem cannot be found');
-      } else {
-        setProblems(res as Problem[]);
-        setError('');
-      }
-    }).catch((err) => {
-      setError((err as ErrorResponse).message);
-      setProblems([]);
-    });
   }, [location]);
 
   const firstProblem = problems?.[0];
