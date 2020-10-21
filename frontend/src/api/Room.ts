@@ -4,11 +4,11 @@ import { User } from './User';
 import Difficulty from './Difficulty';
 
 export type Room = {
-  roomId: string;
-  host: User;
-  users: [User],
-  activeUsers: [User],
-  inactiveUsers: [User],
+  roomId: string,
+  host: User,
+  users: User[],
+  activeUsers: User[],
+  inactiveUsers: User[],
   difficulty: Difficulty,
 };
 

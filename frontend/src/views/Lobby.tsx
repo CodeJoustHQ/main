@@ -31,6 +31,7 @@ function LobbyPage() {
 
   // Set all the different variables in the room object
   const [host, setHost] = useState<User | null>(null);
+  const [users, setUsers] = useState<User[] | null>(null);
   const [activeUsers, setActiveUsers] = useState<User[] | null>(null);
   const [inactiveUsers, setInactiveUsers] = useState<User[] | null>(null);
   const [currentRoomId, setRoomId] = useState('');
@@ -50,11 +51,25 @@ function LobbyPage() {
    */
   const setStateFromRoom = (room: Room) => {
     setHost(room.host);
+    setUsers(room.users);
     setActiveUsers(room.activeUsers);
     setInactiveUsers(room.inactiveUsers);
     setRoomId(room.roomId);
     setDifficulty(room.difficulty);
   };
+
+  /**
+   * Rebuild the room objet from the current variables.
+   * This method assumes all variables of the Room are included.
+   */
+  const rebuildRoom = (): Room => ({
+    roomId: currentRoomId,
+    host: host!,
+    users: users!,
+    activeUsers: activeUsers!,
+    inactiveUsers: inactiveUsers!,
+    difficulty: difficulty!,
+  });
 
   const deleteUser = (user: User) => {
     // Make rest call to delete user from room
@@ -162,7 +177,7 @@ function LobbyPage() {
     };
 
     const startGameCallback = () => {
-      history.push('/game');
+      history.push('/game', rebuildRoom());
     };
 
     connect(roomId, userId).then(() => {
