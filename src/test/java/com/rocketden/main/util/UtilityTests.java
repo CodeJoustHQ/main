@@ -1,33 +1,39 @@
 package com.rocketden.main.util;
 
+import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dao.UserRepository;
 import com.rocketden.main.model.User;
 import com.rocketden.main.service.RoomService;
 import com.rocketden.main.service.UserService;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class UtilityTests {
 
-    private final Utility utility;
+    @Spy
+    @InjectMocks
+    private Utility utility;
 
     @Mock
-	private UserRepository userRepository;
-
-    @Autowired
-    public UtilityTests(Utility utility) {
-        this.utility = utility;
-    }
+    private UserRepository userRepository;
+    
+    @Mock
+	private RoomRepository roomRepository;
 
     @Test
     public void generateValidRoomId() {
@@ -61,9 +67,12 @@ public class UtilityTests {
          * Simulate first user ID already existing in the database, and second 
          * user ID not present in the database.
          */
-        Mockito.doReturn(new User()).when(userRepository).findUserByUserId(Mockito.any(String.class));
+        User nullUser = null;
+        Mockito.doReturn(new User(), nullUser).when(userRepository).findUserByUserId(Mockito.any(String.class));
         String userId = utility.generateUniqueId(UserService.USER_ID_LENGTH, Utility.USER_ID_KEY);
-        verify(userRepository).findUserByUserId(Mockito.any(String.class));
+
+        // Confirm that the method was indeed called two times.
+        verify(userRepository, times(2)).findUserByUserId(Mockito.any(String.class));
 
         assertEquals(UserService.USER_ID_LENGTH, userId.length());
 

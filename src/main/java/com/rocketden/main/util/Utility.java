@@ -51,7 +51,7 @@ public class Utility {
     }
 
     // Determine if the id of idType already exists in the database.
-    public boolean idExists(String id, String idType) {
+    private boolean idExists(String id, String idType) {
         switch (idType) {
             case (ROOM_ID_KEY):
                 return roomRepository.findRoomByRoomId(id) != null;
