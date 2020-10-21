@@ -77,4 +77,14 @@ public class ProblemServiceTests {
         assertEquals(NAME, response.get(0).getName());
         assertEquals(DESCRIPTION, response.get(0).getDescription());
     }
+
+    @Test
+    public void createTestCaseSuccess() {
+        // test problem is updated correctly too
+    }
+
+    @Test
+    public void createTestCaseFailure() {
+
+    }
 }

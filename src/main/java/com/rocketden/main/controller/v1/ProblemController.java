@@ -4,6 +4,7 @@ import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
 
+import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.service.ProblemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,9 +34,8 @@ public class ProblemController extends BaseRestController {
     }
 
     @PostMapping("/problems/{id}/test-case")
-    public ProblemDto createTestCase(@PathVariable Integer id, CreateTestCaseRequest request) {
-        // TODO
-        return null;
+    public ResponseEntity<ProblemTestCaseDto> createTestCase(@PathVariable Integer id, CreateTestCaseRequest request) {
+        return new ResponseEntity<>(service.createTestCase(id, request), HttpStatus.CREATED);
     }
 
     @GetMapping("/problems")

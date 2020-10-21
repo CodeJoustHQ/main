@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class ProblemTestCaseDto {
     private String input;
-    private String expected;
+    private String output;
 }

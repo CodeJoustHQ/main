@@ -135,4 +135,18 @@ class ProblemTests {
         assertTrue(actual.isEmpty());
     }
 
+    @Test
+    public void createTestCaseSuccess() throws Exception {
+        assertTrue(false);
+    }
+
+    @Test
+    public void createTestCaseEmptyField() throws Exception {
+        assertTrue(false);
+    }
+
+    @Test
+    public void createProblemWithTestCasesSuccess() throws Exception {
+        assertTrue(false);
+    }
 }

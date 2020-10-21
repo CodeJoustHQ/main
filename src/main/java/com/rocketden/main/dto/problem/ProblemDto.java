@@ -11,5 +11,5 @@ import java.util.List;
 public class ProblemDto {
     private String name;
     private String description;
-//    private List<TestCaseDto> testCases = new ArrayList<>(); TODO: upcoming PR
+    private List<ProblemTestCaseDto> testCases = new ArrayList<>();
 }
