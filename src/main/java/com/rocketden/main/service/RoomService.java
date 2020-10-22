@@ -128,7 +128,9 @@ public class RoomService {
         room.removeUser(user);
         repository.save(room);
 
-        return RoomMapper.toDto(room);
+        RoomDto roomDto = RoomMapper.toDto(room);
+        socketService.sendSocketUpdate(roomDto);
+        return roomDto;
     }
 
     public RoomDto updateRoomHost(String roomId, UpdateHostRequest request) {
