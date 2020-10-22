@@ -2,7 +2,9 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.ProblemRepository;
 import com.rocketden.main.dto.problem.CreateProblemRequest;
+import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Problem;
@@ -21,6 +23,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -68,8 +71,7 @@ public class ProblemServiceTests {
 
     @Test
     public void getProblemNotFound() {
-
-        ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblem(ID));
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblem(99));
 
         verify(repository).findById(ID);
         assertEquals(ProblemError.NOT_FOUND, exception.getError());
@@ -121,11 +123,52 @@ public class ProblemServiceTests {
 
     @Test
     public void createTestCaseSuccess() {
-        // test problem is updated correctly too
+        Problem expected = new Problem();
+        expected.setId(ID);
+        expected.setName(NAME);
+        expected.setDescription(DESCRIPTION);
+
+        Mockito.doReturn(expected).when(repository).findById(ID);
+
+        CreateTestCaseRequest request = new CreateTestCaseRequest();
+        request.setInput(INPUT);
+        request.setOutput(OUTPUT);
+        request.setHidden(true);
+
+        ProblemTestCaseDto response = problemService.createTestCase(ID, request);
+
+        verify(repository).save(Mockito.any(Problem.class));
+
+        assertEquals(INPUT, response.getInput());
+        assertEquals(OUTPUT, response.getOutput());
+        assertTrue(response.isHidden());
+
+        // The created test case should be added to this problem
+        assertEquals(1, expected.getTestCases().size());
     }
 
     @Test
     public void createTestCaseFailure() {
+        // A problem with the given ID could not be found
+        CreateTestCaseRequest noProblemRequest = new CreateTestCaseRequest();
+        noProblemRequest.setInput(INPUT);
+        noProblemRequest.setOutput(OUTPUT);
 
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.createTestCase(99, noProblemRequest));
+
+        verify(repository, never()).save(Mockito.any());
+        assertEquals(ProblemError.NOT_FOUND, exception.getError());
+
+        // The test case has empty fields
+        CreateTestCaseRequest emptyFieldRequest = new CreateTestCaseRequest();
+        emptyFieldRequest.setOutput(OUTPUT);
+        emptyFieldRequest.setHidden(false);
+
+        Mockito.doReturn(new Problem()).when(repository).findById(ID);
+
+        exception = assertThrows(ApiException.class, () -> problemService.createTestCase(ID, noProblemRequest));
+
+        verify(repository, never()).save(Mockito.any());
+        assertEquals(ProblemError.EMPTY_FIELD, exception.getError());
     }
 }
