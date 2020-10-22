@@ -62,7 +62,7 @@ class ProblemTests {
         ApiError ERROR = ProblemError.NOT_FOUND;
 
         MvcResult result = this.mockMvc.perform(get(String.format(GET_PROBLEM, 99)))
-                .andDo(print()).andExpect(status().isOk())
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();

@@ -39,7 +39,8 @@ public class ProblemController extends BaseRestController {
     }
 
     @PostMapping("/problems/{id}/test-case")
-    public ResponseEntity<ProblemTestCaseDto> createTestCase(@PathVariable Integer id, CreateTestCaseRequest request) {
+    public ResponseEntity<ProblemTestCaseDto> createTestCase(@PathVariable Integer id,
+                                                             @RequestBody CreateTestCaseRequest request) {
         return new ResponseEntity<>(service.createTestCase(id, request), HttpStatus.CREATED);
     }
 
