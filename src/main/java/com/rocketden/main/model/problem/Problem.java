@@ -1,4 +1,4 @@
-package com.rocketden.main.model;
+package com.rocketden.main.model.problem;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;

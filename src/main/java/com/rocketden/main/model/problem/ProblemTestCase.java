@@ -1,4 +1,4 @@
-package com.rocketden.main.model;
+package com.rocketden.main.model.problem;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

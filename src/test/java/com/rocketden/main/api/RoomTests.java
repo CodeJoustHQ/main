@@ -10,7 +10,7 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
-import com.rocketden.main.model.ProblemDifficulty;
+import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;

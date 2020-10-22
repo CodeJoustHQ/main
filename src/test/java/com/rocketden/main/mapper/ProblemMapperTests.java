@@ -3,8 +3,8 @@ package com.rocketden.main.mapper;
 import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
-import com.rocketden.main.model.Problem;
-import com.rocketden.main.model.ProblemTestCase;
+import com.rocketden.main.model.problem.Problem;
+import com.rocketden.main.model.problem.ProblemTestCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

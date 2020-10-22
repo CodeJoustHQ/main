@@ -1,7 +1,7 @@
 package com.rocketden.main.entity;
 
-import com.rocketden.main.model.Problem;
-import com.rocketden.main.model.ProblemTestCase;
+import com.rocketden.main.model.problem.Problem;
+import com.rocketden.main.model.problem.ProblemTestCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

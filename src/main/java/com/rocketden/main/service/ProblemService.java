@@ -8,8 +8,8 @@ import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
-import com.rocketden.main.model.Problem;
-import com.rocketden.main.model.ProblemTestCase;
+import com.rocketden.main.model.problem.Problem;
+import com.rocketden.main.model.problem.ProblemTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

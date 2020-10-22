@@ -1,5 +1,6 @@
 package com.rocketden.main.model;
 
+import com.rocketden.main.model.problem.ProblemDifficulty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;

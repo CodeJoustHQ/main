@@ -11,7 +11,7 @@ import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
-import com.rocketden.main.model.ProblemDifficulty;
+import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.Room;
 
 import com.rocketden.main.model.User;
