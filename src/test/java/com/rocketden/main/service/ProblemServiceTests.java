@@ -18,8 +18,8 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -56,7 +56,7 @@ public class ProblemServiceTests {
         testCase.setOutput(OUTPUT);
         expected.addTestCase(testCase);
 
-        Mockito.doReturn(expected).when(repository).findById(ID);
+        Mockito.doReturn(Optional.of(expected)).when(repository).findById(ID);
 
         ProblemDto response = problemService.getProblem(ID);
 
@@ -72,7 +72,7 @@ public class ProblemServiceTests {
     public void getProblemNotFound() {
         ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblem(99));
 
-        verify(repository).findById(ID);
+        verify(repository).findById(99);
         assertEquals(ProblemError.NOT_FOUND, exception.getError());
     }
 
@@ -127,7 +127,7 @@ public class ProblemServiceTests {
         expected.setName(NAME);
         expected.setDescription(DESCRIPTION);
 
-        Mockito.doReturn(expected).when(repository).findById(ID);
+        Mockito.doReturn(Optional.of(expected)).when(repository).findById(ID);
 
         CreateTestCaseRequest request = new CreateTestCaseRequest();
         request.setInput(INPUT);
@@ -163,9 +163,9 @@ public class ProblemServiceTests {
         emptyFieldRequest.setOutput(OUTPUT);
         emptyFieldRequest.setHidden(false);
 
-        Mockito.doReturn(new Problem()).when(repository).findById(ID);
+        Mockito.doReturn(Optional.of(new Problem())).when(repository).findById(ID);
 
-        exception = assertThrows(ApiException.class, () -> problemService.createTestCase(ID, noProblemRequest));
+        exception = assertThrows(ApiException.class, () -> problemService.createTestCase(ID, emptyFieldRequest));
 
         verify(repository, never()).save(Mockito.any());
         assertEquals(ProblemError.EMPTY_FIELD, exception.getError());

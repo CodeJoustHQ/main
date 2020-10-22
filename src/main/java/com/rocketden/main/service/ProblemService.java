@@ -68,6 +68,8 @@ public class ProblemService {
         testCase.setHidden(request.isHidden());
 
         problem.addTestCase(testCase);
+        repository.save(problem);
+
         return ProblemMapper.toTestCaseDto(testCase);
     }
 }
