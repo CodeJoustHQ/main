@@ -9,6 +9,7 @@ import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Problem;
+import com.rocketden.main.model.ProblemTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +55,19 @@ public class ProblemService {
     }
 
     public ProblemTestCaseDto createTestCase(int problemId, CreateTestCaseRequest request) {
-        // TODO
-        return null;
+        Problem problem = repository.findById(problemId)
+                .orElseThrow(() -> new ApiException(ProblemError.NOT_FOUND));
+
+        if (request.getInput() == null || request.getOutput() == null) {
+            throw new ApiException(ProblemError.EMPTY_FIELD);
+        }
+
+        ProblemTestCase testCase = new ProblemTestCase();
+        testCase.setInput(request.getInput());
+        testCase.setOutput(request.getOutput());
+        testCase.setHidden(request.isHidden());
+
+        problem.addTestCase(testCase);
+        return ProblemMapper.toTestCaseDto(testCase);
     }
 }
