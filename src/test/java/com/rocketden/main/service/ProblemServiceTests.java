@@ -6,6 +6,7 @@ import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Problem;
+import com.rocketden.main.model.ProblemTestCase;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,6 +16,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,12 +34,35 @@ public class ProblemServiceTests {
     @InjectMocks
     private ProblemService problemService;
 
+    private static final int ID = 10;
     private static final String NAME = "Sort a List";
     private static final String DESCRIPTION = "Sort the given list in O(n log n) time.";
 
+    private static final String INPUT = "[1, 2, 8]";
+    private static final String OUTPUT = "8";
+
     @Test
     public void getProblemSuccess() {
+        Problem expected = new Problem();
+        expected.setId(ID);
+        expected.setName(NAME);
+        expected.setDescription(DESCRIPTION);
 
+        ProblemTestCase testCase = new ProblemTestCase();
+        testCase.setInput(INPUT);
+        testCase.setOutput(OUTPUT);
+        expected.setTestCases(Collections.singletonList(testCase));
+
+        Mockito.doReturn(expected).when(repository).findById(ID);
+
+        ProblemDto response = problemService.getProblem(ID);
+
+        assertEquals(expected.getId(), response.getId());
+        assertEquals(expected.getName(), response.getName());
+        assertEquals(expected.getDescription(), response.getDescription());
+
+        assertEquals(expected.getTestCases().get(0).getInput(), response.getTestCases().get(0).getInput());
+        assertEquals(expected.getTestCases().get(0).getOutput(), response.getTestCases().get(0).getOutput());
     }
 
     @Test

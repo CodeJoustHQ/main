@@ -21,5 +21,5 @@ public class Problem {
 
     private String name;
     private String description;
-//    private List<TestCase> testCases = new ArrayList<>(); TODO: upcoming PR
+    private List<ProblemTestCase> testCases = new ArrayList<>();
 }
