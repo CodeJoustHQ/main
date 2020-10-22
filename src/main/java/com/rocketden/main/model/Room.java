@@ -40,7 +40,7 @@ public class Room {
 
     /**
      * Generated from all the matching room variables in the User class.
-     * If the room is deleted or users removed from this set, those users will also be deleted.
+     * If the room is deleted or users removed from this list, those users will also be deleted.
      * Setter is set to private to ensure proper use of addUser and removeUser methods.
      */
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
