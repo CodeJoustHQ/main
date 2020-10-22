@@ -1,5 +1,6 @@
 package com.rocketden.main.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +12,7 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @Setter
+@EqualsAndHashCode
 public class ProblemTestCase {
 
     @Id

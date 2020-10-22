@@ -51,6 +51,7 @@ public class ProblemServiceTests {
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(INPUT);
         testCase.setOutput(OUTPUT);
+        // TODO: change to addTestCase/deleteTestCase format
         expected.setTestCases(Collections.singletonList(testCase));
 
         Mockito.doReturn(expected).when(repository).findById(ID);
@@ -68,6 +69,10 @@ public class ProblemServiceTests {
     @Test
     public void getProblemNotFound() {
 
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblem(ID));
+
+        verify(repository).findById(ID);
+        assertEquals(ProblemError.NOT_FOUND, exception.getError());
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.rocketden.main.dto.problem;
 
 import com.rocketden.main.model.Problem;
+import com.rocketden.main.model.ProblemTestCase;
 import org.modelmapper.ModelMapper;
 
 public class ProblemMapper {
@@ -15,5 +16,13 @@ public class ProblemMapper {
         }
 
         return mapper.map(entity, ProblemDto.class);
+    }
+
+    public static ProblemTestCaseDto toTestCaseDto(ProblemTestCase entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        return mapper.map(entity, ProblemTestCaseDto.class);
     }
 }
