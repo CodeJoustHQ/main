@@ -110,6 +110,27 @@ public class RoomService {
         return RoomMapper.toDto(room);
     }
 
+    public RoomDto removeUser(String roomId, String userId) {
+        Room room = repository.findRoomByRoomId(roomId);
+
+        // Return error if room could not be found
+        if (room == null) {
+            throw new ApiException(RoomError.NOT_FOUND);
+        }
+
+        User user = room.getUserByUserId(userId);
+
+        // Return error if user does not exist in room
+        if (user == null) {
+            throw new ApiException(UserError.NOT_FOUND);
+        }
+
+        room.removeUser(user);
+        repository.save(room);
+
+        return RoomMapper.toDto(room);
+    }
+
     public RoomDto updateRoomHost(String roomId, UpdateHostRequest request) {
         Room room = repository.findRoomByRoomId(roomId);
 
