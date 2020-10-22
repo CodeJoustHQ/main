@@ -54,8 +54,7 @@ public class ProblemServiceTests {
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(INPUT);
         testCase.setOutput(OUTPUT);
-        // TODO: change to addTestCase/deleteTestCase format
-        expected.setTestCases(Collections.singletonList(testCase));
+        expected.addTestCase(testCase);
 
         Mockito.doReturn(expected).when(repository).findById(ID);
 

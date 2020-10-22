@@ -8,7 +8,6 @@ import com.rocketden.main.model.ProblemTestCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,8 +34,7 @@ public class ProblemMapperTests {
         testCase.setInput(INPUT);
         testCase.setOutput(OUTPUT);
         testCase.setHidden(true);
-        // TODO: change to addTestCase/deleteTestCase format
-        expected.setTestCases(Collections.singletonList(testCase));
+        expected.addTestCase(testCase);
 
         ProblemDto actual = ProblemMapper.toDto(expected);
 

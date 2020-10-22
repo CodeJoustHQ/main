@@ -56,6 +56,8 @@ public class Room {
     }
 
     // Removes user if the nicknames match (based on equals/hashCode implementation)
+    // Note: if we switch to permanent users and disable orphanRemoval, this will
+    // need to call getEquivalentUser(user).setRoom(null) first
     public boolean removeUser(User user) {
         return users.remove(user);
     }

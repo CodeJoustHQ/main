@@ -15,15 +15,20 @@ import javax.persistence.ManyToOne;
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class ProblemTestCase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
+    @EqualsAndHashCode.Include
     private String input;
+
+    @EqualsAndHashCode.Include
     private String output;
+
+    @EqualsAndHashCode.Include
     private Boolean hidden = false;
 
     @ManyToOne(fetch = FetchType.LAZY)

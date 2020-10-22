@@ -35,10 +35,11 @@ public class Problem {
     private List<ProblemTestCase> testCases = new ArrayList<>();
 
     public void addTestCase(ProblemTestCase testCase) {
-
+        testCases.add(testCase);
+        testCase.setProblem(this);
     }
 
-    public void removeTestCase(ProblemTestCase testCase) {
-        
+    public boolean removeTestCase(ProblemTestCase testCase) {
+        return testCases.remove(testCase);
     }
 }
