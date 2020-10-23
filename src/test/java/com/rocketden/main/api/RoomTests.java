@@ -5,6 +5,7 @@ import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
+import com.rocketden.main.dto.user.CreateUserRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,6 +48,7 @@ public class RoomTests {
     private static final String POST_ROOM_CREATE = "/api/v1/rooms";
     private static final String PUT_ROOM_HOST = "/api/v1/rooms/%s/host";
     private static final String PUT_ROOM_SETTINGS = "/api/v1/rooms/%s/settings";
+    private static final String REMOVE_USER = "/api/v1/rooms/%s/user/%s";
 
     // Predefine user and room attributes.
     private static final String NICKNAME = "rocket";
@@ -541,5 +544,49 @@ public class RoomTests {
         assertTrue(room.getUsers().contains(user));
 
         return room;
+    }
+
+    @Test
+    public void removeUserSuccess() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        UserDto user = new UserDto();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+
+        RoomDto room = setUpRoomWithTwoUsers(host, user);
+
+        MvcResult result = this.mockMvc.perform(delete(String.format(REMOVE_USER, room.getRoomId(), user.getUserId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        room = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+
+        assertEquals(1, room.getUsers().size());
+        assertFalse(room.getUsers().contains(user));
+    }
+
+    @Test
+    public void removeNonExistentUser() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        RoomDto room = setUpRoomWithOneUser(host);
+
+        MvcResult result = this.mockMvc.perform(delete(String.format(REMOVE_USER, room.getRoomId(), USER_ID_2))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNotFound())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse errorResponse = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        ApiError ERROR = UserError.NOT_FOUND;
+        assertEquals(ERROR.getResponse(), errorResponse);
     }
 }

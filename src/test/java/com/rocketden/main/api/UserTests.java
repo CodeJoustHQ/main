@@ -1,7 +1,6 @@
 package com.rocketden.main.api;
 
 import com.rocketden.main.dto.user.CreateUserRequest;
-import com.rocketden.main.dto.user.DeleteUserRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiError;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -150,55 +148,6 @@ public class UserTests {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
-        assertEquals(ERROR.getResponse(), actual);
-    }
-
-    // Status is provided as 404. Something missing.
-    // @Test
-    public void deleteExistingUser() throws Exception {
-        CreateUserRequest createRequest = new CreateUserRequest();
-        createRequest.setNickname(NICKNAME);
-        createRequest.setUserId(USER_ID);
-
-        UserDto expected = new UserDto();
-        expected.setNickname(NICKNAME);
-        expected.setUserId(USER_ID);
-
-        DeleteUserRequest deleteRequest = new DeleteUserRequest();
-        deleteRequest.setUserId(USER_ID);
-
-        this.mockMvc.perform(post(USER_URI)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(createRequest)));
-
-        MvcResult result = this.mockMvc.perform(delete(USER_URI)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(deleteRequest)))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        UserDto actual = UtilityTestMethods.toObject(jsonResponse, UserDto.class);
-
-        assertEquals(expected.getNickname(), actual.getNickname());
-    }
-
-    @Test
-    public void deleteNonExistentUser() throws Exception {
-        DeleteUserRequest request = new DeleteUserRequest();
-        request.setUserId(USER_ID);
-
-        ApiError ERROR = UserError.NOT_FOUND;
-
-        MvcResult result = this.mockMvc.perform(delete(USER_URI)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andExpect(status().isNotFound())
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();

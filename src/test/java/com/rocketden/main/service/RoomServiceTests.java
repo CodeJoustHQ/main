@@ -27,6 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -345,5 +346,30 @@ public class RoomServiceTests {
         ApiException exception = assertThrows(ApiException.class, () ->
                 roomService.updateRoomSettings("999999", noRoomRequest));
         assertEquals(RoomError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void removeUserSuccess() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User host = new User();
+        host.setNickname(NICKNAME);
+
+        room.setHost(host);
+        room.addUser(host);
+
+        User user = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        RoomDto response = roomService.removeUser(room.getRoomId(), user.getUserId());
+
+        verify(socketService).sendSocketUpdate(eq(response));
+        assertEquals(1, response.getUsers.size());
+        assertFalse(response.getUsers.contains(UserMapper.toDto(user)));
     }
 }

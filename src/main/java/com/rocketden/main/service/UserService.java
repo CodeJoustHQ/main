@@ -2,7 +2,6 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.UserRepository;
 import com.rocketden.main.dto.user.CreateUserRequest;
-import com.rocketden.main.dto.user.DeleteUserRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.UserError;
@@ -48,19 +47,6 @@ public class UserService {
         }
         
         repository.save(user);
-
-        return UserMapper.toDto(user);
-    }
-
-    public UserDto deleteUser(DeleteUserRequest request) {
-        User user = repository.findUserByUserId(request.getUserId());
-
-        // If requested user does not exist in database, throw an exception. 
-        if (user == null) {
-            throw new ApiException(UserError.NOT_FOUND);
-        }
-
-        repository.delete(user);
 
         return UserMapper.toDto(user);
     }
