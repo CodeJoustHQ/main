@@ -219,7 +219,7 @@ function LobbyPage() {
         currentUser,
       });
     }
-  }, [history, active]);
+  }, [history, active, currentUser, currentRoomId]);
 
   // Render the lobby.
   return (
