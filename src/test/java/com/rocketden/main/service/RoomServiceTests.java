@@ -62,6 +62,7 @@ public class RoomServiceTests {
     private static final String SESSION_ID_2 = "ghijkl";
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "678910";
+    private static final String USER_ID_2 = "123456";
 
     @Test
     public void createRoomSuccess() {
@@ -355,18 +356,19 @@ public class RoomServiceTests {
 
         User host = new User();
         host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
 
         room.setHost(host);
         room.addUser(host);
 
         User user = new User();
         user.setNickname(NICKNAME_2);
-        user.setUserId(USER_ID);
+        user.setUserId(USER_ID_2);
         room.addUser(user);
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
 
-        RoomDto response = roomService.removeUser(room.getRoomId(), user.getUserId());
+        RoomDto response = roomService.removeUser(ROOM_ID, USER_ID_2);
 
         verify(socketService).sendSocketUpdate(eq(response));
         assertEquals(1, response.getUsers().size());
