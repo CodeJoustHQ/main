@@ -369,7 +369,7 @@ public class RoomServiceTests {
         RoomDto response = roomService.removeUser(room.getRoomId(), user.getUserId());
 
         verify(socketService).sendSocketUpdate(eq(response));
-        assertEquals(1, response.getUsers.size());
-        assertFalse(response.getUsers.contains(UserMapper.toDto(user)));
+        assertEquals(1, response.getUsers().size());
+        assertFalse(response.getUsers().contains(UserMapper.toDto(user)));
     }
 }
