@@ -78,7 +78,6 @@ public class UserServiceTests {
         assertEquals(UserError.INVALID_USER, exception.getError());
     }
 
-    /*
     @Test
     public void deleteExistingUser() {
         User user = new User();
@@ -108,5 +107,4 @@ public class UserServiceTests {
 
         assertEquals(UserError.NOT_FOUND, exception.getError());
     }
-     */
 }

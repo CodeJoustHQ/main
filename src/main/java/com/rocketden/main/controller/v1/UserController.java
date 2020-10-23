@@ -1,7 +1,6 @@
 package com.rocketden.main.controller.v1;
 
 import com.rocketden.main.dto.user.CreateUserRequest;
-import com.rocketden.main.dto.user.DeleteUserRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.service.UserService;
 
@@ -26,10 +25,5 @@ public class UserController extends BaseRestController {
     @PostMapping("/user")
     public ResponseEntity<UserDto> createUser(@RequestBody CreateUserRequest request) {
         return new ResponseEntity<>(service.createUser(request), HttpStatus.CREATED);
-    }
-
-    @DeleteMapping("/user")
-    public ResponseEntity<UserDto> deleteUser(@RequestBody DeleteUserRequest request) {
-        return new ResponseEntity<>(service.deleteUser(request), HttpStatus.OK);
     }
 }
