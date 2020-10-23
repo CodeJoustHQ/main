@@ -374,4 +374,23 @@ public class RoomServiceTests {
         assertEquals(1, response.getUsers().size());
         assertFalse(response.getUsers().contains(UserMapper.toDto(user)));
     }
+
+    @Test
+    public void removeNonExistentUser() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User host = new User();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        room.setHost(host);
+        room.addUser(host);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.removeUser(ROOM_ID, USER_ID_2));
+        assertEquals(UserError.NOT_FOUND, exception.getError());
+    }
 }
