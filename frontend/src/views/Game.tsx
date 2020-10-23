@@ -5,7 +5,6 @@ import { useBeforeunload } from 'react-beforeunload';
 import Editor from '../components/core/Editor';
 import { errorHandler, ErrorResponse } from '../api/Error';
 import { Problem, getProblems } from '../api/Problem';
-import { Room } from '../api/Room';
 import MainContainer, {
   FlexContainer, FlexInfoBar, Panel, SplitterContainer,
 } from '../components/core/Container';
@@ -14,16 +13,19 @@ import { ProblemHeaderText, Text } from '../components/core/Text';
 import 'react-splitter-layout/lib/index.css';
 import { checkLocationState } from '../util/Utility';
 import Loading from '../components/core/Loading';
+import { User } from '../api/User';
 
 type LocationState = {
-  room: Room,
+  roomId: string,
+  currentUser: User,
 }
 
 function GamePage() {
   // Get history object to be able to move between different pages
   const history = useHistory();
   const location = useLocation<LocationState>();
-  const [room, setRoom] = useState<Room | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [roomId, setRoomId] = useState<string>('');
   const [problems, setProblems] = useState<Problem[]>([]);
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
@@ -38,8 +40,9 @@ function GamePage() {
 
   // Called every time location changes
   useEffect(() => {
-    if (checkLocationState(location, 'room')) {
-      setRoom(location.state.room);
+    if (checkLocationState(location, 'roomId', 'currentUser')) {
+      setCurrentUser(location.state.currentUser);
+      setRoomId(location.state.roomId);
 
       // Get the game problem.
       getProblems().then((res) => {
@@ -83,7 +86,12 @@ function GamePage() {
       <FlexInfoBar>
         Room:
         {' '}
-        {room ? room.roomId : 'No room joined'}
+        {roomId || 'An unknown room'}
+      </FlexInfoBar>
+      <FlexInfoBar>
+        You are
+        {' '}
+        {currentUser != null ? currentUser.nickname : 'An unknown user'}
       </FlexInfoBar>
       <SplitterContainer>
         <SplitterLayout
