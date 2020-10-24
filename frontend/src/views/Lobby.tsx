@@ -214,9 +214,12 @@ function LobbyPage() {
   // Redirect user to game page if room is active.
   useEffect(() => {
     if (active) {
-      history.push('/game');
+      history.push('/game', {
+        roomId: currentRoomId,
+        currentUser,
+      });
     }
-  }, [history, active]);
+  }, [history, active, currentUser, currentRoomId]);
 
   // Render the lobby.
   return (
