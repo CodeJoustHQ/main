@@ -58,7 +58,7 @@ function GamePage() {
       });
       setFullPageLoading(false);
     } else {
-      history.push('/game/join', {
+      history.replace('/game/join', {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
       });
     }
