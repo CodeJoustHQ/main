@@ -29,6 +29,7 @@ public class ProblemMapperTests {
         expected.setId(ID);
         expected.setName(NAME);
         expected.setDescription(DESCRIPTION);
+        // TODO problem difficulty
 
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(INPUT);
@@ -42,7 +43,6 @@ public class ProblemMapperTests {
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getDescription(), actual.getDescription());
 
-
         List<ProblemTestCaseDto> expectedTestCases = expected.getTestCases()
                 .stream()
                 .map(ProblemMapper::toTestCaseDto)
@@ -53,7 +53,6 @@ public class ProblemMapperTests {
 
     @Test
     public void entityToTestCaseDto() {
-
         ProblemTestCase expected = new ProblemTestCase();
         expected.setInput(INPUT);
         expected.setOutput(OUTPUT);

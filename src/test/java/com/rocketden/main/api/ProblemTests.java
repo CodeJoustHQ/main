@@ -76,6 +76,7 @@ class ProblemTests {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);
         request.setDescription(DESCRIPTION);
+        // TODO problem difficulty
 
         MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -108,6 +109,7 @@ class ProblemTests {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);
         request.setDescription(DESCRIPTION);
+        // TODO problem difficulty
 
         this.mockMvc.perform(post(POST_PROBLEM_CREATE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -144,6 +146,7 @@ class ProblemTests {
     public void createProblemEmptyFields() throws Exception {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);
+        request.setDescription(DESCRIPTION);
 
         ApiError ERROR = ProblemError.EMPTY_FIELD;
 
@@ -157,6 +160,11 @@ class ProblemTests {
         ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
 
         assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @Test
+    public void createProblemBadDifficulty() {
+        // TODO nonexistent difficulty fails, e.g. "eXtremely hard"
     }
 
     @Test
@@ -298,6 +306,7 @@ class ProblemTests {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);
         request.setDescription(DESCRIPTION);
+        // TODO problem difficulty
 
         MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

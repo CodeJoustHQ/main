@@ -50,6 +50,7 @@ public class ProblemServiceTests {
         expected.setId(ID);
         expected.setName(NAME);
         expected.setDescription(DESCRIPTION);
+        // TODO problem difficulty
 
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(INPUT);
@@ -81,6 +82,7 @@ public class ProblemServiceTests {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);
         request.setDescription(DESCRIPTION);
+        // TODO problem difficulty
 
         ProblemDto response = problemService.createProblem(request);
 
@@ -95,6 +97,7 @@ public class ProblemServiceTests {
     public void createProblemFailureEmptyField() {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setDescription(DESCRIPTION);
+        // TODO problem difficulty
 
         ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblem(request));
 
@@ -103,10 +106,16 @@ public class ProblemServiceTests {
     }
 
     @Test
+    public void createProblemFailureBadDifficulty() {
+        // TODO 1. random difficulty not allowed 2. null difficulty
+    }
+
+    @Test
     public void getProblemsSuccess() {
         Problem problem = new Problem();
         problem.setName(NAME);
         problem.setDescription(DESCRIPTION);
+        // TODO problem difficulty
 
         List<Problem> expected = new ArrayList<>();
         expected.add(problem);
@@ -126,6 +135,7 @@ public class ProblemServiceTests {
         expected.setId(ID);
         expected.setName(NAME);
         expected.setDescription(DESCRIPTION);
+        // TODO problem difficulty
 
         Mockito.doReturn(Optional.of(expected)).when(repository).findById(ID);
 
@@ -152,6 +162,7 @@ public class ProblemServiceTests {
         CreateTestCaseRequest noProblemRequest = new CreateTestCaseRequest();
         noProblemRequest.setInput(INPUT);
         noProblemRequest.setOutput(OUTPUT);
+        // TODO problem difficulty
 
         ApiException exception = assertThrows(ApiException.class, () -> problemService.createTestCase(99, noProblemRequest));
 
