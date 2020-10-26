@@ -340,6 +340,13 @@ public class RoomSocketTests {
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(newUser);
 
+        HttpEntity<JoinRoomRequest> joinEntity = new HttpEntity<>(joinRequest);
+        String joinRoomEndpoint = String.format("%s/%s/users", baseRestEndpoint, room.getRoomId());
+        template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
+
+        RoomDto actual = blockingQueue.poll(5, SECONDS);
+        assertNotNull(actual);
+
         RemoveUserRequest removeUserRequest = new RemoveUserRequest();
         removeUserRequest.setInitiatorId(room.getHost().getUserId());
         removeUserRequest.setUserId(newUser.getUserId());
@@ -348,7 +355,7 @@ public class RoomSocketTests {
         String removeUserEndpoint = String.format("%s/%s/users/remove", baseRestEndpoint, room.getRoomId());
         RoomDto expected = template.exchange(removeUserEndpoint, HttpMethod.PUT, removeUserEntity, RoomDto.class).getBody();
 
-        RoomDto actual = blockingQueue.poll(5, SECONDS);
+        actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(expected);
         assertNotNull(actual);
 
