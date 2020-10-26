@@ -401,4 +401,45 @@ public class RoomServiceTests {
                 roomService.removeUser(ROOM_ID, request));
         assertEquals(UserError.NOT_FOUND, exception.getError());
     }
+
+    @Test
+    public void removeUserBadHost() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User host = new User();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        room.setHost(host);
+        room.addUser(host);
+
+        User user = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(user);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiatorId(user.getUserId());
+        request.setUserId(user.getUserId());
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.removeUser(ROOM_ID, request));
+        assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
+    }
+
+    @Test
+    public void removeUserRoomNotFound() {
+        Mockito.doReturn(null).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiatorId(USER_ID);
+        request.setUserId(USER_ID_2);
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.removeUser(ROOM_ID, request));
+        assertEquals(RoomError.NOT_FOUND, exception.getError());
+    }
 }

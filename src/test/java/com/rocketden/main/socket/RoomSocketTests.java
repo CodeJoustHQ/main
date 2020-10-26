@@ -7,6 +7,7 @@ import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
+import com.rocketden.main.dto.user.RemoveUserRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.model.ProblemDifficulty;
 import com.rocketden.main.util.SocketTestMethods;
@@ -184,7 +185,7 @@ public class RoomSocketTests {
     }
 
     @Test
-    public void socketRecievesMessageOnConnection() throws Exception {
+    public void socketReceivesMessageOnConnection() throws Exception {
         // Session ID has not been set yet
         assertNull(room.getHost().getSessionId());
 
@@ -222,7 +223,7 @@ public class RoomSocketTests {
     }
 
     @Test
-    public void socketRecievesMessageOnDisconnection() throws Exception {
+    public void socketReceivesMessageOnDisconnection() throws Exception {
         // Have someone join the room
         UserDto user = new UserDto();
         user.setNickname(NICKNAME_2);
@@ -315,7 +316,7 @@ public class RoomSocketTests {
     }
 
     @Test
-    public void socketRecievesMessageOnStartGame() throws Exception {
+    public void socketReceivesMessageOnStartGame() throws Exception {
         StartGameRequest startGameRequest = new StartGameRequest();
         startGameRequest.setInitiator(room.getHost());
 
@@ -329,5 +330,29 @@ public class RoomSocketTests {
 
         assertEquals(expected.getRoomId(), actual.getRoomId());
         assertEquals(true, actual.isActive());
+    }
+
+    @Test
+    public void socketReceivesMessageOnUserKicked() throws Exception {
+        UserDto newUser = new UserDto();
+        newUser.setNickname(NICKNAME_2);
+        newUser.setUserId(USER_ID_2);
+        JoinRoomRequest joinRequest = new JoinRoomRequest();
+        joinRequest.setUser(newUser);
+
+        RemoveUserRequest removeUserRequest = new RemoveUserRequest();
+        removeUserRequest.setInitiatorId(room.getHost().getUserId());
+        removeUserRequest.setUserId(newUser.getUserId());
+
+        HttpEntity<RemoveUserRequest> removeUserEntity = new HttpEntity<>(removeUserRequest);
+        String removeUserEndpoint = String.format("%s/%s/users/remove", baseRestEndpoint, room.getRoomId());
+        RoomDto expected = template.exchange(removeUserEndpoint, HttpMethod.PUT, removeUserEntity, RoomDto.class).getBody();
+
+        RoomDto actual = blockingQueue.poll(5, SECONDS);
+        assertNotNull(expected);
+        assertNotNull(actual);
+
+        assertEquals(expected.getRoomId(), actual.getRoomId());
+        assertEquals(false, actual.getUsers().contains(newUser));
     }
 }

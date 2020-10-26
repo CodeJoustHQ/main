@@ -563,7 +563,7 @@ public class RoomTests {
         request.setInitiatorId(host.getUserId());
         request.setUserId(user.getUserId());
 
-        MvcResult result = this.mockMvc.perform(delete(String.format(REMOVE_USER, room.getRoomId()))
+        MvcResult result = this.mockMvc.perform(put(String.format(REMOVE_USER, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andExpect(status().isOk())
@@ -588,7 +588,7 @@ public class RoomTests {
         request.setInitiatorId(host.getUserId());
         request.setUserId(USER_ID_2);
 
-        MvcResult result = this.mockMvc.perform(delete(String.format(REMOVE_USER, room.getRoomId()))
+        MvcResult result = this.mockMvc.perform(put(String.format(REMOVE_USER, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andExpect(status().isNotFound())
@@ -598,6 +598,35 @@ public class RoomTests {
         ApiErrorResponse errorResponse = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
 
         ApiError ERROR = UserError.NOT_FOUND;
+        assertEquals(ERROR.getResponse(), errorResponse);
+    }
+
+    @Test
+    public void removeUserBadHost() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        UserDto user = new UserDto();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+
+        RoomDto room = setUpRoomWithTwoUsers(host, user);
+
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiatorId(user.getUserId());
+        request.setUserId(user.getUserId());
+
+        MvcResult result = this.mockMvc.perform(put(String.format(REMOVE_USER, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andExpect(status().isForbidden())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse errorResponse = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        ApiError ERROR = RoomError.INVALID_PERMISSIONS;
         assertEquals(ERROR.getResponse(), errorResponse);
     }
 }

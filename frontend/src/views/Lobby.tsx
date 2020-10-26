@@ -63,6 +63,9 @@ function LobbyPage() {
       initiatorId: currentUser!.userId as string,
       userId,
     })
+      .then(() => {
+        setLoading(true);
+      })
       .catch((err) => {
         setError(err.message);
       });
