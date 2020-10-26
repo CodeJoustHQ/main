@@ -7,6 +7,7 @@ import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
+import com.rocketden.main.dto.user.RemoveUserRequest;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
@@ -110,7 +111,7 @@ public class RoomService {
         return RoomMapper.toDto(room);
     }
 
-    public RoomDto removeUser(String roomId, String userId) {
+    public RoomDto removeUser(String roomId, RemoveUserRequest request) {
         Room room = repository.findRoomByRoomId(roomId);
 
         // Return error if room could not be found
@@ -118,11 +119,17 @@ public class RoomService {
             throw new ApiException(RoomError.NOT_FOUND);
         }
 
-        User user = room.getUserByUserId(userId);
+        User initiator = room.getUserByUserId(request.getInitiatorId());
+        User user = room.getUserByUserId(request.getUserId());
 
-        // Return error if user does not exist in room
-        if (user == null) {
+        // Return error if initiator or user to delete does not exist in room
+        if (initiator == null || user == null) {
             throw new ApiException(UserError.NOT_FOUND);
+        }
+
+        // Return error if initiator is not host
+        if (!initiator.getUserId().equals(room.getHost().getUserId())) {
+            throw new ApiException(RoomError.INVALID_PERMISSIONS);
         }
 
         room.removeUser(user);

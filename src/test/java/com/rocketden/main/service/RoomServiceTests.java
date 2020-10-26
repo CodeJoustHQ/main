@@ -6,6 +6,7 @@ import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
+import com.rocketden.main.dto.user.RemoveUserRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.RoomError;
@@ -368,7 +369,10 @@ public class RoomServiceTests {
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
 
-        RoomDto response = roomService.removeUser(ROOM_ID, USER_ID_2);
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiatorId(host.getUserId());
+        request.setUserId(user.getUserId());
+        RoomDto response = roomService.removeUser(ROOM_ID, request);
 
         verify(socketService).sendSocketUpdate(eq(response));
         assertEquals(1, response.getUsers().size());
@@ -389,8 +393,12 @@ public class RoomServiceTests {
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
 
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiatorId(host.getUserId());
+        request.setUserId(USER_ID_2);
+
         ApiException exception = assertThrows(ApiException.class, () ->
-                roomService.removeUser(ROOM_ID, USER_ID_2));
+                roomService.removeUser(ROOM_ID, request));
         assertEquals(UserError.NOT_FOUND, exception.getError());
     }
 }

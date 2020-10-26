@@ -6,6 +6,7 @@ import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.user.CreateUserRequest;
+import com.rocketden.main.dto.user.RemoveUserRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
@@ -48,7 +49,7 @@ public class RoomTests {
     private static final String POST_ROOM_CREATE = "/api/v1/rooms";
     private static final String PUT_ROOM_HOST = "/api/v1/rooms/%s/host";
     private static final String PUT_ROOM_SETTINGS = "/api/v1/rooms/%s/settings";
-    private static final String REMOVE_USER = "/api/v1/rooms/%s/user/%s";
+    private static final String REMOVE_USER = "/api/v1/rooms/%s/users/remove";
 
     // Predefine user and room attributes.
     private static final String NICKNAME = "rocket";
@@ -558,8 +559,13 @@ public class RoomTests {
 
         RoomDto room = setUpRoomWithTwoUsers(host, user);
 
-        MvcResult result = this.mockMvc.perform(delete(String.format(REMOVE_USER, room.getRoomId(), user.getUserId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE))
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiatorId(host.getUserId());
+        request.setUserId(user.getUserId());
+
+        MvcResult result = this.mockMvc.perform(delete(String.format(REMOVE_USER, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -578,8 +584,13 @@ public class RoomTests {
 
         RoomDto room = setUpRoomWithOneUser(host);
 
-        MvcResult result = this.mockMvc.perform(delete(String.format(REMOVE_USER, room.getRoomId(), USER_ID_2))
-                .contentType(MediaType.APPLICATION_JSON_VALUE))
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiatorId(host.getUserId());
+        request.setUserId(USER_ID_2);
+
+        MvcResult result = this.mockMvc.perform(delete(String.format(REMOVE_USER, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andExpect(status().isNotFound())
                 .andReturn();
 

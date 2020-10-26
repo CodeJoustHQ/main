@@ -58,8 +58,11 @@ function LobbyPage() {
     setDifficulty(room.difficulty);
   };
 
-  const deleteUser = (userId: string) => {
-    removeUser(currentRoomId, userId)
+  const kickUser = (userId: string) => {
+    removeUser(currentRoomId, {
+      initiatorId: currentUser!.userId as string,
+      userId,
+    })
       .catch((err) => {
         setError(err.message);
       });
@@ -140,7 +143,7 @@ function LobbyPage() {
                 user={user}
                 userIsActive={Boolean(user.sessionId)}
                 onMakeHost={changeHosts}
-                onDeleteUser={deleteUser}
+                onRemoveUser={kickUser}
               />
             ) : null}
         </PlayerCard>
