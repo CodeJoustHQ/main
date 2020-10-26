@@ -8,6 +8,7 @@ import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.problem.Problem;
+import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemTestCase;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,7 +51,7 @@ public class ProblemServiceTests {
         expected.setId(ID);
         expected.setName(NAME);
         expected.setDescription(DESCRIPTION);
-        // TODO problem difficulty
+        expected.setDifficulty(ProblemDifficulty.EASY);
 
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(INPUT);
@@ -64,6 +65,7 @@ public class ProblemServiceTests {
         assertEquals(expected.getId(), response.getId());
         assertEquals(expected.getName(), response.getName());
         assertEquals(expected.getDescription(), response.getDescription());
+        assertEquals(expected.getDifficulty(), response.getDifficulty());
 
         assertEquals(expected.getTestCases().get(0).getInput(), response.getTestCases().get(0).getInput());
         assertEquals(expected.getTestCases().get(0).getOutput(), response.getTestCases().get(0).getOutput());
@@ -82,7 +84,7 @@ public class ProblemServiceTests {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);
         request.setDescription(DESCRIPTION);
-        // TODO problem difficulty
+        request.setDifficulty(ProblemDifficulty.MEDIUM);
 
         ProblemDto response = problemService.createProblem(request);
 
@@ -90,6 +92,7 @@ public class ProblemServiceTests {
 
         assertEquals(NAME, response.getName());
         assertEquals(DESCRIPTION, response.getDescription());
+        assertEquals(request.getDifficulty(), response.getDifficulty());
         assertEquals(0, response.getTestCases().size());
     }
 
@@ -97,7 +100,7 @@ public class ProblemServiceTests {
     public void createProblemFailureEmptyField() {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setDescription(DESCRIPTION);
-        // TODO problem difficulty
+        request.setDifficulty(ProblemDifficulty.HARD);
 
         ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblem(request));
 
@@ -115,7 +118,7 @@ public class ProblemServiceTests {
         Problem problem = new Problem();
         problem.setName(NAME);
         problem.setDescription(DESCRIPTION);
-        // TODO problem difficulty
+        problem.setDifficulty(ProblemDifficulty.EASY);
 
         List<Problem> expected = new ArrayList<>();
         expected.add(problem);
@@ -127,6 +130,7 @@ public class ProblemServiceTests {
         assertEquals(1, response.size());
         assertEquals(NAME, response.get(0).getName());
         assertEquals(DESCRIPTION, response.get(0).getDescription());
+        assertEquals(problem.getDifficulty(), response.get(0).getDifficulty());
     }
 
     @Test
@@ -135,7 +139,7 @@ public class ProblemServiceTests {
         expected.setId(ID);
         expected.setName(NAME);
         expected.setDescription(DESCRIPTION);
-        // TODO problem difficulty
+        expected.setDifficulty(ProblemDifficulty.HARD);
 
         Mockito.doReturn(Optional.of(expected)).when(repository).findById(ID);
 
@@ -162,7 +166,6 @@ public class ProblemServiceTests {
         CreateTestCaseRequest noProblemRequest = new CreateTestCaseRequest();
         noProblemRequest.setInput(INPUT);
         noProblemRequest.setOutput(OUTPUT);
-        // TODO problem difficulty
 
         ApiException exception = assertThrows(ApiException.class, () -> problemService.createTestCase(99, noProblemRequest));
 

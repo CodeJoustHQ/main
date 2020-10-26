@@ -4,6 +4,7 @@ import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.model.problem.Problem;
+import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemTestCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +30,7 @@ public class ProblemMapperTests {
         expected.setId(ID);
         expected.setName(NAME);
         expected.setDescription(DESCRIPTION);
-        // TODO problem difficulty
+        expected.setDifficulty(ProblemDifficulty.HARD);
 
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(INPUT);
@@ -42,6 +43,7 @@ public class ProblemMapperTests {
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getDescription(), actual.getDescription());
+        assertEquals(expected.getDifficulty(), actual.getDifficulty());
 
         List<ProblemTestCaseDto> expectedTestCases = expected.getTestCases()
                 .stream()

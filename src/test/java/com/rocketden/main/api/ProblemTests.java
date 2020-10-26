@@ -17,6 +17,7 @@ import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
+import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
@@ -76,7 +77,7 @@ class ProblemTests {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);
         request.setDescription(DESCRIPTION);
-        // TODO problem difficulty
+        request.setDifficulty(ProblemDifficulty.MEDIUM);
 
         MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -101,6 +102,7 @@ class ProblemTests {
 
         assertEquals(NAME, actual.getName());
         assertEquals(DESCRIPTION, actual.getDescription());
+        assertEquals(request.getDifficulty(), actual.getDifficulty());
         assertEquals(0, actual.getTestCases().size());
     }
 
@@ -109,7 +111,7 @@ class ProblemTests {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);
         request.setDescription(DESCRIPTION);
-        // TODO problem difficulty
+        request.setDifficulty(ProblemDifficulty.HARD);
 
         this.mockMvc.perform(post(POST_PROBLEM_CREATE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -146,7 +148,7 @@ class ProblemTests {
     public void createProblemEmptyFields() throws Exception {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);
-        request.setDescription(DESCRIPTION);
+        request.setDifficulty(ProblemDifficulty.HARD);
 
         ApiError ERROR = ProblemError.EMPTY_FIELD;
 
@@ -306,7 +308,7 @@ class ProblemTests {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);
         request.setDescription(DESCRIPTION);
-        // TODO problem difficulty
+        request.setDifficulty(ProblemDifficulty.EASY);
 
         MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -319,6 +321,7 @@ class ProblemTests {
 
         assertEquals(NAME, actual.getName());
         assertEquals(DESCRIPTION, actual.getDescription());
+        assertEquals(request.getDifficulty(), actual.getDifficulty());
 
         return actual;
     }
