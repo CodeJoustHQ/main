@@ -165,8 +165,21 @@ class ProblemTests {
     }
 
     @Test
-    public void createProblemBadDifficulty() {
-        // TODO nonexistent difficulty fails, e.g. "eXtremely hard"
+    public void createProblemBadDifficulty() throws Exception {
+        String jsonRequest = "{\"name\": \"Test\", \"description\": \"Do this\", \"difficulty\": \"invalid\"}";
+
+        ApiError ERROR = ProblemError.EMPTY_FIELD;
+
+        MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(jsonRequest))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
     }
 
     @Test

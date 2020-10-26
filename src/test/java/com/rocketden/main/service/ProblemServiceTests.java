@@ -110,7 +110,26 @@ public class ProblemServiceTests {
 
     @Test
     public void createProblemFailureBadDifficulty() {
-        // TODO 1. random difficulty not allowed 2. null difficulty
+        // Must provide a difficulty setting
+        CreateProblemRequest missingRequest = new CreateProblemRequest();
+        missingRequest.setName(NAME);
+        missingRequest.setDescription(DESCRIPTION);
+
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblem(missingRequest));
+
+        verify(repository, never()).save(Mockito.any());
+        assertEquals(ProblemError.EMPTY_FIELD, exception.getError());
+
+        // Difficulty setting cannot be random
+        CreateProblemRequest badRequest = new CreateProblemRequest();
+        badRequest.setName(NAME);
+        badRequest.setDescription(DESCRIPTION);
+        badRequest.setDifficulty(ProblemDifficulty.RANDOM);
+
+        exception = assertThrows(ApiException.class, () -> problemService.createProblem(badRequest));
+
+        verify(repository, never()).save(Mockito.any());
+        assertEquals(ProblemError.BAD_SETTING, exception.getError());
     }
 
     @Test
