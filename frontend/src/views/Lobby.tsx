@@ -59,12 +59,13 @@ function LobbyPage() {
   };
 
   const kickUser = (userId: string) => {
+    setLoading(true);
     removeUser(currentRoomId, {
       initiatorId: currentUser!.userId as string,
       userId,
     })
       .then(() => {
-        setLoading(true);
+        setLoading(false);
       })
       .catch((err) => {
         setError(err.message);

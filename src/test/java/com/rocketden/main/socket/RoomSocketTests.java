@@ -347,6 +347,9 @@ public class RoomSocketTests {
         RoomDto actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(actual);
 
+        // Check that the room contains the user
+        assertEquals(true, actual.getUsers().contains(newUser));
+
         RemoveUserRequest removeUserRequest = new RemoveUserRequest();
         removeUserRequest.setInitiatorId(room.getHost().getUserId());
         removeUserRequest.setUserId(newUser.getUserId());
