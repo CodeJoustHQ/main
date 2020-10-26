@@ -40,6 +40,7 @@ public class ProblemService {
         Problem problem = new Problem();
         problem.setName(request.getName());
         problem.setDescription(request.getDescription());
+        problem.setDifficulty(request.getDifficulty());
 
         repository.save(problem);
 
