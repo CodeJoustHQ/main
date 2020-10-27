@@ -20,6 +20,7 @@ public class ProblemTestCase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @EqualsAndHashCode.Include
     private Integer id;
 
     @EqualsAndHashCode.Include

@@ -55,6 +55,7 @@ public class ProblemEntityTests {
 
         assertFalse(problem.removeTestCase(caseToRemove));
 
+        caseToRemove.setId(ID);
         caseToRemove.setHidden(false);
         assertTrue(problem.removeTestCase(caseToRemove));
         assertTrue(problem.getTestCases().isEmpty());
