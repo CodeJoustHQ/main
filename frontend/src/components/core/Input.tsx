@@ -41,3 +41,16 @@ export const LargeInputButton = styled(Input).attrs(() => ({
     cursor: default;
   }
 `;
+
+export const ConsoleInput = styled(Input).attrs(() => ({
+  type: 'text',
+}))`
+  font-family: monospace;
+  margin: 5px;
+
+  // &:disabled {
+  //   background-color: ${({ theme }) => theme.colors.lightBlue};
+  //   border: 3px solid ${({ theme }) => theme.colors.lightBlue};
+  //   cursor: default;
+  // }
+`;
