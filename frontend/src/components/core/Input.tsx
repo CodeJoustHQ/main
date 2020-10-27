@@ -42,15 +42,12 @@ export const LargeInputButton = styled(Input).attrs(() => ({
   }
 `;
 
-export const ConsoleInput = styled(Input).attrs(() => ({
-  type: 'text',
-}))`
+export const ConsoleTextArea = styled.textarea`
   font-family: monospace;
-  margin: 5px;
-
-  // &:disabled {
-  //   background-color: ${({ theme }) => theme.colors.lightBlue};
-  //   border: 3px solid ${({ theme }) => theme.colors.lightBlue};
-  //   cursor: default;
-  // }
+  margin: 2px;
+  padding: 5px;
+  border: 3px solid ${({ theme }) => theme.colors.darkBlue};
+  border-radius: 0.25rem;
+  
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
 `;

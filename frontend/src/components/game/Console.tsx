@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { TestCase } from '../../api/Problem';
-import { ConsoleInput } from '../core/Input';
+import { BoldText } from '../core/Text';
+import { ConsoleTextArea } from '../core/Input';
 
 const Content = styled.div`
   height: 100%;
@@ -17,13 +18,13 @@ function Console({ testCases }: ConsoleProps) {
 
   useEffect(() => {
     setInput(testCases?.length ? testCases[0].input : '');
-  });
+  }, [testCases]);
 
   return (
     <Content>
       <div>
-        {input}
-        <ConsoleInput />
+        <BoldText>Input</BoldText>
+        <ConsoleTextArea value={input} onChange={(e) => setInput(e.target.value)} />
       </div>
     </Content>
   );
