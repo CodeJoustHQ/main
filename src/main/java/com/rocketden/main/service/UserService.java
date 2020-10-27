@@ -2,6 +2,7 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.UserRepository;
 import com.rocketden.main.dto.user.CreateUserRequest;
+import com.rocketden.main.dto.user.DeleteUserRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.UserError;
