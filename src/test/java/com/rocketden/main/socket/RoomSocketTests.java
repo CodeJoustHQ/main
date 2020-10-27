@@ -7,7 +7,7 @@ import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
-import com.rocketden.main.dto.user.RemoveUserRequest;
+import com.rocketden.main.dto.room.RemoveUserRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.model.ProblemDifficulty;
 import com.rocketden.main.util.SocketTestMethods;

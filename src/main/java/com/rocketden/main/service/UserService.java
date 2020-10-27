@@ -51,6 +51,19 @@ public class UserService {
         return UserMapper.toDto(user);
     }
 
+    public UserDto deleteUser(DeleteUserRequest request) {
+        User user = repository.findUserByUserId(request.getUserId());
+
+        // If requested user does not exist in database, throw an exception.
+        if (user == null) {
+            throw new ApiException(UserError.NOT_FOUND);
+        }
+
+        repository.delete(user);
+
+        return UserMapper.toDto(user);
+    }
+
     /**
      * The requirements for validity are as follows:
      * 1. Non-null and non-empty
