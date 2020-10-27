@@ -57,6 +57,31 @@ class ProblemTests {
     private static final String INPUT_2 = "[-1, 5, 0, 3]";
     private static final String OUTPUT_2 = "5";
 
+    /**
+     * Helper method that sends a POST request to create a new problem
+     * @return the created problem
+     * @throws Exception if anything wrong occurs
+     */
+    private ProblemDto createSingleProblem() throws Exception {
+        CreateProblemRequest request = new CreateProblemRequest();
+        request.setName(NAME);
+        request.setDescription(DESCRIPTION);
+
+        MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ProblemDto actual = UtilityTestMethods.toObject(jsonResponse, ProblemDto.class);
+
+        assertEquals(NAME, actual.getName());
+        assertEquals(DESCRIPTION, actual.getDescription());
+
+        return actual;
+    }
+
     @Test
     public void getProblemNonExistent() throws Exception {
         ApiError ERROR = ProblemError.NOT_FOUND;
@@ -287,30 +312,5 @@ class ProblemTests {
         assertEquals(INPUT_2, case2.getInput());
         assertEquals(OUTPUT_2, case2.getOutput());
         assertFalse(case2.isHidden());
-    }
-
-    /**
-     * Helper method that sends a POST request to create a new problem
-     * @return the created problem
-     * @throws Exception if anything wrong occurs
-     */
-    private ProblemDto createSingleProblem() throws Exception {
-        CreateProblemRequest request = new CreateProblemRequest();
-        request.setName(NAME);
-        request.setDescription(DESCRIPTION);
-
-        MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().isCreated())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ProblemDto actual = UtilityTestMethods.toObject(jsonResponse, ProblemDto.class);
-
-        assertEquals(NAME, actual.getName());
-        assertEquals(DESCRIPTION, actual.getDescription());
-
-        return actual;
     }
 }
