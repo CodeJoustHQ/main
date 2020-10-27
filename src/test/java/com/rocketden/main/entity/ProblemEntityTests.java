@@ -14,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ProblemEntityTests {
 
     private static final int ID = 10;
-    private static final String INPUT = "[1, 2, 8]";
-    private static final String OUTPUT = "8";
+    private static final String INPUT = "[1, 8, 2]";
+    private static final String OUTPUT = "[1, 2, 8]";
 
     @Test
     public void problemInitialization() {

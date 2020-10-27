@@ -52,8 +52,8 @@ class ProblemTests {
     private static final String NAME_2 = "Find Maximum";
     private static final String DESCRIPTION_2 = "Find the maximum value in an array.";
 
-    private static final String INPUT = "[1, 2, 8]";
-    private static final String OUTPUT = "8";
+    private static final String INPUT = "[1, 8, 2]";
+    private static final String OUTPUT = "[1, 2, 8]";
     private static final String INPUT_2 = "[-1, 5, 0, 3]";
     private static final String OUTPUT_2 = "5";
 

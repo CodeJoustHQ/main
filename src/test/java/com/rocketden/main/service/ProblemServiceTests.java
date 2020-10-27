@@ -41,8 +41,8 @@ public class ProblemServiceTests {
     private static final String NAME = "Sort a List";
     private static final String DESCRIPTION = "Sort the given list in O(n log n) time.";
 
-    private static final String INPUT = "[1, 2, 8]";
-    private static final String OUTPUT = "8";
+    private static final String INPUT = "[1, 8, 2]";
+    private static final String OUTPUT = "[1, 2, 8]";
 
     @Test
     public void getProblemSuccess() {
