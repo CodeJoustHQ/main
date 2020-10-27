@@ -56,6 +56,7 @@ public class ProblemServiceTests {
         testCase.setOutput(OUTPUT);
         expected.addTestCase(testCase);
 
+        // findById returns Optional<Problem>, so we need to make this return Optional.of(expected)
         Mockito.doReturn(Optional.of(expected)).when(repository).findById(ID);
 
         ProblemDto response = problemService.getProblem(ID);

@@ -42,7 +42,6 @@ public class ProblemMapperTests {
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getDescription(), actual.getDescription());
 
-
         List<ProblemTestCaseDto> expectedTestCases = expected.getTestCases()
                 .stream()
                 .map(ProblemMapper::toTestCaseDto)
