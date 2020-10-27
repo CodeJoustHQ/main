@@ -1,10 +1,17 @@
 import axios from 'axios';
 import { axiosErrorHandler } from './Error';
 
+export type TestCase = {
+  input: string,
+  output: string,
+  hidden: boolean,
+};
+
 export type Problem = {
   id: number,
   name: string,
   description: string;
+  testCases: TestCase[],
 }
 
 const basePath = '/api/v1/problems';

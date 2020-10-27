@@ -79,7 +79,7 @@ function GamePage() {
             </Panel>
 
             <Panel>
-              <Console />
+              <Console testCases={problem?.testCases!} />
             </Panel>
           </SplitterLayout>
         </SplitterLayout>
