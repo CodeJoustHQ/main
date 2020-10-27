@@ -8,15 +8,22 @@ const Content = styled.div`
   height: 100%;
 `;
 
+const FixedContent = styled.div`
+  
+`;
+
 type ConsoleProps = {
   testCases: TestCase[],
   submission: SubmissionResult | null,
+  onRun: (input: string) => void,
 };
 
 // This function refreshes the width of Monaco editor upon change in container size
-function Console({ testCases, submission }: ConsoleProps) {
+function Console(props: ConsoleProps) {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
+
+  const { testCases, submission, onRun } = props;
 
   useEffect(() => {
     setInput(testCases?.length ? testCases[0].input : '');
@@ -28,6 +35,9 @@ function Console({ testCases, submission }: ConsoleProps) {
 
   return (
     <Content>
+      <FixedContent>
+
+      </FixedContent>
       <div>
         <BoldText>Input</BoldText>
         <ConsoleTextArea value={input} onChange={(e) => setInput(e.target.value)} />

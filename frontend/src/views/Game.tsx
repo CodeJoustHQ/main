@@ -46,6 +46,13 @@ function GamePage() {
     window.dispatchEvent(event);
   };
 
+  // Callback when user runs code against custom test case
+  const runSolution = (input: string) => {
+    console.log(input);
+    const tempSubmission = { status: 'SUCCESS', output: input };
+    setSubmission(tempSubmission);
+  };
+
   return (
     <FlexContainer>
       <FlexInfoBar>
@@ -80,7 +87,11 @@ function GamePage() {
             </Panel>
 
             <Panel>
-              <Console testCases={problem?.testCases!} submission={submission} />
+              <Console
+                testCases={problem?.testCases!}
+                submission={submission}
+                onRun={runSolution}
+              />
             </Panel>
           </SplitterLayout>
         </SplitterLayout>
