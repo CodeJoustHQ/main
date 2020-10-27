@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
 import Editor from '../components/game/Editor';
-import { Problem, getProblems } from '../api/Problem';
+import { Problem, getProblems, SubmissionResult } from '../api/Problem';
 import { Room } from '../api/Room';
 import {
   FlexContainer, FlexInfoBar, Panel, SplitterContainer,
@@ -21,6 +21,7 @@ function GamePage() {
   const location = useLocation<LocationState>();
   const [room, setRoom] = useState<Room | null>(null);
   const [problem, setProblem] = useState<Problem | null>(null);
+  const [submission, setSubmission] = useState<SubmissionResult | null>({status: 'good', output: '3'});
   const [error, setError] = useState<string>('');
 
   // Called every time location changes
@@ -72,14 +73,14 @@ function GamePage() {
             percentage
             vertical
             primaryMinSize={20}
-            secondaryMinSize={2}
+            secondaryMinSize={1}
           >
             <Panel>
               <Editor />
             </Panel>
 
             <Panel>
-              <Console testCases={problem?.testCases!} />
+              <Console testCases={problem?.testCases!} submission={submission} />
             </Panel>
           </SplitterLayout>
         </SplitterLayout>

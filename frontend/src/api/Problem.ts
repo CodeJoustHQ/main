@@ -12,7 +12,12 @@ export type Problem = {
   name: string,
   description: string;
   testCases: TestCase[],
-}
+};
+
+export type SubmissionResult = {
+  status: string,
+  output: string,
+};
 
 const basePath = '/api/v1/problems';
 const routes = {
