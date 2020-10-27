@@ -20,7 +20,7 @@ type LocationState = {
 function GamePage() {
   const location = useLocation<LocationState>();
   const [room, setRoom] = useState<Room | null>(null);
-  const [problems, setProblems] = useState<Problem[]>([]);
+  const [problem, setProblem] = useState<Problem | null>(null);
   const [error, setError] = useState<string>('');
 
   // Called every time location changes
@@ -28,20 +28,16 @@ function GamePage() {
     if (checkLocationState(location, 'room')) {
       setRoom(location.state.room);
     }
-    getProblems().then((res) => {
-      if (!(res as Problem[]).length) {
-        setError('Problem cannot be found');
-      } else {
-        setProblems(res as Problem[]);
-        setError('');
-      }
-    }).catch((err) => {
-      setError((err as ErrorResponse).message);
-      setProblems([]);
-    });
+    getProblems()
+      .then((res) => {
+        if (!res.length) {
+          setError('Problem cannot be found');
+        } else {
+          setProblem(res[0]);
+          setError('');
+        }
+      }).catch((err) => setError(err.message));
   }, [location]);
-
-  const firstProblem = problems?.[0];
 
   // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {
@@ -64,8 +60,8 @@ function GamePage() {
           secondaryMinSize={35}
         >
           <Panel>
-            <ProblemHeaderText>{firstProblem?.name}</ProblemHeaderText>
-            <Text>{firstProblem?.description}</Text>
+            <ProblemHeaderText>{problem?.name}</ProblemHeaderText>
+            <Text>{problem?.description}</Text>
             {error ? <ErrorMessage message={error} /> : null}
           </Panel>
           <Panel>
