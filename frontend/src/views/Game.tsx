@@ -21,7 +21,7 @@ function GamePage() {
   const location = useLocation<LocationState>();
   const [room, setRoom] = useState<Room | null>(null);
   const [problem, setProblem] = useState<Problem | null>(null);
-  const [submission, setSubmission] = useState<SubmissionResult | null>({status: 'good', output: '3'});
+  const [submission, setSubmission] = useState<SubmissionResult | null>(null);
   const [error, setError] = useState<string>('');
 
   // Called every time location changes
@@ -48,7 +48,7 @@ function GamePage() {
 
   // Callback when user runs code against custom test case
   const runSolution = (input: string) => {
-    console.log(input);
+    // Needs to be implemented
     const tempSubmission = { status: 'SUCCESS', output: input };
     setSubmission(tempSubmission);
   };
