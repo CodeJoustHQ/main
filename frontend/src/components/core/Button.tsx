@@ -70,3 +70,9 @@ export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`
     cursor: ${({ enabled }) => (enabled ? 'pointer' : 'default')};
   }
 `;
+
+export const SmallButton = styled(DefaultButton)`
+  color: ${({ theme }) => theme.colors.white};
+  background-color: ${({ theme }) => theme.colors.blue};
+  padding: 0.5rem 1rem;
+`;

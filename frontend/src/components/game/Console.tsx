@@ -3,13 +3,16 @@ import styled from 'styled-components';
 import { SubmissionResult, TestCase } from '../../api/Problem';
 import { BoldText } from '../core/Text';
 import { ConsoleTextArea } from '../core/Input';
+import { SmallButton } from '../core/Button';
 
 const Content = styled.div`
   height: 100%;
 `;
 
 const FixedContent = styled.div`
-  
+  position: absolute;
+  top: 0;
+  right: 0;
 `;
 
 type ConsoleProps = {
@@ -36,7 +39,7 @@ function Console(props: ConsoleProps) {
   return (
     <Content>
       <FixedContent>
-
+        <SmallButton onClick={() => onRun(input)}>Run Code</SmallButton>
       </FixedContent>
       <div>
         <BoldText>Input</BoldText>
