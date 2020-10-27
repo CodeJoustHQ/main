@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
 import Editor from '../components/core/Editor';
-import { ErrorResponse } from '../api/Error';
 import { Problem, getProblems } from '../api/Problem';
 import { Room } from '../api/Room';
 import {
@@ -59,14 +58,28 @@ function GamePage() {
           primaryMinSize={20}
           secondaryMinSize={35}
         >
+          {/* Problem title/description panel */}
           <Panel>
             <ProblemHeaderText>{problem?.name}</ProblemHeaderText>
             <Text>{problem?.description}</Text>
             {error ? <ErrorMessage message={error} /> : null}
           </Panel>
-          <Panel>
-            <Editor />
-          </Panel>
+
+          {/* Code editor and test case panels */}
+          <SplitterLayout
+            percentage
+            vertical
+            primaryMinSize={20}
+            secondaryMinSize={2}
+          >
+            <Panel>
+              <Editor />
+            </Panel>
+
+            <Panel>
+              Test cases go here
+            </Panel>
+          </SplitterLayout>
         </SplitterLayout>
       </SplitterContainer>
     </FlexContainer>
