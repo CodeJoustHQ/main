@@ -25,7 +25,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -44,9 +43,6 @@ public class RoomServiceTests {
 
     @Mock
     private SocketService socketService;
-
-    @Mock
-    private SimpMessagingTemplate template;
 
     @Mock
     private Utility utility;
@@ -377,6 +373,38 @@ public class RoomServiceTests {
         verify(socketService).sendSocketUpdate(eq(response));
         assertEquals(1, response.getUsers().size());
         assertFalse(response.getUsers().contains(UserMapper.toDto(user)));
+    }
+
+    @Test
+    public void removeHost() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User host = new User();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+        host.setSessionId(SESSION_ID);
+
+        room.setHost(host);
+        room.addUser(host);
+
+        User user = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        user.setSessionId(SESSION_ID_2);
+        room.addUser(user);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiatorId(host.getUserId());
+        request.setUserId(host.getUserId());
+        RoomDto response = roomService.removeUser(ROOM_ID, request);
+
+        verify(socketService).sendSocketUpdate(eq(response));
+        assertEquals(1, response.getUsers().size());
+        assertEquals(UserMapper.toDto(user), response.getHost());
+        assertFalse(response.getUsers().contains(UserMapper.toDto(host)));
     }
 
     @Test

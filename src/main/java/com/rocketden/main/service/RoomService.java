@@ -132,6 +132,25 @@ public class RoomService {
             throw new ApiException(RoomError.INVALID_PERMISSIONS);
         }
 
+        // Assign new host if user being kicked is host
+        if (user.getUserId().equals(room.getHost().getUserId())) {
+            UpdateHostRequest updateHostRequest = new UpdateHostRequest();
+            updateHostRequest.setInitiator(UserMapper.toDto(user));
+
+            // Get the first active non-host user, if one exists.
+            for (User roomUser : room.getUsers()) {
+                if (roomUser.getSessionId() != null && !roomUser.equals(room.getHost())) {
+                    updateHostRequest.setNewHost(UserMapper.toDto(roomUser));
+                    break;
+                }
+            }
+
+            // Determine whether an active non-host user was found, and if so, send an update room host request.
+            if (updateHostRequest.getNewHost() != null) {
+                updateRoomHost(room.getRoomId(), updateHostRequest);
+            }
+        }
+
         room.removeUser(user);
         repository.save(room);
 
