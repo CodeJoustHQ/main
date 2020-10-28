@@ -160,27 +160,29 @@ public class UserTests {
 
     @Test
     public void deleteExistingUser() throws Exception {
-        CreateUserRequest createRequest = new CreateUserRequest();
-        createRequest.setNickname(NICKNAME);
-        createRequest.setUserId(USER_ID);
+        CreateUserRequest createUserRequest = new CreateUserRequest();
+        createUserRequest.setNickname(NICKNAME);
+        createUserRequest.setUserId(USER_ID);
 
-        UserDto expected = new UserDto();
-        expected.setUserId(USER_ID);
-
-        DeleteUserRequest request = new DeleteUserRequest();
-        request.setUserId(USER_ID);
-
-        this.mockMvc.perform(post(USER_URI)
+        MvcResult result = this.mockMvc.perform(post(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)));
-
-        MvcResult result = this.mockMvc.perform(put(USER_URI)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andExpect(status().isOk())
+                .content(UtilityTestMethods.convertObjectToJsonString(createUserRequest)))
+                .andDo(print()).andExpect(status().isCreated())
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
+        UserDto expected = UtilityTestMethods.toObject(jsonResponse, UserDto.class);
+
+        DeleteUserRequest deleteUserRequest = new DeleteUserRequest();
+        deleteUserRequest.setUserId(USER_ID);
+
+        result = this.mockMvc.perform(put(USER_URI)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(deleteUserRequest)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
         UserDto actual = UtilityTestMethods.toObject(jsonResponse, UserDto.class);
 
         assertEquals(expected.getUserId(), actual.getUserId());
