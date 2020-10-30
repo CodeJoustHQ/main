@@ -366,8 +366,8 @@ public class RoomServiceTests {
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
 
         RemoveUserRequest request = new RemoveUserRequest();
-        request.setInitiatorId(host.getUserId());
-        request.setUserId(user.getUserId());
+        request.setInitiator(UserMapper.toDto(host));
+        request.setUserToDelete(UserMapper.toDto(user));
         RoomDto response = roomService.removeUser(ROOM_ID, request);
 
         verify(socketService).sendSocketUpdate(eq(response));
@@ -397,8 +397,8 @@ public class RoomServiceTests {
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
 
         RemoveUserRequest request = new RemoveUserRequest();
-        request.setInitiatorId(host.getUserId());
-        request.setUserId(host.getUserId());
+        request.setInitiator(UserMapper.toDto(host));
+        request.setUserToDelete(UserMapper.toDto(host));
         RoomDto response = roomService.removeUser(ROOM_ID, request);
 
         verify(socketService).sendSocketUpdate(eq(response));
@@ -421,9 +421,12 @@ public class RoomServiceTests {
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
 
+        User user = new User();
+        user.setUserId(USER_ID_2);
+
         RemoveUserRequest request = new RemoveUserRequest();
-        request.setInitiatorId(host.getUserId());
-        request.setUserId(USER_ID_2);
+        request.setInitiator(UserMapper.toDto(host));
+        request.setUserToDelete(UserMapper.toDto(user));
 
         ApiException exception = assertThrows(ApiException.class, () ->
                 roomService.removeUser(ROOM_ID, request));
@@ -450,8 +453,8 @@ public class RoomServiceTests {
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
 
         RemoveUserRequest request = new RemoveUserRequest();
-        request.setInitiatorId(user.getUserId());
-        request.setUserId(user.getUserId());
+        request.setInitiator(UserMapper.toDto(user));
+        request.setUserToDelete(UserMapper.toDto(user));
 
         ApiException exception = assertThrows(ApiException.class, () ->
                 roomService.removeUser(ROOM_ID, request));
@@ -460,11 +463,17 @@ public class RoomServiceTests {
 
     @Test
     public void removeUserRoomNotFound() {
+        User host = new User();
+        host.setUserId(USER_ID);
+
+        User user = new User();
+        user.setUserId(USER_ID_2);
+
         Mockito.doReturn(null).when(repository).findRoomByRoomId(eq(ROOM_ID));
 
         RemoveUserRequest request = new RemoveUserRequest();
-        request.setInitiatorId(USER_ID);
-        request.setUserId(USER_ID_2);
+        request.setInitiator(UserMapper.toDto(host));
+        request.setUserToDelete(UserMapper.toDto(user));
 
         ApiException exception = assertThrows(ApiException.class, () ->
                 roomService.removeUser(ROOM_ID, request));

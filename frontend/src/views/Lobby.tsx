@@ -58,17 +58,18 @@ function LobbyPage() {
     setDifficulty(room.difficulty);
   };
 
-  const kickUser = (userId: string) => {
+  const kickUser = (user: User) => {
     setLoading(true);
     removeUser(currentRoomId, {
-      initiatorId: currentUser!.userId as string,
-      userId,
+      initiator: currentUser as User,
+      userToDelete: user,
     })
       .then(() => {
         setLoading(false);
       })
       .catch((err) => {
         setError(err.message);
+        setLoading(false);
       });
   };
 

@@ -119,39 +119,23 @@ public class RoomService {
             throw new ApiException(RoomError.NOT_FOUND);
         }
 
-        User initiator = room.getUserByUserId(request.getInitiatorId());
-        User user = room.getUserByUserId(request.getUserId());
+        User initiator = UserMapper.toEntity(request.getInitiator());
+        User userToDelete = UserMapper.toEntity(request.getUserToDelete());
 
-        // Return error if initiator or user to delete does not exist in room
-        if (initiator == null || user == null) {
-            throw new ApiException(UserError.NOT_FOUND);
-        }
-
-        // Return error if initiator is not host
-        if (!initiator.getUserId().equals(room.getHost().getUserId())) {
+        // Return error if the initiator is not the host
+        if (!room.getHost().equals(initiator)) {
             throw new ApiException(RoomError.INVALID_PERMISSIONS);
         }
 
-        // Assign new host if user being kicked is host
-        if (user.getUserId().equals(room.getHost().getUserId())) {
-            UpdateHostRequest updateHostRequest = new UpdateHostRequest();
-            updateHostRequest.setInitiator(UserMapper.toDto(user));
-
-            // Get the first active non-host user, if one exists.
-            for (User roomUser : room.getUsers()) {
-                if (roomUser.getSessionId() != null && !roomUser.equals(room.getHost())) {
-                    updateHostRequest.setNewHost(UserMapper.toDto(roomUser));
-                    break;
-                }
-            }
-
-            // Determine whether an active non-host user was found, and if so, send an update room host request.
-            if (updateHostRequest.getNewHost() != null) {
-                updateRoomHost(room.getRoomId(), updateHostRequest);
-            }
+        // Return error if user to delete does not exist in room
+        if (!room.getUsers().contains(userToDelete)) {
+            throw new ApiException(UserError.NOT_FOUND);
         }
 
-        room.removeUser(user);
+        // Assign new host if user being kicked is host
+        conditionallyUpdateRoomHost(room.getRoomId(), userToDelete);
+
+        room.removeUser(userToDelete);
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
@@ -195,6 +179,30 @@ public class RoomService {
         RoomDto roomDto = RoomMapper.toDto(room);
         socketService.sendSocketUpdate(roomDto);
         return roomDto;
+    }
+
+    // This function randomly assigns a new host in the room
+    public void conditionallyUpdateRoomHost(String roomId, User user) {
+        Room room = repository.findRoomByRoomId(roomId);
+
+        // If the disconnected user is the host and another active user is present, reassign the host for the room.
+        if (room.getHost().equals(user)) {
+            UpdateHostRequest request = new UpdateHostRequest();
+            request.setInitiator(UserMapper.toDto(user));
+
+            // Get the first active non-host user, if one exists.
+            for (User roomUser : room.getUsers()) {
+                if (roomUser.getSessionId() != null && !roomUser.equals(room.getHost())) {
+                    request.setNewHost(UserMapper.toDto(roomUser));
+                    break;
+                }
+            }
+
+            // Determine whether an active non-host user was found, and if so, send an update room host request.
+            if (request.getNewHost() != null) {
+                updateRoomHost(room.getRoomId(), request);
+            }
+        }
     }
 
     public RoomDto updateRoomSettings(String roomId, UpdateSettingsRequest request) {

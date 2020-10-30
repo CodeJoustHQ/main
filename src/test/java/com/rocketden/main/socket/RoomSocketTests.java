@@ -351,8 +351,8 @@ public class RoomSocketTests {
         assertEquals(true, actual.getUsers().contains(newUser));
 
         RemoveUserRequest removeUserRequest = new RemoveUserRequest();
-        removeUserRequest.setInitiatorId(room.getHost().getUserId());
-        removeUserRequest.setUserId(newUser.getUserId());
+        removeUserRequest.setInitiator(room.getHost());
+        removeUserRequest.setUserToDelete(newUser);
 
         HttpEntity<RemoveUserRequest> removeUserEntity = new HttpEntity<>(removeUserRequest);
         String removeUserEndpoint = String.format("%s/%s/users/remove", baseRestEndpoint, room.getRoomId());

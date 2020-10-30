@@ -6,8 +6,6 @@ import java.util.Map;
 import com.rocketden.main.dao.UserRepository;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
-import com.rocketden.main.dto.room.UpdateHostRequest;
-import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 import com.rocketden.main.service.RoomService;
@@ -94,35 +92,9 @@ public class WebSocketConnectionEvents {
 
             // Get room, conditionally update the host, and send socket update.
             Room room = user.getRoom();
-            conditionallyUpdateRoomHost(room, user);
+            roomService.conditionallyUpdateRoomHost(room.getRoomId(), user);
             RoomDto roomDto = RoomMapper.toDto(room);
             socketService.sendSocketUpdate(roomDto);
         }
-    }
-
-    /**
-     * This method updates the room host as long as:
-     * 1. The disconnected user is the room's host, and
-     * 2. The room has another active non-host user.
-     */
-    public void conditionallyUpdateRoomHost(Room room, User user) {
-        // If the disconnected user is the host and another active user is present, reassign the host for the room.
-        if (room.getHost().equals(user)) {
-            UpdateHostRequest updateHostRequest = new UpdateHostRequest();
-            updateHostRequest.setInitiator(UserMapper.toDto(user));
-
-            // Get the first active non-host user, if one exists.
-            for (User roomUser : room.getUsers()) {
-                if (roomUser.getSessionId() != null && !roomUser.equals(room.getHost())) {
-                    updateHostRequest.setNewHost(UserMapper.toDto(roomUser));
-                    break;
-                }
-            }
-
-            // Determine whether an active non-host user was found, and if so, send an update room host request.
-            if (updateHostRequest.getNewHost() != null) {
-                roomService.updateRoomHost(room.getRoomId(), updateHostRequest);
-            }
-        }   
     }
 }

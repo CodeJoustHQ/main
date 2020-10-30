@@ -32,8 +32,8 @@ export type ChangeHostParams = {
 };
 
 export type RemoveUserParams = {
-  initiatorId: String,
-  userId: String,
+  initiator: User,
+  userToDelete: User,
 };
 
 const basePath = '/api/v1/rooms';

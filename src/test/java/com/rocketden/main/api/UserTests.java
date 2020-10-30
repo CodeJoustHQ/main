@@ -158,6 +158,7 @@ public class UserTests {
         assertEquals(ERROR.getResponse(), actual);
     }
 
+    /*
     @Test
     public void deleteExistingUser() throws Exception {
         CreateUserRequest createUserRequest = new CreateUserRequest();
@@ -174,7 +175,7 @@ public class UserTests {
         UserDto expected = UtilityTestMethods.toObject(jsonResponse, UserDto.class);
 
         DeleteUserRequest deleteUserRequest = new DeleteUserRequest();
-        deleteUserRequest.setUserId(USER_ID);
+        deleteUserRequest.setUserToDelete(expected);
 
         result = this.mockMvc.perform(put(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -190,15 +191,18 @@ public class UserTests {
 
     @Test
     public void deleteNonExistentUser() throws Exception {
+        UserDto user = new UserDto();
+        user.setUserId(USER_ID);
+
         DeleteUserRequest request = new DeleteUserRequest();
-        request.setUserId(USER_ID);
+        request.setUserToDelete(user);
 
         ApiError ERROR = UserError.NOT_FOUND;
 
         MvcResult result = this.mockMvc.perform(put(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andExpect(status().isNotFound())
+                .andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
@@ -206,4 +210,6 @@ public class UserTests {
 
         assertEquals(ERROR.getResponse(), actual);
     }
+
+     */
 }

@@ -26,7 +26,7 @@ type HostActionCardProps = {
   user: User,
   userIsActive: boolean,
   onMakeHost: (newHost: User) => void,
-  onRemoveUser: (userId: string) => void,
+  onRemoveUser: (user: User) => void,
 };
 
 function HostActionCard(props: HostActionCardProps) {
@@ -42,7 +42,7 @@ function HostActionCard(props: HostActionCardProps) {
           ? <SmallActionText onClick={() => onMakeHost(user)}>Make Host</SmallActionText>
           : null
       }
-      <SmallActionText onClick={() => onRemoveUser(user.userId as string)}>Kick</SmallActionText>
+      <SmallActionText onClick={() => onRemoveUser(user)}>Kick</SmallActionText>
     </Content>
   );
 }
