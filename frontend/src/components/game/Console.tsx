@@ -7,6 +7,7 @@ import { SmallButton } from '../core/Button';
 
 const Content = styled.div`
   height: 100%;
+  overflow-y:auto;
 `;
 
 const FixedContent = styled.div`
