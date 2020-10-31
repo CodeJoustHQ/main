@@ -3,7 +3,7 @@ package com.rocketden.main.mapper;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.user.UserMapper;
-import com.rocketden.main.model.ProblemDifficulty;
+import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 
