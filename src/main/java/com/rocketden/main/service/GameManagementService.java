@@ -11,7 +11,7 @@ public class GameManagementService {
 	private final SocketService socketService;
 
     @Autowired
-    public GameService(RoomRepository repository, SocketService socketService) {
+    public GameManagementService(RoomRepository repository, SocketService socketService) {
         this.repository = repository;
         this.socketService = socketService;
     }
