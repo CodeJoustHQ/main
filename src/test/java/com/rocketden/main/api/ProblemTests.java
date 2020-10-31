@@ -67,6 +67,7 @@ class ProblemTests {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);
         request.setDescription(DESCRIPTION);
+        request.setDifficulty(ProblemDifficulty.EASY);
 
         MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -79,6 +80,7 @@ class ProblemTests {
 
         assertEquals(NAME, actual.getName());
         assertEquals(DESCRIPTION, actual.getDescription());
+        assertEquals(request.getDifficulty(), actual.getDifficulty());
 
         return actual;
     }
