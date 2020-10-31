@@ -15,18 +15,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class GameService {
 
-	private static final String START_GAME_SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/start-game";
-
     private final RoomRepository repository;
-    private final SimpMessagingTemplate template;
+	private final SocketService socketService;
 
     @Autowired
-    public GameService(RoomRepository repository, SimpMessagingTemplate template) {
+    public GameService(RoomRepository repository, SocketService socketService) {
         this.repository = repository;
-        this.template = template;
+        this.socketService = socketService;
     }
 
-	// Send request to redirect users to game when host clicks start
+	// Set room's active state to true
 	public RoomDto startGame(String roomId, StartGameRequest request) {
 		Room room = repository.findRoomByRoomId(roomId);
 
@@ -40,11 +38,11 @@ public class GameService {
 			throw new ApiException(RoomError.INVALID_PERMISSIONS);
 		}
 
+		room.setActive(true);
+		repository.save(room);
+
 		RoomDto roomDto = RoomMapper.toDto(room);
-
-		String socketPath = String.format(START_GAME_SOCKET_PATH, roomId);
-		template.convertAndSend(socketPath, roomDto);
-
+		socketService.sendSocketUpdate(roomDto);
 		return roomDto;
 	}
 }

@@ -55,9 +55,14 @@ public class RoomService {
             throw new ApiException(RoomError.DUPLICATE_USERNAME);
         }
 
+        // Return error if room is already active.
+        if (room.getActive()) {
+            throw new ApiException(RoomError.ALREADY_ACTIVE);
+        }
+
         // Add userId if not already present.
         if (user.getUserId() == null) {
-            user.setUserId(utility.generateId(UserService.USER_ID_LENGTH));
+            user.setUserId(utility.generateUniqueId(UserService.USER_ID_LENGTH, Utility.USER_ID_KEY));
         }
 
         // Add the user to the room.
@@ -82,11 +87,11 @@ public class RoomService {
 
         // Create user ID for the host if not already present.
         if (host.getUserId() == null) {
-            host.setUserId(utility.generateId(UserService.USER_ID_LENGTH));
+            host.setUserId(utility.generateUniqueId(UserService.USER_ID_LENGTH, Utility.USER_ID_KEY));
         }
 
         Room room = new Room();
-        room.setRoomId(utility.generateId(ROOM_ID_LENGTH));
+        room.setRoomId(utility.generateUniqueId(RoomService.ROOM_ID_LENGTH, Utility.ROOM_ID_KEY));
         room.setHost(host);
         room.addUser(host);
         repository.save(room);
@@ -127,8 +132,14 @@ public class RoomService {
             throw new ApiException(UserError.NOT_FOUND);
         }
 
-        // Change the host to the new user
         User newHost = room.getEquivalentUser(proposedNewHost);
+
+        // Return error if the proposed new host is currently inactive
+        if (newHost.getSessionId() == null) {
+            throw new ApiException(RoomError.INACTIVE_USER);
+        }
+
+        // Change the host to the new user
         room.setHost(newHost);
         repository.save(room);
 

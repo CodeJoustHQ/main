@@ -42,7 +42,7 @@ public class UserService {
 
         // If no user ID is present set a new automatically-generated user ID.
         if (request.getUserId() == null) {
-            user.setUserId(utility.generateId(UserService.USER_ID_LENGTH));
+            user.setUserId(utility.generateUniqueId(UserService.USER_ID_LENGTH, Utility.USER_ID_KEY));
         } else {
             user.setUserId(request.getUserId());
         }

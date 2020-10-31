@@ -42,8 +42,8 @@ public class ProblemServiceTests {
     private static final String NAME = "Sort a List";
     private static final String DESCRIPTION = "Sort the given list in O(n log n) time.";
 
-    private static final String INPUT = "[1, 2, 8]";
-    private static final String OUTPUT = "8";
+    private static final String INPUT = "[1, 8, 2]";
+    private static final String OUTPUT = "[1, 2, 8]";
 
     @Test
     public void getProblemSuccess() {
@@ -58,6 +58,7 @@ public class ProblemServiceTests {
         testCase.setOutput(OUTPUT);
         expected.addTestCase(testCase);
 
+        // findById returns Optional<Problem>, so we need to make this return Optional.of(expected)
         Mockito.doReturn(Optional.of(expected)).when(repository).findById(ID);
 
         ProblemDto response = problemService.getProblem(ID);
