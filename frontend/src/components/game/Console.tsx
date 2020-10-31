@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { SubmissionResult, TestCase } from '../../api/Problem';
-import { BoldText } from '../core/Text';
+import { Text } from '../core/Text';
 import { ConsoleTextArea } from '../core/Input';
 import { SmallButton } from '../core/Button';
 
@@ -42,11 +42,11 @@ function Console(props: ConsoleProps) {
         <SmallButton onClick={() => onRun(input)}>Run Code</SmallButton>
       </FixedContent>
       <div>
-        <BoldText>Input</BoldText>
+        <Text bold>Input</Text>
         <ConsoleTextArea value={input} onChange={(e) => setInput(e.target.value)} />
       </div>
       <div>
-        <BoldText>Output</BoldText>
+        <Text bold>Output</Text>
         <ConsoleTextArea value={output} readOnly />
       </div>
     </Content>

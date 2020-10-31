@@ -1,11 +1,12 @@
 import styled from 'styled-components';
 
-export const Text = styled.p`
-  font-size: ${({ theme }) => theme.fontSize.default};
-`;
+type TextAttributes = {
+  bold?: boolean,
+};
 
-export const BoldText = styled(Text)`
-  font-weight: bold;
+export const Text = styled.p<TextAttributes>`
+  font-size: ${({ theme }) => theme.fontSize.default};
+  font-weight: ${({ bold }) => (bold ? 'bold' : 'normal')};
 `;
 
 export const ErrorText = styled(Text)`
