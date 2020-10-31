@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 public class ProblemDto {
-    private int id;
+    private String problemId;
     private String name;
     private String description;
     private ProblemDifficulty difficulty;

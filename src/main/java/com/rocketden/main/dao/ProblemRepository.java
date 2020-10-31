@@ -8,4 +8,5 @@ import com.rocketden.main.model.problem.Problem;
 // CRUD refers Create, Read, Update, Delete
 public interface ProblemRepository extends CrudRepository<Problem, Integer> {
 
+    Problem findProblemByProblemId(String problemId);
 }

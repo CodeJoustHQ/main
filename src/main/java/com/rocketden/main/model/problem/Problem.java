@@ -15,6 +15,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity // This tells Hibernate to make a table out of this class
 @Getter
@@ -23,6 +24,9 @@ public class Problem {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+
+    // Auto-generate default business ID for each problem
+    private String problemId = UUID.randomUUID().toString();
 
     private String name;
     private String description;

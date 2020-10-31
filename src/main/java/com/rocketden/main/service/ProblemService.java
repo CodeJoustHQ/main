@@ -47,9 +47,12 @@ public class ProblemService {
         return ProblemMapper.toDto(problem);
     }
 
-    public ProblemDto getProblem(int id) {
-        Problem problem = repository.findById(id)
-                .orElseThrow(() -> new ApiException(ProblemError.NOT_FOUND));
+    public ProblemDto getProblem(String problemId) {
+        Problem problem = repository.findProblemByProblemId(problemId);
+
+        if (problem == null) {
+            throw new ApiException(ProblemError.NOT_FOUND);
+        }
 
         return ProblemMapper.toDto(problem);
     }
@@ -61,9 +64,12 @@ public class ProblemService {
         return problems;
     }
 
-    public ProblemTestCaseDto createTestCase(int problemId, CreateTestCaseRequest request) {
-        Problem problem = repository.findById(problemId)
-                .orElseThrow(() -> new ApiException(ProblemError.NOT_FOUND));
+    public ProblemTestCaseDto createTestCase(String problemId, CreateTestCaseRequest request) {
+        Problem problem = repository.findProblemByProblemId(problemId);
+
+        if (problem == null) {
+            throw new ApiException(ProblemError.NOT_FOUND);
+        }
 
         if (request.getInput() == null || request.getOutput() == null) {
             throw new ApiException(ProblemError.EMPTY_FIELD);
