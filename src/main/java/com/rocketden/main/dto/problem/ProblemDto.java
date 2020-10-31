@@ -9,7 +9,8 @@ import java.util.List;
 @Getter
 @Setter
 public class ProblemDto {
+    private int id;
     private String name;
     private String description;
-//    private List<TestCaseDto> testCases = new ArrayList<>(); TODO: upcoming PR
+    private List<ProblemTestCaseDto> testCases = new ArrayList<>();
 }

@@ -1,4 +1,4 @@
-package com.rocketden.main.model;
+package com.rocketden.main.model.problem;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.rocketden.main.exception.RoomError;
