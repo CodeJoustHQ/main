@@ -4,16 +4,17 @@ import { User } from './User';
 import Difficulty from './Difficulty';
 
 export type Room = {
-  roomId: string;
-  host: User;
-  users: [User],
-  activeUsers: [User],
-  inactiveUsers: [User],
+  roomId: string,
+  host: User,
+  users: User[],
+  activeUsers: User[],
+  inactiveUsers: User[],
+  active: boolean,
   difficulty: Difficulty,
 };
 
 export type CreateRoomParams = {
-  host: User;
+  host: User,
 };
 
 export type JoinRoomParams = {

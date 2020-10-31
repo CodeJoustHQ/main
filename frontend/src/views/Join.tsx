@@ -65,9 +65,13 @@ function JoinGamePage() {
     if (!loading) {
       setLoading(true);
       getRoom(roomIdParam)
-        .then(() => {
+        .then((res) => {
           setLoading(false);
-          setPageState(2);
+          if (res.active) {
+            setError('Cannot join a game that has already started.');
+          } else {
+            setPageState(2);
+          }
         }).catch((err) => {
           setLoading(false);
           setError(err.message);

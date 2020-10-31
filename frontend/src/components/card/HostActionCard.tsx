@@ -24,16 +24,24 @@ const Content = styled.div`
 
 type HostActionCardProps = {
   user: User,
+  userIsActive: boolean,
   onMakeHost: (newHost: User) => void,
   onDeleteUser: (userToDelete: User) => void,
 };
 
 function HostActionCard(props: HostActionCardProps) {
-  const { user, onMakeHost, onDeleteUser } = props;
+  const {
+    user, userIsActive, onMakeHost, onDeleteUser
+  } = props;
 
   return (
     <Content>
-      <SmallActionText onClick={() => onMakeHost(user)}>Make Host</SmallActionText>
+      {
+        // Only show the make host button if user is active
+        userIsActive
+          ? <SmallActionText onClick={() => onMakeHost(user)}>Make Host</SmallActionText>
+          : null
+      }
       <SmallActionText onClick={() => onDeleteUser(user)}>Kick</SmallActionText>
     </Content>
   );
