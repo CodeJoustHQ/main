@@ -77,7 +77,6 @@ function GamePage() {
 
   // Callback when user runs code against custom test case
   const runSolution = (input: string) => {
-    // Needs to be implemented
     const tempSubmission = { status: 'SUCCESS', output: input };
     setSubmission(tempSubmission);
   };
