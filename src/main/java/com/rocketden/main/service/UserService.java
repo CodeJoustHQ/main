@@ -53,11 +53,10 @@ public class UserService {
     }
 
     public UserDto deleteUser(DeleteUserRequest request) {
-        User user = new User();
-        user.setUserId(request.getUserId());
+        User user = repository.findUserByUserId(request.getUserId());
 
         // If requested user does not exist in database, throw an exception.
-        if (repository.findUserByUserId(user.getUserId()) == null) {
+        if (user == null) {
             throw new ApiException(UserError.NOT_FOUND);
         }
 
