@@ -61,8 +61,10 @@ function LobbyPage() {
   const kickUser = (user: User) => {
     setLoading(true);
     removeUser(currentRoomId, {
-      initiator: currentUser as User,
-      userToDelete: user,
+      data: {
+        initiator: currentUser as User,
+        userToDelete: user,
+      }
     })
       .then(() => {
         setLoading(false);

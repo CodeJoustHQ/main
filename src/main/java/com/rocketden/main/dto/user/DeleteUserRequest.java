@@ -6,5 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DeleteUserRequest {
-	private String userId;
+	private UserDto userToDelete;
 }

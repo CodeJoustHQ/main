@@ -11,6 +11,7 @@ import com.rocketden.main.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,7 +44,7 @@ public class RoomController extends BaseRestController {
         return new ResponseEntity<>(service.createRoom(request), HttpStatus.CREATED);
     }
 
-    @PutMapping("/rooms/{roomId}/users/remove")
+    @DeleteMapping("/rooms/{roomId}/users/remove")
     public ResponseEntity<RoomDto> removeUser(@PathVariable String roomId,
                                               @RequestBody RemoveUserRequest request) {
         return new ResponseEntity<>(service.removeUser(roomId, request), HttpStatus.OK);

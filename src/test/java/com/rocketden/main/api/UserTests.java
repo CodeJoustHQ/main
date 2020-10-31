@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -158,7 +159,6 @@ public class UserTests {
         assertEquals(ERROR.getResponse(), actual);
     }
 
-    /*
     @Test
     public void deleteExistingUser() throws Exception {
         CreateUserRequest createUserRequest = new CreateUserRequest();
@@ -177,7 +177,7 @@ public class UserTests {
         DeleteUserRequest deleteUserRequest = new DeleteUserRequest();
         deleteUserRequest.setUserToDelete(expected);
 
-        result = this.mockMvc.perform(put(USER_URI)
+        result = this.mockMvc.perform(delete(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(deleteUserRequest)))
                 .andExpect(status().isOk())
@@ -199,7 +199,7 @@ public class UserTests {
 
         ApiError ERROR = UserError.NOT_FOUND;
 
-        MvcResult result = this.mockMvc.perform(put(USER_URI)
+        MvcResult result = this.mockMvc.perform(delete(USER_URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andExpect(status().is(ERROR.getStatus().value()))
@@ -210,6 +210,4 @@ public class UserTests {
 
         assertEquals(ERROR.getResponse(), actual);
     }
-
-     */
 }
