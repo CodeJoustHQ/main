@@ -58,6 +58,7 @@ public class RoomTests {
 
     /**
      * Helper method that creates a room with the given host
+     *
      * @param host the host of the room
      * @return the resulting RoomDto object
      * @throws Exception any error that occurs
@@ -78,6 +79,7 @@ public class RoomTests {
 
     /**
      * Helper method that creates a room with two users
+     *
      * @param host the host of the room
      * @param user the second user who joins the room
      * @return the resulting RoomDto object
@@ -214,7 +216,7 @@ public class RoomTests {
     public void createValidRoomNoHost() throws Exception {
         // POST request to create valid room should return successful response
         CreateRoomRequest createRequest = new CreateRoomRequest();
-        
+
         ApiError ERROR = RoomError.NO_HOST;
 
         MvcResult result = this.mockMvc.perform(post(POST_ROOM_CREATE)
@@ -632,4 +634,4 @@ public class RoomTests {
 
         assertEquals(ERROR.getResponse(), errorResponse);
     }
-
+}
