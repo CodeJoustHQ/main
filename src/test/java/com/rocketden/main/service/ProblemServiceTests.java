@@ -8,6 +8,7 @@ import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.problem.Problem;
+import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemTestCase;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,6 +51,7 @@ public class ProblemServiceTests {
         expected.setId(ID);
         expected.setName(NAME);
         expected.setDescription(DESCRIPTION);
+        expected.setDifficulty(ProblemDifficulty.EASY);
 
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(INPUT);
@@ -64,6 +66,7 @@ public class ProblemServiceTests {
         assertEquals(expected.getId(), response.getId());
         assertEquals(expected.getName(), response.getName());
         assertEquals(expected.getDescription(), response.getDescription());
+        assertEquals(expected.getDifficulty(), response.getDifficulty());
 
         assertEquals(expected.getTestCases().get(0).getInput(), response.getTestCases().get(0).getInput());
         assertEquals(expected.getTestCases().get(0).getOutput(), response.getTestCases().get(0).getOutput());
@@ -82,6 +85,7 @@ public class ProblemServiceTests {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);
         request.setDescription(DESCRIPTION);
+        request.setDifficulty(ProblemDifficulty.MEDIUM);
 
         ProblemDto response = problemService.createProblem(request);
 
@@ -89,6 +93,7 @@ public class ProblemServiceTests {
 
         assertEquals(NAME, response.getName());
         assertEquals(DESCRIPTION, response.getDescription());
+        assertEquals(request.getDifficulty(), response.getDifficulty());
         assertEquals(0, response.getTestCases().size());
     }
 
@@ -96,6 +101,7 @@ public class ProblemServiceTests {
     public void createProblemFailureEmptyField() {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setDescription(DESCRIPTION);
+        request.setDifficulty(ProblemDifficulty.HARD);
 
         ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblem(request));
 
@@ -104,10 +110,35 @@ public class ProblemServiceTests {
     }
 
     @Test
+    public void createProblemFailureBadDifficulty() {
+        // Must provide a difficulty setting
+        CreateProblemRequest missingRequest = new CreateProblemRequest();
+        missingRequest.setName(NAME);
+        missingRequest.setDescription(DESCRIPTION);
+
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblem(missingRequest));
+
+        verify(repository, never()).save(Mockito.any());
+        assertEquals(ProblemError.EMPTY_FIELD, exception.getError());
+
+        // Difficulty setting cannot be random
+        CreateProblemRequest badRequest = new CreateProblemRequest();
+        badRequest.setName(NAME);
+        badRequest.setDescription(DESCRIPTION);
+        badRequest.setDifficulty(ProblemDifficulty.RANDOM);
+
+        exception = assertThrows(ApiException.class, () -> problemService.createProblem(badRequest));
+
+        verify(repository, never()).save(Mockito.any());
+        assertEquals(ProblemError.BAD_SETTING, exception.getError());
+    }
+
+    @Test
     public void getProblemsSuccess() {
         Problem problem = new Problem();
         problem.setName(NAME);
         problem.setDescription(DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.EASY);
 
         List<Problem> expected = new ArrayList<>();
         expected.add(problem);
@@ -119,6 +150,7 @@ public class ProblemServiceTests {
         assertEquals(1, response.size());
         assertEquals(NAME, response.get(0).getName());
         assertEquals(DESCRIPTION, response.get(0).getDescription());
+        assertEquals(problem.getDifficulty(), response.get(0).getDifficulty());
     }
 
     @Test
@@ -127,6 +159,7 @@ public class ProblemServiceTests {
         expected.setId(ID);
         expected.setName(NAME);
         expected.setDescription(DESCRIPTION);
+        expected.setDifficulty(ProblemDifficulty.HARD);
 
         Mockito.doReturn(Optional.of(expected)).when(repository).findById(ID);
 
