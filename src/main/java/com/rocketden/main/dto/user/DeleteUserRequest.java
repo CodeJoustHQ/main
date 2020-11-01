@@ -1,4 +1,4 @@
-package com.rocketden.main.dto.room;
+package com.rocketden.main.dto.user;
 
 import lombok.Getter;
 import lombok.Setter;
