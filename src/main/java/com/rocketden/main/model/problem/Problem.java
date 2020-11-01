@@ -2,6 +2,8 @@ package com.rocketden.main.model.problem;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -33,6 +35,9 @@ public class Problem {
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true)
     @Setter(AccessLevel.PRIVATE)
     private List<ProblemTestCase> testCases = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    private ProblemDifficulty difficulty;
 
     public void addTestCase(ProblemTestCase testCase) {
         testCases.add(testCase);
