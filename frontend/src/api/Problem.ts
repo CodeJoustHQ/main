@@ -2,7 +2,7 @@ import axios from 'axios';
 import { ErrorResponse, errorHandler } from './Error';
 
 export type Problem = {
-  id: number,
+  problemId: string,
   name: string,
   description: string;
 }
@@ -10,7 +10,9 @@ export type Problem = {
 const basePath = '/api/v1/problems';
 const routes = {
   getProblems: `${basePath}/`,
-  postProblem: `${basePath}/`,
+  createProblem: `${basePath}/`,
+  getSingleProblem: (problemId: string) => `${basePath}/${problemId}`,
+  createTestCase: (problemId: string) => `${basePath}/${problemId}/test-case`,
 };
 
 export const getProblems = (): Promise<Problem[] | ErrorResponse> => axios
