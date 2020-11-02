@@ -120,7 +120,7 @@ class ProblemTests {
         assertEquals(0, actual.getTestCases().size());
 
         // Get the newly created problem from the database
-        result = this.mockMvc.perform(get(String.format(GET_PROBLEM, actual.getId())))
+        result = this.mockMvc.perform(get(String.format(GET_PROBLEM, actual.getProblemId())))
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
@@ -230,7 +230,7 @@ class ProblemTests {
         request.setInput(INPUT);
         request.setOutput(OUTPUT);
 
-        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getId());
+        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getProblemId());
         MvcResult result = this.mockMvc.perform(post(endpoint)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(request)))
@@ -254,7 +254,7 @@ class ProblemTests {
 
         ApiError ERROR = ProblemError.EMPTY_FIELD;
 
-        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getId());
+        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getProblemId());
         MvcResult result = this.mockMvc.perform(post(endpoint)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(request)))
@@ -298,7 +298,7 @@ class ProblemTests {
         request.setOutput(OUTPUT);
         request.setHidden(true);
 
-        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getId());
+        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getProblemId());
         this.mockMvc.perform(post(endpoint)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(request)))
@@ -317,7 +317,7 @@ class ProblemTests {
                 .andReturn();
 
         // Get problem from database
-        MvcResult result = this.mockMvc.perform(get(String.format(GET_PROBLEM, problem.getId())))
+        MvcResult result = this.mockMvc.perform(get(String.format(GET_PROBLEM, problem.getProblemId())))
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
