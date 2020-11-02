@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 public class ProblemMapperTests {
 
-    private static final int ID = 10;
     private static final String NAME = "Sort a List";
     private static final String DESCRIPTION = "Sort the given list in O(n log n) time.";
 
@@ -27,7 +26,6 @@ public class ProblemMapperTests {
     @Test
     public void entityToDto() {
         Problem expected = new Problem();
-        expected.setId(ID);
         expected.setName(NAME);
         expected.setDescription(DESCRIPTION);
         expected.setDifficulty(ProblemDifficulty.HARD);
@@ -40,7 +38,7 @@ public class ProblemMapperTests {
 
         ProblemDto actual = ProblemMapper.toDto(expected);
 
-        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getProblemId(), actual.getProblemId());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getDescription(), actual.getDescription());
         assertEquals(expected.getDifficulty(), actual.getDifficulty());

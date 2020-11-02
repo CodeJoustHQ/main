@@ -17,12 +17,11 @@ public class ProblemEntityTests {
     private static final String INPUT = "[1, 8, 2]";
     private static final String OUTPUT = "[1, 2, 8]";
 
-    // TODO update tests here
-
     @Test
     public void problemInitialization() {
         Problem problem = new Problem();
 
+        assertNotNull(problem.getProblemId());
         assertNotNull(problem.getTestCases());
         assertTrue(problem.getTestCases().isEmpty());
     }
