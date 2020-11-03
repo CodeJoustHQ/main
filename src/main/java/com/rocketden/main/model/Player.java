@@ -33,4 +33,6 @@ public class Player {
     // Updated field to hold the user's current-language code.
     private String code;
 
+    private List<Submission> submissions;
+
 }

@@ -17,8 +17,8 @@ public class Timer {
     // The time that the game began.
     private LocalDateTime startTime = LocalDateTime.now();
 
-    // 
-    private Long duration;
+    // The projected game duration, in seconds.
+    private Integer duration;
 
     private LocalDateTime endTime;
 
