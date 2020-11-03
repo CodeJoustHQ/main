@@ -1,7 +1,7 @@
 package com.rocketden.main.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.rocketden.main.exception.RoomError;
+import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.api.ApiException;
 
 public enum GameNotification {
@@ -13,7 +13,7 @@ public enum GameNotification {
         try {
             return ProblemDifficulty.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new ApiException(RoomError.BAD_SETTING);
+            throw new ApiException(GameError.BAD_SETTING);
         }
     }
 }
