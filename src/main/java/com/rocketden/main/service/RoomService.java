@@ -133,7 +133,7 @@ public class RoomService {
         }
 
         // Assign new host if user being kicked is host
-        conditionallyUpdateRoomHost(room.getRoomId(), userToDelete);
+        conditionallyUpdateRoomHost(room, userToDelete);
 
         room.removeUser(userToDelete);
         repository.save(room);
@@ -182,9 +182,7 @@ public class RoomService {
     }
 
     // This function randomly assigns a new host in the room
-    public void conditionallyUpdateRoomHost(String roomId, User user) {
-        Room room = repository.findRoomByRoomId(roomId);
-
+    public void conditionallyUpdateRoomHost(Room room, User user) {
         // If the disconnected user is the host and another active user is present, reassign the host for the room.
         if (room.getHost().equals(user)) {
             UpdateHostRequest request = new UpdateHostRequest();
