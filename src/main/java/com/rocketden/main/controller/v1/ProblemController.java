@@ -4,7 +4,7 @@ import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
 
-import com.rocketden.main.dto.problem.ProblemSettingsRequest;
+import com.rocketden.main.dto.problem.ProblemSettingsDto;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.service.ProblemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +50,7 @@ public class ProblemController extends BaseRestController {
     }
 
     @GetMapping("/problems/random")
-    public ResponseEntity<ProblemDto> getRandomProblem(@RequestBody ProblemSettingsRequest request) {
+    public ResponseEntity<ProblemDto> getRandomProblem(@RequestBody ProblemSettingsDto request) {
         return new ResponseEntity<>(service.getRandomProblem(request), HttpStatus.OK);
     }
 }

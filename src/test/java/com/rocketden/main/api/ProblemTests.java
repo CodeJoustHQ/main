@@ -13,6 +13,7 @@ import com.google.gson.reflect.TypeToken;
 import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.dto.problem.ProblemSettingsDto;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiError;
@@ -342,11 +343,45 @@ class ProblemTests {
 
     @Test
     public void getRandomProblemSuccess() throws Exception {
-        // correct difficulty
+        ProblemDto problem = createSingleProblem();
+
+        ProblemSettingsDto request = new ProblemSettingsDto();
+        request.setDifficulty(ProblemDifficulty.EASY);
+
+        MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_RANDOM)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ProblemDto actual = UtilityTestMethods.toObject(jsonResponse, ProblemDto.class);
+
+        assertEquals(problem.getName(), actual.getName());
+        assertEquals(problem.getDescription(), actual.getDescription());
+        assertEquals(problem.getDifficulty(), actual.getDifficulty());
+        assertEquals(problem.getProblemId(), actual.getProblemId());
+        assertEquals(problem.getTestCases(), actual.getTestCases());
     }
 
     @Test
     public void getRandomProblemNotFound() throws Exception {
-        // none of difficulty found
+        createSingleProblem();
+
+        ProblemSettingsDto request = new ProblemSettingsDto();
+        request.setDifficulty(ProblemDifficulty.MEDIUM);
+
+        ApiError ERROR = ProblemError.NOT_FOUND;
+
+        MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_RANDOM)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
     }
 }
