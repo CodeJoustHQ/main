@@ -4,6 +4,7 @@ import com.rocketden.main.dao.ProblemRepository;
 import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.dto.problem.ProblemSettingsDto;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
@@ -19,6 +20,8 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -207,18 +210,42 @@ public class ProblemServiceTests {
     }
 
     @Test
-    public void getRandomProblemEasyDifficulty() {
+    public void getRandomProblemMediumDifficulty() {
+        Problem problem1 = new Problem();
+        problem1.setDifficulty(ProblemDifficulty.MEDIUM);
+        Problem problem2 = new Problem();
+        problem2.setDifficulty(ProblemDifficulty.HARD);
+        List<Problem> problems = Arrays.asList(problem1, problem2);
 
+        Mockito.doReturn(problems).when(repository).findAllByDifficulty(ProblemDifficulty.MEDIUM);
+
+        ProblemSettingsDto request = new ProblemSettingsDto();
+        request.setDifficulty(ProblemDifficulty.MEDIUM);
+
+        ProblemDto response = problemService.getRandomProblem(request);
+
+        assertEquals(problem1.getProblemId(), response.getProblemId());
     }
 
     @Test
-    public void getRandomProblemRandomDifficulty() {
+    public void getRandomProblemRandomOrNullDifficulty() {
+        Problem problem1 = new Problem();
+        problem1.setDifficulty(ProblemDifficulty.MEDIUM);
+        List<Problem> problems = Collections.singletonList(problem1);
 
-    }
+        Mockito.doReturn(problems).when(repository).findAllByDifficulty(ProblemDifficulty.MEDIUM);
 
-    @Test
-    public void getRandomProblemNullDifficulty() {
+        // Return correct problem when selecting random difficulty
+        ProblemSettingsDto request = new ProblemSettingsDto();
+        request.setDifficulty(ProblemDifficulty.RANDOM);
 
+        ProblemDto response = problemService.getRandomProblem(request);
+        assertEquals(problem1.getProblemId(), response.getProblemId());
+
+        // Return correct problem when difficulty not specified
+        request.setDifficulty(null);
+        response = problemService.getRandomProblem(request);
+        assertEquals(problem1.getProblemId(), response.getProblemId());
     }
 
     @Test
