@@ -7,6 +7,7 @@ import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
+import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 import com.rocketden.main.util.Utility;
 
@@ -106,5 +107,24 @@ public class UserServiceTests {
         });
 
         assertEquals(UserError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void deleteUserInRoom() {
+        User user = new User();
+        user.setUserId(USER_ID);
+        when(repository.findUserByUserId(USER_ID)).thenReturn(user);
+
+        Room room = new Room();
+        room.addUser(user);
+
+        DeleteUserRequest request = new DeleteUserRequest();
+        request.setUserToDelete(UserMapper.toDto(user));
+
+        ApiException exception = assertThrows(ApiException.class, () -> {
+            service.deleteUser(request);
+        });
+
+        assertEquals(UserError.IN_ROOM, exception.getError());
     }
 }

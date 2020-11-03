@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 public enum UserError implements ApiError {
 
     INVALID_USER(HttpStatus.BAD_REQUEST, "Please provide a user with a valid nickname (1-16 characters without spaces)."),
-    NOT_FOUND(HttpStatus.NOT_FOUND, "A user with given nickname could not be found in database.");
+    NOT_FOUND(HttpStatus.NOT_FOUND, "A user with given nickname could not be found in database."),
+    IN_ROOM(HttpStatus.BAD_REQUEST, "The requested action could not be completed because the user is in a room.");
 
     private final HttpStatus status;
     private final ApiErrorResponse response;
