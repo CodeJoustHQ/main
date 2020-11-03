@@ -5,6 +5,7 @@ import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.dto.problem.ProblemMapper;
+import com.rocketden.main.dto.problem.ProblemSettingsRequest;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
@@ -62,6 +63,10 @@ public class ProblemService {
         repository.findAll().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
 
         return problems;
+    }
+
+    public ProblemDto getRandomProblem(ProblemSettingsRequest request) {
+        return null;
     }
 
     public ProblemTestCaseDto createTestCase(String problemId, CreateTestCaseRequest request) {
