@@ -1,5 +1,6 @@
 package com.rocketden.main.model;
 
+import com.rocketden.main.model.problem.ProblemDifficulty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,7 +41,7 @@ public class Room {
 
     /**
      * Generated from all the matching room variables in the User class.
-     * If the room is deleted or users removed from this set, those users will also be deleted.
+     * If the room is deleted or users removed from this list, those users will also be deleted.
      * Setter is set to private to ensure proper use of addUser and removeUser methods.
      */
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -58,6 +59,8 @@ public class Room {
     }
 
     // Removes user if the nicknames match (based on equals/hashCode implementation)
+    // Note: if we switch to permanent users and disable orphanRemoval, this will
+    // need to call getEquivalentUser(user).setRoom(null) first
     public boolean removeUser(User user) {
         return users.remove(user);
     }

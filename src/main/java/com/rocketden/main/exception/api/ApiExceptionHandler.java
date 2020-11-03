@@ -1,6 +1,6 @@
 package com.rocketden.main.exception.api;
 
-import com.rocketden.main.exception.RoomError;
+import com.rocketden.main.exception.ProblemError;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +26,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   HttpHeaders headers, HttpStatus status,
                                                                   WebRequest request) {
 
-        // Check for a RoomError.BAD_SETTING triggered in the Difficulty.fromString method
+        // Check for a ProblemError.BAD_SETTING triggered in the Difficulty.fromString method
         if (ex.getCause() != null && ex.getCause().getCause() instanceof ApiException) {
-            ApiError apiError = RoomError.BAD_SETTING;
+            ApiError apiError = ProblemError.BAD_SETTING;
             return new ResponseEntity<>(apiError.getResponse(), apiError.getStatus());
         }
 

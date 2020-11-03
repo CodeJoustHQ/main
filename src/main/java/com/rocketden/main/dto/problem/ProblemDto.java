@@ -1,5 +1,6 @@
 package com.rocketden.main.dto.problem;
 
+import com.rocketden.main.model.problem.ProblemDifficulty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +10,9 @@ import java.util.List;
 @Getter
 @Setter
 public class ProblemDto {
+    private int id;
     private String name;
     private String description;
-//    private List<TestCaseDto> testCases = new ArrayList<>(); TODO: upcoming PR
+    private ProblemDifficulty difficulty;
+    private List<ProblemTestCaseDto> testCases = new ArrayList<>();
 }
