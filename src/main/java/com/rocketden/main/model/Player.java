@@ -1,23 +1,8 @@
 package com.rocketden.main.model;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -33,6 +18,10 @@ public class Player {
     // Updated field to hold the user's current-language code.
     private String code;
 
+    // Submissions in order of first-to-last submitted.
     private List<Submission> submissions;
+
+    // Active variable if the user is still competing.
+    private Boolean active;
 
 }
