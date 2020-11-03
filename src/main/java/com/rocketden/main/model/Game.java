@@ -7,13 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class Game {
-
-    // Game is identified by roomId.
-    private String roomId;
-
-    // Game corresponds to an associated room.
-    private Room room;
+public class Game extends Room {
 
     private List<Player> players;
 
