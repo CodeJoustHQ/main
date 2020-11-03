@@ -9,9 +9,9 @@ public enum GameNotification {
 
     // Convert a matching string (ignoring case) to enum object
     @JsonCreator
-    public static ProblemDifficulty fromString(String value) {
+    public static GameNotification fromString(String value) {
         try {
-            return ProblemDifficulty.valueOf(value.toUpperCase());
+            return GameNotification.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new ApiException(GameError.BAD_SETTING);
         }
