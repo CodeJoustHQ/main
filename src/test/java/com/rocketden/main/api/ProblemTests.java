@@ -44,6 +44,7 @@ class ProblemTests {
     private MockMvc mockMvc;
 
     private static final String GET_PROBLEM = "/api/v1/problems/%s";
+    private static final String GET_PROBLEM_RANDOM = "/api/v1/problems/random";
     private static final String GET_PROBLEM_ALL = "/api/v1/problems";
     private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
     private static final String POST_TEST_CASE_CREATE = "/api/v1/problems/%s/test-case";
@@ -337,5 +338,15 @@ class ProblemTests {
         assertEquals(INPUT_2, case2.getInput());
         assertEquals(OUTPUT_2, case2.getOutput());
         assertFalse(case2.isHidden());
+    }
+
+    @Test
+    public void getRandomProblemSuccess() throws Exception {
+        // correct difficulty
+    }
+
+    @Test
+    public void getRandomProblemNotFound() throws Exception {
+        // none of difficulty found
     }
 }

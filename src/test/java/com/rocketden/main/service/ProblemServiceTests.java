@@ -205,4 +205,24 @@ public class ProblemServiceTests {
         verify(repository, never()).save(Mockito.any());
         assertEquals(ProblemError.EMPTY_FIELD, exception.getError());
     }
+
+    @Test
+    public void getRandomProblemEasyDifficulty() {
+
+    }
+
+    @Test
+    public void getRandomProblemRandomDifficulty() {
+
+    }
+
+    @Test
+    public void getRandomProblemNullDifficulty() {
+
+    }
+
+    @Test
+    public void getRandomProblemNotFound() {
+        // random difficulty
+    }
 }
