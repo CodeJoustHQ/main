@@ -6,6 +6,7 @@ import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.room.RemoveUserRequest;
 import com.rocketden.main.dto.user.UserDto;
+import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiError;
@@ -26,7 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -511,7 +514,7 @@ public class RoomTests {
 
         String jsonRequest = "{\"initiator\": {\"nickname\": \"host\"}, \"difficulty\": \"invalid\"}";
 
-        ApiError ERROR = RoomError.BAD_SETTING;
+        ApiError ERROR = ProblemError.BAD_SETTING;
 
         MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

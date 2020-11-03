@@ -1,7 +1,7 @@
 package com.rocketden.main.model.problem;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.rocketden.main.exception.RoomError;
+import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
 
 public enum ProblemDifficulty {
@@ -13,7 +13,7 @@ public enum ProblemDifficulty {
         try {
             return ProblemDifficulty.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new ApiException(RoomError.BAD_SETTING);
+            throw new ApiException(ProblemError.BAD_SETTING);
         }
     }
 }

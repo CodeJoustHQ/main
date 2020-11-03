@@ -1,5 +1,6 @@
 package com.rocketden.main.dto.problem;
 
+import com.rocketden.main.model.problem.ProblemDifficulty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,5 +13,6 @@ public class ProblemDto {
     private int id;
     private String name;
     private String description;
+    private ProblemDifficulty difficulty;
     private List<ProblemTestCaseDto> testCases = new ArrayList<>();
 }

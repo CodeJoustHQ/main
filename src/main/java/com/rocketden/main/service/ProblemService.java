@@ -9,6 +9,7 @@ import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.problem.Problem;
+import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,13 +28,19 @@ public class ProblemService {
     }
 
     public ProblemDto createProblem(CreateProblemRequest request) {
-        if (request.getName() == null || request.getDescription() == null) {
+        if (request.getName() == null || request.getDescription() == null
+                || request.getDifficulty() == null) {
             throw new ApiException(ProblemError.EMPTY_FIELD);
+        }
+
+        if (request.getDifficulty() == ProblemDifficulty.RANDOM) {
+            throw new ApiException(ProblemError.BAD_SETTING);
         }
 
         Problem problem = new Problem();
         problem.setName(request.getName());
         problem.setDescription(request.getDescription());
+        problem.setDifficulty(request.getDifficulty());
 
         repository.save(problem);
 
