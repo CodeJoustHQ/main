@@ -250,6 +250,11 @@ public class ProblemServiceTests {
 
     @Test
     public void getRandomProblemNotFound() {
-        // random difficulty
+        ProblemSettingsDto request = new ProblemSettingsDto();
+        request.setDifficulty(ProblemDifficulty.RANDOM);
+
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.getRandomProblem(request));
+
+        assertEquals(ProblemError.NOT_FOUND, exception.getError());
     }
 }
