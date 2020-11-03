@@ -66,6 +66,19 @@ public class ProblemService {
     }
 
     public ProblemDto getRandomProblem(ProblemSettingsDto request) {
+        ProblemDifficulty difficulty = request.getDifficulty();
+        List<Problem> problems;
+
+        if (difficulty == null || difficulty == ProblemDifficulty.RANDOM) {
+            problems = repository.findAll();
+        } else {
+            problems = repository.findAllByDifficulty(difficulty);
+        }
+
+        if (problems == null || problems.isEmpty()) {
+            throw new ApiException(ProblemError.NOT_FOUND);
+        }
+
         return null;
     }
 
