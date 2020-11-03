@@ -24,12 +24,17 @@ export type JoinRoomParams = {
 export type UpdateSettingsParams = {
   initiator: User,
   difficulty: Difficulty,
-}
+};
 
 export type ChangeHostParams = {
   initiator: User,
   newHost: User,
-}
+};
+
+export type RemoveUserParams = {
+  initiator: User,
+  userToDelete: User,
+};
 
 const basePath = '/api/v1/rooms';
 const routes = {
@@ -38,6 +43,7 @@ const routes = {
   getRoom: (roomId: string) => `${basePath}/${roomId}`,
   updateRoomSettings: (roomId: string) => `${basePath}/${roomId}/settings`,
   changeRoomHost: (roomId: string) => `${basePath}/${roomId}/host`,
+  removeUser: (roomId: string) => `${basePath}/${roomId}/users/remove`,
 };
 
 export const createRoom = (roomParams: CreateRoomParams):
@@ -70,6 +76,13 @@ export const updateRoomSettings = (roomId: string, roomParams: UpdateSettingsPar
 
 export const changeRoomHost = (roomId: string, roomParams: ChangeHostParams):
   Promise<Room> => axios.put<Room>(routes.changeRoomHost(roomId), roomParams)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const removeUser = (roomId: string, roomParams: RemoveUserParams):
+  Promise<Room> => axios.put<Room>(routes.removeUser(roomId), roomParams)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

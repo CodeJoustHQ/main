@@ -5,6 +5,7 @@ import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
+import com.rocketden.main.dto.room.RemoveUserRequest;
 import com.rocketden.main.service.RoomService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,12 @@ public class RoomController extends BaseRestController {
     @PostMapping("/rooms")
     public ResponseEntity<RoomDto> createRoom(@RequestBody CreateRoomRequest request) {
         return new ResponseEntity<>(service.createRoom(request), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/rooms/{roomId}/users/remove")
+    public ResponseEntity<RoomDto> removeUser(@PathVariable String roomId,
+                                              @RequestBody RemoveUserRequest request) {
+        return new ResponseEntity<>(service.removeUser(roomId, request), HttpStatus.OK);
     }
 
     @PutMapping("/rooms/{roomId}/host")

@@ -6,6 +6,7 @@ import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
+import com.rocketden.main.dto.room.RemoveUserRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.RoomError;
@@ -24,9 +25,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -44,9 +45,6 @@ public class RoomServiceTests {
     private SocketService socketService;
 
     @Mock
-    private SimpMessagingTemplate template;
-
-    @Mock
     private Utility utility;
 
     @Spy
@@ -61,6 +59,7 @@ public class RoomServiceTests {
     private static final String SESSION_ID_2 = "ghijkl";
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "678910";
+    private static final String USER_ID_2 = "123456";
 
     @Test
     public void createRoomSuccess() {
@@ -344,6 +343,140 @@ public class RoomServiceTests {
 
         ApiException exception = assertThrows(ApiException.class, () ->
                 roomService.updateRoomSettings("999999", noRoomRequest));
+        assertEquals(RoomError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void removeUserSuccess() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User host = new User();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        room.setHost(host);
+        room.addUser(host);
+
+        User user = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(user);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiator(UserMapper.toDto(host));
+        request.setUserToDelete(UserMapper.toDto(user));
+        RoomDto response = roomService.removeUser(ROOM_ID, request);
+
+        verify(socketService).sendSocketUpdate(eq(response));
+        assertEquals(1, response.getUsers().size());
+        assertFalse(response.getUsers().contains(UserMapper.toDto(user)));
+    }
+
+    @Test
+    public void removeHost() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User host = new User();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+        host.setSessionId(SESSION_ID);
+
+        room.setHost(host);
+        room.addUser(host);
+
+        User user = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        user.setSessionId(SESSION_ID_2);
+        room.addUser(user);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiator(UserMapper.toDto(host));
+        request.setUserToDelete(UserMapper.toDto(host));
+        RoomDto response = roomService.removeUser(ROOM_ID, request);
+
+        verify(socketService).sendSocketUpdate(eq(response));
+        assertEquals(1, response.getUsers().size());
+        assertEquals(UserMapper.toDto(user), response.getHost());
+        assertFalse(response.getUsers().contains(UserMapper.toDto(host)));
+    }
+
+    @Test
+    public void removeNonExistentUser() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User host = new User();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        room.setHost(host);
+        room.addUser(host);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        User user = new User();
+        user.setUserId(USER_ID_2);
+
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiator(UserMapper.toDto(host));
+        request.setUserToDelete(UserMapper.toDto(user));
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.removeUser(ROOM_ID, request));
+        assertEquals(UserError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void removeUserBadHost() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User host = new User();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        room.setHost(host);
+        room.addUser(host);
+
+        User user = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(user);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiator(UserMapper.toDto(user));
+        request.setUserToDelete(UserMapper.toDto(user));
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.removeUser(ROOM_ID, request));
+        assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
+    }
+
+    @Test
+    public void removeUserRoomNotFound() {
+        User host = new User();
+        host.setUserId(USER_ID);
+
+        User user = new User();
+        user.setUserId(USER_ID_2);
+
+        Mockito.doReturn(null).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiator(UserMapper.toDto(host));
+        request.setUserToDelete(UserMapper.toDto(user));
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.removeUser(ROOM_ID, request));
         assertEquals(RoomError.NOT_FOUND, exception.getError());
     }
 }

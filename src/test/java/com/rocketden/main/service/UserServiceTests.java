@@ -4,8 +4,10 @@ import com.rocketden.main.dao.UserRepository;
 import com.rocketden.main.dto.user.CreateUserRequest;
 import com.rocketden.main.dto.user.DeleteUserRequest;
 import com.rocketden.main.dto.user.UserDto;
+import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
+import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 import com.rocketden.main.util.Utility;
 
@@ -80,30 +82,49 @@ public class UserServiceTests {
     @Test
     public void deleteExistingUser() {
         User user = new User();
-        user.setNickname(NICKNAME);
         user.setUserId(USER_ID);
         when(repository.findUserByUserId(USER_ID)).thenReturn(user);
 
         DeleteUserRequest request = new DeleteUserRequest();
-        request.setUserId(USER_ID);
+        request.setUserToDelete(UserMapper.toDto(user));
 
         UserDto response = service.deleteUser(request);
         verify(repository).delete(user);
-        assertEquals(NICKNAME, response.getNickname());
         assertEquals(USER_ID, response.getUserId());
     }
 
     @Test
     public void deleteNonExistentUser() {
+        User user = new User();
+        user.setUserId(USER_ID);
         when(repository.findUserByUserId(USER_ID)).thenReturn(null);
 
         DeleteUserRequest request = new DeleteUserRequest();
-        request.setUserId(USER_ID);
+        request.setUserToDelete(UserMapper.toDto(user));
 
         ApiException exception = assertThrows(ApiException.class, () -> {
             service.deleteUser(request);
         });
 
         assertEquals(UserError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void deleteUserInRoom() {
+        User user = new User();
+        user.setUserId(USER_ID);
+        when(repository.findUserByUserId(USER_ID)).thenReturn(user);
+
+        Room room = new Room();
+        room.addUser(user);
+
+        DeleteUserRequest request = new DeleteUserRequest();
+        request.setUserToDelete(UserMapper.toDto(user));
+
+        ApiException exception = assertThrows(ApiException.class, () -> {
+            service.deleteUser(request);
+        });
+
+        assertEquals(UserError.IN_ROOM, exception.getError());
     }
 }

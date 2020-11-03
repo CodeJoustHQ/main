@@ -13,7 +13,7 @@ import PlayerCard from '../components/card/PlayerCard';
 import HostActionCard from '../components/card/HostActionCard';
 import { startGame } from '../api/Game';
 import {
-  getRoom, Room, changeRoomHost, updateRoomSettings,
+  getRoom, Room, changeRoomHost, updateRoomSettings, removeUser
 } from '../api/Room';
 
 type LobbyPageLocation = {
@@ -58,9 +58,19 @@ function LobbyPage() {
     setDifficulty(room.difficulty);
   };
 
-  const deleteUser = (user: User) => {
-    // Make rest call to delete user from room
-    console.log(user);
+  const kickUser = (user: User) => {
+    setLoading(true);
+    removeUser(currentRoomId, {
+      initiator: currentUser as User,
+      userToDelete: user,
+    })
+      .then(() => {
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
   };
 
   const changeHosts = (newHost: User) => {
@@ -138,7 +148,7 @@ function LobbyPage() {
                 user={user}
                 userIsActive={Boolean(user.sessionId)}
                 onMakeHost={changeHosts}
-                onDeleteUser={deleteUser}
+                onRemoveUser={kickUser}
               />
             ) : null}
         </PlayerCard>
