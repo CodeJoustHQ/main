@@ -17,11 +17,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class ProblemService {
 
     private final ProblemRepository repository;
+    private final Random random = new Random();
 
     @Autowired
     public ProblemService(ProblemRepository repository) {
@@ -79,7 +81,8 @@ public class ProblemService {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
 
-        return null;
+        Problem problem = problems.get(random.nextInt(problems.size()));
+        return ProblemMapper.toDto(problem);
     }
 
     public ProblemTestCaseDto createTestCase(String problemId, CreateTestCaseRequest request) {

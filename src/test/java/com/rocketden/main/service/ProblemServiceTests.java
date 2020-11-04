@@ -213,9 +213,7 @@ public class ProblemServiceTests {
     public void getRandomProblemMediumDifficulty() {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
-        Problem problem2 = new Problem();
-        problem2.setDifficulty(ProblemDifficulty.HARD);
-        List<Problem> problems = Arrays.asList(problem1, problem2);
+        List<Problem> problems = Collections.singletonList(problem1);
 
         Mockito.doReturn(problems).when(repository).findAllByDifficulty(ProblemDifficulty.MEDIUM);
 
@@ -233,7 +231,7 @@ public class ProblemServiceTests {
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
 
-        Mockito.doReturn(problems).when(repository).findAllByDifficulty(ProblemDifficulty.MEDIUM);
+        Mockito.doReturn(problems).when(repository).findAll();
 
         // Return correct problem when selecting random difficulty
         ProblemSettingsDto request = new ProblemSettingsDto();
