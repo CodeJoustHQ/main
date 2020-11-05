@@ -43,6 +43,4 @@ const StyledMainContainer = styled.div`
   width: 80%;
 `;
 
-const MainContainer = (props: MyProps) => createContainer(StyledMainContainer, props);
-
-export default MainContainer;
+export const MainContainer = (props: MyProps) => createContainer(StyledMainContainer, props);
