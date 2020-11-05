@@ -50,6 +50,8 @@ class ProblemTests {
     private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
     private static final String POST_TEST_CASE_CREATE = "/api/v1/problems/%s/test-case";
 
+    private static final String DIFFICULTY_KEY = "difficulty";
+
     private static final String NAME = "Sort an Array";
     private static final String DESCRIPTION = "Sort an array from lowest to highest value.";
     private static final String NAME_2 = "Find Maximum";
@@ -345,12 +347,8 @@ class ProblemTests {
     public void getRandomProblemSuccess() throws Exception {
         ProblemDto problem = createSingleProblem();
 
-        ProblemSettingsDto request = new ProblemSettingsDto();
-        request.setDifficulty(ProblemDifficulty.EASY);
-
         MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_RANDOM)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .param(DIFFICULTY_KEY, "EasY"))
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
@@ -359,7 +357,7 @@ class ProblemTests {
 
         assertEquals(problem.getName(), actual.getName());
         assertEquals(problem.getDescription(), actual.getDescription());
-        assertEquals(problem.getDifficulty(), actual.getDifficulty());
+        assertEquals(ProblemDifficulty.EASY, actual.getDifficulty());
         assertEquals(problem.getProblemId(), actual.getProblemId());
         assertEquals(problem.getTestCases(), actual.getTestCases());
     }
@@ -368,14 +366,10 @@ class ProblemTests {
     public void getRandomProblemNotFound() throws Exception {
         createSingleProblem();
 
-        ProblemSettingsDto request = new ProblemSettingsDto();
-        request.setDifficulty(ProblemDifficulty.MEDIUM);
-
         ApiError ERROR = ProblemError.NOT_FOUND;
 
         MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_RANDOM)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .param(DIFFICULTY_KEY, "medium"))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 

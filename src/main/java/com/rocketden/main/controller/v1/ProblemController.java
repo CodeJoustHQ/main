@@ -50,7 +50,7 @@ public class ProblemController extends BaseRestController {
     }
 
     @GetMapping("/problems/random")
-    public ResponseEntity<ProblemDto> getRandomProblem(@RequestBody ProblemSettingsDto request) {
+    public ResponseEntity<ProblemDto> getRandomProblem(ProblemSettingsDto request) {
         return new ResponseEntity<>(service.getRandomProblem(request), HttpStatus.OK);
     }
 }
