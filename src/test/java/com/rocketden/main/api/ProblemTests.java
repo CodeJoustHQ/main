@@ -348,7 +348,7 @@ class ProblemTests {
         ProblemDto problem = createSingleProblem();
 
         MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_RANDOM)
-                .param(DIFFICULTY_KEY, "EasY"))
+                .param(DIFFICULTY_KEY, "EASY"))
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
@@ -369,7 +369,7 @@ class ProblemTests {
         ApiError ERROR = ProblemError.NOT_FOUND;
 
         MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_RANDOM)
-                .param(DIFFICULTY_KEY, "medium"))
+                .param(DIFFICULTY_KEY, "MEDIUM"))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 

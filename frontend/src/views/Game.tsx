@@ -3,7 +3,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
 import { useBeforeunload } from 'react-beforeunload';
 import Editor from '../components/game/Editor';
-import { Problem, getProblems, SubmissionResult } from '../api/Problem';
+import { Problem, SubmissionResult, getRandomProblem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
 import {
   MainContainer, FlexContainer, FlexInfoBar, Panel, SplitterContainer,
@@ -15,10 +15,12 @@ import { checkLocationState } from '../util/Utility';
 import Console from '../components/game/Console';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
+import Difficulty from '../api/Difficulty';
 
 type LocationState = {
   roomId: string,
   currentUser: User,
+  difficulty: Difficulty,
 }
 
 function GamePage() {
@@ -45,19 +47,15 @@ function GamePage() {
 
   // Called every time location changes
   useEffect(() => {
-    if (checkLocationState(location, 'roomId', 'currentUser')) {
+    if (checkLocationState(location, 'roomId', 'currentUser', 'difficulty')) {
       setCurrentUser(location.state.currentUser);
       setRoomId(location.state.roomId);
 
-      // Get the game problem.
-      getProblems().then((res) => {
+      // Get a random problem.
+      const request = { difficulty: location.state.difficulty };
+      getRandomProblem(request).then((res) => {
         setFullPageLoading(false);
-
-        if (!res.length) {
-          setError('Problem cannot be found');
-        } else {
-          setProblem(res[0]);
-        }
+        setProblem(res);
       }).catch((err) => {
         setFullPageLoading(false);
         setError(err.message);

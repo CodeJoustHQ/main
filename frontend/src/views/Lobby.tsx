@@ -227,6 +227,7 @@ function LobbyPage() {
       history.push('/game', {
         roomId: currentRoomId,
         currentUser,
+        difficulty,
       });
     }
   }, [history, active, currentUser, currentRoomId]);

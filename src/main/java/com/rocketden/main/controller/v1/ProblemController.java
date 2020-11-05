@@ -49,6 +49,8 @@ public class ProblemController extends BaseRestController {
         return new ResponseEntity<>(service.getAllProblems(), HttpStatus.OK);
     }
 
+    // Note: Since this GET request takes query parameters, the difficulty to enum
+    // conversion does not automatically match case (i.e. Easy != easy != EASY)
     @GetMapping("/problems/random")
     public ResponseEntity<ProblemDto> getRandomProblem(ProblemSettingsDto request) {
         return new ResponseEntity<>(service.getRandomProblem(request), HttpStatus.OK);
