@@ -41,3 +41,18 @@ export const LargeInputButton = styled(Input).attrs(() => ({
     cursor: default;
   }
 `;
+
+export const ConsoleTextArea = styled.textarea`
+  font-family: monospace;
+  margin: 2px;
+  min-width: 20%;
+  max-width: 70%;
+  min-height: 24px;
+  max-height: 150px;
+
+  padding: 5px;
+  border: 3px solid ${({ theme }) => theme.colors.darkBlue};
+  border-radius: 0.25rem;
+  
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+`;

@@ -85,6 +85,21 @@ public class Room {
     }
 
     /**
+     * Find and return a User object in the room based on userId.
+     * @param userId
+     * @return User if found,
+     * null if no User with matching userId found.
+     */
+    public User getUserByUserId(String userId) {
+        for (User roomUser: this.users) {
+            if (roomUser.getUserId().equals(userId)) {
+                return roomUser;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Determine whether a user with the given nickname already exists
      * in the room. Capitalization matters.
      * 

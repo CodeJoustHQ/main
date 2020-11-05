@@ -2,16 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
 import { useBeforeunload } from 'react-beforeunload';
-import Editor from '../components/core/Editor';
-import { errorHandler, ErrorResponse } from '../api/Error';
-import { Problem, getProblems } from '../api/Problem';
-import MainContainer, {
-  FlexContainer, FlexInfoBar, Panel, SplitterContainer,
+import Editor from '../components/game/Editor';
+import { Problem, getProblems, SubmissionResult } from '../api/Problem';
+import { errorHandler } from '../api/Error';
+import {
+  MainContainer, FlexContainer, FlexInfoBar, Panel, SplitterContainer,
 } from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
 import { ProblemHeaderText, Text } from '../components/core/Text';
 import 'react-splitter-layout/lib/index.css';
 import { checkLocationState } from '../util/Utility';
+import Console from '../components/game/Console';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
 
@@ -24,9 +25,13 @@ function GamePage() {
   // Get history object to be able to move between different pages
   const history = useHistory();
   const location = useLocation<LocationState>();
+
+  const [problem, setProblem] = useState<Problem | null>(null);
+  const [submission, setSubmission] = useState<SubmissionResult | null>(null);
+
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [roomId, setRoomId] = useState<string>('');
-  const [problems, setProblems] = useState<Problem[]>([]);
+
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
@@ -46,17 +51,17 @@ function GamePage() {
 
       // Get the game problem.
       getProblems().then((res) => {
-        if (!(res as Problem[]).length) {
-          setError('Problem cannot be found.');
+        setFullPageLoading(false);
+
+        if (!res.length) {
+          setError('Problem cannot be found');
         } else {
-          setProblems(res as Problem[]);
-          setError('');
+          setProblem(res[0]);
         }
       }).catch((err) => {
-        setError((err as ErrorResponse).message);
-        setProblems([]);
+        setFullPageLoading(false);
+        setError(err.message);
       });
-      setFullPageLoading(false);
     } else {
       history.replace('/game/join', {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
@@ -64,12 +69,16 @@ function GamePage() {
     }
   }, [location, history]);
 
-  const firstProblem = problems?.[0];
-
   // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {
     const event = new Event('secondaryPanelSizeChange');
     window.dispatchEvent(event);
+  };
+
+  // Callback when user runs code against custom test case
+  const runSolution = (input: string) => {
+    const tempSubmission = { status: 'SUCCESS', output: input };
+    setSubmission(tempSubmission);
   };
 
   // If the page is loading, return a centered Loading object.
@@ -93,6 +102,7 @@ function GamePage() {
         {' '}
         {currentUser != null ? currentUser.nickname : 'An unknown user'}
       </FlexInfoBar>
+
       <SplitterContainer>
         <SplitterLayout
           onSecondaryPaneSizeChange={onSecondaryPanelSizeChange}
@@ -100,14 +110,32 @@ function GamePage() {
           primaryMinSize={20}
           secondaryMinSize={35}
         >
+          {/* Problem title/description panel */}
           <Panel>
-            <ProblemHeaderText>{firstProblem?.name}</ProblemHeaderText>
-            <Text>{firstProblem?.description}</Text>
+            <ProblemHeaderText>{problem?.name}</ProblemHeaderText>
+            <Text>{problem?.description}</Text>
             {error ? <ErrorMessage message={error} /> : null}
           </Panel>
-          <Panel>
-            <Editor />
-          </Panel>
+
+          {/* Code editor and console panels */}
+          <SplitterLayout
+            percentage
+            vertical
+            primaryMinSize={20}
+            secondaryMinSize={1}
+          >
+            <Panel>
+              <Editor />
+            </Panel>
+
+            <Panel>
+              <Console
+                testCases={problem?.testCases!}
+                submission={submission}
+                onRun={runSolution}
+              />
+            </Panel>
+          </SplitterLayout>
         </SplitterLayout>
       </SplitterContainer>
     </FlexContainer>

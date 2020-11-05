@@ -3,8 +3,8 @@ package com.rocketden.main.api;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
-import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
+import com.rocketden.main.dto.room.RemoveUserRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.RoomError;
@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -49,6 +50,7 @@ public class RoomTests {
     private static final String POST_ROOM_CREATE = "/api/v1/rooms";
     private static final String PUT_ROOM_HOST = "/api/v1/rooms/%s/host";
     private static final String PUT_ROOM_SETTINGS = "/api/v1/rooms/%s/settings";
+    private static final String REMOVE_USER = "/api/v1/rooms/%s/users/remove";
 
     // Predefine user and room attributes.
     private static final String NICKNAME = "rocket";
@@ -59,6 +61,7 @@ public class RoomTests {
 
     /**
      * Helper method that creates a room with the given host
+     *
      * @param host the host of the room
      * @return the resulting RoomDto object
      * @throws Exception any error that occurs
@@ -79,6 +82,7 @@ public class RoomTests {
 
     /**
      * Helper method that creates a room with two users
+     *
      * @param host the host of the room
      * @param user the second user who joins the room
      * @return the resulting RoomDto object
@@ -215,7 +219,7 @@ public class RoomTests {
     public void createValidRoomNoHost() throws Exception {
         // POST request to create valid room should return successful response
         CreateRoomRequest createRequest = new CreateRoomRequest();
-        
+
         ApiError ERROR = RoomError.NO_HOST;
 
         MvcResult result = this.mockMvc.perform(post(POST_ROOM_CREATE)
@@ -544,5 +548,93 @@ public class RoomTests {
         room = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
         assertEquals(ProblemDifficulty.MEDIUM, room.getDifficulty());
+    }
+
+    @Test
+    public void removeUserSuccess() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        UserDto user = new UserDto();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+
+        RoomDto room = setUpRoomWithTwoUsers(host, user);
+
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiator(host);
+        request.setUserToDelete(user);
+
+        MvcResult result = this.mockMvc.perform(put(String.format(REMOVE_USER, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        room = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+
+        assertEquals(1, room.getUsers().size());
+        assertFalse(room.getUsers().contains(user));
+    }
+
+    @Test
+    public void removeNonExistentUser() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        UserDto user = new UserDto();
+        user.setUserId(USER_ID_2);
+
+        RoomDto room = setUpRoomWithOneUser(host);
+
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiator(host);
+        request.setUserToDelete(user);
+
+        ApiError ERROR = UserError.NOT_FOUND;
+
+        MvcResult result = this.mockMvc.perform(put(String.format(REMOVE_USER, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse errorResponse = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), errorResponse);
+    }
+
+    @Test
+    public void removeUserBadHost() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        UserDto user = new UserDto();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+
+        RoomDto room = setUpRoomWithTwoUsers(host, user);
+
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiator(user);
+        request.setUserToDelete(user);
+
+        ApiError ERROR = RoomError.INVALID_PERMISSIONS;
+
+        MvcResult result = this.mockMvc.perform(put(String.format(REMOVE_USER, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse errorResponse = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), errorResponse);
     }
 }
