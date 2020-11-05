@@ -230,7 +230,7 @@ function LobbyPage() {
         difficulty,
       });
     }
-  }, [history, active, currentUser, currentRoomId]);
+  }, [history, active, currentUser, currentRoomId, difficulty]);
 
   // Render the lobby.
   return (
