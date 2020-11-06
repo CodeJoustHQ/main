@@ -60,6 +60,7 @@ public class RoomServiceTests {
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "678910";
     private static final String USER_ID_2 = "123456";
+    private static final String USER_ID_3 = "024681";
 
     @Test
     public void createRoomSuccess() {
@@ -478,5 +479,38 @@ public class RoomServiceTests {
         ApiException exception = assertThrows(ApiException.class, () ->
                 roomService.removeUser(ROOM_ID, request));
         assertEquals(RoomError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void conditionallyUpdateRoomHostSuccess() {
+        User user1 = new User();
+        user1.setUserId(USER_ID);
+        user1.setSessionId(SESSION_ID);
+
+        User user2 = new User();
+        user2.setUserId(USER_ID_2);
+
+        User user3 = new User();
+        user3.setSessionId(USER_ID_3);
+        user3.setSessionId(SESSION_ID_2);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(user1);
+        room.addUser(user1);
+        room.addUser(user2);
+        room.addUser(user3);
+
+        // Passing in a non-host user has no effect on the room
+        roomService.conditionallyUpdateRoomHost(room, user2);
+        assertEquals(user1, room.getHost());
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(room.getRoomId()));
+
+        // Passing in the host will assign the first active user to be the new host
+        roomService.conditionallyUpdateRoomHost(room, user1);
+        assertEquals(user3, room.getHost());
+
+        verify(repository).save(room);
     }
 }
