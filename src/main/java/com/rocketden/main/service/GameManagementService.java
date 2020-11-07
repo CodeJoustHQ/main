@@ -28,13 +28,11 @@ public abstract class GameManagementService {
         currentGameMap = new HashMap<>();
     }
 
-    public Game createGameFromRoom(Room room) {
+    public Game createAddGameFromRoom(Room room) {
         // TODO: Create the game from the room (or roomId).
-        return null;
-    }
-
-    public void addGame(Game game) {
+        Game game = new Game();
         currentGameMap.put(game.getRoomId(), game);
+        return null;
     }
 
     protected Game getGameFromRoomId(String roomId) {
