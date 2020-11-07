@@ -15,7 +15,10 @@ public class Player extends User {
     // Submissions in order of first-to-last submitted.
     private List<Submission> submissions;
 
-    // Active variable if the user is still competing.
-    private Boolean active;
+    /**
+     * Solved variable if the user has successfully solved the problem,
+     * or is still competing.
+     */
+    private Boolean solved;
 
 }
