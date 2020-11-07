@@ -1,9 +1,11 @@
-package com.rocketden.main.model;
+package com.rocketden.main.game_object;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Map;
+
+import com.rocketden.main.model.Room;
 
 @Getter
 @Setter

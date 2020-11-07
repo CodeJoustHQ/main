@@ -1,4 +1,4 @@
-package com.rocketden.main.model;
+package com.rocketden.main.game_object;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.rocketden.main.exception.GameError;

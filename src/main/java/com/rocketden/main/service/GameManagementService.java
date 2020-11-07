@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.rocketden.main.dao.RoomRepository;
-import com.rocketden.main.model.Game;
+import com.rocketden.main.game_object.Game;
 import com.rocketden.main.model.Room;
 
 import org.springframework.beans.factory.annotation.Autowired;
