@@ -3,13 +3,13 @@ package com.rocketden.main.model;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
 public class Game extends Room {
 
-    private List<Player> players;
+    private Map<String, Player> players;
 
     private Timer timer;
 
