@@ -9,7 +9,8 @@ import com.rocketden.main.dto.room.RoomDto;
 
 @Getter
 @Setter
-public class GameDto extends RoomDto {
+public class GameDto {
+    private RoomDto roomDto;
     private Map<String, PlayerDto> playerMap;
     private TimerDto timer;
 }

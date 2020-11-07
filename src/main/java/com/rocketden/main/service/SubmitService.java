@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
  * Class to handle code updates and miscellaneous requests.
  */
 @Service
-public abstract class SubmitService extends GameManagementService {
+public class SubmitService extends GameManagementService {
 
     protected SubmitService(RoomRepository repository, SocketService socketService) {
         super(repository, socketService);

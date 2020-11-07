@@ -9,7 +9,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PlayerDto extends UserDto {
+public class PlayerDto {
+    private UserDto userDto;
     private PlayerCodeDto playerCode;
     private List<SubmissionDto> submissions;
     private Boolean solved;

@@ -7,7 +7,9 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class Game extends Room {
+public class Game {
+
+    private Room room;
 
     private Map<String, Player> players;
 

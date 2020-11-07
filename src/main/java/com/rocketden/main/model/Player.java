@@ -7,7 +7,10 @@ import java.util.List;
 
 @Getter
 @Setter
-public class Player extends User {
+public class Player {
+
+    // User associated with this Player object.
+    private User user;
 
     // Updated field to hold the user's current-language code.
     private PlayerCode playerCode;

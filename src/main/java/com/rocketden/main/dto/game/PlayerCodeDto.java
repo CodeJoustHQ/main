@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class PlayerCodeDto {
     private String code;
-    private String codeLanguage;
+    private String language;
 }
