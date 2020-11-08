@@ -5,6 +5,7 @@ import java.util.List;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.notification.NotificationDto;
 import com.rocketden.main.game_object.GameNotification;
+import com.rocketden.main.game_object.Player;
 
 import org.springframework.stereotype.Service;
 

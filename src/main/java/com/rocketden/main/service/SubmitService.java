@@ -2,6 +2,7 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
+import com.rocketden.main.game_object.Player;
 import com.rocketden.main.model.problem.Problem;
 
 import org.springframework.stereotype.Service;
