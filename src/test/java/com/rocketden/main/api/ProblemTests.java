@@ -13,6 +13,7 @@ import com.google.gson.reflect.TypeToken;
 import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.dto.problem.ProblemSettingsDto;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiError;
@@ -44,9 +45,12 @@ class ProblemTests {
     private MockMvc mockMvc;
 
     private static final String GET_PROBLEM = "/api/v1/problems/%s";
+    private static final String GET_PROBLEM_RANDOM = "/api/v1/problems/random";
     private static final String GET_PROBLEM_ALL = "/api/v1/problems";
     private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
     private static final String POST_TEST_CASE_CREATE = "/api/v1/problems/%s/test-case";
+
+    private static final String DIFFICULTY_KEY = "difficulty";
 
     private static final String NAME = "Sort an Array";
     private static final String DESCRIPTION = "Sort an array from lowest to highest value.";
@@ -120,7 +124,7 @@ class ProblemTests {
         assertEquals(0, actual.getTestCases().size());
 
         // Get the newly created problem from the database
-        result = this.mockMvc.perform(get(String.format(GET_PROBLEM, actual.getId())))
+        result = this.mockMvc.perform(get(String.format(GET_PROBLEM, actual.getProblemId())))
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
@@ -230,7 +234,7 @@ class ProblemTests {
         request.setInput(INPUT);
         request.setOutput(OUTPUT);
 
-        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getId());
+        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getProblemId());
         MvcResult result = this.mockMvc.perform(post(endpoint)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(request)))
@@ -254,7 +258,7 @@ class ProblemTests {
 
         ApiError ERROR = ProblemError.EMPTY_FIELD;
 
-        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getId());
+        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getProblemId());
         MvcResult result = this.mockMvc.perform(post(endpoint)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(request)))
@@ -298,7 +302,7 @@ class ProblemTests {
         request.setOutput(OUTPUT);
         request.setHidden(true);
 
-        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getId());
+        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getProblemId());
         this.mockMvc.perform(post(endpoint)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(request)))
@@ -317,7 +321,7 @@ class ProblemTests {
                 .andReturn();
 
         // Get problem from database
-        MvcResult result = this.mockMvc.perform(get(String.format(GET_PROBLEM, problem.getId())))
+        MvcResult result = this.mockMvc.perform(get(String.format(GET_PROBLEM, problem.getProblemId())))
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
@@ -337,5 +341,41 @@ class ProblemTests {
         assertEquals(INPUT_2, case2.getInput());
         assertEquals(OUTPUT_2, case2.getOutput());
         assertFalse(case2.isHidden());
+    }
+
+    @Test
+    public void getRandomProblemSuccess() throws Exception {
+        ProblemDto problem = createSingleProblem();
+
+        MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_RANDOM)
+                .param(DIFFICULTY_KEY, "EASY"))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ProblemDto actual = UtilityTestMethods.toObject(jsonResponse, ProblemDto.class);
+
+        assertEquals(problem.getName(), actual.getName());
+        assertEquals(problem.getDescription(), actual.getDescription());
+        assertEquals(ProblemDifficulty.EASY, actual.getDifficulty());
+        assertEquals(problem.getProblemId(), actual.getProblemId());
+        assertEquals(problem.getTestCases(), actual.getTestCases());
+    }
+
+    @Test
+    public void getRandomProblemNotFound() throws Exception {
+        createSingleProblem();
+
+        ApiError ERROR = ProblemError.NOT_FOUND;
+
+        MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_RANDOM)
+                .param(DIFFICULTY_KEY, "MEDIUM"))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
     }
 }

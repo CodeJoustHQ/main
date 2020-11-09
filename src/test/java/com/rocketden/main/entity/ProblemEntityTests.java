@@ -21,6 +21,7 @@ public class ProblemEntityTests {
     public void problemInitialization() {
         Problem problem = new Problem();
 
+        assertNotNull(problem.getProblemId());
         assertNotNull(problem.getTestCases());
         assertTrue(problem.getTestCases().isEmpty());
     }

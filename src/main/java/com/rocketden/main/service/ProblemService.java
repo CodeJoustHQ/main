@@ -5,6 +5,7 @@ import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.dto.problem.ProblemMapper;
+import com.rocketden.main.dto.problem.ProblemSettingsDto;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
@@ -16,11 +17,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class ProblemService {
 
     private final ProblemRepository repository;
+    private final Random random = new Random();
 
     @Autowired
     public ProblemService(ProblemRepository repository) {
@@ -47,9 +50,12 @@ public class ProblemService {
         return ProblemMapper.toDto(problem);
     }
 
-    public ProblemDto getProblem(int id) {
-        Problem problem = repository.findById(id)
-                .orElseThrow(() -> new ApiException(ProblemError.NOT_FOUND));
+    public ProblemDto getProblem(String problemId) {
+        Problem problem = repository.findProblemByProblemId(problemId);
+
+        if (problem == null) {
+            throw new ApiException(ProblemError.NOT_FOUND);
+        }
 
         return ProblemMapper.toDto(problem);
     }
@@ -61,9 +67,34 @@ public class ProblemService {
         return problems;
     }
 
-    public ProblemTestCaseDto createTestCase(int problemId, CreateTestCaseRequest request) {
-        Problem problem = repository.findById(problemId)
-                .orElseThrow(() -> new ApiException(ProblemError.NOT_FOUND));
+    public ProblemDto getRandomProblem(ProblemSettingsDto request) {
+        ProblemDifficulty difficulty = request.getDifficulty();
+
+        if (difficulty == null) {
+            throw new ApiException(ProblemError.BAD_SETTING);
+        }
+
+        List<Problem> problems;
+        if (difficulty == ProblemDifficulty.RANDOM) {
+            problems = repository.findAll();
+        } else {
+            problems = repository.findAllByDifficulty(difficulty);
+        }
+
+        if (problems == null || problems.isEmpty()) {
+            throw new ApiException(ProblemError.NOT_FOUND);
+        }
+
+        Problem problem = problems.get(random.nextInt(problems.size()));
+        return ProblemMapper.toDto(problem);
+    }
+
+    public ProblemTestCaseDto createTestCase(String problemId, CreateTestCaseRequest request) {
+        Problem problem = repository.findProblemByProblemId(problemId);
+
+        if (problem == null) {
+            throw new ApiException(ProblemError.NOT_FOUND);
+        }
 
         if (request.getInput() == null || request.getOutput() == null) {
             throw new ApiException(ProblemError.EMPTY_FIELD);

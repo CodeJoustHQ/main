@@ -227,9 +227,10 @@ function LobbyPage() {
       history.push('/game', {
         roomId: currentRoomId,
         currentUser,
+        difficulty,
       });
     }
-  }, [history, active, currentUser, currentRoomId]);
+  }, [history, active, currentUser, currentRoomId, difficulty]);
 
   // Render the lobby.
   return (
