@@ -7,6 +7,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProblemSettingsDto {
-
     private ProblemDifficulty difficulty;
 }
