@@ -41,7 +41,7 @@ public class GameManagementService {
     public Game createAddGameFromRoom(Room room) {
         // TODO: Create the game from the room (or roomId).
         Game game = new Game();
-        currentGameMap.put(game.getRoom().getRoomId(), game);
+        currentGameMap.put(room.getRoomId(), game);
         return null;
     }
 
