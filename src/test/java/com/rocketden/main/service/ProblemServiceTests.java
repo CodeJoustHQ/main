@@ -226,7 +226,7 @@ public class ProblemServiceTests {
     }
 
     @Test
-    public void getRandomProblemRandomOrNullDifficulty() {
+    public void getRandomProblemRandomDifficulty() {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
@@ -239,11 +239,15 @@ public class ProblemServiceTests {
 
         ProblemDto response = problemService.getRandomProblem(request);
         assertEquals(problem1.getProblemId(), response.getProblemId());
+    }
 
-        // Return correct problem when difficulty not specified
-        request.setDifficulty(null);
-        response = problemService.getRandomProblem(request);
-        assertEquals(problem1.getProblemId(), response.getProblemId());
+    @Test
+    public void getRandomProblemNullDifficulty() {
+        ProblemSettingsDto request = new ProblemSettingsDto();
+
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.getRandomProblem(request));
+
+        assertEquals(ProblemError.BAD_SETTING, exception.getError());
     }
 
     @Test

@@ -69,9 +69,13 @@ public class ProblemService {
 
     public ProblemDto getRandomProblem(ProblemSettingsDto request) {
         ProblemDifficulty difficulty = request.getDifficulty();
-        List<Problem> problems;
 
-        if (difficulty == null || difficulty == ProblemDifficulty.RANDOM) {
+        if (difficulty == null) {
+            throw new ApiException(ProblemError.BAD_SETTING);
+        }
+
+        List<Problem> problems;
+        if (difficulty == ProblemDifficulty.RANDOM) {
             problems = repository.findAll();
         } else {
             problems = repository.findAllByDifficulty(difficulty);
