@@ -43,7 +43,7 @@ const routes = {
   getRoom: (roomId: string) => `${basePath}/${roomId}`,
   updateRoomSettings: (roomId: string) => `${basePath}/${roomId}/settings`,
   changeRoomHost: (roomId: string) => `${basePath}/${roomId}/host`,
-  removeUser: (roomId: string) => `${basePath}/${roomId}/users/remove`,
+  removeUser: (roomId: string) => `${basePath}/${roomId}/users`,
 };
 
 export const createRoom = (roomParams: CreateRoomParams):
@@ -82,7 +82,10 @@ export const changeRoomHost = (roomId: string, roomParams: ChangeHostParams):
   });
 
 export const removeUser = (roomId: string, roomParams: RemoveUserParams):
-  Promise<Room> => axios.put<Room>(routes.removeUser(roomId), roomParams)
+  Promise<Room> => axios.delete<Room>(routes.removeUser(roomId), {
+    headers: { 'Content-Type': 'application/json' },
+    data: roomParams,
+  })
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

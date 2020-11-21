@@ -355,8 +355,8 @@ public class RoomSocketTests {
         removeUserRequest.setUserToDelete(newUser);
 
         HttpEntity<RemoveUserRequest> removeUserEntity = new HttpEntity<>(removeUserRequest);
-        String removeUserEndpoint = String.format("%s/%s/users/remove", baseRestEndpoint, room.getRoomId());
-        RoomDto expected = template.exchange(removeUserEndpoint, HttpMethod.PUT, removeUserEntity, RoomDto.class).getBody();
+        String removeUserEndpoint = String.format("%s/%s/users", baseRestEndpoint, room.getRoomId());
+        RoomDto expected = template.exchange(removeUserEndpoint, HttpMethod.DELETE, removeUserEntity, RoomDto.class).getBody();
 
         actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(expected);
