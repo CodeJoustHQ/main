@@ -82,10 +82,11 @@ export const changeRoomHost = (roomId: string, roomParams: ChangeHostParams):
   });
 
 export const removeUser = (roomId: string, roomParams: RemoveUserParams):
-  Promise<Room> => axios.delete<Room>(routes.removeUser(roomId), {
-    headers: { 'Content-Type': 'application/json' },
-    data: roomParams,
-  })
+  Promise<Room> => axios({
+  url: routes.removeUser(roomId),
+  method: 'DELETE',
+  data: roomParams,
+})
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
