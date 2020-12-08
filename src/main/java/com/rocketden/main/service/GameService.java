@@ -23,24 +23,24 @@ public class GameService {
     }
 
 	// Set room's active state to true
-	public RoomDto startGame(String roomId, StartGameRequest request) {
-		Room room = repository.findRoomByRoomId(roomId);
-
-		// If requested room does not exist in database, throw an exception.
-		if (room == null) {
-			throw new ApiException(RoomError.NOT_FOUND);
-		}
-
-		// if user making request is not the host, throw an exception.
-		if (!request.getInitiator().getNickname().equals(room.getHost().getNickname())) {
-			throw new ApiException(RoomError.INVALID_PERMISSIONS);
-		}
-
-		room.setActive(true);
-		repository.save(room);
-
-		RoomDto roomDto = RoomMapper.toDto(room);
-		socketService.sendSocketUpdate(roomDto);
-		return roomDto;
-	}
+//	public RoomDto startGame(String roomId, StartGameRequest request) {
+//		Room room = repository.findRoomByRoomId(roomId);
+//
+//		// If requested room does not exist in database, throw an exception.
+//		if (room == null) {
+//			throw new ApiException(RoomError.NOT_FOUND);
+//		}
+//
+//		// if user making request is not the host, throw an exception.
+//		if (!request.getInitiator().getNickname().equals(room.getHost().getNickname())) {
+//			throw new ApiException(RoomError.INVALID_PERMISSIONS);
+//		}
+//
+//		room.setActive(true);
+//		repository.save(room);
+//
+//		RoomDto roomDto = RoomMapper.toDto(room);
+//		socketService.sendSocketUpdate(roomDto);
+//		return roomDto;
+//	}
 }
