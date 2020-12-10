@@ -92,8 +92,7 @@ public class WebSocketConnectionEvents {
 
             // Get room, conditionally update the host, and send socket update.
             Room room = user.getRoom();
-            roomService.conditionallyUpdateRoomHost(room, user);
-            RoomDto roomDto = RoomMapper.toDto(room);
+            RoomDto roomDto = roomService.conditionallyUpdateRoomHost(room, user);
             socketService.sendSocketUpdate(roomDto);
         }
     }

@@ -172,6 +172,7 @@ function LobbyPage() {
      */
     const subscribeCallback = (result: Message) => {
       setStateFromRoom(JSON.parse(result.body));
+      console.log(JSON.parse(result.body).host);
     };
 
     connect(roomId, userId).then(() => {
@@ -187,6 +188,7 @@ function LobbyPage() {
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
+    console.log('useEffect - load room data');
     // Grab the user and room information; otherwise, redirect to the join page
     if (checkLocationState(location, 'user', 'roomId')) {
       // Call GET endpoint to get latest room info
@@ -194,7 +196,7 @@ function LobbyPage() {
         .then((res) => {
           setStateFromRoom(res);
           // Reset the user to hold the ID.
-          res.inactiveUsers.forEach((user: User) => {
+          res.users.forEach((user: User) => {
             if (user.nickname === location.state.user.nickname) {
               setCurrentUser(user);
             }
@@ -216,6 +218,7 @@ function LobbyPage() {
 
   // Connect the user to the room.
   useEffect(() => {
+    console.log('useEffect - connecdt to room');
     if (!socketConnected && currentRoomId && currentUser && currentUser.userId) {
       connectUserToRoom(currentRoomId, currentUser.userId);
     }
