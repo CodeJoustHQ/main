@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
+import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.notification.NotificationDto;
 import com.rocketden.main.dto.room.RoomDto;
@@ -47,7 +48,6 @@ public class GameManagementService {
 
     protected Game getGameFromRoomId(String roomId) {
         Game game = currentGameMap.get(roomId);
-
         if (game == null) {
             throw new ApiException(GameError.NOT_FOUND);
         }
@@ -85,11 +85,9 @@ public class GameManagementService {
     }
 
     // Initialize and add a game object from a room object
-    public Game createAddGameFromRoom(Room room) {
-        // TODO: Create the game from the room (or roomId).
-        Game game = new Game();
+    public void createAddGameFromRoom(Room room) {
+        Game game = GameMapper.fromRoom(room);
         currentGameMap.put(room.getRoomId(), game);
-        return null;
     }
 
     // Test the submission and return a socket update.

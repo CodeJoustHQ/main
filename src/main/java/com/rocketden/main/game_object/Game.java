@@ -13,6 +13,7 @@ public class Game {
 
     private Room room;
 
+    // TODO discussion: is the key userId or nickname or none?
     private Map<String, Player> players;
 
     private Timer timer;
