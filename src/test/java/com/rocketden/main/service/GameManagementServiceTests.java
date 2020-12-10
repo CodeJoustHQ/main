@@ -24,7 +24,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class GameServiceTests {
+public class GameManagementServiceTests {
 
 	@Mock
 	private RoomRepository repository;
@@ -37,7 +37,7 @@ public class GameServiceTests {
 
 	@Spy
 	@InjectMocks
-    private GameService gameService;
+    private GameManagementService gameService;
     
     // Predefine user and room attributes.
     private static final String NICKNAME = "rocket";
