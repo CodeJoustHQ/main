@@ -5,10 +5,13 @@ import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
+import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
+import com.rocketden.main.game_object.Game;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,7 +22,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
@@ -44,6 +49,33 @@ public class GameManagementServiceTests {
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String ROOM_ID = "012345";
 
+    @Test
+	public void addGetAndRemoveGame() {
+    	// Initially, room doesn't exist
+		ApiException exception = assertThrows(ApiException.class, () -> gameService.getGameFromRoomId(ROOM_ID));
+		assertEquals(GameError.NOT_FOUND, exception.getError());
+
+		Room room = new Room();
+		room.setRoomId(ROOM_ID);
+		User user = new User();
+		user.setNickname(NICKNAME);
+		room.addUser(user);
+
+		// Create a game from a room
+		gameService.createAddGameFromRoom(room);
+
+		// Check that game has copied over the correct details
+		Game game = gameService.getGameFromRoomId(ROOM_ID);
+		assertEquals(room, game.getRoom());
+		assertEquals(user, game.getPlayers().get(NICKNAME).getUser());
+
+		gameService.removeGame(ROOM_ID);
+
+		// Check that game has been removed
+		exception = assertThrows(ApiException.class, () -> gameService.getGameFromRoomId(ROOM_ID));
+		assertEquals(GameError.NOT_FOUND, exception.getError());
+	}
+
 	@Test
 	public void startGameSuccess() {
 		User host = new User();
@@ -62,7 +94,11 @@ public class GameManagementServiceTests {
 		verify(socketService).sendSocketUpdate(eq(response));
 
 		assertEquals(ROOM_ID, response.getRoomId());
-		assertEquals(true, response.isActive());
+		assertTrue(response.isActive());
+
+		// Game object is created when the room chooses to start
+		Game game = gameService.getGameFromRoomId(ROOM_ID);
+		assertNotNull(game);
 	}
 
 	@Test

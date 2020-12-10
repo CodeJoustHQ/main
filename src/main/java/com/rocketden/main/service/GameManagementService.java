@@ -11,6 +11,7 @@ import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.notification.NotificationDto;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
+import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.Game;
@@ -45,7 +46,13 @@ public class GameManagementService {
     }
 
     protected Game getGameFromRoomId(String roomId) {
-        return currentGameMap.get(roomId);
+        Game game = currentGameMap.get(roomId);
+
+        if (game == null) {
+            throw new ApiException(GameError.NOT_FOUND);
+        }
+
+        return game;
     }
 
     protected void removeGame(String roomId) {
