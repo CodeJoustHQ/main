@@ -46,4 +46,9 @@ public class GameMapperTests {
         assertFalse(player.getSolved());
         assertEquals(0, player.getSubmissions().size());
     }
+
+    @Test
+    public void toDto() throws Exception {
+        // TODO
+    }
 }

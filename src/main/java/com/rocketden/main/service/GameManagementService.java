@@ -59,6 +59,10 @@ public class GameManagementService {
         currentGameMap.remove(roomId);
     }
 
+    public GameDto getGameDto(String roomId) {
+        return GameMapper.toDto(getGameFromRoomId(roomId));
+    }
+
     // When host starts the game, redirect everyone and initialize the game state
     public RoomDto startGame(String roomId, StartGameRequest request) {
         Room room = repository.findRoomByRoomId(roomId);

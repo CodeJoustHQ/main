@@ -9,6 +9,16 @@ public class GameMapper {
 
     protected GameMapper() {}
 
+    public static GameDto toDto(Game game) {
+        if (game == null) {
+            return null;
+        }
+
+        // TODO
+
+        return null;
+    }
+
     public static Game fromRoom(Room room) {
         if (room == null) {
             return null;

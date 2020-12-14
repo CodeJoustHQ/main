@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -79,7 +80,7 @@ public class GameTests {
 		RoomDto actual = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
 		assertEquals(roomDto.getRoomId(), actual.getRoomId());
-		assertEquals(true, actual.isActive());
+		assertTrue(actual.isActive());
 	}
 
 	@Test
@@ -138,5 +139,10 @@ public class GameTests {
 		ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
 
 		assertEquals(ERROR.getResponse(), actual);
+	}
+
+	@Test
+	public void getGameSuccess() throws Exception {
+		// TODO
 	}
 }
