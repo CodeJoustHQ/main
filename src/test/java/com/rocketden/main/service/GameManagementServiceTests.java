@@ -1,8 +1,10 @@
 package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
+import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.room.RoomDto;
+import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.GameError;
@@ -23,6 +25,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
@@ -136,11 +139,23 @@ public class GameManagementServiceTests {
 
 	@Test
 	public void getGameSuccess() throws Exception {
-		// TODO
+		Room room = new Room();
+		room.setRoomId(ROOM_ID);
+		User user = new User();
+		user.setNickname(NICKNAME);
+		room.addUser(user);
+
+		gameService.createAddGameFromRoom(room);
+
+		GameDto gameDto = gameService.getGameDto(ROOM_ID);
+
+		assertEquals(RoomMapper.toDto(room), gameDto.getRoomDto());
+		assertNull(gameDto.getPlayerMap());
 	}
 
 	@Test
 	public void getGameNotFound() throws Exception {
-		// TODO
+		ApiException exception = assertThrows(ApiException.class, () -> gameService.getGameDto(ROOM_ID));
+		assertEquals(GameError.NOT_FOUND, exception.getError());
 	}
 }

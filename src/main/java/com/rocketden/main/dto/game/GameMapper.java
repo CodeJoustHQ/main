@@ -1,5 +1,6 @@
 package com.rocketden.main.dto.game;
 
+import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.model.Room;
@@ -14,9 +15,11 @@ public class GameMapper {
             return null;
         }
 
-        // TODO
+        // For now, just include the room info in the GameDto
+        GameDto gameDto = new GameDto();
+        gameDto.setRoomDto(RoomMapper.toDto(game.getRoom()));
 
-        return null;
+        return gameDto;
     }
 
     public static Game fromRoom(Room room) {

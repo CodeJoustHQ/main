@@ -1,11 +1,14 @@
 package com.rocketden.main.mapper;
 
+import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
+import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,6 +52,16 @@ public class GameMapperTests {
 
     @Test
     public void toDto() throws Exception {
-        // TODO
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        Game game = new Game();
+        game.setRoom(room);
+
+        GameDto gameDto = GameMapper.toDto(game);
+
+        assertEquals(RoomMapper.toDto(room), gameDto.getRoomDto());
+        // Assert player map is null for now until implemented
+        assertNull(gameDto.getPlayerMap());
     }
 }
