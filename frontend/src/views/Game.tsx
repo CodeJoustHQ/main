@@ -16,6 +16,7 @@ import Console from '../components/game/Console';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
 import Difficulty from '../api/Difficulty';
+import { Game, getGame } from '../api/Game';
 
 type LocationState = {
   roomId: string,
@@ -33,6 +34,7 @@ function GamePage() {
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [roomId, setRoomId] = useState<string>('');
+  const [game, setGame] = useState<Game | null>(null);
 
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
@@ -60,6 +62,14 @@ function GamePage() {
         setFullPageLoading(false);
         setError(err.message);
       });
+
+      // Get game object with room details
+      getGame(location.state.roomId)
+        .then((res) => {
+          setGame(res);
+          console.log(game);
+        })
+        .catch((err) => setError(err));
     } else {
       history.replace('/game/join', {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
