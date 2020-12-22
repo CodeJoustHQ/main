@@ -67,6 +67,7 @@ function GamePage() {
       getGame(location.state.roomId)
         .then((res) => {
           setGame(res);
+          console.log(game);
           console.log(res);
         })
         .catch((err) => setError(err));
