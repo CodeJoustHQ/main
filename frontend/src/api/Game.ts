@@ -4,7 +4,7 @@ import { Room } from './Room';
 import { User } from './User';
 
 export type Game = {
-  room: Room,
+  roomDto: Room,
 };
 
 export type StartGameParams = {

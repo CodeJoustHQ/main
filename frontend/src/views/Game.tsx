@@ -67,7 +67,6 @@ function GamePage() {
       getGame(location.state.roomId)
         .then((res) => {
           setGame(res);
-          console.log(game);
           console.log(res);
         })
         .catch((err) => setError(err));
@@ -105,6 +104,7 @@ function GamePage() {
         Room:
         {' '}
         {roomId || 'An unknown room'}
+        {` (${game?.roomDto?.users?.length} players)`}
       </FlexInfoBar>
       <FlexInfoBar>
         You are
