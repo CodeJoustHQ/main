@@ -16,6 +16,7 @@ public class ProblemEntityTests {
     private static final int ID = 10;
     private static final String INPUT = "[1, 8, 2]";
     private static final String OUTPUT = "[1, 2, 8]";
+    private static final String EXPLANATION = "2 < 8, so those are swapped.";
 
     @Test
     public void problemInitialization() {
@@ -46,12 +47,14 @@ public class ProblemEntityTests {
         testCase.setId(ID);
         testCase.setInput(INPUT);
         testCase.setOutput(OUTPUT);
+        testCase.setExplanation(EXPLANATION);
 
         problem.addTestCase(testCase);
 
         ProblemTestCase caseToRemove = new ProblemTestCase();
         caseToRemove.setInput(INPUT);
         caseToRemove.setOutput(OUTPUT);
+        caseToRemove.setExplanation(EXPLANATION);
         caseToRemove.setHidden(true);
 
         assertFalse(problem.removeTestCase(caseToRemove));
