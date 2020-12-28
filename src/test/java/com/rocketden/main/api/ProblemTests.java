@@ -59,8 +59,10 @@ class ProblemTests {
 
     private static final String INPUT = "[1, 8, 2]";
     private static final String OUTPUT = "[1, 2, 8]";
+    private static final String EXPLANATION = "2 < 8, so those are swapped.";
     private static final String INPUT_2 = "[-1, 5, 0, 3]";
     private static final String OUTPUT_2 = "5";
+    private static final String EXPLANATION_2 = "5 is the greatest number.";
 
     /**
      * Helper method that sends a POST request to create a new problem
@@ -233,6 +235,7 @@ class ProblemTests {
         CreateTestCaseRequest request = new CreateTestCaseRequest();
         request.setInput(INPUT);
         request.setOutput(OUTPUT);
+        request.setExplanation(EXPLANATION);
 
         String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getProblemId());
         MvcResult result = this.mockMvc.perform(post(endpoint)
@@ -246,6 +249,7 @@ class ProblemTests {
 
         assertEquals(INPUT, actual.getInput());
         assertEquals(OUTPUT, actual.getOutput());
+        assertEquals(EXPLANATION, actual.getExplanation());
         assertFalse(actual.isHidden());
     }
 
@@ -276,6 +280,7 @@ class ProblemTests {
         CreateTestCaseRequest request = new CreateTestCaseRequest();
         request.setInput(INPUT);
         request.setOutput(OUTPUT);
+        request.setExplanation(EXPLANATION);
 
         ApiError ERROR = ProblemError.NOT_FOUND;
 
