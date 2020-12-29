@@ -26,7 +26,7 @@ public class GameController extends BaseRestController {
 
     @GetMapping("/games/{roomId}")
     public ResponseEntity<GameDto> getGame(@PathVariable String roomId) {
-        return new ResponseEntity<>(service.getGameDto(roomId), HttpStatus.OK);
+        return new ResponseEntity<>(service.getGameDtoFromRoomId(roomId), HttpStatus.OK);
     }
 
     @PostMapping("/rooms/{roomId}/start")

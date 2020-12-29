@@ -147,7 +147,7 @@ public class GameManagementServiceTests {
 
 		gameService.createAddGameFromRoom(room);
 
-		GameDto gameDto = gameService.getGameDto(ROOM_ID);
+		GameDto gameDto = gameService.getGameDtoFromRoomId(ROOM_ID);
 
 		assertEquals(RoomMapper.toDto(room), gameDto.getRoomDto());
 		assertNull(gameDto.getPlayerMap());
@@ -155,7 +155,7 @@ public class GameManagementServiceTests {
 
 	@Test
 	public void getGameNotFound() throws Exception {
-		ApiException exception = assertThrows(ApiException.class, () -> gameService.getGameDto(ROOM_ID));
+		ApiException exception = assertThrows(ApiException.class, () -> gameService.getGameDtoFromRoomId(ROOM_ID));
 		assertEquals(GameError.NOT_FOUND, exception.getError());
 	}
 }

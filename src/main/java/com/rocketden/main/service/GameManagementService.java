@@ -59,7 +59,7 @@ public class GameManagementService {
         currentGameMap.remove(roomId);
     }
 
-    public GameDto getGameDto(String roomId) {
+    public GameDto getGameDtoFromRoomId(String roomId) {
         return GameMapper.toDto(getGameFromRoomId(roomId));
     }
 
