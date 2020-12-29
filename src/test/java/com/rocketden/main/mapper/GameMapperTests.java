@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class GameMapperTests {
 
     private static final String ROOM_ID = "012345";
+    private static final String USER_ID = "098765";
     private static final String NICKNAME = "test";
 
     @Test
@@ -28,19 +29,21 @@ public class GameMapperTests {
         room.setRoomId(ROOM_ID);
         User user = new User();
         user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
         room.addUser(user);
         
         Game game = GameMapper.fromRoom(room);
 
         assertEquals(room, game.getRoom());
-        assertNotNull(game.getPlayers().get(NICKNAME));
-        assertEquals(user, game.getPlayers().get(NICKNAME).getUser());
+        assertNotNull(game.getPlayers().get(USER_ID));
+        assertEquals(user, game.getPlayers().get(USER_ID).getUser());
     }
 
     @Test
     public void playerFromUser() {
         User user = new User();
         user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
 
         Player player = GameMapper.playerFromUser(user);
 
@@ -51,7 +54,7 @@ public class GameMapperTests {
     }
 
     @Test
-    public void toDto() throws Exception {
+    public void toDto() {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
 

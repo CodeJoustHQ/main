@@ -32,7 +32,7 @@ public class GameMapper {
 
         for (User user : room.getUsers()) {
             Player player = playerFromUser(user);
-            game.getPlayers().put(user.getNickname(), player);
+            game.getPlayers().put(user.getUserId(), player);
         }
 
         return game;

@@ -14,7 +14,7 @@ public class Game {
 
     private Room room;
 
-    // TODO discussion: is the key userId or nickname or none?
+    // Map from userId to associated player object
     private Map<String, Player> players = new HashMap<>();
 
     private Timer timer = new Timer();
