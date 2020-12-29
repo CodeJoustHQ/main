@@ -6,6 +6,8 @@ import com.rocketden.main.game_object.Player;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 
+import java.util.Map;
+
 public class GameMapper {
 
     protected GameMapper() {}
@@ -30,9 +32,10 @@ public class GameMapper {
         Game game = new Game();
         game.setRoom(room);
 
+        Map<String, Player> players = game.getPlayers();
         for (User user : room.getUsers()) {
             Player player = playerFromUser(user);
-            game.getPlayers().put(user.getUserId(), player);
+            players.put(user.getUserId(), player);
         }
 
         return game;
