@@ -64,6 +64,13 @@ public class WebSocketConnectionEvents {
         // Get the unique auto-generated session ID for this connection.
         String sessionId = sha.getSessionId();
 
+        // Pause for 0.5 seconds to allow any pending DB updates to flush to disk
+        try {
+            Thread.sleep(500);
+        } catch (Exception e) {
+            System.out.println("Thread sleep failed on socket connection");
+        }
+
         // Update the session ID of the relevant user, if it is found.
         User user = userRepository.findUserByUserId(userId);
         if (user != null) {
