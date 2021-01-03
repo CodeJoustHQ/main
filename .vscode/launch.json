@@ -1,7 +1,7 @@
 {
     "configurations": [
         {
-            "name": "Launch Chrome",
+            "name": "Launch Chrome against localhost",
             "request": "launch",
             "type": "pwa-chrome",
             "url": "http://localhost:3000",
