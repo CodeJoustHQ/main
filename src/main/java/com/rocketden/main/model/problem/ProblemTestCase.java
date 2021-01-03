@@ -35,4 +35,7 @@ public class ProblemTestCase {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "problem_table_id")
     private Problem problem;
+
+    @EqualsAndHashCode.Include
+    private String explanation;
 }

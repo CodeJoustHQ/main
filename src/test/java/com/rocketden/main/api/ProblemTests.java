@@ -1,5 +1,6 @@
 package com.rocketden.main.api;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -13,7 +14,6 @@ import com.google.gson.reflect.TypeToken;
 import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
-import com.rocketden.main.dto.problem.ProblemSettingsDto;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiError;
@@ -59,8 +59,10 @@ class ProblemTests {
 
     private static final String INPUT = "[1, 8, 2]";
     private static final String OUTPUT = "[1, 2, 8]";
+    private static final String EXPLANATION = "2 < 8, so those are swapped.";
     private static final String INPUT_2 = "[-1, 5, 0, 3]";
     private static final String OUTPUT_2 = "5";
+    private static final String EXPLANATION_2 = "5 is the greatest number.";
 
     /**
      * Helper method that sends a POST request to create a new problem
@@ -233,6 +235,7 @@ class ProblemTests {
         CreateTestCaseRequest request = new CreateTestCaseRequest();
         request.setInput(INPUT);
         request.setOutput(OUTPUT);
+        request.setExplanation(EXPLANATION);
 
         String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getProblemId());
         MvcResult result = this.mockMvc.perform(post(endpoint)
@@ -246,6 +249,31 @@ class ProblemTests {
 
         assertEquals(INPUT, actual.getInput());
         assertEquals(OUTPUT, actual.getOutput());
+        assertEquals(EXPLANATION, actual.getExplanation());
+        assertFalse(actual.isHidden());
+    }
+
+    @Test
+    public void createTestCaseNoExplanationSuccess() throws Exception {
+        ProblemDto problem = createSingleProblem();
+
+        CreateTestCaseRequest request = new CreateTestCaseRequest();
+        request.setInput(INPUT);
+        request.setOutput(OUTPUT);
+
+        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getProblemId());
+        MvcResult result = this.mockMvc.perform(post(endpoint)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ProblemTestCaseDto actual = UtilityTestMethods.toObject(jsonResponse, ProblemTestCaseDto.class);
+
+        assertEquals(INPUT, actual.getInput());
+        assertEquals(OUTPUT, actual.getOutput());
+        assertNull(actual.getExplanation());
         assertFalse(actual.isHidden());
     }
 
@@ -276,6 +304,7 @@ class ProblemTests {
         CreateTestCaseRequest request = new CreateTestCaseRequest();
         request.setInput(INPUT);
         request.setOutput(OUTPUT);
+        request.setExplanation(EXPLANATION);
 
         ApiError ERROR = ProblemError.NOT_FOUND;
 
@@ -300,6 +329,7 @@ class ProblemTests {
         CreateTestCaseRequest request = new CreateTestCaseRequest();
         request.setInput(INPUT);
         request.setOutput(OUTPUT);
+        request.setExplanation(EXPLANATION);
         request.setHidden(true);
 
         String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getProblemId());
@@ -312,6 +342,7 @@ class ProblemTests {
         // Create second test case
         request.setInput(INPUT_2);
         request.setOutput(OUTPUT_2);
+        request.setExplanation(EXPLANATION_2);
         request.setHidden(false);
 
         this.mockMvc.perform(post(endpoint)
@@ -336,10 +367,12 @@ class ProblemTests {
 
         assertEquals(INPUT, case1.getInput());
         assertEquals(OUTPUT, case1.getOutput());
+        assertEquals(EXPLANATION, case1.getExplanation());
         assertTrue(case1.isHidden());
 
         assertEquals(INPUT_2, case2.getInput());
         assertEquals(OUTPUT_2, case2.getOutput());
+        assertEquals(EXPLANATION_2, case2.getExplanation());
         assertFalse(case2.isHidden());
     }
 
