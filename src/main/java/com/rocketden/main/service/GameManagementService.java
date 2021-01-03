@@ -9,6 +9,8 @@ import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.StartGameRequest;
+import com.rocketden.main.dto.game.SubmissionDto;
+import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.notification.NotificationDto;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
@@ -94,8 +96,8 @@ public class GameManagementService {
         currentGameMap.put(room.getRoomId(), game);
     }
 
-    // Test the submission and return a socket update.
-    public GameDto testSubmission(String userId, String roomId) {
+    // Test the submission, return the results, and send a socket update
+    public SubmissionDto submitSolution(String roomId, SubmissionRequest request) {
         // TODO: Get the player and game.
         return submitService.testSubmission(new Player(), new Problem());
     }

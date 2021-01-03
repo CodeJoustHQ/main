@@ -163,4 +163,9 @@ public class GameManagementServiceTests {
         ApiException exception = assertThrows(ApiException.class, () -> gameService.getGameDtoFromRoomId(ROOM_ID));
         assertEquals(GameError.NOT_FOUND, exception.getError());
     }
+
+    @Test
+    public void submitSolutionSuccess() {
+        // TODO: should simply call SubmitService
+    }
 }

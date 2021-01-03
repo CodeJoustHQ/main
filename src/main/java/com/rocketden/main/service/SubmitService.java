@@ -2,6 +2,7 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
+import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.model.problem.Problem;
 
@@ -21,9 +22,9 @@ public class SubmitService {
         this.socketService = socketService;
     }
 
-    // Test the submission and return a socket update.
-    public GameDto testSubmission(Player player, Problem problem) {
-        return new GameDto();
+    // Test the submission and send a socket update.
+    public SubmissionDto testSubmission(Player player, Problem problem) {
+        return null;
     }
 
 }

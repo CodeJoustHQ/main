@@ -155,4 +155,9 @@ public class GameTests {
 
 		assertEquals(ERROR.getResponse(), actual);
 	}
+
+	@Test
+	public void submitSolutionSuccess() {
+		// TODO: should return successful result
+	}
 }
