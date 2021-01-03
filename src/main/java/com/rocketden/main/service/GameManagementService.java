@@ -98,8 +98,8 @@ public class GameManagementService {
 
     // Test the submission, return the results, and send a socket update
     public SubmissionDto submitSolution(String roomId, SubmissionRequest request) {
-        // TODO: Get the player and game.
-        return submitService.testSubmission(new Player(), new Problem());
+        Game game = currentGameMap.get(roomId);
+        return submitService.submitSolution(game, request);
     }
 
     // Send a notification through a socket update.

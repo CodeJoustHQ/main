@@ -1,10 +1,9 @@
 package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
-import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.SubmissionDto;
-import com.rocketden.main.game_object.Player;
-import com.rocketden.main.model.problem.Problem;
+import com.rocketden.main.dto.game.SubmissionRequest;
+import com.rocketden.main.game_object.Game;
 
 import org.springframework.stereotype.Service;
 
@@ -23,7 +22,7 @@ public class SubmitService {
     }
 
     // Test the submission and send a socket update.
-    public SubmissionDto testSubmission(Player player, Problem problem) {
+    public SubmissionDto submitSolution(Game game, SubmissionRequest request) {
         return null;
     }
 

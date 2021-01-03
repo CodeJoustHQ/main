@@ -12,6 +12,7 @@ import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.util.RoomTestMethods;
 import com.rocketden.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -58,69 +58,6 @@ public class RoomTests {
     private static final String USER_ID = "012345";
     private static final String USER_ID_2 = "678910";
     private static final String ROOM_ID = "012345";
-
-    /**
-     * Helper method that creates a room with the given host
-     *
-     * @param host the host of the room
-     * @return the resulting RoomDto object
-     * @throws Exception any error that occurs
-     */
-    private RoomDto setUpRoomWithOneUser(UserDto host) throws Exception {
-        CreateRoomRequest createRequest = new CreateRoomRequest();
-        createRequest.setHost(host);
-
-        MvcResult result = this.mockMvc.perform(post(POST_ROOM_CREATE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(createRequest)))
-                .andDo(print()).andExpect(status().isCreated())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        return UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
-    }
-
-    /**
-     * Helper method that creates a room with two users
-     *
-     * @param host the host of the room
-     * @param user the second user who joins the room
-     * @return the resulting RoomDto object
-     * @throws Exception any error that occurs
-     */
-    private RoomDto setUpRoomWithTwoUsers(UserDto host, UserDto user) throws Exception {
-        // First, create the room
-        CreateRoomRequest createRequest = new CreateRoomRequest();
-        createRequest.setHost(host);
-
-        MvcResult result = this.mockMvc.perform(post(POST_ROOM_CREATE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(createRequest)))
-                .andDo(print()).andExpect(status().isCreated())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        RoomDto room = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
-
-        // A second user joins the room
-        JoinRoomRequest joinRequest = new JoinRoomRequest();
-        joinRequest.setUser(user);
-
-        result = this.mockMvc.perform(put(String.format(PUT_ROOM_JOIN, room.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(joinRequest)))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
-
-        jsonResponse = result.getResponse().getContentAsString();
-        room = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
-
-        assertEquals(host, room.getHost());
-        assertEquals(2, room.getUsers().size());
-        assertTrue(room.getUsers().contains(user));
-
-        return room;
-    }
 
     @Test
     public void getNonExistentRoom() throws Exception {
@@ -399,7 +336,7 @@ public class RoomTests {
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
 
-        RoomDto room = setUpRoomWithOneUser(host);
+        RoomDto room = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
         assertEquals(ProblemDifficulty.RANDOM, room.getDifficulty());
 
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
@@ -434,7 +371,7 @@ public class RoomTests {
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
 
-        RoomDto room = setUpRoomWithOneUser(host);
+        RoomDto room = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
 
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(host);
@@ -485,7 +422,7 @@ public class RoomTests {
         user.setNickname(NICKNAME_2);
         user.setUserId(USER_ID_2);
 
-        RoomDto room = setUpRoomWithTwoUsers(host, user);
+        RoomDto room = RoomTestMethods.setUpRoomWithTwoUsers(this.mockMvc, host, user);
 
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(user);
@@ -510,7 +447,7 @@ public class RoomTests {
         UserDto host = new UserDto();
         host.setNickname(NICKNAME);
 
-        RoomDto room = setUpRoomWithOneUser(host);
+        RoomDto room = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
 
         String jsonRequest = "{\"initiator\": {\"nickname\": \"host\"}, \"difficulty\": \"invalid\"}";
 
@@ -534,7 +471,7 @@ public class RoomTests {
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
 
-        RoomDto room = setUpRoomWithOneUser(host);
+        RoomDto room = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
 
         String jsonRequest = String.format("{\"initiator\": {\"nickname\": \"%s\",\"userId\":\"%s\"}, \"difficulty\": \"medIUM\"}", NICKNAME, USER_ID);
 
@@ -560,7 +497,7 @@ public class RoomTests {
         user.setNickname(NICKNAME_2);
         user.setUserId(USER_ID_2);
 
-        RoomDto room = setUpRoomWithTwoUsers(host, user);
+        RoomDto room = RoomTestMethods.setUpRoomWithTwoUsers(this.mockMvc, host, user);
 
         RemoveUserRequest request = new RemoveUserRequest();
         request.setInitiator(host);
@@ -588,7 +525,7 @@ public class RoomTests {
         UserDto user = new UserDto();
         user.setUserId(USER_ID_2);
 
-        RoomDto room = setUpRoomWithOneUser(host);
+        RoomDto room = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
 
         RemoveUserRequest request = new RemoveUserRequest();
         request.setInitiator(host);
@@ -618,7 +555,7 @@ public class RoomTests {
         user.setNickname(NICKNAME_2);
         user.setUserId(USER_ID_2);
 
-        RoomDto room = setUpRoomWithTwoUsers(host, user);
+        RoomDto room = RoomTestMethods.setUpRoomWithTwoUsers(this.mockMvc, host, user);
 
         RemoveUserRequest request = new RemoveUserRequest();
         request.setInitiator(user);

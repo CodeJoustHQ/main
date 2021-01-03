@@ -3,6 +3,8 @@ package com.rocketden.main.api;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.StartGameRequest;
+import com.rocketden.main.dto.game.SubmissionDto;
+import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.room.RoomDto;
@@ -11,6 +13,7 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.model.User;
+import com.rocketden.main.util.RoomTestMethods;
 import com.rocketden.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
@@ -25,6 +28,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -45,14 +49,35 @@ public class GameTests {
 	private RoomRepository repository;
 
 	private static final String POST_ROOM = "/api/v1/rooms";
-	private static final String GET_GAME = "/api/v1/games/%s";
     private static final String START_GAME = "/api/v1/rooms/%s/start";
+	private static final String GET_GAME = "/api/v1/games/%s";
+    private static final String POST_SUBMISSION = "/api/v1/games/%s/submission";
 
     // Predefine user and room attributes.
     private static final String NICKNAME = "rocket";
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String ROOM_ID = "012345";
+    private static final String USER_ID = "098765";
+    private static final String CODE = "print('hello')";
 
+    // Helper method to start the game for a given room
+    private GameDto startGameHelper(RoomDto room, UserDto host) throws Exception {
+		StartGameRequest request = new StartGameRequest();
+		request.setInitiator(host);
+
+		MvcResult result = this.mockMvc.perform(post(String.format(START_GAME, room.getRoomId()))
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.content(UtilityTestMethods.convertObjectToJsonString(request)))
+				.andDo(print()).andExpect(status().isOk())
+				.andReturn();
+
+		String jsonResponse = result.getResponse().getContentAsString();
+		GameDto gameDto = UtilityTestMethods.toObject(jsonResponse, GameDto.class);
+
+		assertEquals(room, gameDto.getRoomDto());
+
+		return gameDto;
+	}
 
 	@Test
 	public void startAndGetGameSuccess() throws Exception {
@@ -157,7 +182,28 @@ public class GameTests {
 	}
 
 	@Test
-	public void submitSolutionSuccess() {
-		// TODO: should return successful result
+	public void submitSolutionSuccess() throws Exception {
+		UserDto host = new UserDto();
+		host.setNickname(NICKNAME);
+		host.setUserId(USER_ID);
+
+		RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
+		startGameHelper(roomDto, host);
+
+		SubmissionRequest request = new SubmissionRequest();
+		request.setInitiator(host);
+		request.setCode(CODE);
+		request.setLanguage("TODO java");
+
+		MvcResult result = this.mockMvc.perform(post(String.format(POST_SUBMISSION, roomDto.getRoomId()))
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.content(UtilityTestMethods.convertObjectToJsonString(request)))
+				.andDo(print()).andExpect(status().isOk())
+				.andReturn();
+
+		String jsonResponse = result.getResponse().getContentAsString();
+		SubmissionDto submissionDto = UtilityTestMethods.toObject(jsonResponse, SubmissionDto.class);
+
+		assertNotNull(submissionDto); // TODO
 	}
 }
