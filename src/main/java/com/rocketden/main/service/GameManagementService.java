@@ -10,6 +10,8 @@ import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.notification.NotificationDto;
+import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemSettingsDto;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
@@ -96,14 +98,22 @@ public class GameManagementService {
     // Initialize and add a game object from a room object
     public void createAddGameFromRoom(Room room) {
         Game game = GameMapper.fromRoom(room);
-        game.setProblems(chooseProblemFromDifficulty(room.getDifficulty()));
+        game.setProblems(getProblemsFromDifficulty(room.getDifficulty(), 1));
         currentGameMap.put(room.getRoomId(), game);
     }
 
     // Choose the problem based on problem difficulty settings
-    private List<Problem> chooseProblemFromDifficulty(ProblemDifficulty difficulty) {
+    private List<Problem> getProblemsFromDifficulty(ProblemDifficulty difficulty, int n) {
         // TODO (NOW): Handle the potential exceptions.
-        return problemService.getRandomProblems(difficulty, 1);
+        ProblemSettingsDto request = new ProblemSettingsDto();
+        request.setDifficulty(difficulty);
+        request.setN(n);
+
+        List<Problem> problems = new ArrayList<>();
+        for (ProblemDto problemDto : problemService.getRandomProblems(request)) {
+            problems.add(ProblemMapper.toEntity(problemDto));
+        }
+        return problems;
     }
 
     // Test the submission and return a socket update.

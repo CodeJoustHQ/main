@@ -55,13 +55,6 @@ public class ProblemController extends BaseRestController {
     // conversion does not automatically match case (i.e. Easy != easy != EASY)
     @GetMapping("/problems/random")
     public ResponseEntity<List<ProblemDto>> getRandomProblem(ProblemSettingsDto request) {
-        List<Problem> problems = service.getRandomProblems(request.getDifficulty(), request.getN());
-
-        // Convert the problems to a list of DTO.
-        List<ProblemDto> problemDtos = new ArrayList<>();
-        for (Problem problem : problems) {
-            problemDtos.add(ProblemMapper.toDto(problem));
-        }
-        return new ResponseEntity<>(problemDtos, HttpStatus.OK);
+        return new ResponseEntity<>(service.getRandomProblems(request), HttpStatus.OK);
     }
 }

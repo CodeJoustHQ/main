@@ -78,8 +78,11 @@ public class ProblemService {
      * @param difficulty The problem difficulty the problems must match.
      * @param n The number of problems to fetch.
      */
-    public List<Problem> getRandomProblems(ProblemDifficulty difficulty, int n) {
-        if (difficulty == null) {
+    public List<ProblemDto> getRandomProblems(ProblemSettingsDto request) {
+        ProblemDifficulty difficulty = request.getDifficulty();
+        Integer n = request.getN();
+
+        if (difficulty == null || n == null) {
             throw new ApiException(ProblemError.BAD_SETTING);
         }
 
@@ -105,9 +108,9 @@ public class ProblemService {
         }
 
         // Get the n problems mapped to those integers.
-        List<Problem> chosenProblems = new ArrayList<>();
+        List<ProblemDto> chosenProblems = new ArrayList<>();
         for (Integer i : randomIntegers) {
-            chosenProblems.add(problems.get(i));
+            chosenProblems.add(ProblemMapper.toDto(problems.get(i)));
         }
 
         return chosenProblems;
