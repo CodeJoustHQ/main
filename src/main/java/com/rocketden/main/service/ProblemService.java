@@ -16,13 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Service
 public class ProblemService {
@@ -97,7 +94,7 @@ public class ProblemService {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
 
-        if (n <= 0 && problems.size() < n) {
+        if (n <= 0 || (n > problems.size())) {
             throw new ApiException(ProblemError.INVALID_NUMBER_REQUEST);
         }
 
