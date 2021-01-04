@@ -94,7 +94,7 @@ public class GameTests {
 		jsonResponse = result.getResponse().getContentAsString();
 		GameDto gameDto = UtilityTestMethods.toObject(jsonResponse, GameDto.class);
 
-		assertEquals(actual, gameDto.getRoomDto());
+		assertEquals(actual, gameDto.getRoom());
 		assertNull(gameDto.getPlayerMap());
 	}
 
