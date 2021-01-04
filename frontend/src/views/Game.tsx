@@ -104,7 +104,7 @@ function GamePage() {
         Room:
         {' '}
         {roomId || 'An unknown room'}
-        {` (${game?.roomDto?.users?.length} players)`}
+        {` (${game?.room?.users?.length} players)`}
       </FlexInfoBar>
       <FlexInfoBar>
         You are
