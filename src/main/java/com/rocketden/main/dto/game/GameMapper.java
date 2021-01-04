@@ -20,6 +20,7 @@ public class GameMapper {
         // For now, just include the room info in the GameDto
         GameDto gameDto = new GameDto();
         gameDto.setRoomDto(RoomMapper.toDto(game.getRoom()));
+        gameDto.setTimer(TimerMapper.toDto(game.getTimer()));
 
         return gameDto;
     }

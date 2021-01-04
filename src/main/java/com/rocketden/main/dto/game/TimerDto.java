@@ -11,4 +11,5 @@ public class TimerDto {
     private LocalDateTime startTime;
     private Integer duration;
     private LocalDateTime endTime;
+    private boolean timeUp;
 }
