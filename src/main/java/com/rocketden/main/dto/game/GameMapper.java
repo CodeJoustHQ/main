@@ -17,9 +17,9 @@ public class GameMapper {
             return null;
         }
 
-        // For now, just include the room info in the GameDto
         GameDto gameDto = new GameDto();
         gameDto.setRoomDto(RoomMapper.toDto(game.getRoom()));
+        gameDto.setProblems(game.getProblems());
 
         return gameDto;
     }
