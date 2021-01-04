@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 public class Submission {
 
-    private Player player;
+    private String language;
 
     private String code;
 

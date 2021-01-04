@@ -59,6 +59,7 @@ public class GameTests {
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "098765";
     private static final String CODE = "print('hello')";
+    private static final String LANGUAGE = "java";
 
     // Helper method to start the game for a given room
     private GameDto startGameHelper(RoomDto room, UserDto host) throws Exception {
@@ -193,7 +194,7 @@ public class GameTests {
 		SubmissionRequest request = new SubmissionRequest();
 		request.setInitiator(host);
 		request.setCode(CODE);
-		request.setLanguage("TODO java");
+		request.setLanguage(LANGUAGE);
 
 		MvcResult result = this.mockMvc.perform(post(String.format(POST_SUBMISSION, roomDto.getRoomId()))
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -204,6 +205,10 @@ public class GameTests {
 		String jsonResponse = result.getResponse().getContentAsString();
 		SubmissionDto submissionDto = UtilityTestMethods.toObject(jsonResponse, SubmissionDto.class);
 
-		assertNotNull(submissionDto); // TODO
+		assertNotNull(submissionDto);
+		assertEquals(CODE, submissionDto.getCode());
+		assertEquals(LANGUAGE, submissionDto.getLanguage());
+		// For now, just assert that all test cases were passed
+		assertEquals(submissionDto.getNumCorrect(), submissionDto.getNumTestCases());
 	}
 }
