@@ -96,15 +96,14 @@ public class GameManagementService {
     // Initialize and add a game object from a room object
     public void createAddGameFromRoom(Room room) {
         Game game = GameMapper.fromRoom(room);
-        game.setProblem(chooseProblemFromDifficulty(room.getDifficulty()));
+        game.setProblems(chooseProblemFromDifficulty(room.getDifficulty()));
         currentGameMap.put(room.getRoomId(), game);
     }
 
     // Choose the problem based on problem difficulty settings
-    private Problem chooseProblemFromDifficulty(ProblemDifficulty difficulty) {
-        ProblemSettingsDto problemSettingsDto = new ProblemSettingsDto();
-        problemSettingsDto.setDifficulty(difficulty);
-        problemService.getRandomProblem(problemSettingsDto);
+    private List<Problem> chooseProblemFromDifficulty(ProblemDifficulty difficulty) {
+        // TODO (NOW): Handle the potential exceptions.
+        return problemService.getRandomProblems(difficulty, 1);
     }
 
     // Test the submission and return a socket update.

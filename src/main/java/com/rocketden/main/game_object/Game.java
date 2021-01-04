@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.rocketden.main.model.Room;
@@ -15,7 +16,7 @@ public class Game {
 
     private Room room;
 
-    private Problem problem;
+    private List<Problem> problems;
 
     // Map from userId to associated player object
     private Map<String, Player> players = new HashMap<>();
