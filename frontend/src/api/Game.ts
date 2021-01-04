@@ -6,7 +6,7 @@ import { Problem } from './Problem';
 
 export type Game = {
   room: Room,
-  problem: Problem,
+  problems: Problem[],
 };
 
 export type StartGameParams = {

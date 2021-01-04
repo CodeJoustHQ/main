@@ -114,8 +114,8 @@ function GamePage() {
         >
           {/* Problem title/description panel */}
           <Panel>
-            <ProblemHeaderText>{game?.problem?.name}</ProblemHeaderText>
-            <Text>{game?.problem?.description}</Text>
+            <ProblemHeaderText>{game?.problems[0]?.name}</ProblemHeaderText>
+            <Text>{game?.problems[0]?.description}</Text>
             {error ? <ErrorMessage message={error} /> : null}
           </Panel>
 
@@ -132,7 +132,7 @@ function GamePage() {
 
             <Panel>
               <Console
-                testCases={game?.problem?.testCases!}
+                testCases={game?.problems[0]?.testCases!}
                 submission={submission}
                 onRun={runSolution}
               />
