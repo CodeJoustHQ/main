@@ -3,6 +3,7 @@ package com.rocketden.main.service;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.StartGameRequest;
+import com.rocketden.main.dto.problem.ProblemSettingsDto;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.user.UserDto;
@@ -42,6 +43,9 @@ public class GameManagementServiceTests {
     private SocketService socketService;
 
     @Mock
+    private ProblemService problemService;
+
+    @Mock
     private SimpMessagingTemplate template;
 
     @Spy
@@ -63,6 +67,7 @@ public class GameManagementServiceTests {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
         room.setDifficulty(ProblemDifficulty.RANDOM);
+
         User user = new User();
         user.setNickname(NICKNAME);
         user.setUserId(USER_ID);
@@ -70,6 +75,12 @@ public class GameManagementServiceTests {
 
         // Create a game from a room
         gameService.createAddGameFromRoom(room);
+
+        // Confirm that the problem service method is called correctly.
+        ProblemSettingsDto request = new ProblemSettingsDto();
+        request.setDifficulty(room.getDifficulty());
+        request.setN(1);
+        verify(problemService).getRandomProblems(eq(request));
 
         // Check that game has copied over the correct details
         Game game = gameService.getGameFromRoomId(ROOM_ID);
@@ -99,6 +110,12 @@ public class GameManagementServiceTests {
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
         RoomDto response = gameService.startGame(ROOM_ID, request);
+
+        // Confirm that the problem service method is called correctly.
+        ProblemSettingsDto problemSettingsRequest = new ProblemSettingsDto();
+        problemSettingsRequest.setDifficulty(room.getDifficulty());
+        problemSettingsRequest.setN(1);
+        verify(problemService).getRandomProblems(eq(problemSettingsRequest));
 
         verify(socketService).sendSocketUpdate(eq(response));
 
@@ -156,6 +173,12 @@ public class GameManagementServiceTests {
         room.addUser(user);
 
         gameService.createAddGameFromRoom(room);
+
+        // Confirm that the problem service method is called correctly.
+        ProblemSettingsDto problemSettingsRequest = new ProblemSettingsDto();
+        problemSettingsRequest.setDifficulty(room.getDifficulty());
+        problemSettingsRequest.setN(1);
+        verify(problemService).getRandomProblems(eq(problemSettingsRequest));
 
         GameDto gameDto = gameService.getGameDtoFromRoomId(ROOM_ID);
 
