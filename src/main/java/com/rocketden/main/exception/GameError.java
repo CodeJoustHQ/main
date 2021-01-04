@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum GameError implements ApiError {
 
     BAD_SETTING(HttpStatus.BAD_REQUEST, "An invalid game setting was provided."),
+    INVALID_PERMISSIONS(HttpStatus.FORBIDDEN, "You do not have permission to perform this action."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "A game could not be found with the given id.");
 
     private final HttpStatus status;

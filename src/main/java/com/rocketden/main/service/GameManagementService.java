@@ -91,9 +91,10 @@ public class GameManagementService {
     }
 
     // Initialize and add a game object from a room object
-    public void createAddGameFromRoom(Room room) {
+    public Game createAddGameFromRoom(Room room) {
         Game game = GameMapper.fromRoom(room);
         currentGameMap.put(room.getRoomId(), game);
+        return game;
     }
 
     // Test the submission, return the results, and send a socket update

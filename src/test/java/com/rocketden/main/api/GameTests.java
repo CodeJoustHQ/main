@@ -59,7 +59,7 @@ public class GameTests {
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "098765";
     private static final String CODE = "print('hello')";
-    private static final String LANGUAGE = "java";
+    private static final String LANGUAGE = "python";
 
     // Helper method to start the game for a given room
     private GameDto startGameHelper(RoomDto room, UserDto host) throws Exception {
