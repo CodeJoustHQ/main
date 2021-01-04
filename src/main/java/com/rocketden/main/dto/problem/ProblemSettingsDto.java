@@ -8,4 +8,5 @@ import lombok.Setter;
 @Setter
 public class ProblemSettingsDto {
     private ProblemDifficulty difficulty;
+    private Integer n;
 }

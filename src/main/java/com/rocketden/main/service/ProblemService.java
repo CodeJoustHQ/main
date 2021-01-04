@@ -94,8 +94,8 @@ public class ProblemService {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
 
-        if (problems.size() < n) {
-            throw new ApiException(ProblemError.TOO_MANY_REQUESTED_PROBLEMS);
+        if (n <= 0 && problems.size() < n) {
+            throw new ApiException(ProblemError.INVALID_NUMBER_REQUEST);
         }
 
         // Get n random integers used to map to problems.
