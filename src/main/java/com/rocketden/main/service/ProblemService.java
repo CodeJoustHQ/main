@@ -16,8 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class ProblemService {
@@ -67,9 +72,13 @@ public class ProblemService {
         return problems;
     }
 
-    public ProblemDto getRandomProblem(ProblemSettingsDto request) {
-        ProblemDifficulty difficulty = request.getDifficulty();
-
+    /**
+     * Get a list of random problems with the provided parameters.
+     * 
+     * @param difficulty The problem difficulty the problems must match.
+     * @param n The number of problems to fetch.
+     */
+    public List<Problem> getRandomProblems(ProblemDifficulty difficulty, int n) {
         if (difficulty == null) {
             throw new ApiException(ProblemError.BAD_SETTING);
         }
@@ -85,8 +94,23 @@ public class ProblemService {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
 
-        Problem problem = problems.get(random.nextInt(problems.size()));
-        return ProblemMapper.toDto(problem);
+        if (problems.size() < n) {
+            throw new ApiException(ProblemError.TOO_MANY_REQUESTED_PROBLEMS);
+        }
+
+        // Get n random integers used to map to problems.
+        Set<Integer> randomIntegers = new HashSet<>();
+        while (randomIntegers.size() < n) {
+            randomIntegers.add(random.nextInt(problems.size()));
+        }
+
+        // Get the n problems mapped to those integers.
+        List<Problem> chosenProblems = new ArrayList<>();
+        for (Integer i : randomIntegers) {
+            chosenProblems.add(problems.get(i));
+        }
+
+        return chosenProblems;
     }
 
     public ProblemTestCaseDto createTestCase(String problemId, CreateTestCaseRequest request) {

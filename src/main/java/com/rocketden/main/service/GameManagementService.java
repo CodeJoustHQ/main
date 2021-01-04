@@ -10,6 +10,7 @@ import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.notification.NotificationDto;
+import com.rocketden.main.dto.problem.ProblemSettingsDto;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.exception.GameError;
@@ -21,6 +22,7 @@ import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.problem.Problem;
+import com.rocketden.main.model.problem.ProblemDifficulty;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,16 +35,19 @@ public class GameManagementService {
     private final LiveGameService liveGameService;
     private final NotificationService notificationService;
     private final SubmitService submitService;
+    private final ProblemService problemService;
     private final Map<String, Game> currentGameMap;
 
     @Autowired
-    protected GameManagementService(RoomRepository repository, SocketService socketService, LiveGameService liveGameService,
-                                    NotificationService notificationService, SubmitService submitService) {
+    protected GameManagementService(RoomRepository repository, SocketService socketService,
+            LiveGameService liveGameService, NotificationService notificationService, SubmitService submitService,
+            ProblemService problemService) {
         this.repository = repository;
         this.socketService = socketService;
         this.liveGameService = liveGameService;
         this.notificationService = notificationService;
         this.submitService = submitService;
+        this.problemService = problemService;
         currentGameMap = new HashMap<>();
     }
 
@@ -91,7 +96,15 @@ public class GameManagementService {
     // Initialize and add a game object from a room object
     public void createAddGameFromRoom(Room room) {
         Game game = GameMapper.fromRoom(room);
+        game.setProblem(chooseProblemFromDifficulty(room.getDifficulty()));
         currentGameMap.put(room.getRoomId(), game);
+    }
+
+    // Choose the problem based on problem difficulty settings
+    private Problem chooseProblemFromDifficulty(ProblemDifficulty difficulty) {
+        ProblemSettingsDto problemSettingsDto = new ProblemSettingsDto();
+        problemSettingsDto.setDifficulty(difficulty);
+        problemService.getRandomProblem(problemSettingsDto);
     }
 
     // Test the submission and return a socket update.
