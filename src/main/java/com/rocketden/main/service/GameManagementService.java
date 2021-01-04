@@ -102,18 +102,22 @@ public class GameManagementService {
         currentGameMap.put(room.getRoomId(), game);
     }
 
-    // Choose the problem based on problem difficulty settings
+    // Choose the problem based on problem difficulty settings (empty list for invalid request)
     private List<Problem> getProblemsFromDifficulty(ProblemDifficulty difficulty, int n) {
-        // TODO (NOW): Handle the potential exceptions.
         ProblemSettingsDto request = new ProblemSettingsDto();
         request.setDifficulty(difficulty);
         request.setN(n);
 
-        List<Problem> problems = new ArrayList<>();
-        for (ProblemDto problemDto : problemService.getRandomProblems(request)) {
-            problems.add(ProblemMapper.toEntity(problemDto));
+        try {
+            List<Problem> problems = new ArrayList<>();
+            for (ProblemDto problemDto : problemService.getRandomProblems(request)) {
+                problems.add(ProblemMapper.toEntity(problemDto));
+            }
+
+            return problems;
+        } catch (ApiException e) {
+            return new ArrayList<>();
         }
-        return problems;
     }
 
     // Test the submission and return a socket update.

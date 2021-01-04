@@ -13,6 +13,8 @@ import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
+import com.rocketden.main.model.problem.ProblemDifficulty;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -60,6 +62,7 @@ public class GameManagementServiceTests {
 
         Room room = new Room();
         room.setRoomId(ROOM_ID);
+        room.setDifficulty(ProblemDifficulty.RANDOM);
         User user = new User();
         user.setNickname(NICKNAME);
         user.setUserId(USER_ID);
@@ -89,6 +92,7 @@ public class GameManagementServiceTests {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
         room.setHost(host);
+        room.setDifficulty(ProblemDifficulty.RANDOM);
 
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(UserMapper.toDto(host));
@@ -145,6 +149,7 @@ public class GameManagementServiceTests {
     public void getGameSuccess() {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
+        room.setDifficulty(ProblemDifficulty.RANDOM);
         User user = new User();
         user.setNickname(NICKNAME);
         user.setUserId(USER_ID);
