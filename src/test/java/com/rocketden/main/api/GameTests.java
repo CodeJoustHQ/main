@@ -210,5 +210,15 @@ public class GameTests {
 		assertEquals(LANGUAGE, submissionDto.getLanguage());
 		// For now, just assert that all test cases were passed
 		assertEquals(submissionDto.getNumCorrect(), submissionDto.getNumTestCases());
+
+		// Check that the submission is stored in the game object
+		result = this.mockMvc.perform(get(String.format(GET_GAME, roomDto.getRoomId())))
+				.andDo(print()).andExpect(status().isOk())
+				.andReturn();
+
+		jsonResponse = result.getResponse().getContentAsString();
+		GameDto gameDto = UtilityTestMethods.toObject(jsonResponse, GameDto.class);
+
+		assertEquals(submissionDto, gameDto.getPlayerMap().get(USER_ID).getSubmissions().get(0));
 	}
 }

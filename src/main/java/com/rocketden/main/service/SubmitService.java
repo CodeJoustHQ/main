@@ -13,11 +13,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class SubmitService {
 
-    private final RoomRepository repository;
     private final SocketService socketService;
 
-    protected SubmitService(RoomRepository repository, SocketService socketService) {
-        this.repository = repository;
+    protected SubmitService(SocketService socketService) {
         this.socketService = socketService;
     }
 
