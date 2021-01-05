@@ -19,7 +19,7 @@ import { User } from '../api/User';
 import Difficulty from '../api/Difficulty';
 import { Game, getGame } from '../api/Game';
 import { routes, subscribe } from '../api/Socket';
-import { GameClock } from '../api/GameTimer';
+import { GameClock, GameTimer } from '../api/GameTimer';
 
 type LocationState = {
   roomId: string,
@@ -54,14 +54,12 @@ function GamePage() {
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
-  const updateClock = () => {
-    if (game && game.gameTimer) {
-      const newCurrentClock = (game.gameTimer.endTime.getTime() - Date.now()) / 1000;
-      setInterval(() => setCurrentClock({
-        minutes: newCurrentClock / 60,
-        seconds: newCurrentClock % 60,
-      }), 1000);
-    }
+  const updateClock = (gameTimerParam: GameTimer) => {
+    const newCurrentClock = (gameTimerParam.endTime.getTime() - Date.now()) / 1000;
+    setInterval(() => setCurrentClock({
+      minutes: newCurrentClock / 60,
+      seconds: newCurrentClock % 60,
+    }), 1000);
   };
 
   // Re-subscribe in order to get the correct subscription callback.
@@ -104,7 +102,7 @@ function GamePage() {
       getGame(location.state.roomId)
         .then((res) => {
           setGame(res);
-          updateClock();
+          updateClock(res.gameTimer);
           console.log(res);
         })
         .catch((err) => setError(err));
