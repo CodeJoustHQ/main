@@ -9,9 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 public class Submission {
 
-    private String language;
-
-    private String code;
+    private PlayerCode playerCode;
 
     // The time that the submission was received.
     private LocalDateTime startTime = LocalDateTime.now();

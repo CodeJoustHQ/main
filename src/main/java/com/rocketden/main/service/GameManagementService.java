@@ -99,6 +99,11 @@ public class GameManagementService {
 
     // Test the submission, return the results, and send a socket update
     public SubmissionDto submitSolution(String roomId, SubmissionRequest request) {
+        String initiatorUserId = request.getInitiator().getUserId();
+        if (!currentGameMap.containsKey(initiatorUserId)) {
+            throw new ApiException(GameError.INVALID_PERMISSIONS);
+        }
+
         Game game = currentGameMap.get(roomId);
         return submitService.submitSolution(game, request);
     }
