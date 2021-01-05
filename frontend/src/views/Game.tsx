@@ -19,6 +19,7 @@ import { User } from '../api/User';
 import Difficulty from '../api/Difficulty';
 import { Game, getGame } from '../api/Game';
 import { routes, subscribe } from '../api/Socket';
+import { GameClock } from '../api/GameTimer';
 
 type LocationState = {
   roomId: string,
@@ -37,6 +38,7 @@ function GamePage() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [roomId, setRoomId] = useState<string>('');
   const [game, setGame] = useState<Game | null>(null);
+  const [currentClock, setCurrentClock] = useState<GameClock | null>(null);
 
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
@@ -51,6 +53,16 @@ function GamePage() {
    * message; see https://github.com/jacobbuck/react-beforeunload.
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
+
+  const updateClock = () => {
+    if (game && game.gameTimer) {
+      const newCurrentClock = (game.gameTimer.endTime.getTime() - Date.now()) / 1000;
+      setInterval(() => setCurrentClock({
+        minutes: newCurrentClock / 60,
+        seconds: newCurrentClock % 60,
+      }), 1000);
+    }
+  };
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
@@ -92,6 +104,7 @@ function GamePage() {
       getGame(location.state.roomId)
         .then((res) => {
           setGame(res);
+          updateClock();
           console.log(res);
         })
         .catch((err) => setError(err));
@@ -142,6 +155,12 @@ function GamePage() {
         You are
         {' '}
         {currentUser != null ? currentUser.nickname : 'An unknown user'}
+      </FlexInfoBar>
+      <FlexInfoBar>
+        Time:
+        {(currentClock) ? currentClock.minutes : '00'}
+        :
+        {(currentClock) ? currentClock.seconds : '00'}
       </FlexInfoBar>
 
       <SplitterContainer>
