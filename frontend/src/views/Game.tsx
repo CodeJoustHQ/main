@@ -54,12 +54,22 @@ function GamePage() {
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
+  // Calculate and set the new clock on the frontend.
+  const calculateSetClock = (gameTimerParam: GameTimer) => {
+    const newCurrentClock = (new Date(gameTimerParam.endTime).getTime() - Date.now()) / 1000;
+    if (newCurrentClock > 0) {
+      setCurrentClock({
+        minutes: Math.floor(newCurrentClock / 60),
+        seconds: Math.floor(newCurrentClock % 60),
+      });
+    } else {
+      // Set null to indicate that the timer has ended.
+      setCurrentClock(null);
+    }
+  };
+
   const updateClock = (gameTimerParam: GameTimer) => {
-    const newCurrentClock = (gameTimerParam.endTime.getTime() - Date.now()) / 1000;
-    setInterval(() => setCurrentClock({
-      minutes: newCurrentClock / 60,
-      seconds: newCurrentClock % 60,
-    }), 1000);
+    setInterval(() => calculateSetClock(gameTimerParam), 1000);
   };
 
   // Re-subscribe in order to get the correct subscription callback.
@@ -156,6 +166,7 @@ function GamePage() {
       </FlexInfoBar>
       <FlexInfoBar>
         Time:
+        {' '}
         {(currentClock) ? currentClock.minutes : '00'}
         :
         {(currentClock) ? currentClock.seconds : '00'}
