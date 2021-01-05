@@ -8,9 +8,6 @@ import java.util.Timer;
 
 import com.rocketden.main.util.EndGameTimerTask;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * The Timer class handles the timing for the Game.
  * This class is dynamic, so depending on player actions time could
@@ -20,24 +17,28 @@ import org.slf4j.LoggerFactory;
 @Setter
 public class GameTimer {
 
-    Logger logger = LoggerFactory.getLogger(GameTimer.class);
-
-    public GameTimer(Integer duration) {
+    /**
+     * Instantiate the GameTimer class, and schedule the end game task after
+     * timer ends.
+     * 
+     * @param duration The duration, in seconds, until the timer ends.
+     * @param roomId The roomId needed to send the socket update on game end.
+     */
+    public GameTimer(Long duration, String roomId) {
         this.duration = duration;
         this.endTime = this.startTime.plusSeconds(duration);
         this.timer = new Timer();
 
-        EndGameTimerTask timerTask = new EndGameTimerTask(this);
-        logger.info("Task immediately prior.");
-        timer.schedule(timerTask, duration);
-        logger.info("Task immediately after.");
+        // Schedule the game to end after <duration> seconds.
+        EndGameTimerTask timerTask = new EndGameTimerTask(this, roomId);
+        timer.schedule(timerTask, duration * 1000);
     }
 
     // The time that the game began.
     private LocalDateTime startTime = LocalDateTime.now();
 
     // The projected game duration, in seconds.
-    private Integer duration;
+    private Long duration;
 
     private LocalDateTime endTime;
 

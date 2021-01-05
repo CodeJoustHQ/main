@@ -18,14 +18,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Setter
 public class Game {
 
-    // 15 second duration for the GameTimer.
-    private static final Integer DURATION_15 = 15000;
+    /*
+     * Create default Game object that does not immediately construct the Timer.
+     */
+    public Game() {}
+
+    /**
+     * Constructor to attach the Room field and start the Game Timer.
+     * 
+     * @param room The room connected to this game.
+     */
+    public Game(Room room) {
+        this.room = room;
+        this.gameTimer = new GameTimer(DURATION_15, room.getRoomId());
+    }
+
+    // 15 minute duration for the GameTimer, in seconds.
+    private static final Long DURATION_15 = (long) 900;
 
     private Room room;
 
     // Map from userId to associated player object
     private Map<String, Player> players = new HashMap<>();
 
-    private GameTimer gameTimer = new GameTimer(DURATION_15);
+    private GameTimer gameTimer;
 
 }
