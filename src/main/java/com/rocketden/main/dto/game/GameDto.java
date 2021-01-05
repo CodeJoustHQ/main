@@ -12,5 +12,5 @@ import com.rocketden.main.dto.room.RoomDto;
 public class GameDto {
     private RoomDto roomDto;
     private Map<String, PlayerDto> playerMap;
-    private TimerDto timer;
+    private GameTimerDto gameTimer;
 }

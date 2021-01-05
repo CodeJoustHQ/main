@@ -4,6 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Timer;
+
+import com.rocketden.main.util.EndGameTimerTask;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Timer class handles the timing for the Game.
@@ -12,11 +18,19 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-public class Timer {
+public class GameTimer {
 
-    public Timer(Integer duration) {
+    Logger logger = LoggerFactory.getLogger(GameTimer.class);
+
+    public GameTimer(Integer duration) {
         this.duration = duration;
         this.endTime = this.startTime.plusSeconds(duration);
+        this.timer = new Timer();
+
+        EndGameTimerTask timerTask = new EndGameTimerTask(this);
+        logger.info("Task immediately prior.");
+        timer.schedule(timerTask, duration);
+        logger.info("Task immediately after.");
     }
 
     // The time that the game began.
@@ -29,15 +43,6 @@ public class Timer {
 
     private boolean timeUp = false;
 
-    // Method that allows for dynamic changes to time.
-    boolean isTimeUp() throws InterruptedException {
-        while (!LocalDateTime.now().isAfter(endTime)) {
-            Thread.sleep(1000);
-        }
-
-        // Set timeUp to true, and return true.
-        this.timeUp = true;
-        return true;
-    }
+    private Timer timer;
 
 }

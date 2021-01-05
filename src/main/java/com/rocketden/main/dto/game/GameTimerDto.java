@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class TimerDto {
+public class GameTimerDto {
     private LocalDateTime startTime;
     private Integer duration;
     private LocalDateTime endTime;
