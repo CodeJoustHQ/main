@@ -58,8 +58,8 @@ public class SubmitServiceTests {
 
         Submission submission = submissions.get(0);
 
-        assertEquals(CODE, submission.getCode());
-        assertEquals(LANGUAGE, submission.getLanguage());
+        assertEquals(CODE, submission.getPlayerCode().getCode());
+        assertEquals(LANGUAGE, submission.getPlayerCode().getLanguage());
         assertEquals(submission.getNumCorrect(), submission.getNumTestCases());
     }
 }

@@ -2,6 +2,7 @@ package com.rocketden.main.api;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
+import com.rocketden.main.dto.game.PlayerDto;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
@@ -31,6 +32,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -76,7 +78,8 @@ public class GameTests {
 		GameDto gameDto = UtilityTestMethods.toObject(jsonResponse, GameDto.class);
 
 		assertEquals(room, gameDto.getRoom());
-		// TODO
+		assertEquals(1, gameDto.getPlayers().size());
+		assertFalse(gameDto.getPlayers().get(0).getSolved());
 
 		return gameDto;
 	}
@@ -122,8 +125,7 @@ public class GameTests {
 		GameDto gameDto = UtilityTestMethods.toObject(jsonResponse, GameDto.class);
 
 		assertEquals(actual, gameDto.getRoom());
-		assertNull(gameDto.getPlayers());
-		// TODO
+		assertEquals(1, gameDto.getPlayers().size());
 	}
 
 	@Test
@@ -221,8 +223,11 @@ public class GameTests {
 		jsonResponse = result.getResponse().getContentAsString();
 		GameDto gameDto = UtilityTestMethods.toObject(jsonResponse, GameDto.class);
 
-		assertEquals(submissionDto, gameDto.getPlayers().get(USER_ID).getSubmissions().get(0));
-
-		// TODO
+		assertEquals(1, gameDto.getPlayers().size());
+		PlayerDto player = gameDto.getPlayers().get(0);
+		assertEquals(submissionDto, player.getSubmissions().get(0));
+		assertEquals(submissionDto.getCode(), player.getCode());
+		assertEquals(submissionDto.getLanguage(), player.getLanguage());
+		assertTrue(player.getSolved());
 	}
 }

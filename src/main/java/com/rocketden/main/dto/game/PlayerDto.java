@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PlayerDto {
-    private UserDto userDto;
+    private UserDto user;
     private String code;
     private String language;
     private List<SubmissionDto> submissions;
