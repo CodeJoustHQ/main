@@ -3,7 +3,6 @@ package com.rocketden.main.dto.game;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Player;
-import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.game_object.Submission;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
@@ -75,13 +74,5 @@ public class GameMapper {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
 
         return mapper.map(submission, SubmissionDto.class);
-
-//        SubmissionDto submissionDto = new SubmissionDto();
-//
-//        PlayerCode playerCode = submission.getPlayerCode();
-//        submissionDto.setCode(playerCode.getCode());
-//        submissionDto.setLanguage(playerCode.getLanguage());
-//
-//        return submissionDto;
     }
 }
