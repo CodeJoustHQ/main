@@ -18,7 +18,7 @@ import com.rocketden.main.util.EndGameTimerTask;
 public class GameTimer {
 
     // 15 minute duration for the GameTimer, in seconds.
-    public static final Long DURATION_15 = (long) 900;
+    public static final Long DURATION_15 = (long) 15;
 
     /**
      * Instantiate the GameTimer class, and schedule the end game task after

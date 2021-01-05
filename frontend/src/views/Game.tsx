@@ -58,9 +58,30 @@ function GamePage() {
   const calculateSetClock = (gameTimerParam: GameTimer) => {
     const newCurrentClock = (new Date(gameTimerParam.endTime).getTime() - Date.now()) / 1000;
     if (newCurrentClock > 0) {
+      // Set minutes and its string.
+      const minutes: number = Math.floor(newCurrentClock / 60);
+      let minutesStr: string;
+      if (minutes >= 10) {
+        minutesStr = `${minutes}`;
+      } else if (minutes > 0 && minutes < 10) {
+        minutesStr = `0${minutes}`;
+      } else {
+        minutesStr = '00';
+      }
+
+      const seconds: number = Math.floor(newCurrentClock % 60);
+      let secondsStr: string;
+      if (seconds >= 10) {
+        secondsStr = `${seconds}`;
+      } else if (seconds > 0 && seconds < 10) {
+        secondsStr = `0${seconds}`;
+      } else {
+        secondsStr = '00';
+      }
+
       setCurrentClock({
-        minutes: Math.floor(newCurrentClock / 60),
-        seconds: Math.floor(newCurrentClock % 60),
+        minutes: minutesStr,
+        seconds: secondsStr,
       });
     } else {
       // Set null to indicate that the timer has ended.

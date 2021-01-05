@@ -8,7 +8,9 @@ import com.rocketden.main.service.GameManagementService;
 import com.rocketden.main.service.SocketService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class EndGameTimerTask extends TimerTask {
 
     private GameTimer gameTimer;

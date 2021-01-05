@@ -6,6 +6,6 @@ export type GameTimer = {
 }
 
 export type GameClock = {
-  minutes: number,
-  seconds: number,
+  minutes: string,
+  seconds: string,
 }
