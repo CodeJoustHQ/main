@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
 import { useBeforeunload } from 'react-beforeunload';
+import { Message } from 'stompjs';
 import Editor from '../components/game/Editor';
 import { Problem, SubmissionResult, getRandomProblem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
@@ -17,6 +18,7 @@ import Loading from '../components/core/Loading';
 import { User } from '../api/User';
 import Difficulty from '../api/Difficulty';
 import { Game, getGame } from '../api/Game';
+import { routes, subscribe } from '../api/Socket';
 
 type LocationState = {
   roomId: string,
@@ -39,6 +41,9 @@ function GamePage() {
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
+  // Variable to hold whether the user is subscribed to the primary Game socket.
+  const [socketSubscribed, setSocketSubscribed] = useState(false);
+
   /**
    * Display beforeUnload message to inform the user that they may lose
    * their code / data if they leave the page.
@@ -46,6 +51,19 @@ function GamePage() {
    * message; see https://github.com/jacobbuck/react-beforeunload.
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
+
+  // Re-subscribe in order to get the correct subscription callback.
+  const subscribePrimary = useCallback((roomIdParam: string) => {
+    const subscribeCallback = (result: Message) => {
+      setGame(JSON.parse(result.body));
+      setSocketSubscribed(true);
+      console.log(JSON.parse(result.body));
+    };
+
+    subscribe(routes(roomIdParam).subscribe, subscribeCallback).catch((err) => {
+      setError(err.message);
+    });
+  }, []);
 
   // Called every time location changes
   useEffect(() => {
@@ -88,6 +106,13 @@ function GamePage() {
     const tempSubmission = { status: 'SUCCESS', output: input };
     setSubmission(tempSubmission);
   };
+
+  // Redirect user to game page if room is active.
+  useEffect(() => {
+    if (!socketSubscribed && roomId) {
+      subscribePrimary(roomId);
+    }
+  }, [socketSubscribed, roomId]);
 
   // If the page is loading, return a centered Loading object.
   if (fullPageLoading) {
