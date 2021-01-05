@@ -75,7 +75,8 @@ public class GameTests {
 		String jsonResponse = result.getResponse().getContentAsString();
 		GameDto gameDto = UtilityTestMethods.toObject(jsonResponse, GameDto.class);
 
-		assertEquals(room, gameDto.getRoomDto());
+		assertEquals(room, gameDto.getRoom());
+		// TODO
 
 		return gameDto;
 	}
@@ -120,8 +121,9 @@ public class GameTests {
 		jsonResponse = result.getResponse().getContentAsString();
 		GameDto gameDto = UtilityTestMethods.toObject(jsonResponse, GameDto.class);
 
-		assertEquals(actual, gameDto.getRoomDto());
-		assertNull(gameDto.getPlayerMap());
+		assertEquals(actual, gameDto.getRoom());
+		assertNull(gameDto.getPlayers());
+		// TODO
 	}
 
 	@Test
@@ -219,6 +221,8 @@ public class GameTests {
 		jsonResponse = result.getResponse().getContentAsString();
 		GameDto gameDto = UtilityTestMethods.toObject(jsonResponse, GameDto.class);
 
-		assertEquals(submissionDto, gameDto.getPlayerMap().get(USER_ID).getSubmissions().get(0));
+		assertEquals(submissionDto, gameDto.getPlayers().get(USER_ID).getSubmissions().get(0));
+
+		// TODO
 	}
 }

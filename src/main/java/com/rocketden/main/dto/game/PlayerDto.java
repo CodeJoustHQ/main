@@ -11,7 +11,8 @@ import lombok.Setter;
 @Setter
 public class PlayerDto {
     private UserDto userDto;
-    private PlayerCodeDto playerCode;
+    private String code;
+    private String language;
     private List<SubmissionDto> submissions;
     private Boolean solved;
 }

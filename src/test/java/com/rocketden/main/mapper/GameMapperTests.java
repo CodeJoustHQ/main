@@ -63,8 +63,15 @@ public class GameMapperTests {
 
         GameDto gameDto = GameMapper.toDto(game);
 
-        assertEquals(RoomMapper.toDto(room), gameDto.getRoomDto());
+        assertEquals(RoomMapper.toDto(room), gameDto.getRoom());
         // Assert player map is null for now until implemented
-        assertNull(gameDto.getPlayerMap());
+        assertNull(gameDto.getPlayers());
+
+        // TODO
+    }
+
+    @Test
+    public void submissionToDto() {
+        // TODO
     }
 }
