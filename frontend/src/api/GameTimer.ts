@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { axiosErrorHandler } from './Error';
-import { GameTimer } from './GameTimer';
 import { Room } from './Room';
 import { User } from './User';
 
@@ -8,6 +7,13 @@ export type Game = {
   roomDto: Room,
   gameTimer: GameTimer,
 };
+
+export type GameTimer = {
+  duration: number,
+  startTime: Date,
+  endTime: Date,
+  timeUp: boolean,
+}
 
 export type StartGameParams = {
   initiator: User,

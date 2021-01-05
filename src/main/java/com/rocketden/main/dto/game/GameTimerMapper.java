@@ -12,9 +12,10 @@ public class GameTimerMapper {
         }
 
         GameTimerDto gameTimerDto = new GameTimerDto();
-        gameTimerDto.setDuration(gameTimerDto.getDuration());
-        gameTimerDto.setStartTime(gameTimerDto.getStartTime());
-        gameTimerDto.setEndTime(gameTimerDto.getEndTime());
+        gameTimerDto.setDuration(gameTimer.getDuration());
+        gameTimerDto.setStartTime(gameTimer.getStartTime());
+        gameTimerDto.setEndTime(gameTimer.getEndTime());
+        gameTimerDto.setTimeUp(gameTimer.isTimeUp());
 
         return gameTimerDto;
     }

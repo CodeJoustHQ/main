@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 public class GameTimerDto {
     private LocalDateTime startTime;
-    private Integer duration;
+    private Long duration;
     private LocalDateTime endTime;
     private boolean timeUp;
 }
