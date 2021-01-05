@@ -161,9 +161,8 @@ public class GameManagementServiceTests {
         GameDto gameDto = gameService.getGameDtoFromRoomId(ROOM_ID);
 
         assertEquals(RoomMapper.toDto(room), gameDto.getRoom());
-        assertNull(gameDto.getPlayers());
-
-        // TODO
+        assertEquals(1, gameDto.getPlayers().size());
+        assertEquals(UserMapper.toDto(user), gameDto.getPlayers().get(0).getUser());
     }
 
     @Test

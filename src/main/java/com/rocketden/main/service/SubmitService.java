@@ -40,6 +40,7 @@ public class SubmitService {
         submission.setNumTestCases(10);
 
         player.getSubmissions().add(submission);
+        player.setSolved(true);
 
         return GameMapper.submissionToDto(submission);
     }

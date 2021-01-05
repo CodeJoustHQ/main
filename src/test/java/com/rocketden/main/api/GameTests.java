@@ -30,9 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -64,7 +62,7 @@ public class GameTests {
     private static final String LANGUAGE = "python";
 
     // Helper method to start the game for a given room
-    private GameDto startGameHelper(RoomDto room, UserDto host) throws Exception {
+    private void startGameHelper(RoomDto room, UserDto host) throws Exception {
 		StartGameRequest request = new StartGameRequest();
 		request.setInitiator(host);
 
@@ -75,13 +73,10 @@ public class GameTests {
 				.andReturn();
 
 		String jsonResponse = result.getResponse().getContentAsString();
-		GameDto gameDto = UtilityTestMethods.toObject(jsonResponse, GameDto.class);
+		RoomDto roomDto = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
-		assertEquals(room, gameDto.getRoom());
-		assertEquals(1, gameDto.getPlayers().size());
-		assertFalse(gameDto.getPlayers().get(0).getSolved());
-
-		return gameDto;
+		assertEquals(room.getRoomId(), roomDto.getRoomId());
+		assertTrue(roomDto.isActive());
 	}
 
 	@Test
