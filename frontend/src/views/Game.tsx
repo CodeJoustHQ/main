@@ -55,9 +55,16 @@ function GamePage() {
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
     const subscribeCallback = (result: Message) => {
-      setGame(JSON.parse(result.body));
+      const updatedGame: Game = JSON.parse(result.body);
+      setGame(updatedGame);
       setSocketSubscribed(true);
-      console.log(JSON.parse(result.body));
+
+      // Check if end game.
+      if (updatedGame.gameTimer.timeUp) {
+        history.push('/game/results', {
+          game,
+        });
+      }
     };
 
     subscribe(routes(roomIdParam).subscribe, subscribeCallback).catch((err) => {
