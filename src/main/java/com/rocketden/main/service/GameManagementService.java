@@ -22,6 +22,7 @@ import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.problem.Problem;
+import com.rocketden.main.util.EndGameTimerTask;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,8 +38,7 @@ public class GameManagementService {
     private final Map<String, Game> currentGameMap;
 
     @Autowired
-    protected GameManagementService(RoomRepository repository, SocketService socketService, LiveGameService liveGameService,
-                                    NotificationService notificationService, SubmitService submitService) {
+    protected GameManagementService(RoomRepository repository, SocketService socketService, LiveGameService liveGameService, NotificationService notificationService, SubmitService submitService) {
         this.repository = repository;
         this.socketService = socketService;
         this.liveGameService = liveGameService;
@@ -83,7 +83,7 @@ public class GameManagementService {
 
         // Initialize game state
         Game game = createAddGameFromRoom(room);
-        setGameTimer(game, GameTimer.DURATION_15, room.getRoomId());
+        setGameTimer(game, GameTimer.DURATION_15);
 
         RoomDto roomDto = RoomMapper.toDto(room);
         socketService.sendSocketUpdate(roomDto);
@@ -98,8 +98,13 @@ public class GameManagementService {
     }
 
     // Set and start the Game Timer.
-    public void setGameTimer(Game game, Long duration, String roomId) {
-        game.setGameTimer(new GameTimer(duration, roomId));
+    public void setGameTimer(Game game, Long duration) {
+        GameTimer gameTimer = new GameTimer(duration);
+        game.setGameTimer(gameTimer);
+
+        // Schedule the game to end after <duration> seconds.
+        EndGameTimerTask endGameTimerTask = new EndGameTimerTask(socketService, game);
+        gameTimer.getTimer().schedule(endGameTimerTask, duration * 1000);
     }
 
     // Test the submission and return a socket update.
