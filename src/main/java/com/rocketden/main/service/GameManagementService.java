@@ -83,7 +83,7 @@ public class GameManagementService {
 
         // Initialize game state
         Game game = createAddGameFromRoom(room);
-        setGameTimer(game, GameTimer.DURATION_15);
+        setStartGameTimer(game, GameTimer.DURATION_15);
 
         RoomDto roomDto = RoomMapper.toDto(room);
         socketService.sendSocketUpdate(roomDto);
@@ -98,7 +98,7 @@ public class GameManagementService {
     }
 
     // Set and start the Game Timer.
-    public void setGameTimer(Game game, Long duration) {
+    public void setStartGameTimer(Game game, Long duration) {
         GameTimer gameTimer = new GameTimer(duration);
         game.setGameTimer(gameTimer);
 
