@@ -101,6 +101,10 @@ public class GameManagementService {
     public SubmissionDto submitSolution(String roomId, SubmissionRequest request) {
         Game game = currentGameMap.get(roomId);
 
+        if (request.getInitiator() == null || request.getCode() == null || request.getLanguage() == null) {
+            throw new ApiException(GameError.EMPTY_FIELD);
+        }
+
         String initiatorUserId = request.getInitiator().getUserId();
         if (!game.getPlayers().containsKey(initiatorUserId)) {
             throw new ApiException(GameError.INVALID_PERMISSIONS);
