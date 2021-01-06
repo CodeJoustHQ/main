@@ -66,6 +66,52 @@ public class EndGameTimerTaskTests {
     }
 
     @Test
+    public void endGameTimerTaskSocketMessageNullGameTimer() {
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        user.setSessionId(SESSION_ID);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setDifficulty(ProblemDifficulty.MEDIUM);
+        room.setHost(user);
+        room.addUser(user);
+
+        Game game = GameMapper.fromRoom(room);
+
+        assertThrows(ApiException.class, () -> new EndGameTimerTask(socketService, game));
+    }
+
+    @Test
+    public void endGameTimerTaskSocketMessageNullRoom() {
+        Game game = new Game();
+        GameTimer gameTimer = new GameTimer((long) 10);
+        game.setGameTimer(gameTimer);
+
+        assertThrows(ApiException.class, () -> new EndGameTimerTask(socketService, game));
+    }
+
+    @Test
+    public void endGameTimerTaskSocketMessageNullRoomId() {
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        user.setSessionId(SESSION_ID);
+
+        Room room = new Room();
+        room.setDifficulty(ProblemDifficulty.MEDIUM);
+        room.setHost(user);
+        room.addUser(user);
+
+        Game game = GameMapper.fromRoom(room);
+        GameTimer gameTimer = new GameTimer((long) 10);
+        game.setGameTimer(gameTimer);
+
+        assertThrows(ApiException.class, () -> new EndGameTimerTask(socketService, game));
+    }
+
+    @Test
     public void endGameTimerTaskSocketMessage() {
         User user = new User();
         user.setNickname(NICKNAME);
