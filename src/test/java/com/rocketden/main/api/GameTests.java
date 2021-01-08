@@ -92,7 +92,7 @@ public class GameTests {
 				.andReturn();
 
 		jsonResponse = result.getResponse().getContentAsString();
-		GameDto gameDto = UtilityTestMethods.toObject(jsonResponse, GameDto.class);
+		GameDto gameDto = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, GameDto.class);
 
 		assertEquals(actual, gameDto.getRoomDto());
 		assertNull(gameDto.getPlayerMap());
