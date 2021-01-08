@@ -17,6 +17,7 @@ import com.rocketden.main.util.SocketTestMethods;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,7 +41,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
@@ -338,6 +338,9 @@ public class RoomSocketTests {
         StartGameRequest startGameRequest = new StartGameRequest();
         startGameRequest.setInitiator(room.getHost());
 
+        HttpEntity<StartGameRequest> startGameEntity = new HttpEntity<>(startGameRequest);
+        String startGameEndpoint = String.format("%s/%s/start", baseRestEndpoint, room.getRoomId());
+
         List<Problem> problems = new ArrayList<>();
         Problem problem = new Problem();
         problem.setName(NAME);
@@ -351,10 +354,8 @@ public class RoomSocketTests {
         problems.add(problem);
 
         // Ensure that a problem will be returned on repository call.
-        when(problemRepository.findAll()).thenReturn(problems);
+        Mockito.doReturn(problems).when(problemRepository).findAll();
 
-        HttpEntity<StartGameRequest> startGameEntity = new HttpEntity<>(startGameRequest);
-        String startGameEndpoint = String.format("%s/%s/start", baseRestEndpoint, room.getRoomId());
         RoomDto expected = template.exchange(startGameEndpoint, HttpMethod.POST, startGameEntity, RoomDto.class).getBody();
 
         RoomDto actual = blockingQueue.poll(5, SECONDS);
