@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum GameError implements ApiError {
 
+    BAD_LANGUAGE(HttpStatus.BAD_REQUEST, "An invalid language was chosen."),
     BAD_SETTING(HttpStatus.BAD_REQUEST, "An invalid game setting was provided."),
     INVALID_PERMISSIONS(HttpStatus.FORBIDDEN, "You do not have permission to perform this action."),
     EMPTY_FIELD(HttpStatus.BAD_REQUEST, "Please ensure a value is provided for each required field."),

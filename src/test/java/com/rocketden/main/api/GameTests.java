@@ -10,6 +10,7 @@ import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.user.UserMapper;
+import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
@@ -225,5 +226,30 @@ public class GameTests {
 		assertEquals(submissionDto.getCode(), player.getCode());
 		assertEquals(submissionDto.getLanguage(), player.getLanguage());
 		assertTrue(player.getSolved());
+	}
+
+	@Test
+	public void submitSolutionBadLanguage() throws Exception {
+		UserDto host = new UserDto();
+		host.setNickname(NICKNAME);
+		host.setUserId(USER_ID);
+
+		RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
+		startGameHelper(roomDto, host);
+
+		String request = "{\"initiator\": {\"nickname\": \"hi\"}, \"code\": \"print('hi')\", \"language\": \"x\"}";
+
+		ApiError ERROR = GameError.BAD_LANGUAGE;
+
+		MvcResult result = this.mockMvc.perform(post(String.format(POST_SUBMISSION, roomDto.getRoomId()))
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.content(request))
+				.andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+				.andReturn();
+
+		String jsonResponse = result.getResponse().getContentAsString();
+		ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+		assertEquals(ERROR.getResponse(), actual);
 	}
 }

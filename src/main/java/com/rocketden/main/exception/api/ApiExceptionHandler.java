@@ -28,7 +28,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         // Check for a ProblemError.BAD_SETTING triggered in the Difficulty.fromString method
         if (ex.getCause() != null && ex.getCause().getCause() instanceof ApiException) {
-            ApiError apiError = ProblemError.BAD_SETTING;
+            ApiError apiError = ((ApiException) ex.getCause().getCause()).getError();
             return new ResponseEntity<>(apiError.getResponse(), apiError.getStatus());
         }
 
