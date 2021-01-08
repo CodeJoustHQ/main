@@ -5,7 +5,6 @@ import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.dto.problem.ProblemMapper;
-import com.rocketden.main.dto.problem.ProblemSettingsDto;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
@@ -75,10 +74,7 @@ public class ProblemService {
      * @param difficulty The problem difficulty the problems must match.
      * @param numProblems The number of problems to fetch.
      */
-    public List<ProblemDto> getRandomProblems(ProblemSettingsDto request) {
-        ProblemDifficulty difficulty = request.getDifficulty();
-        Integer numProblems = request.getNumProblems();
-
+    public List<Problem> getProblemsFromDifficulty(ProblemDifficulty difficulty, Integer numProblems) {
         if (difficulty == null || numProblems == null) {
             throw new ApiException(ProblemError.BAD_SETTING);
         }
@@ -105,9 +101,9 @@ public class ProblemService {
         }
 
         // Get the numProblem problems mapped to those integers.
-        List<ProblemDto> chosenProblems = new ArrayList<>();
+        List<Problem> chosenProblems = new ArrayList<>();
         for (Integer i : randomIntegers) {
-            chosenProblems.add(ProblemMapper.toDto(problems.get(i)));
+            chosenProblems.add(problems.get(i));
         }
 
         return chosenProblems;

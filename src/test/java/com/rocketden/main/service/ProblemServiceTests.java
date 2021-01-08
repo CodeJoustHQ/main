@@ -4,7 +4,6 @@ import com.rocketden.main.dao.ProblemRepository;
 import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
-import com.rocketden.main.dto.problem.ProblemSettingsDto;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
@@ -216,13 +215,9 @@ public class ProblemServiceTests {
 
         Mockito.doReturn(problems).when(repository).findAllByDifficulty(ProblemDifficulty.MEDIUM);
 
-        ProblemSettingsDto request = new ProblemSettingsDto();
-        request.setDifficulty(ProblemDifficulty.MEDIUM);
-        request.setNumProblems(1);
+        List<Problem> response = problemService.getProblemsFromDifficulty(ProblemDifficulty.MEDIUM, 1);
 
-        List<ProblemDto> response = problemService.getRandomProblems(request);
-
-        assertEquals(problem1.getProblemId(), response.get(0).getProblemId());
+        assertEquals(problem1, response.get(0));
     }
 
     @Test
@@ -234,30 +229,20 @@ public class ProblemServiceTests {
         Mockito.doReturn(problems).when(repository).findAll();
 
         // Return correct problem when selecting random difficulty
-        ProblemSettingsDto request = new ProblemSettingsDto();
-        request.setDifficulty(ProblemDifficulty.RANDOM);
-        request.setNumProblems(1);
-
-        List<ProblemDto> response = problemService.getRandomProblems(request);
+        List<Problem> response = problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 1);
         assertEquals(problem1.getProblemId(), response.get(0).getProblemId());
     }
 
     @Test
     public void getRandomProblemNullDifficulty() {
-        ProblemSettingsDto request = new ProblemSettingsDto();
-        request.setNumProblems(1);
-
-        ApiException exception = assertThrows(ApiException.class, () -> problemService.getRandomProblems(request));
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblemsFromDifficulty(null, 1));
 
         assertEquals(ProblemError.BAD_SETTING, exception.getError());
     }
 
     @Test
     public void getRandomProblemNullN() {
-        ProblemSettingsDto request = new ProblemSettingsDto();
-        request.setDifficulty(ProblemDifficulty.RANDOM);
-
-        ApiException exception = assertThrows(ApiException.class, () -> problemService.getRandomProblems(request));
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, null));
 
         assertEquals(ProblemError.BAD_SETTING, exception.getError());
     }
@@ -269,11 +254,8 @@ public class ProblemServiceTests {
         List<Problem> problems = Collections.singletonList(problem1);
 
         Mockito.doReturn(problems).when(repository).findAll();
-        ProblemSettingsDto request = new ProblemSettingsDto();
-        request.setDifficulty(ProblemDifficulty.RANDOM);
-        request.setNumProblems(0);
 
-        ApiException exception = assertThrows(ApiException.class, () -> problemService.getRandomProblems(request));
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 0));
 
         assertEquals(ProblemError.INVALID_NUMBER_REQUEST, exception.getError());
     }
@@ -285,11 +267,8 @@ public class ProblemServiceTests {
         List<Problem> problems = Collections.singletonList(problem1);
 
         Mockito.doReturn(problems).when(repository).findAll();
-        ProblemSettingsDto request = new ProblemSettingsDto();
-        request.setDifficulty(ProblemDifficulty.RANDOM);
-        request.setNumProblems(-3);
 
-        ApiException exception = assertThrows(ApiException.class, () -> problemService.getRandomProblems(request));
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, -3));
 
         assertEquals(ProblemError.INVALID_NUMBER_REQUEST, exception.getError());
     }
@@ -301,22 +280,15 @@ public class ProblemServiceTests {
         List<Problem> problems = Collections.singletonList(problem1);
 
         Mockito.doReturn(problems).when(repository).findAll();
-        ProblemSettingsDto request = new ProblemSettingsDto();
-        request.setDifficulty(ProblemDifficulty.RANDOM);
-        request.setNumProblems(10);
 
-        ApiException exception = assertThrows(ApiException.class, () -> problemService.getRandomProblems(request));
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 10));
 
         assertEquals(ProblemError.INVALID_NUMBER_REQUEST, exception.getError());
     }
 
     @Test
     public void getRandomProblemNotFound() {
-        ProblemSettingsDto request = new ProblemSettingsDto();
-        request.setDifficulty(ProblemDifficulty.RANDOM);
-        request.setNumProblems(1);
-
-        ApiException exception = assertThrows(ApiException.class, () -> problemService.getRandomProblems(request));
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 1));
 
         assertEquals(ProblemError.NOT_FOUND, exception.getError());
     }

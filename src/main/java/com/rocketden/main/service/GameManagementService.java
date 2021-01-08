@@ -10,9 +10,6 @@ import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.notification.NotificationDto;
-import com.rocketden.main.dto.problem.ProblemDto;
-import com.rocketden.main.dto.problem.ProblemMapper;
-import com.rocketden.main.dto.problem.ProblemSettingsDto;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.exception.GameError;
@@ -24,7 +21,6 @@ import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.problem.Problem;
-import com.rocketden.main.model.problem.ProblemDifficulty;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -98,26 +94,8 @@ public class GameManagementService {
     // Initialize and add a game object from a room object
     public void createAddGameFromRoom(Room room) {
         Game game = GameMapper.fromRoom(room);
-        game.setProblems(getProblemsFromDifficulty(room.getDifficulty(), 1));
+        game.setProblems(problemService.getProblemsFromDifficulty(room.getDifficulty(), 1));
         currentGameMap.put(room.getRoomId(), game);
-    }
-
-    // Choose the problem based on problem difficulty settings (empty list for invalid request)
-    private List<Problem> getProblemsFromDifficulty(ProblemDifficulty difficulty, int numProblems) {
-        ProblemSettingsDto request = new ProblemSettingsDto();
-        request.setDifficulty(difficulty);
-        request.setNumProblems(numProblems);
-
-        try {
-            List<Problem> problems = new ArrayList<>();
-            for (ProblemDto problemDto : problemService.getRandomProblems(request)) {
-                problems.add(ProblemMapper.toEntity(problemDto));
-            }
-
-            return problems;
-        } catch (ApiException e) {
-            return new ArrayList<>();
-        }
     }
 
     // Test the submission and return a socket update.

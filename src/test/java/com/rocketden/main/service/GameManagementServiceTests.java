@@ -3,7 +3,6 @@ package com.rocketden.main.service;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.StartGameRequest;
-import com.rocketden.main.dto.problem.ProblemSettingsDto;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.user.UserDto;
@@ -77,10 +76,7 @@ public class GameManagementServiceTests {
         gameService.createAddGameFromRoom(room);
 
         // Confirm that the problem service method is called correctly.
-        ProblemSettingsDto request = new ProblemSettingsDto();
-        request.setDifficulty(room.getDifficulty());
-        request.setNumProblems(1);
-        verify(problemService).getRandomProblems(eq(request));
+        verify(problemService).getProblemsFromDifficulty(eq(room.getDifficulty()), eq(1));
 
         // Check that game has copied over the correct details
         Game game = gameService.getGameFromRoomId(ROOM_ID);
@@ -112,10 +108,7 @@ public class GameManagementServiceTests {
         RoomDto response = gameService.startGame(ROOM_ID, request);
 
         // Confirm that the problem service method is called correctly.
-        ProblemSettingsDto problemSettingsRequest = new ProblemSettingsDto();
-        problemSettingsRequest.setDifficulty(room.getDifficulty());
-        problemSettingsRequest.setNumProblems(1);
-        verify(problemService).getRandomProblems(eq(problemSettingsRequest));
+        verify(problemService).getProblemsFromDifficulty(eq(room.getDifficulty()), eq(1));
 
         verify(socketService).sendSocketUpdate(eq(response));
 
@@ -175,10 +168,7 @@ public class GameManagementServiceTests {
         gameService.createAddGameFromRoom(room);
 
         // Confirm that the problem service method is called correctly.
-        ProblemSettingsDto problemSettingsRequest = new ProblemSettingsDto();
-        problemSettingsRequest.setDifficulty(room.getDifficulty());
-        problemSettingsRequest.setNumProblems(1);
-        verify(problemService).getRandomProblems(eq(problemSettingsRequest));
+        verify(problemService).getProblemsFromDifficulty(eq(room.getDifficulty()), eq(1));
 
         GameDto gameDto = gameService.getGameDtoFromRoomId(ROOM_ID);
 
