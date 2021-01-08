@@ -1,5 +1,6 @@
 package com.rocketden.main.api;
 
+import com.rocketden.main.dao.ProblemRepository;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.StartGameRequest;
@@ -11,10 +12,14 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.model.User;
+import com.rocketden.main.model.problem.Problem;
+import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.model.problem.ProblemTestCase;
 import com.rocketden.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,6 +37,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -42,7 +50,16 @@ public class GameTests {
 	private MockMvc mockMvc;
 
 	@Mock
-	private RoomRepository repository;
+    private RoomRepository repository;
+    
+    @Mock
+    private ProblemRepository problemRepository;
+
+    // Predefine problem attributes.
+    private static final String NAME = "Sort a List";
+    private static final String DESCRIPTION = "Sort the given list in O(n log n) time.";
+    private static final String INPUT = "[1, 8, 2]";
+    private static final String OUTPUT = "[1, 2, 8]";
 
 	private static final String POST_ROOM = "/api/v1/rooms";
 	private static final String GET_GAME = "/api/v1/games/%s";
@@ -72,7 +89,22 @@ public class GameTests {
 		RoomDto roomDto = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
 		StartGameRequest request = new StartGameRequest();
-		request.setInitiator(host);
+        request.setInitiator(host);
+        
+        List<Problem> problems = new ArrayList<>();
+        Problem problem = new Problem();
+        problem.setName(NAME);
+        problem.setDescription(DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.HARD);
+        ProblemTestCase testCase = new ProblemTestCase();
+        testCase.setInput(INPUT);
+        testCase.setOutput(OUTPUT);
+        testCase.setHidden(true);
+        problem.addTestCase(testCase);
+        problems.add(problem);
+
+        // Ensure that a problem will be returned on repository call.
+        Mockito.doReturn(problems).when(problemRepository).findAll();
 
 		result = this.mockMvc.perform(post(String.format(START_GAME, roomDto.getRoomId()))
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
