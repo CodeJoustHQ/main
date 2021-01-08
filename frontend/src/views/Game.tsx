@@ -16,7 +16,7 @@ import Console from '../components/game/Console';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
 import Difficulty from '../api/Difficulty';
-import { Game, getGame, SubmissionResult } from '../api/Game';
+import {Game, getGame, SubmissionResult, submitSolution} from '../api/Game';
 
 type LocationState = {
   roomId: string,
@@ -66,7 +66,7 @@ function GamePage() {
       // Get game object with room details
       getGame(location.state.roomId)
         .then((res) => {
-          setGame(res);
+          setGame(res); // TODO: setStateFromGame
           console.log(res);
         })
         .catch((err) => setError(err));
@@ -85,8 +85,17 @@ function GamePage() {
 
   // Callback when user runs code against custom test case
   const runSolution = (input: string) => {
-    const tempSubmission = { status: 'SUCCESS', output: input };
-    setSubmission(tempSubmission);
+    const request = {
+      initiator: currentUser!,
+      code: input,
+      language: 'python', // TODO
+    };
+
+    submitSolution(roomId, request)
+      .then((res) => {
+        setSubmission(res);
+      })
+      .catch((err) => setError(err));
   };
 
   // If the page is loading, return a centered Loading object.

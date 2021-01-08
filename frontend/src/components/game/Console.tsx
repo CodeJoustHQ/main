@@ -35,7 +35,7 @@ function Console(props: ConsoleProps) {
   }, [testCases]);
 
   useEffect(() => {
-    setOutput(submission ? submission.output : '');
+    setOutput(submission ? `${submission.numCorrect} / ${submission.numTestCases} passed` : '');
   }, [submission]);
 
   return (
