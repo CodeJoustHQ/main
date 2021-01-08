@@ -1,6 +1,7 @@
 package com.rocketden.main.socket;
 
 import com.rocketden.main.controller.v1.BaseRestController;
+import com.rocketden.main.dao.ProblemRepository;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
@@ -9,11 +10,15 @@ import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.room.RemoveUserRequest;
 import com.rocketden.main.dto.user.UserDto;
+import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.model.problem.ProblemTestCase;
 import com.rocketden.main.util.SocketTestMethods;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -26,6 +31,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -33,9 +40,11 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
+@AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @Transactional
 public class RoomSocketTests {
@@ -46,6 +55,9 @@ public class RoomSocketTests {
     @Autowired
     private TestRestTemplate template;
 
+    @Mock
+    private ProblemRepository problemRepository;
+
     private static final String CONNECT_ENDPOINT = "ws://localhost:{port}" + BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint";
     private static final String SUBSCRIBE_ENDPOINT = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user";
 
@@ -53,6 +65,12 @@ public class RoomSocketTests {
     private String baseRestEndpoint;
     private RoomDto room;
     private StompSession hostSession;
+
+    // Predefine problem attributes.
+    private static final String NAME = "Sort a List";
+    private static final String DESCRIPTION = "Sort the given list in O(n log n) time.";
+    private static final String INPUT = "[1, 8, 2]";
+    private static final String OUTPUT = "[1, 2, 8]";
 
     // Predefine user and room attributes.
     private static final String NICKNAME = "rocket";
@@ -319,6 +337,21 @@ public class RoomSocketTests {
     public void socketReceivesMessageOnStartGame() throws Exception {
         StartGameRequest startGameRequest = new StartGameRequest();
         startGameRequest.setInitiator(room.getHost());
+
+        List<Problem> problems = new ArrayList<>();
+        Problem problem = new Problem();
+        problem.setName(NAME);
+        problem.setDescription(DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.HARD);
+        ProblemTestCase testCase = new ProblemTestCase();
+        testCase.setInput(INPUT);
+        testCase.setOutput(OUTPUT);
+        testCase.setHidden(true);
+        problem.addTestCase(testCase);
+        problems.add(problem);
+
+        // Ensure that a problem will be returned on repository call.
+        when(problemRepository.findAll()).thenReturn(problems);
 
         HttpEntity<StartGameRequest> startGameEntity = new HttpEntity<>(startGameRequest);
         String startGameEndpoint = String.format("%s/%s/start", baseRestEndpoint, room.getRoomId());

@@ -50,7 +50,7 @@ class ProblemTests {
     private static final String POST_TEST_CASE_CREATE = "/api/v1/problems/%s/test-case";
 
     private static final String DIFFICULTY_KEY = "difficulty";
-    private static final String N_KEY = "n";
+    private static final String NUM_PROBLEMS_KEY = "numProblems";
 
     private static final String NAME = "Sort an Array";
     private static final String DESCRIPTION = "Sort an array from lowest to highest value.";
@@ -349,7 +349,7 @@ class ProblemTests {
 
         MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_RANDOM)
                 .param(DIFFICULTY_KEY, "EASY")
-                .param(N_KEY, "1"))
+                .param(NUM_PROBLEMS_KEY, "1"))
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
@@ -371,7 +371,7 @@ class ProblemTests {
 
         MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_RANDOM)
                 .param(DIFFICULTY_KEY, "MEDIUM")
-                .param(N_KEY, "1"))
+                .param(NUM_PROBLEMS_KEY, "1"))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 

@@ -58,7 +58,7 @@ public class ProblemController extends BaseRestController {
         // Convert from the Problem object to Problem DTOs.
         List<Problem> problems = service.getProblemsFromDifficulty(request.getDifficulty(), request.getNumProblems());
         List<ProblemDto> problemDtos = new ArrayList<>();
-        problems.forEach((problem) -> problemDtos.add(ProblemMapper.toDto(problem)));
+        problems.forEach(problem -> problemDtos.add(ProblemMapper.toDto(problem)));
         return new ResponseEntity<>(problemDtos, HttpStatus.OK);
     }
 }

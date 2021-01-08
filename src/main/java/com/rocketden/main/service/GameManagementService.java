@@ -94,7 +94,8 @@ public class GameManagementService {
     // Initialize and add a game object from a room object
     public void createAddGameFromRoom(Room room) {
         Game game = GameMapper.fromRoom(room);
-        game.setProblems(problemService.getProblemsFromDifficulty(room.getDifficulty(), 1));
+        List<Problem> problems = problemService.getProblemsFromDifficulty(room.getDifficulty(), 1);
+        game.setProblems(problems);
         currentGameMap.put(room.getRoomId(), game);
     }
 
