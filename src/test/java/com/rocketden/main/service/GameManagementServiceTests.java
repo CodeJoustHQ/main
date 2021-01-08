@@ -79,7 +79,7 @@ public class GameManagementServiceTests {
         // Confirm that the problem service method is called correctly.
         ProblemSettingsDto request = new ProblemSettingsDto();
         request.setDifficulty(room.getDifficulty());
-        request.setN(1);
+        request.setNumProblems(1);
         verify(problemService).getRandomProblems(eq(request));
 
         // Check that game has copied over the correct details
@@ -114,7 +114,7 @@ public class GameManagementServiceTests {
         // Confirm that the problem service method is called correctly.
         ProblemSettingsDto problemSettingsRequest = new ProblemSettingsDto();
         problemSettingsRequest.setDifficulty(room.getDifficulty());
-        problemSettingsRequest.setN(1);
+        problemSettingsRequest.setNumProblems(1);
         verify(problemService).getRandomProblems(eq(problemSettingsRequest));
 
         verify(socketService).sendSocketUpdate(eq(response));
@@ -177,7 +177,7 @@ public class GameManagementServiceTests {
         // Confirm that the problem service method is called correctly.
         ProblemSettingsDto problemSettingsRequest = new ProblemSettingsDto();
         problemSettingsRequest.setDifficulty(room.getDifficulty());
-        problemSettingsRequest.setN(1);
+        problemSettingsRequest.setNumProblems(1);
         verify(problemService).getRandomProblems(eq(problemSettingsRequest));
 
         GameDto gameDto = gameService.getGameDtoFromRoomId(ROOM_ID);

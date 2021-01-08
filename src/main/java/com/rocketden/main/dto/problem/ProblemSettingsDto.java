@@ -11,5 +11,5 @@ import lombok.Setter;
 @EqualsAndHashCode
 public class ProblemSettingsDto {
     private ProblemDifficulty difficulty;
-    private Integer n;
+    private Integer numProblems;
 }

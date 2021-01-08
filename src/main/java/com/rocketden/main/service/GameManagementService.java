@@ -103,10 +103,10 @@ public class GameManagementService {
     }
 
     // Choose the problem based on problem difficulty settings (empty list for invalid request)
-    private List<Problem> getProblemsFromDifficulty(ProblemDifficulty difficulty, int n) {
+    private List<Problem> getProblemsFromDifficulty(ProblemDifficulty difficulty, int numProblems) {
         ProblemSettingsDto request = new ProblemSettingsDto();
         request.setDifficulty(difficulty);
-        request.setN(n);
+        request.setNumProblems(numProblems);
 
         try {
             List<Problem> problems = new ArrayList<>();
