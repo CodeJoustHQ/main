@@ -13,6 +13,7 @@ import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
+import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.model.User;
 import com.rocketden.main.util.RoomTestMethods;
 import com.rocketden.main.util.UtilityTestMethods;
@@ -59,7 +60,7 @@ public class GameTests {
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "098765";
     private static final String CODE = "print('hello')";
-    private static final String LANGUAGE = "python";
+	private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
 
     // Helper method to start the game for a given room
     private void startGameHelper(RoomDto room, UserDto host) throws Exception {

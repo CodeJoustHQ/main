@@ -1,5 +1,6 @@
 package com.rocketden.main.dto.game;
 
+import com.rocketden.main.game_object.CodeLanguage;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +10,7 @@ import lombok.Setter;
 @EqualsAndHashCode
 public class SubmissionDto {
 
-    private String language;
+    private CodeLanguage language;
     private String code;
     private Integer numCorrect;
     private Integer numTestCases;

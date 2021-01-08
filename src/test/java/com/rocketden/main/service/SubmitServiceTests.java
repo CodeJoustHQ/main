@@ -3,6 +3,7 @@ package com.rocketden.main.service;
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.user.UserMapper;
+import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Submission;
 import com.rocketden.main.model.Room;
@@ -26,7 +27,7 @@ public class SubmitServiceTests {
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "098765";
     private static final String CODE = "print('hi')";
-    private static final String LANGUAGE = "python";
+    private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
 
     @Spy
     @InjectMocks

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.rocketden.main.dto.user.UserDto;
 
+import com.rocketden.main.game_object.CodeLanguage;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +13,7 @@ import lombok.Setter;
 public class PlayerDto {
     private UserDto user;
     private String code;
-    private String language;
+    private CodeLanguage language;
     private List<SubmissionDto> submissions;
     private Boolean solved;
 }

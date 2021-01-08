@@ -6,6 +6,7 @@ import com.rocketden.main.dto.game.PlayerDto;
 import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.user.UserMapper;
+import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
@@ -27,7 +28,7 @@ public class GameMapperTests {
     private static final String USER_ID = "098765";
     private static final String NICKNAME = "test";
     private static final String CODE = "print('hi')";
-    private static final String LANGUAGE = "python";
+    private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
     private static final int TEST_CASES = 10;
 
     @Test
