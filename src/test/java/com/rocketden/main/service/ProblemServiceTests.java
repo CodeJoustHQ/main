@@ -241,14 +241,14 @@ public class ProblemServiceTests {
     }
 
     @Test
-    public void getRandomProblemNullN() {
+    public void getRandomProblemNullNumProblems() {
         ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, null));
 
         assertEquals(ProblemError.BAD_SETTING, exception.getError());
     }
 
     @Test
-    public void getRandomProblemZeroN() {
+    public void getRandomProblemZeroNumProblems() {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
@@ -261,7 +261,7 @@ public class ProblemServiceTests {
     }
 
     @Test
-    public void getRandomProblemNegativeN() {
+    public void getRandomProblemNegativeNumProblems() {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
@@ -274,7 +274,7 @@ public class ProblemServiceTests {
     }
 
     @Test
-    public void getRandomProblemExcessiveN() {
+    public void getRandomProblemExcessiveNumProblems() {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
