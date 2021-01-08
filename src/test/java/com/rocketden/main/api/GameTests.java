@@ -4,6 +4,10 @@ import com.rocketden.main.dao.ProblemRepository;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.StartGameRequest;
+import com.rocketden.main.dto.problem.CreateProblemRequest;
+import com.rocketden.main.dto.problem.CreateTestCaseRequest;
+import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.room.RoomDto;
@@ -12,14 +16,11 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.model.User;
-import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.problem.ProblemDifficulty;
-import com.rocketden.main.model.problem.ProblemTestCase;
 import com.rocketden.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,6 +31,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -37,8 +39,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
 @AutoConfigureMockMvc
@@ -64,11 +64,58 @@ public class GameTests {
 	private static final String POST_ROOM = "/api/v1/rooms";
 	private static final String GET_GAME = "/api/v1/games/%s";
     private static final String START_GAME = "/api/v1/rooms/%s/start";
+    private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
+    private static final String POST_TEST_CASE_CREATE = "/api/v1/problems/%s/test-case";
 
     // Predefine user and room attributes.
     private static final String NICKNAME = "rocket";
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String ROOM_ID = "012345";
+
+    /**
+     * Helper method that sends a POST request to create a new problem
+     * @return the created problem
+     * @throws Exception if anything wrong occurs
+     */
+    private ProblemDto createSingleProblemAndTestCases() throws Exception {
+        CreateProblemRequest createProblemRequest = new CreateProblemRequest();
+        createProblemRequest.setName(NAME);
+        createProblemRequest.setDescription(DESCRIPTION);
+        createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
+
+        MvcResult problemResult = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(createProblemRequest)))
+                .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        String problemJsonResponse = problemResult.getResponse().getContentAsString();
+        ProblemDto problemActual = UtilityTestMethods.toObject(problemJsonResponse, ProblemDto.class);
+
+        assertEquals(NAME, problemActual.getName());
+        assertEquals(DESCRIPTION, problemActual.getDescription());
+        assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
+
+        CreateTestCaseRequest createTestCaseRequest = new CreateTestCaseRequest();
+        createTestCaseRequest.setInput(INPUT);
+        createTestCaseRequest.setOutput(OUTPUT);
+
+        String endpoint = String.format(POST_TEST_CASE_CREATE, problemActual.getProblemId());
+        MvcResult testCaseResult = this.mockMvc.perform(post(endpoint)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(createTestCaseRequest)))
+                .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        String testCaseJsonResponse = testCaseResult.getResponse().getContentAsString();
+        ProblemTestCaseDto testCaseActual = UtilityTestMethods.toObject(testCaseJsonResponse, ProblemTestCaseDto.class);
+
+        assertEquals(INPUT, testCaseActual.getInput());
+        assertEquals(OUTPUT, testCaseActual.getOutput());
+        assertFalse(testCaseActual.isHidden());
+
+        return problemActual;
+    }
 
 
 	@Test
@@ -91,20 +138,7 @@ public class GameTests {
 		StartGameRequest request = new StartGameRequest();
         request.setInitiator(host);
         
-        List<Problem> problems = new ArrayList<>();
-        Problem problem = new Problem();
-        problem.setName(NAME);
-        problem.setDescription(DESCRIPTION);
-        problem.setDifficulty(ProblemDifficulty.HARD);
-        ProblemTestCase testCase = new ProblemTestCase();
-        testCase.setInput(INPUT);
-        testCase.setOutput(OUTPUT);
-        testCase.setHidden(true);
-        problem.addTestCase(testCase);
-        problems.add(problem);
-
-        // Ensure that a problem will be returned on repository call.
-        Mockito.doReturn(problems).when(problemRepository).findAll();
+        createSingleProblemAndTestCases();
 
 		result = this.mockMvc.perform(post(String.format(START_GAME, roomDto.getRoomId()))
 				.contentType(MediaType.APPLICATION_JSON_VALUE)

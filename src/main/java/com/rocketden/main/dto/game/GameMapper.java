@@ -7,7 +7,6 @@ import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
-import com.rocketden.main.model.problem.Problem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +25,7 @@ public class GameMapper {
         gameDto.setRoom(RoomMapper.toDto(game.getRoom()));
 
         List<ProblemDto> problems = new ArrayList<>();
-        for (Problem problem : game.getProblems()) {
-            problems.add(ProblemMapper.toDto(problem));
-        }
+        game.getProblems().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
         gameDto.setProblems(problems);
 
         return gameDto;
