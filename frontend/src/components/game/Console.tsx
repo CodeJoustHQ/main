@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { SubmissionResult, TestCase } from '../../api/Problem';
+import { TestCase } from '../../api/Problem';
 import { Text } from '../core/Text';
 import { ConsoleTextArea } from '../core/Input';
 import { SmallButton } from '../core/Button';
+import { SubmissionResult } from '../../api/Game';
 
 const Content = styled.div`
   height: 100%;

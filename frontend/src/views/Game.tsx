@@ -3,7 +3,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
 import { useBeforeunload } from 'react-beforeunload';
 import Editor from '../components/game/Editor';
-import { Problem, SubmissionResult, getRandomProblem } from '../api/Problem';
+import { Problem, getRandomProblem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
 import {
   MainContainer, FlexContainer, FlexInfoBar, Panel, SplitterContainer,
@@ -16,7 +16,7 @@ import Console from '../components/game/Console';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
 import Difficulty from '../api/Difficulty';
-import { Game, getGame } from '../api/Game';
+import { Game, getGame, SubmissionResult } from '../api/Game';
 
 type LocationState = {
   roomId: string,
