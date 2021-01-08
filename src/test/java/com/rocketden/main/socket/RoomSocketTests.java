@@ -4,7 +4,9 @@ import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dao.ProblemRepository;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.problem.CreateProblemRequest;
+import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
@@ -36,6 +38,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -73,6 +76,8 @@ public class RoomSocketTests {
     private static final String USER_ID = "012345";
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String USER_ID_2 = "098765";
+    private static final String INPUT = "[1, 8, 2]";
+    private static final String OUTPUT = "[1, 2, 8]";
 
     @BeforeEach
     public void setup() throws Exception {
@@ -119,22 +124,35 @@ public class RoomSocketTests {
      * @return the created problem
      * @throws Exception if anything wrong occurs
      */
-    private ProblemDto createSingleProblem() throws Exception {
-        CreateProblemRequest request = new CreateProblemRequest();
-        request.setName(NAME);
-        request.setDescription(DESCRIPTION);
-        request.setDifficulty(ProblemDifficulty.EASY);
+    private ProblemDto createSingleProblemAndTestCases() throws Exception {
+        CreateProblemRequest createProblemRequest = new CreateProblemRequest();
+        createProblemRequest.setName(NAME);
+        createProblemRequest.setDescription(DESCRIPTION);
+        createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
 
-        HttpEntity<CreateProblemRequest> createProblemEntity = new HttpEntity<>(request);
+        HttpEntity<CreateProblemRequest> createProblemEntity = new HttpEntity<>(createProblemRequest);
         String createProblemEndpoint = String.format("http://localhost:%s/api/v1/problems", port);
 
-        ProblemDto actual = template.exchange(createProblemEndpoint, HttpMethod.POST, createProblemEntity, ProblemDto.class).getBody();
+        ProblemDto problemActual = template.exchange(createProblemEndpoint, HttpMethod.POST, createProblemEntity, ProblemDto.class).getBody();
 
-        assertEquals(NAME, actual.getName());
-        assertEquals(DESCRIPTION, actual.getDescription());
-        assertEquals(request.getDifficulty(), actual.getDifficulty());
+        assertEquals(NAME, problemActual.getName());
+        assertEquals(DESCRIPTION, problemActual.getDescription());
+        assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
 
-        return actual;
+        CreateTestCaseRequest createTestCaseRequest = new CreateTestCaseRequest();
+        createTestCaseRequest.setInput(INPUT);
+        createTestCaseRequest.setOutput(OUTPUT);
+
+        HttpEntity<CreateTestCaseRequest> createTestCaseEntity = new HttpEntity<>(createTestCaseRequest);
+        String createTestCaseEndpoint = String.format("http://localhost:%s/api/v1/problems/%s/test-case", port, problemActual.getProblemId());
+
+        ProblemTestCaseDto testCaseActual = template.exchange(createTestCaseEndpoint, HttpMethod.POST, createTestCaseEntity, ProblemTestCaseDto.class).getBody();
+
+        assertEquals(INPUT, testCaseActual.getInput());
+        assertEquals(OUTPUT, testCaseActual.getOutput());
+        assertFalse(testCaseActual.isHidden());
+
+        return problemActual;
     }
 
     @Test
@@ -362,7 +380,7 @@ public class RoomSocketTests {
         String startGameEndpoint = String.format("%s/%s/start", baseRestEndpoint, room.getRoomId());
 
         // Create a problem that the game can find and attach to the room.
-        createSingleProblem();
+        createSingleProblemAndTestCases();
 
         RoomDto expected = template.exchange(startGameEndpoint, HttpMethod.POST, startGameEntity, RoomDto.class).getBody();
 
