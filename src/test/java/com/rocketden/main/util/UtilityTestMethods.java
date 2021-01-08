@@ -25,12 +25,13 @@ public class UtilityTestMethods {
 
     // Include type adapter to appropriately convert LocalDateTime.
     public static <T> T toObjectLocalDateTime(String json, Class<T> c) {
-        Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new JsonDeserializer<LocalDateTime>() { 
+        Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class,
+            new JsonDeserializer<LocalDateTime>() { 
             @Override 
             public LocalDateTime deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException { 
-            
-            return LocalDateTime.parse(json.getAsString(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")); } 
-            
+                return LocalDateTime.parse(json.getAsString(),
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS"));
+                } 
             }).create();
         return gson.fromJson(json, c);
     }
