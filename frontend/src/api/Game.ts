@@ -3,8 +3,17 @@ import { axiosErrorHandler } from './Error';
 import { Room } from './Room';
 import { User } from './User';
 
+export type Player = {
+  user: User,
+  code: string,
+  language: string,
+  submissions: SubmissionResult[],
+  solved: boolean,
+};
+
 export type Game = {
-  roomDto: Room,
+  room: Room,
+  players: Player[],
 };
 
 export type StartGameParams = {

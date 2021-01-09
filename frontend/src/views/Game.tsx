@@ -16,7 +16,10 @@ import Console from '../components/game/Console';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
 import Difficulty from '../api/Difficulty';
-import {Game, getGame, SubmissionResult, submitSolution} from '../api/Game';
+import {
+  Game, getGame, Player, SubmissionResult, submitSolution
+} from '../api/Game';
+import { Room } from '../api/Room';
 
 type LocationState = {
   roomId: string,
@@ -34,10 +37,12 @@ function GamePage() {
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [roomId, setRoomId] = useState<string>('');
-  const [game, setGame] = useState<Game | null>(null);
 
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
+
+  const [room, setRoom] = useState<Room | null>(null);
+  const [players, setPlayers] = useState<Player[]>([]);
 
   /**
    * Display beforeUnload message to inform the user that they may lose
@@ -46,6 +51,11 @@ function GamePage() {
    * message; see https://github.com/jacobbuck/react-beforeunload.
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
+
+  const setStateFromGame = (game: Game) => {
+    setRoom(game.room);
+    setPlayers(game.players);
+  };
 
   // Called every time location changes
   useEffect(() => {
@@ -66,8 +76,7 @@ function GamePage() {
       // Get game object with room details
       getGame(location.state.roomId)
         .then((res) => {
-          setGame(res); // TODO: setStateFromGame
-          console.log(res);
+          setStateFromGame(res);
         })
         .catch((err) => setError(err));
     } else {
@@ -113,7 +122,7 @@ function GamePage() {
         Room:
         {' '}
         {roomId || 'An unknown room'}
-        {` (${game?.roomDto?.users?.length} players)`}
+        {` (${room?.users?.length} players)`}
       </FlexInfoBar>
       <FlexInfoBar>
         You are
