@@ -1,6 +1,7 @@
 package com.rocketden.main.api;
 
 import com.rocketden.main.dao.RoomRepository;
+import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.user.UserDto;
@@ -24,6 +25,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,6 +45,7 @@ public class GameTests {
 	private RoomRepository repository;
 
 	private static final String POST_ROOM = "/api/v1/rooms";
+	private static final String GET_GAME = "/api/v1/games/%s";
     private static final String START_GAME = "/api/v1/rooms/%s/start";
 
     // Predefine user and room attributes.
@@ -50,7 +55,7 @@ public class GameTests {
 
 
 	@Test
-	public void startGameSuccess() throws Exception {
+	public void startAndGetGameSuccess() throws Exception {
 		UserDto host = new UserDto();
 		host.setNickname(NICKNAME);
 
@@ -79,7 +84,18 @@ public class GameTests {
 		RoomDto actual = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
 		assertEquals(roomDto.getRoomId(), actual.getRoomId());
-		assertEquals(true, actual.isActive());
+		assertTrue(actual.isActive());
+
+		// Check that game object was created properly
+		result = this.mockMvc.perform(get(String.format(GET_GAME, roomDto.getRoomId())))
+				.andDo(print()).andExpect(status().isOk())
+				.andReturn();
+
+		jsonResponse = result.getResponse().getContentAsString();
+		GameDto gameDto = UtilityTestMethods.toObject(jsonResponse, GameDto.class);
+
+		assertEquals(actual, gameDto.getRoomDto());
+		assertNull(gameDto.getPlayerMap());
 	}
 
 	@Test

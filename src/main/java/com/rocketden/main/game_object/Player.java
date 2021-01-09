@@ -3,6 +3,7 @@ package com.rocketden.main.game_object;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.rocketden.main.model.User;
@@ -18,12 +19,12 @@ public class Player {
     private PlayerCode playerCode;
 
     // Submissions in order of first-to-last submitted.
-    private List<Submission> submissions;
+    private List<Submission> submissions = new ArrayList<>();
 
     /**
      * Solved variable if the user has successfully solved the problem,
      * or is still competing.
      */
-    private Boolean solved;
+    private Boolean solved = false;
 
 }
