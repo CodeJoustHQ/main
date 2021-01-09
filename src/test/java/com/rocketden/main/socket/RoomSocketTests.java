@@ -118,7 +118,7 @@ public class RoomSocketTests {
         });
     }
 
-        /**
+    /**
      * Helper method that sends a POST request using template to 
      * create a new problem
      * @return the created problem
