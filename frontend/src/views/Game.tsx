@@ -55,7 +55,7 @@ function GamePage() {
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
   // Calculate and set the new clock on the frontend.
-  const calculateSetClock = (gameTimerParam: GameTimer) => {
+  const calculateSetClock = useCallback((gameTimerParam: GameTimer) => {
     const newCurrentClock = (new Date(gameTimerParam.endTime).getTime() - Date.now()) / 1000;
     if (newCurrentClock > 0) {
       // Set minutes and its string.
@@ -87,11 +87,11 @@ function GamePage() {
       // Set null to indicate that the timer has ended.
       setCurrentClock(null);
     }
-  };
+  }, []);
 
-  const updateClock = (gameTimerParam: GameTimer) => {
+  const updateClock = useCallback((gameTimerParam: GameTimer) => {
     setInterval(() => calculateSetClock(gameTimerParam), 1000);
-  };
+  }, [calculateSetClock]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
