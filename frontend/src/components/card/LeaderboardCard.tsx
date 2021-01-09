@@ -4,6 +4,7 @@ import { Player } from '../../api/Game';
 import { Text } from '../core/Text';
 
 const Content = styled.div`
+  display: inline-block;
   margin: 10px;
 `;
 

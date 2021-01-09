@@ -20,6 +20,7 @@ import {
   Game, getGame, Player, SubmissionResult, submitSolution
 } from '../api/Game';
 import { Room } from '../api/Room';
+import LeaderboardCard from '../components/card/LeaderboardCard';
 
 type LocationState = {
   roomId: string,
@@ -115,6 +116,15 @@ function GamePage() {
       .catch((err) => setError(err));
   };
 
+  const displayPlayerLeaderboard = () => {
+    return players.map((player) => (
+      <LeaderboardCard
+        player={player}
+        isCurrentPlayer={player.user.userId === currentUser?.userId}
+      />
+    ));
+  };
+
   // If the page is loading, return a centered Loading object.
   if (fullPageLoading) {
     return (
@@ -131,6 +141,7 @@ function GamePage() {
         {' '}
         {roomId || 'An unknown room'}
         {` (${room?.users?.length} players)`}
+        {displayPlayerLeaderboard()}
       </FlexInfoBar>
       <FlexInfoBar>
         You are
