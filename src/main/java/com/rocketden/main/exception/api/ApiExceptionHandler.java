@@ -26,9 +26,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   HttpHeaders headers, HttpStatus status,
                                                                   WebRequest request) {
 
-        // Check for a ProblemError.BAD_SETTING triggered in the Difficulty.fromString method
+        // Check for a ProblemError.BAD_DIFFICULTY triggered in the Difficulty.fromString method
         if (ex.getCause() != null && ex.getCause().getCause() instanceof ApiException) {
-            ApiError apiError = ProblemError.BAD_SETTING;
+            ApiError apiError = ProblemError.BAD_DIFFICULTY;
             return new ResponseEntity<>(apiError.getResponse(), apiError.getStatus());
         }
 

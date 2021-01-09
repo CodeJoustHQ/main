@@ -514,7 +514,7 @@ public class RoomTests {
 
         String jsonRequest = "{\"initiator\": {\"nickname\": \"host\"}, \"difficulty\": \"invalid\"}";
 
-        ApiError ERROR = ProblemError.BAD_SETTING;
+        ApiError ERROR = ProblemError.BAD_DIFFICULTY;
 
         MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

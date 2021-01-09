@@ -129,7 +129,7 @@ public class ProblemServiceTests {
         exception = assertThrows(ApiException.class, () -> problemService.createProblem(badRequest));
 
         verify(repository, never()).save(Mockito.any());
-        assertEquals(ProblemError.BAD_SETTING, exception.getError());
+        assertEquals(ProblemError.BAD_DIFFICULTY, exception.getError());
     }
 
     @Test
@@ -237,14 +237,14 @@ public class ProblemServiceTests {
     public void getRandomProblemNullDifficulty() {
         ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblemsFromDifficulty(null, 1));
 
-        assertEquals(ProblemError.BAD_SETTING, exception.getError());
+        assertEquals(ProblemError.BAD_DIFFICULTY, exception.getError());
     }
 
     @Test
     public void getRandomProblemNullNumProblems() {
         ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, null));
 
-        assertEquals(ProblemError.BAD_SETTING, exception.getError());
+        assertEquals(ProblemError.BAD_NUMBER_PROBLEMS, exception.getError());
     }
 
     @Test

@@ -199,7 +199,7 @@ class ProblemTests {
     public void createProblemBadDifficulty() throws Exception {
         String jsonRequest = "{\"name\": \"Test\", \"description\": \"Do this\", \"difficulty\": \"invalid\"}";
 
-        ApiError ERROR = ProblemError.BAD_SETTING;
+        ApiError ERROR = ProblemError.BAD_DIFFICULTY;
 
         MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

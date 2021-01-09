@@ -38,7 +38,7 @@ public class ProblemService {
         }
 
         if (request.getDifficulty() == ProblemDifficulty.RANDOM) {
-            throw new ApiException(ProblemError.BAD_SETTING);
+            throw new ApiException(ProblemError.BAD_DIFFICULTY);
         }
 
         Problem problem = new Problem();
@@ -75,8 +75,10 @@ public class ProblemService {
      * @param numProblems The number of problems to fetch.
      */
     public List<Problem> getProblemsFromDifficulty(ProblemDifficulty difficulty, Integer numProblems) {
-        if (difficulty == null || numProblems == null) {
-            throw new ApiException(ProblemError.BAD_SETTING);
+        if (difficulty == null) {
+            throw new ApiException(ProblemError.BAD_DIFFICULTY);
+        } else if (numProblems == null) {
+            throw new ApiException(ProblemError.BAD_NUMBER_PROBLEMS);
         }
 
         List<Problem> problems;
