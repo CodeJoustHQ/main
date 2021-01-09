@@ -76,15 +76,17 @@ export const subscribe = (subscribeUrl: string,
  * Disconnect the user by sending a message via socket.
  * @returns void, or error if socket is not connected.
 */
-export const disconnect = (): void => {
-  if (connected) {
-    const socket: WebSocket = new SockJS(routes(socketRoomId).connect);
-    stompClient = Stomp.over(socket);
-    stompClient.disconnect(() => {
-      // Reassign connected variable.
-      connected = false;
-    });
-  } else {
-    throw errorHandler('The socket is not connected.');
-  }
-};
+export const disconnect = ():
+  Promise<void> => new Promise<void>((resolve, reject) => {
+    if (connected) {
+      const socket: WebSocket = new SockJS(routes(socketRoomId).connect);
+      stompClient = Stomp.over(socket);
+      stompClient.disconnect(() => {
+        // Reassign connected variable.
+        connected = false;
+        resolve();
+      });
+    } else {
+      reject(errorHandler('The socket is not connected.'));
+    }
+  });

@@ -3,7 +3,9 @@ import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
 import { LargeText, MediumText } from '../components/core/Text';
-import { connect, routes, subscribe } from '../api/Socket';
+import {
+  connect, routes, subscribe, disconnect,
+} from '../api/Socket';
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
 import Difficulty from '../api/Difficulty';
@@ -13,8 +15,9 @@ import PlayerCard from '../components/card/PlayerCard';
 import HostActionCard from '../components/card/HostActionCard';
 import { startGame } from '../api/Game';
 import {
-  getRoom, Room, changeRoomHost, updateRoomSettings, removeUser
+  getRoom, Room, changeRoomHost, updateRoomSettings, removeUser,
 } from '../api/Room';
+import { errorHandler } from '../api/Error';
 
 type LobbyPageLocation = {
   user: User,
@@ -72,6 +75,27 @@ function LobbyPage() {
         setLoading(false);
       });
   };
+
+  /**
+   * If the user is not present in the room after a refresh, then
+   * disconnect them and boot them off the page, as they were kicked.
+   *
+   * @param user The kicked user to be booted off the page.
+   */
+  const bootKickedUser = useCallback(() => {
+    history.replace('/game/join', {
+      error: errorHandler('You have been kicked from the room.'),
+    });
+    disconnect().then(() => {
+      history.replace('/game/join', {
+        error: errorHandler('You have been kicked from the room.'),
+      });
+      setLoading(false);
+    }).catch((err) => {
+      setError(err.message);
+      setLoading(false);
+    });
+  }, []);
 
   const changeHosts = (newHost: User) => {
     const request = {
@@ -169,9 +193,18 @@ function LobbyPage() {
     /**
      * Subscribe callback that will be triggered on every message.
      * Update the users list and other room info.
+     * Boot any kicked users that are no longer present in the room.
      */
     const subscribeCallback = (result: Message) => {
-      setStateFromRoom(JSON.parse(result.body));
+      const room: Room = JSON.parse(result.body);
+      console.log(room);
+      console.log(currentUser);
+      setStateFromRoom(room);
+      console.log(room);
+      console.log(currentUser);
+      if (currentUser && room.users.includes(currentUser)) {
+        bootKickedUser();
+      }
     };
 
     connect(roomId, userId).then(() => {
@@ -194,11 +227,12 @@ function LobbyPage() {
         .then((res) => {
           setStateFromRoom(res);
           // Reset the user to hold the ID.
-          res.inactiveUsers.forEach((user: User) => {
-            if (user.nickname === location.state.user.nickname) {
+          res.users.forEach((user: User) => {
+            if (user.userId === location.state.user.userId) {
               setCurrentUser(user);
             }
           });
+          // TODO: How should I determine if the user is kicked or not?
         })
         .catch((err) => setError(err));
     } else {
@@ -260,8 +294,8 @@ function LobbyPage() {
         <DifficultyButton
           onClick={() => updateDifficultySetting(key)}
           active={difficulty === Difficulty[key as keyof typeof Difficulty]}
-          enabled={currentUser?.nickname === host?.nickname}
-          title={currentUser?.nickname !== host?.nickname
+          enabled={currentUser?.userId === host?.userId}
+          title={currentUser?.userId !== host?.userId
             ? 'Only the host can change these settings' : undefined}
         >
           {key}
@@ -269,7 +303,7 @@ function LobbyPage() {
       ))}
       <br />
 
-      {currentUser?.nickname === host?.nickname
+      {currentUser?.userId === host?.userId
         ? <PrimaryButton onClick={handleStartGame} disabled={loading}>Start Game</PrimaryButton>
         : <MediumText>Waiting for the host to start the game...</MediumText>}
     </div>
