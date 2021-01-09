@@ -43,6 +43,8 @@ function GamePage() {
 
   const [room, setRoom] = useState<Room | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
+  const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+  const [currentLanguage, setCurrentLanguage] = useState('java');
 
   /**
    * Display beforeUnload message to inform the user that they may lose
@@ -55,6 +57,12 @@ function GamePage() {
   const setStateFromGame = (game: Game) => {
     setRoom(game.room);
     setPlayers(game.players);
+
+    game.players.forEach((player) => {
+      if (player.user.userId === currentUser?.userId) {
+        setCurrentPlayer(player);
+      }
+    });
   };
 
   // Called every time location changes
@@ -97,7 +105,7 @@ function GamePage() {
     const request = {
       initiator: currentUser!,
       code: input,
-      language: 'python', // TODO
+      language: currentLanguage,
     };
 
     submitSolution(roomId, request)
@@ -152,7 +160,7 @@ function GamePage() {
             secondaryMinSize={1}
           >
             <Panel>
-              <Editor />
+              <Editor onLanguageChange={setCurrentLanguage} />
             </Panel>
 
             <Panel>

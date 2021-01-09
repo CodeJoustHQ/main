@@ -45,14 +45,20 @@ export const languages: LanguageType = {
   },
 };
 
+type EditorProps = {
+  onLanguageChange: (language: string) => void,
+};
+
 const Content = styled.div`
   height: 100%;
 `;
 
 // This function refreshes the width of Monaco editor upon change in container size
-function ResizableMonacoEditor() {
+function ResizableMonacoEditor(props: EditorProps) {
   const [currentLanguage, setCurrentLanguage] = useState('java');
   const [codeEditor, setCodeEditor] = useState<any>(null);
+
+  const { onLanguageChange } = props;
 
   const handleEditorDidMount = (editor: any) => {
     setCodeEditor(editor);
@@ -71,6 +77,8 @@ function ResizableMonacoEditor() {
     // Change the language and initial code for the editor
     codeEditor!.setValue(languages[language].defaultCode);
     setCurrentLanguage(language);
+
+    onLanguageChange(language);
   };
 
   return (
