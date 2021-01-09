@@ -111,7 +111,7 @@ function GamePage() {
     subscribe(routes(roomIdParam).subscribe, subscribeCallback).catch((err) => {
       setError(err.message);
     });
-  }, []);
+  }, [history, game]);
 
   // Called every time location changes
   useEffect(() => {
@@ -142,7 +142,7 @@ function GamePage() {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
       });
     }
-  }, [location, history]);
+  }, [location, history, updateClock]);
 
   // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {
@@ -161,7 +161,7 @@ function GamePage() {
     if (!socketSubscribed && roomId) {
       subscribePrimary(roomId);
     }
-  }, [socketSubscribed, roomId]);
+  }, [socketSubscribed, roomId, subscribePrimary]);
 
   // If the page is loading, return a centered Loading object.
   if (fullPageLoading) {

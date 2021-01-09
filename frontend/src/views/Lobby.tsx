@@ -13,7 +13,7 @@ import PlayerCard from '../components/card/PlayerCard';
 import HostActionCard from '../components/card/HostActionCard';
 import { startGame } from '../api/Game';
 import {
-  getRoom, Room, changeRoomHost, updateRoomSettings, removeUser
+  getRoom, Room, changeRoomHost, updateRoomSettings, removeUser,
 } from '../api/Room';
 
 type LobbyPageLocation = {
@@ -235,7 +235,7 @@ function LobbyPage() {
         difficulty,
       });
     }
-  }, [history, active, currentUser, currentRoomId, difficulty]);
+  }, [history, active, currentUser, currentRoomId, difficulty, subscription]);
 
   // Render the lobby.
   return (
