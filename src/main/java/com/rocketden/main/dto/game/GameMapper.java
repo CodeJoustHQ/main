@@ -29,11 +29,7 @@ public class GameMapper {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
 
         List<PlayerDto> players = gameDto.getPlayers();
-        Map<String, Player> playerMap = game.getPlayers();
-        for (String userId : playerMap.keySet()) {
-            PlayerDto playerDto = mapper.map(playerMap.get(userId), PlayerDto.class);
-            players.add(playerDto);
-        }
+        game.getPlayers().values().forEach(player -> players.add(mapper.map(player, PlayerDto.class)));
 
         return gameDto;
     }
