@@ -117,7 +117,7 @@ function LobbyPage() {
         });
       }
     }
-  }, [currentUser, bootKickedUser, location]);
+  }, [currentUser, history, location]);
 
   const changeHosts = (newHost: User) => {
     const request = {
