@@ -127,7 +127,7 @@ function LobbyPage() {
    * Update the difficulty setting of the room (EASY, MEDIUM, HARD, or RANDOM)
    */
   const updateDifficultySetting = (key: string) => {
-    if (currentUser?.nickname === host?.nickname && !loading) {
+    if (currentUser?.userId === host?.userId && !loading) {
       const oldDifficulty = difficulty;
       const newDifficulty = Difficulty[key as keyof typeof Difficulty];
 
@@ -160,11 +160,11 @@ function LobbyPage() {
       return userList.map((user) => (
         <PlayerCard
           user={user}
-          isHost={user.nickname === host?.nickname}
+          isHost={user.userId === host?.userId}
           isActive={isActive}
         >
-          {currentUser?.nickname === host?.nickname
-            && (user.nickname !== currentUser?.nickname) ? (
+          {currentUser?.userId === host?.userId
+            && (user.userId !== currentUser?.userId) ? (
               // If currentUser is host, pass in an on-click action card for all other users
               <HostActionCard
                 user={user}
@@ -229,12 +229,25 @@ function LobbyPage() {
       getRoom(location.state.roomId)
         .then((res) => {
           setStateFromRoom(res);
-          // Reset the user to hold the ID (location currently has only nickname).
-          res.inactiveUsers.forEach((user: User) => {
-            if (user.nickname === location.state.user.nickname) {
-              setCurrentUser(user);
+          /**
+           * Reset the user to hold the ID (location currently has
+           * only nickname). Boot user if not present in list.
+           * Only go through process if current user is not yet set.
+           */
+          if (!currentUser) {
+            let userFound: boolean = false;
+            res.inactiveUsers.forEach((user: User) => {
+              if (user.nickname === location.state.user.nickname) {
+                setCurrentUser(user);
+                userFound = true;
+              }
+            });
+
+            // If user is not found in list, assume they are kicked and boot them.
+            if (!userFound) {
+              bootKickedUser();
             }
-          });
+          }
         })
         .catch((err) => setError(err));
     } else {
