@@ -5,9 +5,6 @@ import { errorHandler } from './Error';
 
 let stompClient: Client;
 
-// Variable to hold the current connected state.
-let connected: boolean = false;
-
 // Dynamic route endpoints that depend on the room id
 const basePath = '/api/v1/socket';
 let socketRoomId: string;
@@ -35,7 +32,7 @@ export const isValidNickname = (nickname: string) => nickname.length > 0
 */
 export const connect = (roomId: string, userId: string):
   Promise<void> => new Promise<void>((resolve, reject) => {
-    if (!connected) {
+    if (!stompClient || !stompClient.connected) {
       // Connect to given endpoint, subscribe to future messages, and send user message.
       socketRoomId = roomId;
       const socket: WebSocket = new SockJS(routes(socketRoomId).connect);
@@ -64,7 +61,7 @@ export const connect = (roomId: string, userId: string):
 export const subscribe = (subscribeUrl: string,
   subscribeCallback: (room: Message) => void):
   Promise<void> => new Promise<void>((resolve, reject) => {
-    if (connected) {
+    if (stompClient && stompClient.connected) {
       stompClient.subscribe(subscribeUrl, subscribeCallback);
       resolve();
     } else {
@@ -78,7 +75,7 @@ export const subscribe = (subscribeUrl: string,
 */
 export const disconnect = ():
   Promise<void> => new Promise<void>((resolve, reject) => {
-    if (connected) {
+    if (stompClient && stompClient.connected) {
       // Stomp client is already set from last connection.
       stompClient.disconnect(() => {
         // Reassign connected variable.
