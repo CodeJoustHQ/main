@@ -284,6 +284,7 @@ public class ProblemServiceTests {
         ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 10));
 
         assertEquals(ProblemError.INVALID_NUMBER_REQUEST, exception.getError());
+        // TODO
     }
 
     @Test
