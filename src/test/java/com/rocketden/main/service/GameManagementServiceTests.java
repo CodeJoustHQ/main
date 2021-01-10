@@ -193,7 +193,7 @@ public class GameManagementServiceTests {
     }
 
     @Test
-    public void submitSolutionFailure() {
+    public void submitSolutionInvalidPermissions() {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
         gameService.createAddGameFromRoom(room);
@@ -209,13 +209,24 @@ public class GameManagementServiceTests {
 
         ApiException exception = assertThrows(ApiException.class, () -> gameService.submitSolution(ROOM_ID, request));
         assertEquals(GameError.INVALID_PERMISSIONS, exception.getError());
+    }
+
+    @Test
+    public void submitSolutionEmptyField() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        gameService.createAddGameFromRoom(room);
+
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
 
         SubmissionRequest missingRequest = new SubmissionRequest();
         missingRequest.setLanguage(null);
         missingRequest.setCode(CODE);
         missingRequest.setInitiator(UserMapper.toDto(user));
 
-        exception = assertThrows(ApiException.class, () -> gameService.submitSolution(ROOM_ID, missingRequest));
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.submitSolution(ROOM_ID, missingRequest));
         assertEquals(GameError.EMPTY_FIELD, exception.getError());
     }
 }
