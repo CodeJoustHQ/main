@@ -92,8 +92,13 @@ public class ProblemService {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
 
-        if (numProblems <= 0 || (numProblems > problems.size())) {
+        if (numProblems <= 0) {
             throw new ApiException(ProblemError.INVALID_NUMBER_REQUEST);
+        }
+
+        // If the user wants more problems than exists, just return all of them
+        if (numProblems > problems.size()) {
+            return problems;
         }
 
         // Get numProblem random integers used to map to problems.
