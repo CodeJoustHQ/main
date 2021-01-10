@@ -8,7 +8,6 @@ import com.rocketden.main.game_object.Player;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
