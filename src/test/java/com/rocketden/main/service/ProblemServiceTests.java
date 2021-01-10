@@ -234,6 +234,20 @@ public class ProblemServiceTests {
     }
 
     @Test
+    public void getRandomProblemExceedsAvailableProblems() {
+        Problem problem1 = new Problem();
+        problem1.setDifficulty(ProblemDifficulty.MEDIUM);
+        List<Problem> problems = Collections.singletonList(problem1);
+
+        Mockito.doReturn(problems).when(repository).findAll();
+
+        // Return correct problem when selecting random difficulty
+        List<Problem> response = problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 3);
+        assertEquals(1, response.size());
+        assertEquals(problem1.getProblemId(), response.get(0).getProblemId());
+    }
+
+    @Test
     public void getRandomProblemNullDifficulty() {
         ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblemsFromDifficulty(null, 1));
 
