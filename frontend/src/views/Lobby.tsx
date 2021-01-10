@@ -50,19 +50,6 @@ function LobbyPage() {
   const [socketConnected, setSocketConnected] = useState(false);
 
   /**
-   * Accept the room's users to update the current user, if applicable.
-   */
-  const updateCurrentUser = (users: User[]) => {
-    if (currentUser) {
-      users.forEach((user) => {
-        if (currentUser.userId === user.userId) {
-          setCurrentUser(user);
-        }
-      });
-    }
-  };
-
-  /**
    * Set state variables from an updated room object
    */
   const setStateFromRoom = (room: Room) => {
@@ -72,7 +59,6 @@ function LobbyPage() {
     setRoomId(room.roomId);
     setActive(room.active);
     setDifficulty(room.difficulty);
-    updateCurrentUser(room.users);
   };
 
   const kickUser = (user: User) => {
@@ -233,7 +219,7 @@ function LobbyPage() {
     }).catch((err) => {
       setError(err.message);
     });
-  }, [currentUser]);
+  }, [currentUser, bootKickedUser]);
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
