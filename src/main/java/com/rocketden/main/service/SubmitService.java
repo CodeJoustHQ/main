@@ -8,6 +8,7 @@ import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.game_object.Submission;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,6 +19,7 @@ public class SubmitService {
 
     private final SocketService socketService;
 
+    @Autowired
     protected SubmitService(SocketService socketService) {
         this.socketService = socketService;
     }
