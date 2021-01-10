@@ -58,7 +58,7 @@ function GameTimerContainer(props: GameTimerProps) {
         seconds: '00',
       });
     }
-  }, [props]);
+  }, [updateClock]);
 
   return (
     <div>
