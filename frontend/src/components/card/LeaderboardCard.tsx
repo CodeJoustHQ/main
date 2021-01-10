@@ -21,16 +21,23 @@ type LeaderboardCardProps = {
 function LeaderboardCard(props: LeaderboardCardProps) {
   const { player, isCurrentPlayer } = props;
 
+  const name = `${player.user.nickname.charAt(0).toUpperCase()} ${isCurrentPlayer ? '(you)' : ''}`;
+  const latestSubmission = player.submissions.slice(-1)[0];
+  let status = '';
+  if (!latestSubmission) {
+    status = 'No attempts';
+  } else {
+    status = `${latestSubmission.numCorrect} / ${latestSubmission.numTestCases}`;
+  }
+
   return (
     <Content>
       <PlayerIcon>
-        <Text>{player.user.nickname}</Text>
-        <Text>{isCurrentPlayer ? ' (you)' : ''}</Text>
+        <Text>{name}</Text>
       </PlayerIcon>
 
       <Text>
-        Solved:
-        {player.solved}
+        {status}
       </Text>
     </Content>
   );

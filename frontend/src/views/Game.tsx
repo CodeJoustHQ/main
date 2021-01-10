@@ -17,7 +17,7 @@ import Loading from '../components/core/Loading';
 import { User } from '../api/User';
 import Difficulty from '../api/Difficulty';
 import {
-  Game, getGame, Player, SubmissionResult, submitSolution
+  Game, getGame, Player, SubmissionResult, submitSolution,
 } from '../api/Game';
 import { Room } from '../api/Room';
 import LeaderboardCard from '../components/card/LeaderboardCard';
@@ -139,14 +139,8 @@ function GamePage() {
       <FlexInfoBar>
         Room:
         {' '}
-        {roomId || 'An unknown room'}
-        {` (${room?.users?.length} players)`}
+        {roomId || 'N/A'}
         {displayPlayerLeaderboard()}
-      </FlexInfoBar>
-      <FlexInfoBar>
-        You are
-        {' '}
-        {currentUser != null ? currentUser.nickname : 'An unknown user'}
       </FlexInfoBar>
 
       <SplitterContainer>

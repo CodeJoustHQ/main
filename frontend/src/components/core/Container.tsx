@@ -19,7 +19,6 @@ export const FlexContainer = styled.div`
 
 export const FlexInfoBar = styled.div`
   padding: 0.5rem;
-  height: 1rem;
   text-align: center;
 `;
 
