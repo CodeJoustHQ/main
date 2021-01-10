@@ -4,7 +4,7 @@ import SplitterLayout from 'react-splitter-layout';
 import { useBeforeunload } from 'react-beforeunload';
 import { Message } from 'stompjs';
 import Editor from '../components/game/Editor';
-import { Problem, SubmissionResult, getRandomProblem } from '../api/Problem';
+import { SubmissionResult } from '../api/Problem';
 import { errorHandler } from '../api/Error';
 import {
   MainContainer, FlexContainer, FlexInfoBar, Panel, SplitterContainer,
@@ -32,7 +32,6 @@ function GamePage() {
   const history = useHistory();
   const location = useLocation<LocationState>();
 
-  const [problem, setProblem] = useState<Problem | null>(null);
   const [submission, setSubmission] = useState<SubmissionResult | null>(null);
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -79,23 +78,17 @@ function GamePage() {
       setCurrentUser(location.state.currentUser);
       setRoomId(location.state.roomId);
 
-      // Get a random problem.
-      const request = { difficulty: location.state.difficulty };
-      getRandomProblem(request).then((res) => {
-        setFullPageLoading(false);
-        setProblem(res);
-      }).catch((err) => {
-        setFullPageLoading(false);
-        setError(err.message);
-      });
-
-      // Get game object with room details
+      // Get game object with problem and room details.
       getGame(location.state.roomId)
         .then((res) => {
+          setFullPageLoading(false);
           setGame(res);
           console.log(res);
         })
-        .catch((err) => setError(err));
+        .catch((err) => {
+          setFullPageLoading(false);
+          setError(err);
+        });
     } else {
       history.replace('/game/join', {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
@@ -137,7 +130,7 @@ function GamePage() {
         Room:
         {' '}
         {roomId || 'An unknown room'}
-        {` (${game?.roomDto?.users?.length} players)`}
+        {` (${game?.room?.users?.length} players)`}
       </FlexInfoBar>
       <FlexInfoBar>
         You are
@@ -157,8 +150,8 @@ function GamePage() {
         >
           {/* Problem title/description panel */}
           <Panel>
-            <ProblemHeaderText>{problem?.name}</ProblemHeaderText>
-            <Text>{problem?.description}</Text>
+            <ProblemHeaderText>{game?.problems[0]?.name}</ProblemHeaderText>
+            <Text>{game?.problems[0]?.description}</Text>
             {error ? <ErrorMessage message={error} /> : null}
           </Panel>
 
@@ -175,7 +168,7 @@ function GamePage() {
 
             <Panel>
               <Console
-                testCases={problem?.testCases!}
+                testCases={game?.problems[0]?.testCases!}
                 submission={submission}
                 onRun={runSolution}
               />

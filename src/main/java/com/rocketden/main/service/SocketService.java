@@ -26,7 +26,7 @@ public class SocketService {
 
     // Send updates about new game status to the client through sockets
     public void sendSocketUpdate(GameDto gameDto) {
-        String socketPath = String.format(WebSocketConfig.SOCKET_PATH, gameDto.getRoomDto().getRoomId());
+        String socketPath = String.format(WebSocketConfig.SOCKET_PATH, gameDto.getRoom().getRoomId());
         template.convertAndSend(socketPath, gameDto);
     }
     

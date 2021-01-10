@@ -23,6 +23,11 @@ public class UtilityTestMethods {
         return gson.fromJson(json, c);
     }
 
+    public static <T> T toObjectList(String json, Type type) {
+        Gson gson = new Gson();
+        return gson.fromJson(json, type);
+    }
+
     // Include type adapter to appropriately convert LocalDateTime.
     public static <T> T toObjectLocalDateTime(String json, Class<T> c) {
         Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class,

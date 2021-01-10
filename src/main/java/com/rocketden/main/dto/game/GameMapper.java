@@ -1,11 +1,15 @@
 package com.rocketden.main.dto.game;
 
+import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class GameMapper {
@@ -17,10 +21,13 @@ public class GameMapper {
             return null;
         }
 
-        // For now, just include the room info in the GameDto
         GameDto gameDto = new GameDto();
-        gameDto.setRoomDto(RoomMapper.toDto(game.getRoom()));
+        gameDto.setRoom(RoomMapper.toDto(game.getRoom()));
         gameDto.setGameTimer(GameTimerMapper.toDto(game.getGameTimer()));
+
+        List<ProblemDto> problems = new ArrayList<>();
+        game.getProblems().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
+        gameDto.setProblems(problems);
 
         return gameDto;
     }
