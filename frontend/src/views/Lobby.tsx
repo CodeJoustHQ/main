@@ -110,12 +110,14 @@ function LobbyPage() {
         }
       });
 
-      // If user is not found in list, assume they are kicked and boot them.
+      // If user is not found in list, redirect them to join page with error.
       if (!userFound) {
-        bootKickedUser();
+        history.replace('/game/join', {
+          error: errorHandler('You could not be found in the room\'s list of users.'),
+        });
       }
     }
-  }, [currentUser, bootKickedUser]);
+  }, [currentUser, bootKickedUser, location]);
 
   const changeHosts = (newHost: User) => {
     const request = {
