@@ -53,6 +53,8 @@ public class Room {
     @Enumerated(EnumType.STRING)
     private ProblemDifficulty difficulty = ProblemDifficulty.RANDOM;
 
+    private int numProblems = 1;
+
     public void addUser(User user) {
         users.add(user);
         user.setRoom(this);

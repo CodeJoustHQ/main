@@ -221,6 +221,12 @@ public class RoomService {
         if (request.getDifficulty() != null) {
             room.setDifficulty(request.getDifficulty());
         }
+
+        // Set number of problems if not null
+        if (request.getNumProblems() != null) {
+            room.setNumProblems(request.getNumProblems());
+        }
+
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
