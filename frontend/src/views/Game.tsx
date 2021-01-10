@@ -63,7 +63,7 @@ function GamePage() {
       // Check if end game.
       if (updatedGame.gameTimer.timeUp) {
         history.push('/game/results', {
-          game,
+          game: updatedGame,
         });
       }
     };
@@ -71,7 +71,7 @@ function GamePage() {
     subscribe(routes(roomIdParam).subscribe, subscribeCallback).catch((err) => {
       setError(err.message);
     });
-  }, [history, game]);
+  }, [history]);
 
   // Called every time location changes
   useEffect(() => {
