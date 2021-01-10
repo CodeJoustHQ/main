@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Player } from '../../api/Game';
-import { Text } from '../core/Text';
+import { NoMarginText } from '../core/Text';
 
 const Content = styled.div`
   display: inline-block;
@@ -11,6 +11,9 @@ const Content = styled.div`
 const PlayerIcon = styled.div`
   background-color: ${({ theme }) => theme.colors.blue};
   border-radius: 50%;
+  
+  height: 50px;
+  line-height: 50px;
 `;
 
 type LeaderboardCardProps = {
@@ -33,12 +36,12 @@ function LeaderboardCard(props: LeaderboardCardProps) {
   return (
     <Content>
       <PlayerIcon>
-        <Text>{name}</Text>
+        <NoMarginText>{name}</NoMarginText>
       </PlayerIcon>
 
-      <Text>
+      <NoMarginText>
         {status}
-      </Text>
+      </NoMarginText>
     </Content>
   );
 }

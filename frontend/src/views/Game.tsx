@@ -140,6 +140,8 @@ function GamePage() {
         Room:
         {' '}
         {roomId || 'N/A'}
+      </FlexInfoBar>
+      <FlexInfoBar>
         {displayPlayerLeaderboard()}
       </FlexInfoBar>
 

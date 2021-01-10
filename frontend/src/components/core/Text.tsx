@@ -45,3 +45,7 @@ export const SmallActionText = styled.p`
     text-decoration: underline;
   }
 `;
+
+export const NoMarginText = styled(Text)`
+  margin: 0;
+`;
