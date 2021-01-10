@@ -43,8 +43,6 @@ export const connect = (roomId: string, userId: string):
         userId,
       };
       stompClient.connect(connectHeaders, () => {
-        // Reassign connected variable.
-        connected = true;
         resolve();
       }, () => {
         reject(errorHandler('The socket failed to connect.'));
@@ -78,8 +76,6 @@ export const disconnect = ():
     if (stompClient && stompClient.connected) {
       // Stomp client is already set from last connection.
       stompClient.disconnect(() => {
-        // Reassign connected variable.
-        connected = false;
         resolve();
       });
     } else {

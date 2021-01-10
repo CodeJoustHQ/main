@@ -235,7 +235,6 @@ function LobbyPage() {
               setCurrentUser(user);
             }
           });
-          // TODO: How should I determine if the user is kicked or not?
         })
         .catch((err) => setError(err));
     } else {
