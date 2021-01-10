@@ -16,6 +16,7 @@ import { checkLocationState } from '../util/Utility';
 import Console from '../components/game/Console';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
+import Notification from '../api/Notification';
 import Difficulty from '../api/Difficulty';
 import { Game, getGame } from '../api/Game';
 import { routes, subscribe } from '../api/Socket';
@@ -54,7 +55,7 @@ function GamePage() {
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
-    const subscribeCallback = (result: Message) => {
+    const subscribeUserCallback = (result: Message) => {
       const updatedGame: Game = JSON.parse(result.body);
       setGame(updatedGame);
       setSocketSubscribed(true);
@@ -67,7 +68,19 @@ function GamePage() {
       }
     };
 
-    subscribe(routes(roomIdParam).subscribe, subscribeCallback).catch((err) => {
+    // Subscribe to the main Game channel to receive Game updates.
+    subscribe(routes(roomIdParam).subscribe_user, subscribeUserCallback).catch((err) => {
+      setError(err.message);
+    });
+
+    const displayNotification = (result: Message) => {
+      const notification: Notification = JSON.parse(result.body);
+      alert(notification);
+      // TODO: Display the notifications that are received.
+    };
+
+    // Subscribe for Game Notifications.
+    subscribe(routes(roomIdParam).subscribe_notification, displayNotification).catch((err) => {
       setError(err.message);
     });
   }, [history]);
