@@ -9,6 +9,7 @@ import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.room.RemoveUserRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
+import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
@@ -299,11 +300,13 @@ public class RoomServiceTests {
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(host));
         request.setDifficulty(ProblemDifficulty.EASY);
+        request.setNumProblems(3);
 
         RoomDto response = roomService.updateRoomSettings(room.getRoomId(), request);
 
         verify(socketService).sendSocketUpdate(eq(response));
         assertEquals(request.getDifficulty(), response.getDifficulty());
+        assertEquals(request.getNumProblems(), response.getNumProblems());
     }
 
     @Test
@@ -345,6 +348,30 @@ public class RoomServiceTests {
         ApiException exception = assertThrows(ApiException.class, () ->
                 roomService.updateRoomSettings("999999", noRoomRequest));
         assertEquals(RoomError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void updateRoomSettingsBadNumProblems() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User host = new User();
+        host.setNickname(NICKNAME);
+
+        room.setHost(host);
+        room.addUser(host);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        UpdateSettingsRequest request = new UpdateSettingsRequest();
+        request.setInitiator(UserMapper.toDto(host));
+        request.setNumProblems(-1);
+
+        RoomDto response = roomService.updateRoomSettings(room.getRoomId(), request);
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.updateRoomSettings(ROOM_ID, request));
+        assertEquals(ProblemError.INVALID_NUMBER_REQUEST, exception.getError());
     }
 
     @Test
