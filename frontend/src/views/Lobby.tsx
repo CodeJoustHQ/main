@@ -50,6 +50,19 @@ function LobbyPage() {
   const [socketConnected, setSocketConnected] = useState(false);
 
   /**
+   * Accept the room's users to update the current user, if applicable.
+   */
+  const updateCurrentUser = (users: User[]) => {
+    if (currentUser) {
+      users.forEach((user) => {
+        if (currentUser.userId === user.userId) {
+          setCurrentUser(user);
+        }
+      });
+    }
+  };
+
+  /**
    * Set state variables from an updated room object
    */
   const setStateFromRoom = (room: Room) => {
@@ -59,6 +72,7 @@ function LobbyPage() {
     setRoomId(room.roomId);
     setActive(room.active);
     setDifficulty(room.difficulty);
+    updateCurrentUser(room.users);
   };
 
   const kickUser = (user: User) => {
@@ -83,19 +97,17 @@ function LobbyPage() {
    * @param user The kicked user to be booted off the page.
    */
   const bootKickedUser = useCallback(() => {
-    history.replace('/game/join', {
-      error: errorHandler('You have been kicked from the room.'),
-    });
     disconnect().then(() => {
       history.replace('/game/join', {
         error: errorHandler('You have been kicked from the room.'),
       });
+      setSocketConnected(false);
       setLoading(false);
     }).catch((err) => {
       setError(err.message);
       setLoading(false);
     });
-  }, []);
+  }, [history]);
 
   const changeHosts = (newHost: User) => {
     const request = {
@@ -197,13 +209,18 @@ function LobbyPage() {
      */
     const subscribeCallback = (result: Message) => {
       const room: Room = JSON.parse(result.body);
-      console.log(room);
-      console.log(currentUser);
       setStateFromRoom(room);
-      console.log(room);
-      console.log(currentUser);
-      if (currentUser && room.users.includes(currentUser)) {
-        bootKickedUser();
+      if (currentUser) {
+        let userIncluded: boolean = false;
+        room.users.forEach((user) => {
+          if (currentUser.userId === user.userId) {
+            userIncluded = true;
+          }
+        });
+        // If user is no longer present in room, boot the user.
+        if (!userIncluded) {
+          bootKickedUser();
+        }
       }
     };
 
@@ -216,7 +233,7 @@ function LobbyPage() {
     }).catch((err) => {
       setError(err.message);
     });
-  }, []);
+  }, [currentUser]);
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
@@ -226,9 +243,9 @@ function LobbyPage() {
       getRoom(location.state.roomId)
         .then((res) => {
           setStateFromRoom(res);
-          // Reset the user to hold the ID.
-          res.users.forEach((user: User) => {
-            if (user.userId === location.state.user.userId) {
+          // Reset the user to hold the ID (location currently has only nickname).
+          res.inactiveUsers.forEach((user: User) => {
+            if (user.nickname === location.state.user.nickname) {
               setCurrentUser(user);
             }
           });

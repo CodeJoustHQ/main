@@ -79,8 +79,7 @@ export const subscribe = (subscribeUrl: string,
 export const disconnect = ():
   Promise<void> => new Promise<void>((resolve, reject) => {
     if (connected) {
-      const socket: WebSocket = new SockJS(routes(socketRoomId).connect);
-      stompClient = Stomp.over(socket);
+      // Stomp client is already set from last connection.
       stompClient.disconnect(() => {
         // Reassign connected variable.
         connected = false;
