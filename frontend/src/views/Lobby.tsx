@@ -95,6 +95,28 @@ function LobbyPage() {
     });
   }, [history]);
 
+  /**
+   * Reset the user to hold the ID (location currently has
+   * only nickname). Boot user if not present in list.
+   * Only go through process if current user is not yet set.
+   */
+  const updateCurrentUserDetails = useCallback((inactiveUsersParam: User[]) => {
+    if (!currentUser) {
+      let userFound: boolean = false;
+      inactiveUsersParam.forEach((user: User) => {
+        if (user.nickname === location.state.user.nickname) {
+          setCurrentUser(user);
+          userFound = true;
+        }
+      });
+
+      // If user is not found in list, assume they are kicked and boot them.
+      if (!userFound) {
+        bootKickedUser();
+      }
+    }
+  }, [currentUser, bootKickedUser]);
+
   const changeHosts = (newHost: User) => {
     const request = {
       initiator: currentUser!,
@@ -229,25 +251,7 @@ function LobbyPage() {
       getRoom(location.state.roomId)
         .then((res) => {
           setStateFromRoom(res);
-          /**
-           * Reset the user to hold the ID (location currently has
-           * only nickname). Boot user if not present in list.
-           * Only go through process if current user is not yet set.
-           */
-          if (!currentUser) {
-            let userFound: boolean = false;
-            res.inactiveUsers.forEach((user: User) => {
-              if (user.nickname === location.state.user.nickname) {
-                setCurrentUser(user);
-                userFound = true;
-              }
-            });
-
-            // If user is not found in list, assume they are kicked and boot them.
-            if (!userFound) {
-              bootKickedUser();
-            }
-          }
+          updateCurrentUserDetails(res.inactiveUsers);
         })
         .catch((err) => setError(err));
     } else {
@@ -261,7 +265,7 @@ function LobbyPage() {
         history.replace('/game/join');
       }
     }
-  }, [location, socketConnected, history]);
+  }, [location, socketConnected, history, updateCurrentUserDetails]);
 
   // Connect the user to the room.
   useEffect(() => {
