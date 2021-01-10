@@ -26,6 +26,7 @@ public class GameMapper {
         GameDto gameDto = new GameDto();
         gameDto.setRoom(RoomMapper.toDto(game.getRoom()));
 
+        // Set loose matching to allow flattening of variables in DTO objects
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
 
         List<PlayerDto> players = gameDto.getPlayers();
