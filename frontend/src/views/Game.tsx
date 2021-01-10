@@ -19,7 +19,7 @@ import { User } from '../api/User';
 import Difficulty from '../api/Difficulty';
 import { Game, getGame } from '../api/Game';
 import { routes, subscribe } from '../api/Socket';
-import { GameClock, GameTimer } from '../api/GameTimer';
+import GameTimerContainer from '../components/game/GameTimerContainer';
 
 type LocationState = {
   roomId: string,
@@ -38,7 +38,6 @@ function GamePage() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [roomId, setRoomId] = useState<string>('');
   const [game, setGame] = useState<Game | null>(null);
-  const [currentClock, setCurrentClock] = useState<GameClock | null>(null);
 
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
@@ -53,45 +52,6 @@ function GamePage() {
    * message; see https://github.com/jacobbuck/react-beforeunload.
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
-
-  // Calculate and set the new clock on the frontend.
-  const calculateSetClock = useCallback((gameTimerParam: GameTimer) => {
-    const newCurrentClock = (new Date(gameTimerParam.endTime).getTime() - Date.now()) / 1000;
-    if (newCurrentClock > 0) {
-      // Set minutes and its string.
-      const minutes: number = Math.floor(newCurrentClock / 60);
-      let minutesStr: string;
-      if (minutes >= 10) {
-        minutesStr = `${minutes}`;
-      } else if (minutes > 0 && minutes < 10) {
-        minutesStr = `0${minutes}`;
-      } else {
-        minutesStr = '00';
-      }
-
-      const seconds: number = Math.floor(newCurrentClock % 60);
-      let secondsStr: string;
-      if (seconds >= 10) {
-        secondsStr = `${seconds}`;
-      } else if (seconds > 0 && seconds < 10) {
-        secondsStr = `0${seconds}`;
-      } else {
-        secondsStr = '00';
-      }
-
-      setCurrentClock({
-        minutes: minutesStr,
-        seconds: secondsStr,
-      });
-    } else {
-      // Set null to indicate that the timer has ended.
-      setCurrentClock(null);
-    }
-  }, []);
-
-  const updateClock = useCallback((gameTimerParam: GameTimer) => {
-    setInterval(() => calculateSetClock(gameTimerParam), 1000);
-  }, [calculateSetClock]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
@@ -133,7 +93,6 @@ function GamePage() {
       getGame(location.state.roomId)
         .then((res) => {
           setGame(res);
-          updateClock(res.gameTimer);
           console.log(res);
         })
         .catch((err) => setError(err));
@@ -142,7 +101,7 @@ function GamePage() {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
       });
     }
-  }, [location, history, updateClock]);
+  }, [location, history]);
 
   // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {
@@ -186,11 +145,7 @@ function GamePage() {
         {currentUser != null ? currentUser.nickname : 'An unknown user'}
       </FlexInfoBar>
       <FlexInfoBar>
-        Time:
-        {' '}
-        {(currentClock) ? currentClock.minutes : '00'}
-        :
-        {(currentClock) ? currentClock.seconds : '00'}
+        <GameTimerContainer gameTimer={game ? game.gameTimer : null} />
       </FlexInfoBar>
 
       <SplitterContainer>
