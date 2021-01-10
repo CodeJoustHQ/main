@@ -32,7 +32,7 @@ public class ProblemTestCase {
     @EqualsAndHashCode.Include
     private Boolean hidden = false;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "problem_table_id")
     private Problem problem;
 
