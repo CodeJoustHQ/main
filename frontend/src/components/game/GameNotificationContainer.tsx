@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { GameNotification, NotificationType } from '../../api/GameNotification';
 
-const NotificationBox = styled.div`
+const GameNotificationBox = styled.div`
   position: absolute;
   bottom: 25px;
   left: 25px;
@@ -14,6 +14,11 @@ const NotificationBox = styled.div`
   background: linear-gradient(${({ theme }) => theme.colors.white}, ${({ theme }) => theme.colors.lightBlue});
   box-shadow: ${({ theme }) => theme.colors.lightGray} 0px 8px 24px;
   border-radius: 5px;
+  transition: 0.25s all;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.lightBlue};
+  }
 `;
 
 const notificationToString = (notification: GameNotification): string => {
@@ -30,7 +35,7 @@ const notificationToString = (notification: GameNotification): string => {
 
     case NotificationType.TestCorrect: {
       return `${notification.initiator.nickname} passed a test case
-        ${notification.content ? ` with result ${notification.content}` : ''}
+        ${notification.content ? ` with result '${notification.content}'` : ''}
         ${timeElapsed} seconds ago.`;
     }
 
@@ -44,13 +49,27 @@ const notificationToString = (notification: GameNotification): string => {
   }
 };
 
+type GameNotificationProps = {
+  gameNotification: GameNotification | null,
+};
+
 // This function refreshes the width of Monaco editor upon change in container size
-function NotificationContainer(props: GameNotification) {
+function GameNotificationContainer(props: GameNotificationProps) {
+  // If props or child are null, return null as well, showing no notification.
+  if (props == null) {
+    return null;
+  }
+
+  const { gameNotification } = props;
+  if (gameNotification == null) {
+    return null;
+  }
+
   return (
-    <NotificationBox>
-      {notificationToString(props)}
-    </NotificationBox>
+    <GameNotificationBox>
+      {notificationToString(gameNotification)}
+    </GameNotificationBox>
   );
 }
 
-export default NotificationContainer;
+export default GameNotificationContainer;

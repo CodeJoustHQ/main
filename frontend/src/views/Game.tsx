@@ -21,6 +21,7 @@ import Difficulty from '../api/Difficulty';
 import { Game, getGame } from '../api/Game';
 import { routes, send, subscribe } from '../api/Socket';
 import GameTimerContainer from '../components/game/GameTimerContainer';
+import GameNotificationContainer from '../components/game/GameNotificationContainer';
 
 type LocationState = {
   roomId: string,
@@ -41,6 +42,9 @@ function GamePage() {
 
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
+
+  // When variable null, show nothing; otherwise, show notification.
+  const [gameNotification, setGameNotification] = useState<GameNotification | null>(null);
 
   // Variable to hold whether the user is subscribed to the primary Game socket.
   const [socketSubscribed, setSocketSubscribed] = useState(false);
@@ -74,10 +78,13 @@ function GamePage() {
     });
 
     const displayNotification = (result: Message) => {
-      const notification: GameNotification = JSON.parse(result.body);
-      const timeElapsed: number = Date.now() - new Date(notification.time).getTime();
-      console.log(`${notification.notificationType} notification from ${notification.initiator.nickname}, ${timeElapsed} seconds ago.${notification.content ? ` The content is '${notification.content}'.` : ''}`);
-      // TODO: Display the notifications that are received.
+      const notificationResult: GameNotification = JSON.parse(result.body);
+      setGameNotification(notificationResult);
+
+      // Remove notification automatically after 10 seconds.
+      setTimeout(() => {
+        setGameNotification(null);
+      }, 10000);
     };
 
     // Subscribe for Game Notifications.
@@ -154,6 +161,7 @@ function GamePage() {
 
   return (
     <FlexContainer>
+      <GameNotificationContainer gameNotification={gameNotification} />
       <FlexInfoBar>
         Room:
         {' '}
