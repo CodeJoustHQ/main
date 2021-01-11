@@ -75,7 +75,8 @@ function GamePage() {
 
     const displayNotification = (result: Message) => {
       const notification: Notification = JSON.parse(result.body);
-      console.log(`${notification.notificationType} notification from ${notification.initiator.nickname}, seconds ago.`);
+      const timeElapsed: number = Date.now() - new Date(notification.time).getTime();
+      console.log(`${notification.notificationType} notification from ${notification.initiator.nickname}, ${timeElapsed} seconds ago.${notification.content ? ` The content is '${notification.content}'.` : ''}`);
       // TODO: Display the notifications that are received.
     };
 
@@ -122,6 +123,7 @@ function GamePage() {
         initiator: currentUser,
         time: new Date(),
         notificationType: NotificationType.TestCorrect,
+        content: submissionParam.output,
       });
       send(routes(roomId).subscribe_notification, {}, notificationBody);
     }
