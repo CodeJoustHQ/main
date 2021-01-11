@@ -160,7 +160,6 @@ public class GameTests {
         String jsonResponse = result.getResponse().getContentAsString();
         RoomDto roomDto = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
-<<<<<<< HEAD
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(host);
 
@@ -290,92 +289,4 @@ public class GameTests {
         assertEquals(submissionDto.getLanguage(), player.getLanguage());
         assertTrue(player.getSolved());
     }
-=======
-		StartGameRequest request = new StartGameRequest();
-        request.setInitiator(host);
-        
-        createSingleProblemAndTestCases();
-
-		result = this.mockMvc.perform(post(String.format(START_GAME, roomDto.getRoomId()))
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.content(UtilityTestMethods.convertObjectToJsonString(request)))
-				.andDo(print()).andExpect(status().isOk())
-				.andReturn();
-
-		jsonResponse = result.getResponse().getContentAsString();
-		RoomDto actual = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
-
-		assertEquals(roomDto.getRoomId(), actual.getRoomId());
-		assertTrue(actual.isActive());
-
-		// Check that game object was created properly
-		result = this.mockMvc.perform(get(String.format(GET_GAME, roomDto.getRoomId())))
-				.andDo(print()).andExpect(status().isOk())
-				.andReturn();
-
-		jsonResponse = result.getResponse().getContentAsString();
-		GameDto gameDto = UtilityTestMethods.toObject(jsonResponse, GameDto.class);
-
-		assertEquals(actual, gameDto.getRoom());
-		assertNull(gameDto.getPlayerMap());
-	}
-
-	@Test
-	public void startGameRoomNotFound() throws Exception {
-		UserDto user = new UserDto();
-		user.setNickname(NICKNAME);
-
-		StartGameRequest request = new StartGameRequest();
-		request.setInitiator(user);
-
-		ApiError ERROR = RoomError.NOT_FOUND;
-
-		MvcResult result = this.mockMvc.perform(post(String.format(START_GAME, ROOM_ID))
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.content(UtilityTestMethods.convertObjectToJsonString(request)))
-				.andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-				.andReturn();
-
-		String jsonResponse = result.getResponse().getContentAsString();
-		ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
-		assertEquals(ERROR.getResponse(), actual);
-	}
-
-	@Test
-	public void startGameWrongInitiator() throws Exception {
-		User host = new User();
-		host.setNickname(NICKNAME);
-
-		CreateRoomRequest createRequest = new CreateRoomRequest();
-		createRequest.setHost(UserMapper.toDto(host));
-
-		MvcResult result = this.mockMvc.perform(post(POST_ROOM)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.content(UtilityTestMethods.convertObjectToJsonString(createRequest)))
-				.andDo(print()).andExpect(status().isCreated())
-				.andReturn();
-
-		String jsonResponse = result.getResponse().getContentAsString();
-		RoomDto roomDto = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
-
-		UserDto user = new UserDto();
-		user.setNickname(NICKNAME_2);
-		StartGameRequest request = new StartGameRequest();
-		request.setInitiator(user);
-
-		ApiError ERROR = RoomError.INVALID_PERMISSIONS;
-
-		result = this.mockMvc.perform(post(String.format(START_GAME, roomDto.getRoomId()))
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.content(UtilityTestMethods.convertObjectToJsonString(request)))
-				.andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-				.andReturn();
-
-		jsonResponse = result.getResponse().getContentAsString();
-		ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
-		assertEquals(ERROR.getResponse(), actual);
-	}
->>>>>>> master
 }
