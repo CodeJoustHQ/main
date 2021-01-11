@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { GameNotification, NotificationType } from '../../api/GameNotification';
+import { User } from '../../api/User';
 
 const GameNotificationBox = styled.div`
   position: absolute;
@@ -14,7 +15,8 @@ const GameNotificationBox = styled.div`
   background: linear-gradient(${({ theme }) => theme.colors.white}, ${({ theme }) => theme.colors.lightBlue});
   box-shadow: ${({ theme }) => theme.colors.lightGray} 0px 8px 24px;
   border-radius: 5px;
-  transition: 0.25s all;
+  transition: 0.5s all;
+  z-index: 1;
 
   &:hover {
     background: ${({ theme }) => theme.colors.lightBlue};
@@ -22,12 +24,13 @@ const GameNotificationBox = styled.div`
 `;
 
 const notificationToString = (notification: GameNotification): string => {
-  const timeElapsed: number = Date.now() - new Date(notification.time).getTime();
+  const timeElapsed: number = Math.ceil((Date.now()
+    - new Date(notification.time).getTime()) / 1000);
 
   switch (notification.notificationType) {
     case NotificationType.SubmitCorrect: {
       return `${notification.initiator.nickname} just submitted correctly
-        ${notification.content ? `, taking ${notification.content} place, ` : ''} ${timeElapsed} seconds ago.`;
+        ${notification.content ? `, taking ${notification.content} place, ` : ''} ${timeElapsed} second(s) ago.`;
     }
     case NotificationType.SubmitIncorrect: {
       return `${notification.initiator.nickname} just submitted incorrectly.`;
@@ -36,7 +39,7 @@ const notificationToString = (notification: GameNotification): string => {
     case NotificationType.TestCorrect: {
       return `${notification.initiator.nickname} passed a test case
         ${notification.content ? ` with result '${notification.content}'` : ''}
-        ${timeElapsed} seconds ago.`;
+        ${timeElapsed} second(s) ago.`;
     }
 
     case NotificationType.CodeStreak: {
@@ -51,6 +54,7 @@ const notificationToString = (notification: GameNotification): string => {
 
 type GameNotificationProps = {
   gameNotification: GameNotification | null,
+  currentUser: User | null,
 };
 
 // This function refreshes the width of Monaco editor upon change in container size
@@ -60,8 +64,13 @@ function GameNotificationContainer(props: GameNotificationProps) {
     return null;
   }
 
-  const { gameNotification } = props;
-  if (gameNotification == null) {
+  const { gameNotification, currentUser } = props;
+  if (gameNotification == null || currentUser == null) {
+    return null;
+  }
+
+  // If the initiator of the notification is the currentUser, show nothing.
+  if (gameNotification.initiator.userId === currentUser.userId) {
     return null;
   }
 

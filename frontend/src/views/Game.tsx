@@ -79,6 +79,7 @@ function GamePage() {
 
     const displayNotification = (result: Message) => {
       const notificationResult: GameNotification = JSON.parse(result.body);
+      console.log(notificationResult);
       setGameNotification(notificationResult);
 
       // Remove notification automatically after 10 seconds.
@@ -161,7 +162,7 @@ function GamePage() {
 
   return (
     <FlexContainer>
-      <GameNotificationContainer gameNotification={gameNotification} />
+      <GameNotificationContainer gameNotification={gameNotification} currentUser={currentUser} />
       <FlexInfoBar>
         Room:
         {' '}
