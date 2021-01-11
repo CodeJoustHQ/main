@@ -82,6 +82,8 @@ public class GameTests {
 
     // Helper method to start the game for a given room
     private void startGameHelper(RoomDto room, UserDto host) throws Exception {
+        createSingleProblemAndTestCases();
+
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(host);
 
@@ -162,6 +164,8 @@ public class GameTests {
 
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(host);
+
+        createSingleProblemAndTestCases();
 
         result = this.mockMvc.perform(post(String.format(START_GAME, roomDto.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
