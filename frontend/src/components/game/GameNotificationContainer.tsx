@@ -12,14 +12,14 @@ const GameNotificationBox = styled.div`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   text-align: center;
   color: ${({ theme }) => theme.colors.gray};
-  background: linear-gradient(${({ theme }) => theme.colors.white}, ${({ theme }) => theme.colors.lightBlue});
+  background: linear-gradient(${({ theme }) => theme.colors.white}, ${({ theme }) => theme.colors.background});
   box-shadow: ${({ theme }) => theme.colors.lightGray} 0px 8px 24px;
   border-radius: 5px;
-  transition: 0.5s all;
+  transition: background 0.5s;
   z-index: 1;
 
   &:hover {
-    background: ${({ theme }) => theme.colors.lightBlue};
+    background: linear-gradient(${({ theme }) => theme.colors.background}, ${({ theme }) => theme.colors.background});
   }
 `;
 

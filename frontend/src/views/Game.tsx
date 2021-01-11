@@ -46,6 +46,9 @@ function GamePage() {
   // When variable null, show nothing; otherwise, show notification.
   const [gameNotification, setGameNotification] = useState<GameNotification | null>(null);
 
+  // Time, in milliseconds, before notification disappears. (Currently 15s.)
+  const gameNotificationTime: number = 15000;
+
   // Variable to hold whether the user is subscribed to the primary Game socket.
   const [socketSubscribed, setSocketSubscribed] = useState(false);
 
@@ -56,6 +59,19 @@ function GamePage() {
    * message; see https://github.com/jacobbuck/react-beforeunload.
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
+
+  // Display notification only if no notification currently exists.
+  const displayNotification = useCallback((result: Message) => {
+    if (gameNotification == null) {
+      const notificationResult: GameNotification = JSON.parse(result.body);
+      setGameNotification(notificationResult);
+
+      // Remove notification automatically after 15 seconds.
+      setTimeout(() => {
+        setGameNotification(null);
+      }, gameNotificationTime);
+    }
+  }, [gameNotification, gameNotificationTime]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
@@ -77,22 +93,11 @@ function GamePage() {
       setError(err.message);
     });
 
-    const displayNotification = (result: Message) => {
-      const notificationResult: GameNotification = JSON.parse(result.body);
-      console.log(notificationResult);
-      setGameNotification(notificationResult);
-
-      // Remove notification automatically after 10 seconds.
-      setTimeout(() => {
-        setGameNotification(null);
-      }, 10000);
-    };
-
     // Subscribe for Game Notifications.
     subscribe(routes(roomIdParam).subscribe_notification, displayNotification).catch((err) => {
       setError(err.message);
     });
-  }, [history]);
+  }, [history, displayNotification]);
 
   // Called every time location changes
   useEffect(() => {
