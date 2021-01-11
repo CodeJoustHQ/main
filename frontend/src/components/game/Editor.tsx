@@ -9,6 +9,10 @@ type LanguageType = {
   }
 };
 
+export type EditorProps = {
+  onLanguageChange: (input: string) => void,
+};
+
 export const languages: LanguageType = {
   java: {
     name: 'Java',
@@ -45,15 +49,11 @@ export const languages: LanguageType = {
   },
 };
 
-type EditorProps = {
-  onLanguageChange: (language: string) => void,
-};
-
 const Content = styled.div`
   height: 100%;
 `;
 
-// This function refreshes the width of Monaco editor upon change in container size
+// This function refreshes the Monaco editor
 function ResizableMonacoEditor(props: EditorProps) {
   const [currentLanguage, setCurrentLanguage] = useState('java');
   const [codeEditor, setCodeEditor] = useState<any>(null);
@@ -77,7 +77,6 @@ function ResizableMonacoEditor(props: EditorProps) {
     // Change the language and initial code for the editor
     codeEditor!.setValue(languages[language].defaultCode);
     setCurrentLanguage(language);
-
     onLanguageChange(language);
   };
 
