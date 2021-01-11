@@ -16,10 +16,10 @@ import { checkLocationState } from '../util/Utility';
 import Console from '../components/game/Console';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
-import Notification from '../api/Notification';
+import { Notification, NotificationType } from '../api/Notification';
 import Difficulty from '../api/Difficulty';
 import { Game, getGame } from '../api/Game';
-import { routes, subscribe } from '../api/Socket';
+import { routes, send, subscribe } from '../api/Socket';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 
 type LocationState = {
@@ -75,7 +75,7 @@ function GamePage() {
 
     const displayNotification = (result: Message) => {
       const notification: Notification = JSON.parse(result.body);
-      alert(notification);
+      console.log(`${notification.notificationType} notification from ${notification.initiator.nickname}, seconds ago.`);
       // TODO: Display the notifications that are received.
     };
 
@@ -115,10 +115,23 @@ function GamePage() {
     window.dispatchEvent(event);
   };
 
+  // Send notification if submission result is correct and currentUser is set.
+  const checkSendTestCorrectNotification = (submissionParam: SubmissionResult) => {
+    if (submissionParam.status === 'SUCCESS' && currentUser) {
+      const notificationBody: string = JSON.stringify({
+        initiator: currentUser,
+        time: new Date(),
+        notificationType: NotificationType.TestCorrect,
+      });
+      send(routes(roomId).subscribe_notification, {}, notificationBody);
+    }
+  };
+
   // Callback when user runs code against custom test case
   const runSolution = (input: string) => {
-    const tempSubmission = { status: 'SUCCESS', output: input };
+    const tempSubmission: SubmissionResult = { status: 'SUCCESS', output: input };
     setSubmission(tempSubmission);
+    checkSendTestCorrectNotification(tempSubmission);
   };
 
   // Redirect user to game page if room is active.

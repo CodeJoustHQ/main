@@ -59,7 +59,7 @@ export const connect = (roomId: string, userId: string):
   });
 
 /**
- * Subscribe the user via socket.
+ * Subscribe the user to a URL via socket.
  * @returns void Promise, reject if socket is not connected.
  */
 export const subscribe = (subscribeUrl: string,
@@ -73,13 +73,25 @@ export const subscribe = (subscribeUrl: string,
   });
 
 /**
+ * Subscribe the user via socket.
+ * @returns void Promise, reject if socket is not subscribed to that URL.
+ */
+export const send = (sendUrl: string, headers?: {}, body?: string):
+  Promise<void> => new Promise<void>((resolve, reject) => {
+    if (connected) {
+      stompClient.send(sendUrl, headers, body);
+      resolve();
+    } else {
+      reject(errorHandler('The socket is not connected.'));
+    }
+  });
+
+/**
  * Disconnect the user by sending a message via socket.
  * @returns void, or error if socket is not connected.
 */
 export const disconnect = (): void => {
   if (connected) {
-    const socket: WebSocket = new SockJS(routes(socketRoomId).connect);
-    stompClient = Stomp.over(socket);
     stompClient.disconnect(() => {
       // Reassign connected variable.
       connected = false;
