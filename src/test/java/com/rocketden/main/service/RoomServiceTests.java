@@ -352,6 +352,32 @@ public class RoomServiceTests {
 
     @Test
     public void updateRoomSettingsInvalidDuration() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User host = new User();
+        host.setNickname(NICKNAME);
+
+        room.setHost(host);
+        room.addUser(host);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        UpdateSettingsRequest request = new UpdateSettingsRequest();
+        request.setInitiator(UserMapper.toDto(host));
+        request.setDifficulty(ProblemDifficulty.EASY);
+        request.setDuration(-1);
+
+        UpdateSettingsRequest request = new UpdateSettingsRequest();
+        request.setInitiator(UserMapper.toDto(user));
+        request.setDifficulty(ProblemDifficulty.MEDIUM);
+
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.updateRoomSettings(ROOM_ID, request));
+        assertEquals(TimerError.INVALID_DURATION, exception.getError());
+    }
+
+    @Test
+    public void updateROomSettingsDurationTooLong() {
         // TODO
     }
 
