@@ -50,7 +50,10 @@ function GamePage() {
   const gameNotificationTime: number = 15000;
 
   // Variable to hold whether the user is subscribed to the primary Game socket.
-  const [socketSubscribed, setSocketSubscribed] = useState(false);
+  const [userSocketSubscribed, setUserSocketSubscribed] = useState(false);
+
+  // Variable to hold whether the user is subscribed to the notification socket.
+  const [notificationSocketSubscribed, setNotificationSocketSubscribed] = useState(false);
 
   /**
    * Display beforeUnload message to inform the user that they may lose
@@ -84,7 +87,6 @@ function GamePage() {
     const subscribeUserCallback = (result: Message) => {
       const updatedGame: Game = JSON.parse(result.body);
       setGame(updatedGame);
-      setSocketSubscribed(true);
 
       // Check if end game.
       if (updatedGame.gameTimer.timeUp) {
@@ -95,15 +97,25 @@ function GamePage() {
     };
 
     // Subscribe to the main Game channel to receive Game updates.
-    subscribe(routes(roomIdParam).subscribe_user, subscribeUserCallback).catch((err) => {
-      setError(err.message);
-    });
+    if (!userSocketSubscribed) {
+      subscribe(routes(roomIdParam).subscribe_user, subscribeUserCallback)
+        .then(() => {
+          setUserSocketSubscribed(true);
+        }).catch((err) => {
+          setError(err.message);
+        });
+    }
 
     // Subscribe for Game Notifications.
-    subscribe(routes(roomIdParam).subscribe_notification, displayNotification).catch((err) => {
-      setError(err.message);
-    });
-  }, [history, displayNotification]);
+    if (!notificationSocketSubscribed) {
+      subscribe(routes(roomIdParam).subscribe_notification, displayNotification)
+        .then(() => {
+          setNotificationSocketSubscribed(true);
+        }).catch((err) => {
+          setError(err.message);
+        });
+    }
+  }, [history, displayNotification, userSocketSubscribed, notificationSocketSubscribed]);
 
   // Called every time location changes
   useEffect(() => {
@@ -157,10 +169,10 @@ function GamePage() {
 
   // Redirect user to game page if room is active.
   useEffect(() => {
-    if (!socketSubscribed && roomId) {
+    if (!userSocketSubscribed && roomId) {
       subscribePrimary(roomId);
     }
-  }, [socketSubscribed, roomId, subscribePrimary]);
+  }, [userSocketSubscribed, roomId, subscribePrimary]);
 
   // If the page is loading, return a centered Loading object.
   if (fullPageLoading) {

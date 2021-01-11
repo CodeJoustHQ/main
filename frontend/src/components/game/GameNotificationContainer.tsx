@@ -14,11 +14,15 @@ const GameNotificationBox = styled.div`
   background: linear-gradient(${({ theme }) => theme.colors.white}, ${({ theme }) => theme.colors.background});
   box-shadow: ${({ theme }) => theme.colors.lightGray} 0px 8px 24px;
   border-radius: 5px;
-  transition: all 2s;
   z-index: 1;
 
-  &:hover {
+  &::after {
     background: linear-gradient(${({ theme }) => theme.colors.background}, ${({ theme }) => theme.colors.background});
+    transition: 0.5s all;
+  }
+
+  &:hover::after {
+    transition: 0.5s all;
   }
 `;
 
