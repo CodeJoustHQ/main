@@ -2,11 +2,15 @@ import React, { useState } from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import styled from 'styled-components';
 
-type LanguageType = {
+export type LanguageType = {
   [key: string]: {
     name: string,
     defaultCode: string,
   }
+};
+
+export type EditorProps = {
+  onLanguageChange: (input: string) => void,
 };
 
 export const languages: LanguageType = {
@@ -49,10 +53,12 @@ const Content = styled.div`
   height: 100%;
 `;
 
-// This function refreshes the width of Monaco editor upon change in container size
-function ResizableMonacoEditor() {
+// This function refreshes the Monaco editor
+function ResizableMonacoEditor(props: EditorProps) {
   const [currentLanguage, setCurrentLanguage] = useState('java');
   const [codeEditor, setCodeEditor] = useState<any>(null);
+
+  const { onLanguageChange } = props;
 
   const handleEditorDidMount = (editor: any) => {
     setCodeEditor(editor);
@@ -71,6 +77,7 @@ function ResizableMonacoEditor() {
     // Change the language and initial code for the editor
     codeEditor!.setValue(languages[language].defaultCode);
     setCurrentLanguage(language);
+    onLanguageChange(language);
   };
 
   return (

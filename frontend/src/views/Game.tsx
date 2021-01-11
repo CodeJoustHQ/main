@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
 import { useBeforeunload } from 'react-beforeunload';
-import Editor from '../components/game/Editor';
+import Editor, { languages } from '../components/game/Editor';
 import { Problem, SubmissionResult, getRandomProblem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
 import {
@@ -28,6 +28,7 @@ function GamePage() {
   // Get history object to be able to move between different pages
   const history = useHistory();
   const location = useLocation<LocationState>();
+  const language = useRef('Java');
 
   const [problem, setProblem] = useState<Problem | null>(null);
   const [submission, setSubmission] = useState<SubmissionResult | null>(null);
@@ -85,8 +86,14 @@ function GamePage() {
 
   // Callback when user runs code against custom test case
   const runSolution = (input: string) => {
-    const tempSubmission = { status: 'SUCCESS', output: input };
-    setSubmission(tempSubmission);
+    if (language.current === languages.javascript.name) {
+      eval(input);
+    }
+  };
+
+  // Callback when code language is changed
+  const onLanguageChange = (input: string) => {
+    language.current = input;
   };
 
   // If the page is loading, return a centered Loading object.
@@ -134,7 +141,9 @@ function GamePage() {
             secondaryMinSize={1}
           >
             <Panel>
-              <Editor />
+              <Editor
+                onLanguageChange={onLanguageChange}
+              />
             </Panel>
 
             <Panel>
