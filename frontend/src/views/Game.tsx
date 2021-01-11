@@ -87,7 +87,7 @@ function GamePage() {
   // Callback when user runs code against custom test case
   const runSolution = (input: string) => {
     if (language.current === languages.javascript.name) {
-      eval(input);
+      window.Function(input);
     }
   };
 
