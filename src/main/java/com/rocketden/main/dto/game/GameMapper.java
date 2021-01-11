@@ -1,5 +1,7 @@
 package com.rocketden.main.dto.game;
 
+import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Player;
@@ -9,6 +11,7 @@ import com.rocketden.main.model.User;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +34,10 @@ public class GameMapper {
 
         List<PlayerDto> players = gameDto.getPlayers();
         game.getPlayers().values().forEach(player -> players.add(mapper.map(player, PlayerDto.class)));
+
+        List<ProblemDto> problems = new ArrayList<>();
+        game.getProblems().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
+        gameDto.setProblems(problems);
 
         return gameDto;
     }

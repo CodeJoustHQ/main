@@ -2,9 +2,11 @@ import axios from 'axios';
 import { axiosErrorHandler } from './Error';
 import { Room } from './Room';
 import { User } from './User';
+import { Problem } from './Problem';
 
 export type Game = {
-  roomDto: Room,
+  room: Room,
+  problems: Problem[],
 };
 
 export type StartGameParams = {

@@ -4,6 +4,7 @@ import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.PlayerDto;
 import com.rocketden.main.dto.game.SubmissionDto;
+import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.game_object.Game;
@@ -12,6 +13,10 @@ import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.game_object.Submission;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
+import com.rocketden.main.model.problem.Problem;
+import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.model.problem.ProblemTestCase;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -19,6 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootTest
 public class GameMapperTests {
@@ -29,6 +37,12 @@ public class GameMapperTests {
     private static final String CODE = "print('hi')";
     private static final String LANGUAGE = "python";
     private static final int TEST_CASES = 10;
+
+    private static final String NAME = "Sort a List";
+    private static final String DESCRIPTION = "Sort the given list in O(n log n) time.";
+
+    private static final String INPUT = "[1, 8, 2]";
+    private static final String OUTPUT = "[1, 2, 8]";
 
     @Test
     public void fromRoom() {
@@ -62,6 +76,19 @@ public class GameMapperTests {
 
     @Test
     public void toDto() {
+        Problem problem = new Problem();
+        problem.setName(NAME);
+        problem.setDescription(DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.MEDIUM);
+
+        ProblemTestCase testCase = new ProblemTestCase();
+        testCase.setInput(INPUT);
+        testCase.setOutput(OUTPUT);
+        testCase.setProblem(problem);
+
+        List<Problem> problems = new ArrayList<>();
+        problems.add(problem);
+
         Room room = new Room();
         room.setRoomId(ROOM_ID);
 
@@ -71,6 +98,7 @@ public class GameMapperTests {
         room.addUser(user);
 
         Game game = GameMapper.fromRoom(room);
+        game.setProblems(problems);
 
         PlayerCode playerCode = new PlayerCode();
         playerCode.setCode(CODE);
@@ -90,6 +118,7 @@ public class GameMapperTests {
 
         assertEquals(RoomMapper.toDto(room), gameDto.getRoom());
         assertEquals(1, gameDto.getPlayers().size());
+        assertEquals(ProblemMapper.toDto(problem), gameDto.getProblems().get(0));
 
         PlayerDto playerDto = gameDto.getPlayers().get(0);
         assertEquals(UserMapper.toDto(user), playerDto.getUser());

@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -50,7 +51,7 @@ public class RoomTests {
     private static final String POST_ROOM_CREATE = "/api/v1/rooms";
     private static final String PUT_ROOM_HOST = "/api/v1/rooms/%s/host";
     private static final String PUT_ROOM_SETTINGS = "/api/v1/rooms/%s/settings";
-    private static final String REMOVE_USER = "/api/v1/rooms/%s/users/remove";
+    private static final String REMOVE_USER = "/api/v1/rooms/%s/users";
 
     // Predefine user and room attributes.
     private static final String NICKNAME = "rocket";
@@ -451,7 +452,7 @@ public class RoomTests {
 
         String jsonRequest = "{\"initiator\": {\"nickname\": \"host\"}, \"difficulty\": \"invalid\"}";
 
-        ApiError ERROR = ProblemError.BAD_SETTING;
+        ApiError ERROR = ProblemError.BAD_DIFFICULTY;
 
         MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -503,7 +504,7 @@ public class RoomTests {
         request.setInitiator(host);
         request.setUserToDelete(user);
 
-        MvcResult result = this.mockMvc.perform(put(String.format(REMOVE_USER, room.getRoomId()))
+        MvcResult result = this.mockMvc.perform(delete(String.format(REMOVE_USER, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andExpect(status().isOk())
@@ -533,7 +534,7 @@ public class RoomTests {
 
         ApiError ERROR = UserError.NOT_FOUND;
 
-        MvcResult result = this.mockMvc.perform(put(String.format(REMOVE_USER, room.getRoomId()))
+        MvcResult result = this.mockMvc.perform(delete(String.format(REMOVE_USER, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andExpect(status().is(ERROR.getStatus().value()))
@@ -563,7 +564,7 @@ public class RoomTests {
 
         ApiError ERROR = RoomError.INVALID_PERMISSIONS;
 
-        MvcResult result = this.mockMvc.perform(put(String.format(REMOVE_USER, room.getRoomId()))
+        MvcResult result = this.mockMvc.perform(delete(String.format(REMOVE_USER, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andExpect(status().is(ERROR.getStatus().value()))

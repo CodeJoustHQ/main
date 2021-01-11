@@ -1,7 +1,12 @@
 package com.rocketden.main.socket;
 
 import com.rocketden.main.controller.v1.BaseRestController;
+import com.rocketden.main.dao.ProblemRepository;
 import com.rocketden.main.dto.game.StartGameRequest;
+import com.rocketden.main.dto.problem.CreateProblemRequest;
+import com.rocketden.main.dto.problem.CreateTestCaseRequest;
+import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
@@ -11,9 +16,12 @@ import com.rocketden.main.dto.room.RemoveUserRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.util.SocketTestMethods;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -30,12 +38,16 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
+@AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @Transactional
 public class RoomSocketTests {
@@ -46,6 +58,9 @@ public class RoomSocketTests {
     @Autowired
     private TestRestTemplate template;
 
+    @Mock
+    private ProblemRepository problemRepository;
+
     private static final String CONNECT_ENDPOINT = "ws://localhost:{port}" + BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint";
     private static final String SUBSCRIBE_ENDPOINT = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user";
 
@@ -54,11 +69,17 @@ public class RoomSocketTests {
     private RoomDto room;
     private StompSession hostSession;
 
+    // Predefine problem attributes.
+    private static final String NAME = "Sort a List";
+    private static final String DESCRIPTION = "Sort the given list in O(n log n) time.";
+
     // Predefine user and room attributes.
     private static final String NICKNAME = "rocket";
     private static final String USER_ID = "012345";
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String USER_ID_2 = "098765";
+    private static final String INPUT = "[1, 8, 2]";
+    private static final String OUTPUT = "[1, 2, 8]";
 
     @BeforeEach
     public void setup() throws Exception {
@@ -97,6 +118,43 @@ public class RoomSocketTests {
                 blockingQueue.add((RoomDto) payload);
             }
         });
+    }
+
+    /**
+     * Helper method that sends a POST request using template to 
+     * create a new problem
+     * @return the created problem
+     * @throws Exception if anything wrong occurs
+     */
+    private ProblemDto createSingleProblemAndTestCases() throws Exception {
+        CreateProblemRequest createProblemRequest = new CreateProblemRequest();
+        createProblemRequest.setName(NAME);
+        createProblemRequest.setDescription(DESCRIPTION);
+        createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
+
+        HttpEntity<CreateProblemRequest> createProblemEntity = new HttpEntity<>(createProblemRequest);
+        String createProblemEndpoint = String.format("http://localhost:%s/api/v1/problems", port);
+
+        ProblemDto problemActual = template.exchange(createProblemEndpoint, HttpMethod.POST, createProblemEntity, ProblemDto.class).getBody();
+
+        assertEquals(NAME, problemActual.getName());
+        assertEquals(DESCRIPTION, problemActual.getDescription());
+        assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
+
+        CreateTestCaseRequest createTestCaseRequest = new CreateTestCaseRequest();
+        createTestCaseRequest.setInput(INPUT);
+        createTestCaseRequest.setOutput(OUTPUT);
+
+        HttpEntity<CreateTestCaseRequest> createTestCaseEntity = new HttpEntity<>(createTestCaseRequest);
+        String createTestCaseEndpoint = String.format("http://localhost:%s/api/v1/problems/%s/test-case", port, problemActual.getProblemId());
+
+        ProblemTestCaseDto testCaseActual = template.exchange(createTestCaseEndpoint, HttpMethod.POST, createTestCaseEntity, ProblemTestCaseDto.class).getBody();
+
+        assertEquals(INPUT, testCaseActual.getInput());
+        assertEquals(OUTPUT, testCaseActual.getOutput());
+        assertFalse(testCaseActual.isHidden());
+
+        return problemActual;
     }
 
     @Test
@@ -322,6 +380,10 @@ public class RoomSocketTests {
 
         HttpEntity<StartGameRequest> startGameEntity = new HttpEntity<>(startGameRequest);
         String startGameEndpoint = String.format("%s/%s/start", baseRestEndpoint, room.getRoomId());
+
+        // Create a problem that the game can find and attach to the room.
+        createSingleProblemAndTestCases();
+
         RoomDto expected = template.exchange(startGameEndpoint, HttpMethod.POST, startGameEntity, RoomDto.class).getBody();
 
         RoomDto actual = blockingQueue.poll(5, SECONDS);
@@ -329,7 +391,7 @@ public class RoomSocketTests {
         assertNotNull(actual);
 
         assertEquals(expected.getRoomId(), actual.getRoomId());
-        assertEquals(true, actual.isActive());
+        assertTrue(actual.isActive());
     }
 
     @Test
@@ -348,21 +410,21 @@ public class RoomSocketTests {
         assertNotNull(actual);
 
         // Check that the room contains the user
-        assertEquals(true, actual.getUsers().contains(newUser));
+        assertTrue(actual.getUsers().contains(newUser));
 
         RemoveUserRequest removeUserRequest = new RemoveUserRequest();
         removeUserRequest.setInitiator(room.getHost());
         removeUserRequest.setUserToDelete(newUser);
 
         HttpEntity<RemoveUserRequest> removeUserEntity = new HttpEntity<>(removeUserRequest);
-        String removeUserEndpoint = String.format("%s/%s/users/remove", baseRestEndpoint, room.getRoomId());
-        RoomDto expected = template.exchange(removeUserEndpoint, HttpMethod.PUT, removeUserEntity, RoomDto.class).getBody();
+        String removeUserEndpoint = String.format("%s/%s/users", baseRestEndpoint, room.getRoomId());
+        RoomDto expected = template.exchange(removeUserEndpoint, HttpMethod.DELETE, removeUserEntity, RoomDto.class).getBody();
 
         actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(expected);
         assertNotNull(actual);
 
         assertEquals(expected.getRoomId(), actual.getRoomId());
-        assertEquals(false, actual.getUsers().contains(newUser));
+        assertFalse(actual.getUsers().contains(newUser));
     }
 }
