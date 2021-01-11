@@ -99,7 +99,7 @@ public class GameManagementService {
 
     // Test the submission, return the results, and send a socket update
     public SubmissionDto submitSolution(String roomId, SubmissionRequest request) {
-        Game game = currentGameMap.get(roomId);
+        Game game = getGameFromRoomId(roomId);
 
         if (request.getInitiator() == null || request.getCode() == null || request.getLanguage() == null) {
             throw new ApiException(GameError.EMPTY_FIELD);
