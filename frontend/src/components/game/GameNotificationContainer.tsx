@@ -47,9 +47,9 @@ const notificationToString = (notification: GameNotification): string => {
   }
 };
 
-type GameNotificationProps = {
+interface GameNotificationProps extends React.HTMLAttributes<HTMLElement> {
   gameNotification: GameNotification | null,
-};
+}
 
 // This function refreshes the width of Monaco editor upon change in container size
 function GameNotificationContainer(props: GameNotificationProps) {
