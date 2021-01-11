@@ -56,6 +56,7 @@ public class GameManagementServiceTests {
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "098765";
+    private static final long DURATION = 600;
 
     @Test
     public void addGetAndRemoveGame() {
@@ -100,6 +101,7 @@ public class GameManagementServiceTests {
         room.setRoomId(ROOM_ID);
         room.setHost(host);
         room.setDifficulty(ProblemDifficulty.RANDOM);
+        room.setDuration(DURATION);
 
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(UserMapper.toDto(host));
@@ -119,7 +121,8 @@ public class GameManagementServiceTests {
         Game game = gameService.getGameFromRoomId(ROOM_ID);
         assertNotNull(game);
 
-        // TODO: check game timer and duration
+        assertNotNull(game.getGameTimer());
+        assertEquals(room.getDuration(), game.getGameTimer().getDuration());
     }
 
     @Test
@@ -177,9 +180,8 @@ public class GameManagementServiceTests {
         assertEquals(RoomMapper.toDto(room), gameDto.getRoom());
         assertNull(gameDto.getPlayerMap());
 
-        // TODO: check timer
-
-        // TODO: create GameSocketTests class
+        assertNotNull(gameDto.getGameTimer());
+        assertEquals(room.getDuration(), gameDto.getGameTimer().getDuration());
     }
 
     @Test

@@ -62,7 +62,7 @@ public class RoomServiceTests {
     private static final String USER_ID = "678910";
     private static final String USER_ID_2 = "123456";
     private static final String USER_ID_3 = "024681";
-    private static final Long DURATION = 600;
+    private static final long DURATION = 600;
 
     @Test
     public void createRoomSuccess() {
