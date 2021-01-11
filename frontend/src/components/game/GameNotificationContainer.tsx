@@ -11,13 +11,13 @@ const GameNotificationBox = styled.div`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   text-align: center;
   color: ${({ theme }) => theme.colors.gray};
-  background: linear-gradient(${({ theme }) => theme.colors.white}, ${({ theme }) => theme.colors.background});
+  background: ${({ theme }) => theme.colors.white};
   box-shadow: ${({ theme }) => theme.colors.lightGray} 0px 8px 24px;
   border-radius: 5px;
   z-index: 1;
 
   &::after {
-    background: linear-gradient(${({ theme }) => theme.colors.background}, ${({ theme }) => theme.colors.background});
+    background: ${({ theme }) => theme.colors.background};
     transition: 0.5s all;
   }
 

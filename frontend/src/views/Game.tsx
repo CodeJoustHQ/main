@@ -186,7 +186,9 @@ function GamePage() {
   return (
     <FlexContainer>
       <GameNotificationContainer
-        onClick={() => setGameNotification(null)}
+        onClick={() => {
+          setGameNotification(null);
+        }}
         gameNotification={gameNotification}
       />
       <FlexInfoBar>
