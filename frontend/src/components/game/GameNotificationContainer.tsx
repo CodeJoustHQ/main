@@ -16,12 +16,8 @@ const GameNotificationBox = styled.div`
   border-radius: 5px;
   z-index: 1;
 
-  &::after {
+  &:hover {
     background: ${({ theme }) => theme.colors.background};
-    transition: 0.5s all;
-  }
-
-  &:hover::after {
     transition: 0.5s all;
   }
 `;
@@ -51,8 +47,9 @@ const notificationToString = (notification: GameNotification): string => {
   }
 };
 
-interface GameNotificationProps extends React.HTMLAttributes<HTMLElement> {
+type GameNotificationProps = {
   gameNotification: GameNotification | null,
+  onClickFunc: (gameNotification: GameNotification | null) => void,
 }
 
 // This function refreshes the width of Monaco editor upon change in container size
@@ -62,13 +59,13 @@ function GameNotificationContainer(props: GameNotificationProps) {
     return null;
   }
 
-  const { gameNotification } = props;
+  const { gameNotification, onClickFunc } = props;
   if (gameNotification == null) {
     return null;
   }
 
   return (
-    <GameNotificationBox>
+    <GameNotificationBox onClick={() => onClickFunc(null)}>
       {notificationToString(gameNotification)}
     </GameNotificationBox>
   );
