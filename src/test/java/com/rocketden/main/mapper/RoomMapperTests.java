@@ -52,6 +52,7 @@ public class RoomMapperTests {
         assertNotNull(response);
         assertEquals(room.getRoomId(), response.getRoomId());
         assertEquals(room.getDifficulty(), response.getDifficulty());
+        assertEquals(room.getDuration(), response.getDuration());
 
         User actualHost = UserMapper.toEntity(response.getHost());
         assertEquals(room.getHost(), actualHost);

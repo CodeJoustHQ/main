@@ -61,6 +61,7 @@ public class RoomServiceTests {
     private static final String USER_ID = "678910";
     private static final String USER_ID_2 = "123456";
     private static final String USER_ID_3 = "024681";
+    private static final Long DURATION = 600;
 
     @Test
     public void createRoomSuccess() {
@@ -299,11 +300,13 @@ public class RoomServiceTests {
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(host));
         request.setDifficulty(ProblemDifficulty.EASY);
+        request.setDuration(DURATION);
 
         RoomDto response = roomService.updateRoomSettings(room.getRoomId(), request);
 
         verify(socketService).sendSocketUpdate(eq(response));
         assertEquals(request.getDifficulty(), response.getDifficulty());
+        assertEquals(request.getDuration(), response.getDuration());
     }
 
     @Test
@@ -345,6 +348,11 @@ public class RoomServiceTests {
         ApiException exception = assertThrows(ApiException.class, () ->
                 roomService.updateRoomSettings("999999", noRoomRequest));
         assertEquals(RoomError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void updateRoomSettingsInvalidDuration() {
+        // TODO
     }
 
     @Test

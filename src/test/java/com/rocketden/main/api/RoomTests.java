@@ -59,6 +59,7 @@ public class RoomTests {
     private static final String USER_ID = "012345";
     private static final String USER_ID_2 = "678910";
     private static final String ROOM_ID = "012345";
+    private static final Long DURATION = 600;
 
     /**
      * Helper method that creates a room with the given host
@@ -406,6 +407,7 @@ public class RoomTests {
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(host);
         updateRequest.setDifficulty(ProblemDifficulty.EASY);
+        updateRequest.setDuration(DURATION);
 
         MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -427,6 +429,7 @@ public class RoomTests {
         RoomDto actual = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
         assertEquals(updateRequest.getDifficulty(), actual.getDifficulty());
+        assertEquals(updateRequest.getDuration(), actual.getDuration());
     }
 
     @Test
@@ -451,6 +454,7 @@ public class RoomTests {
 
         // Difficulty remains unchanged from default
         assertEquals(ProblemDifficulty.RANDOM, room.getDifficulty());
+        assertEquals(GameTimer.DURATION_15, room.getDuration());
     }
 
     @Test
