@@ -60,10 +60,16 @@ function GamePage() {
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
-  // Display notification only if no notification currently exists.
+  /**
+   * Display the notification as a callback from the notification
+   * subscription. Do not display anything if notification is already
+   * present or initiator is the current user.
+   */
   const displayNotification = useCallback((result: Message) => {
-    if (gameNotification == null) {
-      const notificationResult: GameNotification = JSON.parse(result.body);
+    const notificationResult: GameNotification = JSON.parse(result.body);
+    if (gameNotification == null && currentUser && notificationResult
+      && notificationResult.initiator
+      && currentUser.userId !== notificationResult.initiator.userId) {
       setGameNotification(notificationResult);
 
       // Remove notification automatically after 15 seconds.
@@ -71,7 +77,7 @@ function GamePage() {
         setGameNotification(null);
       }, gameNotificationTime);
     }
-  }, [gameNotification, gameNotificationTime]);
+  }, [gameNotification, gameNotificationTime, currentUser]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
@@ -167,7 +173,7 @@ function GamePage() {
 
   return (
     <FlexContainer>
-      <GameNotificationContainer gameNotification={gameNotification} currentUser={currentUser} />
+      <GameNotificationContainer gameNotification={gameNotification} />
       <FlexInfoBar>
         Room:
         {' '}
