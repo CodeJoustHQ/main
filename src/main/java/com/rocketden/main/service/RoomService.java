@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 public class RoomService {
 
     public static final int ROOM_ID_LENGTH = 6;
+    public static final long MAX_DURATION = 3600; // 1 hour
 
     private final RoomRepository repository;
     private final SocketService socketService;

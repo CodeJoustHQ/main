@@ -118,6 +118,8 @@ public class GameManagementServiceTests {
         // Game object is created when the room chooses to start
         Game game = gameService.getGameFromRoomId(ROOM_ID);
         assertNotNull(game);
+
+        // TODO: check game timer and duration
     }
 
     @Test
@@ -174,6 +176,10 @@ public class GameManagementServiceTests {
 
         assertEquals(RoomMapper.toDto(room), gameDto.getRoom());
         assertNull(gameDto.getPlayerMap());
+
+        // TODO: check timer
+
+        // TODO: create GameSocketTests class
     }
 
     @Test

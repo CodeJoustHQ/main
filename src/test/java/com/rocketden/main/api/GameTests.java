@@ -15,6 +15,7 @@ import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
+import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.model.User;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.util.UtilityTestMethods;
@@ -161,6 +162,8 @@ public class GameTests {
 
 		assertEquals(actual, gameDto.getRoom());
 		assertNull(gameDto.getPlayerMap());
+
+		assertEquals(GameTimer.DURATION_15, gameDto.getGameTimer().getDuration());
 	}
 
 	@Test

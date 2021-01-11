@@ -10,6 +10,7 @@ import com.rocketden.main.dto.room.RemoveUserRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.RoomError;
+import com.rocketden.main.exception.TimerError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.problem.ProblemDifficulty;
@@ -26,7 +27,7 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -366,19 +367,32 @@ public class RoomServiceTests {
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(host));
         request.setDifficulty(ProblemDifficulty.EASY);
-        request.setDuration(-1);
-
-        UpdateSettingsRequest request = new UpdateSettingsRequest();
-        request.setInitiator(UserMapper.toDto(user));
-        request.setDifficulty(ProblemDifficulty.MEDIUM);
+        request.setDuration(-1L);
 
         ApiException exception = assertThrows(ApiException.class, () -> roomService.updateRoomSettings(ROOM_ID, request));
         assertEquals(TimerError.INVALID_DURATION, exception.getError());
     }
 
     @Test
-    public void updateROomSettingsDurationTooLong() {
-        // TODO
+    public void updateRoomSettingsDurationTooLong() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User host = new User();
+        host.setNickname(NICKNAME);
+
+        room.setHost(host);
+        room.addUser(host);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        UpdateSettingsRequest request = new UpdateSettingsRequest();
+        request.setInitiator(UserMapper.toDto(host));
+        request.setDifficulty(ProblemDifficulty.EASY);
+        request.setDuration(RoomService.MAX_DURATION + 1);
+
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.updateRoomSettings(ROOM_ID, request));
+        assertEquals(TimerError.INVALID_DURATION, exception.getError());
     }
 
     @Test
