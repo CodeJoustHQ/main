@@ -10,13 +10,13 @@ import com.rocketden.main.model.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @SpringBootTest
 public class RoomMapperTests {
@@ -43,6 +43,7 @@ public class RoomMapperTests {
         room.setRoomId(ROOM_ID);
         room.setDifficulty(ProblemDifficulty.MEDIUM);
         room.setHost(host);
+        room.setNumProblems(3);
 
         room.addUser(host);
         room.addUser(user);
@@ -52,6 +53,7 @@ public class RoomMapperTests {
         assertNotNull(response);
         assertEquals(room.getRoomId(), response.getRoomId());
         assertEquals(room.getDifficulty(), response.getDifficulty());
+        assertEquals(room.getNumProblems(), response.getNumProblems());
 
         User actualHost = UserMapper.toEntity(response.getHost());
         assertEquals(room.getHost(), actualHost);
