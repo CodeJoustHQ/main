@@ -16,7 +16,7 @@ import { checkLocationState } from '../util/Utility';
 import Console from '../components/game/Console';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
-import { Notification, NotificationType } from '../api/Notification';
+import { GameNotification, NotificationType } from '../api/GameNotification';
 import Difficulty from '../api/Difficulty';
 import { Game, getGame } from '../api/Game';
 import { routes, send, subscribe } from '../api/Socket';
@@ -74,7 +74,7 @@ function GamePage() {
     });
 
     const displayNotification = (result: Message) => {
-      const notification: Notification = JSON.parse(result.body);
+      const notification: GameNotification = JSON.parse(result.body);
       const timeElapsed: number = Date.now() - new Date(notification.time).getTime();
       console.log(`${notification.notificationType} notification from ${notification.initiator.nickname}, ${timeElapsed} seconds ago.${notification.content ? ` The content is '${notification.content}'.` : ''}`);
       // TODO: Display the notifications that are received.

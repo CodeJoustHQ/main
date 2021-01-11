@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
+import { GameNotification, NotificationType } from '../../api/GameNotification';
 
 const NotificationBox = styled.div`
   position: absolute;
@@ -15,16 +16,39 @@ const NotificationBox = styled.div`
   border-radius: 5px;
 `;
 
-type NotificationProps = {
-  
+const notificationToString = (notification: GameNotification): string => {
+  const timeElapsed: number = Date.now() - new Date(notification.time).getTime();
+
+  switch (notification.notificationType) {
+    case NotificationType.SubmitCorrect: {
+      return `${notification.initiator.nickname} just submitted correctly
+        ${notification.content ? `, taking ${notification.content} place, ` : ''} ${timeElapsed} seconds ago.`;
+    }
+    case NotificationType.SubmitIncorrect: {
+      return `${notification.initiator.nickname} just submitted incorrectly.`;
+    }
+
+    case NotificationType.TestCorrect: {
+      return `${notification.initiator.nickname} passed a test case
+        ${notification.content ? ` with result ${notification.content}` : ''}
+        ${timeElapsed} seconds ago.`;
+    }
+
+    case NotificationType.CodeStreak: {
+      return `${notification.initiator.nickname} is on a coding streak!`;
+    }
+
+    default: {
+      return '5';
+    }
+  }
 };
 
 // This function refreshes the width of Monaco editor upon change in container size
-function NotificationContainer(props: NotificationProps) {
-
+function NotificationContainer(props: GameNotification) {
   return (
     <NotificationBox>
-      Test.
+      {notificationToString(props)}
     </NotificationBox>
   );
 }

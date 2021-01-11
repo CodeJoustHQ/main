@@ -8,7 +8,7 @@ export enum NotificationType {
   OneMinRemaining = 'ONE_MIN_REMAINING',
 }
 
-export type Notification = {
+export type GameNotification = {
   initiator: User,
   time: Date,
   notificationType: NotificationType,
