@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message, Subscription } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
-import { LargeText, MediumText } from '../components/core/Text';
+import { LargeText, MediumText, Text } from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
@@ -296,12 +296,18 @@ function LobbyPage() {
         </DifficultyButton>
       ))}
 
-      <MediumText>Duration (min)</MediumText>
+      <MediumText>Duration</MediumText>
+      <Text>Choose a game duration between 1-60 minutes:</Text>
       <NumberInput
         min={1}
         max={60}
         value={duration}
-        onChange={(e) => setDuration(Number(e.target.value))}
+        onChange={(e) => {
+          const newDuration = Number(e.target.value);
+          if (newDuration > 0 && newDuration <= 60) {
+            setDuration(Number(e.target.value));
+          }
+        }}
       />
       <SmallButton onClick={updateRoomDuration}>Save</SmallButton>
 
