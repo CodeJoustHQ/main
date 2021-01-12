@@ -134,8 +134,24 @@ function LobbyPage() {
     }
   };
 
+  /**
+   * Update the room/game duration (in minutes)
+   */
   const updateRoomDuration = () => {
-    // todo extract updateRoomSettings function
+    const prevDuration = duration;
+    const settings = {
+      initiator: currentUser!,
+      duration: duration * 60,
+    };
+
+    updateRoomSettings(currentRoomId, settings)
+      .then(() => setLoading(false))
+      .catch((err) => {
+        setLoading(false);
+        setError(err.message);
+        // Set duration back to original if REST call failed
+        setDuration(prevDuration);
+      });
   };
 
   /**
@@ -281,6 +297,8 @@ function LobbyPage() {
 
       <MediumText>Duration</MediumText>
       <NumberInput
+        min={1}
+        max={60}
         value={duration}
         onChange={(e) => setDuration(Number(e.target.value))}
       />
