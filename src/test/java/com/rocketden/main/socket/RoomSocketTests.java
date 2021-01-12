@@ -1,7 +1,6 @@
 package com.rocketden.main.socket;
 
 import com.rocketden.main.controller.v1.BaseRestController;
-import com.rocketden.main.dao.ProblemRepository;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
@@ -15,7 +14,6 @@ import com.rocketden.main.util.SocketTestMethods;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,9 +50,6 @@ public class RoomSocketTests {
 
     @Autowired
     private TestRestTemplate template;
-
-    @Mock
-    private ProblemRepository problemRepository;
 
     private static final String CONNECT_ENDPOINT = "ws://localhost:{port}" + BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint";
     private static final String SUBSCRIBE_ENDPOINT = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user";
