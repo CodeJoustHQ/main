@@ -7,6 +7,8 @@ import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.model.User;
 
+import org.modelmapper.ModelMapper;
+
 public class PlayerMapper {
 
     private static final ModelMapper mapper = new ModelMapper();
@@ -23,9 +25,6 @@ public class PlayerMapper {
         playerDto.setSolved(player.getSolved());
         playerDto.setCode(player.getPlayerCode().getCode());
         playerDto.setLanguage(player.getPlayerCode().getLanguage());
-
-        // Set loose matching to allow flattening of variables in DTO objects
-        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
 
         List<SubmissionDto> submissions = new ArrayList<>();
         player.getSubmissions().forEach(submission -> submissions.add(mapper.map(submission, SubmissionDto.class)));

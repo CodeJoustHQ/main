@@ -33,6 +33,8 @@ public class PlayerMapperTests {
 
         assertEquals(player.getUser().getUserId(), playerDto.getUser().getUserId());
         assertTrue(playerDto.getSolved());
+        assertEquals(player.getPlayerCode().getCode(), playerDto.getCode());
+        assertEquals(player.getPlayerCode().getLanguage(), playerDto.getLanguage());
         assertEquals(0, playerDto.getSubmissions().size());
     }
 
