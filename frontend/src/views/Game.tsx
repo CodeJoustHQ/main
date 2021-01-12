@@ -70,7 +70,7 @@ function GamePage() {
    */
   const displayNotification = useCallback((result: Message) => {
     const notificationResult: GameNotification = JSON.parse(result.body);
-    if (gameNotification == null && currentUser && notificationResult
+    if (currentUser && notificationResult
       && notificationResult.initiator
       && currentUser.userId !== notificationResult.initiator.userId) {
       setGameNotification(notificationResult);
@@ -80,7 +80,7 @@ function GamePage() {
         setGameNotification(null);
       }, gameNotificationTime);
     }
-  }, [gameNotification, gameNotificationTime, currentUser]);
+  }, [gameNotificationTime, currentUser]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
