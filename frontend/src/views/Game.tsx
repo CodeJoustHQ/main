@@ -46,9 +46,6 @@ function GamePage() {
   // When variable null, show nothing; otherwise, show notification.
   const [gameNotification, setGameNotification] = useState<GameNotification | null>(null);
 
-  // Time, in milliseconds, before notification disappears. (Currently 15s.)
-  const gameNotificationTime: number = 15000;
-
   // Variable to hold whether the user is subscribed to the primary Game socket.
   const [userSocketSubscribed, setUserSocketSubscribed] = useState(false);
 
@@ -74,13 +71,8 @@ function GamePage() {
       && notificationResult.initiator
       && currentUser.userId !== notificationResult.initiator.userId) {
       setGameNotification(notificationResult);
-
-      // Remove notification automatically after 15 seconds.
-      setTimeout(() => {
-        setGameNotification(null);
-      }, gameNotificationTime);
     }
-  }, [gameNotificationTime, currentUser]);
+  }, [currentUser]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
