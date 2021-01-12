@@ -53,20 +53,6 @@ public class GameMapperTests {
     }
 
     @Test
-    public void playerFromUser() {
-        User user = new User();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
-
-        Player player = GameMapper.playerFromUser(user);
-
-        assertEquals(user, player.getUser());
-        assertNull(player.getPlayerCode());
-        assertFalse(player.getSolved());
-        assertEquals(0, player.getSubmissions().size());
-    }
-
-    @Test
     public void toDto() {
         Problem problem = new Problem();
         problem.setName(NAME);

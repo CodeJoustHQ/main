@@ -28,6 +28,9 @@ public class GameMapper {
         game.getProblems().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
         gameDto.setProblems(problems);
 
+        List<PlayerDto> players = new ArrayList<>();
+        game.getPlayers().values().forEach(player -> players.add(PlayerMapper.toDto(player)));
+
         return gameDto;
     }
 
@@ -41,21 +44,10 @@ public class GameMapper {
 
         Map<String, Player> players = game.getPlayers();
         for (User user : room.getUsers()) {
-            Player player = playerFromUser(user);
+            Player player = PlayerMapper.playerFromUser(user);
             players.put(user.getUserId(), player);
         }
 
         return game;
-    }
-
-    public static Player playerFromUser(User user) {
-        if (user == null) {
-            return null;
-        }
-
-        Player player = new Player();
-        player.setUser(user);
-
-        return player;
     }
 }
