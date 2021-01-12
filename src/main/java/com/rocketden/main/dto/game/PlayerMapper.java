@@ -1,12 +1,15 @@
 package com.rocketden.main.dto.game;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.model.User;
 
 public class PlayerMapper {
+
+    private static final ModelMapper mapper = new ModelMapper();
 
     protected PlayerMapper() {}
 
@@ -20,7 +23,13 @@ public class PlayerMapper {
         playerDto.setSolved(player.getSolved());
         playerDto.setCode(player.getPlayerCode().getCode());
         playerDto.setLanguage(player.getPlayerCode().getLanguage());
-        playerDto.setSubmissions(new ArrayList<>());
+
+        // Set loose matching to allow flattening of variables in DTO objects
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
+
+        List<SubmissionDto> submissions = new ArrayList<>();
+        player.getSubmissions().forEach(submission -> submissions.add(mapper.map(submission, SubmissionDto.class)));
+        playerDto.setSubmissions(submissions);
 
         return playerDto;
     }
