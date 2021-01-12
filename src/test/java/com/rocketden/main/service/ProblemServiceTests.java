@@ -254,7 +254,7 @@ public class ProblemServiceTests {
         ApiException exception = assertThrows(ApiException.class, () ->
                 problemService.getProblemsFromDifficulty(null, 1));
 
-        assertEquals(ProblemError.BAD_DIFFICULTY, exception.getError());
+        assertEquals(ProblemError.EMPTY_FIELD, exception.getError());
     }
 
     @Test
@@ -262,7 +262,7 @@ public class ProblemServiceTests {
         ApiException exception = assertThrows(ApiException.class, () ->
                 problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, null));
 
-        assertEquals(ProblemError.BAD_NUMBER_PROBLEMS, exception.getError());
+        assertEquals(ProblemError.EMPTY_FIELD, exception.getError());
     }
 
     @Test

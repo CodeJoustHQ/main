@@ -75,10 +75,8 @@ public class ProblemService {
      * @param numProblems The number of problems to fetch.
      */
     public List<Problem> getProblemsFromDifficulty(ProblemDifficulty difficulty, Integer numProblems) {
-        if (difficulty == null) {
-            throw new ApiException(ProblemError.BAD_DIFFICULTY);
-        } else if (numProblems == null) {
-            throw new ApiException(ProblemError.BAD_NUMBER_PROBLEMS);
+        if (difficulty == null || numProblems == null) {
+            throw new ApiException(ProblemError.EMPTY_FIELD);
         }
 
         List<Problem> problems;
