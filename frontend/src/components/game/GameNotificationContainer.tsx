@@ -53,13 +53,8 @@ type GameNotificationProps = {
 }
 
 function GameNotificationContainer(props: GameNotificationProps) {
-  // If props or child are null, return null as well, showing no notification.
-  if (props == null) {
-    return null;
-  }
-
   const { gameNotification, onClickFunc } = props;
-  if (gameNotification == null) {
+  if (gameNotification == null || onClickFunc == null) {
     return null;
   }
 
