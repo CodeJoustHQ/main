@@ -1,5 +1,7 @@
 package com.rocketden.main.dto.game;
 
+import java.util.ArrayList;
+
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.model.User;
@@ -14,7 +16,11 @@ public class PlayerMapper {
         }
 
         PlayerDto playerDto = new PlayerDto();
-        playerDto.setUserDto(UserMapper.toDto(player.getUser()));
+        playerDto.setUser(UserMapper.toDto(player.getUser()));
+        playerDto.setSolved(player.getSolved());
+        playerDto.setCode(player.getPlayerCode().getCode());
+        playerDto.setLanguage(player.getPlayerCode().getLanguage());
+        playerDto.setSubmissions(new ArrayList<>());
 
         return playerDto;
     }

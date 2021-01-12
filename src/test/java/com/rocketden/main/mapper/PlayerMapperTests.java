@@ -31,7 +31,7 @@ public class PlayerMapperTests {
 
         PlayerDto playerDto = PlayerMapper.toDto(player);
 
-        assertEquals(player.getUser().getUserId(), playerDto.getUserDto().getUserId());
+        assertEquals(player.getUser().getUserId(), playerDto.getUser().getUserId());
         assertTrue(playerDto.getSolved());
         assertEquals(0, playerDto.getSubmissions().size());
     }
