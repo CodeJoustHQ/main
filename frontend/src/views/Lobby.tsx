@@ -194,7 +194,7 @@ function LobbyPage() {
         .then((res) => {
           setStateFromRoom(res);
           // Reset the user to hold the ID.
-          res.inactiveUsers.forEach((user: User) => {
+          res.users.forEach((user: User) => {
             if (user.nickname === location.state.user.nickname) {
               setCurrentUser(user);
             }

@@ -44,6 +44,7 @@ public class ProblemServiceTests {
 
     private static final String INPUT = "[1, 8, 2]";
     private static final String OUTPUT = "[1, 2, 8]";
+    private static final String EXPLANATION = "2 < 8, so those are swapped.";
 
     @Test
     public void getProblemSuccess() {
@@ -55,6 +56,7 @@ public class ProblemServiceTests {
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(INPUT);
         testCase.setOutput(OUTPUT);
+        testCase.setExplanation(EXPLANATION);
         expected.addTestCase(testCase);
 
         Mockito.doReturn(expected).when(repository).findProblemByProblemId(expected.getProblemId());
@@ -68,6 +70,7 @@ public class ProblemServiceTests {
 
         assertEquals(expected.getTestCases().get(0).getInput(), response.getTestCases().get(0).getInput());
         assertEquals(expected.getTestCases().get(0).getOutput(), response.getTestCases().get(0).getOutput());
+        assertEquals(expected.getTestCases().get(0).getExplanation(), response.getTestCases().get(0).getExplanation());
     }
 
     @Test
@@ -166,6 +169,7 @@ public class ProblemServiceTests {
         request.setInput(INPUT);
         request.setOutput(OUTPUT);
         request.setHidden(true);
+        request.setExplanation(EXPLANATION);
 
         ProblemTestCaseDto response = problemService.createTestCase(expected.getProblemId(), request);
 
@@ -174,6 +178,7 @@ public class ProblemServiceTests {
         assertEquals(INPUT, response.getInput());
         assertEquals(OUTPUT, response.getOutput());
         assertTrue(response.isHidden());
+        assertEquals(EXPLANATION, response.getExplanation());
 
         // The created test case should be added to this problem
         assertEquals(1, expected.getTestCases().size());

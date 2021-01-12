@@ -53,7 +53,7 @@ export const connect = (roomId: string, userId: string):
         reject(errorHandler('The socket failed to connect.'));
       });
     } else {
-      reject(errorHandler('The socket is already connected.'));
+      resolve();
     }
   });
 

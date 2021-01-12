@@ -40,8 +40,10 @@ import java.util.concurrent.BlockingQueue;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
@@ -389,7 +391,7 @@ public class RoomSocketTests {
         assertNotNull(actual);
 
         assertEquals(expected.getRoomId(), actual.getRoomId());
-        assertEquals(true, actual.isActive());
+        assertTrue(actual.isActive());
     }
 
     @Test
@@ -408,21 +410,21 @@ public class RoomSocketTests {
         assertNotNull(actual);
 
         // Check that the room contains the user
-        assertEquals(true, actual.getUsers().contains(newUser));
+        assertTrue(actual.getUsers().contains(newUser));
 
         RemoveUserRequest removeUserRequest = new RemoveUserRequest();
         removeUserRequest.setInitiator(room.getHost());
         removeUserRequest.setUserToDelete(newUser);
 
         HttpEntity<RemoveUserRequest> removeUserEntity = new HttpEntity<>(removeUserRequest);
-        String removeUserEndpoint = String.format("%s/%s/users/remove", baseRestEndpoint, room.getRoomId());
-        RoomDto expected = template.exchange(removeUserEndpoint, HttpMethod.PUT, removeUserEntity, RoomDto.class).getBody();
+        String removeUserEndpoint = String.format("%s/%s/users", baseRestEndpoint, room.getRoomId());
+        RoomDto expected = template.exchange(removeUserEndpoint, HttpMethod.DELETE, removeUserEntity, RoomDto.class).getBody();
 
         actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(expected);
         assertNotNull(actual);
 
         assertEquals(expected.getRoomId(), actual.getRoomId());
-        assertEquals(false, actual.getUsers().contains(newUser));
+        assertFalse(actual.getUsers().contains(newUser));
     }
 }

@@ -184,7 +184,7 @@ public class RoomService {
     }
 
     // This function randomly assigns a new host in the room
-    public void conditionallyUpdateRoomHost(Room room, User user) {
+    public RoomDto conditionallyUpdateRoomHost(Room room, User user) {
         // If the disconnected user is the host and another active user is present, reassign the host for the room.
         if (room.getHost().equals(user)) {
             UpdateHostRequest request = new UpdateHostRequest();
@@ -200,9 +200,11 @@ public class RoomService {
 
             // Determine whether an active non-host user was found, and if so, send an update room host request.
             if (request.getNewHost() != null) {
-                updateRoomHost(room.getRoomId(), request);
+                return updateRoomHost(room.getRoomId(), request);
             }
         }
+        // If conditions fail to match, just return the room as it is
+        return RoomMapper.toDto(room);
     }
 
     public RoomDto updateRoomSettings(String roomId, UpdateSettingsRequest request) {

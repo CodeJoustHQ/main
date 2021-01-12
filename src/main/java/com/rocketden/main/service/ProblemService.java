@@ -121,6 +121,7 @@ public class ProblemService {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
 
+        // Problem input and output are the two required fields.
         if (request.getInput() == null || request.getOutput() == null) {
             throw new ApiException(ProblemError.EMPTY_FIELD);
         }
@@ -128,7 +129,12 @@ public class ProblemService {
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(request.getInput());
         testCase.setOutput(request.getOutput());
+
+        // Test case is not hidden by default.
         testCase.setHidden(request.isHidden());
+
+        // Explanation may be null, indicating no explanation is attached.
+        testCase.setExplanation(request.getExplanation());
 
         problem.addTestCase(testCase);
         repository.save(problem);
