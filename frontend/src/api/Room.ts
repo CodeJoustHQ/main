@@ -23,7 +23,8 @@ export type JoinRoomParams = {
 
 export type UpdateSettingsParams = {
   initiator: User,
-  difficulty: Difficulty,
+  difficulty?: Difficulty,
+  duration?: number,
 };
 
 export type ChangeHostParams = {
