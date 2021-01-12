@@ -131,7 +131,7 @@ public class GameSocketTests {
         });
     }
 
-    // This test is failing likely until merged with master (which removes the map from GameDto)
+    // TODO: This test is failing likely until merged with master (which removes the map from GameDto)
     @Test
     public void socketReceivesMessageOnGameOver() throws Exception {
         GameDto gameDto = blockingQueue.poll(DURATION + 5, SECONDS);

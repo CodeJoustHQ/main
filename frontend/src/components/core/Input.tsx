@@ -63,7 +63,7 @@ export const NumberInput = styled(Input).attrs(() => ({
   display: inline-block;
   width: 7rem;
   text-align: center;
-  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   padding: 1rem;
   color: ${({ theme }) => theme.colors.text};
 

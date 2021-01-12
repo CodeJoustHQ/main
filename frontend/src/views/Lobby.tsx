@@ -65,6 +65,7 @@ function LobbyPage() {
 
   const kickUser = (user: User) => {
     setLoading(true);
+    setError('');
     removeUser(currentRoomId, {
       initiator: currentUser as User,
       userToDelete: user,
@@ -79,6 +80,7 @@ function LobbyPage() {
   };
 
   const changeHosts = (newHost: User) => {
+    setError('');
     const request = {
       initiator: currentUser!,
       newHost,
@@ -96,6 +98,7 @@ function LobbyPage() {
   };
 
   const handleStartGame = () => {
+    setError('');
     const request = { initiator: currentUser as User };
     startGame(currentRoomId, request)
       .then(() => {
@@ -110,6 +113,7 @@ function LobbyPage() {
    * Update the difficulty setting of the room (EASY, MEDIUM, HARD, or RANDOM)
    */
   const updateDifficultySetting = (key: string) => {
+    setError('');
     if (currentUser?.nickname === host?.nickname && !loading) {
       const oldDifficulty = difficulty;
       const newDifficulty = Difficulty[key as keyof typeof Difficulty];
@@ -138,6 +142,7 @@ function LobbyPage() {
    * Update the room/game duration (in minutes)
    */
   const updateRoomDuration = () => {
+    setError('');
     setLoading(true);
     const prevDuration = duration;
     const settings = {
@@ -304,7 +309,7 @@ function LobbyPage() {
         value={duration}
         onChange={(e) => {
           const newDuration = Number(e.target.value);
-          if (newDuration > 0 && newDuration <= 60) {
+          if (newDuration >= 0 && newDuration <= 60) {
             setDuration(Number(e.target.value));
           }
         }}
