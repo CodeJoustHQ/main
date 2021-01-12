@@ -52,7 +52,6 @@ type GameNotificationProps = {
   onClickFunc: (gameNotification: GameNotification | null) => void,
 }
 
-// This function refreshes the width of Monaco editor upon change in container size
 function GameNotificationContainer(props: GameNotificationProps) {
   // If props or child are null, return null as well, showing no notification.
   if (props == null) {
