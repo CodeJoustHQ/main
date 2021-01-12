@@ -31,6 +31,7 @@ import java.util.concurrent.BlockingQueue;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
@@ -79,6 +80,7 @@ public class GameSocketTests {
         // Create room
         HttpEntity<CreateRoomRequest> createEntity = new HttpEntity<>(createRequest);
         room = template.postForObject(baseRestEndpoint, createEntity, RoomDto.class);
+        assertNotNull(room);
 
         UserDto user = new UserDto();
         user.setNickname(NICKNAME_2);
@@ -89,14 +91,17 @@ public class GameSocketTests {
         // Join room
         HttpEntity<JoinRoomRequest> joinEntity = new HttpEntity<>(joinRequest);
         String joinRoomEndpoint = String.format("%s/%s/users", baseRestEndpoint, room.getRoomId());
-        template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class);
+        room = template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
+        assertNotNull(room);
 
         // Update room settings
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
+        updateRequest.setInitiator(host);
         updateRequest.setDuration(DURATION);
         HttpEntity<UpdateSettingsRequest> updateEntity = new HttpEntity<>(updateRequest);
         String updateEndpoint = String.format("%s/%s/settings", baseRestEndpoint, room.getRoomId());
-        template.exchange(updateEndpoint, HttpMethod.PUT, updateEntity, RoomDto.class);
+        room = template.exchange(updateEndpoint, HttpMethod.PUT, updateEntity, RoomDto.class).getBody();
+        assertNotNull(room);
 
         // Create problems
         SocketTestMethods.createSingleProblemAndTestCases(template, port);
@@ -106,7 +111,8 @@ public class GameSocketTests {
         startRequest.setInitiator(host);
         HttpEntity<StartGameRequest> startEntity = new HttpEntity<>(startRequest);
         String startEndpoint = String.format("%s/%s/start", baseRestEndpoint, room.getRoomId());
-        template.exchange(startEndpoint, HttpMethod.POST, startEntity, RoomDto.class);
+        room = template.exchange(startEndpoint, HttpMethod.POST, startEntity, RoomDto.class).getBody();
+        assertNotNull(room);
 
         // Set up the socket connection and subscription
         blockingQueue = new ArrayBlockingQueue<>(2);
@@ -127,11 +133,12 @@ public class GameSocketTests {
 
     @Test
     public void socketReceivesMessageOnGameOver() throws Exception {
-        GameDto gameDto = blockingQueue.poll(DURATION, SECONDS);
+        GameDto gameDto = blockingQueue.poll(DURATION + 5, SECONDS);
         assertNotNull(gameDto);
         assertNotNull(gameDto.getGameTimer());
 
         assertEquals(room, gameDto.getRoom());
         assertEquals(DURATION, gameDto.getGameTimer().getDuration());
+        assertTrue(gameDto.getGameTimer().isTimeUp());
     }
 }

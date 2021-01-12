@@ -10,6 +10,7 @@ import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.room.RemoveUserRequest;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.RoomError;
+import com.rocketden.main.exception.TimerError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Room;
@@ -226,7 +227,11 @@ public class RoomService {
         }
 
         // Set new duration if not null
-        if (request.getDuration() != null) {
+        Long duration = request.getDuration();
+        if (duration != null) {
+            if (duration <= 0 || duration > MAX_DURATION) {
+                throw new ApiException(TimerError.INVALID_DURATION);
+            }
             room.setDuration(request.getDuration());
         }
 
