@@ -60,9 +60,9 @@ export const ConsoleTextArea = styled.textarea`
 export const NumberInput = styled(Input).attrs(() => ({
   type: 'number',
 }))`
-  width: 50px;
+  width: 7rem;
   text-align: center;
-  font-size: ${({ theme }) => theme.fontSize.medium};
+  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
   padding: 1rem;
   color: ${({ theme }) => theme.colors.text};
 

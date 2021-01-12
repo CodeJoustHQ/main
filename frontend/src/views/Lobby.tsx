@@ -138,6 +138,7 @@ function LobbyPage() {
    * Update the room/game duration (in minutes)
    */
   const updateRoomDuration = () => {
+    setLoading(true);
     const prevDuration = duration;
     const settings = {
       initiator: currentUser!,
@@ -295,7 +296,7 @@ function LobbyPage() {
         </DifficultyButton>
       ))}
 
-      <MediumText>Duration</MediumText>
+      <MediumText>Duration (min)</MediumText>
       <NumberInput
         min={1}
         max={60}
