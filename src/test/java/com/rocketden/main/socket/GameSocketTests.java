@@ -1,6 +1,5 @@
 package com.rocketden.main.socket;
 
-
 import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.StartGameRequest;
@@ -28,6 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.lang.reflect.Type;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
@@ -75,7 +78,7 @@ public class GameSocketTests {
 
         // Create room
         HttpEntity<CreateRoomRequest> createEntity = new HttpEntity<>(createRequest);
-        RoomDto room = template.postForObject(baseRestEndpoint, createEntity, RoomDto.class);
+        room = template.postForObject(baseRestEndpoint, createEntity, RoomDto.class);
 
         UserDto user = new UserDto();
         user.setNickname(NICKNAME_2);
@@ -123,7 +126,12 @@ public class GameSocketTests {
     }
 
     @Test
-    public void socketReceivesMessageOnGameOver() {
-        // TODO
+    public void socketReceivesMessageOnGameOver() throws Exception {
+        GameDto gameDto = blockingQueue.poll(DURATION, SECONDS);
+        assertNotNull(gameDto);
+        assertNotNull(gameDto.getGameTimer());
+
+        assertEquals(room, gameDto.getRoom());
+        assertEquals(DURATION, gameDto.getGameTimer().getDuration());
     }
 }

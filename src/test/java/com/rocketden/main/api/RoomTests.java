@@ -11,6 +11,7 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
+import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.util.UtilityTestMethods;
 
@@ -24,7 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -59,7 +60,7 @@ public class RoomTests {
     private static final String USER_ID = "012345";
     private static final String USER_ID_2 = "678910";
     private static final String ROOM_ID = "012345";
-    private static final Long DURATION = 600;
+    private static final long DURATION = 600;
 
     /**
      * Helper method that creates a room with the given host
