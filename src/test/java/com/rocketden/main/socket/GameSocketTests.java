@@ -3,6 +3,7 @@ package com.rocketden.main.socket;
 
 import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dto.game.GameDto;
+import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
@@ -94,14 +95,20 @@ public class GameSocketTests {
         String updateEndpoint = String.format("%s/%s/settings", baseRestEndpoint, room.getRoomId());
         template.exchange(updateEndpoint, HttpMethod.PUT, updateEntity, RoomDto.class);
 
+        // Create problems
+        SocketTestMethods.createSingleProblemAndTestCases(template, port);
+
         // Start game
-        // TODO
+        StartGameRequest startRequest = new StartGameRequest();
+        startRequest.setInitiator(host);
+        HttpEntity<StartGameRequest> startEntity = new HttpEntity<>(startRequest);
+        String startEndpoint = String.format("%s/%s/start", baseRestEndpoint, room.getRoomId());
+        template.exchange(startEndpoint, HttpMethod.POST, startEntity, RoomDto.class);
 
         // Set up the socket connection and subscription
         blockingQueue = new ArrayBlockingQueue<>(2);
         hostSession = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, USER_ID, this.port);
 
-        // Add socket messages to BlockingQueue so we can verify expected behavior
         hostSession.subscribe(String.format(SUBSCRIBE_ENDPOINT, room.getRoomId()), new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
