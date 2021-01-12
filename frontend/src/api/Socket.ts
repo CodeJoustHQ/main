@@ -78,7 +78,7 @@ export const subscribe = (subscribeUrl: string,
  */
 export const send = (sendUrl: string, headers?: {}, body?: string):
   Promise<void> => new Promise<void>((resolve, reject) => {
-    if (connected) {
+    if (stompClient && stompClient.connected) {
       stompClient.send(sendUrl, headers, body);
       resolve();
     } else {
