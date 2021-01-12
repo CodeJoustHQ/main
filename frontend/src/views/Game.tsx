@@ -67,9 +67,7 @@ function GamePage() {
    */
   const displayNotification = useCallback((result: Message) => {
     const notificationResult: GameNotification = JSON.parse(result.body);
-    if (currentUser && notificationResult
-      && notificationResult.initiator
-      && currentUser.userId !== notificationResult.initiator.userId) {
+    if (currentUser?.userId !== notificationResult?.initiator?.userId) {
       setGameNotification(notificationResult);
     }
   }, [currentUser]);
