@@ -49,14 +49,11 @@ function GameTimerContainer(props: GameTimerProps) {
   }, [calculateSetClock]);
 
   useEffect(() => {
-    // Set timer if applicable; otherwise, default of 00:00.
+    // Set timer if applicable; otherwise, default of null to display loading.
     if (props.gameTimer) {
       updateClock(props.gameTimer);
     } else {
-      setCurrentClock({
-        minutes: '00',
-        seconds: '00',
-      });
+      setCurrentClock(null);
     }
   }, [updateClock, props]);
 
@@ -64,9 +61,7 @@ function GameTimerContainer(props: GameTimerProps) {
     <div>
       Time:
       {' '}
-      {(currentClock) ? currentClock.minutes : '00'}
-      :
-      {(currentClock) ? currentClock.seconds : '00'}
+      {(currentClock) ? `${currentClock.minutes}:${currentClock.seconds}` : 'Loading...'}
     </div>
   );
 }

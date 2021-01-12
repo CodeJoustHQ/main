@@ -84,21 +84,20 @@ public class GameManagementService {
         repository.save(room);
 
         // Initialize game state
-        Game game = createAddGameFromRoom(room);
-        setStartGameTimer(game, GameTimer.DURATION_15);
+        createAddGameFromRoom(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
         socketService.sendSocketUpdate(roomDto);
         return roomDto;
     }
 
-    // Initialize and add a game object from a room object
-    public Game createAddGameFromRoom(Room room) {
+    // Initialize and add a game object from a room object, start game timer
+    public void createAddGameFromRoom(Room room) {
         Game game = GameMapper.fromRoom(room);
         List<Problem> problems = problemService.getProblemsFromDifficulty(room.getDifficulty(), 1);
         game.setProblems(problems);
         currentGameMap.put(room.getRoomId(), game);
-        return game;
+        setStartGameTimer(game, GameTimer.DURATION_15);
     }
 
     // Set and start the Game Timer.
