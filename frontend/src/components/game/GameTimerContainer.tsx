@@ -64,9 +64,7 @@ function GameTimerContainer(props: GameTimerProps) {
     <div>
       Time:
       {' '}
-      {(currentClock) ? currentClock.minutes : '00'}
-      :
-      {(currentClock) ? currentClock.seconds : '00'}
+      {(currentClock) ? `${currentClock.minutes}:${currentClock.seconds}` : 'Loading...'}
     </div>
   );
 }
