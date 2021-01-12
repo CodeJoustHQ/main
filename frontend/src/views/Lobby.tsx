@@ -2,12 +2,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message, Subscription } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
-import {LargeText, MediumText, Text} from '../components/core/Text';
+import { LargeText, MediumText } from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
 import Difficulty from '../api/Difficulty';
-import {PrimaryButton, DifficultyButton, SmallButton} from '../components/core/Button';
+import { PrimaryButton, DifficultyButton, SmallButton } from '../components/core/Button';
 import Loading from '../components/core/Loading';
 import PlayerCard from '../components/card/PlayerCard';
 import HostActionCard from '../components/card/HostActionCard';
@@ -15,7 +15,7 @@ import { startGame } from '../api/Game';
 import {
   getRoom, Room, changeRoomHost, updateRoomSettings, removeUser,
 } from '../api/Room';
-import {LargeCenterInputText} from '../components/core/Input';
+import { NumberInput } from '../components/core/Input';
 
 type LobbyPageLocation = {
   user: User,
@@ -280,9 +280,9 @@ function LobbyPage() {
       ))}
 
       <MediumText>Duration</MediumText>
-      <LargeCenterInputText
-        placeholder="15"
-        onChange={(e) => setDuration(e.target.value)}
+      <NumberInput
+        value={duration}
+        onChange={(e) => setDuration(Number(e.target.value))}
       />
       <SmallButton onClick={updateRoomDuration}>Save</SmallButton>
 
