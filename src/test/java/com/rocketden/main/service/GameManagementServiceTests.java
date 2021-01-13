@@ -207,7 +207,7 @@ public class GameManagementServiceTests {
 
         gameService.submitSolution(ROOM_ID, request);
 
-        verify(submitService).submitSolution(any(Game.class), request);
+        verify(submitService).submitSolution(any(Game.class), eq(request));
     }
 
     @Test
