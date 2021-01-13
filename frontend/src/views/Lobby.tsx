@@ -103,10 +103,10 @@ function LobbyPage() {
    * only nickname). Boot user if not present in list.
    * Only go through process if current user is not yet set.
    */
-  const updateCurrentUserDetails = useCallback((inactiveUsersParam: User[]) => {
+  const updateCurrentUserDetails = useCallback((usersParam: User[]) => {
     if (!currentUser) {
       let userFound: boolean = false;
-      inactiveUsersParam.forEach((user: User) => {
+      usersParam.forEach((user: User) => {
         if (user.nickname === location.state.user.nickname) {
           setCurrentUser(user);
           userFound = true;
@@ -257,7 +257,7 @@ function LobbyPage() {
       getRoom(location.state.roomId)
         .then((res) => {
           setStateFromRoom(res);
-          updateCurrentUserDetails(res.inactiveUsers);
+          updateCurrentUserDetails(res.users);
         })
         .catch((err) => setError(err));
     } else {
