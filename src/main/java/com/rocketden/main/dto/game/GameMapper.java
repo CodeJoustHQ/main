@@ -28,6 +28,7 @@ public class GameMapper {
 
         GameDto gameDto = new GameDto();
         gameDto.setRoom(RoomMapper.toDto(game.getRoom()));
+        gameDto.setGameTimer(GameTimerMapper.toDto(game.getGameTimer()));
 
         List<ProblemDto> problems = new ArrayList<>();
         game.getProblems().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));

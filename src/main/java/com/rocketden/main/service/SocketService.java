@@ -1,6 +1,7 @@
 package com.rocketden.main.service;
 
 import com.rocketden.main.config.WebSocketConfig;
+import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.room.RoomDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,12 @@ public class SocketService {
     public void sendSocketUpdate(RoomDto roomDto) {
         String socketPath = String.format(WebSocketConfig.SOCKET_PATH, roomDto.getRoomId());
         template.convertAndSend(socketPath, roomDto);
+    }
+
+    // Send updates about new game status to the client through sockets
+    public void sendSocketUpdate(GameDto gameDto) {
+        String socketPath = String.format(WebSocketConfig.SOCKET_PATH, gameDto.getRoom().getRoomId());
+        template.convertAndSend(socketPath, gameDto);
     }
     
 }

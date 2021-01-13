@@ -29,6 +29,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
@@ -197,7 +198,7 @@ public class GameManagementServiceTests {
         user.setUserId(USER_ID);
         room.addUser(user);
 
-        Game game = gameService.createAddGameFromRoom(room);
+        gameService.createAddGameFromRoom(room);
 
         SubmissionRequest request = new SubmissionRequest();
         request.setLanguage(LANGUAGE);
@@ -206,7 +207,7 @@ public class GameManagementServiceTests {
 
         gameService.submitSolution(ROOM_ID, request);
 
-        verify(submitService).submitSolution(game, request);
+        verify(submitService).submitSolution(any(Game.class), eq(request));
     }
 
     @Test

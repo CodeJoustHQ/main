@@ -183,8 +183,8 @@ public class GameTests {
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
-        jsonResponse = result.getResponse().getContentAsString();
-        GameDto gameDto = UtilityTestMethods.toObject(jsonResponse, GameDto.class);
+		jsonResponse = result.getResponse().getContentAsString();
+		GameDto gameDto = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, GameDto.class);
 
         assertEquals(actual, gameDto.getRoom());
         assertEquals(1, gameDto.getPlayers().size());
@@ -283,7 +283,7 @@ public class GameTests {
                 .andReturn();
 
         jsonResponse = result.getResponse().getContentAsString();
-        GameDto gameDto = UtilityTestMethods.toObject(jsonResponse, GameDto.class);
+        GameDto gameDto = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, GameDto.class);
 
         assertEquals(1, gameDto.getPlayers().size());
         PlayerDto player = gameDto.getPlayers().get(0);
