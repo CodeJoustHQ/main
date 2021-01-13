@@ -36,6 +36,7 @@ public class GameMapper {
 
         List<PlayerDto> players = new ArrayList<>();
         game.getPlayers().values().forEach(player -> players.add(PlayerMapper.toDto(player)));
+        gameDto.setPlayers(players);
 
         return gameDto;
     }
