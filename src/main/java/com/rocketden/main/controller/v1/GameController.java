@@ -1,6 +1,7 @@
 package com.rocketden.main.controller.v1;
 
 import com.rocketden.main.dto.game.GameDto;
+import com.rocketden.main.dto.game.GameNotificationDto;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.game.StartGameRequest;
 
@@ -33,5 +34,10 @@ public class GameController extends BaseRestController {
     public ResponseEntity<RoomDto> startGame(@PathVariable String roomId,
                                              @RequestBody StartGameRequest request) {
         return new ResponseEntity<>(service.startGame(roomId, request), HttpStatus.OK);
+    }
+
+    @PostMapping("/rooms/{roomId}/notification")
+    public ResponseEntity<RoomDto> sendNotification(@PathVariable String roomId, @RequestBody GameNotificationDto notification) {
+        return new ResponseEntity<>(service.sendNotification(roomId, notification), HttpStatus.OK);
     }
 }

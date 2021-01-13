@@ -1,6 +1,5 @@
 package com.rocketden.main.service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,15 +7,14 @@ import java.util.Map;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
+import com.rocketden.main.dto.game.GameNotificationDto;
 import com.rocketden.main.dto.game.StartGameRequest;
-import com.rocketden.main.dto.notification.NotificationDto;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.Game;
-import com.rocketden.main.game_object.NotificationType;
 import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
@@ -117,12 +115,12 @@ public class GameManagementService {
     }
 
     // Send a notification through a socket update.
-    public NotificationDto sendNotification(List<String> userIdList) {
-        /**
-         * TODO: Get the players from the userIdList,
-         * receive a game notification with details.
-         */
-        return notificationService.sendNotification(NotificationType.SUBMIT_CORRECT, new ArrayList<>());
+    public GameNotificationDto sendNotification(String roomId, GameNotificationDto notificationDto) {
+        if (!currentGameMap.containsKey(roomId)) {
+            throw new ApiException(GameError.NOT_FOUND);
+        }
+        
+        return notificationService.sendNotification(roomId, notificationDto);
     }
 
     // Update a specific player's code.

@@ -12,7 +12,9 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    public static final String SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user";
+    public static final String USER_SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user";
+
+    public static final String NOTIFICATION_SOCKET_PATH = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-notification";
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {

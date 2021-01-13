@@ -39,7 +39,7 @@ public class SocketServiceTests {
 
         socketService.sendSocketUpdate(roomDto);
         verify(template).convertAndSend(
-                eq(String.format(WebSocketConfig.SOCKET_PATH, roomDto.getRoomId())),
+                eq(String.format(WebSocketConfig.USER_SOCKET_PATH, roomDto.getRoomId())),
                 eq(roomDto));
     }
     

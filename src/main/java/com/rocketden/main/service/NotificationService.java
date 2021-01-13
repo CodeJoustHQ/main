@@ -1,11 +1,6 @@
 package com.rocketden.main.service;
 
-import java.util.List;
-
-import com.rocketden.main.dao.RoomRepository;
-import com.rocketden.main.dto.notification.NotificationDto;
-import com.rocketden.main.game_object.NotificationType;
-import com.rocketden.main.game_object.Player;
+import com.rocketden.main.dto.game.GameNotificationDto;
 
 import org.springframework.stereotype.Service;
 
@@ -15,17 +10,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class NotificationService {
 
-    private final RoomRepository repository;
     private final SocketService socketService;
 
-    protected NotificationService(RoomRepository repository, SocketService socketService) {
-        this.repository = repository;
+    protected NotificationService(SocketService socketService) {
         this.socketService = socketService;
     }
     
     // Send a notification through a socket update.
-    public NotificationDto sendNotification(NotificationType gameNotification, List<Player> players) {
-        return new NotificationDto();
+    public GameNotificationDto sendNotification(String roomId, GameNotificationDto notificationDto) {
+        socketService.sendSocketUpdate(roomId, notificationDto);
+        return notificationDto;
     }
 
 }
