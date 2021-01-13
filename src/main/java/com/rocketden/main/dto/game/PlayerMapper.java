@@ -7,12 +7,9 @@ import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.model.User;
 
-import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
 public class PlayerMapper {
-
-    private static final ModelMapper mapper = new ModelMapper();
 
     protected PlayerMapper() {}
 
@@ -27,10 +24,8 @@ public class PlayerMapper {
         playerDto.setCode(player.getPlayerCode().getCode());
         playerDto.setLanguage(player.getPlayerCode().getLanguage());
 
-        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
-
         List<SubmissionDto> submissions = new ArrayList<>();
-        player.getSubmissions().forEach(submission -> submissions.add(mapper.map(submission, SubmissionDto.class)));
+        player.getSubmissions().forEach(submission -> submissions.add(GameMapper.submissionToDto(submission)));
         playerDto.setSubmissions(submissions);
 
         return playerDto;
