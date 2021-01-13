@@ -26,7 +26,7 @@ type LocationState = {
   roomId: string,
   currentUser: User,
   difficulty: Difficulty,
-}
+};
 
 function GamePage() {
   // Get history object to be able to move between different pages
@@ -124,6 +124,8 @@ function GamePage() {
       />
     ));
   };
+
+  // TODO: pass game through location to results page after merging master
 
   // If the page is loading, return a centered Loading object.
   if (fullPageLoading) {
