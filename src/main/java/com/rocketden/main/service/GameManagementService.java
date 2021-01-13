@@ -96,6 +96,8 @@ public class GameManagementService {
         game.setProblems(problems);
         currentGameMap.put(room.getRoomId(), game);
         setStartGameTimer(game, GameTimer.DURATION_15);
+        
+        // TODO: Set corresponding time notifications.
     }
 
     // Set and start the Game Timer.
