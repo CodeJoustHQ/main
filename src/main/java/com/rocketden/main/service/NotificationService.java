@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.notification.NotificationDto;
-import com.rocketden.main.game_object.GameNotification;
+import com.rocketden.main.game_object.NotificationType;
 import com.rocketden.main.game_object.Player;
 
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ public class NotificationService {
     }
     
     // Send a notification through a socket update.
-    public NotificationDto sendNotification(GameNotification gameNotification, List<Player> players) {
+    public NotificationDto sendNotification(NotificationType gameNotification, List<Player> players) {
         return new NotificationDto();
     }
 

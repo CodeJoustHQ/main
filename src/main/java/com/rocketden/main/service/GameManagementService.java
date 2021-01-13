@@ -16,7 +16,7 @@ import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.Game;
-import com.rocketden.main.game_object.GameNotification;
+import com.rocketden.main.game_object.NotificationType;
 import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
@@ -122,7 +122,7 @@ public class GameManagementService {
          * TODO: Get the players from the userIdList,
          * receive a game notification with details.
          */
-        return notificationService.sendNotification(GameNotification.SUBMIT_CORRECT, new ArrayList<>());
+        return notificationService.sendNotification(NotificationType.SUBMIT_CORRECT, new ArrayList<>());
     }
 
     // Update a specific player's code.

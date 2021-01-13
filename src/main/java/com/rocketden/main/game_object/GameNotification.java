@@ -1,19 +1,20 @@
 package com.rocketden.main.game_object;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.rocketden.main.exception.GameError;
-import com.rocketden.main.exception.api.ApiException;
+import java.time.LocalDateTime;
 
-public enum GameNotification {
-    SUBMIT_CORRECT, SUBMIT_INCORRECT, TEST_CORRECT, CODE_STREAK, ONE_MIN_REMAINING;
+import com.rocketden.main.model.User;
 
-    // Convert a matching string (ignoring case) to enum object
-    @JsonCreator
-    public static GameNotification fromString(String value) {
-        try {
-            return GameNotification.valueOf(value.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new ApiException(GameError.BAD_SETTING);
-        }
-    }
+public class GameNotification {
+
+    // The user that initiates the notification (may be null).
+    private User initiator;
+
+    // The time the notification is sent.
+    private LocalDateTime time;
+    
+    // The type of notification sent.
+    private NotificationType notificationType;
+    
+    // Optional content for the notification.
+    private String content;
 }
