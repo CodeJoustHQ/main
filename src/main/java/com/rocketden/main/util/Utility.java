@@ -1,5 +1,8 @@
 package com.rocketden.main.util;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 import com.rocketden.main.dao.RoomRepository;
@@ -18,7 +21,21 @@ public class Utility {
     /**
      * Colors to be generated for players.
      */
-    private static final Color WHITE = new Color(0, 0, 0);
+    public static final Color RED = new Color(255, 41, 41);
+    public static final Color ORANGE = new Color(255, 122, 41);
+    public static final Color BROWN = new Color(191, 127, 53);
+    public static final Color YELLOW = new Color(250, 208, 46);
+    public static final Color GREEN = new Color(145, 250, 73);
+    public static final Color TURQUOISE = new Color(54, 216, 183);
+    public static final Color BLUE = new Color(59, 138, 255);
+    public static final Color VIOLET = new Color(153, 30, 249);
+    public static final Color PINK = new Color(255, 93, 205);
+    public static final Color GREY = new Color(179, 186, 193);
+    public static final Color WHITE = new Color(255, 255, 255);
+    public static final Color BLACK = new Color(0, 0, 0);
+    public static final List<Color> COLOR_LIST = Collections.unmodifiableList
+        (Arrays.asList(RED, ORANGE, BROWN, YELLOW, GREEN, TURQUOISE, BLUE,
+            VIOLET, PINK, GREY, WHITE, BLACK));
 
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
