@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
 import { useBeforeunload } from 'react-beforeunload';
+import { Message } from 'stompjs';
 import Editor from '../components/game/Editor';
 import { SubmissionResult } from '../api/Problem';
 import { errorHandler } from '../api/Error';
@@ -17,6 +18,8 @@ import Loading from '../components/core/Loading';
 import { User } from '../api/User';
 import Difficulty from '../api/Difficulty';
 import { Game, getGame } from '../api/Game';
+import { routes, subscribe } from '../api/Socket';
+import GameTimerContainer from '../components/game/GameTimerContainer';
 
 type LocationState = {
   roomId: string,
@@ -38,6 +41,9 @@ function GamePage() {
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
+  // Variable to hold whether the user is subscribed to the primary Game socket.
+  const [socketSubscribed, setSocketSubscribed] = useState(false);
+
   /**
    * Display beforeUnload message to inform the user that they may lose
    * their code / data if they leave the page.
@@ -45,6 +51,26 @@ function GamePage() {
    * message; see https://github.com/jacobbuck/react-beforeunload.
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
+
+  // Re-subscribe in order to get the correct subscription callback.
+  const subscribePrimary = useCallback((roomIdParam: string) => {
+    const subscribeCallback = (result: Message) => {
+      const updatedGame: Game = JSON.parse(result.body);
+      setGame(updatedGame);
+      setSocketSubscribed(true);
+
+      // Check if end game.
+      if (updatedGame.gameTimer.timeUp) {
+        history.push('/game/results', {
+          game: updatedGame,
+        });
+      }
+    };
+
+    subscribe(routes(roomIdParam).subscribe, subscribeCallback).catch((err) => {
+      setError(err.message);
+    });
+  }, [history]);
 
   // Called every time location changes
   useEffect(() => {
@@ -82,6 +108,13 @@ function GamePage() {
     setSubmission(tempSubmission);
   };
 
+  // Subscribe user to primary socket and to notifications.
+  useEffect(() => {
+    if (!socketSubscribed && roomId) {
+      subscribePrimary(roomId);
+    }
+  }, [socketSubscribed, roomId, subscribePrimary]);
+
   // If the page is loading, return a centered Loading object.
   if (fullPageLoading) {
     return (
@@ -103,6 +136,9 @@ function GamePage() {
         You are
         {' '}
         {currentUser != null ? currentUser.nickname : 'An unknown user'}
+      </FlexInfoBar>
+      <FlexInfoBar>
+        <GameTimerContainer gameTimer={game ? game.gameTimer : null} />
       </FlexInfoBar>
 
       <SplitterContainer>

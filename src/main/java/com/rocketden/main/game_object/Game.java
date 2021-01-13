@@ -22,16 +22,6 @@ public class Game {
     // Map from userId to associated player object
     private Map<String, Player> players = new HashMap<>();
 
-    private Timer timer = new Timer();
-
-    private void endGame() {
-        try {
-            if (timer.isTimeUp()) {
-                // TODO: Send socket update to end the game, add results to db.
-            }
-        } catch(InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
+    private GameTimer gameTimer;
 
 }
