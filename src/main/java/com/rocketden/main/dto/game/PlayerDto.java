@@ -12,8 +12,9 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode
 public class PlayerDto {
-    private UserDto userDto;
-    private PlayerCodeDto playerCode;
+    private UserDto user;
+    private String code;
+    private String language;
     private List<SubmissionDto> submissions;
     private Boolean solved;
 }
