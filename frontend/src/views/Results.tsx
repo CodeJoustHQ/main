@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { LargeText } from '../components/core/Text';
 import { Game, Player } from '../api/Game';
 import { checkLocationState } from '../util/Utility';
 import { errorHandler } from '../api/Error';
+import PlayerResultsCard from '../components/card/PlayerResultsCard';
 
 type LocationState = {
   game: Game,
@@ -27,6 +28,12 @@ function GameResultsPage() {
   return (
     <div>
       <LargeText>Winners</LargeText>
+      {players?.map((player, index) => (
+        <PlayerResultsCard
+          player={player}
+          place={index + 1}
+        />
+      ))}
     </div>
   );
 }
