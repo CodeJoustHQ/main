@@ -83,19 +83,31 @@ function LobbyPage() {
    * If the user is not present in the room after a refresh, then
    * disconnect them and boot them off the page, as they were kicked.
    *
-   * @param user The kicked user to be booted off the page.
+   * @param roomParam The updated room to check for kicked user.
+   * @param currentUser The updated room to check for kicked user.
    */
-  const bootKickedUser = useCallback(() => {
-    disconnect().then(() => {
-      history.replace('/game/join', {
-        error: errorHandler('You have been kicked from the room.'),
+  const conditionallyBootKickedUser = useCallback((roomParam: Room, currentUserParam: User | null) => {
+    if (currentUserParam) {
+      let userIncluded: boolean = false;
+      roomParam.users.forEach((user) => {
+        if (currentUserParam.userId === user.userId) {
+          userIncluded = true;
+        }
       });
-      setSocketConnected(false);
-      setLoading(false);
-    }).catch((err) => {
-      setError(err.message);
-      setLoading(false);
-    });
+      // If user is no longer present in room, boot the user.
+      if (!userIncluded) {
+        disconnect().then(() => {
+          history.replace('/game/join', {
+            error: errorHandler('You have been kicked from the room.'),
+          });
+          setSocketConnected(false);
+          setLoading(false);
+        }).catch((err) => {
+          setError(err.message);
+          setLoading(false);
+        });
+      }
+    }
   }, [history]);
 
   /**
@@ -223,18 +235,7 @@ function LobbyPage() {
     const subscribeCallback = (result: Message) => {
       const room: Room = JSON.parse(result.body);
       setStateFromRoom(room);
-      if (currentUser) {
-        let userIncluded: boolean = false;
-        room.users.forEach((user) => {
-          if (currentUser.userId === user.userId) {
-            userIncluded = true;
-          }
-        });
-        // If user is no longer present in room, boot the user.
-        if (!userIncluded) {
-          bootKickedUser();
-        }
-      }
+      conditionallyBootKickedUser(room, currentUser);
     };
 
     connect(roomId, userId).then(() => {
@@ -247,7 +248,7 @@ function LobbyPage() {
     }).catch((err) => {
       setError(err.message);
     });
-  }, [currentUser, bootKickedUser]);
+  }, [currentUser, conditionallyBootKickedUser]);
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
