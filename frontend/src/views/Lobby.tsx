@@ -86,7 +86,8 @@ function LobbyPage() {
    * @param roomParam The updated room to check for kicked user.
    * @param currentUser The updated room to check for kicked user.
    */
-  const conditionallyBootKickedUser = useCallback((roomParam: Room, currentUserParam: User | null) => {
+  const conditionallyBootKickedUser = useCallback((roomParam: Room,
+    currentUserParam: User | null) => {
     if (currentUserParam) {
       let userIncluded: boolean = false;
       roomParam.users.forEach((user) => {
