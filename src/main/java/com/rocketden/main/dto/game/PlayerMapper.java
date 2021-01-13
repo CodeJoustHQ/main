@@ -21,8 +21,10 @@ public class PlayerMapper {
         PlayerDto playerDto = new PlayerDto();
         playerDto.setUser(UserMapper.toDto(player.getUser()));
         playerDto.setSolved(player.getSolved());
-        playerDto.setCode(player.getPlayerCode().getCode());
-        playerDto.setLanguage(player.getPlayerCode().getLanguage());
+        if (player.getPlayerCode() != null) {
+            playerDto.setCode(player.getPlayerCode().getCode());
+            playerDto.setLanguage(player.getPlayerCode().getLanguage());
+        }
 
         List<SubmissionDto> submissions = new ArrayList<>();
         player.getSubmissions().forEach(submission -> submissions.add(GameMapper.submissionToDto(submission)));
