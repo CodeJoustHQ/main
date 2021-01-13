@@ -36,6 +36,7 @@ public class PlayerMapperTests {
         assertEquals(player.getPlayerCode().getCode(), playerDto.getCode());
         assertEquals(player.getPlayerCode().getLanguage(), playerDto.getLanguage());
         assertEquals(0, playerDto.getSubmissions().size());
+        assertEquals(player.getColor(), playerDto.getColor());
     }
 
     @Test
