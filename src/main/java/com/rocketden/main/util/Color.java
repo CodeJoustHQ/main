@@ -1,10 +1,12 @@
 package com.rocketden.main.util;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@EqualsAndHashCode
 public class Color {
 
     private static final String INVALID_COLOR_NUM =

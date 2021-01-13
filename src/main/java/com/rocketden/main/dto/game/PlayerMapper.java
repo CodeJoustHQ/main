@@ -6,6 +6,7 @@ import java.util.List;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.model.User;
+import com.rocketden.main.util.Color;
 
 import org.modelmapper.convention.MatchingStrategies;
 
@@ -29,6 +30,7 @@ public class PlayerMapper {
         List<SubmissionDto> submissions = new ArrayList<>();
         player.getSubmissions().forEach(submission -> submissions.add(GameMapper.submissionToDto(submission)));
         playerDto.setSubmissions(submissions);
+        playerDto.setColor(player.getColor());
 
         return playerDto;
     }

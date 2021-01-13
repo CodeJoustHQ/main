@@ -15,6 +15,11 @@ public class Utility {
     public static final String ROOM_ID_KEY = "ROOM_ID";
     public static final String USER_ID_KEY = "USER_ID";
 
+    /**
+     * Colors to be generated for players.
+     */
+    private static final Color WHITE = new Color(0, 0, 0);
+
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
 
