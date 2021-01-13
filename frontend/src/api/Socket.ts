@@ -1,6 +1,6 @@
 /* eslint-disable consistent-return */
 import SockJS from 'sockjs-client';
-import Stomp, { Client, Message } from 'stompjs';
+import Stomp, { Client, Message, Subscription } from 'stompjs';
 import { errorHandler } from './Error';
 
 let stompClient: Client;
@@ -58,10 +58,9 @@ export const connect = (roomId: string, userId: string):
  */
 export const subscribe = (subscribeUrl: string,
   subscribeCallback: (room: Message) => void):
-  Promise<void> => new Promise<void>((resolve, reject) => {
+  Promise<Subscription> => new Promise<Subscription>((resolve, reject) => {
     if (stompClient && stompClient.connected) {
-      stompClient.subscribe(subscribeUrl, subscribeCallback);
-      resolve();
+      resolve(stompClient.subscribe(subscribeUrl, subscribeCallback));
     } else {
       reject(errorHandler('The socket is not connected.'));
     }

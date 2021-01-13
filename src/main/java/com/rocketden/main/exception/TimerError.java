@@ -6,17 +6,14 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public enum GameError implements ApiError {
+public enum TimerError implements ApiError {
 
-    BAD_SETTING(HttpStatus.BAD_REQUEST, "An invalid game setting was provided."),
-    INVALID_PERMISSIONS(HttpStatus.FORBIDDEN, "You do not have permission to perform this action."),
-    EMPTY_FIELD(HttpStatus.BAD_REQUEST, "Please ensure a value is provided for each required field."),
-    NOT_FOUND(HttpStatus.NOT_FOUND, "A game could not be found with the given id.");
+    NULL_SETTING(HttpStatus.BAD_REQUEST, "The game, associated game timer, room, room ID, and socket service must not be null.");
 
     private final HttpStatus status;
     private final ApiErrorResponse response;
 
-    GameError(HttpStatus status, String message) {
+    TimerError(HttpStatus status, String message) {
         this.status = status;
         this.response = new ApiErrorResponse(message, this.name());
     }

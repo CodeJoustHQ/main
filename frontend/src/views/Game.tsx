@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
 import { useBeforeunload } from 'react-beforeunload';
+import { Message } from 'stompjs';
 import Editor from '../components/game/Editor';
-import { Problem, SubmissionResult, getRandomProblem } from '../api/Problem';
+import { SubmissionResult } from '../api/Problem';
 import { errorHandler } from '../api/Error';
 import {
   MainContainer, FlexContainer, FlexInfoBar, Panel, SplitterContainer,
@@ -17,6 +18,8 @@ import Loading from '../components/core/Loading';
 import { User } from '../api/User';
 import Difficulty from '../api/Difficulty';
 import { Game, getGame } from '../api/Game';
+import { routes, subscribe } from '../api/Socket';
+import GameTimerContainer from '../components/game/GameTimerContainer';
 
 type LocationState = {
   roomId: string,
@@ -29,7 +32,6 @@ function GamePage() {
   const history = useHistory();
   const location = useLocation<LocationState>();
 
-  const [problem, setProblem] = useState<Problem | null>(null);
   const [submission, setSubmission] = useState<SubmissionResult | null>(null);
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -39,6 +41,9 @@ function GamePage() {
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
+  // Variable to hold whether the user is subscribed to the primary Game socket.
+  const [socketSubscribed, setSocketSubscribed] = useState(false);
+
   /**
    * Display beforeUnload message to inform the user that they may lose
    * their code / data if they leave the page.
@@ -47,29 +52,43 @@ function GamePage() {
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
+  // Re-subscribe in order to get the correct subscription callback.
+  const subscribePrimary = useCallback((roomIdParam: string) => {
+    const subscribeCallback = (result: Message) => {
+      const updatedGame: Game = JSON.parse(result.body);
+      setGame(updatedGame);
+      setSocketSubscribed(true);
+
+      // Check if end game.
+      if (updatedGame.gameTimer.timeUp) {
+        history.push('/game/results', {
+          game: updatedGame,
+        });
+      }
+    };
+
+    subscribe(routes(roomIdParam).subscribe, subscribeCallback).catch((err) => {
+      setError(err.message);
+    });
+  }, [history]);
+
   // Called every time location changes
   useEffect(() => {
     if (checkLocationState(location, 'roomId', 'currentUser', 'difficulty')) {
       setCurrentUser(location.state.currentUser);
       setRoomId(location.state.roomId);
 
-      // Get a random problem.
-      const request = { difficulty: location.state.difficulty };
-      getRandomProblem(request).then((res) => {
-        setFullPageLoading(false);
-        setProblem(res);
-      }).catch((err) => {
-        setFullPageLoading(false);
-        setError(err.message);
-      });
-
-      // Get game object with room details
+      // Get game object with problem and room details.
       getGame(location.state.roomId)
         .then((res) => {
+          setFullPageLoading(false);
           setGame(res);
           console.log(res);
         })
-        .catch((err) => setError(err));
+        .catch((err) => {
+          setFullPageLoading(false);
+          setError(err);
+        });
     } else {
       history.replace('/game/join', {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
@@ -89,6 +108,13 @@ function GamePage() {
     setSubmission(tempSubmission);
   };
 
+  // Subscribe user to primary socket and to notifications.
+  useEffect(() => {
+    if (!socketSubscribed && roomId) {
+      subscribePrimary(roomId);
+    }
+  }, [socketSubscribed, roomId, subscribePrimary]);
+
   // If the page is loading, return a centered Loading object.
   if (fullPageLoading) {
     return (
@@ -104,12 +130,15 @@ function GamePage() {
         Room:
         {' '}
         {roomId || 'An unknown room'}
-        {` (${game?.roomDto?.users?.length} players)`}
+        {` (${game?.room?.users?.length} players)`}
       </FlexInfoBar>
       <FlexInfoBar>
         You are
         {' '}
         {currentUser != null ? currentUser.nickname : 'An unknown user'}
+      </FlexInfoBar>
+      <FlexInfoBar>
+        <GameTimerContainer gameTimer={game ? game.gameTimer : null} />
       </FlexInfoBar>
 
       <SplitterContainer>
@@ -121,8 +150,8 @@ function GamePage() {
         >
           {/* Problem title/description panel */}
           <Panel>
-            <ProblemHeaderText>{problem?.name}</ProblemHeaderText>
-            <Text>{problem?.description}</Text>
+            <ProblemHeaderText>{game?.problems[0]?.name}</ProblemHeaderText>
+            <Text>{game?.problems[0]?.description}</Text>
             {error ? <ErrorMessage message={error} /> : null}
           </Panel>
 
@@ -139,7 +168,7 @@ function GamePage() {
 
             <Panel>
               <Console
-                testCases={problem?.testCases!}
+                testCases={game?.problems[0]?.testCases!}
                 submission={submission}
                 onRun={runSolution}
               />

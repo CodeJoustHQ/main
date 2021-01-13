@@ -9,17 +9,10 @@ import java.time.LocalDateTime;
 @Setter
 public class Submission {
 
-    private Player player;
-
-    private String code;
+    private PlayerCode playerCode;
 
     // The time that the submission was received.
     private LocalDateTime startTime = LocalDateTime.now();
-
-    /**
-     * Fields to store the score result.
-     * TODO: Eventually, there may exist a new Result object.
-     */
 
     private Integer numCorrect;
 

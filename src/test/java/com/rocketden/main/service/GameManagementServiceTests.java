@@ -3,6 +3,7 @@ package com.rocketden.main.service;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.StartGameRequest;
+import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.user.UserDto;
@@ -13,6 +14,8 @@ import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
+import com.rocketden.main.model.problem.ProblemDifficulty;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,9 +27,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
@@ -40,6 +43,12 @@ public class GameManagementServiceTests {
     private SocketService socketService;
 
     @Mock
+    private SubmitService submitService;
+
+    @Mock
+    private ProblemService problemService;
+
+    @Mock
     private SimpMessagingTemplate template;
 
     @Spy
@@ -51,6 +60,8 @@ public class GameManagementServiceTests {
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "098765";
+    private static final String CODE = "print('hi')";
+    private static final String LANGUAGE = "python";
 
     @Test
     public void addGetAndRemoveGame() {
@@ -60,6 +71,8 @@ public class GameManagementServiceTests {
 
         Room room = new Room();
         room.setRoomId(ROOM_ID);
+        room.setDifficulty(ProblemDifficulty.RANDOM);
+
         User user = new User();
         user.setNickname(NICKNAME);
         user.setUserId(USER_ID);
@@ -67,6 +80,9 @@ public class GameManagementServiceTests {
 
         // Create a game from a room
         gameService.createAddGameFromRoom(room);
+
+        // Confirm that the problem service method is called correctly.
+        verify(problemService).getProblemsFromDifficulty(eq(room.getDifficulty()), eq(1));
 
         // Check that game has copied over the correct details
         Game game = gameService.getGameFromRoomId(ROOM_ID);
@@ -89,12 +105,16 @@ public class GameManagementServiceTests {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
         room.setHost(host);
+        room.setDifficulty(ProblemDifficulty.RANDOM);
 
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(UserMapper.toDto(host));
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
         RoomDto response = gameService.startGame(ROOM_ID, request);
+
+        // Confirm that the problem service method is called correctly.
+        verify(problemService).getProblemsFromDifficulty(eq(room.getDifficulty()), eq(1));
 
         verify(socketService).sendSocketUpdate(eq(response));
 
@@ -145,6 +165,7 @@ public class GameManagementServiceTests {
     public void getGameSuccess() {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
+        room.setDifficulty(ProblemDifficulty.RANDOM);
         User user = new User();
         user.setNickname(NICKNAME);
         user.setUserId(USER_ID);
@@ -152,15 +173,78 @@ public class GameManagementServiceTests {
 
         gameService.createAddGameFromRoom(room);
 
+        // Confirm that the problem service method is called correctly.
+        verify(problemService).getProblemsFromDifficulty(eq(room.getDifficulty()), eq(1));
+
         GameDto gameDto = gameService.getGameDtoFromRoomId(ROOM_ID);
 
-        assertEquals(RoomMapper.toDto(room), gameDto.getRoomDto());
-        assertNull(gameDto.getPlayerMap());
+        assertEquals(RoomMapper.toDto(room), gameDto.getRoom());
+        assertEquals(1, gameDto.getPlayers().size());
+        assertEquals(UserMapper.toDto(user), gameDto.getPlayers().get(0).getUser());
     }
 
     @Test
     public void getGameNotFound() {
         ApiException exception = assertThrows(ApiException.class, () -> gameService.getGameDtoFromRoomId(ROOM_ID));
         assertEquals(GameError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void submitSolutionSuccess() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        gameService.createAddGameFromRoom(room);
+
+        SubmissionRequest request = new SubmissionRequest();
+        request.setLanguage(LANGUAGE);
+        request.setCode(CODE);
+        request.setInitiator(UserMapper.toDto(user));
+
+        gameService.submitSolution(ROOM_ID, request);
+
+        verify(submitService).submitSolution(any(Game.class), eq(request));
+    }
+
+    @Test
+    public void submitSolutionInvalidPermissions() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        gameService.createAddGameFromRoom(room);
+
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+
+        SubmissionRequest request = new SubmissionRequest();
+        request.setLanguage(LANGUAGE);
+        request.setCode(CODE);
+        request.setInitiator(UserMapper.toDto(user));
+
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.submitSolution(ROOM_ID, request));
+        assertEquals(GameError.INVALID_PERMISSIONS, exception.getError());
+    }
+
+    @Test
+    public void submitSolutionEmptyField() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        gameService.createAddGameFromRoom(room);
+
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+
+        SubmissionRequest missingRequest = new SubmissionRequest();
+        missingRequest.setLanguage(null);
+        missingRequest.setCode(CODE);
+        missingRequest.setInitiator(UserMapper.toDto(user));
+
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.submitSolution(ROOM_ID, missingRequest));
+        assertEquals(GameError.EMPTY_FIELD, exception.getError());
     }
 }
