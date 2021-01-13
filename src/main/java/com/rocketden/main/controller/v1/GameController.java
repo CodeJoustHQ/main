@@ -37,7 +37,7 @@ public class GameController extends BaseRestController {
     }
 
     @PostMapping("/rooms/{roomId}/notification")
-    public ResponseEntity<RoomDto> sendNotification(@PathVariable String roomId, @RequestBody GameNotificationDto notification) {
-        return new ResponseEntity<>(service.sendNotification(roomId, notification), HttpStatus.OK);
+    public ResponseEntity<GameNotificationDto> sendNotification(@PathVariable String roomId, @RequestBody GameNotificationDto notificationDto) {
+        return new ResponseEntity<>(service.sendNotification(roomId, notificationDto), HttpStatus.OK);
     }
 }
