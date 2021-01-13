@@ -8,6 +8,7 @@ import com.rocketden.main.game_object.Player;
 import com.rocketden.main.model.User;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 
 public class PlayerMapper {
 
@@ -25,6 +26,8 @@ public class PlayerMapper {
         playerDto.setSolved(player.getSolved());
         playerDto.setCode(player.getPlayerCode().getCode());
         playerDto.setLanguage(player.getPlayerCode().getLanguage());
+
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
 
         List<SubmissionDto> submissions = new ArrayList<>();
         player.getSubmissions().forEach(submission -> submissions.add(mapper.map(submission, SubmissionDto.class)));
