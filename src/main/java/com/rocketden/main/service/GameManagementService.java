@@ -3,6 +3,7 @@ package com.rocketden.main.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
@@ -21,6 +22,7 @@ import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.util.EndGameTimerTask;
+import com.rocketden.main.util.NotificationTimerTask;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -95,9 +97,52 @@ public class GameManagementService {
         List<Problem> problems = problemService.getProblemsFromDifficulty(room.getDifficulty(), 1);
         game.setProblems(problems);
         currentGameMap.put(room.getRoomId(), game);
-        setStartGameTimer(game, GameTimer.DURATION_15);
+
+        Long time = GameTimer.DURATION_15;
+        setStartGameTimer(game, time);
         
-        // TODO: Set corresponding time notifications.
+        Timer timer = new Timer();
+        if (GameTimer.DURATION_60 < time) {
+            NotificationTimerTask notificationTimerTask =
+                new NotificationTimerTask(socketService, game, "sixty minutes");
+            timer.schedule(notificationTimerTask, GameTimer.DURATION_60 * 1000);
+        }
+        
+        if (GameTimer.DURATION_30 < time) {
+            NotificationTimerTask notificationTimerTask =
+                new NotificationTimerTask(socketService, game, "thirty minutes");
+            timer.schedule(notificationTimerTask, GameTimer.DURATION_30 * 1000);
+        }
+        
+        if (GameTimer.DURATION_15 < time) {
+            NotificationTimerTask notificationTimerTask =
+                new NotificationTimerTask(socketService, game, "fifteen minutes");
+            timer.schedule(notificationTimerTask, GameTimer.DURATION_15 * 1000);
+        }
+        
+        if (GameTimer.DURATION_5 < time) {
+            NotificationTimerTask notificationTimerTask =
+                new NotificationTimerTask(socketService, game, "five minutes");
+            timer.schedule(notificationTimerTask, GameTimer.DURATION_5 * 1000);
+        }
+        
+        if (GameTimer.DURATION_1 < time) {
+            NotificationTimerTask notificationTimerTask =
+                new NotificationTimerTask(socketService, game, "one minute");
+            timer.schedule(notificationTimerTask, GameTimer.DURATION_1 * 1000);
+        }
+
+        if (GameTimer.DURATION_30_SEC < time) {
+            NotificationTimerTask notificationTimerTask =
+                new NotificationTimerTask(socketService, game, "thirty seconds");
+            timer.schedule(notificationTimerTask, GameTimer.DURATION_30_SEC * 1000);
+        }
+
+        if (GameTimer.DURATION_10_SEC < time) {
+            NotificationTimerTask notificationTimerTask =
+                new NotificationTimerTask(socketService, game, "ten seconds");
+            timer.schedule(notificationTimerTask, GameTimer.DURATION_10_SEC * 1000);
+        }
     }
 
     // Set and start the Game Timer.
