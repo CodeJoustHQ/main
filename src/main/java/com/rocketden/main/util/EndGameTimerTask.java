@@ -10,7 +10,7 @@ import com.rocketden.main.service.SocketService;
 
 public class EndGameTimerTask extends TimerTask {
 
-    private Game game;
+    private final Game game;
 
     private final SocketService socketService;
 

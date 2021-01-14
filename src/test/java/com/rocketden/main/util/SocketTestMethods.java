@@ -24,6 +24,7 @@ import java.util.List;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class SocketTestMethods {
 
@@ -49,10 +50,9 @@ public class SocketTestMethods {
     /**
      * Helper method that sends a POST request using template to
      * create a new problem
-     * @return the created problem
      * @throws Exception if anything wrong occurs
      */
-    public static ProblemDto createSingleProblemAndTestCases(TestRestTemplate template, int port) throws Exception {
+    public static void createSingleProblemAndTestCases(TestRestTemplate template, int port) throws Exception {
         CreateProblemRequest createProblemRequest = new CreateProblemRequest();
         createProblemRequest.setName(NAME);
         createProblemRequest.setDescription(DESCRIPTION);
@@ -63,6 +63,7 @@ public class SocketTestMethods {
 
         ProblemDto problemActual = template.exchange(createProblemEndpoint, HttpMethod.POST, createProblemEntity, ProblemDto.class).getBody();
 
+        assertNotNull(problemActual);
         assertEquals(NAME, problemActual.getName());
         assertEquals(DESCRIPTION, problemActual.getDescription());
         assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
@@ -76,10 +77,9 @@ public class SocketTestMethods {
 
         ProblemTestCaseDto testCaseActual = template.exchange(createTestCaseEndpoint, HttpMethod.POST, createTestCaseEntity, ProblemTestCaseDto.class).getBody();
 
+        assertNotNull(testCaseActual);
         assertEquals(INPUT, testCaseActual.getInput());
         assertEquals(OUTPUT, testCaseActual.getOutput());
         assertFalse(testCaseActual.isHidden());
-
-        return problemActual;
     }
 }
