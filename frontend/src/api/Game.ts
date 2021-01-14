@@ -35,6 +35,7 @@ export type SubmissionResult = {
   language: string,
   numCorrect: number,
   numTestCases: number,
+  startTime: Date,
 };
 
 const basePath = '/api/v1';
