@@ -20,6 +20,28 @@ export const FlexContainer = styled.div`
 export const FlexInfoBar = styled.div`
   padding: 0.5rem;
   text-align: center;
+  display: flex;
+`;
+
+export const FlexLeft = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+`;
+
+export const FlexCenter = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const FlexRight = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 `;
 
 export const Panel = styled.div`
