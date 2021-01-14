@@ -101,44 +101,50 @@ public class GameManagementService {
         Long time = GameTimer.DURATION_15;
         setStartGameTimer(game, time);
         
-        Timer timer = new Timer();
         if (GameTimer.DURATION_60 < time) {
+            Timer timer = new Timer();
             NotificationTimerTask notificationTimerTask =
                 new NotificationTimerTask(socketService, game, "are sixty minutes");
             timer.schedule(notificationTimerTask, GameTimer.DURATION_60 * 1000);
         }
         
         if (GameTimer.DURATION_30 < time) {
+            Timer timer = new Timer();
             NotificationTimerTask notificationTimerTask =
                 new NotificationTimerTask(socketService, game, "are thirty minutes");
             timer.schedule(notificationTimerTask, GameTimer.DURATION_30 * 1000);
         }
         
         if (GameTimer.DURATION_15 < time) {
+            Timer timer = new Timer();
             NotificationTimerTask notificationTimerTask =
                 new NotificationTimerTask(socketService, game, "are fifteen minutes");
             timer.schedule(notificationTimerTask, GameTimer.DURATION_15 * 1000);
         }
         
         if (GameTimer.DURATION_5 < time) {
+            Timer timer = new Timer();
             NotificationTimerTask notificationTimerTask =
                 new NotificationTimerTask(socketService, game, "are five minutes");
             timer.schedule(notificationTimerTask, GameTimer.DURATION_5 * 1000);
         }
         
         if (GameTimer.DURATION_1 < time) {
+            Timer timer = new Timer();
             NotificationTimerTask notificationTimerTask =
                 new NotificationTimerTask(socketService, game, "is one minute");
             timer.schedule(notificationTimerTask, GameTimer.DURATION_1 * 1000);
         }
 
         if (GameTimer.DURATION_30_SEC < time) {
+            Timer timer = new Timer();
             NotificationTimerTask notificationTimerTask =
                 new NotificationTimerTask(socketService, game, "are thirty seconds");
             timer.schedule(notificationTimerTask, GameTimer.DURATION_30_SEC * 1000);
         }
 
         if (GameTimer.DURATION_10_SEC < time) {
+            Timer timer = new Timer();
             NotificationTimerTask notificationTimerTask =
                 new NotificationTimerTask(socketService, game, "are ten seconds");
             timer.schedule(notificationTimerTask, GameTimer.DURATION_10_SEC * 1000);
@@ -163,10 +169,16 @@ public class GameManagementService {
 
     // Send a notification through a socket update.
     public GameNotificationDto sendNotification(String roomId, GameNotificationDto notificationDto) {
-        if (!currentGameMap.containsKey(roomId)) {
-            throw new ApiException(GameError.NOT_FOUND);
+        Game game = getGameFromRoomId(roomId);
+
+        /**
+         * If the initiator exists on the notificationDto (not required),
+         * then ensure that they exist in the room.
+         */
+        if (notificationDto.getInitiator() != null && game.getPlayers().containsKey(notificationDto.getInitiator().getUserId())) {
+            throw new ApiException(GameError.USER_NOT_IN_GAME);
         }
-        
+
         return notificationService.sendNotification(roomId, notificationDto);
     }
 
