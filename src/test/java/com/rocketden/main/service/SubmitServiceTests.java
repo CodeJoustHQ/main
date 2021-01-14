@@ -3,6 +3,7 @@ package com.rocketden.main.service;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.PlayerDto;
+import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.game_object.CodeLanguage;
@@ -17,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +33,6 @@ public class SubmitServiceTests {
     private static final String USER_ID = "098765";
     private static final String CODE = "print('hi')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
-    private static final int NUM_TEST_CASES = 10;
 
     @Mock
     private SocketService socketService;
@@ -101,10 +102,23 @@ public class SubmitServiceTests {
         players.add(player3);
         players.add(player4);
         players.add(player5);
+
+        // Player order should be: [4, 2, 3, 1, 5]
+        submitService.sortLeaderboard(players);
+
+        assertEquals(player4, players.get(0));
+        assertEquals(player2, players.get(1));
+        assertEquals(player3, players.get(2));
+        assertEquals(player1, players.get(3));
+        assertEquals(player5, players.get(4));
     }
 
     // Helper method to add a dummy submission to a PlayerDto object
     private void addSubmissionHelper(PlayerDto playerDto, int numCorrect) {
+        SubmissionDto submissionDto = new SubmissionDto();
+        submissionDto.setNumCorrect(numCorrect);
+        submissionDto.setStartTime(LocalDateTime.now());
 
+        playerDto.getSubmissions().add(submissionDto);
     }
 }

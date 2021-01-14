@@ -133,6 +133,7 @@ public class GameMapperTests {
         assertEquals(submission.getPlayerCode().getLanguage(), submissionDto.getLanguage());
         assertEquals(submission.getNumCorrect(), submissionDto.getNumCorrect());
         assertEquals(submission.getNumTestCases(), submissionDto.getNumTestCases());
+        assertEquals(submission.getStartTime(), submissionDto.getStartTime());
     }
 
     @Test
@@ -150,5 +151,6 @@ public class GameMapperTests {
         assertEquals(submission.getPlayerCode().getCode(), submissionDto.getCode());
         assertEquals(submission.getPlayerCode().getLanguage(), submissionDto.getLanguage());
         assertEquals(submission.getNumCorrect(), submissionDto.getNumCorrect());
+        assertEquals(submission.getStartTime(), submissionDto.getStartTime());
     }
 }
