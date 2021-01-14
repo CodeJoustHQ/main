@@ -7,7 +7,8 @@ import Editor from '../components/game/Editor';
 import { Problem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
 import {
-  MainContainer, FlexContainer, FlexInfoBar, Panel, SplitterContainer, FlexLeft, FlexCenter, FlexRight,
+  MainContainer, CenteredContainer, FlexContainer, FlexInfoBar,
+  Panel, SplitterContainer, FlexLeft, FlexCenter, FlexRight,
 } from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
 import { ProblemHeaderText, Text } from '../components/core/Text';
@@ -25,7 +26,7 @@ import LeaderboardCard from '../components/card/LeaderboardCard';
 import { routes, subscribe } from '../api/Socket';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
-import {TextLink} from '../components/core/Link';
+import { TextLink } from '../components/core/Link';
 
 type LocationState = {
   roomId: string,
@@ -142,10 +143,12 @@ function GamePage() {
   };
 
   const displayPlayerLeaderboard = () => {
-    return players.map((player) => (
+    return players.map((player, index) => (
       <LeaderboardCard
         player={player}
         isCurrentPlayer={player.user.userId === currentUser?.userId}
+        place={index + 1}
+        color="blue" // TODO: merge with Chris's color PR
       />
     ));
   };
@@ -182,9 +185,9 @@ function GamePage() {
         </FlexRight>
       </FlexInfoBar>
 
-      <FlexInfoBar>
+      <CenteredContainer>
         {displayPlayerLeaderboard()}
-      </FlexInfoBar>
+      </CenteredContainer>
 
       <SplitterContainer>
         <SplitterLayout

@@ -53,3 +53,8 @@ export const MainContainer = styled.div`
   padding: 10vw 0;
   width: 80%;
 `;
+
+export const CenteredContainer = styled.div`
+  text-align: center;
+  justify-content: center;
+`;

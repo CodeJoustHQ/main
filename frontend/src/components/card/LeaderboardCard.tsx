@@ -3,14 +3,17 @@ import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import { LowMarginText } from '../core/Text';
 
+type PlayerIconProps = {
+  color: string,
+};
+
 const Content = styled.div`
   display: inline-block;
   margin: 10px;
 `;
 
-const PlayerIcon = styled.div`
-  // TODO: change to inputted color
-  background-color: ${({ theme }) => theme.colors.blue};
+const PlayerIcon = styled.div<PlayerIconProps>`
+  background-color: ${({ color }) => color};
   border-radius: 50%;
   margin: 0 auto;
   
@@ -25,10 +28,14 @@ const HoverBar = styled.div`
 type LeaderboardCardProps = {
   player: Player,
   isCurrentPlayer: boolean,
+  place: number,
+  color: string,
 };
 
 function LeaderboardCard(props: LeaderboardCardProps) {
-  const { player, isCurrentPlayer } = props;
+  const {
+    place, player, isCurrentPlayer, color,
+  } = props;
   const { nickname } = player.user;
   const shortenedNickname = nickname.length > 13 ? `${nickname.substring(0, 10)}...` : nickname;
 
@@ -43,8 +50,8 @@ function LeaderboardCard(props: LeaderboardCardProps) {
 
   return (
     <Content>
-      <PlayerIcon />
-      <LowMarginText>{displayName}</LowMarginText>
+      <PlayerIcon color={color} />
+      <LowMarginText>{`${place}. ${displayName}`}</LowMarginText>
 
       <HoverBar>
         {status}
