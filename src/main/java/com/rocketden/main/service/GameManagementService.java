@@ -98,56 +98,57 @@ public class GameManagementService {
         game.setProblems(problems);
         currentGameMap.put(room.getRoomId(), game);
 
-        Long time = GameTimer.DURATION_15;
+        Long time = GameTimer.DURATION_1;
         setStartGameTimer(game, time);
-        
+
+        // Create notifications for different "time left" milestones.
         if (GameTimer.DURATION_60 < time) {
             Timer timer = new Timer();
             NotificationTimerTask notificationTimerTask =
-                new NotificationTimerTask(socketService, game, "are sixty minutes");
-            timer.schedule(notificationTimerTask, GameTimer.DURATION_60 * 1000);
+                new NotificationTimerTask(socketService, room.getRoomId(), "are sixty minutes");
+            timer.schedule(notificationTimerTask, (time - GameTimer.DURATION_60) * 1000);
         }
         
         if (GameTimer.DURATION_30 < time) {
             Timer timer = new Timer();
             NotificationTimerTask notificationTimerTask =
-                new NotificationTimerTask(socketService, game, "are thirty minutes");
-            timer.schedule(notificationTimerTask, GameTimer.DURATION_30 * 1000);
+                new NotificationTimerTask(socketService, room.getRoomId(), "are thirty minutes");
+            timer.schedule(notificationTimerTask, (time - GameTimer.DURATION_30) * 1000);
         }
         
         if (GameTimer.DURATION_15 < time) {
             Timer timer = new Timer();
             NotificationTimerTask notificationTimerTask =
-                new NotificationTimerTask(socketService, game, "are fifteen minutes");
-            timer.schedule(notificationTimerTask, GameTimer.DURATION_15 * 1000);
+                new NotificationTimerTask(socketService, room.getRoomId(), "are fifteen minutes");
+            timer.schedule(notificationTimerTask, (time - GameTimer.DURATION_15) * 1000);
         }
         
         if (GameTimer.DURATION_5 < time) {
             Timer timer = new Timer();
             NotificationTimerTask notificationTimerTask =
-                new NotificationTimerTask(socketService, game, "are five minutes");
-            timer.schedule(notificationTimerTask, GameTimer.DURATION_5 * 1000);
+                new NotificationTimerTask(socketService, room.getRoomId(), "are five minutes");
+            timer.schedule(notificationTimerTask, (time - GameTimer.DURATION_5) * 1000);
         }
         
         if (GameTimer.DURATION_1 < time) {
             Timer timer = new Timer();
             NotificationTimerTask notificationTimerTask =
-                new NotificationTimerTask(socketService, game, "is one minute");
-            timer.schedule(notificationTimerTask, GameTimer.DURATION_1 * 1000);
+                new NotificationTimerTask(socketService, room.getRoomId(), "is one minute");
+            timer.schedule(notificationTimerTask, (time - GameTimer.DURATION_1) * 1000);
         }
 
         if (GameTimer.DURATION_30_SEC < time) {
             Timer timer = new Timer();
             NotificationTimerTask notificationTimerTask =
-                new NotificationTimerTask(socketService, game, "are thirty seconds");
-            timer.schedule(notificationTimerTask, GameTimer.DURATION_30_SEC * 1000);
+                new NotificationTimerTask(socketService, room.getRoomId(), "are thirty seconds");
+            timer.schedule(notificationTimerTask, (time - GameTimer.DURATION_30_SEC) * 1000);
         }
 
         if (GameTimer.DURATION_10_SEC < time) {
             Timer timer = new Timer();
             NotificationTimerTask notificationTimerTask =
-                new NotificationTimerTask(socketService, game, "are ten seconds");
-            timer.schedule(notificationTimerTask, GameTimer.DURATION_10_SEC * 1000);
+                new NotificationTimerTask(socketService, room.getRoomId(), "are ten seconds");
+            timer.schedule(notificationTimerTask, (time - GameTimer.DURATION_10_SEC) * 1000);
         }
     }
 
