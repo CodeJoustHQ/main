@@ -104,7 +104,6 @@ public class GameManagementService {
         setStartGameTimer(game, room.getDuration());
 
         currentGameMap.put(room.getRoomId(), game);
-        setStartGameTimer(game, GameTimer.DURATION_15);
     }
 
     // Set and start the Game Timer.
