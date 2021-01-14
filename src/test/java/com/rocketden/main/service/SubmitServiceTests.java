@@ -11,12 +11,14 @@ import com.rocketden.main.model.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class SubmitServiceTests {
@@ -26,6 +28,9 @@ public class SubmitServiceTests {
     private static final String USER_ID = "098765";
     private static final String CODE = "print('hi')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
+
+    @Mock
+    private SocketService socketService;
 
     @Spy
     @InjectMocks
@@ -53,6 +58,9 @@ public class SubmitServiceTests {
         request.setInitiator(UserMapper.toDto(user));
 
         submitService.submitSolution(game, request);
+
+        verify(socketService).sendSocketUpdate(GameMapper.toDto(game));
+        verify(submitService).sortLeaderboard(game);
 
         List<Submission> submissions = game.getPlayers().get(USER_ID).getSubmissions();
         assertEquals(1, submissions.size());
