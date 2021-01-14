@@ -44,7 +44,17 @@ public class SubmitService {
         player.getSubmissions().add(submission);
         player.setSolved(true);
 
+        // Sort list of players by who is winning
+        sortLeaderboard(game);
+
+        // Send socket update with latest leaderboard info
+        socketService.sendSocketUpdate(GameMapper.toDto(game));
+        // TODO: test socket in GameSocketTests when merged
+
         return GameMapper.submissionToDto(submission);
     }
 
+    public void sortLeaderboard(Game game) {
+        // TODO
+    }
 }

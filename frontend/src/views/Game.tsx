@@ -4,7 +4,7 @@ import SplitterLayout from 'react-splitter-layout';
 import { useBeforeunload } from 'react-beforeunload';
 import { Message } from 'stompjs';
 import Editor from '../components/game/Editor';
-import { Problem, getRandomProblem } from '../api/Problem';
+import { Problem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
 import {
   MainContainer, FlexContainer, FlexInfoBar, Panel, SplitterContainer,
@@ -24,6 +24,7 @@ import { Room } from '../api/Room';
 import LeaderboardCard from '../components/card/LeaderboardCard';
 import { routes, subscribe } from '../api/Socket';
 import GameTimerContainer from '../components/game/GameTimerContainer';
+import { GameTimer } from '../api/GameTimer';
 
 type LocationState = {
   roomId: string,
@@ -47,6 +48,8 @@ function GamePage() {
   const [room, setRoom] = useState<Room | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+  const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
+  const [problems, setProblems] = useState<Problem[]>([]);
   const [currentLanguage, setCurrentLanguage] = useState('java');
 
   // Variable to hold whether the user is subscribed to the primary Game socket.
@@ -63,6 +66,8 @@ function GamePage() {
   const setStateFromGame = (game: Game) => {
     setRoom(game.room);
     setPlayers(game.players);
+    setGameTimer(game.gameTimer);
+    setProblems(game.problems);
 
     game.players.forEach((player) => {
       if (player.user.userId === currentUser?.userId) {
@@ -75,7 +80,7 @@ function GamePage() {
   const subscribePrimary = useCallback((roomIdParam: string) => {
     const subscribeCallback = (result: Message) => {
       const updatedGame: Game = JSON.parse(result.body);
-      setGame(updatedGame);
+      setStateFromGame(updatedGame);
       setSocketSubscribed(true);
 
       // Check if end game.
@@ -171,7 +176,7 @@ function GamePage() {
         {displayPlayerLeaderboard()}
       </FlexInfoBar>
       <FlexInfoBar>
-        <GameTimerContainer gameTimer={game ? game.gameTimer : null} />
+        <GameTimerContainer gameTimer={gameTimer || null} />
       </FlexInfoBar>
 
       <SplitterContainer>
@@ -183,8 +188,8 @@ function GamePage() {
         >
           {/* Problem title/description panel */}
           <Panel>
-            <ProblemHeaderText>{game?.problems[0]?.name}</ProblemHeaderText>
-            <Text>{game?.problems[0]?.description}</Text>
+            <ProblemHeaderText>{problems[0]?.name}</ProblemHeaderText>
+            <Text>{problems[0]?.description}</Text>
             {error ? <ErrorMessage message={error} /> : null}
           </Panel>
 
@@ -201,7 +206,7 @@ function GamePage() {
 
             <Panel>
               <Console
-                testCases={game?.problems[0]?.testCases!}
+                testCases={problems[0]?.testCases!}
                 submission={submission}
                 onRun={runSolution}
               />
