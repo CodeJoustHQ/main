@@ -7,7 +7,7 @@ import Editor from '../components/game/Editor';
 import { Problem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
 import {
-  MainContainer, FlexContainer, FlexInfoBar, Panel, SplitterContainer,
+  MainContainer, FlexContainer, FlexInfoBar, Panel, SplitterContainer, FlexLeft, FlexCenter, FlexRight,
 } from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
 import { ProblemHeaderText, Text } from '../components/core/Text';
@@ -25,6 +25,7 @@ import LeaderboardCard from '../components/card/LeaderboardCard';
 import { routes, subscribe } from '../api/Socket';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
+import {TextLink} from '../components/core/Link';
 
 type LocationState = {
   roomId: string,
@@ -168,15 +169,21 @@ function GamePage() {
   return (
     <FlexContainer>
       <FlexInfoBar>
-        Room:
-        {' '}
-        {roomId || 'N/A'}
+        <FlexLeft>
+          Room:
+          {' '}
+          {roomId || 'N/A'}
+        </FlexLeft>
+        <FlexCenter>
+          <GameTimerContainer gameTimer={gameTimer || null} />
+        </FlexCenter>
+        <FlexRight>
+          <TextLink to={'/'}>Exit Game</TextLink>
+        </FlexRight>
       </FlexInfoBar>
+
       <FlexInfoBar>
         {displayPlayerLeaderboard()}
-      </FlexInfoBar>
-      <FlexInfoBar>
-        <GameTimerContainer gameTimer={gameTimer || null} />
       </FlexInfoBar>
 
       <SplitterContainer>
