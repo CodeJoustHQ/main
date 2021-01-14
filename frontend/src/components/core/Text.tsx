@@ -46,6 +46,7 @@ export const SmallActionText = styled.p`
   }
 `;
 
-export const NoMarginText = styled(Text)`
+export const NoMarginSmallText = styled(Text)`
+  font-size: ${({ theme }) => theme.fontSize.mediumSmall};
   margin: 0;
 `;

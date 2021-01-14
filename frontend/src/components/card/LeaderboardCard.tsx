@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Player } from '../../api/Game';
-import { NoMarginText } from '../core/Text';
+import { NoMarginSmallText } from '../core/Text';
 
 const Content = styled.div`
   display: inline-block;
@@ -9,11 +9,16 @@ const Content = styled.div`
 `;
 
 const PlayerIcon = styled.div`
+  // TODO: change to inputted color
   background-color: ${({ theme }) => theme.colors.blue};
   border-radius: 50%;
   
   height: 50px;
   line-height: 50px;
+`;
+
+const HoverBar = styled.div`
+  // TODO: on hover, show numCorrect, last submission, etc.
 `;
 
 type LeaderboardCardProps = {
@@ -24,7 +29,7 @@ type LeaderboardCardProps = {
 function LeaderboardCard(props: LeaderboardCardProps) {
   const { player, isCurrentPlayer } = props;
 
-  const name = `${player.user.nickname.charAt(0).toUpperCase()} ${isCurrentPlayer ? '(you)' : ''}`;
+  const name = `${player.user.nickname} ${isCurrentPlayer ? '(you)' : ''}`;
   const latestSubmission = player.submissions.slice(-1)[0];
   let status = '';
   if (!latestSubmission) {
@@ -35,13 +40,12 @@ function LeaderboardCard(props: LeaderboardCardProps) {
 
   return (
     <Content>
-      <PlayerIcon>
-        <NoMarginText>{name}</NoMarginText>
-      </PlayerIcon>
+      <PlayerIcon />
+      <NoMarginSmallText>{name}</NoMarginSmallText>
 
-      <NoMarginText>
+      <HoverBar>
         {status}
-      </NoMarginText>
+      </HoverBar>
     </Content>
   );
 }
