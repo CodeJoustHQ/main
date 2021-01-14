@@ -272,7 +272,7 @@ public class GameTests {
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        SubmissionDto submissionDto = UtilityTestMethods.toObject(jsonResponse, SubmissionDto.class);
+        SubmissionDto submissionDto = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, SubmissionDto.class);
 
         assertNotNull(submissionDto);
         assertEquals(CODE, submissionDto.getCode());

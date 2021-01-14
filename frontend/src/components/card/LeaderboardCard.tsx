@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Player } from '../../api/Game';
-import { NoMarginSmallText } from '../core/Text';
+import { LowMarginText } from '../core/Text';
 
 const Content = styled.div`
   display: inline-block;
@@ -12,9 +12,10 @@ const PlayerIcon = styled.div`
   // TODO: change to inputted color
   background-color: ${({ theme }) => theme.colors.blue};
   border-radius: 50%;
+  margin: 0 auto;
   
   height: 50px;
-  line-height: 50px;
+  width: 50px;
 `;
 
 const HoverBar = styled.div`
@@ -28,8 +29,10 @@ type LeaderboardCardProps = {
 
 function LeaderboardCard(props: LeaderboardCardProps) {
   const { player, isCurrentPlayer } = props;
+  const { nickname } = player.user;
+  const shortenedNickname = nickname.length > 13 ? `${nickname.substring(0, 10)}...` : nickname;
 
-  const name = `${player.user.nickname} ${isCurrentPlayer ? '(you)' : ''}`;
+  const displayName = `${shortenedNickname} ${isCurrentPlayer ? '(you)' : ''}`;
   const latestSubmission = player.submissions.slice(-1)[0];
   let status = '';
   if (!latestSubmission) {
@@ -41,7 +44,7 @@ function LeaderboardCard(props: LeaderboardCardProps) {
   return (
     <Content>
       <PlayerIcon />
-      <NoMarginSmallText>{name}</NoMarginSmallText>
+      <LowMarginText>{displayName}</LowMarginText>
 
       <HoverBar>
         {status}
