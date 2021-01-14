@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
@@ -52,29 +52,39 @@ function LeaderboardCard(props: LeaderboardCardProps) {
     place, player, isCurrentPlayer, color,
   } = props;
 
+  const [showHover, setShowHover] = useState(false);
+
   // TODO: clean up in method
   const { nickname } = player.user;
   const shortenedNickname = nickname.length > 13 ? `${nickname.substring(0, 10)}...` : nickname;
 
   const displayName = `${shortenedNickname} ${isCurrentPlayer ? '(you)' : ''}`;
   const latestSubmission = player.submissions.slice(-1)[0];
-  const latestSubmissionTime = Math.abs(new Date() - latestSubmission.startTime) / 1000;
+
+  let latestSubmissionTime = '';
   let status = '';
   if (!latestSubmission) {
     status = 'No attempts';
+    latestSubmissionTime = 'N/A';
   } else {
     status = `${latestSubmission.numCorrect} / ${latestSubmission.numTestCases}`;
+    latestSubmissionTime = `${Math.abs(new Date().getTime() - latestSubmission.startTime.getTime()) / 1000}s ago`;
   }
 
   return (
-    <Content>
+    <Content
+      onMouseEnter={() => setShowHover(true)}
+      onMouseLeave={() => setShowHover(false)}
+    >
       <PlayerIcon color={color} />
       <LowMarginText>{`${place}. ${displayName}`}</LowMarginText>
 
-      <HoverBar>
-        <Text>{status}</Text>
-        <Text>{`Last submitted: ${latestSubmissionTime}s ago`}</Text>
-      </HoverBar>
+      {showHover ? (
+        <HoverBar>
+          <Text>{status}</Text>
+          <Text>{`Last submitted: ${latestSubmissionTime}`}</Text>
+        </HoverBar>
+      ) : null}
     </Content>
   );
 }
