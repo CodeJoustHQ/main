@@ -11,6 +11,7 @@ export type Room = {
   inactiveUsers: User[],
   active: boolean,
   difficulty: Difficulty,
+  duration: number,
 };
 
 export type CreateRoomParams = {

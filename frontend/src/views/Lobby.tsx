@@ -61,7 +61,11 @@ function LobbyPage() {
     setRoomId(room.roomId);
     setActive(room.active);
     setDifficulty(room.difficulty);
+    setDuration(room.duration);
   };
+
+  // Function to determine if the current user is the host or not
+  const isHost = (): boolean => currentUser?.nickname === host?.nickname;
 
   const kickUser = (user: User) => {
     setLoading(true);
@@ -114,7 +118,7 @@ function LobbyPage() {
    */
   const updateDifficultySetting = (key: string) => {
     setError('');
-    if (currentUser?.nickname === host?.nickname && !loading) {
+    if (isHost() && !loading) {
       const oldDifficulty = difficulty;
       const newDifficulty = Difficulty[key as keyof typeof Difficulty];
 
@@ -169,19 +173,18 @@ function LobbyPage() {
       return userList.map((user) => (
         <PlayerCard
           user={user}
-          isHost={user.nickname === host?.nickname}
+          isHost={isHost()}
           isActive={isActive}
         >
-          {currentUser?.nickname === host?.nickname
-            && (user.nickname !== currentUser?.nickname) ? (
-              // If currentUser is host, pass in an on-click action card for all other users
-              <HostActionCard
-                user={user}
-                userIsActive={Boolean(user.sessionId)}
-                onMakeHost={changeHosts}
-                onRemoveUser={kickUser}
-              />
-            ) : null}
+          {isHost() && (user.nickname !== currentUser?.nickname) ? (
+            // If currentUser is host, pass in an on-click action card for all other users
+            <HostActionCard
+              user={user}
+              userIsActive={Boolean(user.sessionId)}
+              onMakeHost={changeHosts}
+              onRemoveUser={kickUser}
+            />
+          ) : null}
         </PlayerCard>
       ));
     }
@@ -293,7 +296,7 @@ function LobbyPage() {
         <DifficultyButton
           onClick={() => updateDifficultySetting(key)}
           active={difficulty === Difficulty[key as keyof typeof Difficulty]}
-          enabled={currentUser?.nickname === host?.nickname}
+          enabled={isHost()}
           title={currentUser?.nickname !== host?.nickname
             ? 'Only the host can change these settings' : undefined}
         >
@@ -302,11 +305,15 @@ function LobbyPage() {
       ))}
 
       <MediumText>Duration</MediumText>
-      <Text>Choose a game duration between 1-60 minutes:</Text>
+      <Text>
+        {isHost() ? 'Choose a game duration between 1-60 minutes:'
+          : 'The game will last for the following minutes:'}
+      </Text>
       <NumberInput
         min={1}
         max={60}
         value={duration}
+        disabled={!isHost()}
         onChange={(e) => {
           const newDuration = Number(e.target.value);
           if (newDuration >= 0 && newDuration <= 60) {
@@ -314,7 +321,7 @@ function LobbyPage() {
           }
         }}
       />
-      <SmallButton onClick={updateRoomDuration}>Save</SmallButton>
+      {isHost() ? <SmallButton onClick={updateRoomDuration}>Save</SmallButton> : null}
 
       <br />
 
