@@ -1,5 +1,6 @@
 package com.rocketden.main.service;
 
+import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.user.UserMapper;
@@ -59,8 +60,9 @@ public class SubmitServiceTests {
 
         submitService.submitSolution(game, request);
 
-        verify(socketService).sendSocketUpdate(GameMapper.toDto(game));
-        verify(submitService).sortLeaderboard(game);
+        GameDto gameDto = GameMapper.toDto(game);
+        verify(socketService).sendSocketUpdate(gameDto);
+        verify(submitService).sortLeaderboard(gameDto.getPlayers());
 
         List<Submission> submissions = game.getPlayers().get(USER_ID).getSubmissions();
         assertEquals(1, submissions.size());
