@@ -56,7 +56,7 @@ public class GameTests {
 
     @Mock
     private RoomRepository repository;
-    
+
     @Mock
     private ProblemRepository problemRepository;
 
@@ -79,7 +79,7 @@ public class GameTests {
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "098765";
     private static final String CODE = "print('hello')";
-	private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
+    private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
 
     // Helper method to start the game for a given room
     private void startGameHelper(RoomDto room, UserDto host) throws Exception {
@@ -103,6 +103,7 @@ public class GameTests {
 
     /**
      * Helper method that sends a POST request to create a new problem
+     *
      * @return the created problem
      * @throws Exception if anything wrong occurs
      */
@@ -185,119 +186,9 @@ public class GameTests {
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
-		jsonResponse = result.getResponse().getContentAsString();
-		GameDto gameDto = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, GameDto.class);
+        jsonResponse = result.getResponse().getContentAsString();
+        GameDto gameDto = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, GameDto.class);
 
-<<<<<<< HEAD
-		assertEquals(ERROR.getResponse(), actual);
-	}
-
-	@Test
-	public void startGameWrongInitiator() throws Exception {
-		User host = new User();
-		host.setNickname(NICKNAME);
-
-		CreateRoomRequest createRequest = new CreateRoomRequest();
-		createRequest.setHost(UserMapper.toDto(host));
-
-		MvcResult result = this.mockMvc.perform(post(POST_ROOM)
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.content(UtilityTestMethods.convertObjectToJsonString(createRequest)))
-				.andDo(print()).andExpect(status().isCreated())
-				.andReturn();
-
-		String jsonResponse = result.getResponse().getContentAsString();
-		RoomDto roomDto = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
-
-		UserDto user = new UserDto();
-		user.setNickname(NICKNAME_2);
-		StartGameRequest request = new StartGameRequest();
-		request.setInitiator(user);
-
-		ApiError ERROR = RoomError.INVALID_PERMISSIONS;
-
-		result = this.mockMvc.perform(post(String.format(START_GAME, roomDto.getRoomId()))
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.content(UtilityTestMethods.convertObjectToJsonString(request)))
-				.andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-				.andReturn();
-
-		jsonResponse = result.getResponse().getContentAsString();
-		ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
-		assertEquals(ERROR.getResponse(), actual);
-	}
-
-	@Test
-	public void submitSolutionSuccess() throws Exception {
-		UserDto host = new UserDto();
-		host.setNickname(NICKNAME);
-		host.setUserId(USER_ID);
-
-		RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
-		startGameHelper(roomDto, host);
-
-		SubmissionRequest request = new SubmissionRequest();
-		request.setInitiator(host);
-		request.setCode(CODE);
-		request.setLanguage(LANGUAGE);
-
-		MvcResult result = this.mockMvc.perform(post(String.format(POST_SUBMISSION, roomDto.getRoomId()))
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.content(UtilityTestMethods.convertObjectToJsonString(request)))
-				.andDo(print()).andExpect(status().isOk())
-				.andReturn();
-
-		String jsonResponse = result.getResponse().getContentAsString();
-		SubmissionDto submissionDto = UtilityTestMethods.toObject(jsonResponse, SubmissionDto.class);
-
-		assertNotNull(submissionDto);
-		assertEquals(CODE, submissionDto.getCode());
-		assertEquals(LANGUAGE, submissionDto.getLanguage());
-		// For now, just assert that all test cases were passed
-		assertEquals(submissionDto.getNumCorrect(), submissionDto.getNumTestCases());
-
-		// Check that the submission is stored in the game object
-		result = this.mockMvc.perform(get(String.format(GET_GAME, roomDto.getRoomId())))
-				.andDo(print()).andExpect(status().isOk())
-				.andReturn();
-
-		jsonResponse = result.getResponse().getContentAsString();
-		GameDto gameDto = UtilityTestMethods.toObject(jsonResponse, GameDto.class);
-
-		assertEquals(1, gameDto.getPlayers().size());
-		PlayerDto player = gameDto.getPlayers().get(0);
-		assertEquals(submissionDto, player.getSubmissions().get(0));
-		assertEquals(submissionDto.getCode(), player.getCode());
-		assertEquals(submissionDto.getLanguage(), player.getLanguage());
-		assertTrue(player.getSolved());
-	}
-
-	@Test
-	public void submitSolutionBadLanguage() throws Exception {
-		UserDto host = new UserDto();
-		host.setNickname(NICKNAME);
-		host.setUserId(USER_ID);
-
-		RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
-		startGameHelper(roomDto, host);
-
-		String request = "{\"initiator\": {\"nickname\": \"hi\"}, \"code\": \"print('hi')\", \"language\": \"x\"}";
-
-		ApiError ERROR = GameError.BAD_LANGUAGE;
-
-		MvcResult result = this.mockMvc.perform(post(String.format(POST_SUBMISSION, roomDto.getRoomId()))
-				.contentType(MediaType.APPLICATION_JSON_VALUE)
-				.content(request))
-				.andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-				.andReturn();
-
-		String jsonResponse = result.getResponse().getContentAsString();
-		ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
-		assertEquals(ERROR.getResponse(), actual);
-	}
-=======
         assertEquals(actual, gameDto.getRoom());
         assertEquals(1, gameDto.getPlayers().size());
     }
@@ -404,5 +295,29 @@ public class GameTests {
         assertEquals(submissionDto.getLanguage(), player.getLanguage());
         assertTrue(player.getSolved());
     }
->>>>>>> master
+
+    @Test
+    public void submitSolutionBadLanguage() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
+        startGameHelper(roomDto, host);
+
+        String request = "{\"initiator\": {\"nickname\": \"hi\"}, \"code\": \"print('hi')\", \"language\": \"x\"}";
+
+        ApiError ERROR = GameError.BAD_LANGUAGE;
+
+        MvcResult result = this.mockMvc.perform(post(String.format(POST_SUBMISSION, roomDto.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(request))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+    }
 }
