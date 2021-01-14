@@ -13,7 +13,7 @@ public enum ProblemDifficulty {
         try {
             return ProblemDifficulty.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new ApiException(ProblemError.BAD_SETTING);
+            throw new ApiException(ProblemError.BAD_DIFFICULTY);
         }
     }
 }

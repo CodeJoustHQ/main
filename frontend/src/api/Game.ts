@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { axiosErrorHandler } from './Error';
+import { GameTimer } from './GameTimer';
 import { Room } from './Room';
 import { User } from './User';
+import { Problem } from './Problem';
 
 export type Player = {
   user: User,
@@ -14,6 +16,8 @@ export type Player = {
 export type Game = {
   room: Room,
   players: Player[],
+  gameTimer: GameTimer,
+  problems: Problem[],
 };
 
 export type StartGameParams = {

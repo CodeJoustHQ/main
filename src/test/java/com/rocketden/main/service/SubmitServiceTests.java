@@ -11,7 +11,6 @@ import com.rocketden.main.model.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -23,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class SubmitServiceTests {
 
     private static final String NICKNAME = "rocket";
-    private static final String NICKNAME_2 = "rocketrocket";
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "098765";
     private static final String CODE = "print('hi')";
@@ -35,8 +33,10 @@ public class SubmitServiceTests {
 
     @Test
     public void submitSolutionSuccess() {
-        // TODO: For now, this just checks that the submission is stored correctly.
-        // In the future, it will likely call the tester endpoint and send a socket update too.
+        /**
+         * TODO: For now, this just checks that the submission is stored correctly.
+         * In the future, it will likely call the tester endpoint and send a socket update too.
+         */
 
         Room room = new Room();
         room.setRoomId(ROOM_ID);

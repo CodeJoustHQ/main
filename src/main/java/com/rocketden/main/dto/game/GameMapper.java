@@ -1,5 +1,7 @@
 package com.rocketden.main.dto.game;
 
+import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Player;
@@ -9,6 +11,7 @@ import com.rocketden.main.model.User;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,15 +28,17 @@ public class GameMapper {
 
         GameDto gameDto = new GameDto();
         gameDto.setRoom(RoomMapper.toDto(game.getRoom()));
+        gameDto.setGameTimer(GameTimerMapper.toDto(game.getGameTimer()));
 
+        // Set loose matching to allow flattening of variables in DTO objects
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
 
         List<PlayerDto> players = gameDto.getPlayers();
-        Map<String, Player> playerMap = game.getPlayers();
-        for (String userId : playerMap.keySet()) {
-            PlayerDto playerDto = mapper.map(playerMap.get(userId), PlayerDto.class);
-            players.add(playerDto);
-        }
+        game.getPlayers().values().forEach(player -> players.add(mapper.map(player, PlayerDto.class)));
+
+        List<ProblemDto> problems = new ArrayList<>();
+        game.getProblems().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
+        gameDto.setProblems(problems);
 
         return gameDto;
     }

@@ -5,7 +5,6 @@ import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.dto.problem.ProblemMapper;
-import com.rocketden.main.dto.problem.ProblemSettingsDto;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
@@ -16,8 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 @Service
 public class ProblemService {
@@ -37,7 +38,7 @@ public class ProblemService {
         }
 
         if (request.getDifficulty() == ProblemDifficulty.RANDOM) {
-            throw new ApiException(ProblemError.BAD_SETTING);
+            throw new ApiException(ProblemError.BAD_DIFFICULTY);
         }
 
         Problem problem = new Problem();
@@ -67,11 +68,17 @@ public class ProblemService {
         return problems;
     }
 
-    public ProblemDto getRandomProblem(ProblemSettingsDto request) {
-        ProblemDifficulty difficulty = request.getDifficulty();
-
+    /**
+     * Get a list of random problems with the provided parameters.
+     * 
+     * @param difficulty The problem difficulty the problems must match.
+     * @param numProblems The number of problems to fetch.
+     */
+    public List<Problem> getProblemsFromDifficulty(ProblemDifficulty difficulty, Integer numProblems) {
         if (difficulty == null) {
-            throw new ApiException(ProblemError.BAD_SETTING);
+            throw new ApiException(ProblemError.BAD_DIFFICULTY);
+        } else if (numProblems == null) {
+            throw new ApiException(ProblemError.BAD_NUMBER_PROBLEMS);
         }
 
         List<Problem> problems;
@@ -85,8 +92,23 @@ public class ProblemService {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
 
-        Problem problem = problems.get(random.nextInt(problems.size()));
-        return ProblemMapper.toDto(problem);
+        if (numProblems <= 0 || (numProblems > problems.size())) {
+            throw new ApiException(ProblemError.INVALID_NUMBER_REQUEST);
+        }
+
+        // Get numProblem random integers used to map to problems.
+        Set<Integer> randomIntegers = new HashSet<>();
+        while (randomIntegers.size() < numProblems) {
+            randomIntegers.add(random.nextInt(problems.size()));
+        }
+
+        // Get the numProblem problems mapped to those integers.
+        List<Problem> chosenProblems = new ArrayList<>();
+        for (Integer i : randomIntegers) {
+            chosenProblems.add(problems.get(i));
+        }
+
+        return chosenProblems;
     }
 
     public ProblemTestCaseDto createTestCase(String problemId, CreateTestCaseRequest request) {
@@ -96,6 +118,7 @@ public class ProblemService {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
 
+        // Problem input and output are the two required fields.
         if (request.getInput() == null || request.getOutput() == null) {
             throw new ApiException(ProblemError.EMPTY_FIELD);
         }
@@ -103,7 +126,12 @@ public class ProblemService {
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(request.getInput());
         testCase.setOutput(request.getOutput());
+
+        // Test case is not hidden by default.
         testCase.setHidden(request.isHidden());
+
+        // Explanation may be null, indicating no explanation is attached.
+        testCase.setExplanation(request.getExplanation());
 
         problem.addTestCase(testCase);
         repository.save(problem);

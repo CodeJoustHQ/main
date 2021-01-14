@@ -22,6 +22,7 @@ public class ProblemMapperTests {
 
     private static final String INPUT = "[1, 8, 2]";
     private static final String OUTPUT = "[1, 2, 8]";
+    private static final String EXPLANATION = "2 < 8, so those are swapped.";
 
     @Test
     public void entityToDto() {
@@ -33,6 +34,7 @@ public class ProblemMapperTests {
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(INPUT);
         testCase.setOutput(OUTPUT);
+        testCase.setExplanation(EXPLANATION);
         testCase.setHidden(true);
         expected.addTestCase(testCase);
 
@@ -57,11 +59,13 @@ public class ProblemMapperTests {
         expected.setInput(INPUT);
         expected.setOutput(OUTPUT);
         expected.setHidden(false);
+        expected.setExplanation(EXPLANATION);
 
         ProblemTestCaseDto actual = ProblemMapper.toTestCaseDto(expected);
 
         assertEquals(expected.getInput(), actual.getInput());
         assertEquals(expected.getOutput(), actual.getOutput());
         assertEquals(expected.getHidden(), actual.isHidden());
+        assertEquals(expected.getExplanation(), actual.getExplanation());
     }
 }
