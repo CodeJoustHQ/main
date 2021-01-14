@@ -61,11 +61,11 @@ function LobbyPage() {
     setRoomId(room.roomId);
     setActive(room.active);
     setDifficulty(room.difficulty);
-    setDuration(room.duration);
+    setDuration(room.duration / 60);
   };
 
-  // Function to determine if the current user is the host or not
-  const isHost = (): boolean => currentUser?.nickname === host?.nickname;
+  // Function to determine if the given user is the host or not
+  const isHost = useCallback((user: User | null) => user?.nickname === host?.nickname, [host]);
 
   const kickUser = (user: User) => {
     setLoading(true);
@@ -118,7 +118,7 @@ function LobbyPage() {
    */
   const updateDifficultySetting = (key: string) => {
     setError('');
-    if (isHost() && !loading) {
+    if (isHost(currentUser) && !loading) {
       const oldDifficulty = difficulty;
       const newDifficulty = Difficulty[key as keyof typeof Difficulty];
 
@@ -173,10 +173,10 @@ function LobbyPage() {
       return userList.map((user) => (
         <PlayerCard
           user={user}
-          isHost={isHost()}
+          isHost={isHost(user)}
           isActive={isActive}
         >
-          {isHost() && (user.nickname !== currentUser?.nickname) ? (
+          {isHost(currentUser) && (user.nickname !== currentUser?.nickname) ? (
             // If currentUser is host, pass in an on-click action card for all other users
             <HostActionCard
               user={user}
@@ -296,7 +296,7 @@ function LobbyPage() {
         <DifficultyButton
           onClick={() => updateDifficultySetting(key)}
           active={difficulty === Difficulty[key as keyof typeof Difficulty]}
-          enabled={isHost()}
+          enabled={isHost(currentUser)}
           title={currentUser?.nickname !== host?.nickname
             ? 'Only the host can change these settings' : undefined}
         >
@@ -306,14 +306,14 @@ function LobbyPage() {
 
       <MediumText>Duration</MediumText>
       <Text>
-        {isHost() ? 'Choose a game duration between 1-60 minutes:'
+        {isHost(currentUser) ? 'Choose a game duration between 1-60 minutes:'
           : 'The game will last for the following minutes:'}
       </Text>
       <NumberInput
         min={1}
         max={60}
         value={duration}
-        disabled={!isHost()}
+        disabled={!isHost(currentUser)}
         onChange={(e) => {
           const newDuration = Number(e.target.value);
           if (newDuration >= 0 && newDuration <= 60) {
@@ -321,7 +321,7 @@ function LobbyPage() {
           }
         }}
       />
-      {isHost() ? <SmallButton onClick={updateRoomDuration}>Save</SmallButton> : null}
+      {isHost(currentUser) ? <SmallButton onClick={updateRoomDuration}>Save</SmallButton> : null}
 
       <br />
 
