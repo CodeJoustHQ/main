@@ -1,7 +1,7 @@
 export type GameTimer = {
   duration: number,
-  startTime: Date,
-  endTime: Date,
+  startTime: string,
+  endTime: string,
   timeUp: boolean,
 }
 

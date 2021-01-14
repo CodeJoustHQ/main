@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Player } from '../../api/Game';
-import { LowMarginText, Text } from '../core/Text';
+import { LowMarginText, SmallText } from '../core/Text';
 
 type PlayerIconProps = {
   color: string,
@@ -9,6 +9,7 @@ type PlayerIconProps = {
 
 const Content = styled.div`
   display: inline-block;
+  position: relative;
   margin: 10px;
 `;
 
@@ -28,16 +29,16 @@ const HoverBar = styled.div`
   left: 50%;
   transform: translate(-50%, 0);
   
-  width: 150px;
+  width: 160px;
   background-color: ${({ theme }) => theme.colors.white};
-  //border-radius: 5px 5px 0 0;
+  //border-radius: 5px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   
-  height: 40px;
+  height: 60px;
   padding: 10px;
   
   // -(height + 2 * padding - 3px)
-  //margin-top: -36px;
+  margin-top: -77px;
 `;
 
 type LeaderboardCardProps = {
@@ -65,10 +66,10 @@ function LeaderboardCard(props: LeaderboardCardProps) {
   let status = '';
   if (!latestSubmission) {
     status = 'No attempts';
-    latestSubmissionTime = 'N/A';
+    latestSubmissionTime = 'Never';
   } else {
-    status = `${latestSubmission.numCorrect} / ${latestSubmission.numTestCases}`;
-    latestSubmissionTime = `${Math.abs(new Date().getTime() - latestSubmission.startTime.getTime()) / 1000}s ago`;
+    status = `${latestSubmission.numCorrect} / ${latestSubmission.numTestCases} correct`;
+    latestSubmissionTime = `${Math.floor(Math.abs(Date.now() - new Date(latestSubmission.startTime).getTime()) / (60 * 1000))}m ago`;
   }
 
   return (
@@ -81,8 +82,8 @@ function LeaderboardCard(props: LeaderboardCardProps) {
 
       {showHover ? (
         <HoverBar>
-          <Text>{status}</Text>
-          <Text>{`Last submitted: ${latestSubmissionTime}`}</Text>
+          <SmallText>{status}</SmallText>
+          <SmallText>{`Last submitted: ${latestSubmissionTime}`}</SmallText>
         </HoverBar>
       ) : null}
     </Content>

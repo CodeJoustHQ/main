@@ -13,6 +13,10 @@ export const ErrorText = styled(Text)`
    color: ${({ theme }) => theme.colors.red};
 `;
 
+export const SmallText = styled.h5`
+  font-size: ${({ theme }) => theme.fontSize.mediumSmall};
+`;
+
 export const MediumText = styled.h5`
   font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
 `;
