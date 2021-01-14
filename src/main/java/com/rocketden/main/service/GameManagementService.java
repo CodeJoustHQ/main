@@ -9,6 +9,8 @@ import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.StartGameRequest;
+import com.rocketden.main.dto.game.SubmissionDto;
+import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.notification.NotificationDto;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
@@ -86,15 +88,15 @@ public class GameManagementService {
         repository.save(room);
 
         // Initialize game state
-        Game game = createAddGameFromRoom(room);
+        createAddGameFromRoom(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
         socketService.sendSocketUpdate(roomDto);
         return roomDto;
     }
 
-    // Initialize and add a game object from a room object
-    public Game createAddGameFromRoom(Room room) {
+    // Initialize and add a game object from a room object, start game timer
+    public void createAddGameFromRoom(Room room) {
         Game game = GameMapper.fromRoom(room);
 
         List<Problem> problems = problemService.getProblemsFromDifficulty(room.getDifficulty(), 1);
@@ -102,7 +104,7 @@ public class GameManagementService {
         setStartGameTimer(game, room.getDuration());
 
         currentGameMap.put(room.getRoomId(), game);
-        return game;
+        setStartGameTimer(game, GameTimer.DURATION_15);
     }
 
     // Set and start the Game Timer.
@@ -115,10 +117,20 @@ public class GameManagementService {
         gameTimer.getTimer().schedule(endGameTimerTask, duration * 1000);
     }
 
-    // Test the submission and return a socket update.
-    public GameDto testSubmission(String userId, String roomId) {
-        // TODO: Get the player and game.
-        return submitService.testSubmission(new Player(), new Problem());
+    // Test the submission, return the results, and send a socket update
+    public SubmissionDto submitSolution(String roomId, SubmissionRequest request) {
+        Game game = getGameFromRoomId(roomId);
+
+        if (request.getInitiator() == null || request.getCode() == null || request.getLanguage() == null) {
+            throw new ApiException(GameError.EMPTY_FIELD);
+        }
+
+        String initiatorUserId = request.getInitiator().getUserId();
+        if (!game.getPlayers().containsKey(initiatorUserId)) {
+            throw new ApiException(GameError.INVALID_PERMISSIONS);
+        }
+
+        return submitService.submitSolution(game, request);
     }
 
     // Send a notification through a socket update.
