@@ -178,7 +178,7 @@ function GamePage() {
           <GameTimerContainer gameTimer={gameTimer || null} />
         </FlexCenter>
         <FlexRight>
-          <TextLink to={'/'}>Exit Game</TextLink>
+          <TextLink to="/">Exit Game</TextLink>
         </FlexRight>
       </FlexInfoBar>
 
