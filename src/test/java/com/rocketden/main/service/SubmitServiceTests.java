@@ -2,6 +2,7 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
+import com.rocketden.main.dto.game.PlayerDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.game_object.CodeLanguage;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,6 +31,7 @@ public class SubmitServiceTests {
     private static final String USER_ID = "098765";
     private static final String CODE = "print('hi')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
+    private static final int NUM_TEST_CASES = 10;
 
     @Mock
     private SocketService socketService;
@@ -72,5 +75,36 @@ public class SubmitServiceTests {
         assertEquals(CODE, submission.getPlayerCode().getCode());
         assertEquals(LANGUAGE, submission.getPlayerCode().getLanguage());
         assertEquals(submission.getNumCorrect(), submission.getNumTestCases());
+    }
+
+    @Test
+    public void sortLeaderboardSuccess() {
+        List<PlayerDto> players = new ArrayList<>();
+
+        PlayerDto player1 = new PlayerDto();
+        addSubmissionHelper(player1, 0);
+
+        PlayerDto player2 = new PlayerDto();
+        addSubmissionHelper(player2, 0);
+        addSubmissionHelper(player2, 3);
+
+        PlayerDto player3 = new PlayerDto();
+        addSubmissionHelper(player3, 3);
+
+        PlayerDto player4 = new PlayerDto();
+        addSubmissionHelper(player4, 5);
+
+        PlayerDto player5 = new PlayerDto();
+
+        players.add(player1);
+        players.add(player2);
+        players.add(player3);
+        players.add(player4);
+        players.add(player5);
+    }
+
+    // Helper method to add a dummy submission to a PlayerDto object
+    private void addSubmissionHelper(PlayerDto playerDto, int numCorrect) {
+
     }
 }
