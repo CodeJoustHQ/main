@@ -56,3 +56,18 @@ export const ConsoleTextArea = styled.textarea`
   
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
 `;
+
+export const NumberInput = styled(Input).attrs(() => ({
+  type: 'number',
+}))`
+  display: inline-block;
+  width: 7rem;
+  text-align: center;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  padding: 1rem;
+  color: ${({ theme }) => theme.colors.text};
+
+  &:focus {
+    border: 3px solid ${({ theme }) => theme.colors.darkBlue};
+  }
+`;

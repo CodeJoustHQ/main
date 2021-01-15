@@ -10,6 +10,8 @@ import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.GameNotificationDto;
 import com.rocketden.main.dto.game.StartGameRequest;
+import com.rocketden.main.dto.game.SubmissionDto;
+import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.exception.GameError;
@@ -39,7 +41,9 @@ public class GameManagementService {
     private final Map<String, Game> currentGameMap;
 
     @Autowired
-    protected GameManagementService(RoomRepository repository, SocketService socketService, LiveGameService liveGameService, NotificationService notificationService, SubmitService submitService, ProblemService problemService) {
+    protected GameManagementService(RoomRepository repository, SocketService socketService,
+                                    LiveGameService liveGameService, NotificationService notificationService,
+                                    SubmitService submitService, ProblemService problemService) {
         this.repository = repository;
         this.socketService = socketService;
         this.liveGameService = liveGameService;
@@ -94,8 +98,11 @@ public class GameManagementService {
     // Initialize and add a game object from a room object, start game timer
     public void createAddGameFromRoom(Room room) {
         Game game = GameMapper.fromRoom(room);
+
         List<Problem> problems = problemService.getProblemsFromDifficulty(room.getDifficulty(), 1);
         game.setProblems(problems);
+        setStartGameTimer(game, room.getDuration());
+
         currentGameMap.put(room.getRoomId(), game);
 
         Long time = GameTimer.DURATION_1;
@@ -162,10 +169,20 @@ public class GameManagementService {
         gameTimer.getTimer().schedule(endGameTimerTask, duration * 1000);
     }
 
-    // Test the submission and return a socket update.
-    public GameDto testSubmission(String userId, String roomId) {
-        // TODO: Get the player and game.
-        return submitService.testSubmission(new Player(), new Problem());
+    // Test the submission, return the results, and send a socket update
+    public SubmissionDto submitSolution(String roomId, SubmissionRequest request) {
+        Game game = getGameFromRoomId(roomId);
+
+        if (request.getInitiator() == null || request.getCode() == null || request.getLanguage() == null) {
+            throw new ApiException(GameError.EMPTY_FIELD);
+        }
+
+        String initiatorUserId = request.getInitiator().getUserId();
+        if (!game.getPlayers().containsKey(initiatorUserId)) {
+            throw new ApiException(GameError.INVALID_PERMISSIONS);
+        }
+
+        return submitService.submitSolution(game, request);
     }
 
     // Send a notification through a socket update.

@@ -10,6 +10,6 @@ public class PlayerCode {
     // Updated field to hold the user's current-language code.
     private String code;
 
-    private CodeLanguage language;
+    private String language;
 
 }

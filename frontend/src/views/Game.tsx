@@ -79,6 +79,7 @@ function GamePage() {
       setGame(updatedGame);
 
       // Check if end game.
+      // TODO: after deconstructing game, move this to useEffect on timeUp
       if (updatedGame.gameTimer.timeUp) {
         history.push('/game/results', {
           game: updatedGame,
@@ -157,7 +158,7 @@ function GamePage() {
     checkSendTestCorrectNotification(tempSubmission);
   };
 
-  // Redirect user to game page if room is active.
+  // Subscribe user to primary socket and to notifications.
   useEffect(() => {
     if (!userSocketSubscribed && roomId) {
       subscribePrimary(roomId);

@@ -10,4 +10,5 @@ import lombok.Setter;
 public class UpdateSettingsRequest {
     private UserDto initiator;
     private ProblemDifficulty difficulty;
+    private Long duration;
 }
