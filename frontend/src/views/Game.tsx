@@ -96,7 +96,7 @@ function GamePage() {
     subscribe(routes(roomIdParam).subscribe, subscribeCallback).catch((err) => {
       setError(err.message);
     });
-  }, [history]);
+  }, [history, setStateFromGame]);
 
   // Called every time location changes
   useEffect(() => {
@@ -119,7 +119,7 @@ function GamePage() {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
       });
     }
-  }, [location, history]);
+  }, [location, history, setStateFromGame]);
 
   // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {
