@@ -6,20 +6,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
-import java.time.LocalDateTime;
 import java.util.Timer;
 
-import com.rocketden.main.dto.game.GameDto;
-import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.GameNotificationDto;
-import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.exception.api.ApiException;
-import com.rocketden.main.game_object.Game;
-import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.game_object.NotificationType;
-import com.rocketden.main.model.Room;
-import com.rocketden.main.model.User;
-import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.service.SocketService;
 
 import org.junit.Test;
@@ -32,10 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class NotificationTimerTaskTests {
 
-    // Predefine user and room attributes.
-    private static final String NICKNAME = "rocket";
-    private static final String USER_ID = "012345";
-    private static final String SESSION_ID = "234567";
+    // Predefine room and time left attributes.
     private static final String ROOM_ID = "012345";
     private static final String TIME_LEFT = "are sixty minutes";
 
