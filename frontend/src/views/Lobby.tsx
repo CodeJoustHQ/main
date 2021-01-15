@@ -65,7 +65,7 @@ function LobbyPage() {
   };
 
   // Function to determine if the given user is the host or not
-  const isHost = useCallback((user: User | null) => user?.nickname === host?.nickname, [host]);
+  const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
 
   const kickUser = (user: User) => {
     setLoading(true);
@@ -176,7 +176,7 @@ function LobbyPage() {
           isHost={isHost(user)}
           isActive={isActive}
         >
-          {isHost(currentUser) && (user.nickname !== currentUser?.nickname) ? (
+          {isHost(currentUser) && (user.userId !== currentUser?.userId) ? (
             // If currentUser is host, pass in an on-click action card for all other users
             <HostActionCard
               user={user}
@@ -297,8 +297,7 @@ function LobbyPage() {
           onClick={() => updateDifficultySetting(key)}
           active={difficulty === Difficulty[key as keyof typeof Difficulty]}
           enabled={isHost(currentUser)}
-          title={currentUser?.nickname !== host?.nickname
-            ? 'Only the host can change these settings' : undefined}
+          title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
         >
           {key}
         </DifficultyButton>
@@ -325,7 +324,7 @@ function LobbyPage() {
 
       <br />
 
-      {currentUser?.nickname === host?.nickname
+      {isHost(currentUser)
         ? <PrimaryButton onClick={handleStartGame} disabled={loading}>Start Game</PrimaryButton>
         : <MediumText>Waiting for the host to start the game...</MediumText>}
     </div>
