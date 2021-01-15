@@ -14,10 +14,10 @@ import lombok.Setter;
 @EqualsAndHashCode
 public class GameNotificationDto {
     private UserDto initiator;
-    private LocalDateTime time;
 
     @EqualsAndHashCode.Exclude
-    private NotificationType notificationType;
+    private LocalDateTime time;
 
+    private NotificationType notificationType;
     private String content;
 }

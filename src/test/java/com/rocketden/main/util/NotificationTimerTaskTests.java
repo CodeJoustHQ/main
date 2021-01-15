@@ -83,6 +83,6 @@ public class NotificationTimerTaskTests {
 
         verify(socketService, never()).sendSocketUpdate(eq(ROOM_ID), eq(notificationDto));
 
-        verify(socketService, timeout(1000)).sendSocketUpdate(eq(ROOM_ID), eq(notificationDto));
+        verify(socketService, timeout(1500)).sendSocketUpdate(eq(ROOM_ID), eq(notificationDto));
     }
 }
