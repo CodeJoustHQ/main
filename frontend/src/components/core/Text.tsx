@@ -15,6 +15,7 @@ export const ErrorText = styled(Text)`
 
 export const SmallText = styled.p`
   font-size: ${({ theme }) => theme.fontSize.mediumSmall};
+  margin: 6px 0;
 `;
 
 export const MediumText = styled.h5`

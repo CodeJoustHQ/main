@@ -10,6 +10,7 @@ import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.game_object.Submission;
+import com.rocketden.main.model.problem.Problem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,10 +42,13 @@ public class SubmitService {
         player.setPlayerCode(playerCode);
 
         // Create a dummy submission - this will be replaced with a call to the tester
+        List<Problem> problems = game.getProblems();
+        int numTestCases = problems.isEmpty() ? 10 : problems.get(0).getTestCases().size();
+
         Submission submission = new Submission();
         submission.setPlayerCode(playerCode);
-        submission.setNumCorrect(10);
-        submission.setNumTestCases(10);
+        submission.setNumCorrect(numTestCases);
+        submission.setNumTestCases(numTestCases);
 
         player.getSubmissions().add(submission);
         player.setSolved(true);

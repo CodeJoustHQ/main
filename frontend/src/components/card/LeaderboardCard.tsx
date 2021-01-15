@@ -31,14 +31,14 @@ const HoverBar = styled.div`
   
   width: 160px;
   background-color: ${({ theme }) => theme.colors.white};
-  //border-radius: 5px;
+  border-radius: 5px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   
-  height: 60px;
+  height: 50px;
   padding: 10px;
   
   // -(height + 2 * padding - 3px)
-  margin-top: -77px;
+  margin-top: -67px;
 `;
 
 type LeaderboardCardProps = {
@@ -64,7 +64,7 @@ function LeaderboardCard(props: LeaderboardCardProps) {
   const getScoreDisplay = () => {
     const latestSubmission = player.submissions.slice(-1)[0];
     if (!latestSubmission) {
-      return '';
+      return '0 correct';
     }
     return `${latestSubmission.numCorrect} / ${latestSubmission.numTestCases} correct`;
   };
