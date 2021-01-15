@@ -7,7 +7,7 @@ import { connect, routes, subscribe } from '../api/Socket';
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
 import Difficulty from '../api/Difficulty';
-import { PrimaryButton, DifficultyButton, SmallButton } from '../components/core/Button';
+import { PrimaryButton, DifficultyButton } from '../components/core/Button';
 import Loading from '../components/core/Loading';
 import PlayerCard from '../components/card/PlayerCard';
 import HostActionCard from '../components/card/HostActionCard';
@@ -37,7 +37,7 @@ function LobbyPage() {
   const [currentRoomId, setRoomId] = useState('');
   const [active, setActive] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
-  const [duration, setDuration] = useState(15);
+  const [duration, setDuration] = useState<number | undefined>(15);
 
   // Hold error text.
   const [error, setError] = useState('');
@@ -151,7 +151,7 @@ function LobbyPage() {
     const prevDuration = duration;
     const settings = {
       initiator: currentUser!,
-      duration: duration * 60,
+      duration: (duration || 0) * 60,
     };
 
     updateRoomSettings(currentRoomId, settings)
@@ -314,9 +314,14 @@ function LobbyPage() {
         value={duration}
         disabled={!isHost(currentUser)}
         onChange={(e) => {
-          const newDuration = Number(e.target.value);
-          if (newDuration >= 0 && newDuration <= 60) {
-            setDuration(Number(e.target.value));
+          // Set duration to undefined to allow users to clear field
+          if (!e.target.value) {
+            setDuration(undefined);
+          } else {
+            const newDuration = Number(e.target.value);
+            if (newDuration >= 0 && newDuration <= 60) {
+              setDuration(Number(e.target.value));
+            }
           }
         }}
         onBlur={updateRoomDuration}
