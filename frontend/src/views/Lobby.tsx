@@ -319,9 +319,8 @@ function LobbyPage() {
             setDuration(Number(e.target.value));
           }
         }}
+        onBlur={updateRoomDuration}
       />
-      {isHost(currentUser) ? <SmallButton onClick={updateRoomDuration}>Save</SmallButton> : null}
-
       <br />
 
       {isHost(currentUser)
