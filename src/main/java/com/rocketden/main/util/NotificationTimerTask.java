@@ -23,7 +23,10 @@ public class NotificationTimerTask extends TimerTask {
         this.roomId = roomId;
         this.timeRemaining = timeRemaining;
 
-        // Handle potential errors for run().
+        /**
+         * Handle potential errors for run(); roomId assumed to match
+         * an existing game.
+         */
         if (socketService == null || roomId == null || timeRemaining == null) {
             throw new ApiException(TimerError.NULL_SETTING);
         }
