@@ -255,4 +255,6 @@ public class GameManagementServiceTests {
         ApiException exception = assertThrows(ApiException.class, () -> gameService.submitSolution(ROOM_ID, missingRequest));
         assertEquals(GameError.EMPTY_FIELD, exception.getError());
     }
+
+    // TODO: Game tests notification verify.
 }

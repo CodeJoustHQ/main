@@ -14,7 +14,14 @@ import com.google.gson.JsonParseException;
 public class UtilityTestMethods {
 
     public static String convertObjectToJsonString(Object o) {
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class,
+        new JsonDeserializer<LocalDateTime>() { 
+        @Override 
+        public LocalDateTime deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException { 
+            return LocalDateTime.parse(json.getAsString(),
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS"));
+            } 
+        }).create();
         return gson.toJson(o);
     }
 

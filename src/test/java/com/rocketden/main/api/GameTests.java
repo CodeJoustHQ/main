@@ -3,6 +3,7 @@ package com.rocketden.main.api;
 import com.rocketden.main.dao.ProblemRepository;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
+import com.rocketden.main.dto.game.GameNotificationDto;
 import com.rocketden.main.dto.game.PlayerDto;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.game.SubmissionDto;
@@ -19,9 +20,11 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.game_object.GameTimer;
+import com.rocketden.main.game_object.NotificationType;
 import com.rocketden.main.model.User;
 import com.rocketden.main.util.RoomTestMethods;
 import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.service.SocketService;
 import com.rocketden.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
@@ -39,10 +42,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDateTime;
 
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
 @AutoConfigureMockMvc
@@ -59,6 +66,9 @@ public class GameTests {
     @Mock
     private ProblemRepository problemRepository;
 
+    @Mock
+    private SocketService socketService;
+
     // Predefine problem attributes.
     private static final String NAME = "Sort a List";
     private static final String DESCRIPTION = "Sort the given list in O(n log n) time.";
@@ -69,6 +79,7 @@ public class GameTests {
     private static final String START_GAME = "/api/v1/rooms/%s/start";
     private static final String GET_GAME = "/api/v1/games/%s";
     private static final String POST_SUBMISSION = "/api/v1/games/%s/submission";
+    private static final String POST_NOTIFICATION = "/api/v1/games/%s/notification";
     private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
     private static final String POST_TEST_CASE_CREATE = "/api/v1/problems/%s/test-case";
 
@@ -79,6 +90,9 @@ public class GameTests {
     private static final String USER_ID = "098765";
     private static final String CODE = "print('hello')";
     private static final String LANGUAGE = "python";
+
+    // Predefine notification content.
+    private static final String CONTENT = "[1, 2, 3]";
 
     // Helper method to start the game for a given room
     private void startGameHelper(RoomDto room, UserDto host) throws Exception {
@@ -293,5 +307,35 @@ public class GameTests {
         assertEquals(submissionDto.getCode(), player.getCode());
         assertEquals(submissionDto.getLanguage(), player.getLanguage());
         assertTrue(player.getSolved());
+    }
+
+    @Test
+    public void sendNotificationSuccess() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
+        startGameHelper(roomDto, host);
+
+        // TODO: If time is replaced with LocalDateTime.now(), 400 error.
+
+        GameNotificationDto notificationDto = new GameNotificationDto();
+        notificationDto.setInitiator(host);
+        notificationDto.setTime(null);
+        notificationDto.setContent(CONTENT);
+        notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
+
+        MvcResult result = this.mockMvc.perform(post(String.format(POST_NOTIFICATION, roomDto.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(notificationDto)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        GameNotificationDto notificationDtoResult = UtilityTestMethods.toObject(jsonResponse, GameNotificationDto.class);
+
+        assertNotNull(notificationDtoResult);
+        assertEquals(notificationDto, notificationDtoResult);
     }
 }

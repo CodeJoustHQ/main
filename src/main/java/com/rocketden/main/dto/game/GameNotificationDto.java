@@ -2,6 +2,10 @@ package com.rocketden.main.dto.game;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.game_object.NotificationType;
 
@@ -16,6 +20,8 @@ public class GameNotificationDto {
     private UserDto initiator;
 
     @EqualsAndHashCode.Exclude
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime time;
 
     private NotificationType notificationType;

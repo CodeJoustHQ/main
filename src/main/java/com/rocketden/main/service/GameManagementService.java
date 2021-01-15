@@ -191,7 +191,7 @@ public class GameManagementService {
          * If the initiator exists on the notificationDto (not required),
          * then ensure that they exist in the room.
          */
-        if (notificationDto.getInitiator() != null && game.getPlayers().containsKey(notificationDto.getInitiator().getUserId())) {
+        if (notificationDto.getInitiator() != null && !game.getPlayers().containsKey(notificationDto.getInitiator().getUserId())) {
             throw new ApiException(GameError.USER_NOT_IN_GAME);
         }
 
