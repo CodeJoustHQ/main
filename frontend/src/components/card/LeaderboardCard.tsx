@@ -55,22 +55,30 @@ function LeaderboardCard(props: LeaderboardCardProps) {
 
   const [showHover, setShowHover] = useState(false);
 
-  // TODO: clean up in method
-  const { nickname } = player.user;
-  const shortenedNickname = nickname.length > 13 ? `${nickname.substring(0, 10)}...` : nickname;
+  const getDisplayNickname = () => {
+    const { nickname } = player.user;
+    const shortenedNickname = nickname.length > 13 ? `${nickname.substring(0, 10)}...` : nickname;
+    return `${shortenedNickname} ${isCurrentPlayer ? '(you)' : ''}`;
+  };
 
-  const displayName = `${shortenedNickname} ${isCurrentPlayer ? '(you)' : ''}`;
-  const latestSubmission = player.submissions.slice(-1)[0];
+  const getScoreDisplay = () => {
+    const latestSubmission = player.submissions.slice(-1)[0];
+    if (!latestSubmission) {
+      return '';
+    }
+    return `${latestSubmission.numCorrect} / ${latestSubmission.numTestCases} correct`;
+  };
 
-  let latestSubmissionTime = '';
-  let status = '';
-  if (!latestSubmission) {
-    status = 'No attempts';
-    latestSubmissionTime = 'Never';
-  } else {
-    status = `${latestSubmission.numCorrect} / ${latestSubmission.numTestCases} correct`;
-    latestSubmissionTime = `${Math.floor(Math.abs(Date.now() - new Date(latestSubmission.startTime).getTime()) / (60 * 1000))}m ago`;
-  }
+  const getSubmissionTime = () => {
+    const latestSubmission = player.submissions.slice(-1)[0];
+    if (!latestSubmission) {
+      return 'Never';
+    }
+
+    const diffMilliseconds = Date.now() - new Date(latestSubmission.startTime).getTime();
+    const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
+    return `${diffMinutes} min ago`;
+  };
 
   return (
     <Content
@@ -78,12 +86,12 @@ function LeaderboardCard(props: LeaderboardCardProps) {
       onMouseLeave={() => setShowHover(false)}
     >
       <PlayerIcon color={color} />
-      <LowMarginText>{`${place}. ${displayName}`}</LowMarginText>
+      <LowMarginText>{`${place}. ${getDisplayNickname()}`}</LowMarginText>
 
       {showHover ? (
         <HoverBar>
-          <SmallText>{status}</SmallText>
-          <SmallText>{`Last submitted: ${latestSubmissionTime}`}</SmallText>
+          <SmallText>{getScoreDisplay()}</SmallText>
+          <SmallText>{`Last submitted: ${getSubmissionTime()}`}</SmallText>
         </HoverBar>
       ) : null}
     </Content>
