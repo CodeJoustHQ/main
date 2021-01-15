@@ -59,7 +59,7 @@ public class EndGameTimerTaskTests {
         room.addUser(user);
 
         Game game = GameMapper.fromRoom(room);
-        GameTimer gameTimer = new GameTimer((long) 10);
+        GameTimer gameTimer = new GameTimer(10L);
         game.setGameTimer(gameTimer);
 
         assertThrows(ApiException.class, () -> new EndGameTimerTask(null, game));
@@ -86,7 +86,7 @@ public class EndGameTimerTaskTests {
     @Test
     public void endGameTimerTaskSocketMessageNullRoom() {
         Game game = new Game();
-        GameTimer gameTimer = new GameTimer((long) 10);
+        GameTimer gameTimer = new GameTimer(10L);
         game.setGameTimer(gameTimer);
 
         assertThrows(ApiException.class, () -> new EndGameTimerTask(socketService, game));
@@ -105,7 +105,7 @@ public class EndGameTimerTaskTests {
         room.addUser(user);
 
         Game game = GameMapper.fromRoom(room);
-        GameTimer gameTimer = new GameTimer((long) 10);
+        GameTimer gameTimer = new GameTimer(10L);
         game.setGameTimer(gameTimer);
 
         assertThrows(ApiException.class, () -> new EndGameTimerTask(socketService, game));
@@ -125,7 +125,7 @@ public class EndGameTimerTaskTests {
         room.addUser(user);
 
         Game game = GameMapper.fromRoom(room);
-        GameTimer gameTimer = new GameTimer((long) 1);
+        GameTimer gameTimer = new GameTimer(1L);
         game.setGameTimer(gameTimer);
 
         // Make the Game DTO update that will occur on timer end.
@@ -135,7 +135,7 @@ public class EndGameTimerTaskTests {
         MockitoAnnotations.initMocks(this);
 
         EndGameTimerTask endGameTimerTask = new EndGameTimerTask(socketService, game);
-        gameTimer.getTimer().schedule(endGameTimerTask, (long) 1 * 1000);
+        gameTimer.getTimer().schedule(endGameTimerTask,  1000L);
 
         /**
          * Confirm that the socket update is not called immediately, 
