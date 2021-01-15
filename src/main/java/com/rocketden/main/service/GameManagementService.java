@@ -98,15 +98,13 @@ public class GameManagementService {
     // Initialize and add a game object from a room object, start game timer
     public void createAddGameFromRoom(Room room) {
         Game game = GameMapper.fromRoom(room);
+        Long time = room.getDuration();
 
         List<Problem> problems = problemService.getProblemsFromDifficulty(room.getDifficulty(), 1);
         game.setProblems(problems);
-        setStartGameTimer(game, room.getDuration());
+        setStartGameTimer(game, time);
 
         currentGameMap.put(room.getRoomId(), game);
-
-        Long time = GameTimer.DURATION_1;
-        setStartGameTimer(game, time);
 
         // Create notifications for different "time left" milestones.
         if (GameTimer.DURATION_60 < time) {
