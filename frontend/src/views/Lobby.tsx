@@ -314,18 +314,21 @@ function LobbyPage() {
         value={duration}
         disabled={!isHost(currentUser)}
         onKeyPress={(e) => {
+          // Prevent user from using any of these non-numeric characters
           if (e.key === 'e' || e.key === '.' || e.key === '-') {
             e.preventDefault();
           }
         }}
         onChange={(e) => {
+          const { value } = e.target;
+
           // Set duration to undefined to allow users to clear field
-          if (!e.target.value) {
+          if (!value) {
             setDuration(undefined);
           } else {
-            const newDuration = Number(e.target.value);
+            const newDuration = Number(value);
             if (newDuration >= 0 && newDuration <= 60) {
-              setDuration(Number(e.target.value));
+              setDuration(newDuration);
             }
           }
         }}
