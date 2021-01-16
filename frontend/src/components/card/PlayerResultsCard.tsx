@@ -16,14 +16,34 @@ type PlayerResultsCardProps = {
 function PlayerResultsCard(props: PlayerResultsCardProps) {
   const { player, place } = props;
 
-  const latestSubmission = player.submissions.slice(-1)[0];
-  let status = '';
-  if (!latestSubmission) {
-    status = 'No attempts';
-  } else {
-    status = `${latestSubmission.numCorrect} / ${latestSubmission.numTestCases}`;
-    // TODO: include time and color
-  }
+  const getDisplayNickname = () => {
+    const { nickname } = player.user;
+    return `${nickname} ${isCurrentPlayer ? '(you)' : ''}`;
+    // TODO 
+  };
+
+  const getScoreDisplay = () => {
+    const latestSubmission = player.submissions.slice(-1)[0];
+    if (!latestSubmission) {
+      return '0 correct';
+    }
+    return `${latestSubmission.numCorrect} / ${latestSubmission.numTestCases} correct`;
+
+    // TODO
+  };
+
+  const getSubmissionTime = () => {
+    const latestSubmission = player.submissions.slice(-1)[0];
+    if (!latestSubmission) {
+      return 'Never';
+    }
+
+    const diffMilliseconds = Date.now() - new Date(latestSubmission.startTime).getTime();
+    const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
+    return `${diffMinutes} min ago`;
+
+    // TODO
+  };
 
   return (
     <Content>
