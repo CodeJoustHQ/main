@@ -313,6 +313,11 @@ function LobbyPage() {
         max={60}
         value={duration}
         disabled={!isHost(currentUser)}
+        onKeyPress={(e) => {
+          if (e.key === 'e' || e.key === '.' || e.key === '-') {
+            e.preventDefault();
+          }
+        }}
         onChange={(e) => {
           // Set duration to undefined to allow users to clear field
           if (!e.target.value) {
