@@ -65,18 +65,22 @@ function GamePage() {
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
-  const setStateFromGame = (game: Game) => {
+  const setStateFromGame = useCallback((game: Game) => {
     setRoom(game.room);
     setPlayers(game.players);
     setGameTimer(game.gameTimer);
     setProblems(game.problems);
+
+    // Print room and currentPlayer to prevent unused variable warning
+    console.log(room);
+    console.log(currentPlayer);
 
     game.players.forEach((player) => {
       if (player.user.userId === currentUser?.userId) {
         setCurrentPlayer(player);
       }
     });
-  };
+  }, []);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
