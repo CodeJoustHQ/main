@@ -5,9 +5,6 @@ import { errorHandler } from './Error';
 
 let stompClient: Client;
 
-// Variable to hold the current connected state.
-let connected: boolean = false;
-
 // Dynamic route endpoints that depend on the room id
 const basePath = '/api/v1/socket';
 let socketRoomId: string;
@@ -35,7 +32,7 @@ export const isValidNickname = (nickname: string) => nickname.length > 0
 */
 export const connect = (roomId: string, userId: string):
   Promise<void> => new Promise<void>((resolve, reject) => {
-    if (!connected) {
+    if (!stompClient || !stompClient.connected) {
       // Connect to given endpoint, subscribe to future messages, and send user message.
       socketRoomId = roomId;
       const socket: WebSocket = new SockJS(routes(socketRoomId).connect);
@@ -46,8 +43,6 @@ export const connect = (roomId: string, userId: string):
         userId,
       };
       stompClient.connect(connectHeaders, () => {
-        // Reassign connected variable.
-        connected = true;
         resolve();
       }, () => {
         reject(errorHandler('The socket failed to connect.'));
@@ -64,7 +59,7 @@ export const connect = (roomId: string, userId: string):
 export const subscribe = (subscribeUrl: string,
   subscribeCallback: (room: Message) => void):
   Promise<Subscription> => new Promise<Subscription>((resolve, reject) => {
-    if (connected) {
+    if (stompClient && stompClient.connected) {
       resolve(stompClient.subscribe(subscribeUrl, subscribeCallback));
     } else {
       reject(errorHandler('The socket is not connected.'));
@@ -75,15 +70,14 @@ export const subscribe = (subscribeUrl: string,
  * Disconnect the user by sending a message via socket.
  * @returns void, or error if socket is not connected.
 */
-export const disconnect = (): void => {
-  if (connected) {
-    const socket: WebSocket = new SockJS(routes(socketRoomId).connect);
-    stompClient = Stomp.over(socket);
-    stompClient.disconnect(() => {
-      // Reassign connected variable.
-      connected = false;
-    });
-  } else {
-    throw errorHandler('The socket is not connected.');
-  }
-};
+export const disconnect = ():
+  Promise<void> => new Promise<void>((resolve, reject) => {
+    if (stompClient && stompClient.connected) {
+      // Stomp client is already set from last connection.
+      stompClient.disconnect(() => {
+        resolve();
+      });
+    } else {
+      reject(errorHandler('The socket is not connected.'));
+    }
+  });
