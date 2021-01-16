@@ -1,14 +1,4 @@
-import React from 'react';
 import styled from 'styled-components';
-
-type MyProps = {
-  children: React.ReactNode,
-}
-
-const createContainer = (Container: any, props: MyProps) => {
-  const { children } = props;
-  return <Container>{children}</Container>;
-};
 
 export const FlexContainer = styled.div`
   display: flex;
@@ -20,6 +10,28 @@ export const FlexContainer = styled.div`
 export const FlexInfoBar = styled.div`
   padding: 0.5rem;
   text-align: center;
+  display: flex;
+`;
+
+export const FlexLeft = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+`;
+
+export const FlexCenter = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const FlexRight = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 `;
 
 export const Panel = styled.div`
@@ -36,10 +48,13 @@ export const SplitterContainer = styled.div`
   position: relative;
 `;
 
-const StyledMainContainer = styled.div`
+export const MainContainer = styled.div`
   margin: 0 auto;
   padding: 10vw 0;
   width: 80%;
 `;
 
-export const MainContainer = (props: MyProps) => createContainer(StyledMainContainer, props);
+export const CenteredContainer = styled.div`
+  text-align: center;
+  justify-content: center;
+`;

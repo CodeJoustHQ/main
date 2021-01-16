@@ -13,6 +13,11 @@ export const ErrorText = styled(Text)`
    color: ${({ theme }) => theme.colors.red};
 `;
 
+export const SmallText = styled.p`
+  font-size: ${({ theme }) => theme.fontSize.mediumSmall};
+  margin: 6px 0;
+`;
+
 export const MediumText = styled.h5`
   font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
 `;
@@ -46,6 +51,7 @@ export const SmallActionText = styled.p`
   }
 `;
 
-export const NoMarginText = styled(Text)`
-  margin: 0;
+export const LowMarginText = styled(Text)`
+  font-size: ${({ theme }) => theme.fontSize.default};
+  margin: 10px 0;
 `;

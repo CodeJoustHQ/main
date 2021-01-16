@@ -19,10 +19,12 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.GameNotification;
+import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.problem.Problem;
+import com.rocketden.main.util.EndGameTimerTask;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,16 +37,17 @@ public class GameManagementService {
     private final LiveGameService liveGameService;
     private final NotificationService notificationService;
     private final SubmitService submitService;
+    private final ProblemService problemService;
     private final Map<String, Game> currentGameMap;
 
     @Autowired
-    protected GameManagementService(RoomRepository repository, SocketService socketService, LiveGameService liveGameService,
-                                    NotificationService notificationService, SubmitService submitService) {
+    protected GameManagementService(RoomRepository repository, SocketService socketService, LiveGameService liveGameService, NotificationService notificationService, SubmitService submitService, ProblemService problemService) {
         this.repository = repository;
         this.socketService = socketService;
         this.liveGameService = liveGameService;
         this.notificationService = notificationService;
         this.submitService = submitService;
+        this.problemService = problemService;
         currentGameMap = new HashMap<>();
     }
 
@@ -90,16 +93,28 @@ public class GameManagementService {
         return roomDto;
     }
 
-    // Initialize and add a game object from a room object
-    public Game createAddGameFromRoom(Room room) {
+    // Initialize and add a game object from a room object, start game timer
+    public void createAddGameFromRoom(Room room) {
         Game game = GameMapper.fromRoom(room);
+        List<Problem> problems = problemService.getProblemsFromDifficulty(room.getDifficulty(), 1);
+        game.setProblems(problems);
         currentGameMap.put(room.getRoomId(), game);
-        return game;
+        setStartGameTimer(game, GameTimer.DURATION_15);
+    }
+
+    // Set and start the Game Timer.
+    public void setStartGameTimer(Game game, Long duration) {
+        GameTimer gameTimer = new GameTimer(duration);
+        game.setGameTimer(gameTimer);
+
+        // Schedule the game to end after <duration> seconds.
+        EndGameTimerTask endGameTimerTask = new EndGameTimerTask(socketService, game);
+        gameTimer.getTimer().schedule(endGameTimerTask, duration * 1000);
     }
 
     // Test the submission, return the results, and send a socket update
     public SubmissionDto submitSolution(String roomId, SubmissionRequest request) {
-        Game game = currentGameMap.get(roomId);
+        Game game = getGameFromRoomId(roomId);
 
         if (request.getInitiator() == null || request.getCode() == null || request.getLanguage() == null) {
             throw new ApiException(GameError.EMPTY_FIELD);

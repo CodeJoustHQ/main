@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
-import { Message } from 'stompjs';
+import { Message, Subscription } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
 import { LargeText, MediumText } from '../components/core/Text';
 import { connect, routes, subscribe } from '../api/Socket';
@@ -13,7 +13,7 @@ import PlayerCard from '../components/card/PlayerCard';
 import HostActionCard from '../components/card/HostActionCard';
 import { startGame } from '../api/Game';
 import {
-  getRoom, Room, changeRoomHost, updateRoomSettings, removeUser
+  getRoom, Room, changeRoomHost, updateRoomSettings, removeUser,
 } from '../api/Room';
 
 type LobbyPageLocation = {
@@ -45,6 +45,9 @@ function LobbyPage() {
 
   // Variable to hold whether the user is connected to the socket.
   const [socketConnected, setSocketConnected] = useState(false);
+
+  // Variable to hold the subscription return, which can be unsubscribed.
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
 
   /**
    * Set state variables from an updated room object
@@ -175,7 +178,8 @@ function LobbyPage() {
     };
 
     connect(roomId, userId).then(() => {
-      subscribe(routes(roomId).subscribe, subscribeCallback).then(() => {
+      subscribe(routes(roomId).subscribe, subscribeCallback).then((subscriptionParam) => {
+        setSubscription(subscriptionParam);
         setSocketConnected(true);
       }).catch((err) => {
         setError(err.message);
@@ -194,7 +198,7 @@ function LobbyPage() {
         .then((res) => {
           setStateFromRoom(res);
           // Reset the user to hold the ID.
-          res.inactiveUsers.forEach((user: User) => {
+          res.users.forEach((user: User) => {
             if (user.nickname === location.state.user.nickname) {
               setCurrentUser(user);
             }
@@ -224,13 +228,14 @@ function LobbyPage() {
   // Redirect user to game page if room is active.
   useEffect(() => {
     if (active) {
+      subscription?.unsubscribe();
       history.push('/game', {
         roomId: currentRoomId,
         currentUser,
         difficulty,
       });
     }
-  }, [history, active, currentUser, currentRoomId, difficulty]);
+  }, [history, active, currentUser, currentRoomId, difficulty, subscription]);
 
   // Render the lobby.
   return (

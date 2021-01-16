@@ -9,4 +9,5 @@ public class CreateTestCaseRequest {
     private String input;
     private String output;
     private boolean hidden = false;
+    private String explanation;
 }
