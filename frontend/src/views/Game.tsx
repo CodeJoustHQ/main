@@ -80,7 +80,7 @@ function GamePage() {
         setCurrentPlayer(player);
       }
     });
-  }, []);
+  }, [currentPlayer, currentUser, room]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
