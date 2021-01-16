@@ -11,15 +11,15 @@ const Content = styled.div`
 type PlayerResultsCardProps = {
   player: Player,
   place: number,
+  isCurrentPlayer: boolean,
 };
 
 function PlayerResultsCard(props: PlayerResultsCardProps) {
-  const { player, place } = props;
+  const { player, place, isCurrentPlayer } = props;
 
   const getDisplayNickname = () => {
     const { nickname } = player.user;
     return `${nickname} ${isCurrentPlayer ? '(you)' : ''}`;
-    // TODO 
   };
 
   const getScoreDisplay = () => {

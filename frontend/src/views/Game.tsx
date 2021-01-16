@@ -93,6 +93,7 @@ function GamePage() {
       if (updatedGame.gameTimer.timeUp) {
         history.push('/game/results', {
           game: updatedGame,
+          currentPlayer,
         });
       }
     };
