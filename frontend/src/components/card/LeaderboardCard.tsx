@@ -20,6 +20,8 @@ const PlayerIcon = styled.div<PlayerIconProps>`
   
   height: 50px;
   width: 50px;
+  
+  // TODO: potentially extract into reusable component
 `;
 
 const HoverBar = styled.div`

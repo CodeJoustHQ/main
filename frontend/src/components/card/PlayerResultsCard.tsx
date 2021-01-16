@@ -6,6 +6,8 @@ import { MediumText, Text } from '../core/Text';
 const Content = styled.div`
   display: block;
   margin: 10px;
+  
+  // TODO: potentially flex
 `;
 
 type PlayerResultsCardProps = {
@@ -25,30 +27,18 @@ function PlayerResultsCard(props: PlayerResultsCardProps) {
   const getScoreDisplay = () => {
     const latestSubmission = player.submissions.slice(-1)[0];
     if (!latestSubmission) {
-      return '0 correct';
+      return 'Final Score: 0 correct';
     }
-    return `${latestSubmission.numCorrect} / ${latestSubmission.numTestCases} correct`;
-
-    // TODO
+    return `Final Score: ${latestSubmission.numCorrect} / ${latestSubmission.numTestCases} correct`;
   };
 
-  const getSubmissionTime = () => {
-    const latestSubmission = player.submissions.slice(-1)[0];
-    if (!latestSubmission) {
-      return 'Never';
-    }
-
-    const diffMilliseconds = Date.now() - new Date(latestSubmission.startTime).getTime();
-    const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
-    return `${diffMinutes} min ago`;
-
-    // TODO
-  };
+  const getSubmissionCount = () => player.submissions.length;
 
   return (
     <Content>
-      <MediumText>{`${place}. ${player.user.nickname}`}</MediumText>
-      <Text>{status}</Text>
+      <MediumText>{`${place}. ${getDisplayNickname()}`}</MediumText>
+      <Text>{getScoreDisplay()}</Text>
+      <Text>{getSubmissionCount()}</Text>
     </Content>
   );
 }
