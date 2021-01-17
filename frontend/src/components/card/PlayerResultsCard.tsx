@@ -1,7 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Player } from '../../api/Game';
-import { MediumText, Text } from '../core/Text';
+import { LowMarginText, Text } from '../core/Text';
+import PlayerIcon from './PlayerIcon';
 
 const Content = styled.div`
   display: block;
@@ -14,10 +15,13 @@ type PlayerResultsCardProps = {
   player: Player,
   place: number,
   isCurrentPlayer: boolean,
+  color: string,
 };
 
 function PlayerResultsCard(props: PlayerResultsCardProps) {
-  const { player, place, isCurrentPlayer } = props;
+  const {
+    player, place, isCurrentPlayer, color,
+  } = props;
 
   const getDisplayNickname = () => {
     const { nickname } = player.user;
@@ -36,7 +40,8 @@ function PlayerResultsCard(props: PlayerResultsCardProps) {
 
   return (
     <Content>
-      <MediumText>{`${place}. ${getDisplayNickname()}`}</MediumText>
+      <PlayerIcon color={color} />
+      <LowMarginText>{`${place}. ${getDisplayNickname()}`}</LowMarginText>
       <Text>{getScoreDisplay()}</Text>
       <Text>{getSubmissionCount()}</Text>
     </Content>

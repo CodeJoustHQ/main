@@ -36,6 +36,7 @@ function GameResultsPage() {
           player={player}
           place={index + 1}
           isCurrentPlayer={currentPlayer?.user.userId === player.user.userId}
+          color="blue" // TODO: merge with Chris's PR
         />
       ))}
     </div>
