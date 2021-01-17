@@ -2,26 +2,12 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import { LowMarginText, SmallText } from '../core/Text';
-
-type PlayerIconProps = {
-  color: string,
-};
+import PlayerIcon from './PlayerIcon';
 
 const Content = styled.div`
   display: inline-block;
   position: relative;
   margin: 10px;
-`;
-
-const PlayerIcon = styled.div<PlayerIconProps>`
-  background-color: ${({ color }) => color};
-  border-radius: 50%;
-  margin: 0 auto;
-  
-  height: 50px;
-  width: 50px;
-  
-  // TODO: potentially extract into reusable component
 `;
 
 const HoverBar = styled.div`
