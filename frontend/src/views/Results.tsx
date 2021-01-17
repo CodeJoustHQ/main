@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useLocation, useHistory } from 'react-router-dom';
-import { LargeText } from '../components/core/Text';
+import { LargeText, Text } from '../components/core/Text';
 import { Game, Player } from '../api/Game';
 import { checkLocationState } from '../util/Utility';
 import { errorHandler } from '../api/Error';
 import PlayerResultsCard from '../components/card/PlayerResultsCard';
 import { PrimaryButton } from '../components/core/Button';
 import { Room } from '../api/Room';
+import ErrorMessage from '../components/core/Error';
+import Loading from '../components/core/Loading';
 
 const Content = styled.div`
   width: 75%;
@@ -21,6 +23,10 @@ type LocationState = {
 function GameResultsPage() {
   const history = useHistory();
   const location = useLocation<LocationState>();
+
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
   const [players, setPlayers] = useState<Player[]>();
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
   const [room, setRoom] = useState<Room | null>(null);
@@ -37,13 +43,24 @@ function GameResultsPage() {
     }
   }, [location, history]);
 
-  const playAgain = () => {
-    console.log(room);
-    // TODO: send POST request (and only show this option to the host)
+  const playAgainAction = () => {
+    setError('');
+    setLoading(true);
+
+    // TODO: implement this axios request
+    playAgain()
+      .catch((err) => {
+        setLoading(false);
+        setError(err.message);
+      });
   };
+
+  // TODO: subscription to socket for playing again
 
   return (
     <Content>
+      { error ? <ErrorMessage message={error} /> : null }
+      { loading ? <Loading /> : null }
       <LargeText>Winners</LargeText>
       {players?.map((player, index) => (
         <PlayerResultsCard
@@ -54,7 +71,9 @@ function GameResultsPage() {
         />
       ))}
 
-      <PrimaryButton onClick={playAgain}>Play Again?</PrimaryButton>
+      {currentPlayer?.user.userId === room?.host.userId
+        ? <PrimaryButton onClick={playAgainAction}>Play Again?</PrimaryButton>
+        : <Text>Waiting for the host to choose whether to play again</Text>}
     </Content>
   );
 }
