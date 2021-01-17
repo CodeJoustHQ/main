@@ -3,11 +3,13 @@ import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
 import PlayerIcon from './PlayerIcon';
-import {FlexContainer, FlexLeft, FlexRight} from '../core/Container';
+import { FlexContainer, FlexLeft, FlexRight } from '../core/Container';
 
 const Content = styled.div`
   display: block;
   margin: 10px;
+  border-radius: 5px;
+  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
 `;
 
 type PlayerResultsCardProps = {
@@ -35,7 +37,7 @@ function PlayerResultsCard(props: PlayerResultsCardProps) {
     return `Final Score: ${latestSubmission.numCorrect} / ${latestSubmission.numTestCases} correct`;
   };
 
-  const getSubmissionCount = () => player.submissions.length;
+  const getSubmissionCount = () => `Submissions: ${player.submissions.length}`;
 
   return (
     <Content>
