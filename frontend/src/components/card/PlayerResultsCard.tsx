@@ -3,12 +3,11 @@ import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
 import PlayerIcon from './PlayerIcon';
+import {FlexContainer, FlexLeft, FlexRight} from '../core/Container';
 
 const Content = styled.div`
   display: block;
   margin: 10px;
-  
-  // TODO: potentially flex
 `;
 
 type PlayerResultsCardProps = {
@@ -40,10 +39,17 @@ function PlayerResultsCard(props: PlayerResultsCardProps) {
 
   return (
     <Content>
-      <PlayerIcon color={color} />
-      <LowMarginText>{`${place}. ${getDisplayNickname()}`}</LowMarginText>
-      <Text>{getScoreDisplay()}</Text>
-      <Text>{getSubmissionCount()}</Text>
+      <FlexContainer>
+        <FlexLeft>
+          <PlayerIcon color={color} />
+          <LowMarginText>{`${place}. ${getDisplayNickname()}`}</LowMarginText>
+        </FlexLeft>
+
+        <FlexRight>
+          <Text>{getScoreDisplay()}</Text>
+          <Text>{getSubmissionCount()}</Text>
+        </FlexRight>
+      </FlexContainer>
     </Content>
   );
 }

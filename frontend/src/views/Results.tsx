@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { useLocation, useHistory } from 'react-router-dom';
 import { LargeText } from '../components/core/Text';
 import { Game, Player } from '../api/Game';
 import { checkLocationState } from '../util/Utility';
 import { errorHandler } from '../api/Error';
 import PlayerResultsCard from '../components/card/PlayerResultsCard';
+
+const Content = styled.div`
+  width: 75%;
+`;
 
 type LocationState = {
   game: Game,
@@ -29,7 +34,7 @@ function GameResultsPage() {
   }, [location, history]);
 
   return (
-    <div>
+    <Content>
       <LargeText>Winners</LargeText>
       {players?.map((player, index) => (
         <PlayerResultsCard
@@ -39,7 +44,7 @@ function GameResultsPage() {
           color="blue" // TODO: merge with Chris's PR
         />
       ))}
-    </div>
+    </Content>
   );
 }
 
