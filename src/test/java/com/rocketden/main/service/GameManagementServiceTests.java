@@ -35,6 +35,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
+import java.time.LocalDateTime;
+
 @ExtendWith(MockitoExtension.class)
 public class GameManagementServiceTests {
 
@@ -285,18 +287,15 @@ public class GameManagementServiceTests {
 
         gameService.createAddGameFromRoom(room);
 
-        // TODO: If time is replaced with LocalDateTime.now(), 400 error.
-
         GameNotificationDto notificationDto = new GameNotificationDto();
         notificationDto.setInitiator(UserMapper.toDto(user));
-        notificationDto.setTime(null);
+        notificationDto.setTime(LocalDateTime.now());
         notificationDto.setContent(CONTENT);
         notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
 
         GameNotificationDto result = gameService.sendNotification(ROOM_ID, notificationDto);
 
-        // Confirm that socket sent update and sendNotification returned DTO.
-        verify(socketService).sendSocketUpdate(eq(ROOM_ID), eq(notificationDto));
-        assertEquals(notificationDto, result);
+        verify(notificationService).sendNotification(eq(ROOM_ID), eq(notificationDto));
     }
+
 }
