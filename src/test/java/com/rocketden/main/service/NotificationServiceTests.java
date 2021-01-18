@@ -1,6 +1,7 @@
 package com.rocketden.main.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
@@ -8,6 +9,8 @@ import java.time.LocalDateTime;
 
 import com.rocketden.main.dto.game.GameNotificationDto;
 import com.rocketden.main.dto.user.UserMapper;
+import com.rocketden.main.exception.NotificationError;
+import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.NotificationType;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
@@ -70,6 +73,12 @@ public class NotificationServiceTests {
 
         verify(socketService).sendSocketUpdate(eq(ROOM_ID), eq(notificationDto));
         assertEquals(notificationDto, result);
+    }
+
+    @Test
+    public void sendNotificationBadNotificationType() throws Exception {
+        ApiException exception = assertThrows(ApiException.class, () -> NotificationType.fromString("nonexistent"));
+        assertEquals(NotificationError.BAD_NOTIFICATION_TYPE, exception.getError());
     }
     
 }

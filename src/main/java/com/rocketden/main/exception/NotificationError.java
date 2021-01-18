@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum NotificationError implements ApiError {
 
-    BAD_SETTING(HttpStatus.BAD_REQUEST, "Please choose a valid notification type (correct or incorrect submission, correct test, code streak, time left, etc).");
+    BAD_NOTIFICATION_TYPE(HttpStatus.BAD_REQUEST, "Please choose a valid notification type (correct or incorrect submission, correct test, code streak, time left, etc).");
 
     private final HttpStatus status;
     private final ApiErrorResponse response;

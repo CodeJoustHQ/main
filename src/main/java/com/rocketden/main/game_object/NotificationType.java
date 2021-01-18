@@ -13,7 +13,7 @@ public enum NotificationType {
         try {
             return NotificationType.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new ApiException(NotificationError.BAD_SETTING);
+            throw new ApiException(NotificationError.BAD_NOTIFICATION_TYPE);
         }
     }
 }

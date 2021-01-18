@@ -10,7 +10,6 @@ import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.GameError;
-import com.rocketden.main.exception.NotificationError;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.Game;
@@ -436,34 +435,6 @@ public class GameManagementServiceTests {
         notificationDto.setInitiator(UserMapper.toDto(user));
         notificationDto.setTime(LocalDateTime.now());
         notificationDto.setContent(CONTENT);
-
-        ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification(ROOM_ID, notificationDto));
-        assertEquals(GameError.EMPTY_FIELD, exception.getError());
-    }
-
-    @Test
-    public void sendNotificationNullNotificationType() throws Exception {
-        Room room = new Room();
-        room.setRoomId(ROOM_ID);
-
-        User user = new User();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
-        room.addUser(user);
-
-        User host = new User();
-        user.setNickname(NICKNAME_2);
-        user.setUserId(USER_ID_2);
-        room.addUser(host);
-        room.setHost(host);
-
-        gameService.createAddGameFromRoom(room);
-
-        GameNotificationDto notificationDto = new GameNotificationDto();
-        notificationDto.setInitiator(UserMapper.toDto(user));
-        notificationDto.setTime(LocalDateTime.now());
-        notificationDto.setContent(CONTENT);
-        notificationDto.setNotificationType(null);
 
         ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification(ROOM_ID, notificationDto));
         assertEquals(GameError.EMPTY_FIELD, exception.getError());
