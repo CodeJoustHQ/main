@@ -71,16 +71,12 @@ function GamePage() {
     setGameTimer(game.gameTimer);
     setProblems(game.problems);
 
-    // Print room and currentPlayer to prevent unused variable warning
-    console.log(room);
-    console.log(currentPlayer);
-
     game.players.forEach((player) => {
       if (player.user.userId === currentUser?.userId) {
         setCurrentPlayer(player);
       }
     });
-  }, [currentPlayer, currentUser, room]);
+  }, [currentUser, room]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {

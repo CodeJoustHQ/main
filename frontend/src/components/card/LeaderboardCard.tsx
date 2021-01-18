@@ -61,7 +61,9 @@ function LeaderboardCard(props: LeaderboardCardProps) {
 
   const getDisplayNickname = () => {
     const { nickname } = player.user;
-    const shortenedNickname = nickname.length > 13 ? `${nickname.substring(0, 10)}...` : nickname;
+    const maxLength = isCurrentPlayer ? 10 : 13;
+
+    const shortenedNickname = (nickname.length > maxLength) ? `${nickname.substring(0, maxLength - 3)}...` : nickname;
     return `${shortenedNickname} ${isCurrentPlayer ? '(you)' : ''}`;
   };
 
