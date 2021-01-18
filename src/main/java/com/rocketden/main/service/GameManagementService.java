@@ -15,6 +15,7 @@ import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.notification.NotificationDto;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
+import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
@@ -24,6 +25,7 @@ import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.model.Room;
+import com.rocketden.main.model.User;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.util.EndGameTimerTask;
 
@@ -79,7 +81,8 @@ public class GameManagementService {
         }
 
         // If user making request is not the host, throw an exception.
-        if (!request.getInitiator().getNickname().equals(room.getHost().getNickname())) {
+        User initiator = UserMapper.toEntity(request.getInitiator());
+        if (!room.getHost().equals(initiator)) {
             throw new ApiException(RoomError.INVALID_PERMISSIONS);
         }
 
@@ -95,7 +98,19 @@ public class GameManagementService {
     }
 
     public RoomDto playAgain(String roomId, PlayAgainRequest request) {
-        
+        Room room = getGameFromRoomId(roomId).getRoom();
+
+        User initiator = UserMapper.toEntity(request.getInitiator());
+        if (!room.getHost().equals(initiator)) {
+            throw new ApiException(RoomError.INVALID_PERMISSIONS);
+        }
+
+        // Set all users to be disconnected
+        room.getUsers().forEach((user) -> user.setSessionId(null));
+
+        // TODO: figure out socket message
+
+        return RoomMapper.toDto(room);
     }
 
     // Initialize and add a game object from a room object, start game timer
