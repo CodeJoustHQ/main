@@ -358,6 +358,35 @@ public class GameManagementServiceTests {
     }
 
     @Test
+    public void sendNotificationContentRequired() throws Exception {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        User host = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(host);
+        room.setHost(host);
+
+        gameService.createAddGameFromRoom(room);
+
+        // Change notification type to time left, as no initiator is required.
+        GameNotificationDto notificationDto = new GameNotificationDto();
+        notificationDto.setInitiator(UserMapper.toDto(user));
+        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setContent(null);
+        notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
+
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification(ROOM_ID, notificationDto));
+        assertEquals(GameError.NOTIFICATION_REQUIRES_CONTENT, exception.getError());
+    }
+
+    @Test
     public void sendNotificationNotFound() throws Exception {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
@@ -409,7 +438,7 @@ public class GameManagementServiceTests {
         notificationDto.setContent(CONTENT);
 
         ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification(ROOM_ID, notificationDto));
-        assertEquals(NotificationError.BAD_SETTING, exception.getError());
+        assertEquals(GameError.BAD_SETTING, exception.getError());
     }
 
     @Test

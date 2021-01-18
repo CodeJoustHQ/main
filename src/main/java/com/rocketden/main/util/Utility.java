@@ -1,6 +1,5 @@
 package com.rocketden.main.util;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -20,6 +19,10 @@ public class Utility {
         Arrays.asList(NotificationType.SUBMIT_CORRECT,
             NotificationType.SUBMIT_INCORRECT, NotificationType.CODE_STREAK,
             NotificationType.TEST_CORRECT);
+
+    public static final List<NotificationType> contentNotifications = 
+        Arrays.asList(NotificationType.SUBMIT_CORRECT,
+            NotificationType.TEST_CORRECT, NotificationType.TIME_LEFT);
 
     private static final Random random = new Random();
     public static final String ROOM_ID_KEY = "ROOM_ID";

@@ -189,18 +189,25 @@ public class GameManagementService {
         Game game = getGameFromRoomId(roomId);
 
         /**
+         * The notification type must be present.
+         * 
          * If the initiator exists on the notificationDto (not required),
          * then ensure that they exist in the room.
          * 
          * If initiator does not exist, ensure that the notification type 
          * does not require an initiator.
          */
-        if (notificationDto.getInitiator() != null
+        if (notificationDto.getNotificationType() == null) {
+            throw new ApiException(GameError.EMPTY_FIELD);
+        } else if (notificationDto.getInitiator() != null
             && !game.getPlayers().containsKey(notificationDto.getInitiator().getUserId())) {
             throw new ApiException(GameError.USER_NOT_IN_GAME);
         } else if (notificationDto.getInitiator() == null
             && Utility.initiatorNotifications.contains(notificationDto.getNotificationType())) {
             throw new ApiException(GameError.NOTIFICATION_REQUIRES_INITIATOR);
+        } else if (notificationDto.getContent() == null
+            && Utility.contentNotifications.contains(notificationDto.getNotificationType())) {
+            throw new ApiException(GameError.NOTIFICATION_REQUIRES_CONTENT);       
         }
 
         return notificationService.sendNotification(roomId, notificationDto);
