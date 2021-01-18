@@ -58,7 +58,7 @@ public class GameMapper {
             Player player = PlayerMapper.playerFromUser(user);
             player.setColor(Utility.COLOR_LIST.get(index));
             players.put(user.getUserId(), player);
-            index++;
+            index = (index + 1) % Utility.COLOR_LIST.size();
         }
 
         return game;
