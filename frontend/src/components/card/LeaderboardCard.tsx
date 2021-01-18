@@ -11,6 +11,10 @@ const Content = styled.div`
   display: inline-block;
   position: relative;
   margin: 10px;
+  
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const PlayerIcon = styled.div<PlayerIconProps>`
@@ -37,8 +41,8 @@ const HoverBar = styled.div`
   height: 50px;
   padding: 10px;
   
-  // -(height + 2 * padding - 3px)
-  margin-top: -67px;
+  // -(height + 2 * padding - 15px)
+  margin-top: -55px;
 `;
 
 type LeaderboardCardProps = {
