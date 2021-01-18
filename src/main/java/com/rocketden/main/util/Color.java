@@ -9,21 +9,27 @@ import lombok.Setter;
 @EqualsAndHashCode
 public class Color {
 
-    private static final String INVALID_COLOR_NUM =
-        "The r, g, and b fields must all be between 0 and 255.";
+    private static final String INVALID_COLOR_STR =
+        "The hexadecimal fields must all be of the form '#XXXXXX'.";
 
-    public Color(int r, int g, int b) {
-        if (r < 0 || g < 0 || b < 0 || r > 255 || g > 255 || b > 255) {
-            throw new IllegalArgumentException(INVALID_COLOR_NUM);
+    public Color(String hexColor) {
+        if (hexColor.charAt(0) != '#' || hexColor.length() != 7) {
+            throw new IllegalArgumentException(INVALID_COLOR_STR);
         }
 
-        this.r = r;
-        this.g = g;
-        this.b = b;
+        // Ensure that all characters are of valid hexadecimal form.
+        for (int index = 1; index < 7; index++) {
+            char hexChar = Character.toUpperCase(hexColor.charAt(index));
+            
+            if ((hexChar < '0' || hexChar > '9') &&
+                (hexChar < 'A' || hexChar > 'F')) {
+                throw new IllegalArgumentException(INVALID_COLOR_STR);
+            }
+        }
+
+        this.hexColor = hexColor;
     }
 
-    private int r;
-    private int g;
-    private int b;
+    private String hexColor;
     
 }
