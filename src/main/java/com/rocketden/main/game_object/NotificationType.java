@@ -1,7 +1,6 @@
 package com.rocketden.main.game_object;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.NotificationError;
 import com.rocketden.main.exception.api.ApiException;
 

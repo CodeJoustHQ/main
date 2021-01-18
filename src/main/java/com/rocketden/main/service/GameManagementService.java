@@ -25,6 +25,7 @@ import com.rocketden.main.model.Room;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.util.EndGameTimerTask;
 import com.rocketden.main.util.NotificationTimerTask;
+import com.rocketden.main.util.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -190,9 +191,16 @@ public class GameManagementService {
         /**
          * If the initiator exists on the notificationDto (not required),
          * then ensure that they exist in the room.
+         * 
+         * If initiator does not exist, ensure that the notification type 
+         * does not require an initiator.
          */
-        if (notificationDto.getInitiator() != null && !game.getPlayers().containsKey(notificationDto.getInitiator().getUserId())) {
+        if (notificationDto.getInitiator() != null
+            && !game.getPlayers().containsKey(notificationDto.getInitiator().getUserId())) {
             throw new ApiException(GameError.USER_NOT_IN_GAME);
+        } else if (notificationDto.getInitiator() == null
+            && Utility.initiatorNotifications.contains(notificationDto.getNotificationType())) {
+            throw new ApiException(GameError.NOTIFICATION_REQUIRES_INITIATOR);
         }
 
         return notificationService.sendNotification(roomId, notificationDto);

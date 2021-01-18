@@ -1,15 +1,25 @@
 package com.rocketden.main.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dao.UserRepository;
+import com.rocketden.main.game_object.NotificationType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class Utility {
+
+    // List notifications that require an initiator.
+    public static final List<NotificationType> initiatorNotifications =
+        Arrays.asList(NotificationType.SUBMIT_CORRECT,
+            NotificationType.SUBMIT_INCORRECT, NotificationType.CODE_STREAK,
+            NotificationType.TEST_CORRECT);
 
     private static final Random random = new Random();
     public static final String ROOM_ID_KEY = "ROOM_ID";
