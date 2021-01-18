@@ -9,7 +9,7 @@ import {
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
 import Difficulty from '../api/Difficulty';
-import { PrimaryButton, DifficultyButton, SmallButton } from '../components/core/Button';
+import { PrimaryButton, DifficultyButton } from '../components/core/Button';
 import Loading from '../components/core/Loading';
 import PlayerCard from '../components/card/PlayerCard';
 import HostActionCard from '../components/card/HostActionCard';
@@ -40,7 +40,7 @@ function LobbyPage() {
   const [currentRoomId, setRoomId] = useState('');
   const [active, setActive] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
-  const [duration, setDuration] = useState(15);
+  const [duration, setDuration] = useState<number | undefined>(15);
 
   // Hold error text.
   const [error, setError] = useState('');
@@ -68,7 +68,7 @@ function LobbyPage() {
   };
 
   // Function to determine if the given user is the host or not
-  const isHost = useCallback((user: User | null) => user?.nickname === host?.nickname, [host]);
+  const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
 
   const kickUser = (user: User) => {
     setLoading(true);
@@ -210,7 +210,7 @@ function LobbyPage() {
     const prevDuration = duration;
     const settings = {
       initiator: currentUser!,
-      duration: duration * 60,
+      duration: (duration || 0) * 60,
     };
 
     updateRoomSettings(currentRoomId, settings)
@@ -355,8 +355,7 @@ function LobbyPage() {
           onClick={() => updateDifficultySetting(key)}
           active={difficulty === Difficulty[key as keyof typeof Difficulty]}
           enabled={isHost(currentUser)}
-          title={currentUser?.userId !== host?.userId
-            ? 'Only the host can change these settings' : undefined}
+          title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
         >
           {key}
         </DifficultyButton>
@@ -372,18 +371,30 @@ function LobbyPage() {
         max={60}
         value={duration}
         disabled={!isHost(currentUser)}
-        onChange={(e) => {
-          const newDuration = Number(e.target.value);
-          if (newDuration >= 0 && newDuration <= 60) {
-            setDuration(Number(e.target.value));
+        onKeyPress={(e) => {
+          // Prevent user from using any of these non-numeric characters
+          if (e.key === 'e' || e.key === '.' || e.key === '-') {
+            e.preventDefault();
           }
         }}
-      />
-      {isHost(currentUser) ? <SmallButton onClick={updateRoomDuration}>Save</SmallButton> : null}
+        onChange={(e) => {
+          const { value } = e.target;
 
+          // Set duration to undefined to allow users to clear field
+          if (!value) {
+            setDuration(undefined);
+          } else {
+            const newDuration = Number(value);
+            if (newDuration >= 0 && newDuration <= 60) {
+              setDuration(newDuration);
+            }
+          }
+        }}
+        onBlur={updateRoomDuration}
+      />
       <br />
 
-      {currentUser?.userId === host?.userId
+      {isHost(currentUser)
         ? <PrimaryButton onClick={handleStartGame} disabled={loading}>Start Game</PrimaryButton>
         : <MediumText>Waiting for the host to start the game...</MediumText>}
     </div>

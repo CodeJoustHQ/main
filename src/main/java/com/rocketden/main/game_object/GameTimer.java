@@ -16,13 +16,13 @@ import java.util.Timer;
 public class GameTimer {
 
     // Varying durations of Game Timer, in seconds.
-    public static final Long DURATION_10_SEC = (long) 10;
-    public static final Long DURATION_30_SEC = (long) 30;
-    public static final Long DURATION_1 = (long) 60;
-    public static final Long DURATION_5 = (long) 300;
-    public static final Long DURATION_15 = (long) 900;
-    public static final Long DURATION_30 = (long) 1800;
-    public static final Long DURATION_60 = (long) 3600;
+    public static final long DURATION_10_SEC = 10;
+    public static final long DURATION_30_SEC = 30;
+    public static final long DURATION_1 = 60;
+    public static final long DURATION_5 = 300;
+    public static final long DURATION_15 = 900;
+    public static final long DURATION_30 = 1800;
+    public static final long DURATION_60 = 3600;
 
     // The time that the game began.
     private LocalDateTime startTime = LocalDateTime.now();
