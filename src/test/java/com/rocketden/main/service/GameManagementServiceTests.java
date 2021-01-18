@@ -466,7 +466,7 @@ public class GameManagementServiceTests {
         notificationDto.setNotificationType(null);
 
         ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification(ROOM_ID, notificationDto));
-        assertEquals(NotificationError.BAD_SETTING, exception.getError());
+        assertEquals(GameError.EMPTY_FIELD, exception.getError());
     }
 
     @Test
@@ -494,7 +494,7 @@ public class GameManagementServiceTests {
         notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
 
         ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification(ROOM_ID, notificationDto));
-        assertEquals(NotificationError.BAD_SETTING, exception.getError());
+        assertEquals(GameError.USER_NOT_IN_GAME, exception.getError());
     }
 
 }
