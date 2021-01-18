@@ -2,6 +2,7 @@ package com.rocketden.main.game_object;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.rocketden.main.exception.GameError;
+import com.rocketden.main.exception.NotificationError;
 import com.rocketden.main.exception.api.ApiException;
 
 public enum NotificationType {
@@ -13,7 +14,7 @@ public enum NotificationType {
         try {
             return NotificationType.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new ApiException(GameError.BAD_SETTING);
+            throw new ApiException(NotificationError.BAD_SETTING);
         }
     }
 }
