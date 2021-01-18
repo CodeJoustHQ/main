@@ -25,7 +25,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -51,9 +50,6 @@ public class GameManagementServiceTests {
 
     @Mock
     private ProblemService problemService;
-
-    @Mock
-    private SimpMessagingTemplate template;
 
     @Spy
     @InjectMocks
@@ -274,7 +270,7 @@ public class GameManagementServiceTests {
         gameService.startGame(ROOM_ID, request);
 
         PlayAgainRequest playAgainRequest = new PlayAgainRequest();
-        request.setInitiator(UserMapper.toDto(host));
+        playAgainRequest.setInitiator(UserMapper.toDto(host));
         RoomDto response = gameService.playAgain(ROOM_ID, playAgainRequest);
 
         verify(socketService).sendSocketUpdate(Mockito.any(RoomDto.class)); // TODO: update with correct params
@@ -287,6 +283,26 @@ public class GameManagementServiceTests {
 
     @Test
     public void playAgainWrongInitiator() {
+        User host = new User();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
 
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(host);
+
+        StartGameRequest startRequest = new StartGameRequest();
+        startRequest.setInitiator(UserMapper.toDto(host));
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
+        gameService.startGame(ROOM_ID, startRequest);
+
+        UserDto initiator = new UserDto();
+        initiator.setNickname(NICKNAME_2);
+        PlayAgainRequest request = new PlayAgainRequest();
+        request.setInitiator(initiator);
+
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.playAgain(ROOM_ID, request));
+        assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
     }
 }

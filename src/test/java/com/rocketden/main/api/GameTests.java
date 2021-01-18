@@ -1,7 +1,5 @@
 package com.rocketden.main.api;
 
-import com.rocketden.main.dao.ProblemRepository;
-import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.PlayerDto;
 import com.rocketden.main.dto.game.StartGameRequest;
@@ -53,12 +51,6 @@ public class GameTests {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Mock
-    private RoomRepository repository;
-
-    @Mock
-    private ProblemRepository problemRepository;
 
     // Predefine problem attributes.
     private static final String NAME = "Sort a List";
