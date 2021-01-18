@@ -2,15 +2,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message, Subscription } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
-<<<<<<< HEAD
 import { LargeText, MediumText, Text } from '../components/core/Text';
-import { connect, routes, subscribe } from '../api/Socket';
-=======
-import { LargeText, MediumText } from '../components/core/Text';
 import {
   connect, routes, subscribe, disconnect,
 } from '../api/Socket';
->>>>>>> 17fdadc4f0fa22157f5d185169be96b3b2c720d5
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
 import Difficulty from '../api/Difficulty';
@@ -22,11 +17,8 @@ import { startGame } from '../api/Game';
 import {
   getRoom, Room, changeRoomHost, updateRoomSettings, removeUser,
 } from '../api/Room';
-<<<<<<< HEAD
 import { NumberInput } from '../components/core/Input';
-=======
 import { errorHandler } from '../api/Error';
->>>>>>> 17fdadc4f0fa22157f5d185169be96b3b2c720d5
 
 type LobbyPageLocation = {
   user: User,
@@ -184,12 +176,8 @@ function LobbyPage() {
    * Update the difficulty setting of the room (EASY, MEDIUM, HARD, or RANDOM)
    */
   const updateDifficultySetting = (key: string) => {
-<<<<<<< HEAD
     setError('');
     if (isHost(currentUser) && !loading) {
-=======
-    if (currentUser?.userId === host?.userId && !loading) {
->>>>>>> 17fdadc4f0fa22157f5d185169be96b3b2c720d5
       const oldDifficulty = difficulty;
       const newDifficulty = Difficulty[key as keyof typeof Difficulty];
 
@@ -244,11 +232,10 @@ function LobbyPage() {
       return userList.map((user) => (
         <PlayerCard
           user={user}
-<<<<<<< HEAD
           isHost={isHost(user)}
           isActive={isActive}
         >
-          {isHost(currentUser) && (user.nickname !== currentUser?.nickname) ? (
+          {isHost(currentUser) && (user.userId !== currentUser?.userId) ? (
             // If currentUser is host, pass in an on-click action card for all other users
             <HostActionCard
               user={user}
@@ -257,21 +244,6 @@ function LobbyPage() {
               onRemoveUser={kickUser}
             />
           ) : null}
-=======
-          isHost={user.userId === host?.userId}
-          isActive={isActive}
-        >
-          {currentUser?.userId === host?.userId
-            && (user.userId !== currentUser?.userId) ? (
-              // If currentUser is host, pass in an on-click action card for all other users
-              <HostActionCard
-                user={user}
-                userIsActive={Boolean(user.sessionId)}
-                onMakeHost={changeHosts}
-                onRemoveUser={kickUser}
-              />
-            ) : null}
->>>>>>> 17fdadc4f0fa22157f5d185169be96b3b2c720d5
         </PlayerCard>
       ));
     }
@@ -382,13 +354,8 @@ function LobbyPage() {
         <DifficultyButton
           onClick={() => updateDifficultySetting(key)}
           active={difficulty === Difficulty[key as keyof typeof Difficulty]}
-<<<<<<< HEAD
           enabled={isHost(currentUser)}
-          title={currentUser?.nickname !== host?.nickname
-=======
-          enabled={currentUser?.userId === host?.userId}
           title={currentUser?.userId !== host?.userId
->>>>>>> 17fdadc4f0fa22157f5d185169be96b3b2c720d5
             ? 'Only the host can change these settings' : undefined}
         >
           {key}
