@@ -240,7 +240,8 @@ function LobbyPage() {
     };
 
     connect(roomId, userId).then(() => {
-      subscribe(routes(roomId).subscribe, subscribeCallback).then((subscriptionParam) => {
+      // Body encrypt through JSON.
+      subscribe(routes(roomId).subscribe_user, subscribeCallback).then((subscriptionParam) => {
         setSubscription(subscriptionParam);
         setSocketConnected(true);
       }).catch((err) => {

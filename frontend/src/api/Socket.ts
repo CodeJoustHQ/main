@@ -12,7 +12,8 @@ export const routes = (roomId: string) => {
   socketRoomId = roomId;
   return {
     connect: `${basePath}/join-room-endpoint`,
-    subscribe: `${basePath}/${roomId}/subscribe-user`,
+    subscribe_user: `${basePath}/${roomId}/subscribe-user`,
+    subscribe_notification: `${basePath}/${roomId}/subscribe-notification`,
   };
 };
 
@@ -53,7 +54,7 @@ export const connect = (roomId: string, userId: string):
   });
 
 /**
- * Subscribe the user via socket.
+ * Subscribe the user to a URL via socket.
  * @returns void Promise, reject if socket is not connected.
  */
 export const subscribe = (subscribeUrl: string,
@@ -61,6 +62,20 @@ export const subscribe = (subscribeUrl: string,
   Promise<Subscription> => new Promise<Subscription>((resolve, reject) => {
     if (stompClient && stompClient.connected) {
       resolve(stompClient.subscribe(subscribeUrl, subscribeCallback));
+    } else {
+      reject(errorHandler('The socket is not connected.'));
+    }
+  });
+
+/**
+ * Subscribe the user via socket.
+ * @returns void Promise, reject if socket is not subscribed to that URL.
+ */
+export const send = (sendUrl: string, headers?: {}, body?: string):
+  Promise<void> => new Promise<void>((resolve, reject) => {
+    if (stompClient && stompClient.connected) {
+      stompClient.send(sendUrl, headers, body);
+      resolve();
     } else {
       reject(errorHandler('The socket is not connected.'));
     }
