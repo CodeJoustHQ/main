@@ -41,6 +41,15 @@ public class SubmitServiceTests {
     @InjectMocks
     private SubmitService submitService;
 
+    // Helper method to add a dummy submission to a PlayerDto object
+    private void addSubmissionHelper(PlayerDto playerDto, int numCorrect) {
+        SubmissionDto submissionDto = new SubmissionDto();
+        submissionDto.setNumCorrect(numCorrect);
+        submissionDto.setStartTime(LocalDateTime.now());
+
+        playerDto.getSubmissions().add(submissionDto);
+    }
+
     @Test
     public void submitSolutionSuccess() {
         /**
@@ -111,14 +120,5 @@ public class SubmitServiceTests {
         assertEquals(player3, players.get(2));
         assertEquals(player1, players.get(3));
         assertEquals(player5, players.get(4));
-    }
-
-    // Helper method to add a dummy submission to a PlayerDto object
-    private void addSubmissionHelper(PlayerDto playerDto, int numCorrect) {
-        SubmissionDto submissionDto = new SubmissionDto();
-        submissionDto.setNumCorrect(numCorrect);
-        submissionDto.setStartTime(LocalDateTime.now());
-
-        playerDto.getSubmissions().add(submissionDto);
     }
 }
