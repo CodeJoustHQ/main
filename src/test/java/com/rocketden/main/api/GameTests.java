@@ -47,6 +47,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
+
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -314,7 +316,12 @@ public class GameTests {
         RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
         startGameHelper(roomDto, host);
 
-        // TODO: If time is replaced with LocalDateTime.now(), 400 error.
+        /**
+         * TODO: If time is replaced with LocalDateTime.now(), 400 error,
+         * as it cannot convert the time field into a JSON string. We could 
+         * simply not have this field be set, and then create it on the
+         * backend, but if this could be figured out that'd be great.
+         */
 
         GameNotificationDto notificationDto = new GameNotificationDto();
         notificationDto.setInitiator(host);
