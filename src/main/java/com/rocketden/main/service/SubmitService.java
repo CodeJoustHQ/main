@@ -73,8 +73,7 @@ public class SubmitService {
             // Players who haven't submitted yet are sorted last
             if (submissions1.isEmpty()) {
                 return 1;
-            }
-            if (submissions2.isEmpty()) {
+            } else if (submissions2.isEmpty()) {
                 return -1;
             }
 
