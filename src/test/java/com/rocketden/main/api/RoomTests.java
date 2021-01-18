@@ -25,7 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -343,6 +343,7 @@ public class RoomTests {
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(host);
         updateRequest.setDifficulty(ProblemDifficulty.EASY);
+        updateRequest.setNumProblems(2);
 
         MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -364,6 +365,7 @@ public class RoomTests {
         RoomDto actual = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
         assertEquals(updateRequest.getDifficulty(), actual.getDifficulty());
+        assertEquals(updateRequest.getNumProblems(), actual.getNumProblems());
     }
 
     @Test
@@ -388,6 +390,7 @@ public class RoomTests {
 
         // Difficulty remains unchanged from default
         assertEquals(ProblemDifficulty.RANDOM, room.getDifficulty());
+        assertEquals(1, room.getNumProblems());
     }
 
     @Test

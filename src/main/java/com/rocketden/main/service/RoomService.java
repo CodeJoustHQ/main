@@ -9,6 +9,7 @@ import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.room.RemoveUserRequest;
 import com.rocketden.main.dto.user.UserMapper;
+import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 public class RoomService {
 
     public static final int ROOM_ID_LENGTH = 6;
+    public static final int MAX_NUM_PROBLEMS = 10;
 
     private final RoomRepository repository;
     private final SocketService socketService;
@@ -223,6 +225,15 @@ public class RoomService {
         if (request.getDifficulty() != null) {
             room.setDifficulty(request.getDifficulty());
         }
+
+        // Set number of problems if not null
+        if (request.getNumProblems() != null) {
+            if (request.getNumProblems() <= 0 || request.getNumProblems() > MAX_NUM_PROBLEMS) {
+                throw new ApiException(ProblemError.INVALID_NUMBER_REQUEST);
+            }
+            room.setNumProblems(request.getNumProblems());
+        }
+
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
