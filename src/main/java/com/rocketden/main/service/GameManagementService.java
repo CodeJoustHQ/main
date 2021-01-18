@@ -97,6 +97,7 @@ public class GameManagementService {
         return roomDto;
     }
 
+    // TODO: add verification that game is over
     public RoomDto playAgain(String roomId, PlayAgainRequest request) {
         Room room = getGameFromRoomId(roomId).getRoom();
 
@@ -108,7 +109,10 @@ public class GameManagementService {
         // Set all users to be disconnected
         room.getUsers().forEach((user) -> user.setSessionId(null));
 
-        // TODO: figure out socket message
+        // Change room to be no longer active
+        room.setActive(false);
+
+        // TODO: figure out socket message (and test in GameSocketTests)
 
         return RoomMapper.toDto(room);
     }

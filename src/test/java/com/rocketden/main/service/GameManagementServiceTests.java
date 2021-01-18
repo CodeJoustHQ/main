@@ -2,6 +2,7 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
+import com.rocketden.main.dto.game.PlayAgainRequest;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.room.RoomDto;
@@ -27,7 +28,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -61,6 +64,7 @@ public class GameManagementServiceTests {
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "098765";
+    private static final String SESSION_ID = "abcdefghijk";
     private static final String CODE = "print('hi')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
 
@@ -247,5 +251,42 @@ public class GameManagementServiceTests {
 
         ApiException exception = assertThrows(ApiException.class, () -> gameService.submitSolution(ROOM_ID, missingRequest));
         assertEquals(GameError.EMPTY_FIELD, exception.getError());
+    }
+
+    @Test
+    public void playAgainSuccess() {
+        User host = new User();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+        host.setSessionId(SESSION_ID);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(host);
+        room.setDifficulty(ProblemDifficulty.HARD);
+        room.setActive(true);
+        room.addUser(host);
+
+        StartGameRequest request = new StartGameRequest();
+        request.setInitiator(UserMapper.toDto(host));
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
+        gameService.startGame(ROOM_ID, request);
+
+        PlayAgainRequest playAgainRequest = new PlayAgainRequest();
+        request.setInitiator(UserMapper.toDto(host));
+        RoomDto response = gameService.playAgain(ROOM_ID, playAgainRequest);
+
+        verify(socketService).sendSocketUpdate(Mockito.any(RoomDto.class)); // TODO: update with correct params
+
+        assertEquals(room.getRoomId(), response.getRoomId());
+        assertEquals(room.getDifficulty(), response.getDifficulty());
+        assertFalse(room.getActive());
+        assertNull(room.getHost().getSessionId());
+    }
+
+    @Test
+    public void playAgainWrongInitiator() {
+
     }
 }
