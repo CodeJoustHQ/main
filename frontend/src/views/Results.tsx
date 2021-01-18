@@ -32,7 +32,7 @@ function GameResultsPage() {
   const [room, setRoom] = useState<Room | null>(null);
 
   useEffect(() => {
-    if (checkLocationState(location, 'game', 'currentPlayer')) {
+    if (checkLocationState(location, 'game', 'room', 'currentPlayer')) {
       setPlayers(location.state.game.players);
       setRoom(location.state.game.room);
       setCurrentPlayer(location.state.currentPlayer);
