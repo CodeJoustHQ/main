@@ -2,6 +2,7 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
+import com.rocketden.main.dto.game.GameNotificationDto;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.room.RoomDto;
@@ -12,6 +13,7 @@ import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.Game;
+import com.rocketden.main.game_object.NotificationType;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 import com.rocketden.main.model.problem.ProblemDifficulty;
@@ -49,6 +51,9 @@ public class GameManagementServiceTests {
     private ProblemService problemService;
 
     @Mock
+    private NotificationService notificationService;
+
+    @Mock
     private SimpMessagingTemplate template;
 
     @Spy
@@ -60,9 +65,13 @@ public class GameManagementServiceTests {
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "098765";
+    private static final String USER_ID_2 = "345678";
     private static final String CODE = "print('hi')";
     private static final String LANGUAGE = "python";
     private static final long DURATION = 600;
+
+    // Predefine notification content.
+    private static final String CONTENT = "[1, 2, 3]";
 
     @Test
     public void addGetAndRemoveGame() {
@@ -257,4 +266,37 @@ public class GameManagementServiceTests {
     }
 
     // TODO: Game tests notification verify.
+
+    @Test
+    public void sendNotificationSuccess() throws Exception {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        User host = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(host);
+        room.setHost(host);
+
+        gameService.createAddGameFromRoom(room);
+
+        // TODO: If time is replaced with LocalDateTime.now(), 400 error.
+
+        GameNotificationDto notificationDto = new GameNotificationDto();
+        notificationDto.setInitiator(UserMapper.toDto(user));
+        notificationDto.setTime(null);
+        notificationDto.setContent(CONTENT);
+        notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
+
+        GameNotificationDto result = gameService.sendNotification(ROOM_ID, notificationDto);
+
+        // Confirm that socket sent update and sendNotification returned DTO.
+        verify(socketService).sendSocketUpdate(eq(ROOM_ID), eq(notificationDto));
+        assertEquals(notificationDto, result);
+    }
 }
