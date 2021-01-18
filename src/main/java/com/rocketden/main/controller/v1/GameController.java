@@ -1,6 +1,7 @@
 package com.rocketden.main.controller.v1;
 
 import com.rocketden.main.dto.game.GameDto;
+import com.rocketden.main.dto.game.PlayAgainRequest;
 import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.room.RoomDto;
@@ -41,5 +42,11 @@ public class GameController extends BaseRestController {
     public ResponseEntity<SubmissionDto> submitSolution(@PathVariable String roomId,
                                                         @RequestBody SubmissionRequest request) {
         return new ResponseEntity<>(service.submitSolution(roomId, request), HttpStatus.OK);
+    }
+
+    @PostMapping("/games/{roomId}/restart")
+    public ResponseEntity<RoomDto> playAgain(@PathVariable String roomId,
+                                                        @RequestBody PlayAgainRequest request) {
+        return new ResponseEntity<>(service.playAgain(roomId, request), HttpStatus.OK);
     }
 }

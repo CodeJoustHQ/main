@@ -8,6 +8,7 @@ import java.util.Map;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
+import com.rocketden.main.dto.game.PlayAgainRequest;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
@@ -91,6 +92,10 @@ public class GameManagementService {
         RoomDto roomDto = RoomMapper.toDto(room);
         socketService.sendSocketUpdate(roomDto);
         return roomDto;
+    }
+
+    public RoomDto playAgain(String roomId, PlayAgainRequest request) {
+        
     }
 
     // Initialize and add a game object from a room object, start game timer
