@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useLocation, useHistory } from 'react-router-dom';
 import { LargeText, Text } from '../components/core/Text';
-import { Game, Player } from '../api/Game';
+import { Game, Player, playAgain } from '../api/Game';
 import { checkLocationState } from '../util/Utility';
 import { errorHandler } from '../api/Error';
 import PlayerResultsCard from '../components/card/PlayerResultsCard';
@@ -47,8 +47,7 @@ function GameResultsPage() {
     setError('');
     setLoading(true);
 
-    // TODO: implement this axios request
-    playAgain()
+    playAgain(room!.roomId, { initiator: currentPlayer!.user })
       .catch((err) => {
         setLoading(false);
         setError(err.message);
