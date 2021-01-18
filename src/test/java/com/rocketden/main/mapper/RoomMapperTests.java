@@ -43,6 +43,7 @@ public class RoomMapperTests {
         room.setRoomId(ROOM_ID);
         room.setDifficulty(ProblemDifficulty.MEDIUM);
         room.setHost(host);
+        room.setNumProblems(3);
 
         room.addUser(host);
         room.addUser(user);
@@ -53,6 +54,7 @@ public class RoomMapperTests {
         assertEquals(room.getRoomId(), response.getRoomId());
         assertEquals(room.getDifficulty(), response.getDifficulty());
         assertEquals(room.getDuration(), response.getDuration());
+        assertEquals(room.getNumProblems(), response.getNumProblems());
 
         User actualHost = UserMapper.toEntity(response.getHost());
         assertEquals(room.getHost(), actualHost);

@@ -346,6 +346,7 @@ public class RoomTests {
         updateRequest.setInitiator(host);
         updateRequest.setDifficulty(ProblemDifficulty.EASY);
         updateRequest.setDuration(DURATION);
+        updateRequest.setNumProblems(2);
 
         MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -368,6 +369,7 @@ public class RoomTests {
 
         assertEquals(updateRequest.getDifficulty(), actual.getDifficulty());
         assertEquals(updateRequest.getDuration(), actual.getDuration());
+        assertEquals(updateRequest.getNumProblems(), actual.getNumProblems());
     }
 
     @Test
@@ -393,6 +395,7 @@ public class RoomTests {
         // Difficulty remains unchanged from default
         assertEquals(ProblemDifficulty.RANDOM, room.getDifficulty());
         assertEquals(GameTimer.DURATION_15, room.getDuration());
+        assertEquals(1, room.getNumProblems());
     }
 
     @Test
