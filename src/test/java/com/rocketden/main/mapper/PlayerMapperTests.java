@@ -20,27 +20,6 @@ public class PlayerMapperTests {
     private static final String NICKNAME = "test";
 
     @Test
-    public void toDto() {
-        User user = new User();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
-
-        Player player = new Player();
-        player.setSolved(true);
-        player.setUser(user);
-
-        PlayerDto playerDto = PlayerMapper.toDto(player);
-
-        assertEquals(player.getUser().getUserId(), playerDto.getUser().getUserId());
-        assertTrue(playerDto.getSolved());
-        assertNull(player.getPlayerCode());
-        assertNull(playerDto.getCode());
-        assertNull(playerDto.getLanguage());
-        assertEquals(0, playerDto.getSubmissions().size());
-        assertEquals(player.getColor(), playerDto.getColor());
-    }
-
-    @Test
     public void playerFromUser() {
         User user = new User();
         user.setNickname(NICKNAME);

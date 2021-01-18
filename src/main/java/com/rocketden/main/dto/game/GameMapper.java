@@ -36,8 +36,10 @@ public class GameMapper {
         game.getProblems().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
         gameDto.setProblems(problems);
 
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
+
         List<PlayerDto> players = new ArrayList<>();
-        game.getPlayers().values().forEach(player -> players.add(PlayerMapper.toDto(player)));
+        game.getPlayers().values().forEach(player -> players.add(mapper.map(player, PlayerDto.class));
         gameDto.setPlayers(players);
 
         return gameDto;
