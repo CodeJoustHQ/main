@@ -3,7 +3,9 @@ import { useLocation, useHistory } from 'react-router-dom';
 import { Message, Subscription } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
 import { LargeText, MediumText } from '../components/core/Text';
-import { connect, routes, subscribe } from '../api/Socket';
+import {
+  connect, routes, subscribe, disconnect,
+} from '../api/Socket';
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
 import Difficulty from '../api/Difficulty';
@@ -15,6 +17,7 @@ import { startGame } from '../api/Game';
 import {
   getRoom, Room, changeRoomHost, updateRoomSettings, removeUser,
 } from '../api/Room';
+import { errorHandler } from '../api/Error';
 
 type LobbyPageLocation = {
   user: User,
@@ -76,6 +79,62 @@ function LobbyPage() {
       });
   };
 
+  /**
+   * If the user is not present in the room after a refresh, then
+   * disconnect them and boot them off the page, as they were kicked.
+   *
+   * @param roomParam The updated room to check for kicked user.
+   * @param currentUser The updated room to check for kicked user.
+   */
+  const conditionallyBootKickedUser = useCallback((roomParam: Room,
+    currentUserParam: User | null) => {
+    if (currentUserParam) {
+      let userIncluded: boolean = false;
+      roomParam.users.forEach((user) => {
+        if (currentUserParam.userId === user.userId) {
+          userIncluded = true;
+        }
+      });
+      // If user is no longer present in room, boot the user.
+      if (!userIncluded) {
+        disconnect().then(() => {
+          history.replace('/game/join', {
+            error: errorHandler('You have been kicked from the room.'),
+          });
+          setSocketConnected(false);
+          setLoading(false);
+        }).catch((err) => {
+          setError(err.message);
+          setLoading(false);
+        });
+      }
+    }
+  }, [history]);
+
+  /**
+   * Reset the user to hold the ID (location currently has
+   * only nickname). Boot user if not present in list.
+   * Only go through process if current user is not yet set.
+   */
+  const updateCurrentUserDetails = useCallback((usersParam: User[]) => {
+    if (!currentUser) {
+      let userFound: boolean = false;
+      usersParam.forEach((user: User) => {
+        if (user.nickname === location.state.user.nickname) {
+          setCurrentUser(user);
+          userFound = true;
+        }
+      });
+
+      // If user is not found in list, redirect them to join page with error.
+      if (!userFound) {
+        history.replace('/game/join', {
+          error: errorHandler('You could not be found in the room\'s list of users.'),
+        });
+      }
+    }
+  }, [currentUser, history, location]);
+
   const changeHosts = (newHost: User) => {
     const request = {
       initiator: currentUser!,
@@ -108,7 +167,7 @@ function LobbyPage() {
    * Update the difficulty setting of the room (EASY, MEDIUM, HARD, or RANDOM)
    */
   const updateDifficultySetting = (key: string) => {
-    if (currentUser?.nickname === host?.nickname && !loading) {
+    if (currentUser?.userId === host?.userId && !loading) {
       const oldDifficulty = difficulty;
       const newDifficulty = Difficulty[key as keyof typeof Difficulty];
 
@@ -141,11 +200,11 @@ function LobbyPage() {
       return userList.map((user) => (
         <PlayerCard
           user={user}
-          isHost={user.nickname === host?.nickname}
+          isHost={user.userId === host?.userId}
           isActive={isActive}
         >
-          {currentUser?.nickname === host?.nickname
-            && (user.nickname !== currentUser?.nickname) ? (
+          {currentUser?.userId === host?.userId
+            && (user.userId !== currentUser?.userId) ? (
               // If currentUser is host, pass in an on-click action card for all other users
               <HostActionCard
                 user={user}
@@ -172,9 +231,12 @@ function LobbyPage() {
     /**
      * Subscribe callback that will be triggered on every message.
      * Update the users list and other room info.
+     * Boot any kicked users that are no longer present in the room.
      */
     const subscribeCallback = (result: Message) => {
-      setStateFromRoom(JSON.parse(result.body));
+      const room: Room = JSON.parse(result.body);
+      setStateFromRoom(room);
+      conditionallyBootKickedUser(room, currentUser);
     };
 
     connect(roomId, userId).then(() => {
@@ -188,7 +250,7 @@ function LobbyPage() {
     }).catch((err) => {
       setError(err.message);
     });
-  }, []);
+  }, [currentUser, conditionallyBootKickedUser]);
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
@@ -198,12 +260,7 @@ function LobbyPage() {
       getRoom(location.state.roomId)
         .then((res) => {
           setStateFromRoom(res);
-          // Reset the user to hold the ID.
-          res.users.forEach((user: User) => {
-            if (user.nickname === location.state.user.nickname) {
-              setCurrentUser(user);
-            }
-          });
+          updateCurrentUserDetails(res.users);
         })
         .catch((err) => setError(err));
     } else {
@@ -217,7 +274,7 @@ function LobbyPage() {
         history.replace('/game/join');
       }
     }
-  }, [location, socketConnected, history]);
+  }, [location, socketConnected, history, updateCurrentUserDetails]);
 
   // Connect the user to the room.
   useEffect(() => {
@@ -266,8 +323,8 @@ function LobbyPage() {
         <DifficultyButton
           onClick={() => updateDifficultySetting(key)}
           active={difficulty === Difficulty[key as keyof typeof Difficulty]}
-          enabled={currentUser?.nickname === host?.nickname}
-          title={currentUser?.nickname !== host?.nickname
+          enabled={currentUser?.userId === host?.userId}
+          title={currentUser?.userId !== host?.userId
             ? 'Only the host can change these settings' : undefined}
         >
           {key}
@@ -275,7 +332,7 @@ function LobbyPage() {
       ))}
       <br />
 
-      {currentUser?.nickname === host?.nickname
+      {currentUser?.userId === host?.userId
         ? <PrimaryButton onClick={handleStartGame} disabled={loading}>Start Game</PrimaryButton>
         : <MediumText>Waiting for the host to start the game...</MediumText>}
     </div>

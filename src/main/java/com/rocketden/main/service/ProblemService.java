@@ -75,10 +75,8 @@ public class ProblemService {
      * @param numProblems The number of problems to fetch.
      */
     public List<Problem> getProblemsFromDifficulty(ProblemDifficulty difficulty, Integer numProblems) {
-        if (difficulty == null) {
-            throw new ApiException(ProblemError.BAD_DIFFICULTY);
-        } else if (numProblems == null) {
-            throw new ApiException(ProblemError.BAD_NUMBER_PROBLEMS);
+        if (difficulty == null || numProblems == null) {
+            throw new ApiException(ProblemError.EMPTY_FIELD);
         }
 
         List<Problem> problems;
@@ -92,8 +90,13 @@ public class ProblemService {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
 
-        if (numProblems <= 0 || (numProblems > problems.size())) {
+        if (numProblems <= 0) {
             throw new ApiException(ProblemError.INVALID_NUMBER_REQUEST);
+        }
+
+        // If the user wants more problems than exists, just return all of them
+        if (numProblems > problems.size()) {
+            return problems;
         }
 
         // Get numProblem random integers used to map to problems.
