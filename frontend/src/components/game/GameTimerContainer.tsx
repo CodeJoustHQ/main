@@ -5,7 +5,6 @@ type GameTimerProps = {
   gameTimer: GameTimer | null,
 };
 
-// This function refreshes the width of Monaco editor upon change in container size
 function GameTimerContainer(props: GameTimerProps) {
   const [currentClock, setCurrentClock] = useState<GameClock | null>(null);
 

@@ -157,7 +157,7 @@ function GamePage() {
     checkSendTestCorrectNotification(tempSubmission);
   };
 
-  // Redirect user to game page if room is active.
+  // Subscribe user to primary socket and to notifications.
   useEffect(() => {
     if (!userSocketSubscribed && roomId) {
       subscribePrimary(roomId);
