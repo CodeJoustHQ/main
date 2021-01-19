@@ -35,6 +35,7 @@ public class GameMapper {
 
         List<PlayerDto> players = gameDto.getPlayers();
         game.getPlayers().values().forEach(player -> players.add(mapper.map(player, PlayerDto.class)));
+        sortLeaderboard(players);
 
         List<ProblemDto> problems = new ArrayList<>();
         game.getProblems().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
@@ -79,5 +80,31 @@ public class GameMapper {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
 
         return mapper.map(submission, SubmissionDto.class);
+    }
+
+    // Sort by numCorrect followed by startTime
+    public static void sortLeaderboard(List<PlayerDto> players) {
+        players.sort((player1, player2) -> {
+            List<SubmissionDto> submissions1 = player1.getSubmissions();
+            List<SubmissionDto> submissions2 = player2.getSubmissions();
+
+            // Players who haven't submitted yet are sorted last
+            if (submissions1.isEmpty()) {
+                return 1;
+            } else if (submissions2.isEmpty()) {
+                return -1;
+            }
+
+            SubmissionDto sub1 = submissions1.get(submissions1.size() - 1);
+            SubmissionDto sub2 = submissions2.get(submissions2.size() - 1);
+
+            // If both have the same numCorrect, whoever submits earlier is first
+            if (sub1.getNumCorrect().equals(sub2.getNumCorrect())) {
+                return sub1.getStartTime().compareTo(sub2.getStartTime());
+            }
+
+            // Whoever has higher numCorrect is first
+            return sub2.getNumCorrect() - sub1.getNumCorrect();
+        });
     }
 }
