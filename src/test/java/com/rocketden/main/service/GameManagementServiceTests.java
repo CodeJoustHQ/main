@@ -285,8 +285,6 @@ public class GameManagementServiceTests {
         verify(submitService).submitSolution(eq(game), eq(request));
 
         // Confirm that socket sent updated GameDto object.
-        addSubmissionHelper(game.getPlayers().get(USER_ID_3), 10);
-        game.setAllSolved(true);
         verify(socketService).sendSocketUpdate(eq(GameMapper.toDto(game)));
     }
 
