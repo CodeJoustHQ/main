@@ -42,7 +42,7 @@ public class SubmitService {
 
         // Create a dummy submission - this will be replaced with a call to the tester
         List<Problem> problems = game.getProblems();
-        int numTestCases = problems.isEmpty() ? 10 : problems.get(0).getTestCases().size();
+        int numTestCases = problems.isEmpty() ? 0 : problems.get(0).getTestCases().size();
 
         Submission submission = new Submission();
         submission.setPlayerCode(playerCode);
