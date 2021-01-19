@@ -41,7 +41,9 @@ public class GameManagementService {
     private final Map<String, Game> currentGameMap;
 
     @Autowired
-    protected GameManagementService(RoomRepository repository, SocketService socketService, LiveGameService liveGameService, NotificationService notificationService, SubmitService submitService, ProblemService problemService) {
+    protected GameManagementService(RoomRepository repository, SocketService socketService,
+                                    LiveGameService liveGameService, NotificationService notificationService,
+                                    SubmitService submitService, ProblemService problemService) {
         this.repository = repository;
         this.socketService = socketService;
         this.liveGameService = liveGameService;
@@ -96,10 +98,12 @@ public class GameManagementService {
     // Initialize and add a game object from a room object, start game timer
     public void createAddGameFromRoom(Room room) {
         Game game = GameMapper.fromRoom(room);
+
         List<Problem> problems = problemService.getProblemsFromDifficulty(room.getDifficulty(), room.getNumProblems());
         game.setProblems(problems);
+        setStartGameTimer(game, room.getDuration());
+
         currentGameMap.put(room.getRoomId(), game);
-        setStartGameTimer(game, GameTimer.DURATION_15);
     }
 
     // Set and start the Game Timer.

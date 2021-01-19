@@ -18,6 +18,7 @@ import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
+import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.model.User;
 import com.rocketden.main.util.RoomTestMethods;
 import com.rocketden.main.model.problem.ProblemDifficulty;
@@ -34,10 +35,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -183,11 +184,12 @@ public class GameTests {
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
-		jsonResponse = result.getResponse().getContentAsString();
-		GameDto gameDto = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, GameDto.class);
+        jsonResponse = result.getResponse().getContentAsString();
+        GameDto gameDto = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, GameDto.class);
 
         assertEquals(actual, gameDto.getRoom());
         assertEquals(1, gameDto.getPlayers().size());
+        assertEquals(GameTimer.DURATION_15, gameDto.getGameTimer().getDuration());
     }
 
     @Test

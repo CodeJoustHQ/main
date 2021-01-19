@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message, Subscription } from 'stompjs';
 import ErrorMessage from '../components/core/Error';
-import { LargeText, MediumText } from '../components/core/Text';
+import { LargeText, MediumText, Text } from '../components/core/Text';
 import {
   connect, routes, subscribe, disconnect,
 } from '../api/Socket';
@@ -17,6 +17,7 @@ import { startGame } from '../api/Game';
 import {
   getRoom, Room, changeRoomHost, updateRoomSettings, removeUser,
 } from '../api/Room';
+import { NumberInput } from '../components/core/Input';
 import { errorHandler } from '../api/Error';
 
 type LobbyPageLocation = {
@@ -39,6 +40,7 @@ function LobbyPage() {
   const [currentRoomId, setRoomId] = useState('');
   const [active, setActive] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
+  const [duration, setDuration] = useState<number | undefined>(15);
 
   // Hold error text.
   const [error, setError] = useState('');
@@ -62,10 +64,15 @@ function LobbyPage() {
     setRoomId(room.roomId);
     setActive(room.active);
     setDifficulty(room.difficulty);
+    setDuration(room.duration / 60);
   };
+
+  // Function to determine if the given user is the host or not
+  const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
 
   const kickUser = (user: User) => {
     setLoading(true);
+    setError('');
     removeUser(currentRoomId, {
       initiator: currentUser as User,
       userToDelete: user,
@@ -136,6 +143,7 @@ function LobbyPage() {
   }, [currentUser, history, location]);
 
   const changeHosts = (newHost: User) => {
+    setError('');
     const request = {
       initiator: currentUser!,
       newHost,
@@ -153,6 +161,7 @@ function LobbyPage() {
   };
 
   const handleStartGame = () => {
+    setError('');
     const request = { initiator: currentUser as User };
     startGame(currentRoomId, request)
       .then(() => {
@@ -167,7 +176,8 @@ function LobbyPage() {
    * Update the difficulty setting of the room (EASY, MEDIUM, HARD, or RANDOM)
    */
   const updateDifficultySetting = (key: string) => {
-    if (currentUser?.userId === host?.userId && !loading) {
+    setError('');
+    if (isHost(currentUser) && !loading) {
       const oldDifficulty = difficulty;
       const newDifficulty = Difficulty[key as keyof typeof Difficulty];
 
@@ -192,6 +202,28 @@ function LobbyPage() {
   };
 
   /**
+   * Update the room/game duration (in minutes)
+   */
+  const updateRoomDuration = () => {
+    setError('');
+    setLoading(true);
+    const prevDuration = duration;
+    const settings = {
+      initiator: currentUser!,
+      duration: (duration || 0) * 60,
+    };
+
+    updateRoomSettings(currentRoomId, settings)
+      .then(() => setLoading(false))
+      .catch((err) => {
+        setLoading(false);
+        setError(err.message);
+        // Set duration back to original if REST call failed
+        setDuration(prevDuration);
+      });
+  };
+
+  /**
    * Display the passed-in list of users on the UI, either as
    * active or inactive.
    */
@@ -200,19 +232,18 @@ function LobbyPage() {
       return userList.map((user) => (
         <PlayerCard
           user={user}
-          isHost={user.userId === host?.userId}
+          isHost={isHost(user)}
           isActive={isActive}
         >
-          {currentUser?.userId === host?.userId
-            && (user.userId !== currentUser?.userId) ? (
-              // If currentUser is host, pass in an on-click action card for all other users
-              <HostActionCard
-                user={user}
-                userIsActive={Boolean(user.sessionId)}
-                onMakeHost={changeHosts}
-                onRemoveUser={kickUser}
-              />
-            ) : null}
+          {isHost(currentUser) && (user.userId !== currentUser?.userId) ? (
+            // If currentUser is host, pass in an on-click action card for all other users
+            <HostActionCard
+              user={user}
+              userIsActive={Boolean(user.sessionId)}
+              onMakeHost={changeHosts}
+              onRemoveUser={kickUser}
+            />
+          ) : null}
         </PlayerCard>
       ));
     }
@@ -323,16 +354,47 @@ function LobbyPage() {
         <DifficultyButton
           onClick={() => updateDifficultySetting(key)}
           active={difficulty === Difficulty[key as keyof typeof Difficulty]}
-          enabled={currentUser?.userId === host?.userId}
-          title={currentUser?.userId !== host?.userId
-            ? 'Only the host can change these settings' : undefined}
+          enabled={isHost(currentUser)}
+          title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
         >
           {key}
         </DifficultyButton>
       ))}
+
+      <MediumText>Duration</MediumText>
+      <Text>
+        {isHost(currentUser) ? 'Choose a game duration between 1-60 minutes:'
+          : 'The game will last for the following minutes:'}
+      </Text>
+      <NumberInput
+        min={1}
+        max={60}
+        value={duration}
+        disabled={!isHost(currentUser)}
+        onKeyPress={(e) => {
+          // Prevent user from using any of these non-numeric characters
+          if (e.key === 'e' || e.key === '.' || e.key === '-') {
+            e.preventDefault();
+          }
+        }}
+        onChange={(e) => {
+          const { value } = e.target;
+
+          // Set duration to undefined to allow users to clear field
+          if (!value) {
+            setDuration(undefined);
+          } else {
+            const newDuration = Number(value);
+            if (newDuration >= 0 && newDuration <= 60) {
+              setDuration(newDuration);
+            }
+          }
+        }}
+        onBlur={updateRoomDuration}
+      />
       <br />
 
-      {currentUser?.userId === host?.userId
+      {isHost(currentUser)
         ? <PrimaryButton onClick={handleStartGame} disabled={loading}>Start Game</PrimaryButton>
         : <MediumText>Waiting for the host to start the game...</MediumText>}
     </div>
