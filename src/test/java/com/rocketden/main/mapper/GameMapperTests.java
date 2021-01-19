@@ -198,4 +198,29 @@ public class GameMapperTests {
         assertEquals(player1, players.get(3));
         assertEquals(player5, players.get(4));
     }
+
+    @Test
+    public void toDtoSortsLeaderboard() {
+        Submission sub1 = new Submission();
+        sub1.setNumCorrect(0);
+        Submission sub2 = new Submission();
+        sub2.setNumCorrect(1);
+
+        Player player1 = new Player();
+        player1.getSubmissions().add(sub1);
+        Player player2 = new Player();
+        player2.getSubmissions().add(sub2);
+
+        Game game = new Game();
+        game.getPlayers().put("player1", player1);
+        game.getPlayers().put("player2", player2);
+
+        GameDto gameDto = GameMapper.toDto(game);
+
+        List<PlayerDto> players = gameDto.getPlayers();
+
+        assertEquals(2, players.size());
+        assertEquals(1, players.get(0).getSubmissions().get(0).getNumCorrect());
+        assertEquals(0, players.get(1).getSubmissions().get(0).getNumCorrect());
+    }
 }

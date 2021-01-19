@@ -42,11 +42,6 @@ public class SubmitServiceTests {
 
     @Test
     public void submitSolutionSuccess() {
-        /**
-         * TODO: For now, this just checks that the submission is stored correctly.
-         * In the future, it will likely call the tester endpoint and send a socket update too.
-         */
-
         Room room = new Room();
         room.setRoomId(ROOM_ID);
         User user = new User();
