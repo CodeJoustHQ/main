@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
@@ -125,7 +126,15 @@ public class GameManagementService {
             throw new ApiException(GameError.INVALID_PERMISSIONS);
         }
 
-        return submitService.submitSolution(game, request);
+        SubmissionDto submissionDto = submitService.submitSolution(game, request);
+
+        // Send socket message if all users have solved the problem.
+        if (submissionDto.getNumCorrect().equals(submissionDto.getNumTestCases())) {
+            conditionalSolvedSocketMessage(game);
+        }
+        
+
+        return submissionDto;
     }
 
     // Send a notification through a socket update.
@@ -141,6 +150,28 @@ public class GameManagementService {
     public void updateCode(String userId, PlayerCode playerCode) {
         // TODO: Get the player from the userId.
         liveGameService.updateCode(new Player(), playerCode);
+    }
+
+    /**
+     * If all players have solved the problem, update the game and send
+     * socket message indicating as such.
+     * (Depending on the game setting, this may or may not end the game).
+     */
+    public void conditionalSolvedSocketMessage(Game game) {
+        // Variable to indicate whether all players have solved the problem.
+        boolean allSolved = true;
+        for (Player player : game.getPlayers().values()) {
+            if (player.getSolved() == null || !player.getSolved()) {
+                allSolved = false;
+                break;
+            }
+        }
+
+        // If the users have all completed the problem, end the game.
+        if (allSolved) {
+            game.setAllSolved(true);
+            socketService.sendSocketUpdate(GameMapper.toDto(game));
+        }
     }
 
 }

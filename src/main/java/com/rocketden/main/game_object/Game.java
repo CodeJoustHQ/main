@@ -24,4 +24,7 @@ public class Game {
 
     private GameTimer gameTimer;
 
+    // Boolean to hold whether all users have solved the problem.
+    private Boolean allSolved = false;
+
 }
