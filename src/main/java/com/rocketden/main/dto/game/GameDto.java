@@ -18,4 +18,5 @@ public class GameDto {
     private RoomDto room;
     private GameTimerDto gameTimer;
     private List<PlayerDto> players = new ArrayList<>();
+    private Boolean allSolved;
 }

@@ -90,7 +90,7 @@ function GamePage() {
       setSocketSubscribed(true);
 
       // Check if end game.
-      if (updatedGame.gameTimer.timeUp) {
+      if (updatedGame.gameTimer.timeUp || updatedGame.allSolved) {
         history.push('/game/results', {
           game: updatedGame,
         });

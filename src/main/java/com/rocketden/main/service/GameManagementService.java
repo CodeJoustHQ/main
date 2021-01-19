@@ -133,7 +133,6 @@ public class GameManagementService {
             conditionalSolvedSocketMessage(game);
         }
         
-
         return submissionDto;
     }
 

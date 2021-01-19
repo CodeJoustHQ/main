@@ -40,6 +40,8 @@ public class GameMapper {
         game.getProblems().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
         gameDto.setProblems(problems);
 
+        gameDto.setAllSolved(game.getAllSolved());
+
         return gameDto;
     }
 
