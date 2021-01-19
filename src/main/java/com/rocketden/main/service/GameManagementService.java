@@ -84,11 +84,11 @@ public class GameManagementService {
             throw new ApiException(RoomError.INVALID_PERMISSIONS);
         }
 
-        room.setActive(true);
-        repository.save(room);
-
         // Initialize game state
         createAddGameFromRoom(room);
+
+        room.setActive(true);
+        repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
         socketService.sendSocketUpdate(roomDto);
@@ -99,7 +99,7 @@ public class GameManagementService {
     public void createAddGameFromRoom(Room room) {
         Game game = GameMapper.fromRoom(room);
 
-        List<Problem> problems = problemService.getProblemsFromDifficulty(room.getDifficulty(), 1);
+        List<Problem> problems = problemService.getProblemsFromDifficulty(room.getDifficulty(), room.getNumProblems());
         game.setProblems(problems);
         setStartGameTimer(game, room.getDuration());
 

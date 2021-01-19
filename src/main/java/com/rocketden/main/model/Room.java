@@ -56,6 +56,8 @@ public class Room {
 
     private Long duration = GameTimer.DURATION_15;
 
+    private Integer numProblems = 1;
+
     public void addUser(User user) {
         users.add(user);
         user.setRoom(this);

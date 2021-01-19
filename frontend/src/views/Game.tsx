@@ -16,10 +16,12 @@ import { checkLocationState } from '../util/Utility';
 import Console from '../components/game/Console';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
+import { GameNotification, NotificationType } from '../api/GameNotification';
 import Difficulty from '../api/Difficulty';
 import { Game, getGame } from '../api/Game';
-import { routes, subscribe } from '../api/Socket';
+import { routes, send, subscribe } from '../api/Socket';
 import GameTimerContainer from '../components/game/GameTimerContainer';
+import GameNotificationContainer from '../components/game/GameNotificationContainer';
 
 type LocationState = {
   roomId: string,
@@ -41,8 +43,14 @@ function GamePage() {
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
+  // When variable null, show nothing; otherwise, show notification.
+  const [gameNotification, setGameNotification] = useState<GameNotification | null>(null);
+
   // Variable to hold whether the user is subscribed to the primary Game socket.
-  const [socketSubscribed, setSocketSubscribed] = useState(false);
+  const [userSocketSubscribed, setUserSocketSubscribed] = useState(false);
+
+  // Variable to hold whether the user is subscribed to the notification socket.
+  const [notificationSocketSubscribed, setNotificationSocketSubscribed] = useState(false);
 
   /**
    * Display beforeUnload message to inform the user that they may lose
@@ -52,12 +60,23 @@ function GamePage() {
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
+  /**
+   * Display the notification as a callback from the notification
+   * subscription. Do not display anything if notification is already
+   * present or initiator is the current user.
+   */
+  const displayNotification = useCallback((result: Message) => {
+    const notificationResult: GameNotification = JSON.parse(result.body);
+    if (currentUser?.userId !== notificationResult?.initiator?.userId) {
+      setGameNotification(notificationResult);
+    }
+  }, [currentUser]);
+
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
-    const subscribeCallback = (result: Message) => {
+    const subscribeUserCallback = (result: Message) => {
       const updatedGame: Game = JSON.parse(result.body);
       setGame(updatedGame);
-      setSocketSubscribed(true);
 
       // Check if end game.
       // TODO: after deconstructing game, move this to useEffect on timeUp
@@ -68,10 +87,26 @@ function GamePage() {
       }
     };
 
-    subscribe(routes(roomIdParam).subscribe, subscribeCallback).catch((err) => {
-      setError(err.message);
-    });
-  }, [history]);
+    // Subscribe to the main Game channel to receive Game updates.
+    if (!userSocketSubscribed) {
+      subscribe(routes(roomIdParam).subscribe_user, subscribeUserCallback)
+        .then(() => {
+          setUserSocketSubscribed(true);
+        }).catch((err) => {
+          setError(err.message);
+        });
+    }
+
+    // Subscribe for Game Notifications.
+    if (!notificationSocketSubscribed) {
+      subscribe(routes(roomIdParam).subscribe_notification, displayNotification)
+        .then(() => {
+          setNotificationSocketSubscribed(true);
+        }).catch((err) => {
+          setError(err.message);
+        });
+    }
+  }, [history, displayNotification, userSocketSubscribed, notificationSocketSubscribed]);
 
   // Called every time location changes
   useEffect(() => {
@@ -103,18 +138,32 @@ function GamePage() {
     window.dispatchEvent(event);
   };
 
+  // Send notification if submission result is correct and currentUser is set.
+  const checkSendTestCorrectNotification = (submissionParam: SubmissionResult) => {
+    if (submissionParam.status === 'SUCCESS' && currentUser) {
+      const notificationBody: string = JSON.stringify({
+        initiator: currentUser,
+        time: new Date(),
+        notificationType: NotificationType.TestCorrect,
+        content: submissionParam.output,
+      });
+      send(routes(roomId).subscribe_notification, {}, notificationBody);
+    }
+  };
+
   // Callback when user runs code against custom test case
   const runSolution = (input: string) => {
-    const tempSubmission = { status: 'SUCCESS', output: input };
+    const tempSubmission: SubmissionResult = { status: 'SUCCESS', output: input };
     setSubmission(tempSubmission);
+    checkSendTestCorrectNotification(tempSubmission);
   };
 
   // Subscribe user to primary socket and to notifications.
   useEffect(() => {
-    if (!socketSubscribed && roomId) {
+    if (!userSocketSubscribed && roomId) {
       subscribePrimary(roomId);
     }
-  }, [socketSubscribed, roomId, subscribePrimary]);
+  }, [userSocketSubscribed, roomId, subscribePrimary]);
 
   // If the page is loading, return a centered Loading object.
   if (fullPageLoading) {
@@ -127,6 +176,10 @@ function GamePage() {
 
   return (
     <FlexContainer>
+      <GameNotificationContainer
+        onClickFunc={setGameNotification}
+        gameNotification={gameNotification}
+      />
       <FlexInfoBar>
         Room:
         {' '}
