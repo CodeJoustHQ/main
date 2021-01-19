@@ -65,18 +65,20 @@ function GamePage() {
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
-  const setStateFromGame = useCallback((game: Game) => {
+  const setStateFromGame = (game: Game) => {
     setRoom(game.room);
     setPlayers(game.players);
     setGameTimer(game.gameTimer);
     setProblems(game.problems);
+  };
 
-    game.players.forEach((player) => {
+  useEffect(() => {
+    players.forEach((player) => {
       if (player.user.userId === currentUser?.userId) {
         setCurrentPlayer(player);
       }
     });
-  }, [currentUser, room]);
+  }, [players, currentUser]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
@@ -96,7 +98,7 @@ function GamePage() {
     subscribe(routes(roomIdParam).subscribe, subscribeCallback).catch((err) => {
       setError(err.message);
     });
-  }, [history, setStateFromGame]);
+  }, [history]);
 
   // Called every time location changes
   useEffect(() => {
@@ -119,7 +121,7 @@ function GamePage() {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
       });
     }
-  }, [location, history, setStateFromGame]);
+  }, [location, history]);
 
   // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {

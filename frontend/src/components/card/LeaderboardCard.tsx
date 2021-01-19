@@ -11,6 +11,7 @@ const Content = styled.div`
   display: inline-block;
   position: relative;
   margin: 10px;
+  width: 7rem;
   
   &:hover {
     cursor: pointer;
@@ -61,7 +62,7 @@ function LeaderboardCard(props: LeaderboardCardProps) {
 
   const getDisplayNickname = () => {
     const { nickname } = player.user;
-    const maxLength = isCurrentPlayer ? 10 : 13;
+    const maxLength = isCurrentPlayer ? 5 : 9;
 
     const shortenedNickname = (nickname.length > maxLength) ? `${nickname.substring(0, maxLength - 3)}...` : nickname;
     return `${shortenedNickname} ${isCurrentPlayer ? '(you)' : ''}`;
