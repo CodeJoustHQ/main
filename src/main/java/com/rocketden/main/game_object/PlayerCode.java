@@ -12,6 +12,8 @@ public class PlayerCode {
     private String code;
     private String language;
 
+    public PlayerCode() {}
+
     public PlayerCode(String code, String language) {
         this.code = code;
         this.language = language;
