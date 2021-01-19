@@ -3,11 +3,14 @@ package com.rocketden.main.socket;
 import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.StartGameRequest;
+import com.rocketden.main.dto.game.SubmissionDto;
+import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.user.UserDto;
+import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.util.SocketTestMethods;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,11 +62,16 @@ public class GameSocketTests {
     private static final String USER_ID = "012345";
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String USER_ID_2 = "098765";
+<<<<<<< HEAD
+=======
+    private static final String CODE = "print('hi')";
+    private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
+>>>>>>> c2503b13b9da557605370d720fd9d43540ef7807
     private static final long DURATION = 5;
 
     @BeforeEach
     public void setup() throws Exception {
-        baseRestEndpoint = "http://localhost:" + port + "/api/v1/rooms";
+        baseRestEndpoint = "http://localhost:" + port + "/api/v1";
 
         UserDto host = new UserDto();
         host.setNickname(NICKNAME);
@@ -73,7 +81,8 @@ public class GameSocketTests {
 
         // Create room
         HttpEntity<CreateRoomRequest> createEntity = new HttpEntity<>(createRequest);
-        room = template.postForObject(baseRestEndpoint, createEntity, RoomDto.class);
+        String createEndpoint = String.format("%s/rooms", baseRestEndpoint);
+        room = template.postForObject(createEndpoint, createEntity, RoomDto.class);
         assertNotNull(room);
 
         UserDto user = new UserDto();
@@ -84,7 +93,7 @@ public class GameSocketTests {
 
         // Join room
         HttpEntity<JoinRoomRequest> joinEntity = new HttpEntity<>(joinRequest);
-        String joinRoomEndpoint = String.format("%s/%s/users", baseRestEndpoint, room.getRoomId());
+        String joinRoomEndpoint = String.format("%s/rooms/%s/users", baseRestEndpoint, room.getRoomId());
         room = template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
         assertNotNull(room);
 
@@ -93,7 +102,7 @@ public class GameSocketTests {
         updateRequest.setInitiator(host);
         updateRequest.setDuration(DURATION);
         HttpEntity<UpdateSettingsRequest> updateEntity = new HttpEntity<>(updateRequest);
-        String updateEndpoint = String.format("%s/%s/settings", baseRestEndpoint, room.getRoomId());
+        String updateEndpoint = String.format("%s/rooms/%s/settings", baseRestEndpoint, room.getRoomId());
         room = template.exchange(updateEndpoint, HttpMethod.PUT, updateEntity, RoomDto.class).getBody();
         assertNotNull(room);
 
@@ -104,7 +113,7 @@ public class GameSocketTests {
         StartGameRequest startRequest = new StartGameRequest();
         startRequest.setInitiator(host);
         HttpEntity<StartGameRequest> startEntity = new HttpEntity<>(startRequest);
-        String startEndpoint = String.format("%s/%s/start", baseRestEndpoint, room.getRoomId());
+        String startEndpoint = String.format("%s/rooms/%s/start", baseRestEndpoint, room.getRoomId());
         room = template.exchange(startEndpoint, HttpMethod.POST, startEntity, RoomDto.class).getBody();
         assertNotNull(room);
 
@@ -135,5 +144,27 @@ public class GameSocketTests {
         assertEquals(room, gameDto.getRoom());
         assertEquals(DURATION, gameDto.getGameTimer().getDuration());
         assertTrue(gameDto.getGameTimer().isTimeUp());
+    }
+
+    @Test
+    public void socketReceivesMessageOnSubmit() throws Exception {
+        SubmissionRequest request = new SubmissionRequest();
+        request.setInitiator(room.getHost());
+        request.setCode(CODE);
+        request.setLanguage(LANGUAGE);
+
+        // Create room
+        HttpEntity<SubmissionRequest> entity = new HttpEntity<>(request);
+        String submitEndpoint = String.format("%s/games/%s/submission", baseRestEndpoint, room.getRoomId());
+        SubmissionDto submissionDto = template.postForObject(submitEndpoint, entity, SubmissionDto.class);
+
+        assertNotNull(submissionDto);
+        assertEquals(CODE, submissionDto.getCode());
+        assertEquals(LANGUAGE, submissionDto.getLanguage());
+
+        GameDto gameDto = blockingQueue.poll(DURATION, SECONDS);
+
+        assertNotNull(gameDto);
+        assertEquals(room.getHost(), gameDto.getPlayers().get(0).getUser());
     }
 }

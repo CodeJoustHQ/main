@@ -27,6 +27,7 @@ import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
 import { TextLink } from '../components/core/Link';
+import { TextButton } from '../components/core/Button';
 import { routes, send, subscribe } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
 
@@ -65,6 +66,12 @@ function GamePage() {
   // Variable to hold whether the user is subscribed to the notification socket.
   const [notificationSocketSubscribed, setNotificationSocketSubscribed] = useState(false);
 
+  // Gets rid of no unused vars warning (temporary build failure workaround until next PR is merged)
+  if (false) {
+    console.log(room);
+    console.log(currentPlayer);
+  }
+
   /**
    * Display beforeUnload message to inform the user that they may lose
    * their code / data if they leave the page.
@@ -73,22 +80,20 @@ function GamePage() {
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
-  const setStateFromGame = useCallback((game: Game) => {
+  const setStateFromGame = (game: Game) => {
     setRoom(game.room);
     setPlayers(game.players);
     setGameTimer(game.gameTimer);
     setProblems(game.problems);
+  };
 
-    // Print room and currentPlayer to prevent unused variable warning
-    console.log(room);
-    console.log(currentPlayer);
-
-    game.players.forEach((player) => {
+  useEffect(() => {
+    players.forEach((player) => {
       if (player.user.userId === currentUser?.userId) {
         setCurrentPlayer(player);
       }
     });
-  }, [currentPlayer, currentUser, room]);
+  }, [players, currentUser]);
 
   /**
    * Display the notification as a callback from the notification
@@ -158,7 +163,7 @@ function GamePage() {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
       });
     }
-  }, [location, history, setStateFromGame]);
+  }, [location, history]);
 
   // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {
@@ -173,7 +178,7 @@ function GamePage() {
         initiator: currentUser,
         time: new Date(),
         notificationType: NotificationType.TestCorrect,
-        content: submissionParam.code,
+        content: 'success',
       });
       send(routes(roomId).subscribe_notification, {}, notificationBody);
     }
@@ -195,14 +200,22 @@ function GamePage() {
       .catch((err) => setError(err));
   };
 
-  const displayPlayerLeaderboard = () => players.map((player, index) => (
-    <LeaderboardCard
-      player={player}
-      isCurrentPlayer={player.user.userId === currentUser?.userId}
-      place={index + 1}
-      color="blue" // TODO: merge with Chris's color PR
-    />
-  ));
+  const exitGame = () => {
+    if (window.confirm('Exit the game? You will not be able to rejoin.')) {
+      history.replace('/');
+    }
+  };
+
+  const displayPlayerLeaderboard = () => {
+    return players.map((player, index) => (
+      <LeaderboardCard
+        player={player}
+        isCurrentPlayer={player.user.userId === currentUser?.userId}
+        place={index + 1}
+        color="blue" // TODO: merge with Chris's color PR
+      />
+    ));
+  };
 
   // Subscribe user to primary socket and to notifications.
   useEffect(() => {
@@ -236,7 +249,7 @@ function GamePage() {
           <GameTimerContainer gameTimer={gameTimer || null} />
         </FlexCenter>
         <FlexRight>
-          <TextLink to="/">Exit Game</TextLink>
+          <TextButton onClick={exitGame}>Exit Game</TextButton>
         </FlexRight>
       </FlexInfoBar>
 
