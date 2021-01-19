@@ -26,7 +26,7 @@ import LeaderboardCard from '../components/card/LeaderboardCard';
 import { routes, subscribe } from '../api/Socket';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
-import { TextLink } from '../components/core/Link';
+import { TextButton } from '../components/core/Button';
 
 type LocationState = {
   roomId: string,
@@ -144,6 +144,12 @@ function GamePage() {
       .catch((err) => setError(err));
   };
 
+  const exitGame = () => {
+    if (window.confirm('Exit the game? You will not be able to rejoin.')) {
+      history.replace('/');
+    }
+  };
+
   const displayPlayerLeaderboard = () => {
     return players.map((player, index) => (
       <LeaderboardCard
@@ -183,7 +189,7 @@ function GamePage() {
           <GameTimerContainer gameTimer={gameTimer || null} />
         </FlexCenter>
         <FlexRight>
-          <TextLink to="/">Exit Game</TextLink>
+          <TextButton onClick={exitGame}>Exit Game</TextButton>
         </FlexRight>
       </FlexInfoBar>
 

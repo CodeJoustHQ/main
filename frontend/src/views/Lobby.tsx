@@ -229,7 +229,7 @@ function LobbyPage() {
   useEffect(() => {
     if (active) {
       subscription?.unsubscribe();
-      history.push('/game', {
+      history.replace('/game', {
         roomId: currentRoomId,
         currentUser,
         difficulty,
