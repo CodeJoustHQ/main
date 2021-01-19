@@ -2,6 +2,7 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
+import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.room.RoomDto;
@@ -13,6 +14,8 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.Game;
+import com.rocketden.main.game_object.Player;
+import com.rocketden.main.game_object.Submission;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 import com.rocketden.main.model.problem.ProblemDifficulty;
@@ -33,6 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+
+import java.time.LocalDateTime;
 
 @ExtendWith(MockitoExtension.class)
 public class GameManagementServiceTests {
@@ -57,12 +62,26 @@ public class GameManagementServiceTests {
     private GameManagementService gameService;
 
     // Predefine user and room attributes.
-    private static final String NICKNAME = "rocket";
-    private static final String NICKNAME_2 = "rocketrocket";
     private static final String ROOM_ID = "012345";
+    private static final String NICKNAME = "rocket";
     private static final String USER_ID = "098765";
+    private static final String NICKNAME_2 = "rocketden";
+    private static final String USER_ID_2 = "012345";
+    private static final String NICKNAME_3 = "rocketrocket";
+    private static final String USER_ID_3 = "678910";
     private static final String CODE = "print('hi')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
+    private static final Integer NUM_PROBLEMS = 10;
+
+    // Helper method to add a dummy submission to a Player object
+    private void addSubmissionHelper(Player player, int numCorrect) {
+        Submission submission = new Submission();
+        submission.setNumCorrect(numCorrect);
+        submission.setNumTestCases(NUM_PROBLEMS);
+        submission.setStartTime(LocalDateTime.now());
+
+        player.getSubmissions().add(submission);
+    }
 
     @Test
     public void addGetAndRemoveGame() {
@@ -209,6 +228,47 @@ public class GameManagementServiceTests {
         gameService.submitSolution(ROOM_ID, request);
 
         verify(submitService).submitSolution(any(Game.class), eq(request));
+    }
+
+    @Test
+    public void sendAllSolvedSocketUpdate() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        User user2 = new User();
+        user2.setNickname(NICKNAME_2);
+        user2.setUserId(USER_ID_2);
+        room.addUser(user2);
+
+        User user3 = new User();
+        user3.setNickname(NICKNAME_3);
+        user3.setUserId(USER_ID_3);
+        room.addUser(user3);
+
+        Game game = GameMapper.fromRoom(room);
+
+        // Add submissions for the first two users.
+        addSubmissionHelper(game.getPlayers().get(USER_ID), 10);
+        addSubmissionHelper(game.getPlayers().get(USER_ID_2), 10);
+
+        SubmissionRequest request = new SubmissionRequest();
+        request.setLanguage(LANGUAGE);
+        request.setCode(CODE);
+        request.setInitiator(UserMapper.toDto(user3));
+
+        gameService.submitSolution(ROOM_ID, request);
+
+        verify(submitService).submitSolution(any(Game.class), eq(request));
+
+        // Confirm that socket sent updated GameDto object.
+        addSubmissionHelper(game.getPlayers().get(USER_ID_3), 10);
+        game.setAllSolved(true);
+        verify(socketService).sendSocketUpdate(eq(GameMapper.toDto(game)));
     }
 
     @Test
