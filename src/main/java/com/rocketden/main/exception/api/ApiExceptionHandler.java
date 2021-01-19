@@ -1,6 +1,5 @@
 package com.rocketden.main.exception.api;
 
-import com.rocketden.main.exception.ProblemError;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
