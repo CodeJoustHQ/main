@@ -9,7 +9,9 @@ import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.room.RemoveUserRequest;
 import com.rocketden.main.dto.user.UserMapper;
+import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.RoomError;
+import com.rocketden.main.exception.TimerError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Room;
@@ -23,6 +25,8 @@ import org.springframework.stereotype.Service;
 public class RoomService {
 
     public static final int ROOM_ID_LENGTH = 6;
+    public static final long MAX_DURATION = 3600; // 1 hour
+    public static final int MAX_NUM_PROBLEMS = 10;
 
     private final RoomRepository repository;
     private final SocketService socketService;
@@ -223,6 +227,24 @@ public class RoomService {
         if (request.getDifficulty() != null) {
             room.setDifficulty(request.getDifficulty());
         }
+
+        // Set new duration if not null
+        Long duration = request.getDuration();
+        if (duration != null) {
+            if (duration <= 0 || duration > MAX_DURATION) {
+                throw new ApiException(TimerError.INVALID_DURATION);
+            }
+            room.setDuration(request.getDuration());
+        }
+
+        // Set number of problems if not null
+        if (request.getNumProblems() != null) {
+            if (request.getNumProblems() <= 0 || request.getNumProblems() > MAX_NUM_PROBLEMS) {
+                throw new ApiException(ProblemError.INVALID_NUMBER_REQUEST);
+            }
+            room.setNumProblems(request.getNumProblems());
+        }
+
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);

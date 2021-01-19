@@ -8,7 +8,7 @@ import { isValidNickname } from '../../api/Socket';
 
 type EnterNicknameProps = {
   enterNicknameHeaderText: string,
-  enterNicknameAction: (nickname: string) => Promise<undefined>;
+  enterNicknameAction: (nickname: string) => Promise<void>;
 }
 
 export default function EnterNicknamePage(props: EnterNicknameProps) {

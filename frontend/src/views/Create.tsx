@@ -9,7 +9,7 @@ function CreateGamePage() {
   const history = useHistory();
 
   // Creates a room with the user as the host, and joins that same lobby.
-  const createJoinLobby = (nickname: string) => new Promise<undefined>((resolve, reject) => {
+  const createJoinLobby = (nickname: string) => new Promise<void>((resolve, reject) => {
     const redirectToLobby = (room: Room, user: User) => {
       history.push(`/game/lobby?room=${room.roomId}`, { user, roomId: room.roomId });
     };

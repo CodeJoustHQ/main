@@ -72,9 +72,7 @@ public class UserServiceTests {
         CreateUserRequest request = new CreateUserRequest();
         request.setNickname("rocket rocket");
 
-        ApiException exception = assertThrows(ApiException.class, () -> {
-            service.createUser(request);
-        });
+        ApiException exception = assertThrows(ApiException.class, () -> service.createUser(request));
 
         assertEquals(UserError.INVALID_USER, exception.getError());
     }
@@ -102,9 +100,7 @@ public class UserServiceTests {
         DeleteUserRequest request = new DeleteUserRequest();
         request.setUserToDelete(UserMapper.toDto(user));
 
-        ApiException exception = assertThrows(ApiException.class, () -> {
-            service.deleteUser(request);
-        });
+        ApiException exception = assertThrows(ApiException.class, () -> service.deleteUser(request));
 
         assertEquals(UserError.NOT_FOUND, exception.getError());
     }
@@ -121,9 +117,7 @@ public class UserServiceTests {
         DeleteUserRequest request = new DeleteUserRequest();
         request.setUserToDelete(UserMapper.toDto(user));
 
-        ApiException exception = assertThrows(ApiException.class, () -> {
-            service.deleteUser(request);
-        });
+        ApiException exception = assertThrows(ApiException.class, () -> service.deleteUser(request));
 
         assertEquals(UserError.IN_ROOM, exception.getError());
     }
