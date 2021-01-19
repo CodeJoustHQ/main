@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 public class GameTimerMapperTests {
 
-    private static final Long DURATION = (long) 15;
+    private static final long DURATION = 15;
 
     @Test
     public void toDto() {

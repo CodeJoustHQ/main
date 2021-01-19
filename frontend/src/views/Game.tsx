@@ -17,16 +17,18 @@ import { checkLocationState } from '../util/Utility';
 import Console from '../components/game/Console';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
+import { GameNotification, NotificationType } from '../api/GameNotification';
 import Difficulty from '../api/Difficulty';
 import {
   Game, getGame, Player, SubmissionResult, submitSolution,
 } from '../api/Game';
 import { Room } from '../api/Room';
 import LeaderboardCard from '../components/card/LeaderboardCard';
-import { routes, subscribe } from '../api/Socket';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
 import { TextLink } from '../components/core/Link';
+import { routes, send, subscribe } from '../api/Socket';
+import GameNotificationContainer from '../components/game/GameNotificationContainer';
 
 type LocationState = {
   roomId: string,
@@ -54,8 +56,14 @@ function GamePage() {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [currentLanguage, setCurrentLanguage] = useState('java');
 
+  // When variable null, show nothing; otherwise, show notification.
+  const [gameNotification, setGameNotification] = useState<GameNotification | null>(null);
+
   // Variable to hold whether the user is subscribed to the primary Game socket.
-  const [socketSubscribed, setSocketSubscribed] = useState(false);
+  const [userSocketSubscribed, setUserSocketSubscribed] = useState(false);
+
+  // Variable to hold whether the user is subscribed to the notification socket.
+  const [notificationSocketSubscribed, setNotificationSocketSubscribed] = useState(false);
 
   /**
    * Display beforeUnload message to inform the user that they may lose
@@ -82,12 +90,23 @@ function GamePage() {
     });
   }, [currentPlayer, currentUser, room]);
 
+  /**
+   * Display the notification as a callback from the notification
+   * subscription. Do not display anything if notification is already
+   * present or initiator is the current user.
+   */
+  const displayNotification = useCallback((result: Message) => {
+    const notificationResult: GameNotification = JSON.parse(result.body);
+    if (currentUser?.userId !== notificationResult?.initiator?.userId) {
+      setGameNotification(notificationResult);
+    }
+  }, [currentUser]);
+
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
-    const subscribeCallback = (result: Message) => {
+    const subscribeUserCallback = (result: Message) => {
       const updatedGame: Game = JSON.parse(result.body);
       setStateFromGame(updatedGame);
-      setSocketSubscribed(true);
 
       // Check if end game.
       if (updatedGame.gameTimer.timeUp || updatedGame.allSolved) {
@@ -97,10 +116,26 @@ function GamePage() {
       }
     };
 
-    subscribe(routes(roomIdParam).subscribe, subscribeCallback).catch((err) => {
-      setError(err.message);
-    });
-  }, [history, setStateFromGame]);
+    // Subscribe to the main Game channel to receive Game updates.
+    if (!userSocketSubscribed) {
+      subscribe(routes(roomIdParam).subscribe_user, subscribeUserCallback)
+        .then(() => {
+          setUserSocketSubscribed(true);
+        }).catch((err) => {
+          setError(err.message);
+        });
+    }
+
+    // Subscribe for Game Notifications.
+    if (!notificationSocketSubscribed) {
+      subscribe(routes(roomIdParam).subscribe_notification, displayNotification)
+        .then(() => {
+          setNotificationSocketSubscribed(true);
+        }).catch((err) => {
+          setError(err.message);
+        });
+    }
+  }, [history, displayNotification, userSocketSubscribed, notificationSocketSubscribed]);
 
   // Called every time location changes
   useEffect(() => {
@@ -131,6 +166,19 @@ function GamePage() {
     window.dispatchEvent(event);
   };
 
+  // Send notification if submission result is correct and currentUser is set.
+  const checkSendTestCorrectNotification = (submissionParam: SubmissionResult) => {
+    if (submissionParam.numCorrect === submissionParam.numTestCases && currentUser) {
+      const notificationBody: string = JSON.stringify({
+        initiator: currentUser,
+        time: new Date(),
+        notificationType: NotificationType.TestCorrect,
+        content: submissionParam.code,
+      });
+      send(routes(roomId).subscribe_notification, {}, notificationBody);
+    }
+  };
+
   // Callback when user runs code against custom test case
   const runSolution = (input: string) => {
     const request = {
@@ -142,27 +190,26 @@ function GamePage() {
     submitSolution(roomId, request)
       .then((res) => {
         setSubmission(res);
+        checkSendTestCorrectNotification(res);
       })
       .catch((err) => setError(err));
   };
 
-  const displayPlayerLeaderboard = () => {
-    return players.map((player, index) => (
-      <LeaderboardCard
-        player={player}
-        isCurrentPlayer={player.user.userId === currentUser?.userId}
-        place={index + 1}
-        color="blue" // TODO: merge with Chris's color PR
-      />
-    ));
-  };
+  const displayPlayerLeaderboard = () => players.map((player, index) => (
+    <LeaderboardCard
+      player={player}
+      isCurrentPlayer={player.user.userId === currentUser?.userId}
+      place={index + 1}
+      color="blue" // TODO: merge with Chris's color PR
+    />
+  ));
 
   // Subscribe user to primary socket and to notifications.
   useEffect(() => {
-    if (!socketSubscribed && roomId) {
+    if (!userSocketSubscribed && roomId) {
       subscribePrimary(roomId);
     }
-  }, [socketSubscribed, roomId, subscribePrimary]);
+  }, [userSocketSubscribed, roomId, subscribePrimary]);
 
   // If the page is loading, return a centered Loading object.
   if (fullPageLoading) {
@@ -175,6 +222,10 @@ function GamePage() {
 
   return (
     <FlexContainer>
+      <GameNotificationContainer
+        onClickFunc={setGameNotification}
+        gameNotification={gameNotification}
+      />
       <FlexInfoBar>
         <FlexLeft>
           Room:

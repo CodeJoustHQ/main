@@ -75,6 +75,7 @@ public class GameManagementServiceTests {
     private static final String CODE = "print('hi')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
     private static final Integer NUM_PROBLEMS = 10;
+    private static final long DURATION = 600;
 
     // Helper method to add a dummy submission to a Player object
     private void addSubmissionHelper(Player player, int numCorrect) {
@@ -132,6 +133,7 @@ public class GameManagementServiceTests {
         room.setRoomId(ROOM_ID);
         room.setHost(host);
         room.setDifficulty(ProblemDifficulty.RANDOM);
+        room.setDuration(DURATION);
 
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(UserMapper.toDto(host));
@@ -150,6 +152,9 @@ public class GameManagementServiceTests {
         // Game object is created when the room chooses to start
         Game game = gameService.getGameFromRoomId(ROOM_ID);
         assertNotNull(game);
+
+        assertNotNull(game.getGameTimer());
+        assertEquals(room.getDuration(), game.getGameTimer().getDuration());
     }
 
     @Test
@@ -205,8 +210,11 @@ public class GameManagementServiceTests {
         GameDto gameDto = gameService.getGameDtoFromRoomId(ROOM_ID);
 
         assertEquals(RoomMapper.toDto(room), gameDto.getRoom());
+
         assertEquals(1, gameDto.getPlayers().size());
         assertEquals(UserMapper.toDto(user), gameDto.getPlayers().get(0).getUser());
+        assertNotNull(gameDto.getGameTimer());
+        assertEquals(room.getDuration(), gameDto.getGameTimer().getDuration());
     }
 
     @Test
