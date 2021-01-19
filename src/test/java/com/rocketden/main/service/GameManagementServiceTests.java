@@ -74,7 +74,6 @@ public class GameManagementServiceTests {
     private static final String USER_ID_3 = "678910";
     private static final String CODE = "print('hi')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
-<<<<<<< HEAD
     private static final Integer NUM_PROBLEMS = 10;
     private static final long DURATION = 600;
 
@@ -90,9 +89,6 @@ public class GameManagementServiceTests {
             player.setSolved(true);
         }
     }
-=======
-    private static final long DURATION = 600;
->>>>>>> c2503b13b9da557605370d720fd9d43540ef7807
 
     @Test
     public void addGetAndRemoveGame() {

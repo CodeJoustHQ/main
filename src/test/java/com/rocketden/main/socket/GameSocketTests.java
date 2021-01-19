@@ -62,11 +62,8 @@ public class GameSocketTests {
     private static final String USER_ID = "012345";
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String USER_ID_2 = "098765";
-<<<<<<< HEAD
-=======
     private static final String CODE = "print('hi')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
->>>>>>> c2503b13b9da557605370d720fd9d43540ef7807
     private static final long DURATION = 5;
 
     @BeforeEach
