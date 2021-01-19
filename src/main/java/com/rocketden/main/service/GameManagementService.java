@@ -129,7 +129,7 @@ public class GameManagementService {
         SubmissionDto submissionDto = submitService.submitSolution(game, request);
 
         // Send socket message if all users have solved the problem.
-        if (submissionDto.getNumCorrect().equals(submissionDto.getNumTestCases())) {
+        if (submissionDto != null && submissionDto.getNumCorrect().equals(submissionDto.getNumTestCases())) {
             conditionalSolvedSocketMessage(game);
         }
         

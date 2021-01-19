@@ -4,6 +4,7 @@ import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.StartGameRequest;
+import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
@@ -26,7 +27,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.Assert.assertEquals;
@@ -81,6 +84,9 @@ public class GameManagementServiceTests {
         submission.setStartTime(LocalDateTime.now());
 
         player.getSubmissions().add(submission);
+        if (numCorrect == NUM_PROBLEMS) {
+            player.setSolved(true);
+        }
     }
 
     @Test
@@ -219,6 +225,7 @@ public class GameManagementServiceTests {
         room.addUser(user);
 
         gameService.createAddGameFromRoom(room);
+        Game game = gameService.getGameFromRoomId(ROOM_ID);
 
         SubmissionRequest request = new SubmissionRequest();
         request.setLanguage(LANGUAGE);
@@ -227,7 +234,7 @@ public class GameManagementServiceTests {
 
         gameService.submitSolution(ROOM_ID, request);
 
-        verify(submitService).submitSolution(any(Game.class), eq(request));
+        verify(submitService).submitSolution(eq(game), eq(request));
     }
 
     @Test
@@ -250,7 +257,8 @@ public class GameManagementServiceTests {
         user3.setUserId(USER_ID_3);
         room.addUser(user3);
 
-        Game game = GameMapper.fromRoom(room);
+        gameService.createAddGameFromRoom(room);
+        Game game = gameService.getGameFromRoomId(ROOM_ID);
 
         // Add submissions for the first two users.
         addSubmissionHelper(game.getPlayers().get(USER_ID), 10);
@@ -261,9 +269,20 @@ public class GameManagementServiceTests {
         request.setCode(CODE);
         request.setInitiator(UserMapper.toDto(user3));
 
+        // Mock the return of the submissionDto, and mock update of player.
+        SubmissionDto submissionDto = new SubmissionDto();
+        submissionDto.setNumCorrect(NUM_PROBLEMS);
+        submissionDto.setNumTestCases(NUM_PROBLEMS);
+        Mockito.doAnswer(new Answer<SubmissionDto>() {
+            public SubmissionDto answer(InvocationOnMock invocation) {
+                addSubmissionHelper(game.getPlayers().get(USER_ID_3), 10);
+                return submissionDto;
+            }})
+          .when(submitService).submitSolution(game, request);
+
         gameService.submitSolution(ROOM_ID, request);
 
-        verify(submitService).submitSolution(any(Game.class), eq(request));
+        verify(submitService).submitSolution(eq(game), eq(request));
 
         // Confirm that socket sent updated GameDto object.
         addSubmissionHelper(game.getPlayers().get(USER_ID_3), 10);
