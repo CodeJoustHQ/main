@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.time.LocalDateTime;
@@ -286,6 +287,53 @@ public class GameManagementServiceTests {
 
         // Confirm that socket sent updated GameDto object.
         verify(socketService).sendSocketUpdate(eq(GameMapper.toDto(game)));
+    }
+
+    @Test
+    public void sendAllSolvedNoSocketUpdate() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        User user2 = new User();
+        user2.setNickname(NICKNAME_2);
+        user2.setUserId(USER_ID_2);
+        room.addUser(user2);
+
+        gameService.createAddGameFromRoom(room);
+        Game game = gameService.getGameFromRoomId(ROOM_ID);
+
+        // Add submissions for the first two users.
+        addSubmissionHelper(game.getPlayers().get(USER_ID), 10);
+        addSubmissionHelper(game.getPlayers().get(USER_ID_2), 10);
+        game.setAllSolved(true);
+
+        SubmissionRequest request = new SubmissionRequest();
+        request.setLanguage(LANGUAGE);
+        request.setCode(CODE);
+        request.setInitiator(UserMapper.toDto(user2));
+
+        // Mock the return of the submissionDto, and mock update of player.
+        SubmissionDto submissionDto = new SubmissionDto();
+        submissionDto.setNumCorrect(NUM_PROBLEMS);
+        submissionDto.setNumTestCases(NUM_PROBLEMS);
+        Mockito.doAnswer(new Answer<SubmissionDto>() {
+            public SubmissionDto answer(InvocationOnMock invocation) {
+                addSubmissionHelper(game.getPlayers().get(USER_ID_2), 10);
+                return submissionDto;
+            }})
+          .when(submitService).submitSolution(game, request);
+
+        gameService.submitSolution(ROOM_ID, request);
+
+        verify(submitService).submitSolution(eq(game), eq(request));
+
+        // Confirm no update sent as all players already solved the problem.
+        verify(socketService, never()).sendSocketUpdate(eq(GameMapper.toDto(game)));
     }
 
     @Test
