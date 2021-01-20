@@ -56,7 +56,6 @@ public class SubmitService {
         GameDto gameDto = GameMapper.toDto(game);
 
         // Send socket update with latest leaderboard info
-        // TODO: test socket in GameSocketTests when merged
         socketService.sendSocketUpdate(gameDto);
 
         return GameMapper.submissionToDto(submission);
