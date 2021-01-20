@@ -98,6 +98,7 @@ public class GameMapper {
             SubmissionDto bestSub1 = submissions1.get(0);
             SubmissionDto bestSub2 = submissions2.get(0);
 
+            // Get the best solution by each player (highest score, then earliest submission)
             for (SubmissionDto sub : submissions1) {
                 if (sub.getNumCorrect() > bestSub1.getNumCorrect()) {
                     bestSub1 = sub;

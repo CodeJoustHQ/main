@@ -168,6 +168,7 @@ public class GameMapperTests {
     public void sortLeaderboardSuccess() {
         List<PlayerDto> players = new ArrayList<>();
 
+        // Note: order of addSubmissionHelper matters (time of submission)
         PlayerDto player1 = new PlayerDto();
         addSubmissionHelper(player1, 0);
 
@@ -178,8 +179,11 @@ public class GameMapperTests {
         PlayerDto player3 = new PlayerDto();
         addSubmissionHelper(player3, 3);
 
+        addSubmissionHelper(player2, 3);
+
         PlayerDto player4 = new PlayerDto();
         addSubmissionHelper(player4, 5);
+        addSubmissionHelper(player4, 1);
 
         PlayerDto player5 = new PlayerDto();
 
