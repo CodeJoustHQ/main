@@ -3,6 +3,7 @@ package com.rocketden.main.dto.game;
 import java.util.List;
 
 import com.rocketden.main.dto.user.UserDto;
+import com.rocketden.main.util.Color;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -17,4 +18,5 @@ public class PlayerDto {
     private String language;
     private List<SubmissionDto> submissions;
     private Boolean solved;
+    private Color color;
 }

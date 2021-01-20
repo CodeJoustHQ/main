@@ -8,7 +8,6 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode
 public class SubmissionDto {
-
     private String language;
     private String code;
     private Integer numCorrect;
