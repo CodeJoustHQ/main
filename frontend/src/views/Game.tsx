@@ -214,7 +214,7 @@ function GamePage() {
         player={player}
         isCurrentPlayer={player.user.userId === currentUser?.userId}
         place={index + 1}
-        color="blue" // TODO: merge with Chris's color PR
+        color={player.color}
       />
     ));
   };
