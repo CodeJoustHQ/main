@@ -27,7 +27,7 @@ import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
 import { TextButton } from '../components/core/Button';
-import { routes, send, subscribe } from '../api/Socket';
+import { disconnect, routes, send, subscribe } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
 
 type LocationState = {
@@ -202,7 +202,9 @@ function GamePage() {
 
   const exitGame = () => {
     if (window.confirm('Exit the game? You will not be able to rejoin.')) {
-      history.replace('/');
+      disconnect()
+        .then(() => history.replace('/'))
+        .catch((err) => setError(err.message));
     }
   };
 
