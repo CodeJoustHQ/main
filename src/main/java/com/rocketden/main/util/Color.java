@@ -12,6 +12,8 @@ public class Color {
     private static final String INVALID_COLOR_STR =
         "The hexadecimal fields must all be of the form '#XXXXXX'.";
 
+    public Color() {}
+
     public Color(String hexColor) {
         if (hexColor.charAt(0) != '#' || hexColor.length() != 7) {
             throw new IllegalArgumentException(INVALID_COLOR_STR);
