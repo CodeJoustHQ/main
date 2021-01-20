@@ -1,15 +1,22 @@
 package com.rocketden.main.game_object;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@EqualsAndHashCode
 public class PlayerCode {
 
-    // Updated field to hold the user's current-language code.
     private String code;
-
     private String language;
+
+    public PlayerCode() {}
+
+    public PlayerCode(String code, String language) {
+        this.code = code;
+        this.language = language;
+    }
 
 }

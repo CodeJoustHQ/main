@@ -1,5 +1,6 @@
 package com.rocketden.main.game_object;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +12,7 @@ import com.rocketden.main.util.Color;
 
 @Getter
 @Setter
+@EqualsAndHashCode
 public class Player {
 
     // User associated with this Player object.
