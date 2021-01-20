@@ -16,7 +16,7 @@ import java.util.Timer;
 public class GameTimer {
 
     // 15 minute duration for the GameTimer, in seconds.
-    public static final Long DURATION_15 = (long) 900;
+    public static final long DURATION_15 = 900;
 
     // The time that the game began.
     private LocalDateTime startTime = LocalDateTime.now();

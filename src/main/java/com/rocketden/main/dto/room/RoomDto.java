@@ -19,5 +19,6 @@ public class RoomDto {
     private List<UserDto> inactiveUsers;
     private boolean active;
     private ProblemDifficulty difficulty;
+    private Long duration;
     private int numProblems;
 }
