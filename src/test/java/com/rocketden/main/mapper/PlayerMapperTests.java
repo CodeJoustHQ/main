@@ -1,6 +1,5 @@
 package com.rocketden.main.mapper;
 
-import com.rocketden.main.dto.game.PlayerDto;
 import com.rocketden.main.dto.game.PlayerMapper;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.model.User;
@@ -8,7 +7,6 @@ import com.rocketden.main.model.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
