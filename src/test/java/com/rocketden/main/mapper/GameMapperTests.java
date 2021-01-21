@@ -21,9 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,20 +56,6 @@ public class GameMapperTests {
         assertEquals(room, game.getRoom());
         assertNotNull(game.getPlayers().get(USER_ID));
         assertEquals(user, game.getPlayers().get(USER_ID).getUser());
-    }
-
-    @Test
-    public void playerFromUser() {
-        User user = new User();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
-
-        Player player = GameMapper.playerFromUser(user);
-
-        assertEquals(user, player.getUser());
-        assertNull(player.getPlayerCode());
-        assertFalse(player.getSolved());
-        assertEquals(0, player.getSubmissions().size());
     }
 
     @Test
@@ -126,6 +110,7 @@ public class GameMapperTests {
         assertEquals(playerCode.getCode(), playerDto.getCode());
         assertEquals(playerCode.getLanguage(), playerDto.getLanguage());
         assertEquals(1, playerDto.getSubmissions().size());
+        assertEquals(player.getColor(), playerDto.getColor());
 
         SubmissionDto submissionDto = playerDto.getSubmissions().get(0);
         assertEquals(submission.getPlayerCode().getCode(), submissionDto.getCode());

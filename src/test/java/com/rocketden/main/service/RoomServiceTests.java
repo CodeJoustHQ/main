@@ -354,6 +354,7 @@ public class RoomServiceTests {
         assertEquals(RoomError.NOT_FOUND, exception.getError());
     }
 
+    @Test
     public void updateRoomSettingsInvalidDuration() {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
@@ -390,6 +391,7 @@ public class RoomServiceTests {
 
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(host));
+
         request.setDifficulty(ProblemDifficulty.EASY);
         request.setDuration(RoomService.MAX_DURATION + 1);
 

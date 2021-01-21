@@ -1,5 +1,6 @@
 package com.rocketden.main.game_object;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,9 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.rocketden.main.model.User;
+import com.rocketden.main.util.Color;
 
 @Getter
 @Setter
+@EqualsAndHashCode
 public class Player {
 
     // User associated with this Player object.
@@ -26,5 +29,8 @@ public class Player {
      * or is still competing.
      */
     private Boolean solved = false;
+
+    // Color associated with this player, generated on backend in game start.
+    private Color color;
 
 }

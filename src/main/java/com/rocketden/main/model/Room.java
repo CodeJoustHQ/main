@@ -55,6 +55,7 @@ public class Room {
     private ProblemDifficulty difficulty = ProblemDifficulty.RANDOM;
 
     private Long duration = GameTimer.DURATION_15;
+
     private Integer numProblems = 1;
 
     public void addUser(User user) {
