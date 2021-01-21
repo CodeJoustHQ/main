@@ -142,9 +142,16 @@ public class GameManagementService {
     }
 
     // Update a specific player's code.
-    public void updateCode(String userId, PlayerCode playerCode) {
-        // TODO: Get the player from the userId.
-        liveGameService.updateCode(new Player(), playerCode);
+    public void updateCode(String roomId, String userId, PlayerCode playerCode) {
+        Game game = getGameFromRoomId(roomId);
+
+        if (!game.getPlayers().containsKey(userId)) {
+            throw new ApiException(GameError.USER_NOT_IN_GAME);
+        } else if (playerCode == null) {
+            throw new ApiException(GameError.EMPTY_FIELD);
+        }
+
+        liveGameService.updateCode(game.getPlayers().get(userId), playerCode);
     }
 
 }

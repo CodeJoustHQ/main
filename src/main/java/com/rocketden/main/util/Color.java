@@ -12,6 +12,8 @@ public class Color {
     private static final String INVALID_COLOR_STR =
         "The hexadecimal fields must all be of the form '#XXXXXX'.";
 
+    private String hexColor;
+
     public Color() {}
 
     public Color(String hexColor) {
@@ -31,7 +33,4 @@ public class Color {
 
         this.hexColor = hexColor;
     }
-
-    private String hexColor;
-    
 }

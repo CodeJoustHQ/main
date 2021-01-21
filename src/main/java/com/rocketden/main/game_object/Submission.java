@@ -1,5 +1,6 @@
 package com.rocketden.main.game_object;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@EqualsAndHashCode
 public class Submission {
 
     private PlayerCode playerCode;
