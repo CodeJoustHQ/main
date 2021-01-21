@@ -12,7 +12,8 @@ export const routes = (roomId: string) => {
   socketRoomId = roomId;
   return {
     connect: `${basePath}/join-room-endpoint`,
-    subscribe_user: `${basePath}/${roomId}/subscribe-user`,
+    subscribe_lobby: `${basePath}/${roomId}/subscribe-lobby`,
+    subscribe_game: `${basePath}/${roomId}/subscribe-game`,
     subscribe_notification: `${basePath}/${roomId}/subscribe-notification`,
   };
 };

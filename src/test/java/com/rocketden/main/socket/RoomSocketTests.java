@@ -52,7 +52,7 @@ public class RoomSocketTests {
     private TestRestTemplate template;
 
     private static final String CONNECT_ENDPOINT = "ws://localhost:{port}" + BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint";
-    private static final String SUBSCRIBE_ENDPOINT = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-user";
+    private static final String SUBSCRIBE_ENDPOINT = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-lobby";
 
     private BlockingQueue<RoomDto> blockingQueue;
     private String baseRestEndpoint;

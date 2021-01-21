@@ -123,7 +123,7 @@ function GamePage() {
 
     // Subscribe to the main Game channel to receive Game updates.
     if (!userSocketSubscribed) {
-      subscribe(routes(roomIdParam).subscribe_user, subscribeUserCallback)
+      subscribe(routes(roomIdParam).subscribe_game, subscribeUserCallback)
         .then(() => {
           setUserSocketSubscribed(true);
         }).catch((err) => {
