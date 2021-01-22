@@ -158,7 +158,7 @@ public class GameTests {
         RoomDto roomDto = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
         StartGameRequest request = new StartGameRequest();
-        request.setInitiator(host);
+        request.setInitiator(roomDto.getHost());
 
         createSingleProblemAndTestCases();
 

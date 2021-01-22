@@ -20,7 +20,6 @@ const Content = styled.div`
 type LocationState = {
   game: Game,
   currentPlayer: Player,
-  room: Room,
 };
 
 function GameResultsPage() {
@@ -35,9 +34,9 @@ function GameResultsPage() {
   const [room, setRoom] = useState<Room | null>(null);
 
   useEffect(() => {
-    if (checkLocationState(location, 'game', 'room', 'currentPlayer')) {
+    if (checkLocationState(location, 'game', 'currentPlayer')) {
       setPlayers(location.state.game.players);
-      setRoom(location.state.room);
+      setRoom(location.state.game.room);
       setCurrentPlayer(location.state.currentPlayer);
 
       const subscribeCallback = (result: Message) => {
@@ -50,7 +49,7 @@ function GameResultsPage() {
         }
       };
 
-      subscribe(routes(location.state.room.roomId).subscribe_game, subscribeCallback)
+      subscribe(routes(location.state.game.room.roomId).subscribe_game, subscribeCallback)
         .catch((err) => setError(err.message));
     } else {
       history.replace('/game/join', {

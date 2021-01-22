@@ -49,7 +49,6 @@ function GamePage() {
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
-  const [room, setRoom] = useState<Room | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
@@ -65,12 +64,6 @@ function GamePage() {
   // Variable to hold whether the user is subscribed to the notification socket.
   const [notificationSocketSubscribed, setNotificationSocketSubscribed] = useState(false);
 
-  // Gets rid of no unused vars warning (temporary build failure workaround until next PR is merged)
-  if (false) {
-    console.log(room);
-    console.log(currentPlayer);
-  }
-
   /**
    * Display beforeUnload message to inform the user that they may lose
    * their code / data if they leave the page.
@@ -80,7 +73,6 @@ function GamePage() {
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
   const setStateFromGame = (game: Game) => {
-    setRoom(game.room);
     setPlayers(game.players);
     setGameTimer(game.gameTimer);
     setProblems(game.problems);
@@ -118,7 +110,6 @@ function GamePage() {
         history.replace('/game/results', {
           game: updatedGame,
           currentPlayer,
-          room,
         });
       }
     };
