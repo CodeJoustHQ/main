@@ -2,6 +2,7 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
+import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.PlayAgainRequest;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.game.SubmissionRequest;
@@ -265,7 +266,7 @@ public class GameManagementServiceTests {
     }
 
     @Test
-    public void playAgainSuccess() {
+    public void playAgainSuccess() throws Exception {
         User host = new User();
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
@@ -277,6 +278,7 @@ public class GameManagementServiceTests {
         room.setDifficulty(ProblemDifficulty.HARD);
         room.setActive(true);
         room.addUser(host);
+        room.setDuration(1L);
 
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(UserMapper.toDto(host));
@@ -287,9 +289,13 @@ public class GameManagementServiceTests {
         PlayAgainRequest playAgainRequest = new PlayAgainRequest();
         playAgainRequest.setInitiator(UserMapper.toDto(host));
         RoomDto response = gameService.playAgain(ROOM_ID, playAgainRequest);
+        Thread.sleep(1000);
 
-        verify(socketService).sendSocketUpdate(Mockito.any(RoomDto.class)); // TODO: update with correct params
+        Game game = gameService.getGameFromRoomId(room.getRoomId());
 
+        verify(socketService).sendSocketUpdate(Mockito.eq(GameMapper.toDto(game)));
+
+        assertTrue(game.getPlayAgain());
         assertEquals(room.getRoomId(), response.getRoomId());
         assertEquals(room.getDifficulty(), response.getDifficulty());
         assertFalse(room.getActive());
@@ -318,13 +324,31 @@ public class GameManagementServiceTests {
         request.setInitiator(initiator);
 
         ApiException exception = assertThrows(ApiException.class, () -> gameService.playAgain(ROOM_ID, request));
-        assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
+        assertEquals(GameError.INVALID_PERMISSIONS, exception.getError());
 
     }
 
     @Test
     public void playAgainGameNotOver() {
-        // TODO
+        User host = new User();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(host);
+
+        StartGameRequest startRequest = new StartGameRequest();
+        startRequest.setInitiator(UserMapper.toDto(host));
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
+        gameService.startGame(ROOM_ID, startRequest);
+
+        PlayAgainRequest request = new PlayAgainRequest();
+        request.setInitiator(UserMapper.toDto(host));
+
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.playAgain(ROOM_ID, request));
+        assertEquals(GameError.GAME_NOT_OVER, exception.getError());
     }
 
     @Test

@@ -24,4 +24,5 @@ public class Game {
 
     private GameTimer gameTimer;
 
+    private Boolean playAgain = false;
 }

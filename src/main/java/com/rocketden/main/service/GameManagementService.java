@@ -102,7 +102,7 @@ public class GameManagementService {
     public RoomDto playAgain(String roomId, PlayAgainRequest request) {
         Game game = getGameFromRoomId(roomId);
 
-        if (game.getGameTimer() == null || game.getGameTimer().isTimeUp()) {
+        if (game.getGameTimer() == null || !game.getGameTimer().isTimeUp()) {
             throw new ApiException(GameError.GAME_NOT_OVER);
         }
 
