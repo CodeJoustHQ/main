@@ -19,7 +19,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,11 +42,6 @@ public class SubmitServiceTests {
 
     @Test
     public void submitSolutionSuccess() {
-        /**
-         * TODO: For now, this just checks that the submission is stored correctly.
-         * In the future, it will likely call the tester endpoint and send a socket update too.
-         */
-
         Room room = new Room();
         room.setRoomId(ROOM_ID);
         User user = new User();
@@ -66,7 +60,6 @@ public class SubmitServiceTests {
 
         GameDto gameDto = GameMapper.toDto(game);
         verify(socketService).sendSocketUpdate(gameDto);
-        verify(submitService).sortLeaderboard(gameDto.getPlayers());
 
         List<Submission> submissions = game.getPlayers().get(USER_ID).getSubmissions();
         assertEquals(1, submissions.size());
@@ -76,49 +69,5 @@ public class SubmitServiceTests {
         assertEquals(CODE, submission.getPlayerCode().getCode());
         assertEquals(LANGUAGE, submission.getPlayerCode().getLanguage());
         assertEquals(submission.getNumCorrect(), submission.getNumTestCases());
-    }
-
-    @Test
-    public void sortLeaderboardSuccess() {
-        List<PlayerDto> players = new ArrayList<>();
-
-        PlayerDto player1 = new PlayerDto();
-        addSubmissionHelper(player1, 0);
-
-        PlayerDto player2 = new PlayerDto();
-        addSubmissionHelper(player2, 0);
-        addSubmissionHelper(player2, 3);
-
-        PlayerDto player3 = new PlayerDto();
-        addSubmissionHelper(player3, 3);
-
-        PlayerDto player4 = new PlayerDto();
-        addSubmissionHelper(player4, 5);
-
-        PlayerDto player5 = new PlayerDto();
-
-        players.add(player1);
-        players.add(player2);
-        players.add(player3);
-        players.add(player4);
-        players.add(player5);
-
-        // Player order should be: [4, 2, 3, 1, 5]
-        submitService.sortLeaderboard(players);
-
-        assertEquals(player4, players.get(0));
-        assertEquals(player2, players.get(1));
-        assertEquals(player3, players.get(2));
-        assertEquals(player1, players.get(3));
-        assertEquals(player5, players.get(4));
-    }
-
-    // Helper method to add a dummy submission to a PlayerDto object
-    private void addSubmissionHelper(PlayerDto playerDto, int numCorrect) {
-        SubmissionDto submissionDto = new SubmissionDto();
-        submissionDto.setNumCorrect(numCorrect);
-        submissionDto.setStartTime(LocalDateTime.now());
-
-        playerDto.getSubmissions().add(submissionDto);
     }
 }

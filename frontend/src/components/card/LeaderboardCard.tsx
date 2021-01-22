@@ -3,11 +3,17 @@ import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import { LowMarginText, SmallText } from '../core/Text';
 import PlayerIcon from './PlayerIcon';
+import { Color } from '../../api/Color';
 
 const Content = styled.div`
   display: inline-block;
   position: relative;
   margin: 10px;
+  width: 7rem;
+  
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const HoverBar = styled.div`
@@ -25,15 +31,15 @@ const HoverBar = styled.div`
   height: 50px;
   padding: 10px;
   
-  // -(height + 2 * padding - 3px)
-  margin-top: -67px;
+  // -(height + 2 * padding - 15px)
+  margin-top: -55px;
 `;
 
 type LeaderboardCardProps = {
   player: Player,
   isCurrentPlayer: boolean,
   place: number,
-  color: string,
+  color: Color,
 };
 
 function LeaderboardCard(props: LeaderboardCardProps) {
@@ -45,7 +51,9 @@ function LeaderboardCard(props: LeaderboardCardProps) {
 
   const getDisplayNickname = () => {
     const { nickname } = player.user;
-    const shortenedNickname = nickname.length > 13 ? `${nickname.substring(0, 10)}...` : nickname;
+    const maxLength = isCurrentPlayer ? 5 : 9;
+
+    const shortenedNickname = (nickname.length > maxLength) ? `${nickname.substring(0, maxLength - 3)}...` : nickname;
     return `${shortenedNickname} ${isCurrentPlayer ? '(you)' : ''}`;
   };
 
@@ -73,7 +81,7 @@ function LeaderboardCard(props: LeaderboardCardProps) {
       onMouseEnter={() => setShowHover(true)}
       onMouseLeave={() => setShowHover(false)}
     >
-      <PlayerIcon color={color} />
+      <PlayerIcon hexColor={color.hexColor} />
       <LowMarginText>{`${place}. ${getDisplayNickname()}`}</LowMarginText>
 
       {showHover ? (

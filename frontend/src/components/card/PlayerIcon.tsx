@@ -2,11 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 
 type PlayerIconProps = {
-  color: string,
+  hexColor: string,
 };
 
 const PlayerIconContent = styled.div<PlayerIconProps>`
-  background-color: ${({ color }) => color};
+  background-color: ${({ hexColor }) => hexColor};
   border-radius: 50%;
   margin: 0 auto;
   
@@ -15,10 +15,10 @@ const PlayerIconContent = styled.div<PlayerIconProps>`
 `;
 
 function PlayerIcon(props: PlayerIconProps) {
-  const { color } = props;
+  const { hexColor } = props;
 
   return (
-    <PlayerIconContent color={color} />
+    <PlayerIconContent hexColor={hexColor} />
   );
 }
 

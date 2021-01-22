@@ -17,16 +17,18 @@ import { checkLocationState } from '../util/Utility';
 import Console from '../components/game/Console';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
+import { GameNotification, NotificationType } from '../api/GameNotification';
 import Difficulty from '../api/Difficulty';
 import {
   Game, getGame, Player, SubmissionResult, submitSolution,
 } from '../api/Game';
 import { Room } from '../api/Room';
 import LeaderboardCard from '../components/card/LeaderboardCard';
-import { routes, subscribe } from '../api/Socket';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
-import { TextLink } from '../components/core/Link';
+import { TextButton } from '../components/core/Button';
+import { disconnect, routes, send, subscribe } from '../api/Socket';
+import GameNotificationContainer from '../components/game/GameNotificationContainer';
 
 type LocationState = {
   roomId: string,
@@ -54,8 +56,20 @@ function GamePage() {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [currentLanguage, setCurrentLanguage] = useState('java');
 
+  // When variable null, show nothing; otherwise, show notification.
+  const [gameNotification, setGameNotification] = useState<GameNotification | null>(null);
+
   // Variable to hold whether the user is subscribed to the primary Game socket.
-  const [socketSubscribed, setSocketSubscribed] = useState(false);
+  const [userSocketSubscribed, setUserSocketSubscribed] = useState(false);
+
+  // Variable to hold whether the user is subscribed to the notification socket.
+  const [notificationSocketSubscribed, setNotificationSocketSubscribed] = useState(false);
+
+  // Gets rid of no unused vars warning (temporary build failure workaround until next PR is merged)
+  if (false) {
+    console.log(room);
+    console.log(currentPlayer);
+  }
 
   /**
    * Display beforeUnload message to inform the user that they may lose
@@ -65,27 +79,41 @@ function GamePage() {
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
-  const setStateFromGame = useCallback((game: Game) => {
+  const setStateFromGame = (game: Game) => {
     setRoom(game.room);
     setPlayers(game.players);
     setGameTimer(game.gameTimer);
     setProblems(game.problems);
+  };
 
-    game.players.forEach((player) => {
+  useEffect(() => {
+    players.forEach((player) => {
       if (player.user.userId === currentUser?.userId) {
         setCurrentPlayer(player);
       }
     });
-  }, [currentUser, room]);
+  }, [players, currentUser]);
+
+  /**
+   * Display the notification as a callback from the notification
+   * subscription. Do not display anything if notification is already
+   * present or initiator is the current user.
+   */
+  const displayNotification = useCallback((result: Message) => {
+    const notificationResult: GameNotification = JSON.parse(result.body);
+    if (currentUser?.userId !== notificationResult?.initiator?.userId) {
+      setGameNotification(notificationResult);
+    }
+  }, [currentUser]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
-    const subscribeCallback = (result: Message) => {
+    const subscribeUserCallback = (result: Message) => {
       const updatedGame: Game = JSON.parse(result.body);
       setStateFromGame(updatedGame);
-      setSocketSubscribed(true);
 
       // Check if end game.
+      // TODO: after deconstructing game, move this to useEffect on timeUp
       if (updatedGame.gameTimer.timeUp) {
         history.push('/game/results', {
           game: updatedGame,
@@ -95,10 +123,26 @@ function GamePage() {
       }
     };
 
-    subscribe(routes(roomIdParam).subscribe, subscribeCallback).catch((err) => {
-      setError(err.message);
-    });
-  }, [history, setStateFromGame]);
+    // Subscribe to the main Game channel to receive Game updates.
+    if (!userSocketSubscribed) {
+      subscribe(routes(roomIdParam).subscribe_game, subscribeUserCallback)
+        .then(() => {
+          setUserSocketSubscribed(true);
+        }).catch((err) => {
+          setError(err.message);
+        });
+    }
+
+    // Subscribe for Game Notifications.
+    if (!notificationSocketSubscribed) {
+      subscribe(routes(roomIdParam).subscribe_notification, displayNotification)
+        .then(() => {
+          setNotificationSocketSubscribed(true);
+        }).catch((err) => {
+          setError(err.message);
+        });
+    }
+  }, [history, displayNotification, userSocketSubscribed, notificationSocketSubscribed]);
 
   // Called every time location changes
   useEffect(() => {
@@ -121,12 +165,25 @@ function GamePage() {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
       });
     }
-  }, [location, history, setStateFromGame]);
+  }, [location, history]);
 
   // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {
     const event = new Event('secondaryPanelSizeChange');
     window.dispatchEvent(event);
+  };
+
+  // Send notification if submission result is correct and currentUser is set.
+  const checkSendTestCorrectNotification = (submissionParam: SubmissionResult) => {
+    if (submissionParam.numCorrect === submissionParam.numTestCases && currentUser) {
+      const notificationBody: string = JSON.stringify({
+        initiator: currentUser,
+        time: new Date(),
+        notificationType: NotificationType.TestCorrect,
+        content: 'success',
+      });
+      send(routes(roomId).subscribe_notification, {}, notificationBody);
+    }
   };
 
   // Callback when user runs code against custom test case
@@ -140,8 +197,17 @@ function GamePage() {
     submitSolution(roomId, request)
       .then((res) => {
         setSubmission(res);
+        checkSendTestCorrectNotification(res);
       })
       .catch((err) => setError(err));
+  };
+
+  const exitGame = () => {
+    if (window.confirm('Exit the game? You will not be able to rejoin.')) {
+      disconnect()
+        .then(() => history.replace('/'))
+        .catch((err) => setError(err.message));
+    }
   };
 
   const displayPlayerLeaderboard = () => {
@@ -150,17 +216,17 @@ function GamePage() {
         player={player}
         isCurrentPlayer={player.user.userId === currentUser?.userId}
         place={index + 1}
-        color="blue" // TODO: merge with Chris's color PR
+        color={player.color}
       />
     ));
   };
 
   // Subscribe user to primary socket and to notifications.
   useEffect(() => {
-    if (!socketSubscribed && roomId) {
+    if (!userSocketSubscribed && roomId) {
       subscribePrimary(roomId);
     }
-  }, [socketSubscribed, roomId, subscribePrimary]);
+  }, [userSocketSubscribed, roomId, subscribePrimary]);
 
   // If the page is loading, return a centered Loading object.
   if (fullPageLoading) {
@@ -173,6 +239,10 @@ function GamePage() {
 
   return (
     <FlexContainer>
+      <GameNotificationContainer
+        onClickFunc={setGameNotification}
+        gameNotification={gameNotification}
+      />
       <FlexInfoBar>
         <FlexLeft>
           Room:
@@ -183,7 +253,7 @@ function GamePage() {
           <GameTimerContainer gameTimer={gameTimer || null} />
         </FlexCenter>
         <FlexRight>
-          <TextLink to="/">Exit Game</TextLink>
+          <TextButton onClick={exitGame}>Exit Game</TextButton>
         </FlexRight>
       </FlexInfoBar>
 

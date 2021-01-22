@@ -14,6 +14,8 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.Game;
+import com.rocketden.main.game_object.Player;
+import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 import com.rocketden.main.model.problem.ProblemDifficulty;
@@ -25,6 +27,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -51,6 +54,9 @@ public class GameManagementServiceTests {
     @Mock
     private ProblemService problemService;
 
+    @Mock
+    private LiveGameService liveGameService;
+
     @Spy
     @InjectMocks
     private GameManagementService gameService;
@@ -63,6 +69,8 @@ public class GameManagementServiceTests {
     private static final String SESSION_ID = "abcdefghijk";
     private static final String CODE = "print('hi')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
+    private static final PlayerCode PLAYER_CODE = new PlayerCode(CODE, LANGUAGE);
+    private static final long DURATION = 600;
 
     @Test
     public void addGetAndRemoveGame() {
@@ -107,6 +115,7 @@ public class GameManagementServiceTests {
         room.setRoomId(ROOM_ID);
         room.setHost(host);
         room.setDifficulty(ProblemDifficulty.RANDOM);
+        room.setDuration(DURATION);
 
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(UserMapper.toDto(host));
@@ -125,6 +134,9 @@ public class GameManagementServiceTests {
         // Game object is created when the room chooses to start
         Game game = gameService.getGameFromRoomId(ROOM_ID);
         assertNotNull(game);
+
+        assertNotNull(game.getGameTimer());
+        assertEquals(room.getDuration(), game.getGameTimer().getDuration());
     }
 
     @Test
@@ -180,8 +192,11 @@ public class GameManagementServiceTests {
         GameDto gameDto = gameService.getGameDtoFromRoomId(ROOM_ID);
 
         assertEquals(RoomMapper.toDto(room), gameDto.getRoom());
+
         assertEquals(1, gameDto.getPlayers().size());
         assertEquals(UserMapper.toDto(user), gameDto.getPlayers().get(0).getUser());
+        assertNotNull(gameDto.getGameTimer());
+        assertEquals(room.getDuration(), gameDto.getGameTimer().getDuration());
     }
 
     @Test
@@ -304,5 +319,71 @@ public class GameManagementServiceTests {
 
         ApiException exception = assertThrows(ApiException.class, () -> gameService.playAgain(ROOM_ID, request));
         assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
+
+    }
+
+    @Test
+    public void updateCodeSuccess() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setDifficulty(ProblemDifficulty.RANDOM);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        gameService.createAddGameFromRoom(room);
+        Game game = gameService.getGameFromRoomId(ROOM_ID);
+        gameService.updateCode(ROOM_ID, USER_ID, PLAYER_CODE);
+
+        Player player = game.getPlayers().get(USER_ID);
+
+        // Confirm that the live game service method is called correctly.
+        verify(liveGameService).updateCode(eq(player), eq(PLAYER_CODE));
+    }
+
+    @Test
+    public void updateCodeInvalidRoomId() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setDifficulty(ProblemDifficulty.RANDOM);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        gameService.createAddGameFromRoom(room);
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.updateCode("999999", USER_ID, PLAYER_CODE));
+        assertEquals(GameError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void updateCodeInvalidUserId() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setDifficulty(ProblemDifficulty.RANDOM);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        gameService.createAddGameFromRoom(room);
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.updateCode(ROOM_ID, "999999", PLAYER_CODE));
+        assertEquals(GameError.USER_NOT_IN_GAME, exception.getError());
+    }
+
+    @Test
+    public void updateCodeEmptyPlayerCode() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setDifficulty(ProblemDifficulty.RANDOM);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        gameService.createAddGameFromRoom(room);
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.updateCode(ROOM_ID, USER_ID, null));
+        assertEquals(GameError.EMPTY_FIELD, exception.getError());
     }
 }

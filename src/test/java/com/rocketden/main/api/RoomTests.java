@@ -11,6 +11,7 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
+import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.util.RoomTestMethods;
 import com.rocketden.main.util.UtilityTestMethods;
@@ -25,7 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -59,6 +60,7 @@ public class RoomTests {
     private static final String USER_ID = "012345";
     private static final String USER_ID_2 = "678910";
     private static final String ROOM_ID = "012345";
+    private static final long DURATION = 600;
 
     @Test
     public void getNonExistentRoom() throws Exception {
@@ -343,6 +345,8 @@ public class RoomTests {
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(host);
         updateRequest.setDifficulty(ProblemDifficulty.EASY);
+        updateRequest.setDuration(DURATION);
+        updateRequest.setNumProblems(2);
 
         MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -364,6 +368,8 @@ public class RoomTests {
         RoomDto actual = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
         assertEquals(updateRequest.getDifficulty(), actual.getDifficulty());
+        assertEquals(updateRequest.getDuration(), actual.getDuration());
+        assertEquals(updateRequest.getNumProblems(), actual.getNumProblems());
     }
 
     @Test
@@ -388,6 +394,8 @@ public class RoomTests {
 
         // Difficulty remains unchanged from default
         assertEquals(ProblemDifficulty.RANDOM, room.getDifficulty());
+        assertEquals(GameTimer.DURATION_15, room.getDuration());
+        assertEquals(1, room.getNumProblems());
     }
 
     @Test

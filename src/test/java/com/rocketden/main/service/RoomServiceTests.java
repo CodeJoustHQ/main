@@ -9,7 +9,9 @@ import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.room.RemoveUserRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
+import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.RoomError;
+import com.rocketden.main.exception.TimerError;
 import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.problem.ProblemDifficulty;
@@ -26,7 +28,7 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -61,6 +63,7 @@ public class RoomServiceTests {
     private static final String USER_ID = "678910";
     private static final String USER_ID_2 = "123456";
     private static final String USER_ID_3 = "024681";
+    private static final long DURATION = 600;
 
     @Test
     public void createRoomSuccess() {
@@ -299,11 +302,15 @@ public class RoomServiceTests {
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(host));
         request.setDifficulty(ProblemDifficulty.EASY);
+        request.setDuration(DURATION);
+        request.setNumProblems(3);
 
         RoomDto response = roomService.updateRoomSettings(room.getRoomId(), request);
 
         verify(socketService).sendSocketUpdate(eq(response));
         assertEquals(request.getDifficulty(), response.getDifficulty());
+        assertEquals(request.getDuration(), response.getDuration());
+        assertEquals(request.getNumProblems(), response.getNumProblems());
     }
 
     @Test
@@ -345,6 +352,96 @@ public class RoomServiceTests {
         ApiException exception = assertThrows(ApiException.class, () ->
                 roomService.updateRoomSettings("999999", noRoomRequest));
         assertEquals(RoomError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void updateRoomSettingsInvalidDuration() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User host = new User();
+        host.setNickname(NICKNAME);
+
+        room.setHost(host);
+        room.addUser(host);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        UpdateSettingsRequest request = new UpdateSettingsRequest();
+        request.setInitiator(UserMapper.toDto(host));
+
+        request.setDifficulty(ProblemDifficulty.EASY);
+        request.setDuration(-1L);
+
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.updateRoomSettings(ROOM_ID, request));
+        assertEquals(TimerError.INVALID_DURATION, exception.getError());
+    }
+
+    @Test
+    public void updateRoomSettingsDurationTooLong() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User host = new User();
+        host.setNickname(NICKNAME);
+
+        room.setHost(host);
+        room.addUser(host);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        UpdateSettingsRequest request = new UpdateSettingsRequest();
+        request.setInitiator(UserMapper.toDto(host));
+
+        request.setDifficulty(ProblemDifficulty.EASY);
+        request.setDuration(RoomService.MAX_DURATION + 1);
+
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.updateRoomSettings(ROOM_ID, request));
+        assertEquals(TimerError.INVALID_DURATION, exception.getError());
+    }
+
+    @Test
+    public void updateRoomSettingsBadNumProblems() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User host = new User();
+        host.setNickname(NICKNAME);
+
+        room.setHost(host);
+        room.addUser(host);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        UpdateSettingsRequest request = new UpdateSettingsRequest();
+        request.setInitiator(UserMapper.toDto(host));
+        request.setNumProblems(-1);
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.updateRoomSettings(ROOM_ID, request));
+        assertEquals(ProblemError.INVALID_NUMBER_REQUEST, exception.getError());
+    }
+
+    @Test
+    public void updateRoomSettingsExceedsMaxProblems() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User host = new User();
+        host.setNickname(NICKNAME);
+
+        room.setHost(host);
+        room.addUser(host);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        UpdateSettingsRequest request = new UpdateSettingsRequest();
+        request.setInitiator(UserMapper.toDto(host));
+        request.setNumProblems(RoomService.MAX_NUM_PROBLEMS + 1);
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.updateRoomSettings(ROOM_ID, request));
+        assertEquals(ProblemError.INVALID_NUMBER_REQUEST, exception.getError());
     }
 
     @Test

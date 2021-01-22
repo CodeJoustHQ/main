@@ -44,7 +44,9 @@ public class GameManagementService {
     private final Map<String, Game> currentGameMap;
 
     @Autowired
-    protected GameManagementService(RoomRepository repository, SocketService socketService, LiveGameService liveGameService, NotificationService notificationService, SubmitService submitService, ProblemService problemService) {
+    protected GameManagementService(RoomRepository repository, SocketService socketService,
+                                    LiveGameService liveGameService, NotificationService notificationService,
+                                    SubmitService submitService, ProblemService problemService) {
         this.repository = repository;
         this.socketService = socketService;
         this.liveGameService = liveGameService;
@@ -86,11 +88,11 @@ public class GameManagementService {
             throw new ApiException(RoomError.INVALID_PERMISSIONS);
         }
 
-        room.setActive(true);
-        repository.save(room);
-
         // Initialize game state
         createAddGameFromRoom(room);
+
+        room.setActive(true);
+        repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
         socketService.sendSocketUpdate(roomDto);
@@ -120,10 +122,12 @@ public class GameManagementService {
     // Initialize and add a game object from a room object, start game timer
     public void createAddGameFromRoom(Room room) {
         Game game = GameMapper.fromRoom(room);
-        List<Problem> problems = problemService.getProblemsFromDifficulty(room.getDifficulty(), 1);
+
+        List<Problem> problems = problemService.getProblemsFromDifficulty(room.getDifficulty(), room.getNumProblems());
         game.setProblems(problems);
+        setStartGameTimer(game, room.getDuration());
+
         currentGameMap.put(room.getRoomId(), game);
-        setStartGameTimer(game, GameTimer.DURATION_15);
     }
 
     // Set and start the Game Timer.
@@ -162,9 +166,16 @@ public class GameManagementService {
     }
 
     // Update a specific player's code.
-    public void updateCode(String userId, PlayerCode playerCode) {
-        // TODO: Get the player from the userId.
-        liveGameService.updateCode(new Player(), playerCode);
+    public void updateCode(String roomId, String userId, PlayerCode playerCode) {
+        Game game = getGameFromRoomId(roomId);
+
+        if (!game.getPlayers().containsKey(userId)) {
+            throw new ApiException(GameError.USER_NOT_IN_GAME);
+        } else if (playerCode == null) {
+            throw new ApiException(GameError.EMPTY_FIELD);
+        }
+
+        liveGameService.updateCode(game.getPlayers().get(userId), playerCode);
     }
 
 }
