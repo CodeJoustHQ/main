@@ -115,7 +115,7 @@ function GamePage() {
       // Check if end game.
       // TODO: after deconstructing game, move this to useEffect on timeUp
       if (updatedGame.gameTimer.timeUp) {
-        history.push('/game/results', {
+        history.replace('/game/results', {
           game: updatedGame,
           currentPlayer,
           room,

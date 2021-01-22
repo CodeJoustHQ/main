@@ -109,7 +109,7 @@ public class GameManagementService {
         Room room = game.getRoom();
         User initiator = UserMapper.toEntity(request.getInitiator());
         if (!room.getHost().equals(initiator)) {
-            throw new ApiException(RoomError.INVALID_PERMISSIONS);
+            throw new ApiException(GameError.INVALID_PERMISSIONS);
         }
 
         // Set all users to be disconnected
@@ -118,7 +118,9 @@ public class GameManagementService {
         // Change room to be no longer active
         room.setActive(false);
 
-        // TODO: figure out socket message (and test in GameSocketTests)
+        // Notify users to play again
+        game.setPlayAgain(true);
+        socketService.sendSocketUpdate(GameMapper.toDto(game));
 
         return RoomMapper.toDto(room);
     }

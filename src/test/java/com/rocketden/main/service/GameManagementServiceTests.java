@@ -28,7 +28,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -285,11 +284,11 @@ public class GameManagementServiceTests {
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
         gameService.startGame(ROOM_ID, request);
+        Thread.sleep(1000);
 
         PlayAgainRequest playAgainRequest = new PlayAgainRequest();
         playAgainRequest.setInitiator(UserMapper.toDto(host));
         RoomDto response = gameService.playAgain(ROOM_ID, playAgainRequest);
-        Thread.sleep(1000);
 
         Game game = gameService.getGameFromRoomId(room.getRoomId());
 
@@ -303,7 +302,7 @@ public class GameManagementServiceTests {
     }
 
     @Test
-    public void playAgainWrongInitiator() {
+    public void playAgainWrongInitiator() throws Exception {
         User host = new User();
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
@@ -311,12 +310,14 @@ public class GameManagementServiceTests {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
         room.setHost(host);
+        room.setDuration(1L);
 
         StartGameRequest startRequest = new StartGameRequest();
         startRequest.setInitiator(UserMapper.toDto(host));
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
         gameService.startGame(ROOM_ID, startRequest);
+        Thread.sleep(1000);
 
         UserDto initiator = new UserDto();
         initiator.setNickname(NICKNAME_2);
