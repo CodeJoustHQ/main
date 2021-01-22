@@ -4,6 +4,7 @@ import { Player } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
 import PlayerIcon from './PlayerIcon';
 import { FlexContainer, FlexLeft, FlexRight } from '../core/Container';
+import { Color } from '../../api/Color';
 
 const Content = styled.div`
   display: block;
@@ -16,7 +17,7 @@ type PlayerResultsCardProps = {
   player: Player,
   place: number,
   isCurrentPlayer: boolean,
-  color: string,
+  color: Color,
 };
 
 function PlayerResultsCard(props: PlayerResultsCardProps) {
@@ -43,7 +44,7 @@ function PlayerResultsCard(props: PlayerResultsCardProps) {
     <Content>
       <FlexContainer>
         <FlexLeft>
-          <PlayerIcon color={color} />
+          <PlayerIcon hexColor={color.hexColor} />
           <LowMarginText>{`${place}. ${getDisplayNickname()}`}</LowMarginText>
         </FlexLeft>
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useLocation, useHistory } from 'react-router-dom';
+import { Message } from 'stompjs';
 import { LargeText, Text } from '../components/core/Text';
 import { Game, Player, playAgain } from '../api/Game';
 import { checkLocationState } from '../util/Utility';
@@ -10,6 +11,7 @@ import { PrimaryButton } from '../components/core/Button';
 import { Room } from '../api/Room';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
+import { routes, subscribe } from '../api/Socket';
 
 const Content = styled.div`
   width: 75%;
@@ -54,7 +56,18 @@ function GameResultsPage() {
       });
   };
 
-  // TODO: subscription to socket for playing again
+  useEffect(() => {
+    const subscribeCallback = (result: Message) => {
+      // TODO
+    };
+
+    subscribe(routes(room?.roomId).subscribe_game, subscribeCallback)
+      .then(() => {
+        // TODO
+      }).catch((err) => {
+        setError(err.message);
+      });
+  }, []);
 
   return (
     <Content>
@@ -66,7 +79,7 @@ function GameResultsPage() {
           player={player}
           place={index + 1}
           isCurrentPlayer={currentPlayer?.user.userId === player.user.userId}
-          color="blue" // TODO: merge with Chris's PR
+          color={player.color}
         />
       ))}
 
