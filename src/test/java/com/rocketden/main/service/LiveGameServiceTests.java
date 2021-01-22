@@ -1,6 +1,7 @@
 package com.rocketden.main.service;
 
 import com.rocketden.main.dto.game.GameMapper;
+import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
@@ -21,7 +22,7 @@ public class LiveGameServiceTests {
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "098765";
     private static final String CODE = "print('hi')";
-    private static final String LANGUAGE = "python";
+    private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
     private static final PlayerCode PLAYER_CODE = new PlayerCode(CODE, LANGUAGE);
 
     @Spy

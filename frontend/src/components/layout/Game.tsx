@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import Header from '../navigation/Header';
 
 const Content = styled.div`
   display: flex;
@@ -17,7 +16,6 @@ type MyProps = {
 function GameLayout({ children }: MyProps) {
   return (
     <Content>
-      <Header />
       {children}
     </Content>
   );

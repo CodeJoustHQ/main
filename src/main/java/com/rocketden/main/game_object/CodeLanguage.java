@@ -1,7 +1,7 @@
 package com.rocketden.main.game_object;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.rocketden.main.exception.RoomError;
+import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.api.ApiException;
 
 public enum CodeLanguage {
@@ -13,7 +13,7 @@ public enum CodeLanguage {
         try {
             return CodeLanguage.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new ApiException(RoomError.BAD_SETTING);
+            throw new ApiException(GameError.BAD_LANGUAGE);
         }
     }
 }

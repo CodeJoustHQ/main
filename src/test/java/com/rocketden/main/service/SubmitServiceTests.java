@@ -1,8 +1,12 @@
 package com.rocketden.main.service;
 
+import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
+import com.rocketden.main.dto.game.PlayerDto;
+import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.user.UserMapper;
+import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Submission;
 import com.rocketden.main.model.Room;
@@ -10,12 +14,15 @@ import com.rocketden.main.model.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class SubmitServiceTests {
@@ -24,7 +31,10 @@ public class SubmitServiceTests {
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "098765";
     private static final String CODE = "print('hi')";
-    private static final String LANGUAGE = "python";
+    private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
+
+    @Mock
+    private SocketService socketService;
 
     @Spy
     @InjectMocks
@@ -32,11 +42,6 @@ public class SubmitServiceTests {
 
     @Test
     public void submitSolutionSuccess() {
-        /**
-         * TODO: For now, this just checks that the submission is stored correctly.
-         * In the future, it will likely call the tester endpoint and send a socket update too.
-         */
-
         Room room = new Room();
         room.setRoomId(ROOM_ID);
         User user = new User();
@@ -52,6 +57,9 @@ public class SubmitServiceTests {
         request.setInitiator(UserMapper.toDto(user));
 
         submitService.submitSolution(game, request);
+
+        GameDto gameDto = GameMapper.toDto(game);
+        verify(socketService).sendSocketUpdate(gameDto);
 
         List<Submission> submissions = game.getPlayers().get(USER_ID).getSubmissions();
         assertEquals(1, submissions.size());

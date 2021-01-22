@@ -11,6 +11,7 @@ import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
+import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
@@ -66,7 +67,7 @@ public class GameManagementServiceTests {
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "098765";
     private static final String CODE = "print('hi')";
-    private static final String LANGUAGE = "python";
+    private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
     private static final PlayerCode PLAYER_CODE = new PlayerCode(CODE, LANGUAGE);
     private static final long DURATION = 600;
 
