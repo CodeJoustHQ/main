@@ -20,6 +20,7 @@ const Content = styled.div`
 type LocationState = {
   game: Game,
   currentPlayer: Player,
+  room: Room,
 };
 
 function GameResultsPage() {
@@ -36,8 +37,21 @@ function GameResultsPage() {
   useEffect(() => {
     if (checkLocationState(location, 'game', 'room', 'currentPlayer')) {
       setPlayers(location.state.game.players);
-      setRoom(location.state.game.room);
+      setRoom(location.state.room);
       setCurrentPlayer(location.state.currentPlayer);
+
+      const subscribeCallback = (result: Message) => {
+        const updatedGame: Game = JSON.parse(result.body);
+        if (updatedGame.playAgain) {
+          history.replace(`/game/lobby?room=${updatedGame.room.roomId}`, {
+            user: location.state.currentPlayer.user,
+            roomId: updatedGame.room.roomId,
+          });
+        }
+      };
+
+      subscribe(routes(location.state.room.roomId).subscribe_game, subscribeCallback)
+        .catch((err) => setError(err.message));
     } else {
       history.replace('/game/join', {
         error: errorHandler('Please join and play a game before viewing the results page.'),
@@ -55,19 +69,6 @@ function GameResultsPage() {
         setError(err.message);
       });
   };
-
-  useEffect(() => {
-    const subscribeCallback = (result: Message) => {
-      // TODO
-    };
-
-    subscribe(routes(room?.roomId).subscribe_game, subscribeCallback)
-      .then(() => {
-        // TODO
-      }).catch((err) => {
-        setError(err.message);
-      });
-  }, []);
 
   return (
     <Content>
