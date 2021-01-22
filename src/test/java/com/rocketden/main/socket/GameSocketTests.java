@@ -168,4 +168,9 @@ public class GameSocketTests {
         assertNotNull(gameDto);
         assertEquals(room.getHost(), gameDto.getPlayers().get(0).getUser());
     }
+
+    @Test
+    public void socketReceivesMessageOnPlayAgain() throws Exception {
+        // TODO
+    }
 }

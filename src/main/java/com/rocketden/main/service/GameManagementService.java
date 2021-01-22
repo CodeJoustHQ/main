@@ -99,10 +99,14 @@ public class GameManagementService {
         return roomDto;
     }
 
-    // TODO: add verification that game is over
     public RoomDto playAgain(String roomId, PlayAgainRequest request) {
-        Room room = getGameFromRoomId(roomId).getRoom();
+        Game game = getGameFromRoomId(roomId);
 
+        if (game.getGameTimer() == null || game.getGameTimer().isTimeUp()) {
+            throw new ApiException(GameError.GAME_NOT_OVER);
+        }
+
+        Room room = game.getRoom();
         User initiator = UserMapper.toEntity(request.getInitiator());
         if (!room.getHost().equals(initiator)) {
             throw new ApiException(RoomError.INVALID_PERMISSIONS);

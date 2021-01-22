@@ -323,6 +323,11 @@ public class GameManagementServiceTests {
     }
 
     @Test
+    public void playAgainGameNotOver() {
+        // TODO
+    }
+
+    @Test
     public void updateCodeSuccess() {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
