@@ -2,6 +2,7 @@ package com.rocketden.main.socket;
 
 import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dto.game.GameDto;
+import com.rocketden.main.dto.game.PlayAgainRequest;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
@@ -171,6 +172,20 @@ public class GameSocketTests {
 
     @Test
     public void socketReceivesMessageOnPlayAgain() throws Exception {
-        // TODO
+        GameDto gameDto = blockingQueue.poll(DURATION + 5, SECONDS);
+        assertNotNull(gameDto);
+
+        PlayAgainRequest request = new PlayAgainRequest();
+        request.setInitiator(room.getHost());
+
+        HttpEntity<PlayAgainRequest> entity = new HttpEntity<>(request);
+        String playAgainEndpoint = String.format("%s/games/%s/restart", baseRestEndpoint, room.getRoomId());
+        RoomDto roomDto = template.postForObject(playAgainEndpoint, entity, RoomDto.class);
+        assertNotNull(roomDto);
+
+        gameDto = blockingQueue.poll(5, SECONDS);
+        assertNotNull(gameDto);
+
+        assertTrue(gameDto.getPlayAgain());
     }
 }
