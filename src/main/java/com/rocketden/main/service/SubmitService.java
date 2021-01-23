@@ -2,7 +2,6 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
-import com.rocketden.main.dto.game.PlayerDto;
 import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.game_object.Game;
@@ -56,7 +55,6 @@ public class SubmitService {
         GameDto gameDto = GameMapper.toDto(game);
 
         // Send socket update with latest leaderboard info
-        // TODO: test socket in GameSocketTests when merged
         socketService.sendSocketUpdate(gameDto);
 
         return GameMapper.submissionToDto(submission);

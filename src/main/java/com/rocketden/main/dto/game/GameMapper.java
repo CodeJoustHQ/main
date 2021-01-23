@@ -8,6 +8,8 @@ import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.Submission;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
+import com.rocketden.main.util.Utility;
+
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
@@ -54,24 +56,17 @@ public class GameMapper {
         Game game = new Game();
         game.setRoom(room);
 
+        // Create players and assign colors in order.
+        int index = 0;
         Map<String, Player> players = game.getPlayers();
         for (User user : room.getUsers()) {
-            Player player = playerFromUser(user);
+            Player player = PlayerMapper.playerFromUser(user);
+            player.setColor(Utility.COLOR_LIST.get(index));
             players.put(user.getUserId(), player);
+            index = (index + 1) % Utility.COLOR_LIST.size();
         }
 
         return game;
-    }
-
-    public static Player playerFromUser(User user) {
-        if (user == null) {
-            return null;
-        }
-
-        Player player = new Player();
-        player.setUser(user);
-
-        return player;
     }
 
     public static SubmissionDto submissionToDto(Submission submission) {
@@ -97,16 +92,29 @@ public class GameMapper {
                 return -1;
             }
 
-            SubmissionDto sub1 = submissions1.get(submissions1.size() - 1);
-            SubmissionDto sub2 = submissions2.get(submissions2.size() - 1);
+            SubmissionDto bestSub1 = submissions1.get(0);
+            SubmissionDto bestSub2 = submissions2.get(0);
+
+            // Get the best solution by each player (highest score, then earliest submission)
+            for (SubmissionDto sub : submissions1) {
+                if (sub.getNumCorrect() > bestSub1.getNumCorrect()) {
+                    bestSub1 = sub;
+                }
+            }
+
+            for (SubmissionDto sub : submissions2) {
+                if (sub.getNumCorrect() > bestSub2.getNumCorrect()) {
+                    bestSub2 = sub;
+                }
+            }
 
             // If both have the same numCorrect, whoever submits earlier is first
-            if (sub1.getNumCorrect().equals(sub2.getNumCorrect())) {
-                return sub1.getStartTime().compareTo(sub2.getStartTime());
+            if (bestSub1.getNumCorrect().equals(bestSub2.getNumCorrect())) {
+                return bestSub1.getStartTime().compareTo(bestSub2.getStartTime());
             }
 
             // Whoever has higher numCorrect is first
-            return sub2.getNumCorrect() - sub1.getNumCorrect();
+            return bestSub2.getNumCorrect() - bestSub1.getNumCorrect();
         });
     }
 }

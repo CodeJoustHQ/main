@@ -20,13 +20,13 @@ public class SocketService {
 
     // Send updates about new users to the client through sockets
     public void sendSocketUpdate(RoomDto roomDto) {
-        String socketPath = String.format(WebSocketConfig.SOCKET_PATH, roomDto.getRoomId());
+        String socketPath = String.format(WebSocketConfig.SOCKET_LOBBY, roomDto.getRoomId());
         template.convertAndSend(socketPath, roomDto);
     }
 
     // Send updates about new game status to the client through sockets
     public void sendSocketUpdate(GameDto gameDto) {
-        String socketPath = String.format(WebSocketConfig.SOCKET_PATH, gameDto.getRoom().getRoomId());
+        String socketPath = String.format(WebSocketConfig.SOCKET_GAME, gameDto.getRoom().getRoomId());
         template.convertAndSend(socketPath, gameDto);
     }
     

@@ -28,7 +28,7 @@ import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
 import { TextLink } from '../components/core/Link';
 import { TextButton } from '../components/core/Button';
-import { routes, send, subscribe } from '../api/Socket';
+import { disconnect, routes, send, subscribe } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
 
 type LocationState = {
@@ -123,7 +123,7 @@ function GamePage() {
 
     // Subscribe to the main Game channel to receive Game updates.
     if (!userSocketSubscribed) {
-      subscribe(routes(roomIdParam).subscribe_user, subscribeUserCallback)
+      subscribe(routes(roomIdParam).subscribe_game, subscribeUserCallback)
         .then(() => {
           setUserSocketSubscribed(true);
         }).catch((err) => {
@@ -202,7 +202,9 @@ function GamePage() {
 
   const exitGame = () => {
     if (window.confirm('Exit the game? You will not be able to rejoin.')) {
-      history.replace('/');
+      disconnect()
+        .then(() => history.replace('/'))
+        .catch((err) => setError(err.message));
     }
   };
 
@@ -212,7 +214,7 @@ function GamePage() {
         player={player}
         isCurrentPlayer={player.user.userId === currentUser?.userId}
         place={index + 1}
-        color="blue" // TODO: merge with Chris's color PR
+        color={player.color}
       />
     ));
   };

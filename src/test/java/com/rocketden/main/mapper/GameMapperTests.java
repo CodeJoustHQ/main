@@ -22,9 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -70,20 +68,6 @@ public class GameMapperTests {
         assertNotNull(game.getPlayers().get(USER_ID));
         assertEquals(user, game.getPlayers().get(USER_ID).getUser());
         assertEquals(false, game.getAllSolved());
-    }
-
-    @Test
-    public void playerFromUser() {
-        User user = new User();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
-
-        Player player = GameMapper.playerFromUser(user);
-
-        assertEquals(user, player.getUser());
-        assertNull(player.getPlayerCode());
-        assertFalse(player.getSolved());
-        assertEquals(0, player.getSubmissions().size());
     }
 
     @Test
@@ -140,6 +124,7 @@ public class GameMapperTests {
         assertEquals(playerCode.getCode(), playerDto.getCode());
         assertEquals(playerCode.getLanguage(), playerDto.getLanguage());
         assertEquals(1, playerDto.getSubmissions().size());
+        assertEquals(player.getColor(), playerDto.getColor());
 
         SubmissionDto submissionDto = playerDto.getSubmissions().get(0);
         assertEquals(submission.getPlayerCode().getCode(), submissionDto.getCode());
@@ -171,6 +156,7 @@ public class GameMapperTests {
     public void sortLeaderboardSuccess() {
         List<PlayerDto> players = new ArrayList<>();
 
+        // Note: order of addSubmissionHelper matters (time of submission)
         PlayerDto player1 = new PlayerDto();
         addSubmissionHelper(player1, 0);
 
@@ -181,8 +167,11 @@ public class GameMapperTests {
         PlayerDto player3 = new PlayerDto();
         addSubmissionHelper(player3, 3);
 
+        addSubmissionHelper(player2, 3);
+
         PlayerDto player4 = new PlayerDto();
         addSubmissionHelper(player4, 5);
+        addSubmissionHelper(player4, 1);
 
         PlayerDto player5 = new PlayerDto();
 

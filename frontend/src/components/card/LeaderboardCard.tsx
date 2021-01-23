@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import { LowMarginText, SmallText } from '../core/Text';
+import { Color } from '../../api/Color';
 
 type PlayerIconProps = {
-  color: string,
+  hexColor: string,
 };
 
 const Content = styled.div`
@@ -19,7 +20,7 @@ const Content = styled.div`
 `;
 
 const PlayerIcon = styled.div<PlayerIconProps>`
-  background-color: ${({ color }) => color};
+  background-color: ${({ hexColor }) => hexColor};
   border-radius: 50%;
   margin: 0 auto;
   
@@ -50,7 +51,7 @@ type LeaderboardCardProps = {
   player: Player,
   isCurrentPlayer: boolean,
   place: number,
-  color: string,
+  color: Color,
 };
 
 function LeaderboardCard(props: LeaderboardCardProps) {
@@ -92,7 +93,7 @@ function LeaderboardCard(props: LeaderboardCardProps) {
       onMouseEnter={() => setShowHover(true)}
       onMouseLeave={() => setShowHover(false)}
     >
-      <PlayerIcon color={color} />
+      <PlayerIcon hexColor={color.hexColor} />
       <LowMarginText>{`${place}. ${getDisplayNickname()}`}</LowMarginText>
 
       {showHover ? (

@@ -17,6 +17,7 @@ import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.Submission;
+import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 import com.rocketden.main.model.problem.ProblemDifficulty;
@@ -58,6 +59,9 @@ public class GameManagementServiceTests {
     private ProblemService problemService;
 
     @Mock
+    private LiveGameService liveGameService;
+
+    @Mock
     private SimpMessagingTemplate template;
 
     @Spy
@@ -75,6 +79,7 @@ public class GameManagementServiceTests {
     private static final String CODE = "print('hi')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
     private static final Integer NUM_PROBLEMS = 10;
+    private static final PlayerCode PLAYER_CODE = new PlayerCode(CODE, LANGUAGE);
     private static final long DURATION = 600;
 
     // Helper method to add a dummy submission to a Player object
@@ -378,6 +383,71 @@ public class GameManagementServiceTests {
         missingRequest.setInitiator(UserMapper.toDto(user));
 
         ApiException exception = assertThrows(ApiException.class, () -> gameService.submitSolution(ROOM_ID, missingRequest));
+        assertEquals(GameError.EMPTY_FIELD, exception.getError());
+    }
+
+    @Test
+    public void updateCodeSuccess() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setDifficulty(ProblemDifficulty.RANDOM);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        gameService.createAddGameFromRoom(room);
+        Game game = gameService.getGameFromRoomId(ROOM_ID);
+        gameService.updateCode(ROOM_ID, USER_ID, PLAYER_CODE);
+
+        Player player = game.getPlayers().get(USER_ID);
+
+        // Confirm that the live game service method is called correctly.
+        verify(liveGameService).updateCode(eq(player), eq(PLAYER_CODE));
+    }
+
+    @Test
+    public void updateCodeInvalidRoomId() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setDifficulty(ProblemDifficulty.RANDOM);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        gameService.createAddGameFromRoom(room);
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.updateCode("999999", USER_ID, PLAYER_CODE));
+        assertEquals(GameError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void updateCodeInvalidUserId() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setDifficulty(ProblemDifficulty.RANDOM);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        gameService.createAddGameFromRoom(room);
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.updateCode(ROOM_ID, "999999", PLAYER_CODE));
+        assertEquals(GameError.USER_NOT_IN_GAME, exception.getError());
+    }
+
+    @Test
+    public void updateCodeEmptyPlayerCode() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setDifficulty(ProblemDifficulty.RANDOM);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        gameService.createAddGameFromRoom(room);
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.updateCode(ROOM_ID, USER_ID, null));
         assertEquals(GameError.EMPTY_FIELD, exception.getError());
     }
 }

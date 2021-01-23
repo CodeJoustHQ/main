@@ -4,6 +4,7 @@ import { GameTimer } from './GameTimer';
 import { Room } from './Room';
 import { User } from './User';
 import { Problem } from './Problem';
+import { Color } from './Color';
 
 export type Player = {
   user: User,
@@ -11,6 +12,7 @@ export type Player = {
   language: string,
   submissions: SubmissionResult[],
   solved: boolean,
+  color: Color,
 };
 
 export type Game = {
