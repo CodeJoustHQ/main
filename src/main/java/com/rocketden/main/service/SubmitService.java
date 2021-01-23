@@ -7,6 +7,8 @@ import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.game.TesterRequest;
 import com.rocketden.main.dto.game.TesterResponse;
+import com.rocketden.main.exception.GameError;
+import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.Game;
 
 import com.rocketden.main.game_object.Player;
@@ -19,6 +21,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -30,6 +33,10 @@ public class SubmitService {
     private final SocketService socketService;
 
     private final Gson gson = new Gson();
+
+    // Pulls value from application.properties
+    @Value("tester.debugMode")
+    private boolean debugMode;
 
     @Autowired
     protected SubmitService(SocketService socketService) {
@@ -83,22 +90,34 @@ public class SubmitService {
     }
 
     // Sends a POST request to the tester service to judge the user submission
-    private Submission callTesterService(TesterRequest request) throws Exception {
-        String postUrl = "https://rocketden-tester.heroku.com/api/v1/runner";
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpPost post = new HttpPost(postUrl);
+    private Submission callTesterService(TesterRequest request) {
+        try {
+            String postUrl = "https://rocketden-tester.heroku.com/api/v1/runner";
+            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpPost post = new HttpPost(postUrl);
 
-        StringEntity stringEntity = new StringEntity(gson.toJson(request));
-        post.setEntity(stringEntity);
-        post.setHeader("Content-type", "application/json");
+            StringEntity stringEntity = new StringEntity(gson.toJson(request));
+            post.setEntity(stringEntity);
+            post.setHeader("Content-type", "application/json");
 
-        HttpResponse response = httpClient.execute(post);
-        String jsonResponse = EntityUtils.toString(response.getEntity());
+            HttpResponse response = httpClient.execute(post);
+            String jsonResponse = EntityUtils.toString(response.getEntity());
 
-        TesterResponse testerResponse = gson.fromJson(jsonResponse, TesterResponse.class);
+            TesterResponse testerResponse = gson.fromJson(jsonResponse, TesterResponse.class);
 
-        // TODO: logic to convert TesterRespone into Submission object
+            // TODO: logic to convert TesterResponse into Submission object
+            Submission submission = new Submission();
+            submission.setNumTestCases(request.getProblem().getTestCases().size());
+            submission.setPlayerCode(new PlayerCode(request.getCode(), request.getLanguage()));
 
-        return getDummySubmission(request);
+            return submission;
+        } catch (Exception e) {
+            // If in debug mode (tester is unavailable), return a dummy submission
+            if (debugMode) {
+                return getDummySubmission(request);
+            }
+
+            throw new ApiException(GameError.TESTER_ERROR);
+        }
     }
 }

@@ -13,7 +13,8 @@ public enum GameError implements ApiError {
     USER_NOT_IN_GAME(HttpStatus.BAD_REQUEST, "The requested action could not be completed because the user is not in the game."),
     INVALID_PERMISSIONS(HttpStatus.FORBIDDEN, "You do not have permission to perform this action."),
     EMPTY_FIELD(HttpStatus.BAD_REQUEST, "Please ensure a value is provided for each required field."),
-    NOT_FOUND(HttpStatus.NOT_FOUND, "A game could not be found with the given id.");
+    NOT_FOUND(HttpStatus.NOT_FOUND, "A game could not be found with the given id."),
+    TESTER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "An internal error occurred connecting to the tester service.");
 
     private final HttpStatus status;
     private final ApiErrorResponse response;
