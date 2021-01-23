@@ -11,10 +11,10 @@ import { PrimaryButton } from '../components/core/Button';
 import { Room } from '../api/Room';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
-import { routes, subscribe } from '../api/Socket';
+import { disconnect, routes, subscribe } from '../api/Socket';
 
 const Content = styled.div`
-  width: 75%;
+  padding: 0 20%;
 `;
 
 type LocationState = {
@@ -41,11 +41,17 @@ function GameResultsPage() {
 
       const subscribeCallback = (result: Message) => {
         const updatedGame: Game = JSON.parse(result.body);
+
+        // Disconnect users from socket and then redirect them to the lobby page
         if (updatedGame.playAgain) {
-          history.replace(`/game/lobby?room=${updatedGame.room.roomId}`, {
-            user: location.state.currentPlayer.user,
-            roomId: updatedGame.room.roomId,
-          });
+          disconnect()
+            .then(() => {
+              history.replace(`/game/lobby?room=${updatedGame.room.roomId}`, {
+                user: location.state.currentPlayer.user,
+                roomId: updatedGame.room.roomId,
+              });
+            })
+            .catch((err) => setError(err.message));
         }
       };
 

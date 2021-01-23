@@ -22,7 +22,6 @@ import Difficulty from '../api/Difficulty';
 import {
   Game, getGame, Player, SubmissionResult, submitSolution,
 } from '../api/Game';
-import { Room } from '../api/Room';
 import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
@@ -79,9 +78,14 @@ function GamePage() {
   };
 
   useEffect(() => {
+    console.log('HEREEEE USEFEECT');
+    console.log(players);
+    console.log(currentUser);
     players.forEach((player) => {
       if (player.user.userId === currentUser?.userId) {
         setCurrentPlayer(player);
+        console.log('SETTING PLAYER');
+        console.log(player);
       }
     });
   }, [players, currentUser]);
@@ -98,22 +102,25 @@ function GamePage() {
     }
   }, [currentUser]);
 
+  const subscribeUserCallback = useCallback((result: Message) => {
+    const updatedGame: Game = JSON.parse(result.body);
+    setStateFromGame(updatedGame);
+
+    // Check if end game.
+    // TODO: after deconstructing game, move this to useEffect on timeUp
+    if (updatedGame.gameTimer.timeUp) {
+      console.log('HEEREEEEEEE');
+      console.log(updatedGame);
+      console.log(currentPlayer);
+      history.replace('/game/results', {
+        game: updatedGame,
+        currentPlayer,
+      });
+    }
+  }, [history, currentPlayer]);
+
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
-    const subscribeUserCallback = (result: Message) => {
-      const updatedGame: Game = JSON.parse(result.body);
-      setStateFromGame(updatedGame);
-
-      // Check if end game.
-      // TODO: after deconstructing game, move this to useEffect on timeUp
-      if (updatedGame.gameTimer.timeUp) {
-        history.replace('/game/results', {
-          game: updatedGame,
-          currentPlayer,
-        });
-      }
-    };
-
     // Subscribe to the main Game channel to receive Game updates.
     if (!userSocketSubscribed) {
       subscribe(routes(roomIdParam).subscribe_game, subscribeUserCallback)
@@ -133,7 +140,8 @@ function GamePage() {
           setError(err.message);
         });
     }
-  }, [history, displayNotification, userSocketSubscribed, notificationSocketSubscribed]);
+  }, [displayNotification, userSocketSubscribed,
+    notificationSocketSubscribed, subscribeUserCallback]);
 
   // Called every time location changes
   useEffect(() => {

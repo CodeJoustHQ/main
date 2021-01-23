@@ -3,7 +3,9 @@ import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
 import PlayerIcon from './PlayerIcon';
-import { FlexContainer, FlexLeft, FlexRight } from '../core/Container';
+import {
+  CenteredContainer, FlexHorizontalContainer, FlexLeft, FlexRight,
+} from '../core/Container';
 import { Color } from '../../api/Color';
 
 const Content = styled.div`
@@ -42,17 +44,23 @@ function PlayerResultsCard(props: PlayerResultsCardProps) {
 
   return (
     <Content>
-      <FlexContainer>
+      <FlexHorizontalContainer>
         <FlexLeft>
-          <PlayerIcon hexColor={color.hexColor} />
-          <LowMarginText>{`${place}. ${getDisplayNickname()}`}</LowMarginText>
+          <CenteredContainer>
+            <PlayerIcon hexColor={color.hexColor} />
+            <br />
+            <LowMarginText>{`${place}. ${getDisplayNickname()}`}</LowMarginText>
+          </CenteredContainer>
         </FlexLeft>
 
         <FlexRight>
-          <Text>{getScoreDisplay()}</Text>
-          <Text>{getSubmissionCount()}</Text>
+          <CenteredContainer>
+            <Text>{getScoreDisplay()}</Text>
+            <br />
+            <Text>{getSubmissionCount()}</Text>
+          </CenteredContainer>
         </FlexRight>
-      </FlexContainer>
+      </FlexHorizontalContainer>
     </Content>
   );
 }
