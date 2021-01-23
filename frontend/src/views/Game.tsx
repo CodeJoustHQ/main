@@ -26,7 +26,9 @@ import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
 import { TextButton } from '../components/core/Button';
-import { disconnect, routes, send, subscribe } from '../api/Socket';
+import {
+  disconnect, routes, send, subscribe,
+} from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
 
 type LocationState = {
@@ -48,8 +50,8 @@ function GamePage() {
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
+  const [game, setGame] = useState<Game | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
-  const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
   const [currentLanguage, setCurrentLanguage] = useState('java');
@@ -71,24 +73,12 @@ function GamePage() {
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
-  const setStateFromGame = (game: Game) => {
-    setPlayers(game.players);
-    setGameTimer(game.gameTimer);
-    setProblems(game.problems);
+  const setStateFromGame = (newGame: Game) => {
+    setGame(newGame);
+    setPlayers(newGame.players);
+    setGameTimer(newGame.gameTimer);
+    setProblems(newGame.problems);
   };
-
-  useEffect(() => {
-    console.log('HEREEEE USEFEECT');
-    console.log(players);
-    console.log(currentUser);
-    players.forEach((player) => {
-      if (player.user.userId === currentUser?.userId) {
-        setCurrentPlayer(player);
-        console.log('SETTING PLAYER');
-        console.log(player);
-      }
-    });
-  }, [players, currentUser]);
 
   /**
    * Display the notification as a callback from the notification
@@ -102,25 +92,23 @@ function GamePage() {
     }
   }, [currentUser]);
 
-  const subscribeUserCallback = useCallback((result: Message) => {
-    const updatedGame: Game = JSON.parse(result.body);
-    setStateFromGame(updatedGame);
-
-    // Check if end game.
-    // TODO: after deconstructing game, move this to useEffect on timeUp
-    if (updatedGame.gameTimer.timeUp) {
-      console.log('HEEREEEEEEE');
-      console.log(updatedGame);
-      console.log(currentPlayer);
+  // Check if game is over or not (TODO: include check for all solved)
+  useEffect(() => {
+    if (gameTimer?.timeUp) {
       history.replace('/game/results', {
-        game: updatedGame,
-        currentPlayer,
+        game,
+        currentUser,
       });
     }
-  }, [history, currentPlayer]);
+  }, [gameTimer, game]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
+    const subscribeUserCallback = (result: Message) => {
+      const updatedGame: Game = JSON.parse(result.body);
+      setStateFromGame(updatedGame);
+    };
+
     // Subscribe to the main Game channel to receive Game updates.
     if (!userSocketSubscribed) {
       subscribe(routes(roomIdParam).subscribe_game, subscribeUserCallback)
@@ -140,8 +128,7 @@ function GamePage() {
           setError(err.message);
         });
     }
-  }, [displayNotification, userSocketSubscribed,
-    notificationSocketSubscribed, subscribeUserCallback]);
+  }, [displayNotification, userSocketSubscribed, notificationSocketSubscribed]);
 
   // Called every time location changes
   useEffect(() => {

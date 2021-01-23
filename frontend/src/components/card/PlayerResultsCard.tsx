@@ -13,6 +13,7 @@ const Content = styled.div`
   margin: 10px;
   border-radius: 5px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
+  background-color: ${({ theme }) => theme.colors.white};
 `;
 
 type PlayerResultsCardProps = {

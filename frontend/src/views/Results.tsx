@@ -12,6 +12,7 @@ import { Room } from '../api/Room';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import { disconnect, routes, subscribe } from '../api/Socket';
+import { User } from '../api/User';
 
 const Content = styled.div`
   padding: 0 20%;
@@ -19,7 +20,7 @@ const Content = styled.div`
 
 type LocationState = {
   game: Game,
-  currentPlayer: Player,
+  currentUser: User,
 };
 
 function GameResultsPage() {
@@ -30,14 +31,14 @@ function GameResultsPage() {
   const [loading, setLoading] = useState(false);
 
   const [players, setPlayers] = useState<Player[]>();
-  const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [room, setRoom] = useState<Room | null>(null);
 
   useEffect(() => {
-    if (checkLocationState(location, 'game', 'currentPlayer')) {
+    if (checkLocationState(location, 'game', 'currentUser')) {
       setPlayers(location.state.game.players);
       setRoom(location.state.game.room);
-      setCurrentPlayer(location.state.currentPlayer);
+      setCurrentUser(location.state.currentUser);
 
       const subscribeCallback = (result: Message) => {
         const updatedGame: Game = JSON.parse(result.body);
@@ -47,7 +48,7 @@ function GameResultsPage() {
           disconnect()
             .then(() => {
               history.replace(`/game/lobby?room=${updatedGame.room.roomId}`, {
-                user: location.state.currentPlayer.user,
+                user: location.state.currentUser,
                 roomId: updatedGame.room.roomId,
               });
             })
@@ -68,7 +69,7 @@ function GameResultsPage() {
     setError('');
     setLoading(true);
 
-    playAgain(room!.roomId, { initiator: currentPlayer!.user })
+    playAgain(room!.roomId, { initiator: currentUser! })
       .catch((err) => {
         setLoading(false);
         setError(err.message);
@@ -84,12 +85,12 @@ function GameResultsPage() {
         <PlayerResultsCard
           player={player}
           place={index + 1}
-          isCurrentPlayer={currentPlayer?.user.userId === player.user.userId}
+          isCurrentPlayer={currentUser?.userId === player.user.userId}
           color={player.color}
         />
       ))}
 
-      {currentPlayer?.user.userId === room?.host.userId
+      {currentUser?.userId === room?.host.userId
         ? <PrimaryButton onClick={playAgainAction}>Play Again?</PrimaryButton>
         : <Text>Waiting for the host to choose whether to play again</Text>}
     </Content>

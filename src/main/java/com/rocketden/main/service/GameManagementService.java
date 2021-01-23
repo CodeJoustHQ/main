@@ -117,6 +117,7 @@ public class GameManagementService {
 
         // Change room to be no longer active
         room.setActive(false);
+        repository.save(room);
 
         // Notify users to play again
         game.setPlayAgain(true);

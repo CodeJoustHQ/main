@@ -75,7 +75,7 @@ export const submitSolution = (roomId: string, params: SubmitSolutionParams):
   });
 
 export const playAgain = (roomId: string, params: PlayAgainParams):
-  Promise<SubmissionResult> => axios.post<SubmissionResult>(routes.submitSolution(roomId), params)
+  Promise<Room> => axios.post<Room>(routes.playAgain(roomId), params)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
