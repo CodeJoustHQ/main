@@ -272,7 +272,7 @@ function LobbyPage() {
 
     connect(roomId, userId).then(() => {
       // Body encrypt through JSON.
-      subscribe(routes(roomId).subscribe_user, subscribeCallback).then((subscriptionParam) => {
+      subscribe(routes(roomId).subscribe_lobby, subscribeCallback).then((subscriptionParam) => {
         setSubscription(subscriptionParam);
         setSocketConnected(true);
       }).catch((err) => {
@@ -318,7 +318,7 @@ function LobbyPage() {
   useEffect(() => {
     if (active) {
       subscription?.unsubscribe();
-      history.push('/game', {
+      history.replace('/game', {
         roomId: currentRoomId,
         currentUser,
         difficulty,

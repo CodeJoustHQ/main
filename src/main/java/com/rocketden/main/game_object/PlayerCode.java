@@ -10,11 +10,12 @@ import lombok.Setter;
 public class PlayerCode {
 
     private String code;
-    private String language;
+
+    private CodeLanguage language;
 
     public PlayerCode() {}
 
-    public PlayerCode(String code, String language) {
+    public PlayerCode(String code, CodeLanguage language) {
         this.code = code;
         this.language = language;
     }

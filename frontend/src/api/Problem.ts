@@ -15,11 +15,6 @@ export type Problem = {
   testCases: TestCase[],
 };
 
-export type SubmissionResult = {
-  status: string,
-  output: string,
-};
-
 export type ProblemSettings = {
   difficulty: Difficulty,
 };

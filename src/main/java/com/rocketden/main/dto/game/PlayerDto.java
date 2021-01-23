@@ -1,8 +1,10 @@
 package com.rocketden.main.dto.game;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.rocketden.main.dto.user.UserDto;
+import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.util.Color;
 
 import lombok.EqualsAndHashCode;
@@ -15,8 +17,8 @@ import lombok.Setter;
 public class PlayerDto {
     private UserDto user;
     private String code;
-    private String language;
-    private List<SubmissionDto> submissions;
+    private CodeLanguage language;
+    private List<SubmissionDto> submissions = new ArrayList<>();
     private Boolean solved;
     private Color color;
 }

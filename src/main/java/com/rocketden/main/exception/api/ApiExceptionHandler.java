@@ -1,6 +1,5 @@
 package com.rocketden.main.exception.api;
 
-import com.rocketden.main.exception.ProblemError;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +27,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         // Check for a ProblemError.BAD_DIFFICULTY triggered in the Difficulty.fromString method
         if (ex.getCause() != null && ex.getCause().getCause() instanceof ApiException) {
-            ApiError apiError = ProblemError.BAD_DIFFICULTY;
+            ApiError apiError = ((ApiException) ex.getCause().getCause()).getError();
             return new ResponseEntity<>(apiError.getResponse(), apiError.getStatus());
         }
 

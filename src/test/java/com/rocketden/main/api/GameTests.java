@@ -16,9 +16,11 @@ import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.user.UserMapper;
+import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
+import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.game_object.NotificationType;
 import com.rocketden.main.model.User;
@@ -58,7 +60,7 @@ public class GameTests {
 
     @Mock
     private RoomRepository repository;
-    
+
     @Mock
     private ProblemRepository problemRepository;
 
@@ -85,7 +87,7 @@ public class GameTests {
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "098765";
     private static final String CODE = "print('hello')";
-    private static final String LANGUAGE = "python";
+    private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
 
     // Predefine notification content.
     private static final String CONTENT = "[1, 2, 3]";
@@ -112,6 +114,7 @@ public class GameTests {
 
     /**
      * Helper method that sends a POST request to create a new problem
+     *
      * @return the created problem
      * @throws Exception if anything wrong occurs
      */
@@ -281,7 +284,7 @@ public class GameTests {
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        SubmissionDto submissionDto = UtilityTestMethods.toObject(jsonResponse, SubmissionDto.class);
+        SubmissionDto submissionDto = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, SubmissionDto.class);
 
         assertNotNull(submissionDto);
         assertEquals(CODE, submissionDto.getCode());
@@ -313,7 +316,7 @@ public class GameTests {
 
         RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
         startGameHelper(roomDto, host);
-
+        
         /**
          * TODO: If time is replaced with LocalDateTime.now(), 400 error,
          * as it cannot convert the time field into a JSON string. We could 
@@ -338,5 +341,30 @@ public class GameTests {
 
         assertNotNull(notificationDtoResult);
         assertEquals(notificationDto, notificationDtoResult);
+    }
+
+    @Test
+    public void submitSolutionBadLanguage() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
+        startGameHelper(roomDto, host);
+
+        String request = "{\"initiator\": {\"nickname\": \"hi\"}, \"code\": \"print('hi')\", \"language\": \"x\"}";
+
+        ApiError ERROR = GameError.BAD_LANGUAGE;
+
+        MvcResult result = this.mockMvc.perform(post(String.format(POST_SUBMISSION, roomDto.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(request))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
     }
 }
