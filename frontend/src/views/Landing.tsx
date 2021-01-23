@@ -3,6 +3,8 @@ import { PrimaryButtonLink, TextLink } from '../components/core/Link';
 import { LandingHeaderText } from '../components/core/Text';
 
 function LandingPage() {
+  console.log(Date.now());
+  console.log(new Date());
   return (
     <div>
       <LandingHeaderText>

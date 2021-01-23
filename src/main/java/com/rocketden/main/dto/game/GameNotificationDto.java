@@ -26,4 +26,13 @@ public class GameNotificationDto {
 
     private NotificationType notificationType;
     private String content;
+
+    public GameNotificationDto() {}
+    
+    public GameNotificationDto(GameNotificationRequest request) {
+        this.initiator = request.getInitiator();
+        this.time = LocalDateTime.now();
+        this.notificationType = request.getNotificationType();
+        this.content = request.getContent();
+    }
 }
