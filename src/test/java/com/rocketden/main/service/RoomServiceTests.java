@@ -369,11 +369,11 @@ public class RoomServiceTests {
 
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(host));
-        request.setNumProblems(-1);
+        request.setDifficulty(ProblemDifficulty.EASY);
+        request.setDuration(-1L);
 
-        ApiException exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomSettings(ROOM_ID, request));
-        assertEquals(ProblemError.INVALID_NUMBER_REQUEST, exception.getError());
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.updateRoomSettings(ROOM_ID, request));
+        assertEquals(TimerError.INVALID_DURATION, exception.getError());
     }
 
     @Test

@@ -167,7 +167,7 @@ public class GameManagementService {
         Game game = getGameFromRoomId(roomId);
 
         // The user must be present in the game.
-        if (!game.getPlayers().containsKey(userId)) {
+        if (userId != null && !game.getPlayers().containsKey(userId)) {
             throw new ApiException(GameError.USER_NOT_IN_GAME);
         }
         
