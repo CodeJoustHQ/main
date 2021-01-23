@@ -4,6 +4,7 @@ import com.rocketden.main.dao.ProblemRepository;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameNotificationDto;
+import com.rocketden.main.dto.game.GameNotificationRequest;
 import com.rocketden.main.dto.game.PlayerDto;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.game.SubmissionDto;
@@ -48,6 +49,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDateTime;
 
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
 @AutoConfigureMockMvc
@@ -317,24 +320,26 @@ public class GameTests {
         RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
         startGameHelper(roomDto, host);
 
-        // Note: If time equals LocalDateTime.now(), there is a 400 error
-        GameNotificationDto notificationDto = new GameNotificationDto();
-        notificationDto.setInitiator(host);
-        notificationDto.setTime(null);
-        notificationDto.setContent(CONTENT);
-        notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
+        GameNotificationRequest request = new GameNotificationRequest();
+        request.setInitiator(host);
+        request.setContent(CONTENT);
+        request.setNotificationType(NotificationType.TEST_CORRECT);
 
         MvcResult result = this.mockMvc.perform(post(String.format(POST_NOTIFICATION, roomDto.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(notificationDto)))
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        GameNotificationDto notificationDtoResult = UtilityTestMethods.toObject(jsonResponse, GameNotificationDto.class);
+        GameNotificationDto notificationDtoResult = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, GameNotificationDto.class);
 
         assertNotNull(notificationDtoResult);
-        assertEquals(notificationDto, notificationDtoResult);
+        assertEquals(request.getInitiator(), notificationDtoResult.getInitiator());
+        assertEquals(request.getNotificationType(), notificationDtoResult.getNotificationType());
+        assertEquals(request.getContent(), notificationDtoResult.getContent());
+        assertTrue(LocalDateTime.now().isAfter(notificationDtoResult.getTime())
+            || LocalDateTime.now().minusSeconds((long) 1).isBefore(notificationDtoResult.getTime()));
     }
 
     @Test

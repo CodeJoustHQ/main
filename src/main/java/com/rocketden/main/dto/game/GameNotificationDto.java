@@ -19,7 +19,6 @@ import lombok.Setter;
 public class GameNotificationDto {
     private UserDto initiator;
 
-    @EqualsAndHashCode.Exclude
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime time;
