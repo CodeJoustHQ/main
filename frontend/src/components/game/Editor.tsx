@@ -1,52 +1,13 @@
 import React, { useState } from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import styled from 'styled-components';
-
-export type LanguageType = {
-  [key: string]: {
-    name: string,
-    defaultCode: string,
-  }
-};
+import { ProblemIO } from '../../api/Problem';
+import { languages } from './Languages';
 
 export type EditorProps = {
   onLanguageChange: (input: string) => void,
-};
-
-export const languages: LanguageType = {
-  java: {
-    name: 'Java',
-    defaultCode:
-      'public class Solution {\n'
-      + '    public static void main(String[] args) {\n'
-      + '        \n'
-      + '    }\n'
-      + '}\n',
-  },
-  python: {
-    name: 'Python',
-    defaultCode:
-      'def solution():\n'
-      + '    \n',
-  },
-  javascript: {
-    name: 'JavaScript',
-    defaultCode:
-      'function solution() {\n'
-      + '    \n'
-      + '}\n',
-  },
-  csharp: {
-    name: 'C#',
-    defaultCode:
-      'using System;\n\n'
-      + 'public class Solution\n{\n'
-      + '    public static void Main()\n'
-      + '    {\n'
-      + '        \n'
-      + '    }\n'
-      + '}\n',
-  },
+  onCodeUpdate: (input: string) => void,
+  problem: (input: ProblemIO) => void,
 };
 
 const Content = styled.div`
@@ -58,7 +19,7 @@ function ResizableMonacoEditor(props: EditorProps) {
   const [currentLanguage, setCurrentLanguage] = useState('java');
   const [codeEditor, setCodeEditor] = useState<any>(null);
 
-  const { onLanguageChange } = props;
+  const { onLanguageChange, onCodeUpdate } = props;
 
   const handleEditorDidMount = (editor: any) => {
     setCodeEditor(editor);
@@ -67,6 +28,11 @@ function ResizableMonacoEditor(props: EditorProps) {
     });
     window.addEventListener('secondaryPanelSizeChange', () => {
       editor.layout();
+    });
+    // Callback to save written code
+    editor.onDidChangeModelContent(() => {
+      const code = editor.getValue();
+      onCodeUpdate(code);
     });
   };
 

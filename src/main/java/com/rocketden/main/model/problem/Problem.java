@@ -1,13 +1,6 @@
 package com.rocketden.main.model.problem;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -42,6 +35,15 @@ public class Problem {
 
     @Enumerated(EnumType.STRING)
     private ProblemDifficulty difficulty;
+
+    // These fields used for default code generation
+    private String codeLanguage;
+    private String methodName;
+    @ElementCollection
+    private List<ProblemIOType> parameterTypes;
+    @ElementCollection
+    private List<String> parameterNames;
+    private ProblemIOType outputType;
 
     public void addTestCase(ProblemTestCase testCase) {
         testCases.add(testCase);
