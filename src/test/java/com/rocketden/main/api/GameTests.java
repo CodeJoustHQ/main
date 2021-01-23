@@ -316,14 +316,8 @@ public class GameTests {
 
         RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
         startGameHelper(roomDto, host);
-        
-        /**
-         * TODO: If time is replaced with LocalDateTime.now(), 400 error,
-         * as it cannot convert the time field into a JSON string. We could 
-         * simply not have this field be set, and then create it on the
-         * backend, but if this could be figured out that'd be great.
-         */
 
+        // Note: If time equals LocalDateTime.now(), there is a 400 error
         GameNotificationDto notificationDto = new GameNotificationDto();
         notificationDto.setInitiator(host);
         notificationDto.setTime(null);

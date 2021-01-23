@@ -19,6 +19,7 @@ public class GameTimer {
     // Varying durations of Game Timer, in seconds.
     public static final long DURATION_1 = 60;
     public static final long DURATION_10 = 600;
+    public static final long DURATION_15 = 900;
     public static final long DURATION_30 = 1800;
     public static final Map<Long, String> TIME_LEFT_DURATION_CONTENT = Map.of(
         DURATION_30, "are thirty minutes",
