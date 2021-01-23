@@ -100,7 +100,7 @@ function GamePage() {
         currentUser,
       });
     }
-  }, [gameTimer, game]);
+  }, [gameTimer, game, history, currentUser]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
