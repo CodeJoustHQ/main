@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Timer;
 
 /**
@@ -23,6 +24,15 @@ public class GameTimer {
     public static final long DURATION_15 = 900;
     public static final long DURATION_30 = 1800;
     public static final long DURATION_60 = 3600;
+    public static final Map<Long, String> TIME_LEFT_DURATION_CONTENT = Map.of(
+        DURATION_60, "are sixty minutes",
+        DURATION_30, "are thirty minutes",
+        DURATION_15, "are fifteen minutes",
+        DURATION_5, "are five minutes",
+        DURATION_1, "is one minute",
+        DURATION_30_SEC, "are thirty seconds",
+        DURATION_10_SEC, "are ten seconds"
+    );
 
     // The time that the game began.
     private LocalDateTime startTime = LocalDateTime.now();

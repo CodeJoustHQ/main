@@ -3,7 +3,6 @@ package com.rocketden.main.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
@@ -23,7 +22,6 @@ import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.util.EndGameTimerTask;
-import com.rocketden.main.util.NotificationTimerTask;
 import com.rocketden.main.util.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,56 +103,7 @@ public class GameManagementService {
         setStartGameTimer(game, time);
 
         currentGameMap.put(room.getRoomId(), game);
-
-        // Create notifications for different "time left" milestones.
-        if (GameTimer.DURATION_60 < time) {
-            Timer timer = new Timer();
-            NotificationTimerTask notificationTimerTask =
-                new NotificationTimerTask(socketService, room.getRoomId(), "are sixty minutes");
-            timer.schedule(notificationTimerTask, (time - GameTimer.DURATION_60) * 1000);
-        }
-        
-        if (GameTimer.DURATION_30 < time) {
-            Timer timer = new Timer();
-            NotificationTimerTask notificationTimerTask =
-                new NotificationTimerTask(socketService, room.getRoomId(), "are thirty minutes");
-            timer.schedule(notificationTimerTask, (time - GameTimer.DURATION_30) * 1000);
-        }
-        
-        if (GameTimer.DURATION_15 < time) {
-            Timer timer = new Timer();
-            NotificationTimerTask notificationTimerTask =
-                new NotificationTimerTask(socketService, room.getRoomId(), "are fifteen minutes");
-            timer.schedule(notificationTimerTask, (time - GameTimer.DURATION_15) * 1000);
-        }
-        
-        if (GameTimer.DURATION_5 < time) {
-            Timer timer = new Timer();
-            NotificationTimerTask notificationTimerTask =
-                new NotificationTimerTask(socketService, room.getRoomId(), "are five minutes");
-            timer.schedule(notificationTimerTask, (time - GameTimer.DURATION_5) * 1000);
-        }
-        
-        if (GameTimer.DURATION_1 < time) {
-            Timer timer = new Timer();
-            NotificationTimerTask notificationTimerTask =
-                new NotificationTimerTask(socketService, room.getRoomId(), "is one minute");
-            timer.schedule(notificationTimerTask, (time - GameTimer.DURATION_1) * 1000);
-        }
-
-        if (GameTimer.DURATION_30_SEC < time) {
-            Timer timer = new Timer();
-            NotificationTimerTask notificationTimerTask =
-                new NotificationTimerTask(socketService, room.getRoomId(), "are thirty seconds");
-            timer.schedule(notificationTimerTask, (time - GameTimer.DURATION_30_SEC) * 1000);
-        }
-
-        if (GameTimer.DURATION_10_SEC < time) {
-            Timer timer = new Timer();
-            NotificationTimerTask notificationTimerTask =
-                new NotificationTimerTask(socketService, room.getRoomId(), "are ten seconds");
-            timer.schedule(notificationTimerTask, (time - GameTimer.DURATION_10_SEC) * 1000);
-        }
+        notificationService.scheduleTimeLeftNotifications(room.getRoomId(), time);
     }
 
     // Set and start the Game Timer.
