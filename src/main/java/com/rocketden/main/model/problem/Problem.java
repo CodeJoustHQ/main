@@ -44,6 +44,15 @@ public class Problem {
     @Enumerated(EnumType.STRING)
     private ProblemDifficulty difficulty;
 
+    // These fields used for default code generation
+    private String codeLanguage;
+    private String methodName;
+    @ElementCollection
+    private List<ProblemIOType> parameterTypes;
+    @ElementCollection
+    private List<String> parameterNames;
+    private ProblemIOType outputType;
+
     public void addTestCase(ProblemTestCase testCase) {
         testCases.add(testCase);
         testCase.setProblem(this);

@@ -11,13 +11,32 @@ export type TestCase = {
 export type Problem = {
   problemId: string,
   name: string,
-  description: string;
+  description: string,
   testCases: TestCase[],
+  codeLanguage: string,
+  methodName: string,
+  parameterTypes: ProblemIO[],
+  parameterNames: string,
+  outputType: ProblemIO
 };
 
 export type ProblemSettings = {
   difficulty: Difficulty,
 };
+
+export enum ProblemIO {
+  STRING,
+  STRING_LIST,
+  STRING_DICTIONARY,
+  INTEGER,
+  INTEGER_LIST,
+  INTEGER_DICTIONARY,
+  BOOLEAN,
+  BOOLEAN_LIST,
+  BOOLEAN_DICTIONARY,
+  VOID,
+}
+// Eventually add custom types such as nodes
 
 const basePath = '/api/v1/problems';
 const routes = {

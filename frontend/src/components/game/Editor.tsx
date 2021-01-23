@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import styled from 'styled-components';
+import { ProblemIO } from '../../api/Problem';
+import { languages } from './Languages';
 
-type LanguageType = {
+export type LanguageType = {
   [key: string]: {
     name: string,
     defaultCode: string,
@@ -11,6 +13,8 @@ type LanguageType = {
 
 export type EditorProps = {
   onLanguageChange: (input: string) => void,
+  onCodeUpdate: (input: string) => void,
+  problem: (input: ProblemIO) => void,
 };
 
 export const languages: LanguageType = {
@@ -58,7 +62,7 @@ function ResizableMonacoEditor(props: EditorProps) {
   const [currentLanguage, setCurrentLanguage] = useState('java');
   const [codeEditor, setCodeEditor] = useState<any>(null);
 
-  const { onLanguageChange } = props;
+  const { onLanguageChange, onCodeUpdate, problem } = props;
 
   const handleEditorDidMount = (editor: any) => {
     setCodeEditor(editor);
@@ -67,6 +71,11 @@ function ResizableMonacoEditor(props: EditorProps) {
     });
     window.addEventListener('secondaryPanelSizeChange', () => {
       editor.layout();
+    });
+    // Callback to save written code
+    editor.onDidChangeModelContent(() => {
+      const code = editor.getValue();
+      onCodeUpdate(code);
     });
   };
 

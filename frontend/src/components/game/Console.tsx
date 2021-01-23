@@ -23,7 +23,6 @@ type ConsoleProps = {
   onRun: (input: string) => void,
 };
 
-// This function refreshes the width of Monaco editor upon change in container size
 function Console(props: ConsoleProps) {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');

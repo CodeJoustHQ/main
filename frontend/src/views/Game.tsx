@@ -41,6 +41,7 @@ function GamePage() {
   const history = useHistory();
   const location = useLocation<LocationState>();
   const language = useRef('Java');
+  const code = useRef('');
 
   const [submission, setSubmission] = useState<SubmissionResult | null>(null);
 
@@ -187,8 +188,8 @@ function GamePage() {
 
   // Callback when user runs code against custom test case
   const runSolution = (input: string) => {
-    if (language.current === languages.javascript.name) {
-      window.Function(input);
+    if (language.current === 'javascript') {
+      console.log(eval(code.current)); // eslint-disable-line no-eval
     }
   };
 
@@ -239,6 +240,10 @@ function GamePage() {
       subscribePrimary(roomId);
     }
   }, [userSocketSubscribed, roomId, subscribePrimary]);
+
+  const onCodeUpdate = (input: string) => {
+    code.current = input;
+  };
 
   // If the page is loading, return a centered Loading object.
   if (fullPageLoading) {
@@ -295,7 +300,11 @@ function GamePage() {
             secondaryMinSize={1}
           >
             <Panel>
-              <Editor onLanguageChange={setCurrentLanguage} />
+              <Editor
+                onLanguageChange={onLanguageChange}
+                onCodeUpdate={onCodeUpdate}
+                problem={problem}
+              />
             </Panel>
 
             <Panel>
