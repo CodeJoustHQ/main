@@ -17,6 +17,7 @@ import java.util.Timer;
 public class GameTimer {
 
     // Varying durations of Game Timer, in seconds.
+    public static final long DURATION_10_SECONDS = 10;
     public static final long DURATION_1 = 60;
     public static final long DURATION_10 = 600;
     public static final long DURATION_15 = 900;
@@ -24,7 +25,8 @@ public class GameTimer {
     public static final Map<Long, String> TIME_LEFT_DURATION_CONTENT = Map.of(
         DURATION_30, "are thirty minutes",
         DURATION_10, "are ten minutes",
-        DURATION_1, "is one minute"
+        DURATION_1, "is one minute",
+        DURATION_10_SECONDS, "are ten seconds"
     );
 
     // The time that the game began.
