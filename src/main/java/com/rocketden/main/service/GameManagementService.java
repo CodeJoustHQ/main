@@ -136,24 +136,25 @@ public class GameManagementService {
     public GameNotificationDto sendNotification(String roomId, GameNotificationDto notificationDto) {
         Game game = getGameFromRoomId(roomId);
 
-        /**
-         * The notification type must be present.
-         * 
-         * If the initiator exists on the notificationDto (not required),
-         * then ensure that they exist in the room.
-         * 
-         * If initiator does not exist, ensure that the notification type 
-         * does not require an initiator.
-         */
+        //  The notification type must be present.
         if (notificationDto.getNotificationType() == null) {
             throw new ApiException(GameError.EMPTY_FIELD);
-        } else if (notificationDto.getInitiator() != null
+        }
+        
+        // If initiator exists, they must be in the game.
+        if (notificationDto.getInitiator() != null
             && !game.getPlayers().containsKey(notificationDto.getInitiator().getUserId())) {
             throw new ApiException(GameError.USER_NOT_IN_GAME);
-        } else if (notificationDto.getInitiator() == null
+        }
+        
+        // If initiator doesn't exist, the notification must not require one.
+        if (notificationDto.getInitiator() == null
             && Utility.initiatorNotifications.contains(notificationDto.getNotificationType())) {
             throw new ApiException(GameError.NOTIFICATION_REQUIRES_INITIATOR);
-        } else if (notificationDto.getContent() == null
+        }
+        
+        // If content doesn't exist, the notification must not require any.
+        if (notificationDto.getContent() == null
             && Utility.contentNotifications.contains(notificationDto.getNotificationType())) {
             throw new ApiException(GameError.NOTIFICATION_REQUIRES_CONTENT);       
         }
@@ -165,9 +166,13 @@ public class GameManagementService {
     public void updateCode(String roomId, String userId, PlayerCode playerCode) {
         Game game = getGameFromRoomId(roomId);
 
+        // The user must be present in the game.
         if (!game.getPlayers().containsKey(userId)) {
             throw new ApiException(GameError.USER_NOT_IN_GAME);
-        } else if (playerCode == null) {
+        }
+        
+        // The player must have code to update (even if empty string).
+        if (playerCode == null) {
             throw new ApiException(GameError.EMPTY_FIELD);
         }
 

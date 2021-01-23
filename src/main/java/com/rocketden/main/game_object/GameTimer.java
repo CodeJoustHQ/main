@@ -17,21 +17,13 @@ import java.util.Timer;
 public class GameTimer {
 
     // Varying durations of Game Timer, in seconds.
-    public static final long DURATION_10_SEC = 10;
-    public static final long DURATION_30_SEC = 30;
     public static final long DURATION_1 = 60;
-    public static final long DURATION_5 = 300;
-    public static final long DURATION_15 = 900;
+    public static final long DURATION_10 = 600;
     public static final long DURATION_30 = 1800;
-    public static final long DURATION_60 = 3600;
     public static final Map<Long, String> TIME_LEFT_DURATION_CONTENT = Map.of(
-        DURATION_60, "are sixty minutes",
         DURATION_30, "are thirty minutes",
-        DURATION_15, "are fifteen minutes",
-        DURATION_5, "are five minutes",
-        DURATION_1, "is one minute",
-        DURATION_30_SEC, "are thirty seconds",
-        DURATION_10_SEC, "are ten seconds"
+        DURATION_10, "are ten minutes",
+        DURATION_1, "is one minute"
     );
 
     // The time that the game began.
