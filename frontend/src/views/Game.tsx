@@ -145,7 +145,7 @@ function GamePage() {
     if (timeUp || allSolved) {
       history.push('/game/results');
     }
-  }, [timeUp, allSolved]);
+  }, [timeUp, allSolved, history]);
 
   // Called every time location changes
   useEffect(() => {
@@ -290,7 +290,7 @@ function GamePage() {
 
             <Panel>
               <Console
-                testCases={problems[0]?.testCases!}
+                testCases={problems[0]?.testCases}
                 submission={submission}
                 onRun={runSolution}
               />
