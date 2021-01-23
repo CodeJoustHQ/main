@@ -26,9 +26,10 @@ import { Room } from '../api/Room';
 import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
-import { TextLink } from '../components/core/Link';
 import { TextButton } from '../components/core/Button';
-import { disconnect, routes, send, subscribe } from '../api/Socket';
+import {
+  disconnect, routes, send, subscribe,
+} from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
 
 type LocationState = {
@@ -56,6 +57,8 @@ function GamePage() {
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
   const [currentLanguage, setCurrentLanguage] = useState('java');
+  const [timeUp, setTimeUp] = useState(false);
+  const [allSolved, setAllSolved] = useState(false);
 
   // When variable null, show nothing; otherwise, show notification.
   const [gameNotification, setGameNotification] = useState<GameNotification | null>(null);
@@ -85,6 +88,8 @@ function GamePage() {
     setPlayers(game.players);
     setGameTimer(game.gameTimer);
     setProblems(game.problems);
+    setAllSolved(game.allSolved);
+    setTimeUp(game.gameTimer.timeUp);
   };
 
   useEffect(() => {
@@ -112,13 +117,6 @@ function GamePage() {
     const subscribeUserCallback = (result: Message) => {
       const updatedGame: Game = JSON.parse(result.body);
       setStateFromGame(updatedGame);
-
-      // Check if end game.
-      if (updatedGame.gameTimer.timeUp || updatedGame.allSolved) {
-        history.push('/game/results', {
-          game: updatedGame,
-        });
-      }
     };
 
     // Subscribe to the main Game channel to receive Game updates.
@@ -141,6 +139,13 @@ function GamePage() {
         });
     }
   }, [history, displayNotification, userSocketSubscribed, notificationSocketSubscribed]);
+
+  useEffect(() => {
+    // Check if end game.
+    if (timeUp || allSolved) {
+      history.push('/game/results');
+    }
+  }, [timeUp, allSolved]);
 
   // Called every time location changes
   useEffect(() => {
@@ -201,6 +206,7 @@ function GamePage() {
   };
 
   const exitGame = () => {
+    // eslint-disable-next-line no-alert
     if (window.confirm('Exit the game? You will not be able to rejoin.')) {
       disconnect()
         .then(() => history.replace('/'))
@@ -208,16 +214,14 @@ function GamePage() {
     }
   };
 
-  const displayPlayerLeaderboard = () => {
-    return players.map((player, index) => (
-      <LeaderboardCard
-        player={player}
-        isCurrentPlayer={player.user.userId === currentUser?.userId}
-        place={index + 1}
-        color={player.color}
-      />
-    ));
-  };
+  const displayPlayerLeaderboard = () => players.map((player, index) => (
+    <LeaderboardCard
+      player={player}
+      isCurrentPlayer={player.user.userId === currentUser?.userId}
+      place={index + 1}
+      color={player.color}
+    />
+  ));
 
   // Subscribe user to primary socket and to notifications.
   useEffect(() => {

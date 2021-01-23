@@ -135,7 +135,7 @@ public class GameManagementService {
          * Check allSolved if the user solved the problem and not everybody
          * has solved the problem yet.
          */
-        if (submissionDto != null && submissionDto.getNumCorrect().equals(submissionDto.getNumTestCases())&& Boolean.FALSE.equals(game.getAllSolved())) {
+        if (submissionDto != null && submissionDto.getNumCorrect().equals(submissionDto.getNumTestCases()) && Boolean.FALSE.equals(game.getAllSolved())) {
             conditionalSolvedSocketMessage(game);
         }
         
