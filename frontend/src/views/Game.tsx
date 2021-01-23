@@ -138,7 +138,7 @@ function GamePage() {
           setError(err.message);
         });
     }
-  }, [history, displayNotification, userSocketSubscribed, notificationSocketSubscribed]);
+  }, [displayNotification, userSocketSubscribed, notificationSocketSubscribed]);
 
   useEffect(() => {
     // Check if end game.
