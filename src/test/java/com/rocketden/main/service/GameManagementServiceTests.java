@@ -326,7 +326,6 @@ public class GameManagementServiceTests {
 
         ApiException exception = assertThrows(ApiException.class, () -> gameService.playAgain(ROOM_ID, request));
         assertEquals(GameError.INVALID_PERMISSIONS, exception.getError());
-
     }
 
     @Test

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
 import { useBeforeunload } from 'react-beforeunload';
-import { Message } from 'stompjs';
+import { Message, Subscription } from 'stompjs';
 import Editor from '../components/game/Editor';
 import { Problem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
@@ -60,10 +60,10 @@ function GamePage() {
   const [gameNotification, setGameNotification] = useState<GameNotification | null>(null);
 
   // Variable to hold whether the user is subscribed to the primary Game socket.
-  const [userSocketSubscribed, setUserSocketSubscribed] = useState(false);
+  const [gameSocket, setGameSocket] = useState<Subscription | null>(null);
 
   // Variable to hold whether the user is subscribed to the notification socket.
-  const [notificationSocketSubscribed, setNotificationSocketSubscribed] = useState(false);
+  const [notificationSocket, setNotificationSocket] = useState<Subscription | null>(null);
 
   /**
    * Display beforeUnload message to inform the user that they may lose
@@ -95,6 +95,9 @@ function GamePage() {
   // Check if game is over or not (TODO: include check for all solved)
   useEffect(() => {
     if (gameTimer?.timeUp) {
+      gameSocket?.unsubscribe();
+      notificationSocket?.unsubscribe();
+
       history.replace('/game/results', {
         game,
         currentUser,
@@ -110,25 +113,25 @@ function GamePage() {
     };
 
     // Subscribe to the main Game channel to receive Game updates.
-    if (!userSocketSubscribed) {
+    if (!gameSocket) {
       subscribe(routes(roomIdParam).subscribe_game, subscribeUserCallback)
-        .then(() => {
-          setUserSocketSubscribed(true);
+        .then((subscription) => {
+          setGameSocket(subscription);
         }).catch((err) => {
           setError(err.message);
         });
     }
 
     // Subscribe for Game Notifications.
-    if (!notificationSocketSubscribed) {
+    if (!notificationSocket) {
       subscribe(routes(roomIdParam).subscribe_notification, displayNotification)
-        .then(() => {
-          setNotificationSocketSubscribed(true);
+        .then((subscription) => {
+          setNotificationSocket(subscription);
         }).catch((err) => {
           setError(err.message);
         });
     }
-  }, [displayNotification, userSocketSubscribed, notificationSocketSubscribed]);
+  }, [displayNotification, gameSocket, notificationSocket]);
 
   // Called every time location changes
   useEffect(() => {
@@ -209,10 +212,10 @@ function GamePage() {
 
   // Subscribe user to primary socket and to notifications.
   useEffect(() => {
-    if (!userSocketSubscribed && roomId) {
+    if (!gameSocket && roomId) {
       subscribePrimary(roomId);
     }
-  }, [userSocketSubscribed, roomId, subscribePrimary]);
+  }, [gameSocket, roomId, subscribePrimary]);
 
   // If the page is loading, return a centered Loading object.
   if (fullPageLoading) {
