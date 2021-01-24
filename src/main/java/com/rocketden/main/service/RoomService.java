@@ -236,7 +236,7 @@ public class RoomService {
             }
             room.setDuration(request.getDuration());
         }
-
+        
         // Set number of problems if not null
         if (request.getNumProblems() != null) {
             if (request.getNumProblems() <= 0 || request.getNumProblems() > MAX_NUM_PROBLEMS) {

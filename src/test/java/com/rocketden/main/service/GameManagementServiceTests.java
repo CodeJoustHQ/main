@@ -3,6 +3,7 @@ package com.rocketden.main.service;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
+import com.rocketden.main.dto.game.GameNotificationDto;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
@@ -15,6 +16,7 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.Game;
+import com.rocketden.main.game_object.NotificationType;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.Submission;
 import com.rocketden.main.game_object.PlayerCode;
@@ -59,6 +61,9 @@ public class GameManagementServiceTests {
     private ProblemService problemService;
 
     @Mock
+    private NotificationService notificationService;
+
+    @Mock
     private LiveGameService liveGameService;
 
     @Mock
@@ -81,6 +86,10 @@ public class GameManagementServiceTests {
     private static final Integer NUM_PROBLEMS = 10;
     private static final PlayerCode PLAYER_CODE = new PlayerCode(CODE, LANGUAGE);
     private static final long DURATION = 600;
+    
+    // Predefine notification content.
+    private static final String CONTENT = "[1, 2, 3]";
+    private static final String TIME_CONTENT = "are thirty minutes";
 
     // Helper method to add a dummy submission to a Player object
     private void addSubmissionHelper(Player player, int numCorrect) {
@@ -385,6 +394,205 @@ public class GameManagementServiceTests {
         ApiException exception = assertThrows(ApiException.class, () -> gameService.submitSolution(ROOM_ID, missingRequest));
         assertEquals(GameError.EMPTY_FIELD, exception.getError());
     }
+
+    @Test
+    public void sendNotificationSuccess() throws Exception {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        User host = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(host);
+        room.setHost(host);
+
+        gameService.createAddGameFromRoom(room);
+
+        GameNotificationDto notificationDto = new GameNotificationDto();
+        notificationDto.setInitiator(UserMapper.toDto(user));
+        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setContent(CONTENT);
+        notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
+
+        gameService.sendNotification(ROOM_ID, notificationDto);
+
+        verify(notificationService).sendNotification(eq(ROOM_ID), eq(notificationDto));
+    }
+
+    @Test
+    public void sendNotificationNoInitiatorSuccess() throws Exception {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        User host = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(host);
+        room.setHost(host);
+
+        gameService.createAddGameFromRoom(room);
+
+        // Change notification type to time left, as no initiator is required.
+        GameNotificationDto notificationDto = new GameNotificationDto();
+        notificationDto.setInitiator(null);
+        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setContent(TIME_CONTENT);
+        notificationDto.setNotificationType(NotificationType.TIME_LEFT);
+
+        gameService.sendNotification(ROOM_ID, notificationDto);
+
+        verify(notificationService).sendNotification(eq(ROOM_ID), eq(notificationDto));
+    }
+
+    @Test
+    public void sendNotificationInitiatorRequired() throws Exception {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        User host = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(host);
+        room.setHost(host);
+
+        gameService.createAddGameFromRoom(room);
+
+        // Change notification type to time left, as no initiator is required.
+        GameNotificationDto notificationDto = new GameNotificationDto();
+        notificationDto.setInitiator(null);
+        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setContent(TIME_CONTENT);
+        notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
+
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification(ROOM_ID, notificationDto));
+        assertEquals(GameError.NOTIFICATION_REQUIRES_INITIATOR, exception.getError());
+    }
+
+    @Test
+    public void sendNotificationContentRequired() throws Exception {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        User host = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(host);
+        room.setHost(host);
+
+        gameService.createAddGameFromRoom(room);
+
+        // Change notification type to time left, as no initiator is required.
+        GameNotificationDto notificationDto = new GameNotificationDto();
+        notificationDto.setInitiator(UserMapper.toDto(user));
+        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setContent(null);
+        notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
+
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification(ROOM_ID, notificationDto));
+        assertEquals(GameError.NOTIFICATION_REQUIRES_CONTENT, exception.getError());
+    }
+
+    @Test
+    public void sendNotificationNotFound() throws Exception {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        User host = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(host);
+        room.setHost(host);
+
+        gameService.createAddGameFromRoom(room);
+
+        GameNotificationDto notificationDto = new GameNotificationDto();
+        notificationDto.setInitiator(UserMapper.toDto(user));
+        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setContent(CONTENT);
+        notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
+
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification("999999", notificationDto));
+        assertEquals(GameError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void sendNotificationMissingNotificationType() throws Exception {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        User host = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(host);
+        room.setHost(host);
+
+        gameService.createAddGameFromRoom(room);
+
+        GameNotificationDto notificationDto = new GameNotificationDto();
+        notificationDto.setInitiator(UserMapper.toDto(user));
+        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setContent(CONTENT);
+
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification(ROOM_ID, notificationDto));
+        assertEquals(GameError.EMPTY_FIELD, exception.getError());
+    }
+
+    @Test
+    public void sendNotificationUserNotInGame() throws Exception {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        // Do not add user to game, then send invalid notification from them.
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+
+        User host = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(host);
+        room.setHost(host);
+
+        gameService.createAddGameFromRoom(room);
+
+        GameNotificationDto notificationDto = new GameNotificationDto();
+        notificationDto.setInitiator(UserMapper.toDto(user));
+        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setContent(CONTENT);
+        notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
+
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification(ROOM_ID, notificationDto));
+        assertEquals(GameError.USER_NOT_IN_GAME, exception.getError());
+    }
+
+
 
     @Test
     public void updateCodeSuccess() {

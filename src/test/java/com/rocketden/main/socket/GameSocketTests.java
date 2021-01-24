@@ -2,6 +2,7 @@ package com.rocketden.main.socket;
 
 import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dto.game.GameDto;
+import com.rocketden.main.dto.game.GameNotificationDto;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
@@ -10,6 +11,7 @@ import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.user.UserDto;
+import com.rocketden.main.game_object.NotificationType;
 import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.util.SocketTestMethods;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,12 +30,14 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -50,9 +54,11 @@ public class GameSocketTests {
     private TestRestTemplate template;
 
     private static final String CONNECT_ENDPOINT = "ws://localhost:{port}" + BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint";
-    private static final String SUBSCRIBE_ENDPOINT = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-game";
+    private static final String NOTIFICATION_SUBSCRIBE_ENDPOINT = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-notification";
+    private static final String GAME_SUBSCRIBE_ENDPOINT = BaseRestController.BASE_SOCKET_URL + "/%s/subscribe-game";
 
-    private BlockingQueue<GameDto> blockingQueue;
+    private BlockingQueue<GameDto> userBlockingQueue;
+    private BlockingQueue<GameNotificationDto> notificationBlockingQueue;
     private String baseRestEndpoint;
     private RoomDto room;
     private StompSession hostSession;
@@ -62,9 +68,11 @@ public class GameSocketTests {
     private static final String USER_ID = "012345";
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String USER_ID_2 = "098765";
+    private static final String TIME_LEFT = "are ten seconds";
+    private static final long DURATION = 15;
+    private static final long TIME_UNTIL_TEN_LEFT = 5;
     private static final String CODE = "print('hi')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
-    private static final long DURATION = 5;
 
     @BeforeEach
     public void setup() throws Exception {
@@ -114,11 +122,11 @@ public class GameSocketTests {
         room = template.exchange(startEndpoint, HttpMethod.POST, startEntity, RoomDto.class).getBody();
         assertNotNull(room);
 
-        // Set up the socket connection and subscription
-        blockingQueue = new ArrayBlockingQueue<>(2);
+        // Set up the user socket connection and subscription
+        userBlockingQueue = new ArrayBlockingQueue<>(2);
         hostSession = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, USER_ID, this.port);
 
-        hostSession.subscribe(String.format(SUBSCRIBE_ENDPOINT, room.getRoomId()), new StompFrameHandler() {
+        hostSession.subscribe(String.format(GAME_SUBSCRIBE_ENDPOINT, room.getRoomId()), new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
                 return GameDto.class;
@@ -126,14 +134,28 @@ public class GameSocketTests {
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                blockingQueue.add((GameDto) payload);
+                userBlockingQueue.add((GameDto) payload);
+            }
+        });
+
+        // Set up the notification socket subscription
+        notificationBlockingQueue = new ArrayBlockingQueue<>(2);
+        hostSession.subscribe(String.format(NOTIFICATION_SUBSCRIBE_ENDPOINT, room.getRoomId()), new StompFrameHandler() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return GameNotificationDto.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                notificationBlockingQueue.add((GameNotificationDto) payload);
             }
         });
     }
 
     @Test
     public void socketReceivesMessageOnGameOver() throws Exception {
-        GameDto gameDto = blockingQueue.poll(DURATION + 5, SECONDS);
+        GameDto gameDto = userBlockingQueue.poll(DURATION + 5, SECONDS);
 
         assertNotNull(gameDto);
         assertNotNull(gameDto.getGameTimer());
@@ -141,6 +163,20 @@ public class GameSocketTests {
         assertEquals(room, gameDto.getRoom());
         assertEquals(DURATION, gameDto.getGameTimer().getDuration());
         assertTrue(gameDto.getGameTimer().isTimeUp());
+    }
+
+    @Test
+    public void socketReceivesNotificationMessageTenSecondsLeft() throws Exception {
+        GameNotificationDto notificationDto = notificationBlockingQueue.poll(TIME_UNTIL_TEN_LEFT + 5, SECONDS);
+
+        assertNotNull(notificationDto);
+        
+        assertNull(notificationDto.getInitiator());
+        assertEquals(NotificationType.TIME_LEFT,
+            notificationDto.getNotificationType());
+        assertTrue(LocalDateTime.now().isAfter(notificationDto.getTime())
+            || LocalDateTime.now().minusSeconds((long) 1).isBefore(notificationDto.getTime()));
+        assertEquals(TIME_LEFT, notificationDto.getContent());
     }
 
     @Test
@@ -159,7 +195,7 @@ public class GameSocketTests {
         assertEquals(CODE, submissionDto.getCode());
         assertEquals(LANGUAGE, submissionDto.getLanguage());
 
-        GameDto gameDto = blockingQueue.poll(DURATION, SECONDS);
+        GameDto gameDto = userBlockingQueue.poll(DURATION, SECONDS);
 
         assertNotNull(gameDto);
         assertEquals(room.getHost(), gameDto.getPlayers().get(0).getUser());

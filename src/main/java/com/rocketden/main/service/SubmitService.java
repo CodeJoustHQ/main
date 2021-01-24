@@ -24,7 +24,7 @@ public class SubmitService {
     private final SocketService socketService;
 
     @Autowired
-    protected SubmitService(SocketService socketService) {
+    public SubmitService(SocketService socketService) {
         this.socketService = socketService;
     }
 
