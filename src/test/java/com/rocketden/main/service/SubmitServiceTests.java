@@ -70,4 +70,14 @@ public class SubmitServiceTests {
         assertEquals(LANGUAGE, submission.getPlayerCode().getLanguage());
         assertEquals(submission.getNumCorrect(), submission.getNumTestCases());
     }
+
+    @Test
+    public void callTesterServiceSuccess() {
+
+    }
+
+    @Test
+    public void callTesterServiceFailsNoDebug() {
+        
+    }
 }
