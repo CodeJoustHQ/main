@@ -90,7 +90,7 @@ public class SubmitService {
     }
 
     // Sends a POST request to the tester service to judge the user submission
-    private Submission callTesterService(TesterRequest request) {
+    protected Submission callTesterService(TesterRequest request) {
         try {
             String postUrl = "https://rocketden-tester.heroku.com/api/v1/runner";
             HttpClient httpClient = HttpClientBuilder.create().build();
@@ -119,5 +119,10 @@ public class SubmitService {
 
             throw new ApiException(GameError.TESTER_ERROR);
         }
+    }
+
+    // This method should only be called for testing purposes
+    protected void toggleDebugModeForTesting(boolean debugMode) {
+        this.debugMode = debugMode;
     }
 }

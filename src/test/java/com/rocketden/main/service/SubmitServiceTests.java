@@ -5,7 +5,10 @@ import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.PlayerDto;
 import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
+import com.rocketden.main.dto.game.TesterRequest;
 import com.rocketden.main.dto.user.UserMapper;
+import com.rocketden.main.exception.GameError;
+import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Submission;
@@ -22,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -78,6 +82,13 @@ public class SubmitServiceTests {
 
     @Test
     public void callTesterServiceFailsNoDebug() {
-        
+        submitService.toggleDebugModeForTesting(false);
+
+        TesterRequest request = new TesterRequest();
+        request.setCode("temp");
+
+        ApiException exception = assertThrows(ApiException.class, () -> submitService.callTesterService(request));
+
+        assertEquals(GameError.TESTER_ERROR, exception.getError());
     }
 }
