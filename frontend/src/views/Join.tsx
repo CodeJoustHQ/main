@@ -129,7 +129,7 @@ function JoinGamePage() {
               setFocusInput(false);
             }}
             onKeyPress={(event) => {
-              setError('')
+              setError('');
               /**
                * If the key pressed is not a number or the roomId is
                * already at length 6, do not add it to the input.

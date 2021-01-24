@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Timer;
 
 /**
@@ -15,8 +16,18 @@ import java.util.Timer;
 @Setter
 public class GameTimer {
 
-    // 15 minute duration for the GameTimer, in seconds.
+    // Varying durations of Game Timer, in seconds.
+    public static final long DURATION_10_SECONDS = 10;
+    public static final long DURATION_1 = 60;
+    public static final long DURATION_10 = 600;
     public static final long DURATION_15 = 900;
+    public static final long DURATION_30 = 1800;
+    public static final Map<Long, String> TIME_LEFT_DURATION_CONTENT = Map.of(
+        DURATION_30, "are thirty minutes",
+        DURATION_10, "are ten minutes",
+        DURATION_1, "is one minute",
+        DURATION_10_SECONDS, "are ten seconds"
+    );
 
     // The time that the game began.
     private LocalDateTime startTime = LocalDateTime.now();

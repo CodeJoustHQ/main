@@ -42,6 +42,10 @@ const notificationToString = (notification: GameNotification): string => {
       return `${notification.initiator.nickname} is on a coding streak!`;
     }
 
+    case NotificationType.TimeLeft: {
+      return `There ${notification.content} left.`;
+    }
+
     default: {
       return 'There was a mysterious, unknown notification.';
     }
