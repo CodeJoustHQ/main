@@ -18,7 +18,6 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.GameTimer;
-import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.problem.Problem;
@@ -137,8 +136,11 @@ public class GameManagementService {
          * has solved the problem yet.
          */
         if (submissionDto != null && submissionDto.getNumCorrect().equals(submissionDto.getNumTestCases()) && Boolean.FALSE.equals(game.getAllSolved())) {
-            conditionalSolvedSocketMessage(game);
+            submitService.conditionalSolvedSocketMessage(game);
         }
+
+        // Send socket update with latest leaderboard info
+        socketService.sendSocketUpdate(GameMapper.toDto(game));
         
         return submissionDto;
     }
@@ -189,27 +191,4 @@ public class GameManagementService {
 
         liveGameService.updateCode(game.getPlayers().get(userId), playerCode);
     }
-
-    /**
-     * If all players have solved the problem, update the game and send
-     * socket message indicating as such.
-     * (Depending on the game setting, this may or may not end the game).
-     */
-    public void conditionalSolvedSocketMessage(Game game) {
-        // Variable to indicate whether all players have solved the problem.
-        boolean allSolved = true;
-        for (Player player : game.getPlayers().values()) {
-            if (player.getSolved() == null || !player.getSolved()) {
-                allSolved = false;
-                break;
-            }
-        }
-
-        // If the users have all completed the problem, end the game.
-        if (allSolved) {
-            game.setAllSolved(true);
-            socketService.sendSocketUpdate(GameMapper.toDto(game));
-        }
-    }
-
 }
