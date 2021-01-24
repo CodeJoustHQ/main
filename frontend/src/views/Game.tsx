@@ -103,7 +103,7 @@ function GamePage() {
         currentUser,
       });
     }
-  }, [gameTimer, game, history, currentUser]);
+  }, [gameTimer, game, history, currentUser, gameSocket, notificationSocket]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {

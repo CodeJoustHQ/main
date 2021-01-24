@@ -106,6 +106,7 @@ public class GameManagementService {
     public RoomDto playAgain(String roomId, PlayAgainRequest request) {
         Game game = getGameFromRoomId(roomId);
 
+        // TODO add allSolved
         if (game.getGameTimer() == null || !game.getGameTimer().isTimeUp()) {
             throw new ApiException(GameError.GAME_NOT_OVER);
         }
