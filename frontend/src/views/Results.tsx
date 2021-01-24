@@ -91,7 +91,7 @@ function GameResultsPage() {
       ))}
 
       {currentUser?.userId === room?.host.userId
-        ? <PrimaryButton onClick={playAgainAction}>Play Again?</PrimaryButton>
+        ? <PrimaryButton onClick={playAgainAction}>Play Again</PrimaryButton>
         : <Text>Waiting for the host to choose whether to play again</Text>}
     </Content>
   );
