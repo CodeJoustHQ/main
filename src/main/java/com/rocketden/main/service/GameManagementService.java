@@ -99,6 +99,12 @@ public class GameManagementService {
         return roomDto;
     }
 
+    // This method should be called whenever a game ends (time up, all solved, etc.)
+    public void endGame(String roomId) {
+        // TODO: implement and connect after other PRs are merged
+        // will delete the game from the map
+    }
+
     public RoomDto playAgain(String roomId, PlayAgainRequest request) {
         Game game = getGameFromRoomId(roomId);
 

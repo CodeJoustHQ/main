@@ -284,7 +284,9 @@ public class GameManagementServiceTests {
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
         gameService.startGame(ROOM_ID, request);
-        Thread.sleep(1000);
+
+        // Wait 1 second until the game timeUp socket update is sent
+        Mockito.verify(socketService, Mockito.timeout(1500)).sendSocketUpdate(Mockito.any(GameDto.class));
 
         PlayAgainRequest playAgainRequest = new PlayAgainRequest();
         playAgainRequest.setInitiator(UserMapper.toDto(host));
@@ -317,7 +319,8 @@ public class GameManagementServiceTests {
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
         gameService.startGame(ROOM_ID, startRequest);
-        Thread.sleep(1000);
+
+        Mockito.verify(socketService, Mockito.timeout(1500)).sendSocketUpdate(Mockito.any(GameDto.class));
 
         UserDto initiator = new UserDto();
         initiator.setNickname(NICKNAME_2);
