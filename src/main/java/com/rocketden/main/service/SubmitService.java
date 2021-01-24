@@ -42,26 +42,20 @@ public class SubmitService {
         player.getSubmissions().add(submission);
         player.setSolved(true);
 
-        return GameMapper.submissionToDto(submission);
-    }
-
-    /**
-     * If all players have solved the problem, update the game as such.
-     * (Depending on the game setting, this may or may not end the game).
-     */
-    public void conditionalSolvedSocketMessage(Game game) {
         // Variable to indicate whether all players have solved the problem.
         boolean allSolved = true;
-        for (Player player : game.getPlayers().values()) {
-            if (player.getSolved() == null || !player.getSolved()) {
+        for (Player p : game.getPlayers().values()) {
+            if (p.getSolved() == null || !p.getSolved()) {
                 allSolved = false;
                 break;
             }
         }
 
-        // If the users have all completed the problem, end the game.
+        // If the users have all completed the problem, set all solved to true.
         if (allSolved) {
             game.setAllSolved(true);
         }
+
+        return GameMapper.submissionToDto(submission);
     }
 }
