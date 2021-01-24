@@ -5,7 +5,7 @@ export enum NotificationType {
   SubmitIncorrect = 'SUBMIT_INCORRECT',
   TestCorrect = 'TEST_CORRECT',
   CodeStreak = 'CODE_STREAK',
-  OneMinRemaining = 'ONE_MIN_REMAINING',
+  TimeLeft = 'TIME_LEFT',
 }
 
 export type GameNotification = {

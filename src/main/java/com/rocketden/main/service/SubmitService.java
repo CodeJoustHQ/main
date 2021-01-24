@@ -2,7 +2,6 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
-import com.rocketden.main.dto.game.PlayerDto;
 import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.game_object.Game;
@@ -25,7 +24,7 @@ public class SubmitService {
     private final SocketService socketService;
 
     @Autowired
-    protected SubmitService(SocketService socketService) {
+    public SubmitService(SocketService socketService) {
         this.socketService = socketService;
     }
 

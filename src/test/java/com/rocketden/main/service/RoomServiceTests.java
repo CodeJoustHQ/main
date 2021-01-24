@@ -369,7 +369,6 @@ public class RoomServiceTests {
 
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(host));
-
         request.setDifficulty(ProblemDifficulty.EASY);
         request.setDuration(-1L);
 
