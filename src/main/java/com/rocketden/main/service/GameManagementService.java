@@ -131,14 +131,6 @@ public class GameManagementService {
 
         SubmissionDto submissionDto = submitService.submitSolution(game, request);
 
-        /**
-         * Check allSolved if the user solved the problem and not everybody
-         * has solved the problem yet.
-         */
-        if (submissionDto.getNumCorrect().equals(submissionDto.getNumTestCases()) && Boolean.FALSE.equals(game.getAllSolved())) {
-            submitService.conditionalSolvedSocketMessage(game);
-        }
-
         // Send socket update with latest leaderboard info
         socketService.sendSocketUpdate(GameMapper.toDto(game));
         

@@ -41,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.time.LocalDateTime;
@@ -262,23 +261,15 @@ public class GameManagementServiceTests {
         Mockito.doAnswer(new Answer<SubmissionDto>() {
             public SubmissionDto answer(InvocationOnMock invocation) {
                 addSubmissionHelper(game.getPlayers().get(USER_ID), 10);
+                game.setAllSolved(true);
                 return submissionDto;
             }})
           .when(submitService).submitSolution(game, request);
-
-        // Mock the update of the allSolved variable in the game.
-        Mockito.doAnswer(new Answer<Void>() {
-            public Void answer(InvocationOnMock invocation) {
-                game.setAllSolved(true);
-                return null;
-            }})
-          .when(submitService).conditionalSolvedSocketMessage(game);
 
         gameService.submitSolution(ROOM_ID, request);
 
         // Test that both submit service methods were called.
         verify(submitService).submitSolution(eq(game), eq(request));
-        verify(submitService).conditionalSolvedSocketMessage(eq(game));
 
         // Test that game has been updated in socket message.
         verify(socketService).sendSocketUpdate(GameMapper.toDto(game));
@@ -324,22 +315,14 @@ public class GameManagementServiceTests {
         Mockito.doAnswer(new Answer<SubmissionDto>() {
             public SubmissionDto answer(InvocationOnMock invocation) {
                 addSubmissionHelper(game.getPlayers().get(USER_ID_3), 10);
+                game.setAllSolved(true);
                 return submissionDto;
             }})
           .when(submitService).submitSolution(game, request);
 
-        // Mock the update of the allSolved variable in the game.
-        Mockito.doAnswer(new Answer<Void>() {
-            public Void answer(InvocationOnMock invocation) {
-                game.setAllSolved(true);
-                return null;
-            }})
-            .when(submitService).conditionalSolvedSocketMessage(game);
-
         gameService.submitSolution(ROOM_ID, request);
 
         verify(submitService).submitSolution(eq(game), eq(request));
-        verify(submitService).conditionalSolvedSocketMessage(eq(game));
 
         // Confirm that socket sent updated GameDto object.
         verify(socketService).sendSocketUpdate(eq(GameMapper.toDto(game)));
@@ -383,51 +366,6 @@ public class GameManagementServiceTests {
         gameService.submitSolution(ROOM_ID, request);
 
         verify(submitService).submitSolution(eq(game), eq(request));
-        verify(submitService).conditionalSolvedSocketMessage(eq(game));
-
-        // Confirm the same update is sent even when all players solved problem.
-        verify(socketService).sendSocketUpdate(eq(GameMapper.toDto(game)));
-        assertFalse(game.getAllSolved());
-    }
-
-    @Test
-    public void submitSolutionNotAllSolvedNoConditionalInvoked() {
-        Room room = new Room();
-        room.setRoomId(ROOM_ID);
-
-        User user = new User();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
-        room.addUser(user);
-
-        User user2 = new User();
-        user2.setNickname(NICKNAME_2);
-        user2.setUserId(USER_ID_2);
-        room.addUser(user2);
-
-        gameService.createAddGameFromRoom(room);
-        Game game = gameService.getGameFromRoomId(ROOM_ID);
-
-        SubmissionRequest request = new SubmissionRequest();
-        request.setLanguage(LANGUAGE);
-        request.setCode(CODE);
-        request.setInitiator(UserMapper.toDto(user));
-
-        // Mock the return of incorrect submissionDto, mock update of player.
-        SubmissionDto submissionDto = new SubmissionDto();
-        submissionDto.setNumCorrect(NUM_PROBLEMS - 1);
-        submissionDto.setNumTestCases(NUM_PROBLEMS);
-        Mockito.doAnswer(new Answer<SubmissionDto>() {
-            public SubmissionDto answer(InvocationOnMock invocation) {
-                addSubmissionHelper(game.getPlayers().get(USER_ID), 10);
-                return submissionDto;
-            }})
-          .when(submitService).submitSolution(game, request);
-
-        gameService.submitSolution(ROOM_ID, request);
-
-        verify(submitService).submitSolution(eq(game), eq(request));
-        verify(submitService, never()).conditionalSolvedSocketMessage(eq(game));
 
         // Confirm the same update is sent even when all players solved problem.
         verify(socketService).sendSocketUpdate(eq(GameMapper.toDto(game)));

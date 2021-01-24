@@ -14,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,11 +24,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SubmitServiceTests {
 
     private static final String NICKNAME = "rocket";
-    private static final String ROOM_ID = "012345";
     private static final String USER_ID = "098765";
+    private static final String NICKNAME_2 = "rocketrocket";
+    private static final String USER_ID_2 = "345678";
+    private static final String ROOM_ID = "012345";
     private static final String CODE = "print('hi')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
-    private static final Integer NUM_PROBLEMS = 10;
 
     @Spy
     @InjectMocks
@@ -61,46 +61,39 @@ public class SubmitServiceTests {
         assertEquals(CODE, submission.getPlayerCode().getCode());
         assertEquals(LANGUAGE, submission.getPlayerCode().getLanguage());
         assertEquals(submission.getNumCorrect(), submission.getNumTestCases());
-    }
-
-    @Test
-    public void conditionalSolvedSocketMessageAllSolvedTrueSuccess() {
-        Room room = new Room();
-        room.setRoomId(ROOM_ID);
-        User user = new User();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
-        room.addUser(user);
-
-        Game game = GameMapper.fromRoom(room);
-
-        // Add successful submission.
-        List<Submission> submissions = game.getPlayers().get(USER_ID).getSubmissions();
-        Submission submission = new Submission();
-        submission.setNumCorrect(NUM_PROBLEMS);
-        submission.setNumTestCases(NUM_PROBLEMS);
-        submission.setStartTime(LocalDateTime.now());
-        submissions.add(submission);
-        game.getPlayers().get(USER_ID).setSolved(true);
-
-        submitService.conditionalSolvedSocketMessage(game);
-
         assertTrue(game.getAllSolved());
     }
 
     @Test
-    public void conditionalSolvedSocketMessageAllSolvedFalseSuccess() {
+    public void submitSolutionNotAllSolvedSuccess() {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
         User user = new User();
         user.setNickname(NICKNAME);
         user.setUserId(USER_ID);
         room.addUser(user);
+        User user2 = new User();
+        user2.setNickname(NICKNAME_2);
+        user2.setUserId(USER_ID_2);
+        room.addUser(user2);
 
         Game game = GameMapper.fromRoom(room);
 
-        submitService.conditionalSolvedSocketMessage(game);
+        SubmissionRequest request = new SubmissionRequest();
+        request.setLanguage(LANGUAGE);
+        request.setCode(CODE);
+        request.setInitiator(UserMapper.toDto(user));
 
+        submitService.submitSolution(game, request);
+
+        List<Submission> submissions = game.getPlayers().get(USER_ID).getSubmissions();
+        assertEquals(1, submissions.size());
+
+        Submission submission = submissions.get(0);
+
+        assertEquals(CODE, submission.getPlayerCode().getCode());
+        assertEquals(LANGUAGE, submission.getPlayerCode().getLanguage());
+        assertEquals(submission.getNumCorrect(), submission.getNumTestCases());
         assertFalse(game.getAllSolved());
     }
 }
