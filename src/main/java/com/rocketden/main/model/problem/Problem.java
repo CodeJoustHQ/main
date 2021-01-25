@@ -37,7 +37,6 @@ public class Problem {
     private ProblemDifficulty difficulty;
 
     // These fields used for default code generation
-    private String codeLanguage;
     private String methodName;
     @ElementCollection
     private List<ProblemIOType> parameterTypes;

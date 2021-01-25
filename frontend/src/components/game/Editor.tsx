@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import styled from 'styled-components';
-import { ProblemIO } from '../../api/Problem';
-import { languages } from './Languages';
+import { Problem } from '../../api/Problem';
+import { defaultCodeGeneration, languages } from './Languages';
 
 export type EditorProps = {
   onLanguageChange: (input: string) => void,
   onCodeUpdate: (input: string) => void,
-  problem: (input: ProblemIO) => void,
+  problem: Problem,
 };
 
 const Content = styled.div`
@@ -19,7 +19,7 @@ function ResizableMonacoEditor(props: EditorProps) {
   const [currentLanguage, setCurrentLanguage] = useState('java');
   const [codeEditor, setCodeEditor] = useState<any>(null);
 
-  const { onLanguageChange, onCodeUpdate } = props;
+  const { onLanguageChange, onCodeUpdate, problem } = props;
 
   const handleEditorDidMount = (editor: any) => {
     setCodeEditor(editor);
@@ -36,7 +36,7 @@ function ResizableMonacoEditor(props: EditorProps) {
     });
   };
 
-  const handleLanguageChange = (language: string) => {
+  const handleLanguageChange = (p: Problem, language: string) => {
     // Save the code for this language
     languages[currentLanguage].defaultCode = codeEditor!.getValue();
 
@@ -49,7 +49,7 @@ function ResizableMonacoEditor(props: EditorProps) {
   return (
     <Content>
       <select
-        onChange={(e) => handleLanguageChange(e.target.value)}
+        onChange={(e) => handleLanguageChange(problem, e.target.value)}
         value={currentLanguage}
       >
         {
@@ -62,7 +62,7 @@ function ResizableMonacoEditor(props: EditorProps) {
         height="100%"
         editorDidMount={handleEditorDidMount}
         language={currentLanguage}
-        defaultValue={languages[currentLanguage].defaultCode}
+        defaultValue={defaultCodeGeneration(problem, currentLanguage)}
       />
     </Content>
   );

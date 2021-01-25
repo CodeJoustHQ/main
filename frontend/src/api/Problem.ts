@@ -13,7 +13,6 @@ export type Problem = {
   name: string,
   description: string,
   testCases: TestCase[],
-  codeLanguage: string,
   methodName: string,
   parameterTypes: ProblemIO[],
   parameterNames: string,

@@ -10,44 +10,21 @@ export type LanguageType = {
 export const languages: LanguageType = {
   java: {
     name: 'Java',
-    defaultCode:
-      'public class Solution {\n'
-      + '    public static void main(String[] args) {\n'
-      + '        \n'
-      + '    }\n'
-      + '}\n',
+    defaultCode: '',
   },
   python: {
     name: 'Python',
-    defaultCode:
-      'def solution():\n'
-      + '    \n',
+    defaultCode: '',
   },
   javascript: {
     name: 'JavaScript',
-    defaultCode:
-      'function solution() {\n'
-      + '    \n'
-      + '}\n',
+    defaultCode: '',
   },
   csharp: {
     name: 'C#',
-    defaultCode:
-      'using System;\n\n'
-      + 'public class Solution\n{\n'
-      + '    public static void Main()\n'
-      + '    {\n'
-      + '        \n'
-      + '    }\n'
-      + '}\n',
+    defaultCode: '',
   },
 };
-
-export function languages2(problem: Problem) : string {
-  switch (problem.codeLanguage) {
-    case
-  }
-}
 
 export function javaCsharpFormatter(problem: Problem) : string {
   let defaultCode = 'public ';
@@ -64,7 +41,7 @@ export function javaCsharpFormatter(problem: Problem) : string {
   types(problem.outputType);
   defaultCode += `${problem.methodName}(`;
   if (problem.parameterNames.length === problem.parameterTypes.length) {
-    for (let i = 0; i < problem.parameterTypes.length; i++) {
+    for (let i = 0; i < problem.parameterTypes.length; i += 1) {
       types(problem.parameterTypes[i]);
       defaultCode += `${problem.parameterNames[i]}`;
       if (i !== problem.parameterTypes.length - 1) {
@@ -87,4 +64,26 @@ export function javascriptFormatter(problem: Problem) : string {
   return `function ${problem.methodName}() {\n`
   + '\n'
   + '}\n';
+}
+
+export function defaultCodeGeneration(problem: Problem, language: string) : string {
+  let defaultCode = '';
+  switch (language) {
+    case 'java' || 'csharp': {
+      defaultCode = javaCsharpFormatter(problem);
+      break;
+    }
+    case 'python': {
+      defaultCode = pythonFormatter(problem);
+      break;
+    }
+    case 'javascript': {
+      defaultCode = javascriptFormatter(problem);
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+  return defaultCode;
 }
