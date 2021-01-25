@@ -39,6 +39,9 @@ public class SubmitService {
     @Value("${tester.debugMode}")
     private boolean debugMode;
 
+    @Value("${tester.url}")
+    private String testerUrl;
+
     private final HttpClient httpClient;
 
     @Autowired
@@ -97,8 +100,7 @@ public class SubmitService {
     // Sends a POST request to the tester service to judge the user submission
     protected Submission callTesterService(TesterRequest request) {
         try {
-            String postUrl = "https://rocketden-tester.herokuapp.com/api/v1/runner";
-            HttpPost post = new HttpPost(postUrl);
+            HttpPost post = new HttpPost(testerUrl);
 
             StringEntity stringEntity = new StringEntity(gson.toJson(request));
             post.setEntity(stringEntity);
