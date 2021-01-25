@@ -35,7 +35,7 @@ public class SubmitService {
     private final Gson gson = new Gson();
 
     // Pulls value from application.properties
-    @Value("tester.debugMode")
+    @Value("${tester.debugMode}")
     private boolean debugMode;
 
     @Autowired

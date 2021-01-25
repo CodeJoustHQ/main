@@ -2,8 +2,6 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
-import com.rocketden.main.dto.game.PlayerDto;
-import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.game.TesterRequest;
 import com.rocketden.main.dto.user.UserMapper;
@@ -14,17 +12,20 @@ import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Submission;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 
@@ -76,8 +77,16 @@ public class SubmitServiceTests {
     }
 
     @Test
-    public void callTesterServiceSuccess() {
+    public void callTesterServiceSuccess() throws Exception {
+        HttpClient httpClient = Mockito.mock(HttpClient.class);
+        HttpResponse httpResponse = Mockito.mock(HttpResponse.class);
 
+        Mockito.doReturn(httpResponse).when(httpClient).execute(Mockito.any());
+
+        TesterRequest request = new TesterRequest();
+        Submission response = submitService.callTesterService(request);
+
+        assertNotNull(response);
     }
 
     @Test
