@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
 import { useBeforeunload } from 'react-beforeunload';
-import Editor, { languages } from '../components/game/Editor';
+import Editor from '../components/game/Editor';
 import { Problem, SubmissionResult, getRandomProblem } from '../api/Problem';
 import { Message } from 'stompjs';
 import { errorHandler } from '../api/Error';

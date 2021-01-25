@@ -4,53 +4,10 @@ import styled from 'styled-components';
 import { Problem } from '../../api/Problem';
 import { defaultCodeGeneration, languages } from './Languages';
 
-export type LanguageType = {
-  [key: string]: {
-    name: string,
-    defaultCode: string,
-  }
-};
-
 export type EditorProps = {
   onLanguageChange: (input: string) => void,
   onCodeUpdate: (input: string) => void,
   problem: Problem,
-};
-
-export const languages: LanguageType = {
-  java: {
-    name: 'Java',
-    defaultCode:
-      'public class Solution {\n'
-      + '    public static void main(String[] args) {\n'
-      + '        \n'
-      + '    }\n'
-      + '}\n',
-  },
-  python: {
-    name: 'Python',
-    defaultCode:
-      'def solution():\n'
-      + '    \n',
-  },
-  javascript: {
-    name: 'JavaScript',
-    defaultCode:
-      'function solution() {\n'
-      + '    \n'
-      + '}\n',
-  },
-  csharp: {
-    name: 'C#',
-    defaultCode:
-      'using System;\n\n'
-      + 'public class Solution\n{\n'
-      + '    public static void Main()\n'
-      + '    {\n'
-      + '        \n'
-      + '    }\n'
-      + '}\n',
-  },
 };
 
 const Content = styled.div`

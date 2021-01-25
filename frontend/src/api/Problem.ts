@@ -19,6 +19,11 @@ export type Problem = {
   outputType: ProblemIO
 };
 
+export type SubmissionResult = {
+  status: string,
+  output: string,
+};
+
 export type ProblemSettings = {
   difficulty: Difficulty,
 };
