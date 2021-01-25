@@ -37,7 +37,7 @@ public class SubmitService {
 
     // Pulls value from application.properties
     @Value("${tester.debugMode}")
-    private boolean debugMode;
+    private Boolean debugMode;
 
     @Value("${tester.url}")
     private String testerUrl;
@@ -100,7 +100,7 @@ public class SubmitService {
     // Sends a POST request to the tester service to judge the user submission
     protected Submission callTesterService(TesterRequest request) {
         try {
-            HttpPost post = new HttpPost(testerUrl);
+            HttpPost post = new HttpPost(getTesterUrl());
 
             StringEntity stringEntity = new StringEntity(gson.toJson(request));
             post.setEntity(stringEntity);
@@ -120,12 +120,25 @@ public class SubmitService {
             return submission;
         } catch (Exception e) {
             // If in debug mode (tester is unavailable), return a dummy submission
-            if (debugMode) {
+            if (getDebugMode()) {
                 return getDummySubmission(request);
             }
 
             throw new ApiException(GameError.TESTER_ERROR);
         }
+    }
+
+    // Is null in certain testing environments; if so, return a default value
+    private String getTesterUrl() {
+        if (testerUrl == null) {
+            return "http://localhost:8080";
+        }
+        return testerUrl;
+    }
+
+    // Is null in certain testing environments; if so, return true by default
+    private boolean getDebugMode() {
+        return debugMode == null || debugMode;
     }
 
     // Method that can be mocked to not return an error for SubmitServiceTests

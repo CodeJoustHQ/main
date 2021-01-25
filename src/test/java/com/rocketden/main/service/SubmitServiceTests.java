@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -81,10 +80,9 @@ public class SubmitServiceTests {
         assertEquals(submission.getNumCorrect(), submission.getNumTestCases());
     }
 
+    // This is a very weak test - it simply resorts to ensuring a submission is returned in debug mode
     @Test
     public void callTesterServiceSuccess() {
-        Mockito.doReturn(null).when(submitService).getResponseFromJson(Mockito.anyString());
-
         TesterRequest request = new TesterRequest();
         request.setCode(CODE);
         request.setLanguage(LANGUAGE);
