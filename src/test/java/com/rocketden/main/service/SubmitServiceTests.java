@@ -1,5 +1,6 @@
 package com.rocketden.main.service;
 
+import com.google.gson.Gson;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.SubmissionRequest;
@@ -12,8 +13,12 @@ import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Submission;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
+import com.rocketden.main.model.problem.Problem;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.EntityBuilder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,7 +26,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.test.context.TestPropertySource;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,6 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 
+@EnableConfigurationProperties
+@TestPropertySource(locations= "classpath:application.properties")
 @ExtendWith(MockitoExtension.class)
 public class SubmitServiceTests {
 
@@ -37,6 +50,9 @@ public class SubmitServiceTests {
     private static final String USER_ID = "098765";
     private static final String CODE = "print('hi')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
+//
+//    @Mock
+//    HttpClient httpClient;
 
     @Mock
     private SocketService socketService;
@@ -55,6 +71,10 @@ public class SubmitServiceTests {
         room.addUser(user);
 
         Game game = GameMapper.fromRoom(room);
+
+        List<Problem> problems = new ArrayList<>();
+        problems.add(new Problem());
+        game.setProblems(problems);
 
         SubmissionRequest request = new SubmissionRequest();
         request.setLanguage(LANGUAGE);
@@ -78,12 +98,13 @@ public class SubmitServiceTests {
 
     @Test
     public void callTesterServiceSuccess() throws Exception {
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
-        HttpResponse httpResponse = Mockito.mock(HttpResponse.class);
-
-        Mockito.doReturn(httpResponse).when(httpClient).execute(Mockito.any());
+        Mockito.doReturn(null).when(submitService).getResponseFromJson(Mockito.anyString());
 
         TesterRequest request = new TesterRequest();
+        request.setCode(CODE);
+        request.setLanguage(LANGUAGE);
+        request.setProblem(new Problem());
+
         Submission response = submitService.callTesterService(request);
 
         assertNotNull(response);

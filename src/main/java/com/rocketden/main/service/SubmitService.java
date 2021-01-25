@@ -32,15 +32,19 @@ public class SubmitService {
 
     private final SocketService socketService;
 
-    private final Gson gson = new Gson();
+    private final Gson gson;
 
     // Pulls value from application.properties
     @Value("${tester.debugMode}")
     private boolean debugMode;
 
+    private final HttpClient httpClient;
+
     @Autowired
     protected SubmitService(SocketService socketService) {
         this.socketService = socketService;
+        this.httpClient = HttpClientBuilder.create().build();
+        this.gson = new Gson();
     }
 
     // Helper method to return a perfect score dummy submission
@@ -92,8 +96,7 @@ public class SubmitService {
     // Sends a POST request to the tester service to judge the user submission
     protected Submission callTesterService(TesterRequest request) {
         try {
-            String postUrl = "https://rocketden-tester.heroku.com/api/v1/runner";
-            HttpClient httpClient = HttpClientBuilder.create().build();
+            String postUrl = "https://rocketden-tester.herokuapp.com/api/v1/runner";
             HttpPost post = new HttpPost(postUrl);
 
             StringEntity stringEntity = new StringEntity(gson.toJson(request));
@@ -103,10 +106,11 @@ public class SubmitService {
             HttpResponse response = httpClient.execute(post);
             String jsonResponse = EntityUtils.toString(response.getEntity());
 
-            TesterResponse testerResponse = gson.fromJson(jsonResponse, TesterResponse.class);
+            TesterResponse testerResponse = getResponseFromJson(jsonResponse);
 
             // TODO: logic to convert TesterResponse into Submission object
             Submission submission = new Submission();
+            submission.setNumCorrect(request.getProblem().getTestCases().size());
             submission.setNumTestCases(request.getProblem().getTestCases().size());
             submission.setPlayerCode(new PlayerCode(request.getCode(), request.getLanguage()));
 
@@ -119,6 +123,11 @@ public class SubmitService {
 
             throw new ApiException(GameError.TESTER_ERROR);
         }
+    }
+
+    // Method that can be mocked to not return an error for SubmitServiceTests
+    protected TesterResponse getResponseFromJson(String json) {
+        return gson.fromJson(json, TesterResponse.class);
     }
 
     // This method should only be called for testing purposes
