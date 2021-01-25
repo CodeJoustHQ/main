@@ -7,6 +7,7 @@ import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.game.TesterRequest;
 import com.rocketden.main.dto.game.TesterResponse;
+import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.Game;
@@ -75,7 +76,7 @@ public class SubmitService {
         TesterRequest testerRequest = new TesterRequest();
         testerRequest.setCode(request.getCode());
         testerRequest.setLanguage(request.getLanguage());
-        testerRequest.setProblem(game.getProblems().get(0));
+        testerRequest.setProblem(ProblemMapper.toDto(game.getProblems().get(0)));
 
         Submission submission = callTesterService(testerRequest);
         player.getSubmissions().add(submission);

@@ -1,7 +1,7 @@
 package com.rocketden.main.dto.game;
 
+import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.game_object.CodeLanguage;
-import com.rocketden.main.model.problem.Problem;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,5 +11,6 @@ import lombok.Setter;
 public class TesterRequest {
     private String code;
     private CodeLanguage language;
-    private Problem problem;
+    private ProblemDto problem;
+
 }

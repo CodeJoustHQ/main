@@ -6,6 +6,7 @@ import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.game.TesterRequest;
 import com.rocketden.main.dto.user.UserMapper;
+import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.CodeLanguage;
@@ -21,13 +22,18 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.EntityBuilder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,8 +46,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 
-@EnableConfigurationProperties
-@TestPropertySource(locations= "classpath:application.properties")
+@SpringBootTest
+//@EnableConfigurationProperties
+//@TestPropertySource(locations= "classpath:application.properties")
+//@RunWith(SpringRunner.class)
+@ContextConfiguration(initializers = ConfigFileApplicationContextInitializer.class)
 @ExtendWith(MockitoExtension.class)
 public class SubmitServiceTests {
 
@@ -97,13 +106,13 @@ public class SubmitServiceTests {
     }
 
     @Test
-    public void callTesterServiceSuccess() throws Exception {
+    public void callTesterServiceSuccess() {
         Mockito.doReturn(null).when(submitService).getResponseFromJson(Mockito.anyString());
 
         TesterRequest request = new TesterRequest();
         request.setCode(CODE);
         request.setLanguage(LANGUAGE);
-        request.setProblem(new Problem());
+        request.setProblem(new ProblemDto());
 
         Submission response = submitService.callTesterService(request);
 
