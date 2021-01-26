@@ -2,7 +2,10 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
+import com.rocketden.main.dto.game.GameMapper;
+import com.rocketden.main.dto.game.GameNotificationDto;
 import com.rocketden.main.dto.game.StartGameRequest;
+import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
@@ -13,7 +16,9 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.Game;
+import com.rocketden.main.game_object.NotificationType;
 import com.rocketden.main.game_object.Player;
+import com.rocketden.main.game_object.Submission;
 import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
@@ -25,16 +30,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+
+import java.time.LocalDateTime;
 
 @ExtendWith(MockitoExtension.class)
 public class GameManagementServiceTests {
@@ -52,6 +61,9 @@ public class GameManagementServiceTests {
     private ProblemService problemService;
 
     @Mock
+    private NotificationService notificationService;
+
+    @Mock
     private LiveGameService liveGameService;
 
     @Mock
@@ -62,14 +74,35 @@ public class GameManagementServiceTests {
     private GameManagementService gameService;
 
     // Predefine user and room attributes.
-    private static final String NICKNAME = "rocket";
-    private static final String NICKNAME_2 = "rocketrocket";
     private static final String ROOM_ID = "012345";
+    private static final String NICKNAME = "rocket";
     private static final String USER_ID = "098765";
+    private static final String NICKNAME_2 = "rocketden";
+    private static final String USER_ID_2 = "012345";
+    private static final String NICKNAME_3 = "rocketrocket";
+    private static final String USER_ID_3 = "678910";
     private static final String CODE = "print('hi')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
+    private static final Integer NUM_PROBLEMS = 10;
     private static final PlayerCode PLAYER_CODE = new PlayerCode(CODE, LANGUAGE);
     private static final long DURATION = 600;
+    
+    // Predefine notification content.
+    private static final String CONTENT = "[1, 2, 3]";
+    private static final String TIME_CONTENT = "are thirty minutes";
+
+    // Helper method to add a dummy submission to a Player object
+    private void addSubmissionHelper(Player player, int numCorrect) {
+        Submission submission = new Submission();
+        submission.setNumCorrect(numCorrect);
+        submission.setNumTestCases(NUM_PROBLEMS);
+        submission.setStartTime(LocalDateTime.now());
+
+        player.getSubmissions().add(submission);
+        if (numCorrect == NUM_PROBLEMS) {
+            player.setSolved(true);
+        }
+    }
 
     @Test
     public void addGetAndRemoveGame() {
@@ -214,15 +247,129 @@ public class GameManagementServiceTests {
         room.addUser(user);
 
         gameService.createAddGameFromRoom(room);
+        Game game = gameService.getGameFromRoomId(ROOM_ID);
 
         SubmissionRequest request = new SubmissionRequest();
         request.setLanguage(LANGUAGE);
         request.setCode(CODE);
         request.setInitiator(UserMapper.toDto(user));
 
+        // Mock the return of the submissionDto, and mock update of player.
+        SubmissionDto submissionDto = new SubmissionDto();
+        submissionDto.setNumCorrect(NUM_PROBLEMS);
+        submissionDto.setNumTestCases(NUM_PROBLEMS);
+        Mockito.doAnswer(new Answer<SubmissionDto>() {
+            public SubmissionDto answer(InvocationOnMock invocation) {
+                addSubmissionHelper(game.getPlayers().get(USER_ID), 10);
+                game.setAllSolved(true);
+                return submissionDto;
+            }})
+          .when(submitService).submitSolution(game, request);
+
         gameService.submitSolution(ROOM_ID, request);
 
-        verify(submitService).submitSolution(any(Game.class), eq(request));
+        // Test that both submit service methods were called.
+        verify(submitService).submitSolution(eq(game), eq(request));
+
+        // Test that game has been updated in socket message.
+        verify(socketService).sendSocketUpdate(GameMapper.toDto(game));
+        assertTrue(game.getAllSolved());
+    }
+
+    @Test
+    public void sendAllSolvedSocketUpdate() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        User user2 = new User();
+        user2.setNickname(NICKNAME_2);
+        user2.setUserId(USER_ID_2);
+        room.addUser(user2);
+
+        User user3 = new User();
+        user3.setNickname(NICKNAME_3);
+        user3.setUserId(USER_ID_3);
+        room.addUser(user3);
+
+        gameService.createAddGameFromRoom(room);
+        Game game = gameService.getGameFromRoomId(ROOM_ID);
+
+        // Add submissions for the first two users.
+        addSubmissionHelper(game.getPlayers().get(USER_ID), 10);
+        addSubmissionHelper(game.getPlayers().get(USER_ID_2), 10);
+
+        SubmissionRequest request = new SubmissionRequest();
+        request.setLanguage(LANGUAGE);
+        request.setCode(CODE);
+        request.setInitiator(UserMapper.toDto(user3));
+
+        // Mock the return of the submissionDto, and mock update of player.
+        SubmissionDto submissionDto = new SubmissionDto();
+        submissionDto.setNumCorrect(NUM_PROBLEMS);
+        submissionDto.setNumTestCases(NUM_PROBLEMS);
+        Mockito.doAnswer(new Answer<SubmissionDto>() {
+            public SubmissionDto answer(InvocationOnMock invocation) {
+                addSubmissionHelper(game.getPlayers().get(USER_ID_3), 10);
+                game.setAllSolved(true);
+                return submissionDto;
+            }})
+          .when(submitService).submitSolution(game, request);
+
+        gameService.submitSolution(ROOM_ID, request);
+
+        verify(submitService).submitSolution(eq(game), eq(request));
+
+        // Confirm that socket sent updated GameDto object.
+        verify(socketService).sendSocketUpdate(eq(GameMapper.toDto(game)));
+        assertTrue(game.getAllSolved());
+    }
+
+    @Test
+    public void submitSolutionNotAllSolved() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        User user2 = new User();
+        user2.setNickname(NICKNAME_2);
+        user2.setUserId(USER_ID_2);
+        room.addUser(user2);
+
+        gameService.createAddGameFromRoom(room);
+        Game game = gameService.getGameFromRoomId(ROOM_ID);
+
+        SubmissionRequest request = new SubmissionRequest();
+        request.setLanguage(LANGUAGE);
+        request.setCode(CODE);
+        request.setInitiator(UserMapper.toDto(user));
+
+        // Mock the return of the submissionDto, and mock update of player.
+        SubmissionDto submissionDto = new SubmissionDto();
+        submissionDto.setNumCorrect(NUM_PROBLEMS);
+        submissionDto.setNumTestCases(NUM_PROBLEMS);
+        Mockito.doAnswer(new Answer<SubmissionDto>() {
+            public SubmissionDto answer(InvocationOnMock invocation) {
+                addSubmissionHelper(game.getPlayers().get(USER_ID), 10);
+                return submissionDto;
+            }})
+          .when(submitService).submitSolution(game, request);
+
+        gameService.submitSolution(ROOM_ID, request);
+
+        verify(submitService).submitSolution(eq(game), eq(request));
+
+        // Confirm the same update is sent even when all players solved problem.
+        verify(socketService).sendSocketUpdate(eq(GameMapper.toDto(game)));
+        assertFalse(game.getAllSolved());
     }
 
     @Test
@@ -262,6 +409,205 @@ public class GameManagementServiceTests {
         ApiException exception = assertThrows(ApiException.class, () -> gameService.submitSolution(ROOM_ID, missingRequest));
         assertEquals(GameError.EMPTY_FIELD, exception.getError());
     }
+
+    @Test
+    public void sendNotificationSuccess() throws Exception {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        User host = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(host);
+        room.setHost(host);
+
+        gameService.createAddGameFromRoom(room);
+
+        GameNotificationDto notificationDto = new GameNotificationDto();
+        notificationDto.setInitiator(UserMapper.toDto(user));
+        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setContent(CONTENT);
+        notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
+
+        gameService.sendNotification(ROOM_ID, notificationDto);
+
+        verify(notificationService).sendNotification(eq(ROOM_ID), eq(notificationDto));
+    }
+
+    @Test
+    public void sendNotificationNoInitiatorSuccess() throws Exception {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        User host = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(host);
+        room.setHost(host);
+
+        gameService.createAddGameFromRoom(room);
+
+        // Change notification type to time left, as no initiator is required.
+        GameNotificationDto notificationDto = new GameNotificationDto();
+        notificationDto.setInitiator(null);
+        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setContent(TIME_CONTENT);
+        notificationDto.setNotificationType(NotificationType.TIME_LEFT);
+
+        gameService.sendNotification(ROOM_ID, notificationDto);
+
+        verify(notificationService).sendNotification(eq(ROOM_ID), eq(notificationDto));
+    }
+
+    @Test
+    public void sendNotificationInitiatorRequired() throws Exception {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        User host = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(host);
+        room.setHost(host);
+
+        gameService.createAddGameFromRoom(room);
+
+        // Change notification type to time left, as no initiator is required.
+        GameNotificationDto notificationDto = new GameNotificationDto();
+        notificationDto.setInitiator(null);
+        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setContent(TIME_CONTENT);
+        notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
+
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification(ROOM_ID, notificationDto));
+        assertEquals(GameError.NOTIFICATION_REQUIRES_INITIATOR, exception.getError());
+    }
+
+    @Test
+    public void sendNotificationContentRequired() throws Exception {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        User host = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(host);
+        room.setHost(host);
+
+        gameService.createAddGameFromRoom(room);
+
+        // Change notification type to time left, as no initiator is required.
+        GameNotificationDto notificationDto = new GameNotificationDto();
+        notificationDto.setInitiator(UserMapper.toDto(user));
+        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setContent(null);
+        notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
+
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification(ROOM_ID, notificationDto));
+        assertEquals(GameError.NOTIFICATION_REQUIRES_CONTENT, exception.getError());
+    }
+
+    @Test
+    public void sendNotificationNotFound() throws Exception {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        User host = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(host);
+        room.setHost(host);
+
+        gameService.createAddGameFromRoom(room);
+
+        GameNotificationDto notificationDto = new GameNotificationDto();
+        notificationDto.setInitiator(UserMapper.toDto(user));
+        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setContent(CONTENT);
+        notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
+
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification("999999", notificationDto));
+        assertEquals(GameError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void sendNotificationMissingNotificationType() throws Exception {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        User host = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(host);
+        room.setHost(host);
+
+        gameService.createAddGameFromRoom(room);
+
+        GameNotificationDto notificationDto = new GameNotificationDto();
+        notificationDto.setInitiator(UserMapper.toDto(user));
+        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setContent(CONTENT);
+
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification(ROOM_ID, notificationDto));
+        assertEquals(GameError.EMPTY_FIELD, exception.getError());
+    }
+
+    @Test
+    public void sendNotificationUserNotInGame() throws Exception {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        // Do not add user to game, then send invalid notification from them.
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+
+        User host = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(host);
+        room.setHost(host);
+
+        gameService.createAddGameFromRoom(room);
+
+        GameNotificationDto notificationDto = new GameNotificationDto();
+        notificationDto.setInitiator(UserMapper.toDto(user));
+        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setContent(CONTENT);
+        notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
+
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification(ROOM_ID, notificationDto));
+        assertEquals(GameError.USER_NOT_IN_GAME, exception.getError());
+    }
+
+
 
     @Test
     public void updateCodeSuccess() {

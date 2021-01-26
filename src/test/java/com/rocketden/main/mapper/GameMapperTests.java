@@ -67,6 +67,7 @@ public class GameMapperTests {
         assertEquals(room, game.getRoom());
         assertNotNull(game.getPlayers().get(USER_ID));
         assertEquals(user, game.getPlayers().get(USER_ID).getUser());
+        assertEquals(false, game.getAllSolved());
     }
 
     @Test
@@ -94,6 +95,7 @@ public class GameMapperTests {
 
         Game game = GameMapper.fromRoom(room);
         game.setProblems(problems);
+        game.setAllSolved(true);
 
         PlayerCode playerCode = new PlayerCode();
         playerCode.setCode(CODE);
@@ -114,6 +116,7 @@ public class GameMapperTests {
         assertEquals(RoomMapper.toDto(room), gameDto.getRoom());
         assertEquals(1, gameDto.getPlayers().size());
         assertEquals(ProblemMapper.toDto(problem), gameDto.getProblems().get(0));
+        assertEquals(game.getAllSolved(), gameDto.getAllSolved());
 
         PlayerDto playerDto = gameDto.getPlayers().get(0);
         assertEquals(UserMapper.toDto(user), playerDto.getUser());

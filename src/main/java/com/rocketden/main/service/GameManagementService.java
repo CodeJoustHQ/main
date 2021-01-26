@@ -1,6 +1,5 @@
 package com.rocketden.main.service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,23 +7,22 @@ import java.util.Map;
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
+import com.rocketden.main.dto.game.GameNotificationDto;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
-import com.rocketden.main.dto.notification.NotificationDto;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.Game;
-import com.rocketden.main.game_object.GameNotification;
 import com.rocketden.main.game_object.GameTimer;
-import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.util.EndGameTimerTask;
+import com.rocketden.main.util.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -98,12 +96,14 @@ public class GameManagementService {
     // Initialize and add a game object from a room object, start game timer
     public void createAddGameFromRoom(Room room) {
         Game game = GameMapper.fromRoom(room);
+        Long time = room.getDuration();
 
         List<Problem> problems = problemService.getProblemsFromDifficulty(room.getDifficulty(), room.getNumProblems());
         game.setProblems(problems);
-        setStartGameTimer(game, room.getDuration());
+        setStartGameTimer(game, time);
 
         currentGameMap.put(room.getRoomId(), game);
+        notificationService.scheduleTimeLeftNotifications(room.getRoomId(), time);
     }
 
     // Set and start the Game Timer.
@@ -129,29 +129,58 @@ public class GameManagementService {
             throw new ApiException(GameError.INVALID_PERMISSIONS);
         }
 
-        return submitService.submitSolution(game, request);
+        SubmissionDto submissionDto = submitService.submitSolution(game, request);
+
+        // Send socket update with latest leaderboard info
+        socketService.sendSocketUpdate(GameMapper.toDto(game));
+        
+        return submissionDto;
     }
 
     // Send a notification through a socket update.
-    public NotificationDto sendNotification(List<String> userIdList) {
-        /**
-         * TODO: Get the players from the userIdList,
-         * receive a game notification with details.
-         */
-        return notificationService.sendNotification(GameNotification.SUBMIT_CORRECT, new ArrayList<>());
+    public GameNotificationDto sendNotification(String roomId, GameNotificationDto notificationDto) {
+        Game game = getGameFromRoomId(roomId);
+
+        //  The notification type must be present.
+        if (notificationDto.getNotificationType() == null) {
+            throw new ApiException(GameError.EMPTY_FIELD);
+        }
+        
+        // If initiator exists, they must be in the game.
+        if (notificationDto.getInitiator() != null
+            && !game.getPlayers().containsKey(notificationDto.getInitiator().getUserId())) {
+            throw new ApiException(GameError.USER_NOT_IN_GAME);
+        }
+        
+        // If initiator doesn't exist, the notification must not require one.
+        if (notificationDto.getInitiator() == null
+            && Utility.initiatorNotifications.contains(notificationDto.getNotificationType())) {
+            throw new ApiException(GameError.NOTIFICATION_REQUIRES_INITIATOR);
+        }
+        
+        // If content doesn't exist, the notification must not require any.
+        if (notificationDto.getContent() == null
+            && Utility.contentNotifications.contains(notificationDto.getNotificationType())) {
+            throw new ApiException(GameError.NOTIFICATION_REQUIRES_CONTENT);       
+        }
+
+        return notificationService.sendNotification(roomId, notificationDto);
     }
 
     // Update a specific player's code.
     public void updateCode(String roomId, String userId, PlayerCode playerCode) {
         Game game = getGameFromRoomId(roomId);
 
-        if (!game.getPlayers().containsKey(userId)) {
+        // The user must be present in the game.
+        if (userId != null && !game.getPlayers().containsKey(userId)) {
             throw new ApiException(GameError.USER_NOT_IN_GAME);
-        } else if (playerCode == null) {
+        }
+        
+        // The player must have code to update (even if empty string).
+        if (playerCode == null) {
             throw new ApiException(GameError.EMPTY_FIELD);
         }
 
         liveGameService.updateCode(game.getPlayers().get(userId), playerCode);
     }
-
 }

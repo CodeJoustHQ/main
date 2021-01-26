@@ -11,6 +11,7 @@ import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.Game;
+import com.rocketden.main.model.problem.Problem;
 
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
@@ -88,11 +89,19 @@ public class SubmitService {
             player.setSolved(true);
         }
 
-        // Sort list of players by who is winning
-        GameDto gameDto = GameMapper.toDto(game);
+        // Variable to indicate whether all players have solved the problem.
+        boolean allSolved = true;
+        for (Player p : game.getPlayers().values()) {
+            if (p.getSolved() == null || !p.getSolved()) {
+                allSolved = false;
+                break;
+            }
+        }
 
-        // Send socket update with latest leaderboard info
-        socketService.sendSocketUpdate(gameDto);
+        // If the users have all completed the problem, set all solved to true.
+        if (allSolved) {
+            game.setAllSolved(true);
+        }
 
         return GameMapper.submissionToDto(submission);
     }
