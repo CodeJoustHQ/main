@@ -96,9 +96,9 @@ function GamePage() {
     }
   }, [currentUser]);
 
-  // Check if game is over or not (TODO: include check for all solved)
+  // Check if game is over or not and redirect to results page if so
   useEffect(() => {
-    if (gameTimer?.timeUp) {
+    if (timeUp || allSolved) {
       gameSocket?.unsubscribe();
       notificationSocket?.unsubscribe();
 
@@ -107,7 +107,7 @@ function GamePage() {
         currentUser,
       });
     }
-  }, [gameTimer, game, history, currentUser, gameSocket, notificationSocket]);
+  }, [timeUp, allSolved, game, history, currentUser, gameSocket, notificationSocket]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
@@ -136,14 +136,6 @@ function GamePage() {
         });
     }
   }, [displayNotification, gameSocket, notificationSocket]);
-
-  useEffect(() => {
-    // Check if end game.
-    if (timeUp || allSolved) {
-      // TODO
-      history.push('/game/results');
-    }
-  }, [timeUp, allSolved, history]);
 
   // Called every time location changes
   useEffect(() => {
