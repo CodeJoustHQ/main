@@ -100,8 +100,7 @@ public class GameManagementService {
     public RoomDto playAgain(String roomId, PlayAgainRequest request) {
         Game game = getGameFromRoomId(roomId);
 
-        // TODO add allSolved
-        if (game.getGameTimer() == null || !game.getGameTimer().isTimeUp()) {
+        if (!isGameOver(game)) {
             throw new ApiException(GameError.GAME_NOT_OVER);
         }
 
@@ -214,5 +213,9 @@ public class GameManagementService {
         }
 
         liveGameService.updateCode(game.getPlayers().get(userId), playerCode);
+    }
+
+    protected boolean isGameOver(Game game) {
+        return game.getAllSolved() || (game.getGameTimer() != null && game.getGameTimer().isTimeUp());
     }
 }

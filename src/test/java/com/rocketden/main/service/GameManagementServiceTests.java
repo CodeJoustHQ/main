@@ -17,6 +17,7 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.Game;
+import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.game_object.NotificationType;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.Submission;
@@ -758,5 +759,27 @@ public class GameManagementServiceTests {
         gameService.createAddGameFromRoom(room);
         ApiException exception = assertThrows(ApiException.class, () -> gameService.updateCode(ROOM_ID, USER_ID, null));
         assertEquals(GameError.EMPTY_FIELD, exception.getError());
+    }
+
+    @Test
+    public void isGameOverFunctionsCorrectly() {
+        Game game = new Game();
+        game.setGameTimer(new GameTimer(DURATION));
+
+        game.setAllSolved(false);
+        game.getGameTimer().setTimeUp(false);
+        assertFalse(gameService.isGameOver(game));
+
+        game.setAllSolved(true);
+        game.getGameTimer().setTimeUp(false);
+        assertTrue(gameService.isGameOver(game));
+
+        game.setAllSolved(false);
+        game.getGameTimer().setTimeUp(true);
+        assertTrue(gameService.isGameOver(game));
+
+        game.setAllSolved(false);
+        game.setGameTimer(null);
+        assertFalse(gameService.isGameOver(game));
     }
 }
