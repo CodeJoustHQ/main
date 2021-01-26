@@ -21,6 +21,7 @@ export type Game = {
   gameTimer: GameTimer,
   problems: Problem[],
   playAgain: boolean,
+  allSolved: boolean,
 };
 
 export type StartGameParams = {

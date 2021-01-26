@@ -55,6 +55,8 @@ function GamePage() {
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
   const [currentLanguage, setCurrentLanguage] = useState('java');
+  const [timeUp, setTimeUp] = useState(false);
+  const [allSolved, setAllSolved] = useState(false);
 
   // When variable null, show nothing; otherwise, show notification.
   const [gameNotification, setGameNotification] = useState<GameNotification | null>(null);
@@ -78,6 +80,8 @@ function GamePage() {
     setPlayers(newGame.players);
     setGameTimer(newGame.gameTimer);
     setProblems(newGame.problems);
+    setAllSolved(newGame.allSolved);
+    setTimeUp(newGame.gameTimer.timeUp);
   };
 
   /**
@@ -132,6 +136,14 @@ function GamePage() {
         });
     }
   }, [displayNotification, gameSocket, notificationSocket]);
+
+  useEffect(() => {
+    // Check if end game.
+    if (timeUp || allSolved) {
+      // TODO
+      history.push('/game/results');
+    }
+  }, [timeUp, allSolved, history]);
 
   // Called every time location changes
   useEffect(() => {
@@ -192,6 +204,7 @@ function GamePage() {
   };
 
   const exitGame = () => {
+    // eslint-disable-next-line no-alert
     if (window.confirm('Exit the game? You will not be able to rejoin.')) {
       disconnect()
         .then(() => history.replace('/'))
@@ -199,16 +212,14 @@ function GamePage() {
     }
   };
 
-  const displayPlayerLeaderboard = () => {
-    return players.map((player, index) => (
-      <LeaderboardCard
-        player={player}
-        isCurrentPlayer={player.user.userId === currentUser?.userId}
-        place={index + 1}
-        color={player.color}
-      />
-    ));
-  };
+  const displayPlayerLeaderboard = () => players.map((player, index) => (
+    <LeaderboardCard
+      player={player}
+      isCurrentPlayer={player.user.userId === currentUser?.userId}
+      place={index + 1}
+      color={player.color}
+    />
+  ));
 
   // Subscribe user to primary socket and to notifications.
   useEffect(() => {
@@ -277,7 +288,7 @@ function GamePage() {
 
             <Panel>
               <Console
-                testCases={problems[0]?.testCases!}
+                testCases={problems[0]?.testCases}
                 submission={submission}
                 onRun={runSolution}
               />

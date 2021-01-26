@@ -167,7 +167,12 @@ public class GameManagementService {
             throw new ApiException(GameError.INVALID_PERMISSIONS);
         }
 
-        return submitService.submitSolution(game, request);
+        SubmissionDto submissionDto = submitService.submitSolution(game, request);
+
+        // Send socket update with latest leaderboard info
+        socketService.sendSocketUpdate(GameMapper.toDto(game));
+        
+        return submissionDto;
     }
 
     // Send a notification through a socket update.
@@ -216,5 +221,4 @@ public class GameManagementService {
 
         liveGameService.updateCode(game.getPlayers().get(userId), playerCode);
     }
-
 }

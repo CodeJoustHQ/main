@@ -19,4 +19,5 @@ public class GameDto {
     private GameTimerDto gameTimer;
     private List<PlayerDto> players = new ArrayList<>();
     private Boolean playAgain = false;
+    private Boolean allSolved;
 }
