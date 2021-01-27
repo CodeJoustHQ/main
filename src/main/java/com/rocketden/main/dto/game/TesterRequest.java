@@ -12,5 +12,4 @@ public class TesterRequest {
     private String code;
     private CodeLanguage language;
     private ProblemDto problem;
-
 }
