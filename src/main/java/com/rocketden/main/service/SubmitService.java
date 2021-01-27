@@ -156,7 +156,7 @@ public class SubmitService {
     }
 
     // This method should only be called for testing purposes
-    protected void toggleDebugModeForTesting(boolean debugMode) {
+    protected void setDebugModeForTesting(boolean debugMode) {
         this.debugMode = debugMode;
     }
 }

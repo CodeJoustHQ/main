@@ -128,7 +128,7 @@ public class SubmitServiceTests {
 
     @Test
     public void callTesterServiceFailsNoDebug() {
-        submitService.toggleDebugModeForTesting(false);
+        submitService.setDebugModeForTesting(false);
 
         TesterRequest request = new TesterRequest();
         request.setCode("temp");
