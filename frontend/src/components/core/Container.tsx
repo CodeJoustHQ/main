@@ -7,6 +7,12 @@ export const FlexContainer = styled.div`
   margin: 1rem;
 `;
 
+export const FlexHorizontalContainer = styled.div`
+  display: flex;
+  flex: auto;
+  margin: 1rem;
+`;
+
 export const FlexInfoBar = styled.div`
   padding: 0.5rem;
   text-align: center;

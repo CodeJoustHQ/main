@@ -1,7 +1,5 @@
 package com.rocketden.main.api;
 
-import com.rocketden.main.dao.ProblemRepository;
-import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameNotificationDto;
 import com.rocketden.main.dto.game.GameNotificationRequest;
@@ -27,11 +25,9 @@ import com.rocketden.main.game_object.NotificationType;
 import com.rocketden.main.model.User;
 import com.rocketden.main.util.RoomTestMethods;
 import com.rocketden.main.model.problem.ProblemDifficulty;
-import com.rocketden.main.service.SocketService;
 import com.rocketden.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -60,15 +56,6 @@ public class GameTests {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Mock
-    private RoomRepository repository;
-
-    @Mock
-    private ProblemRepository problemRepository;
-
-    @Mock
-    private SocketService socketService;
 
     // Predefine problem attributes.
     private static final String NAME = "Sort a List";
@@ -179,7 +166,7 @@ public class GameTests {
         RoomDto roomDto = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
         StartGameRequest request = new StartGameRequest();
-        request.setInitiator(host);
+        request.setInitiator(roomDto.getHost());
 
         createSingleProblemAndTestCases();
 
