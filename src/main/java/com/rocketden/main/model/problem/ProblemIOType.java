@@ -1,8 +1,8 @@
-package com.rocketden.tester.model.problem;
+package com.rocketden.main.model.problem;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.rocketden.tester.exception.ProblemError;
-import com.rocketden.tester.exception.api.ApiException;
+import com.rocketden.main.exception.ProblemError;
+import com.rocketden.main.exception.api.ApiException;
 
 import lombok.Getter;
 
