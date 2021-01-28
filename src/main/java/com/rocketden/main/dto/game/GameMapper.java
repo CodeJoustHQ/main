@@ -31,6 +31,7 @@ public class GameMapper {
         GameDto gameDto = new GameDto();
         gameDto.setRoom(RoomMapper.toDto(game.getRoom()));
         gameDto.setGameTimer(GameTimerMapper.toDto(game.getGameTimer()));
+        gameDto.setPlayAgain(game.getPlayAgain());
 
         // Set loose matching to allow flattening of variables in DTO objects
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
@@ -42,6 +43,8 @@ public class GameMapper {
         List<ProblemDto> problems = new ArrayList<>();
         game.getProblems().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
         gameDto.setProblems(problems);
+
+        gameDto.setAllSolved(game.getAllSolved());
 
         return gameDto;
     }

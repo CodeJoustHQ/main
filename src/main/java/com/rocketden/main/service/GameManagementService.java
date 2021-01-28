@@ -8,11 +8,13 @@ import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.GameNotificationDto;
+import com.rocketden.main.dto.game.PlayAgainRequest;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
+import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
@@ -20,6 +22,7 @@ import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.model.Room;
+import com.rocketden.main.model.User;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.util.EndGameTimerTask;
 import com.rocketden.main.util.Utility;
@@ -78,7 +81,8 @@ public class GameManagementService {
         }
 
         // If user making request is not the host, throw an exception.
-        if (!request.getInitiator().getNickname().equals(room.getHost().getNickname())) {
+        User initiator = UserMapper.toEntity(request.getInitiator());
+        if (!room.getHost().equals(initiator)) {
             throw new ApiException(RoomError.INVALID_PERMISSIONS);
         }
 
@@ -91,6 +95,33 @@ public class GameManagementService {
         RoomDto roomDto = RoomMapper.toDto(room);
         socketService.sendSocketUpdate(roomDto);
         return roomDto;
+    }
+
+    public RoomDto playAgain(String roomId, PlayAgainRequest request) {
+        Game game = getGameFromRoomId(roomId);
+
+        if (!isGameOver(game)) {
+            throw new ApiException(GameError.GAME_NOT_OVER);
+        }
+
+        Room room = game.getRoom();
+        User initiator = UserMapper.toEntity(request.getInitiator());
+        if (!room.getHost().equals(initiator)) {
+            throw new ApiException(GameError.INVALID_PERMISSIONS);
+        }
+
+        // Set all users to be disconnected
+        room.getUsers().forEach((user) -> user.setSessionId(null));
+
+        // Change room to be no longer active
+        room.setActive(false);
+        repository.save(room);
+
+        // Notify users to play again
+        game.setPlayAgain(true);
+        socketService.sendSocketUpdate(GameMapper.toDto(game));
+
+        return RoomMapper.toDto(room);
     }
 
     // Initialize and add a game object from a room object, start game timer
@@ -129,7 +160,12 @@ public class GameManagementService {
             throw new ApiException(GameError.INVALID_PERMISSIONS);
         }
 
-        return submitService.submitSolution(game, request);
+        SubmissionDto submissionDto = submitService.submitSolution(game, request);
+
+        // Send socket update with latest leaderboard info
+        socketService.sendSocketUpdate(GameMapper.toDto(game));
+        
+        return submissionDto;
     }
 
     // Send a notification through a socket update.
@@ -179,4 +215,7 @@ public class GameManagementService {
         liveGameService.updateCode(game.getPlayers().get(userId), playerCode);
     }
 
+    protected boolean isGameOver(Game game) {
+        return game.getAllSolved() || (game.getGameTimer() != null && game.getGameTimer().isTimeUp());
+    }
 }

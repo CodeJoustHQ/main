@@ -84,7 +84,7 @@ export const send = (sendUrl: string, headers?: {}, body?: string):
 
 /**
  * Disconnect the user by sending a message via socket.
- * @returns void, or error if socket is not connected.
+ * @returns void, or an error if the socket is not connected.
 */
 export const disconnect = ():
   Promise<void> => new Promise<void>((resolve, reject) => {
