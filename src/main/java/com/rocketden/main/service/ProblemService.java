@@ -10,6 +10,7 @@ import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.model.problem.ProblemTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,8 @@ public class ProblemService {
 
     public ProblemDto createProblem(CreateProblemRequest request) {
         if (request.getName() == null || request.getDescription() == null
-                || request.getDifficulty() == null) {
+                || request.getDifficulty() == null
+                || request.getOutputType() == null) {
             throw new ApiException(ProblemError.EMPTY_FIELD);
         }
 
@@ -41,10 +43,20 @@ public class ProblemService {
             throw new ApiException(ProblemError.BAD_DIFFICULTY);
         }
 
+        if (request.getProblemInputs() != null) {
+            for (ProblemInput problemInput : request.getProblemInputs()) {
+                if (problemInput == null) {
+                    throw new ApiException(ProblemError.BAD_INPUT);
+                }
+            }
+        }
+
         Problem problem = new Problem();
         problem.setName(request.getName());
         problem.setDescription(request.getDescription());
         problem.setDifficulty(request.getDifficulty());
+        problem.setProblemInputs((request.getProblemInputs() != null) ? request.getProblemInputs() : new ArrayList<>());
+        problem.setOutputType(request.getOutputType());
 
         repository.save(problem);
 

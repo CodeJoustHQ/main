@@ -46,7 +46,6 @@ public class Problem {
 
     // Additional fields for the default code generation.
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @Setter(AccessLevel.PRIVATE)
     private List<ProblemInput> problemInputs;
 
     @Enumerated(EnumType.STRING)
