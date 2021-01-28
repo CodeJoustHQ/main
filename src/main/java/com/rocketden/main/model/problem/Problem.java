@@ -45,7 +45,11 @@ public class Problem {
     private ProblemDifficulty difficulty;
 
     // Additional fields for the default code generation.
+    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @Setter(AccessLevel.PRIVATE)
     private List<ProblemInput> problemInputs;
+
+    @Enumerated(EnumType.STRING)
     private ProblemIOType outputType;
 
     public void addTestCase(ProblemTestCase testCase) {

@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum ProblemError implements ApiError {
 
     BAD_DIFFICULTY(HttpStatus.BAD_REQUEST, "Please choose either Easy, Medium, or Hard (or Random if choosing a room difficulty)"),
+    BAD_IOTYPE(HttpStatus.BAD_REQUEST, "Please choose a value Problem IO Type."),
     INVALID_NUMBER_REQUEST(HttpStatus.BAD_REQUEST, "Please request a valid number of problems."),
     EMPTY_FIELD(HttpStatus.BAD_REQUEST, "Please enter a value for each required field."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "A problem could not be found with the given criteria.");

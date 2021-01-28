@@ -1,6 +1,7 @@
 package com.rocketden.main.dto.problem;
 
 import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.model.problem.ProblemIOType;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -18,4 +19,6 @@ public class ProblemDto {
     private String description;
     private ProblemDifficulty difficulty;
     private List<ProblemTestCaseDto> testCases = new ArrayList<>();
+    private List<ProblemInputDto> problemInputs;
+    private ProblemIOType outputType;
 }
