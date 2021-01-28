@@ -2,11 +2,8 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import { LowMarginText, SmallText } from '../core/Text';
+import PlayerIcon from './PlayerIcon';
 import { Color } from '../../api/Color';
-
-type PlayerIconProps = {
-  hexColor: string,
-};
 
 const Content = styled.div`
   display: inline-block;
@@ -17,15 +14,6 @@ const Content = styled.div`
   &:hover {
     cursor: pointer;
   }
-`;
-
-const PlayerIcon = styled.div<PlayerIconProps>`
-  background-color: ${({ hexColor }) => hexColor};
-  border-radius: 50%;
-  margin: 0 auto;
-  
-  height: 50px;
-  width: 50px;
 `;
 
 const HoverBar = styled.div`

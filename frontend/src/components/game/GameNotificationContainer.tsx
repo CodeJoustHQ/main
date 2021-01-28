@@ -19,6 +19,7 @@ const GameNotificationBox = styled.div`
   &:hover {
     background: ${({ theme }) => theme.colors.background};
     transition: 0.5s all;
+    cursor: pointer;
   }
 `;
 

@@ -95,6 +95,7 @@ public class GameMapperTests {
 
         Game game = GameMapper.fromRoom(room);
         game.setProblems(problems);
+        game.setPlayAgain(true);
         game.setAllSolved(true);
 
         PlayerCode playerCode = new PlayerCode();
@@ -116,6 +117,7 @@ public class GameMapperTests {
         assertEquals(RoomMapper.toDto(room), gameDto.getRoom());
         assertEquals(1, gameDto.getPlayers().size());
         assertEquals(ProblemMapper.toDto(problem), gameDto.getProblems().get(0));
+        assertEquals(game.getPlayAgain(), gameDto.getPlayAgain());
         assertEquals(game.getAllSolved(), gameDto.getAllSolved());
 
         PlayerDto playerDto = gameDto.getPlayers().get(0);

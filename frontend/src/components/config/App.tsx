@@ -19,7 +19,7 @@ function App() {
       <CustomRoute path="/game/join" component={JoinGamePage} layout={MainLayout} exact />
       <CustomRoute path="/game/create" component={CreateGamePage} layout={MainLayout} exact />
       <CustomRoute path="/game/lobby" component={LobbyPage} layout={MainLayout} exact />
-      <CustomRoute path="/game/results" component={GameResultsPage} layout={GameLayout} exact />
+      <CustomRoute path="/game/results" component={GameResultsPage} layout={MainLayout} exact />
       <CustomRoute path="*" component={NotFound} layout={MainLayout} />
     </Switch>
   );
