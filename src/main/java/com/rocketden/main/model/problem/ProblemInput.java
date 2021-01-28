@@ -20,4 +20,11 @@ public class ProblemInput {
 
     private String name;
     private ProblemIOType type;
+
+    public ProblemInput() {}
+    
+    public ProblemInput(String name, ProblemIOType type) {
+        this.name = name;
+        this.type = type;
+    }
 }
