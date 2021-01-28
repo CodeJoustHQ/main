@@ -35,6 +35,7 @@ public class ProblemService {
     public ProblemDto createProblem(CreateProblemRequest request) {
         if (request.getName() == null || request.getDescription() == null
                 || request.getDifficulty() == null
+                || request.getProblemInputs() == null
                 || request.getOutputType() == null) {
             throw new ApiException(ProblemError.EMPTY_FIELD);
         }
@@ -55,7 +56,7 @@ public class ProblemService {
         problem.setName(request.getName());
         problem.setDescription(request.getDescription());
         problem.setDifficulty(request.getDifficulty());
-        problem.setProblemInputs((request.getProblemInputs() != null) ? request.getProblemInputs() : new ArrayList<>());
+        problem.setProblemInputs(request.getProblemInputs());
         problem.setOutputType(request.getOutputType());
 
         repository.save(problem);
