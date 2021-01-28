@@ -108,6 +108,11 @@ public class SubmitService {
 
     // Sends a POST request to the tester service to judge the user submission
     protected Submission callTesterService(TesterRequest request) {
+        // If in debug mode (tester is unavailable), return a dummy submission
+        if (getDebugMode()) {
+            return getDummySubmission(request);
+        }
+
         try {
             HttpPost post = new HttpPost(getTesterUrl());
 
@@ -118,7 +123,7 @@ public class SubmitService {
             HttpResponse response = httpClient.execute(post);
             String jsonResponse = EntityUtils.toString(response.getEntity());
 
-            TesterResponse testerResponse = getResponseFromJson(jsonResponse);
+            TesterResponse testerResponse = gson.fromJson(jsonResponse, TesterResponse.class);;
 
             // TODO: logic to convert TesterResponse into Submission object
             Submission submission = new Submission();
@@ -128,11 +133,6 @@ public class SubmitService {
 
             return submission;
         } catch (Exception e) {
-            // If in debug mode (tester is unavailable), return a dummy submission
-            if (getDebugMode()) {
-                return getDummySubmission(request);
-            }
-
             throw new ApiException(GameError.TESTER_ERROR);
         }
     }
@@ -148,11 +148,6 @@ public class SubmitService {
     // Is null in certain testing environments; if so, return true by default
     private boolean getDebugMode() {
         return debugMode == null || debugMode;
-    }
-
-    // Method that can be mocked to not return an error for SubmitServiceTests
-    protected TesterResponse getResponseFromJson(String json) {
-        return gson.fromJson(json, TesterResponse.class);
     }
 
     // This method should only be called for testing purposes
