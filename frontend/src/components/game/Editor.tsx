@@ -1,25 +1,64 @@
 import React, { useState } from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import styled from 'styled-components';
-import { Problem } from '../../api/Problem';
-import { defaultCodeGeneration, languages } from './Languages';
 
-export type EditorProps = {
-  onLanguageChange: (input: string) => void,
-  onCodeUpdate: (input: string) => void,
-  problem: Problem,
+type LanguageType = {
+  [key: string]: {
+    name: string,
+    defaultCode: string,
+  }
+};
+
+export const languages: LanguageType = {
+  java: {
+    name: 'Java',
+    defaultCode:
+      'public class Solution {\n'
+      + '    public static void main(String[] args) {\n'
+      + '        \n'
+      + '    }\n'
+      + '}\n',
+  },
+  python: {
+    name: 'Python',
+    defaultCode:
+      'def solution():\n'
+      + '    \n',
+  },
+  javascript: {
+    name: 'JavaScript',
+    defaultCode:
+      'function solution() {\n'
+      + '    \n'
+      + '}\n',
+  },
+  csharp: {
+    name: 'C#',
+    defaultCode:
+      'using System;\n\n'
+      + 'public class Solution\n{\n'
+      + '    public static void Main()\n'
+      + '    {\n'
+      + '        \n'
+      + '    }\n'
+      + '}\n',
+  },
+};
+
+type EditorProps = {
+  onLanguageChange: (language: string) => void,
 };
 
 const Content = styled.div`
   height: 100%;
 `;
 
-// This function refreshes the Monaco editor
+// This function refreshes the width of Monaco editor upon change in container size
 function ResizableMonacoEditor(props: EditorProps) {
   const [currentLanguage, setCurrentLanguage] = useState('java');
   const [codeEditor, setCodeEditor] = useState<any>(null);
 
-  const { onLanguageChange, onCodeUpdate, problem } = props;
+  const { onLanguageChange } = props;
 
   const handleEditorDidMount = (editor: any) => {
     setCodeEditor(editor);
@@ -29,27 +68,23 @@ function ResizableMonacoEditor(props: EditorProps) {
     window.addEventListener('secondaryPanelSizeChange', () => {
       editor.layout();
     });
-    // Callback to save written code
-    editor.onDidChangeModelContent(() => {
-      const code = editor.getValue();
-      onCodeUpdate(code);
-    });
   };
 
-  const handleLanguageChange = (p: Problem, language: string) => {
+  const handleLanguageChange = (language: string) => {
     // Save the code for this language
     languages[currentLanguage].defaultCode = codeEditor!.getValue();
 
     // Change the language and initial code for the editor
     codeEditor!.setValue(languages[language].defaultCode);
     setCurrentLanguage(language);
+
     onLanguageChange(language);
   };
 
   return (
     <Content>
       <select
-        onChange={(e) => handleLanguageChange(problem, e.target.value)}
+        onChange={(e) => handleLanguageChange(e.target.value)}
         value={currentLanguage}
       >
         {
@@ -62,7 +97,7 @@ function ResizableMonacoEditor(props: EditorProps) {
         height="100%"
         editorDidMount={handleEditorDidMount}
         language={currentLanguage}
-        defaultValue={defaultCodeGeneration(problem, currentLanguage)}
+        defaultValue={languages[currentLanguage].defaultCode}
       />
     </Content>
   );

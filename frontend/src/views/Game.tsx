@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
 import { useBeforeunload } from 'react-beforeunload';
+import { Message, Subscription } from 'stompjs';
 import Editor from '../components/game/Editor';
-import { Problem, SubmissionResult, getRandomProblem } from '../api/Problem';
-import { Message } from 'stompjs';
+import { Problem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
 import {
   MainContainer, CenteredContainer, FlexContainer, FlexInfoBar,
@@ -22,26 +22,25 @@ import Difficulty from '../api/Difficulty';
 import {
   Game, getGame, Player, SubmissionResult, submitSolution,
 } from '../api/Game';
-import { Room } from '../api/Room';
 import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
 import { TextButton } from '../components/core/Button';
-import { disconnect, routes, send, subscribe } from '../api/Socket';
+import {
+  disconnect, routes, send, subscribe,
+} from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
 
 type LocationState = {
   roomId: string,
   currentUser: User,
   difficulty: Difficulty,
-}
+};
 
 function GamePage() {
   // Get history object to be able to move between different pages
   const history = useHistory();
   const location = useLocation<LocationState>();
-  const language = useRef('Java');
-  const code = useRef('');
 
   const [submission, setSubmission] = useState<SubmissionResult | null>(null);
 
@@ -51,27 +50,22 @@ function GamePage() {
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
-  const [room, setRoom] = useState<Room | null>(null);
+  const [game, setGame] = useState<Game | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
-  const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
   const [currentLanguage, setCurrentLanguage] = useState('java');
+  const [timeUp, setTimeUp] = useState(false);
+  const [allSolved, setAllSolved] = useState(false);
 
   // When variable null, show nothing; otherwise, show notification.
   const [gameNotification, setGameNotification] = useState<GameNotification | null>(null);
 
   // Variable to hold whether the user is subscribed to the primary Game socket.
-  const [userSocketSubscribed, setUserSocketSubscribed] = useState(false);
+  const [gameSocket, setGameSocket] = useState<Subscription | null>(null);
 
   // Variable to hold whether the user is subscribed to the notification socket.
-  const [notificationSocketSubscribed, setNotificationSocketSubscribed] = useState(false);
-
-  // Gets rid of no unused vars warning (temporary build failure workaround until next PR is merged)
-  if (false) {
-    console.log(room);
-    console.log(currentPlayer);
-  }
+  const [notificationSocket, setNotificationSocket] = useState<Subscription | null>(null);
 
   /**
    * Display beforeUnload message to inform the user that they may lose
@@ -81,20 +75,14 @@ function GamePage() {
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
-  const setStateFromGame = (game: Game) => {
-    setRoom(game.room);
-    setPlayers(game.players);
-    setGameTimer(game.gameTimer);
-    setProblems(game.problems);
+  const setStateFromGame = (newGame: Game) => {
+    setGame(newGame);
+    setPlayers(newGame.players);
+    setGameTimer(newGame.gameTimer);
+    setProblems(newGame.problems);
+    setAllSolved(newGame.allSolved);
+    setTimeUp(newGame.gameTimer.timeUp);
   };
-
-  useEffect(() => {
-    players.forEach((player) => {
-      if (player.user.userId === currentUser?.userId) {
-        setCurrentPlayer(player);
-      }
-    });
-  }, [players, currentUser]);
 
   /**
    * Display the notification as a callback from the notification
@@ -108,41 +96,48 @@ function GamePage() {
     }
   }, [currentUser]);
 
+  // Check if game is over or not and redirect to results page if so
+  useEffect(() => {
+    if (timeUp || allSolved) {
+      // eslint-disable-next-line no-unused-expressions
+      gameSocket?.unsubscribe();
+      // eslint-disable-next-line no-unused-expressions
+      notificationSocket?.unsubscribe();
+
+      history.replace('/game/results', {
+        game,
+        currentUser,
+      });
+    }
+  }, [timeUp, allSolved, game, history, currentUser, gameSocket, notificationSocket]);
+
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string) => {
     const subscribeUserCallback = (result: Message) => {
       const updatedGame: Game = JSON.parse(result.body);
       setStateFromGame(updatedGame);
-
-      // Check if end game.
-      // TODO: after deconstructing game, move this to useEffect on timeUp
-      if (updatedGame.gameTimer.timeUp) {
-        history.push('/game/results', {
-          game: updatedGame,
-        });
-      }
     };
 
     // Subscribe to the main Game channel to receive Game updates.
-    if (!userSocketSubscribed) {
+    if (!gameSocket) {
       subscribe(routes(roomIdParam).subscribe_game, subscribeUserCallback)
-        .then(() => {
-          setUserSocketSubscribed(true);
+        .then((subscription) => {
+          setGameSocket(subscription);
         }).catch((err) => {
           setError(err.message);
         });
     }
 
     // Subscribe for Game Notifications.
-    if (!notificationSocketSubscribed) {
+    if (!notificationSocket) {
       subscribe(routes(roomIdParam).subscribe_notification, displayNotification)
-        .then(() => {
-          setNotificationSocketSubscribed(true);
+        .then((subscription) => {
+          setNotificationSocket(subscription);
         }).catch((err) => {
           setError(err.message);
         });
     }
-  }, [history, displayNotification, userSocketSubscribed, notificationSocketSubscribed]);
+  }, [displayNotification, gameSocket, notificationSocket]);
 
   // Called every time location changes
   useEffect(() => {
@@ -188,14 +183,6 @@ function GamePage() {
 
   // Callback when user runs code against custom test case
   const runSolution = (input: string) => {
-    if (language.current === 'javascript') {
-      console.log(eval(code.current)); // eslint-disable-line no-eval
-    }
-  };
-
-  // Callback when code language is changed
-  const onLanguageChange = (input: string) => {
-    language.current = input;
     const request = {
       initiator: currentUser!,
       code: input,
@@ -209,13 +196,9 @@ function GamePage() {
       })
       .catch((err) => setError(err));
   };
-  
-  // Callback when code language is changed
-  const onLanguageChange = (input: string) => {
-    language.current = input;
-  };
 
   const exitGame = () => {
+    // eslint-disable-next-line no-alert
     if (window.confirm('Exit the game? You will not be able to rejoin.')) {
       disconnect()
         .then(() => history.replace('/'))
@@ -223,27 +206,21 @@ function GamePage() {
     }
   };
 
-  const displayPlayerLeaderboard = () => {
-    return players.map((player, index) => (
-      <LeaderboardCard
-        player={player}
-        isCurrentPlayer={player.user.userId === currentUser?.userId}
-        place={index + 1}
-        color={player.color}
-      />
-    ));
-  };
+  const displayPlayerLeaderboard = () => players.map((player, index) => (
+    <LeaderboardCard
+      player={player}
+      isCurrentPlayer={player.user.userId === currentUser?.userId}
+      place={index + 1}
+      color={player.color}
+    />
+  ));
 
   // Subscribe user to primary socket and to notifications.
   useEffect(() => {
-    if (!userSocketSubscribed && roomId) {
+    if (!gameSocket && roomId) {
       subscribePrimary(roomId);
     }
-  }, [userSocketSubscribed, roomId, subscribePrimary]);
-
-  const onCodeUpdate = (input: string) => {
-    code.current = input;
-  };
+  }, [gameSocket, roomId, subscribePrimary]);
 
   // If the page is loading, return a centered Loading object.
   if (fullPageLoading) {
@@ -300,16 +277,12 @@ function GamePage() {
             secondaryMinSize={1}
           >
             <Panel>
-              <Editor
-                onLanguageChange={onLanguageChange}
-                onCodeUpdate={onCodeUpdate}
-                problem={problem}
-              />
+              <Editor onLanguageChange={setCurrentLanguage} />
             </Panel>
 
             <Panel>
               <Console
-                testCases={problems[0]?.testCases!}
+                testCases={problems[0]?.testCases}
                 submission={submission}
                 onRun={runSolution}
               />
