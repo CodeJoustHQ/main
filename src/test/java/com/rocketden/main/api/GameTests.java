@@ -10,6 +10,8 @@ import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.dto.problem.ProblemInputDto;
+import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.user.UserDto;
@@ -121,7 +123,8 @@ public class GameTests {
         createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
 
         List<ProblemInput> problemInputs = new ArrayList<>();
-        problemInputs.add(new ProblemInput(INPUT_NAME, IO_TYPE));
+        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        problemInputs.add(problemInput);
         createProblemRequest.setProblemInputs(problemInputs);
         createProblemRequest.setOutputType(IO_TYPE);
 
@@ -137,6 +140,11 @@ public class GameTests {
         assertEquals(NAME, problemActual.getName());
         assertEquals(DESCRIPTION, problemActual.getDescription());
         assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
+
+        List<ProblemInputDto> problemInputDtos = new ArrayList<>();
+        problemInputDtos.add(ProblemMapper.toProblemInputDto(problemInput));
+        assertEquals(problemInputDtos, problemActual.getProblemInputs());
+        assertEquals(IO_TYPE, problemActual.getOutputType());
 
         CreateTestCaseRequest createTestCaseRequest = new CreateTestCaseRequest();
         createTestCaseRequest.setInput(INPUT);
