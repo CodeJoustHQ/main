@@ -16,7 +16,7 @@ public class ProblemMapper {
         if (entity == null) {
             return null;
         }
-
+        
         return mapper.map(entity, ProblemDto.class);
     }
 

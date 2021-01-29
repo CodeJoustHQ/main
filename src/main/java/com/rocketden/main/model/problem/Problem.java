@@ -10,8 +10,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import org.hibernate.annotations.IndexColumn;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,7 +37,7 @@ public class Problem {
      * is deleted or test cases are removed from this list, the test cases will also be deleted.
      * Setter is set to private to ensure proper use of addTestCase and removeTestCase methods.
      */
-    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Setter(AccessLevel.PRIVATE)
     private List<ProblemTestCase> testCases = new ArrayList<>();
 
@@ -47,9 +45,8 @@ public class Problem {
     private ProblemDifficulty difficulty;
 
     // Additional fields for the default code generation.
-    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Setter(AccessLevel.PRIVATE)
-    @IndexColumn(name="INDEX_COL")
     private List<ProblemInput> problemInputs = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
