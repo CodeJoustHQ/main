@@ -220,6 +220,32 @@ class ProblemTests {
     }
 
     @Test
+    public void createProblemBadInput() throws Exception {
+        CreateProblemRequest request = new CreateProblemRequest();
+        request.setName(NAME);
+        request.setDescription(DESCRIPTION);
+        request.setDifficulty(ProblemDifficulty.HARD);
+
+        List<ProblemInput> problemInputs = new ArrayList<>();
+        problemInputs.add(null);
+        request.setProblemInputs(problemInputs);
+        request.setOutputType(IO_TYPE);
+
+        ApiError ERROR = ProblemError.BAD_INPUT;
+
+        MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @Test
     public void createProblemEmptyFields() throws Exception {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);
