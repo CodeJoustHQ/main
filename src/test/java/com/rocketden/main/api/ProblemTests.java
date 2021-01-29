@@ -241,7 +241,7 @@ class ProblemTests {
 
     @Test
     public void createProblemBadDifficulty() throws Exception {
-        String jsonRequest = "{\"name\": \"Test\", \"description\": \"Do this\", \"difficulty\": \"invalid\"}";
+        String jsonRequest = "{\"name\": \"Test\", \"description\": \"Do this\", \"difficulty\": \"invalid\", \"problemInputs\": [{\"name\": \"nums\", \"type\": \"java\"}], \"outputType\": \"java\"}";
 
         ApiError ERROR = ProblemError.BAD_DIFFICULTY;
 
