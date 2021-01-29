@@ -3,8 +3,12 @@ package com.rocketden.main.util;
 import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.dto.problem.ProblemInputDto;
+import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.model.problem.ProblemIOType;
+import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.socket.WebSocketConnectionEvents;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
@@ -19,6 +23,7 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -33,6 +38,9 @@ public class SocketTestMethods {
     private static final String DESCRIPTION = "Sort the given list in O(n log n) time.";
     private static final String INPUT = "[1, 8, 2]";
     private static final String OUTPUT = "[1, 2, 8]";
+
+    private static final String INPUT_NAME = "nums";
+    private static final ProblemIOType IO_TYPE = ProblemIOType.ARRAY_INTEGER;
 
     public static StompSession connectToSocket(String endpoint, String userId, int port) throws Exception {
         WebSocketStompClient newStompClient = new WebSocketStompClient(new SockJsClient(
@@ -58,6 +66,12 @@ public class SocketTestMethods {
         createProblemRequest.setDescription(DESCRIPTION);
         createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
 
+        List<ProblemInput> problemInputs = new ArrayList<>();
+        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        problemInputs.add(problemInput);
+        createProblemRequest.setProblemInputs(problemInputs);
+        createProblemRequest.setOutputType(IO_TYPE);
+
         HttpEntity<CreateProblemRequest> createProblemEntity = new HttpEntity<>(createProblemRequest);
         String createProblemEndpoint = String.format("http://localhost:%s/api/v1/problems", port);
 
@@ -67,6 +81,11 @@ public class SocketTestMethods {
         assertEquals(NAME, problemActual.getName());
         assertEquals(DESCRIPTION, problemActual.getDescription());
         assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
+
+        List<ProblemInputDto> problemInputDtos = new ArrayList<>();
+        problemInputDtos.add(ProblemMapper.toProblemInputDto(problemInput));
+        assertEquals(problemInputDtos, problemActual.getProblemInputs());
+        assertEquals(IO_TYPE, problemActual.getOutputType());
 
         CreateTestCaseRequest createTestCaseRequest = new CreateTestCaseRequest();
         createTestCaseRequest.setInput(INPUT);
