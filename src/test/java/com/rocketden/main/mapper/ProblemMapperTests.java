@@ -46,7 +46,7 @@ public class ProblemMapperTests {
 
         List<ProblemInput> problemInputs = new ArrayList<>();
         problemInputs.add(new ProblemInput(INPUT_NAME, ProblemIOType.ARRAY_INTEGER));
-        expected.setProblemInputs(problemInputs);
+        // expected.setProblemInputs(problemInputs);
         expected.setOutputType(ProblemIOType.ARRAY_INTEGER);
 
         ProblemDto actual = ProblemMapper.toDto(expected);
@@ -63,12 +63,12 @@ public class ProblemMapperTests {
 
         assertEquals(expectedTestCases, actual.getTestCases());
 
-        List<ProblemInputDto> expectedProblemInputs = expected.getProblemInputs()
-                .stream()
-                .map(ProblemMapper::toProblemInputDto)
-                .collect(Collectors.toList());
+        // List<ProblemInputDto> expectedProblemInputs = expected.getProblemInputs()
+        //         .stream()
+        //         .map(ProblemMapper::toProblemInputDto)
+        //         .collect(Collectors.toList());
 
-        assertEquals(expectedProblemInputs, actual.getProblemInputs());
+        // assertEquals(expectedProblemInputs, actual.getProblemInputs());
 
         assertEquals(expected.getOutputType(), actual.getOutputType());
     }

@@ -37,7 +37,7 @@ public class Problem {
      * is deleted or test cases are removed from this list, the test cases will also be deleted.
      * Setter is set to private to ensure proper use of addTestCase and removeTestCase methods.
      */
-    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Setter(AccessLevel.PRIVATE)
     private List<ProblemTestCase> testCases = new ArrayList<>();
 
@@ -45,8 +45,9 @@ public class Problem {
     private ProblemDifficulty difficulty;
 
     // Additional fields for the default code generation.
-    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<ProblemInput> problemInputs;
+    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Setter(AccessLevel.PRIVATE)
+    private List<ProblemInput> problemInputs = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private ProblemIOType outputType;
@@ -58,5 +59,10 @@ public class Problem {
 
     public boolean removeTestCase(ProblemTestCase testCase) {
         return testCases.remove(testCase);
+    }
+
+    public void addProblemInput(ProblemInput problemInput) {
+        problemInputs.add(problemInput);
+        problemInput.setProblem(this);
     }
 }

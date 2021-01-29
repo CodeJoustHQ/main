@@ -44,20 +44,20 @@ public class ProblemService {
             throw new ApiException(ProblemError.BAD_DIFFICULTY);
         }
 
-        if (request.getProblemInputs() != null) {
-            for (ProblemInput problemInput : request.getProblemInputs()) {
-                if (problemInput == null) {
-                    throw new ApiException(ProblemError.BAD_INPUT);
-                }
-            }
-        }
-
         Problem problem = new Problem();
         problem.setName(request.getName());
         problem.setDescription(request.getDescription());
         problem.setDifficulty(request.getDifficulty());
-        problem.setProblemInputs(request.getProblemInputs());
         problem.setOutputType(request.getOutputType());
+
+        // Add all problem inputs in list.
+        for (ProblemInput problemInput : request.getProblemInputs()) {
+            if (problemInput != null) {
+                problem.addProblemInput(problemInput);
+            } else {
+                throw new ApiException(ProblemError.BAD_INPUT);
+            }
+        }
 
         repository.save(problem);
 
