@@ -12,7 +12,6 @@ import com.rocketden.main.model.problem.ProblemTestCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,9 +43,8 @@ public class ProblemMapperTests {
         testCase.setHidden(true);
         expected.addTestCase(testCase);
 
-        List<ProblemInput> problemInputs = new ArrayList<>();
-        problemInputs.add(new ProblemInput(INPUT_NAME, ProblemIOType.ARRAY_INTEGER));
-        // expected.setProblemInputs(problemInputs);
+        ProblemInput problemInput = new ProblemInput(INPUT_NAME, ProblemIOType.ARRAY_INTEGER);
+        expected.addProblemInput(problemInput);
         expected.setOutputType(ProblemIOType.ARRAY_INTEGER);
 
         ProblemDto actual = ProblemMapper.toDto(expected);
@@ -63,12 +61,12 @@ public class ProblemMapperTests {
 
         assertEquals(expectedTestCases, actual.getTestCases());
 
-        // List<ProblemInputDto> expectedProblemInputs = expected.getProblemInputs()
-        //         .stream()
-        //         .map(ProblemMapper::toProblemInputDto)
-        //         .collect(Collectors.toList());
+        List<ProblemInputDto> expectedProblemInputs = expected.getProblemInputs()
+                .stream()
+                .map(ProblemMapper::toProblemInputDto)
+                .collect(Collectors.toList());
 
-        // assertEquals(expectedProblemInputs, actual.getProblemInputs());
+        assertEquals(expectedProblemInputs, actual.getProblemInputs());
 
         assertEquals(expected.getOutputType(), actual.getOutputType());
     }
