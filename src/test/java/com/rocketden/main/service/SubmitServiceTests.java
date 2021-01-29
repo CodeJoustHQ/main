@@ -2,23 +2,32 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.SubmissionRequest;
+import com.rocketden.main.dto.game.TesterRequest;
 import com.rocketden.main.dto.user.UserMapper;
+import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.exception.GameError;
+import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Submission;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
+import com.rocketden.main.model.problem.Problem;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class SubmitServiceTests {
@@ -45,6 +54,10 @@ public class SubmitServiceTests {
         room.addUser(user);
 
         Game game = GameMapper.fromRoom(room);
+
+        List<Problem> problems = new ArrayList<>();
+        problems.add(new Problem());
+        game.setProblems(problems);
 
         SubmissionRequest request = new SubmissionRequest();
         request.setLanguage(LANGUAGE);
@@ -78,6 +91,9 @@ public class SubmitServiceTests {
         room.addUser(user2);
 
         Game game = GameMapper.fromRoom(room);
+        List<Problem> problems = new ArrayList<>();
+        problems.add(new Problem());
+        game.setProblems(problems);
 
         SubmissionRequest request = new SubmissionRequest();
         request.setLanguage(LANGUAGE);
@@ -95,5 +111,30 @@ public class SubmitServiceTests {
         assertEquals(LANGUAGE, submission.getPlayerCode().getLanguage());
         assertEquals(submission.getNumCorrect(), submission.getNumTestCases());
         assertFalse(game.getAllSolved());
+    }
+
+    // This is a very weak test - it simply resorts to ensuring a submission is returned in debug mode
+    @Test
+    public void callTesterServiceSuccess() {
+        TesterRequest request = new TesterRequest();
+        request.setCode(CODE);
+        request.setLanguage(LANGUAGE);
+        request.setProblem(new ProblemDto());
+
+        Submission response = submitService.callTesterService(request);
+
+        assertNotNull(response);
+    }
+
+    @Test
+    public void callTesterServiceFailsNoDebug() {
+        submitService.setDebugModeForTesting(false);
+
+        TesterRequest request = new TesterRequest();
+        request.setCode("temp");
+
+        ApiException exception = assertThrows(ApiException.class, () -> submitService.callTesterService(request));
+
+        assertEquals(GameError.TESTER_ERROR, exception.getError());
     }
 }
