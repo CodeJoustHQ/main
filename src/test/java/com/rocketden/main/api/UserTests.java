@@ -9,6 +9,8 @@ import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -101,48 +103,11 @@ public class UserTests {
         assertEquals(ERROR.getResponse(), actual);
     }
 
-    @Test
-    public void createNewUserEmptyNickname() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"", "rocketrocketrocketrocket", "rocket rocket"})
+    public void createNewUserEmptyNickname(String nickname) throws Exception {
         CreateUserRequest request = new CreateUserRequest();
-        request.setNickname("");
-
-        ApiError ERROR = UserError.INVALID_USER;
-
-        MvcResult result = this.mockMvc.perform(post(USER_URI)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
-        assertEquals(ERROR.getResponse(), actual);
-    }
-
-    @Test
-    public void createNewUserTooLongNickname() throws Exception {
-        CreateUserRequest request = new CreateUserRequest();
-        request.setNickname("rocketrocketrocketrocket");
-
-        ApiError ERROR = UserError.INVALID_USER;
-
-        MvcResult result = this.mockMvc.perform(post(USER_URI)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
-        assertEquals(ERROR.getResponse(), actual);
-    }
-
-    @Test
-    public void createNewUserNicknameContainsSpaces() throws Exception {
-        CreateUserRequest request = new CreateUserRequest();
-        request.setNickname("rocket rocket");
+        request.setNickname(nickname);
 
         ApiError ERROR = UserError.INVALID_USER;
 
