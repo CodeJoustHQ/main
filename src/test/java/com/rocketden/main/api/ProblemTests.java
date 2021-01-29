@@ -14,11 +14,15 @@ import com.google.gson.reflect.TypeToken;
 import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.dto.problem.ProblemInputDto;
+import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.model.problem.ProblemIOType;
+import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
@@ -64,6 +68,8 @@ class ProblemTests {
     private static final String INPUT_2 = "[-1, 5, 0, 3]";
     private static final String OUTPUT_2 = "5";
     private static final String EXPLANATION_2 = "5 is the greatest number.";
+    private static final String INPUT_NAME = "nums";
+    private static final ProblemIOType IO_TYPE = ProblemIOType.ARRAY_INTEGER;
 
     /**
      * Helper method that sends a POST request to create a new problem
@@ -71,25 +77,36 @@ class ProblemTests {
      * @throws Exception if anything wrong occurs
      */
     private ProblemDto createSingleProblem() throws Exception {
-        CreateProblemRequest request = new CreateProblemRequest();
-        request.setName(NAME);
-        request.setDescription(DESCRIPTION);
-        request.setDifficulty(ProblemDifficulty.EASY);
+        CreateProblemRequest createProblemRequest = new CreateProblemRequest();
+        createProblemRequest.setName(NAME);
+        createProblemRequest.setDescription(DESCRIPTION);
+        createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
 
-        MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
+        List<ProblemInput> problemInputs = new ArrayList<>();
+        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        problemInputs.add(problemInput);
+        createProblemRequest.setProblemInputs(problemInputs);
+        createProblemRequest.setOutputType(IO_TYPE);
+
+        MvcResult problemResult = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .content(UtilityTestMethods.convertObjectToJsonString(createProblemRequest)))
                 .andDo(print()).andExpect(status().isCreated())
                 .andReturn();
 
-        String jsonResponse = result.getResponse().getContentAsString();
-        ProblemDto actual = UtilityTestMethods.toObject(jsonResponse, ProblemDto.class);
+        String problemJsonResponse = problemResult.getResponse().getContentAsString();
+        ProblemDto problemActual = UtilityTestMethods.toObject(problemJsonResponse, ProblemDto.class);
 
-        assertEquals(NAME, actual.getName());
-        assertEquals(DESCRIPTION, actual.getDescription());
-        assertEquals(request.getDifficulty(), actual.getDifficulty());
+        assertEquals(NAME, problemActual.getName());
+        assertEquals(DESCRIPTION, problemActual.getDescription());
+        assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
 
-        return actual;
+        List<ProblemInputDto> problemInputDtos = new ArrayList<>();
+        problemInputDtos.add(ProblemMapper.toProblemInputDto(problemInput));
+        assertEquals(problemInputDtos, problemActual.getProblemInputs());
+        assertEquals(IO_TYPE, problemActual.getOutputType());
+
+        return problemActual;
     }
 
     @Test
@@ -113,6 +130,12 @@ class ProblemTests {
         request.setDescription(DESCRIPTION);
         request.setDifficulty(ProblemDifficulty.MEDIUM);
 
+        List<ProblemInput> problemInputs = new ArrayList<>();
+        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        problemInputs.add(problemInput);
+        request.setProblemInputs(problemInputs);
+        request.setOutputType(IO_TYPE);
+
         MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(request)))
@@ -125,6 +148,11 @@ class ProblemTests {
         assertEquals(NAME, actual.getName());
         assertEquals(DESCRIPTION, actual.getDescription());
         assertEquals(0, actual.getTestCases().size());
+
+        List<ProblemInputDto> problemInputDtos = new ArrayList<>();
+        problemInputDtos.add(ProblemMapper.toProblemInputDto(problemInput));
+        assertEquals(problemInputDtos, actual.getProblemInputs());
+        assertEquals(IO_TYPE, actual.getOutputType());
 
         // Get the newly created problem from the database
         result = this.mockMvc.perform(get(String.format(GET_PROBLEM, actual.getProblemId())))
@@ -146,6 +174,12 @@ class ProblemTests {
         request.setName(NAME);
         request.setDescription(DESCRIPTION);
         request.setDifficulty(ProblemDifficulty.HARD);
+
+        List<ProblemInput> problemInputs = new ArrayList<>();
+        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        problemInputs.add(problemInput);
+        request.setProblemInputs(problemInputs);
+        request.setOutputType(IO_TYPE);
 
         this.mockMvc.perform(post(POST_PROBLEM_CREATE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -174,8 +208,15 @@ class ProblemTests {
         assertEquals(NAME, actual.get(0).getName());
         assertEquals(DESCRIPTION, actual.get(0).getDescription());
 
+        List<ProblemInputDto> problemInputDtos = new ArrayList<>();
+        problemInputDtos.add(ProblemMapper.toProblemInputDto(problemInput));
+        assertEquals(problemInputDtos, actual.get(0).getProblemInputs());
+        assertEquals(IO_TYPE, actual.get(0).getOutputType());
+
         assertEquals(NAME_2, actual.get(1).getName());
         assertEquals(DESCRIPTION_2, actual.get(1).getDescription());
+        assertEquals(problemInputDtos, actual.get(1).getProblemInputs());
+        assertEquals(IO_TYPE, actual.get(1).getOutputType());
     }
 
     @Test
