@@ -25,6 +25,8 @@ import com.rocketden.main.game_object.NotificationType;
 import com.rocketden.main.model.User;
 import com.rocketden.main.util.RoomTestMethods;
 import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.model.problem.ProblemIOType;
+import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
@@ -47,6 +49,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
 @AutoConfigureMockMvc
@@ -78,6 +82,8 @@ public class GameTests {
     private static final String USER_ID = "098765";
     private static final String CODE = "print('hello')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
+    private static final String INPUT_NAME = "nums";
+    private static final ProblemIOType IO_TYPE = ProblemIOType.ARRAY_INTEGER;
 
     // Predefine notification content.
     private static final String CONTENT = "[1, 2, 3]";
@@ -113,6 +119,11 @@ public class GameTests {
         createProblemRequest.setName(NAME);
         createProblemRequest.setDescription(DESCRIPTION);
         createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
+
+        List<ProblemInput> problemInputs = new ArrayList<>();
+        problemInputs.add(new ProblemInput(INPUT_NAME, IO_TYPE));
+        createProblemRequest.setProblemInputs(problemInputs);
+        createProblemRequest.setOutputType(IO_TYPE);
 
         MvcResult problemResult = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
