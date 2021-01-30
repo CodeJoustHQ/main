@@ -1,7 +1,6 @@
 package com.rocketden.main.service;
 
 import com.google.gson.Gson;
-import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
@@ -11,7 +10,6 @@ import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.Game;
-import com.rocketden.main.model.problem.Problem;
 
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
@@ -22,7 +20,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -31,8 +28,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SubmitService {
-
-    private final SocketService socketService;
 
     private final Gson gson;
 
@@ -45,9 +40,7 @@ public class SubmitService {
 
     private final HttpClient httpClient;
 
-    @Autowired
-    protected SubmitService(SocketService socketService) {
-        this.socketService = socketService;
+    protected SubmitService() {
         this.httpClient = HttpClientBuilder.create().build();
         this.gson = new Gson();
     }
@@ -123,7 +116,7 @@ public class SubmitService {
             HttpResponse response = httpClient.execute(post);
             String jsonResponse = EntityUtils.toString(response.getEntity());
 
-            TesterResponse testerResponse = gson.fromJson(jsonResponse, TesterResponse.class);;
+            TesterResponse testerResponse = gson.fromJson(jsonResponse, TesterResponse.class);
 
             // TODO: logic to convert TesterResponse into Submission object
             Submission submission = new Submission();
