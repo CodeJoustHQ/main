@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.rocketden.main.exception.LanguageError;
 import com.rocketden.main.exception.api.ApiException;
 
+import org.apache.commons.lang.WordUtils;
 
 import lombok.Getter;
 
@@ -20,6 +21,12 @@ public enum Language {
     JAVASCRIPT,
     RUST,
     BASH;
+
+    private final String driverGeneratorName;
+
+    Language() {
+        this.driverGeneratorName = String.format("%sDefaultCodeGeneratorService", WordUtils.capitalizeFully(this.name()));
+    }
 
     // Convert a matching string (ignoring case) to enum object
     @JsonCreator

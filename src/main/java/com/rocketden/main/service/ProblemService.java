@@ -8,16 +8,20 @@ import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
+import com.rocketden.main.model.Language;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.model.problem.ProblemIOType;
 import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.model.problem.ProblemTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -25,11 +29,13 @@ import java.util.Set;
 public class ProblemService {
 
     private final ProblemRepository repository;
+    private final List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList;
     private final Random random = new Random();
 
     @Autowired
-    public ProblemService(ProblemRepository repository) {
+    public ProblemService(ProblemRepository repository, List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList) {
         this.repository = repository;
+        this.defaultCodeGeneratorServiceList = defaultCodeGeneratorServiceList;
     }
 
     public ProblemDto createProblem(CreateProblemRequest request) {
@@ -153,5 +159,25 @@ public class ProblemService {
         repository.save(problem);
 
         return ProblemMapper.toTestCaseDto(testCase);
+    }
+
+    public Map<Language, String> getDefaultCode(String problemId) {
+        // Convert from the Problem object to Problem DTOs.
+        Problem problem = repository.findProblemByProblemId(problemId);
+        
+        Map<Language, String> defaultCodeMap = new EnumMap<>(Language.class);
+        
+        // Get the relevant problem type information.
+        List<ProblemInput> problemInputs = problem.getProblemInputs();
+        ProblemIOType outputType = problem.getOutputType();
+
+        // Loop through all default code generators, and add them to EnumMap.
+        for (DefaultCodeGeneratorService defaultCodeGeneratorService : defaultCodeGeneratorServiceList) {
+            Language language = defaultCodeGeneratorService.getLanguage();
+            String defaultCode = defaultCodeGeneratorService.getDefaultCode(problemInputs, outputType);
+            defaultCodeMap.put(language, defaultCode);
+        }
+
+        return defaultCodeMap;
     }
 }
