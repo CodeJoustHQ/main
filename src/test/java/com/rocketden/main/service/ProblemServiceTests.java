@@ -9,14 +9,11 @@ import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
-import com.rocketden.main.model.Language;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemIOType;
 import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.model.problem.ProblemTestCase;
-import com.rocketden.main.service.generators.JavaDefaultCodeGeneratorService;
-import com.rocketden.main.service.generators.PythonDefaultCodeGeneratorService;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,10 +24,8 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -92,51 +87,6 @@ public class ProblemServiceTests {
 
         verify(repository).findProblemByProblemId("ZZZ");
         assertEquals(ProblemError.NOT_FOUND, exception.getError());
-    }
-
-    @Test
-    public void getDefaultCodeSuccess() {
-        Problem expected = new Problem();
-        expected.setName(NAME);
-        expected.setDescription(DESCRIPTION);
-        expected.setDifficulty(ProblemDifficulty.EASY);
-        List<ProblemInput> problemInputs = new ArrayList<>();
-        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
-        problemInputs.add(problemInput);
-        expected.addProblemInput(problemInput);
-        expected.setOutputType(IO_TYPE);
-
-        ProblemTestCase testCase = new ProblemTestCase();
-        testCase.setInput(INPUT);
-        testCase.setOutput(OUTPUT);
-        testCase.setExplanation(EXPLANATION);
-        expected.addTestCase(testCase);
-
-        Mockito.doReturn(expected).when(repository).findProblemByProblemId(expected.getProblemId());
-
-        Map<Language, String> response = problemService.getDefaultCode(expected.getProblemId());
-
-        // TODO: Move this method to the individual generator tests.
-
-        String javaDefaultCode = String.join("\n",
-            "import java.util.*;",
-            "",
-            "public class Solution {",
-            "\tpublic int[] solve(int[] nums) {",
-            "\t\t",
-            "\t}",
-            "}",
-            ""
-        );
-
-        String pythonDefaultCode = String.join("\n",
-            "class Solution(object):",
-            "\tdef solve(nums):",
-            "\t\t"
-        );
-
-        assertEquals(javaDefaultCode, response.get(Language.JAVA));
-        assertEquals(pythonDefaultCode, response.get(Language.PYTHON));
     }
 
     @Test
