@@ -1,4 +1,4 @@
-package com.rocketden.main.service;
+package com.rocketden.main.service.generators;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -7,10 +7,9 @@ import java.util.List;
 
 import com.rocketden.main.model.problem.ProblemIOType;
 import com.rocketden.main.model.problem.ProblemInput;
-import com.rocketden.main.service.generators.JavaDefaultCodeGeneratorService;
-import com.rocketden.main.service.generators.PythonDefaultCodeGeneratorService;
+import com.rocketden.main.service.DefaultCodeGeneratorService;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
@@ -51,10 +50,7 @@ public class DefaultCodeGeneratorServiceTests {
 
     @Test
     public void getDefaultCodeJava() {
-        List<ProblemInput> problemInputs = new ArrayList<>();
-        problemInputs.add(new ProblemInput(INPUT_NAME, IO_TYPE));
-        String response = javaDefaultCodeGeneratorService.getDefaultCode(problemInputs, IO_TYPE);
-        assertEquals(javaDefaultCode, response);
+        getDefaultCodeSetupMethod(javaDefaultCodeGeneratorService, javaDefaultCode);
     }
 
     @Test
