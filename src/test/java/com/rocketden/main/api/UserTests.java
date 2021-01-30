@@ -105,7 +105,7 @@ public class UserTests {
 
     @ParameterizedTest
     @ValueSource(strings = {"", "rocketrocketrocketrocket", "rocket rocket"})
-    public void createNewUserEmptyNickname(String nickname) throws Exception {
+    public void createNewUserInvalidNickname(String nickname) throws Exception {
         CreateUserRequest request = new CreateUserRequest();
         request.setNickname(nickname);
 
