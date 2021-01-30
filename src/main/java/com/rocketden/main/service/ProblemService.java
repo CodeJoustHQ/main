@@ -4,13 +4,13 @@ import com.rocketden.main.dao.ProblemRepository;
 import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.dto.problem.ProblemInputDto;
 import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.problem.ProblemDifficulty;
-import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.model.problem.ProblemTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,9 +51,9 @@ public class ProblemService {
         problem.setOutputType(request.getOutputType());
 
         // Add all problem inputs in list.
-        for (ProblemInput problemInput : request.getProblemInputs()) {
+        for (ProblemInputDto problemInput : request.getProblemInputs()) {
             if (problemInput != null) {
-                problem.addProblemInput(problemInput);
+                problem.addProblemInput(ProblemMapper.toProblemInputEntity(problemInput));
             } else {
                 throw new ApiException(ProblemError.BAD_INPUT);
             }

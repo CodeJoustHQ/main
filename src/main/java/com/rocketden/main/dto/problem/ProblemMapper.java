@@ -35,4 +35,12 @@ public class ProblemMapper {
 
         return mapper.map(entity, ProblemInputDto.class);
     }
+
+    public static ProblemInput toProblemInputEntity(ProblemInputDto dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        return mapper.map(dto, ProblemInput.class);
+    }
 }
