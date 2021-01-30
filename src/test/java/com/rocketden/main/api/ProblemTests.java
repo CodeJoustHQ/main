@@ -15,14 +15,12 @@ import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.dto.problem.ProblemInputDto;
-import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemIOType;
-import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
@@ -82,8 +80,8 @@ class ProblemTests {
         createProblemRequest.setDescription(DESCRIPTION);
         createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
 
-        List<ProblemInput> problemInputs = new ArrayList<>();
-        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        List<ProblemInputDto> problemInputs = new ArrayList<>();
+        ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
         problemInputs.add(problemInput);
         createProblemRequest.setProblemInputs(problemInputs);
         createProblemRequest.setOutputType(IO_TYPE);
@@ -100,10 +98,7 @@ class ProblemTests {
         assertEquals(NAME, problemActual.getName());
         assertEquals(DESCRIPTION, problemActual.getDescription());
         assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
-
-        List<ProblemInputDto> problemInputDtos = new ArrayList<>();
-        problemInputDtos.add(ProblemMapper.toProblemInputDto(problemInput));
-        assertEquals(problemInputDtos, problemActual.getProblemInputs());
+        assertEquals(problemInputs, problemActual.getProblemInputs());
         assertEquals(IO_TYPE, problemActual.getOutputType());
 
         return problemActual;
@@ -130,8 +125,8 @@ class ProblemTests {
         request.setDescription(DESCRIPTION);
         request.setDifficulty(ProblemDifficulty.MEDIUM);
 
-        List<ProblemInput> problemInputs = new ArrayList<>();
-        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        List<ProblemInputDto> problemInputs = new ArrayList<>();
+        ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
         problemInputs.add(problemInput);
         request.setProblemInputs(problemInputs);
         request.setOutputType(IO_TYPE);
@@ -148,10 +143,7 @@ class ProblemTests {
         assertEquals(NAME, actual.getName());
         assertEquals(DESCRIPTION, actual.getDescription());
         assertEquals(0, actual.getTestCases().size());
-
-        List<ProblemInputDto> problemInputDtos = new ArrayList<>();
-        problemInputDtos.add(ProblemMapper.toProblemInputDto(problemInput));
-        assertEquals(problemInputDtos, actual.getProblemInputs());
+        assertEquals(problemInputs, actual.getProblemInputs());
         assertEquals(IO_TYPE, actual.getOutputType());
 
         // Get the newly created problem from the database
@@ -175,8 +167,8 @@ class ProblemTests {
         request.setDescription(DESCRIPTION);
         request.setDifficulty(ProblemDifficulty.HARD);
 
-        List<ProblemInput> problemInputs = new ArrayList<>();
-        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        List<ProblemInputDto> problemInputs = new ArrayList<>();
+        ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
         problemInputs.add(problemInput);
         request.setProblemInputs(problemInputs);
         request.setOutputType(IO_TYPE);
@@ -207,15 +199,12 @@ class ProblemTests {
         assertEquals(2, actual.size());
         assertEquals(NAME, actual.get(0).getName());
         assertEquals(DESCRIPTION, actual.get(0).getDescription());
-
-        List<ProblemInputDto> problemInputDtos = new ArrayList<>();
-        problemInputDtos.add(ProblemMapper.toProblemInputDto(problemInput));
-        assertEquals(problemInputDtos, actual.get(0).getProblemInputs());
+        assertEquals(problemInputs, actual.get(0).getProblemInputs());
         assertEquals(IO_TYPE, actual.get(0).getOutputType());
 
         assertEquals(NAME_2, actual.get(1).getName());
         assertEquals(DESCRIPTION_2, actual.get(1).getDescription());
-        assertEquals(problemInputDtos, actual.get(1).getProblemInputs());
+        assertEquals(problemInputs, actual.get(1).getProblemInputs());
         assertEquals(IO_TYPE, actual.get(1).getOutputType());
     }
 
@@ -226,7 +215,7 @@ class ProblemTests {
         request.setDescription(DESCRIPTION);
         request.setDifficulty(ProblemDifficulty.HARD);
 
-        List<ProblemInput> problemInputs = new ArrayList<>();
+        List<ProblemInputDto> problemInputs = new ArrayList<>();
         problemInputs.add(null);
         request.setProblemInputs(problemInputs);
         request.setOutputType(IO_TYPE);

@@ -5,14 +5,12 @@ import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.dto.problem.ProblemInputDto;
-import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemIOType;
-import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.model.problem.ProblemTestCase;
 
 import org.junit.jupiter.api.Test;
@@ -96,8 +94,8 @@ public class ProblemServiceTests {
         request.setDescription(DESCRIPTION);
         request.setDifficulty(ProblemDifficulty.MEDIUM);
 
-        List<ProblemInput> problemInputs = new ArrayList<>();
-        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        List<ProblemInputDto> problemInputs = new ArrayList<>();
+        ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
         problemInputs.add(problemInput);
         request.setProblemInputs(problemInputs);
         request.setOutputType(IO_TYPE);
@@ -111,10 +109,7 @@ public class ProblemServiceTests {
         assertEquals(DESCRIPTION, response.getDescription());
         assertEquals(request.getDifficulty(), response.getDifficulty());
         assertEquals(0, response.getTestCases().size());
-
-        List<ProblemInputDto> problemInputDtos = new ArrayList<>();
-        problemInputDtos.add(ProblemMapper.toProblemInputDto(problemInput));
-        assertEquals(problemInputDtos, response.getProblemInputs());
+        assertEquals(problemInputs, response.getProblemInputs());
         assertEquals(IO_TYPE, response.getOutputType());
     }
 
@@ -124,8 +119,8 @@ public class ProblemServiceTests {
         request.setDescription(DESCRIPTION);
         request.setDifficulty(ProblemDifficulty.HARD);
 
-        List<ProblemInput> problemInputs = new ArrayList<>();
-        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        List<ProblemInputDto> problemInputs = new ArrayList<>();
+        ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
         problemInputs.add(problemInput);
         request.setProblemInputs(problemInputs);
         request.setOutputType(IO_TYPE);
@@ -143,8 +138,8 @@ public class ProblemServiceTests {
         missingRequest.setName(NAME);
         missingRequest.setDescription(DESCRIPTION);
 
-        List<ProblemInput> problemInputs = new ArrayList<>();
-        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        List<ProblemInputDto> problemInputs = new ArrayList<>();
+        ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
         problemInputs.add(problemInput);
         missingRequest.setProblemInputs(problemInputs);
         missingRequest.setOutputType(IO_TYPE);

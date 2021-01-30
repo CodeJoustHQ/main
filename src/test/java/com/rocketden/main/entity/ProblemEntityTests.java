@@ -1,6 +1,7 @@
 package com.rocketden.main.entity;
 
 import com.rocketden.main.model.problem.Problem;
+import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.model.problem.ProblemTestCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -67,5 +68,18 @@ public class ProblemEntityTests {
         assertTrue(problem.removeTestCase(caseToRemove));
         assertFalse(problem.removeTestCase(caseToRemove));
         assertTrue(problem.getTestCases().isEmpty());
+    }
+
+    @Test
+    public void addProblemInput() {
+        Problem problem = new Problem();
+        ProblemInput problemInput = new ProblemInput();
+
+        // The function has no restrictions on necessary test case components.
+        problem.addProblemInput(problemInput);
+
+        assertEquals(1, problem.getProblemInputs().size());
+        assertEquals(problemInput, problem.getProblemInputs().get(0));
+        assertEquals(problem, problemInput.getProblem());
     }
 }
