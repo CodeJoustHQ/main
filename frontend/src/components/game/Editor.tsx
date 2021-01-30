@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import styled from 'styled-components';
+import Language from '../../api/Language';
 
 type LanguageType = {
   [key: string]: {
@@ -47,6 +48,7 @@ export const languages: LanguageType = {
 
 type EditorProps = {
   onLanguageChange: (language: string) => void,
+  defaultCodeMap: Map<Language, string> | null,
 };
 
 const Content = styled.div`
@@ -58,7 +60,10 @@ function ResizableMonacoEditor(props: EditorProps) {
   const [currentLanguage, setCurrentLanguage] = useState('java');
   const [codeEditor, setCodeEditor] = useState<any>(null);
 
-  const { onLanguageChange } = props;
+  const { onLanguageChange, defaultCodeMap } = props;
+
+  // TODO: Implement this in the frontend.
+  console.log(defaultCodeMap);
 
   const handleEditorDidMount = (editor: any) => {
     setCodeEditor(editor);

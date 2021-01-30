@@ -294,7 +294,10 @@ function GamePage() {
             secondaryMinSize={1}
           >
             <Panel>
-              <Editor onLanguageChange={setCurrentLanguage} />
+              <Editor
+                onLanguageChange={setCurrentLanguage}
+                defaultCodeMap={defaultCodeList ? defaultCodeList[0] : null}
+              />
             </Panel>
 
             <Panel>
