@@ -4,7 +4,7 @@ import SplitterLayout from 'react-splitter-layout';
 import { useBeforeunload } from 'react-beforeunload';
 import { Message, Subscription } from 'stompjs';
 import Editor from '../components/game/Editor';
-import { Problem } from '../api/Problem';
+import { getDefaultCodeMap, Problem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
 import {
   MainContainer, CenteredContainer, FlexContainer, FlexInfoBar,
@@ -30,6 +30,7 @@ import {
   disconnect, routes, send, subscribe,
 } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
+import Language from '../api/Language';
 
 type LocationState = {
   roomId: string,
@@ -57,6 +58,7 @@ function GamePage() {
   const [currentLanguage, setCurrentLanguage] = useState('java');
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
+  const [defaultCodeList, setDefaultCodeList] = useState<Map<Language, string>[] | null>(null);
 
   // When variable null, show nothing; otherwise, show notification.
   const [gameNotification, setGameNotification] = useState<GameNotification | null>(null);
@@ -83,6 +85,20 @@ function GamePage() {
     setAllSolved(newGame.allSolved);
     setTimeUp(newGame.gameTimer.timeUp);
   };
+
+  const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[]) => {
+    const tempDefaultCodeList: Map<Language, string>[] = [];
+    problemsParam.forEach((problem) => {
+      if (problem && problem.problemId) {
+        getDefaultCodeMap(problem.problemId).then((defaultCodeMap) => {
+          tempDefaultCodeList.push(defaultCodeMap);
+        }).catch((err) => {
+          setError(err.message);
+        });
+      }
+    });
+    setDefaultCodeList(tempDefaultCodeList);
+  }, [setDefaultCodeList]);
 
   /**
    * Display the notification as a callback from the notification
@@ -149,6 +165,7 @@ function GamePage() {
       getGame(location.state.roomId)
         .then((res) => {
           setStateFromGame(res);
+          setDefaultCodeFromProblems(res.problems);
           setFullPageLoading(false);
         })
         .catch((err) => {

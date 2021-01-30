@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { axiosErrorHandler } from './Error';
 import Difficulty from './Difficulty';
+import Language from './Language';
 
 export type TestCase = {
   input: string,
@@ -26,6 +27,7 @@ const routes = {
   getRandomProblem: `${basePath}/random`,
   getSingleProblem: (problemId: string) => `${basePath}/${problemId}`,
   createTestCase: (problemId: string) => `${basePath}/${problemId}/test-case`,
+  defaultCodeMap: (problemId: string) => `${basePath}/${problemId}/default-code`,
 };
 
 export const getProblems = (): Promise<Problem[]> => axios
@@ -37,6 +39,13 @@ export const getProblems = (): Promise<Problem[]> => axios
 
 export const getRandomProblem = (request: ProblemSettings): Promise<Problem> => axios
   .get<Problem>(`${routes.getRandomProblem}?${new URLSearchParams(request).toString()}`)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const getDefaultCodeMap = (problemId: string): Promise<Map<Language, string>> => axios
+  .get<Map<Language, string>>(routes.defaultCodeMap(problemId))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
