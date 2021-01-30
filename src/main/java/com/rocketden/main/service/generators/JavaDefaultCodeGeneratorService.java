@@ -19,7 +19,7 @@ public class JavaDefaultCodeGeneratorService implements DefaultCodeGeneratorServ
         
         // Initialize method line StringBuilder with the output type.
         StringBuilder methodLineBuilder = new StringBuilder();
-        methodLineBuilder.append(String.format("public %s solve(", typeInstantiationToString(outputType)));
+        methodLineBuilder.append(String.format("\tpublic %s solve(", typeInstantiationToString(outputType)));
 
         // Add all of the method inputs and names.
         String prefix = "";
