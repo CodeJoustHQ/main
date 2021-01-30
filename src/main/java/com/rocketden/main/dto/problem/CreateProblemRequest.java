@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemIOType;
-import com.rocketden.main.model.problem.ProblemInput;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +14,6 @@ public class CreateProblemRequest {
     private String name;
     private String description;
     private ProblemDifficulty difficulty;
-    private List<ProblemInput> problemInputs;
+    private List<ProblemInputDto> problemInputs;
     private ProblemIOType outputType;
 }
