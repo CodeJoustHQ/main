@@ -99,7 +99,9 @@ function GamePage() {
   // Check if game is over or not and redirect to results page if so
   useEffect(() => {
     if (timeUp || allSolved) {
+      // eslint-disable-next-line no-unused-expressions
       gameSocket?.unsubscribe();
+      // eslint-disable-next-line no-unused-expressions
       notificationSocket?.unsubscribe();
 
       history.replace('/game/results', {

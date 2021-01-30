@@ -4,6 +4,7 @@ import com.rocketden.main.dao.ProblemRepository;
 import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.dto.problem.ProblemInputDto;
 import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
@@ -33,7 +34,9 @@ public class ProblemService {
 
     public ProblemDto createProblem(CreateProblemRequest request) {
         if (request.getName() == null || request.getDescription() == null
-                || request.getDifficulty() == null) {
+                || request.getDifficulty() == null
+                || request.getProblemInputs() == null
+                || request.getOutputType() == null) {
             throw new ApiException(ProblemError.EMPTY_FIELD);
         }
 
@@ -45,6 +48,16 @@ public class ProblemService {
         problem.setName(request.getName());
         problem.setDescription(request.getDescription());
         problem.setDifficulty(request.getDifficulty());
+        problem.setOutputType(request.getOutputType());
+
+        // Add all problem inputs in list.
+        for (ProblemInputDto problemInput : request.getProblemInputs()) {
+            if (problemInput != null) {
+                problem.addProblemInput(ProblemMapper.toProblemInputEntity(problemInput));
+            } else {
+                throw new ApiException(ProblemError.BAD_INPUT);
+            }
+        }
 
         repository.save(problem);
 

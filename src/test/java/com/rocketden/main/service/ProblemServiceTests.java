@@ -4,11 +4,13 @@ import com.rocketden.main.dao.ProblemRepository;
 import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
+import com.rocketden.main.dto.problem.ProblemInputDto;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.model.problem.ProblemIOType;
 import com.rocketden.main.model.problem.ProblemTestCase;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,6 +47,9 @@ public class ProblemServiceTests {
     private static final String INPUT = "[1, 8, 2]";
     private static final String OUTPUT = "[1, 2, 8]";
     private static final String EXPLANATION = "2 < 8, so those are swapped.";
+
+    private static final String INPUT_NAME = "nums";
+    private static final ProblemIOType IO_TYPE = ProblemIOType.ARRAY_INTEGER;
 
     @Test
     public void getProblemSuccess() {
@@ -88,6 +93,12 @@ public class ProblemServiceTests {
         request.setDescription(DESCRIPTION);
         request.setDifficulty(ProblemDifficulty.MEDIUM);
 
+        List<ProblemInputDto> problemInputs = new ArrayList<>();
+        ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
+        problemInputs.add(problemInput);
+        request.setProblemInputs(problemInputs);
+        request.setOutputType(IO_TYPE);
+
         ProblemDto response = problemService.createProblem(request);
 
         verify(repository).save(Mockito.any(Problem.class));
@@ -97,6 +108,8 @@ public class ProblemServiceTests {
         assertEquals(DESCRIPTION, response.getDescription());
         assertEquals(request.getDifficulty(), response.getDifficulty());
         assertEquals(0, response.getTestCases().size());
+        assertEquals(problemInputs, response.getProblemInputs());
+        assertEquals(IO_TYPE, response.getOutputType());
     }
 
     @Test
@@ -104,6 +117,12 @@ public class ProblemServiceTests {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setDescription(DESCRIPTION);
         request.setDifficulty(ProblemDifficulty.HARD);
+
+        List<ProblemInputDto> problemInputs = new ArrayList<>();
+        ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
+        problemInputs.add(problemInput);
+        request.setProblemInputs(problemInputs);
+        request.setOutputType(IO_TYPE);
 
         ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblem(request));
 
@@ -118,6 +137,12 @@ public class ProblemServiceTests {
         missingRequest.setName(NAME);
         missingRequest.setDescription(DESCRIPTION);
 
+        List<ProblemInputDto> problemInputs = new ArrayList<>();
+        ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
+        problemInputs.add(problemInput);
+        missingRequest.setProblemInputs(problemInputs);
+        missingRequest.setOutputType(IO_TYPE);
+
         ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblem(missingRequest));
 
         verify(repository, never()).save(Mockito.any());
@@ -128,6 +153,8 @@ public class ProblemServiceTests {
         badRequest.setName(NAME);
         badRequest.setDescription(DESCRIPTION);
         badRequest.setDifficulty(ProblemDifficulty.RANDOM);
+        badRequest.setProblemInputs(problemInputs);
+        badRequest.setOutputType(IO_TYPE);
 
         exception = assertThrows(ApiException.class, () -> problemService.createProblem(badRequest));
 
