@@ -26,7 +26,7 @@ public class PythonDefaultCodeGeneratorService implements DefaultCodeGeneratorSe
             prefix = ", ";
             methodLineBuilder.append(problemInput.getName());
         }
-        methodLineBuilder.append(");");
+        methodLineBuilder.append("):");
 
         return String.join("\n",
             "class Solution(object):",

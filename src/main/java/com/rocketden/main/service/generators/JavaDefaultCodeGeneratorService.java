@@ -31,7 +31,7 @@ public class JavaDefaultCodeGeneratorService implements DefaultCodeGeneratorServ
                 problemInput.getName()
             ));
         }
-        methodLineBuilder.append(");");
+        methodLineBuilder.append(") {");
 
         return String.join("\n", 
             "import java.util.*;",
