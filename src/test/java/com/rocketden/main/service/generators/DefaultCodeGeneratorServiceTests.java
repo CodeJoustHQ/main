@@ -29,11 +29,22 @@ public class DefaultCodeGeneratorServiceTests {
     private static final String INPUT_NAME = "nums";
     private static final ProblemIOType IO_TYPE = ProblemIOType.ARRAY_INTEGER;
 
-    private static final String javaDefaultCode =
-        "import java.util.*;\n\npublic class Solution {\n\tpublic int[] solve(int[] nums) {\n\t\t\n\t}\n}\n";
+    private static final String javaDefaultCode = String.join("\n",
+        "import java.util.*;",
+        "",
+        "public class Solution {",
+        "\tpublic int[] solve(int[] nums) {",
+        "\t\t",
+        "\t}",
+        "}",
+        ""
+    );
 
-    public static final String pythonDefaultCode =
-        "class Solution(object):\n\tdef solve(nums):\n\t\t";
+    public static final String pythonDefaultCode = String.join("\n",
+        "class Solution(object):",
+        "\tdef solve(nums):",
+        "\t\t"
+    );
 
     /**
      * Helper method to test the "getDefaultCode" method across languages.
