@@ -11,16 +11,38 @@ import com.rocketden.main.service.DefaultCodeGeneratorService;
 
 import org.springframework.stereotype.Service;
 
-import lombok.Getter;
-
 @Service
-@Getter
 public class JavaDefaultCodeGeneratorService implements DefaultCodeGeneratorService {
 
     @Override
     public String getDefaultCode(List<ProblemInput> problemInputs, ProblemIOType outputType) {
-        // TODO Auto-generated method stub
-        return null;
+        
+        // Initialize method line StringBuilder with the output type.
+        StringBuilder methodLineBuilder = new StringBuilder();
+        methodLineBuilder.append(String.format("public %s solve(", typeInstantiationToString(outputType)));
+
+        // Add all of the method inputs and names.
+        String prefix = "";
+        for (ProblemInput problemInput : problemInputs) {
+            methodLineBuilder.append(prefix);
+            prefix = ", ";
+            methodLineBuilder.append(String.format("%s %s",
+                typeInstantiationToString(problemInput.getType()),
+                problemInput.getName()
+            ));
+        }
+        methodLineBuilder.append(");");
+
+        return String.join("\n", 
+            "import java.util.*;",
+            "",
+            "public class Solution {",
+            methodLineBuilder.toString(),
+            "\t\t",
+            "\t}",
+            "}",
+            ""
+        );
     }
 
     @Override
