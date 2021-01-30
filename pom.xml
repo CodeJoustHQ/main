@@ -143,6 +143,7 @@
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
       <version>2.6</version>
+    </dependency>
     <!-- Sending REST requests using Java -->
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
