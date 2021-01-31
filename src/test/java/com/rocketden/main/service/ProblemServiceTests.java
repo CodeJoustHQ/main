@@ -198,6 +198,8 @@ public class ProblemServiceTests {
         request.setHidden(true);
         request.setExplanation(EXPLANATION);
 
+        // TODO input outputs must match problem inputs
+
         ProblemTestCaseDto response = problemService.createTestCase(expected.getProblemId(), request);
 
         verify(repository).save(Mockito.any(Problem.class));
@@ -239,6 +241,8 @@ public class ProblemServiceTests {
 
         verify(repository, never()).save(Mockito.any());
         assertEquals(ProblemError.EMPTY_FIELD, exception.getError());
+
+        // TODO invlalid inputs outputs
     }
 
     @Test
@@ -331,5 +335,35 @@ public class ProblemServiceTests {
                 problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 1));
 
         assertEquals(ProblemError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void editProblemSuccess() {
+        // TODO
+    }
+
+    @Test
+    public void editProblemFailure() {
+        // TODO
+    }
+
+    @Test
+    public void deleteProblemSuccess() {
+        // TODO
+    }
+
+    @Test
+    public void deleteProblemFailure() {
+        // TODO
+    }
+
+    @Test
+    public void validateTestCases() {
+        // TODO
+    }
+
+    @Test
+    public void validateGsonParseable() {
+        // TODO
     }
 }

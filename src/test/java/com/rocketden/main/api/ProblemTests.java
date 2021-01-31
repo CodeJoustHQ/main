@@ -209,6 +209,11 @@ class ProblemTests {
     }
 
     @Test
+    public void createEditDeleteProblemSuccess() {
+
+    }
+
+    @Test
     public void createProblemBadInput() throws Exception {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);
@@ -293,6 +298,8 @@ class ProblemTests {
         request.setInput(INPUT);
         request.setOutput(OUTPUT);
         request.setExplanation(EXPLANATION);
+
+        // TODO input output must match problem inputs
 
         String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getProblemId());
         MvcResult result = this.mockMvc.perform(post(endpoint)

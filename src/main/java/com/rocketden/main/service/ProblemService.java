@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ProblemService {
@@ -95,7 +96,7 @@ public class ProblemService {
             throw new ApiException(ProblemError.BAD_DIFFICULTY);
         }
 
-        validateTestCases(updatedProblem.getTestCases());
+        validateTestCases(updatedProblem.getTestCases(), updatedProblem.getProblemInputs());
 
         problem.setName(updatedProblem.getName());
         problem.setDescription(updatedProblem.getDescription());
@@ -183,6 +184,16 @@ public class ProblemService {
         if (request.getInput() == null || request.getOutput() == null) {
             throw new ApiException(ProblemError.EMPTY_FIELD);
         }
+
+        // Verify inputs are of valid form
+        List<ProblemInputDto> inputs = problem.getProblemInputs()
+                .stream()
+                .map(ProblemMapper::toProblemInputDto)
+                .collect(Collectors.toList());
+
+        validateGsonParseable(request.getInput(), inputs);
+        validateGsonParseable(request.getOutput(), inputs);
+
 
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(request.getInput());
