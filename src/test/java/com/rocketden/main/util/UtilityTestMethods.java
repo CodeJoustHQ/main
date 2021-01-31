@@ -27,7 +27,7 @@ public class UtilityTestMethods {
         return gson.fromJson(json, c);
     }
 
-    public static <T> T toObjectList(String json, Type type) {
+    public static <T> T toObjectType(String json, Type type) {
         Gson gson = new Gson();
         return gson.fromJson(json, type);
     }
