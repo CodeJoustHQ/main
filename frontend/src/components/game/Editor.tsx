@@ -32,10 +32,9 @@ function ResizableMonacoEditor(props: EditorProps) {
 
   const handleLanguageChange = (language: Language) => {
     // Save the code for this language
-    // eslint-disable-next-line no-unused-expressions
-    if (codeMap != null) {
+    if (codeMap != null && codeEditor != null) {
       codeMap[currentLanguage] = codeEditor.getValue();
-      codeEditor!.setValue(codeMap[language]);
+      codeEditor.setValue(codeMap[language]);
     }
 
     // Change the language and initial code for the editor
