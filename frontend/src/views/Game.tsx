@@ -58,7 +58,7 @@ function GamePage() {
   const [currentLanguage, setCurrentLanguage] = useState('java');
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
-  const [defaultCodeList, setDefaultCodeList] = useState<Map<Language, string>[] | null>(null);
+  const [defaultCodeList, setDefaultCodeList] = useState<Map<Language, string>[]>([]);
 
   // When variable null, show nothing; otherwise, show notification.
   const [gameNotification, setGameNotification] = useState<GameNotification | null>(null);
@@ -87,17 +87,19 @@ function GamePage() {
   };
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[]) => {
-    const tempDefaultCodeList: Map<Language, string>[] = [];
+    const promises: Promise<Map<Language, string>>[] = [];
     problemsParam.forEach((problem) => {
       if (problem && problem.problemId) {
-        getDefaultCodeMap(problem.problemId).then((defaultCodeMap) => {
-          tempDefaultCodeList.push(defaultCodeMap);
-        }).catch((err) => {
-          setError(err.message);
-        });
+        promises.push(getDefaultCodeMap(problem.problemId));
       }
     });
-    setDefaultCodeList(tempDefaultCodeList);
+
+    // Get the result of promises and set the default code list.
+    Promise.all(promises).then((result) => {
+      setDefaultCodeList(result);
+    }).catch((err) => {
+      setError(err.message);
+    });
   }, [setDefaultCodeList]);
 
   /**
@@ -296,7 +298,7 @@ function GamePage() {
             <Panel>
               <Editor
                 onLanguageChange={setCurrentLanguage}
-                defaultCodeMap={defaultCodeList ? defaultCodeList[0] : null}
+                codeMap={defaultCodeList[0]}
               />
             </Panel>
 

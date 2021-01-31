@@ -11,4 +11,6 @@ enum Language {
   Bash = 'BASH',
 }
 
+export const fromString = (key: string): Language => Language[key as keyof typeof Language];
+
 export default Language;
