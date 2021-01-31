@@ -1,5 +1,7 @@
 package com.rocketden.main.service;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.rocketden.main.dao.ProblemRepository;
 import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
@@ -26,6 +28,7 @@ public class ProblemService {
 
     private final ProblemRepository repository;
     private final Random random = new Random();
+    private final Gson gson = new Gson();
 
     @Autowired
     public ProblemService(ProblemRepository repository) {
@@ -91,6 +94,8 @@ public class ProblemService {
         if (updatedProblem.getDifficulty() == ProblemDifficulty.RANDOM) {
             throw new ApiException(ProblemError.BAD_DIFFICULTY);
         }
+
+        validateTestCases(updatedProblem.getTestCases());
 
         problem.setName(updatedProblem.getName());
         problem.setDescription(updatedProblem.getDescription());
@@ -193,5 +198,28 @@ public class ProblemService {
         repository.save(problem);
 
         return ProblemMapper.toTestCaseDto(testCase);
+    }
+
+    // Check to make sure test case inputs and outputs are Gson-parsable
+    private void validateTestCases(List<ProblemTestCaseDto> inputs, List<ProblemInputDto> types) {
+        for (ProblemTestCaseDto input : inputs) {
+            validateGsonParseable(input.getInput(), types);
+            validateGsonParseable(input.getOutput(), types);
+        }
+    }
+
+    private void validateGsonParseable(String input, List<ProblemInputDto> types) {
+        String[] inputs = input.trim().split("\n");
+        if (inputs.length != types.size()) {
+            throw new ApiException(ProblemError.INCORRECT_INPUT_COUNT);
+        }
+
+        for (int i = 0; i < types.size(); i++) {
+            try {
+                gson.fromJson(inputs[i], types.get(i).getType().getClassType());
+            } catch (JsonSyntaxException e) {
+                throw new ApiException(ProblemError.INVALID_INPUT);
+            }
+        }
     }
 }
