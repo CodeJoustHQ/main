@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import styled from 'styled-components';
-import Language, { fromString } from '../../api/Language';
+import Language, { fromString, languageToEditorLanguage } from '../../api/Language';
 import { DefaultCodeType } from '../../api/Problem';
 
 type EditorProps = {
@@ -63,8 +63,8 @@ function ResizableMonacoEditor(props: EditorProps) {
       <MonacoEditor
         height="100%"
         editorDidMount={handleEditorDidMount}
-        language={currentLanguage}
-        defaultValue={codeMap ? codeMap[currentLanguage] : 'Loading...'}
+        language={languageToEditorLanguage(currentLanguage)}
+        defaultValue="Loading..."
       />
     </Content>
   );
