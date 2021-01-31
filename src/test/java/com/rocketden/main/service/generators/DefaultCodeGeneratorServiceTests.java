@@ -7,7 +7,6 @@ import java.util.List;
 
 import com.rocketden.main.model.problem.ProblemIOType;
 import com.rocketden.main.model.problem.ProblemInput;
-import com.rocketden.main.service.DefaultCodeGeneratorService;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
