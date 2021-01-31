@@ -2,7 +2,7 @@ package com.rocketden.main.service;
 
 import java.util.List;
 
-import com.rocketden.main.model.Language;
+import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.model.problem.ProblemIOType;
 import com.rocketden.main.model.problem.ProblemInput;
 
@@ -18,6 +18,6 @@ public interface DefaultCodeGeneratorService {
     String typeInstantiationToString(ProblemIOType ioType);
 
     // The language associated with the implementing class.
-    Language getLanguage();
+    CodeLanguage getLanguage();
     
 }

@@ -6,7 +6,7 @@ import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemSettingsDto;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
-import com.rocketden.main.model.Language;
+import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.service.ProblemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +65,7 @@ public class ProblemController extends BaseRestController {
     }
 
     @GetMapping("/problems/{problemId}/default-code")
-    public ResponseEntity<Map<Language, String>> getDefaultCode(@PathVariable String problemId) {
+    public ResponseEntity<Map<CodeLanguage, String>> getDefaultCode(@PathVariable String problemId) {
         return new ResponseEntity<>(service.getDefaultCode(problemId), HttpStatus.OK);
     }
 }
