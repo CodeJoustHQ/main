@@ -74,12 +74,44 @@ public class ProblemService {
         return ProblemMapper.toDto(problem);
     }
 
-    public ProblemDto editProblem(String problemId) {
+    public ProblemDto editProblem(String problemId, ProblemDto updatedProblem) {
+        Problem problem = repository.findProblemByProblemId(problemId);
 
+        if (problem == null) {
+            throw new ApiException(ProblemError.NOT_FOUND);
+        }
+
+        if (updatedProblem.getName() == null || updatedProblem.getDescription() == null
+                || updatedProblem.getDifficulty() == null
+                || updatedProblem.getProblemInputs() == null
+                || updatedProblem.getOutputType() == null) {
+            throw new ApiException(ProblemError.EMPTY_FIELD);
+        }
+
+        if (updatedProblem.getDifficulty() == ProblemDifficulty.RANDOM) {
+            throw new ApiException(ProblemError.BAD_DIFFICULTY);
+        }
+
+        problem.setName(updatedProblem.getName());
+        problem.setDescription(updatedProblem.getDescription());
+        problem.setDifficulty(updatedProblem.getDifficulty());
+        problem.setOutputType(updatedProblem.getOutputType());
+
+        for (ProblemInputDto problemInput : updatedProblem.getProblemInputs()) {
+            if (problemInput != null) {
+                problem.addProblemInput(ProblemMapper.toProblemInputEntity(problemInput));
+            } else {
+                throw new ApiException(ProblemError.BAD_INPUT);
+            }
+        }
+
+        repository.save(problem);
+
+        return ProblemMapper.toDto(problem);
     }
 
     public ProblemDto deleteProblem(String problemId) {
-        
+        return null;
     }
 
     public List<ProblemDto> getAllProblems() {

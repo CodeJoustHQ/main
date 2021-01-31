@@ -44,8 +44,8 @@ public class ProblemController extends BaseRestController {
     }
 
     @PutMapping("/problems/{problemId}")
-    public ResponseEntity<ProblemDto> editProblem(@PathVariable String problemId) {
-        return new ResponseEntity<>(service.editProblem(problemId), HttpStatus.OK);
+    public ResponseEntity<ProblemDto> editProblem(@PathVariable String problemId, @RequestBody ProblemDto updatedProblem) {
+        return new ResponseEntity<>(service.editProblem(problemId, updatedProblem), HttpStatus.OK);
     }
 
     @DeleteMapping("/problems/{problemId}")
