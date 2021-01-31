@@ -4,7 +4,7 @@ import SplitterLayout from 'react-splitter-layout';
 import { useBeforeunload } from 'react-beforeunload';
 import { Message, Subscription } from 'stompjs';
 import Editor from '../components/game/Editor';
-import { getDefaultCodeMap, Problem } from '../api/Problem';
+import { DefaultCodeType, getDefaultCodeMap, Problem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
 import {
   MainContainer, CenteredContainer, FlexContainer, FlexInfoBar,
@@ -30,7 +30,6 @@ import {
   disconnect, routes, send, subscribe,
 } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
-import Language from '../api/Language';
 
 type LocationState = {
   roomId: string,
@@ -58,7 +57,7 @@ function GamePage() {
   const [currentLanguage, setCurrentLanguage] = useState('java');
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
-  const [defaultCodeList, setDefaultCodeList] = useState<Map<Language, string>[]>([]);
+  const [defaultCodeList, setDefaultCodeList] = useState<DefaultCodeType[]>([]);
 
   // When variable null, show nothing; otherwise, show notification.
   const [gameNotification, setGameNotification] = useState<GameNotification | null>(null);
@@ -87,7 +86,7 @@ function GamePage() {
   };
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[]) => {
-    const promises: Promise<Map<Language, string>>[] = [];
+    const promises: Promise<DefaultCodeType>[] = [];
     problemsParam.forEach((problem) => {
       if (problem && problem.problemId) {
         promises.push(getDefaultCodeMap(problem.problemId));

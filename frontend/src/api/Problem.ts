@@ -20,6 +20,10 @@ export type ProblemSettings = {
   difficulty: Difficulty,
 };
 
+export type DefaultCodeType = {
+  [language in Language]: string
+};
+
 const basePath = '/api/v1/problems';
 const routes = {
   getProblems: `${basePath}/`,
@@ -44,8 +48,8 @@ export const getRandomProblem = (request: ProblemSettings): Promise<Problem> => 
     throw axiosErrorHandler(err);
   });
 
-export const getDefaultCodeMap = (problemId: string): Promise<Map<Language, string>> => axios
-  .get<Map<Language, string>>(routes.defaultCodeMap(problemId))
+export const getDefaultCodeMap = (problemId: string): Promise<DefaultCodeType> => axios
+  .get<DefaultCodeType>(routes.defaultCodeMap(problemId))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
