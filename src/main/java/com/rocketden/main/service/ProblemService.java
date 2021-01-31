@@ -9,7 +9,7 @@ import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
-import com.rocketden.main.model.Language;
+import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemIOType;
@@ -162,11 +162,11 @@ public class ProblemService {
         return ProblemMapper.toTestCaseDto(testCase);
     }
 
-    public Map<Language, String> getDefaultCode(String problemId) {
+    public Map<CodeLanguage, String> getDefaultCode(String problemId) {
         // Convert from the Problem object to Problem DTOs.
         Problem problem = repository.findProblemByProblemId(problemId);
         
-        Map<Language, String> defaultCodeMap = new EnumMap<>(Language.class);
+        Map<CodeLanguage, String> defaultCodeMap = new EnumMap<>(CodeLanguage.class);
         
         // Get the relevant problem type information.
         List<ProblemInput> problemInputs = problem.getProblemInputs();
@@ -174,7 +174,7 @@ public class ProblemService {
 
         // Loop through all default code generators, and add them to EnumMap.
         for (DefaultCodeGeneratorService defaultCodeGeneratorService : defaultCodeGeneratorServiceList) {
-            Language language = defaultCodeGeneratorService.getLanguage();
+            CodeLanguage language = defaultCodeGeneratorService.getLanguage();
             String defaultCode = defaultCodeGeneratorService.getDefaultCode(problemInputs, outputType);
             defaultCodeMap.put(language, defaultCode);
         }

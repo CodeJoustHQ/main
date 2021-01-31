@@ -2,7 +2,7 @@ package com.rocketden.main.service.generators;
 
 import java.util.List;
 
-import com.rocketden.main.model.Language;
+import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.model.problem.ProblemIOType;
 import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.service.DefaultCodeGeneratorService;
@@ -42,7 +42,7 @@ public class PythonDefaultCodeGeneratorService implements DefaultCodeGeneratorSe
     }
 
     @Override
-    public Language getLanguage() {
-        return Language.PYTHON;
+    public CodeLanguage getLanguage() {
+        return CodeLanguage.PYTHON;
     }
 }
