@@ -74,6 +74,14 @@ public class ProblemService {
         return ProblemMapper.toDto(problem);
     }
 
+    public ProblemDto editProblem(String problemId) {
+
+    }
+
+    public ProblemDto deleteProblem(String problemId) {
+        
+    }
+
     public List<ProblemDto> getAllProblems() {
         List<ProblemDto> problems = new ArrayList<>();
         repository.findAll().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
