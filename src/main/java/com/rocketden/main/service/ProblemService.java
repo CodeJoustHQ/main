@@ -98,11 +98,18 @@ public class ProblemService {
             throw new ApiException(ProblemError.BAD_DIFFICULTY);
         }
 
+        // Ensure that the user entered valid inputs and outputs for the problem
+        for (ProblemTestCaseDto input : updatedProblem.getTestCases()) {
+            validateGsonParseable(input.getInput(), updatedProblem.getProblemInputs());
+            validateGsonParseable(input.getOutput(), updatedProblem.getProblemInputs());
+        }
+
         problem.setName(updatedProblem.getName());
         problem.setDescription(updatedProblem.getDescription());
         problem.setDifficulty(updatedProblem.getDifficulty());
         problem.setOutputType(updatedProblem.getOutputType());
 
+        problem.getProblemInputs().clear();
         for (ProblemInputDto problemInput : updatedProblem.getProblemInputs()) {
             if (problemInput != null) {
                 problem.addProblemInput(ProblemMapper.toProblemInputEntity(problemInput));

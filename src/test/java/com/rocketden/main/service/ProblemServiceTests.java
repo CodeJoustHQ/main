@@ -385,6 +385,7 @@ public class ProblemServiceTests {
 
         verify(repository).save(problem);
         assertEquals(1, problem.getTestCases().size());
+        assertEquals(1, problem.getProblemInputs().size());
 
         ProblemTestCase testCase = problem.getTestCases().get(0);
         assertEquals(testCaseDto.getInput(), testCase.getInput());
@@ -470,7 +471,32 @@ public class ProblemServiceTests {
         assertEquals(ProblemError.EMPTY_FIELD, exception.getError());
     }
 
-    // TODO: edit problem types, previous test cases are invalid
+    @Test
+    public void editProblemNewProblemInputInvalidatesTestCases() {
+        Problem problem = new Problem();
+        problem.setName(NAME);
+        problem.setDescription(DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.MEDIUM);
+
+        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        problem.addProblemInput(problemInput);
+        problem.setOutputType(IO_TYPE);
+
+        ProblemTestCase testCase = new ProblemTestCase();
+        testCase.setInput(INPUT);
+        testCase.setOutput(OUTPUT);
+        problem.addTestCase(testCase);
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
+
+        ProblemDto updatedProblem = ProblemMapper.toDto(problem);
+        updatedProblem.getProblemInputs().get(0).setType(IO_TYPE_2);
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                problemService.editProblem(problem.getProblemId(), updatedProblem));
+
+        assertEquals(ProblemError.INVALID_INPUT, exception.getError());
+    }
 
     @Test
     public void deleteProblemSuccess() {
