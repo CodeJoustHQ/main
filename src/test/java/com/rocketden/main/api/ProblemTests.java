@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
@@ -51,6 +53,7 @@ class ProblemTests {
     private static final String GET_PROBLEM_ALL = "/api/v1/problems";
     private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
     private static final String POST_TEST_CASE_CREATE = "/api/v1/problems/%s/test-case";
+    private static final String PUT_PROBLEM_EDIT = "/api/v1/problems/%s";
 
     private static final String DIFFICULTY_KEY = "difficulty";
     private static final String NUM_PROBLEMS_KEY = "numProblems";
@@ -64,8 +67,8 @@ class ProblemTests {
     private static final String OUTPUT = "[1, 2, 8]";
     private static final String EXPLANATION = "2 < 8, so those are swapped.";
     private static final String INPUT_2 = "[-1, 5, 0, 3]";
-    private static final String OUTPUT_2 = "5";
-    private static final String EXPLANATION_2 = "5 is the greatest number.";
+    private static final String OUTPUT_2 = "[-1, 0, 3, 5]";
+    private static final String EXPLANATION_2 = "5 is the largest, so it should be at the end.";
     private static final String INPUT_NAME = "nums";
     private static final ProblemIOType IO_TYPE = ProblemIOType.ARRAY_INTEGER;
 
@@ -209,8 +212,33 @@ class ProblemTests {
     }
 
     @Test
-    public void createEditDeleteProblemSuccess() {
+    public void createEditDeleteProblemSuccess() throws Exception {
+        ProblemDto problemDto = createSingleProblem();
+        problemDto.setOutputType(ProblemIOType.CHARACTER);
+        problemDto.setName(NAME_2);
 
+        ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
+        testCaseDto.setInput(INPUT);
+        testCaseDto.setOutput("a");
+        problemDto.setTestCases(Collections.singletonList(testCaseDto));
+
+        String endpoint = String.format(PUT_PROBLEM_EDIT, problemDto.getProblemId());
+        this.mockMvc.perform(put(endpoint)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(problemDto)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        MvcResult result = this.mockMvc.perform(get(String.format(GET_PROBLEM, problemDto.getProblemId())))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ProblemDto actual = UtilityTestMethods.toObject(jsonResponse, ProblemDto.class);
+
+        assertEquals(problemDto.getOutputType(), actual.getOutputType());
+        assertEquals(problemDto.getName(), actual.getName());
+        assertEquals(problemDto.getTestCases().get(0).getOutput(), actual.getTestCases().get(0).getOutput());
     }
 
     @Test
@@ -298,8 +326,6 @@ class ProblemTests {
         request.setInput(INPUT);
         request.setOutput(OUTPUT);
         request.setExplanation(EXPLANATION);
-
-        // TODO input output must match problem inputs
 
         String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getProblemId());
         MvcResult result = this.mockMvc.perform(post(endpoint)
