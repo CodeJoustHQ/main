@@ -101,7 +101,7 @@ public class ProblemService {
         // Ensure that the user entered valid inputs and outputs for the problem
         for (ProblemTestCaseDto input : updatedProblem.getTestCases()) {
             validateGsonParseable(input.getInput(), updatedProblem.getProblemInputs());
-            validateGsonParseable(input.getOutput(), updatedProblem.getProblemInputs());
+            validateGsonParseable(input.getOutput(), updatedProblem.getOutputType());
         }
 
         problem.setName(updatedProblem.getName());

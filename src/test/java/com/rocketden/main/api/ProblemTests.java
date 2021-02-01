@@ -4,6 +4,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -48,6 +49,7 @@ class ProblemTests {
     @Autowired
     private MockMvc mockMvc;
 
+    private static final String DELETE_PROBLEM = "/api/v1/problems/%s";
     private static final String GET_PROBLEM = "/api/v1/problems/%s";
     private static final String GET_PROBLEM_RANDOM = "/api/v1/problems/random";
     private static final String GET_PROBLEM_ALL = "/api/v1/problems";
@@ -222,6 +224,7 @@ class ProblemTests {
         testCaseDto.setOutput("a");
         problemDto.setTestCases(Collections.singletonList(testCaseDto));
 
+        // Edit problem with new values
         String endpoint = String.format(PUT_PROBLEM_EDIT, problemDto.getProblemId());
         this.mockMvc.perform(put(endpoint)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -229,6 +232,7 @@ class ProblemTests {
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
+        // Perform GET request to ensure updated problem is saved
         MvcResult result = this.mockMvc.perform(get(String.format(GET_PROBLEM, problemDto.getProblemId())))
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
@@ -239,6 +243,24 @@ class ProblemTests {
         assertEquals(problemDto.getOutputType(), actual.getOutputType());
         assertEquals(problemDto.getName(), actual.getName());
         assertEquals(problemDto.getTestCases().get(0).getOutput(), actual.getTestCases().get(0).getOutput());
+
+        // Delete problem from the database
+        endpoint = String.format(DELETE_PROBLEM, problemDto.getProblemId());
+        result = this.mockMvc.perform(delete(endpoint))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        ApiError ERROR = ProblemError.NOT_FOUND;
+
+        // Ensure that the GET request throws a not found error
+        result = this.mockMvc.perform(get(String.format(GET_PROBLEM, problemDto.getProblemId())))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse response = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), response);
     }
 
     @Test
