@@ -5,12 +5,14 @@ import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.dto.problem.ProblemInputDto;
+import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemIOType;
+import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.model.problem.ProblemTestCase;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,6 +45,7 @@ public class ProblemServiceTests {
 
     private static final String NAME = "Sort a List";
     private static final String DESCRIPTION = "Sort the given list in O(n log n) time.";
+    private static final String PROBLEM_ID = "abcdefghijk";
 
     private static final String INPUT = "[1, 8, 2]";
     private static final String OUTPUT = "[1, 2, 8]";
@@ -339,12 +342,57 @@ public class ProblemServiceTests {
 
     @Test
     public void editProblemSuccess() {
-        // TODO
+        Problem problem = new Problem();
+        problem.setName(NAME);
+        problem.setDescription(DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.MEDIUM);
+
+        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        problem.addProblemInput(problemInput);
+        problem.setOutputType(IO_TYPE);
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(PROBLEM_ID);
+
+        ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
+        testCaseDto.setInput(INPUT);
+        testCaseDto.setOutput(OUTPUT);
+
+        ProblemDto updatedProblem = ProblemMapper.toDto(problem);
+        updatedProblem.setTestCases(Collections.singletonList(testCaseDto));
+
+        problemService.editProblem(PROBLEM_ID, updatedProblem);
+
+        verify(repository).save(problem);
+        assertEquals(1, problem.getTestCases().size());
+
+        ProblemTestCase testCase = problem.getTestCases().get(0);
+        assertEquals(testCaseDto.getInput(), testCase.getInput());
+        assertEquals(testCaseDto.getOutput(), testCase.getOutput());
     }
 
     @Test
     public void editProblemFailure() {
-        // TODO
+        Problem problem = new Problem();
+        problem.setName(NAME);
+        problem.setDescription(DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.MEDIUM);
+
+        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        problem.addProblemInput(problemInput);
+        problem.setOutputType(IO_TYPE);
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(PROBLEM_ID);
+
+        ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
+        testCaseDto.setInput("[1, 2, 3");
+        testCaseDto.setOutput(OUTPUT);
+
+        ProblemDto updatedProblem = ProblemMapper.toDto(problem);
+        updatedProblem.setTestCases(Collections.singletonList(testCaseDto));
+
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.editProblem(PROBLEM_ID, updatedProblem));
+
+        assertEquals(ProblemError.INVALID_INPUT, exception.getError());
     }
 
     @Test

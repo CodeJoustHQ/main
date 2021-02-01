@@ -115,6 +115,16 @@ public class ProblemService {
             }
         }
 
+        for (ProblemTestCaseDto testCaseDto : updatedProblem.getTestCases()) {
+            ProblemTestCase testCase = new ProblemTestCase();
+            testCase.setInput(testCaseDto.getInput());
+            testCase.setOutput(testCaseDto.getOutput());
+            testCase.setHidden(testCaseDto.isHidden());
+            testCase.setExplanation(testCaseDto.getExplanation());
+
+            problem.addTestCase(testCase);
+        }
+
         repository.save(problem);
 
         return ProblemMapper.toDto(problem);
