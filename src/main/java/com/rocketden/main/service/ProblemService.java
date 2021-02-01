@@ -96,7 +96,11 @@ public class ProblemService {
             throw new ApiException(ProblemError.BAD_DIFFICULTY);
         }
 
-        validateTestCases(updatedProblem.getTestCases(), updatedProblem.getProblemInputs());
+        // Ensure that the user entered valid inputs and outputs for the problem
+        for (ProblemTestCaseDto input : updatedProblem.getTestCases()) {
+            validateGsonParseable(input.getInput(), updatedProblem.getProblemInputs());
+            validateGsonParseable(input.getOutput(), updatedProblem.getProblemInputs());
+        }
 
         problem.setName(updatedProblem.getName());
         problem.setDescription(updatedProblem.getDescription());
@@ -220,14 +224,7 @@ public class ProblemService {
     }
 
     // Check to make sure test case inputs and outputs are Gson-parsable
-    private void validateTestCases(List<ProblemTestCaseDto> inputs, List<ProblemInputDto> types) {
-        for (ProblemTestCaseDto input : inputs) {
-            validateGsonParseable(input.getInput(), types);
-            validateGsonParseable(input.getOutput(), types);
-        }
-    }
-
-    private void validateGsonParseable(String input, List<ProblemInputDto> types) {
+    protected void validateGsonParseable(String input, List<ProblemInputDto> types) {
         String[] inputs = input.trim().split("\n");
         if (inputs.length != types.size()) {
             throw new ApiException(ProblemError.INCORRECT_INPUT_COUNT);
