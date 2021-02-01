@@ -470,6 +470,8 @@ public class ProblemServiceTests {
         assertEquals(ProblemError.EMPTY_FIELD, exception.getError());
     }
 
+    // TODO: edit problem types, previous test cases are invalid
+
     @Test
     public void deleteProblemSuccess() {
         Problem problem = new Problem();
@@ -526,5 +528,16 @@ public class ProblemServiceTests {
                 problemService.validateGsonParseable("true\n[a]\nstring", inputs));
 
         assertEquals(ProblemError.INVALID_INPUT, exception.getError());
+
+        exception = assertThrows(ApiException.class, () ->
+                problemService.validateGsonParseable(null, inputs));
+
+        assertEquals(ProblemError.INVALID_INPUT, exception.getError());
+
+        inputs.add(new ProblemInputDto("", ProblemIOType.ARRAY_STRING));
+        exception = assertThrows(ApiException.class, () ->
+                problemService.validateGsonParseable("true\n[a]\n3.0\n[]", inputs));
+
+        assertEquals(ProblemError.BAD_INPUT, exception.getError());
     }
 }

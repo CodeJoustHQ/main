@@ -14,6 +14,7 @@ import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemIOType;
+import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.model.problem.ProblemTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -95,12 +96,6 @@ public class ProblemService {
 
         if (updatedProblem.getDifficulty() == ProblemDifficulty.RANDOM) {
             throw new ApiException(ProblemError.BAD_DIFFICULTY);
-        }
-
-        // Ensure that the user entered valid inputs and outputs for the problem
-        for (ProblemTestCaseDto input : updatedProblem.getTestCases()) {
-            validateGsonParseable(input.getInput(), updatedProblem.getProblemInputs());
-            validateGsonParseable(input.getOutput(), updatedProblem.getOutputType());
         }
 
         problem.setName(updatedProblem.getName());
@@ -236,17 +231,30 @@ public class ProblemService {
 
     // Check to make sure test case inputs and outputs are Gson-parsable
     protected void validateGsonParseable(String input, List<ProblemInputDto> types) {
+        if (input == null) {
+            throw new ApiException(ProblemError.INVALID_INPUT);
+        }
+
         String[] inputs = input.trim().split("\n");
         if (inputs.length != types.size()) {
             throw new ApiException(ProblemError.INCORRECT_INPUT_COUNT);
         }
 
         for (int i = 0; i < types.size(); i++) {
+            ProblemInputDto type = types.get(i);
+            if (type.getName() == null || type.getName().isEmpty() || type.getType() == null) {
+                throw new ApiException(ProblemError.BAD_INPUT);
+            }
+
             validateGsonParseable(inputs[i], types.get(i).getType());
         }
     }
 
     private void validateGsonParseable(String input, ProblemIOType type) {
+        if (input == null) {
+            throw new ApiException(ProblemError.INVALID_INPUT);
+        }
+
         try {
             gson.fromJson(input, type.getClassType());
         } catch (Exception e) {
