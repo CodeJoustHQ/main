@@ -397,12 +397,28 @@ public class ProblemServiceTests {
 
     @Test
     public void deleteProblemSuccess() {
-        // TODO
+        Problem problem = new Problem();
+        problem.setName(NAME);
+        problem.setDescription(DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.MEDIUM);
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(PROBLEM_ID);
+
+        ProblemDto response = problemService.deleteProblem(PROBLEM_ID);
+
+        verify(repository).delete(problem);
+
+        assertEquals(problem.getName(), response.getName());
+        assertEquals(problem.getDescription(), response.getDescription());
+        assertEquals(problem.getDifficulty(), response.getDifficulty());
     }
 
     @Test
     public void deleteProblemFailure() {
-        // TODO
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.deleteProblem("ZZZ"));
+
+        verify(repository).findProblemByProblemId("ZZZ");
+        assertEquals(ProblemError.NOT_FOUND, exception.getError());
     }
 
     @Test
