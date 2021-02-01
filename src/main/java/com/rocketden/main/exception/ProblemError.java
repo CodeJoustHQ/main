@@ -12,7 +12,7 @@ public enum ProblemError implements ApiError {
     BAD_INPUT(HttpStatus.BAD_REQUEST, "None of the problem inputs provided can be null."),
     BAD_IOTYPE(HttpStatus.BAD_REQUEST, "Please choose a value Problem IO Type."),
     INCORRECT_INPUT_COUNT(HttpStatus.BAD_REQUEST, "Please specify the correct number of parameters for ths problem."),
-    INVALID_INPUT(HttpStatus.BAD_REQUEST, "Please ensure each line of test case input is valid and is of the correct type."),
+    INVALID_INPUT(HttpStatus.BAD_REQUEST, "Please ensure each line of test case input/output is valid and is of the correct type."),
     INVALID_NUMBER_REQUEST(HttpStatus.BAD_REQUEST, "Please request a valid number of problems."),
     EMPTY_FIELD(HttpStatus.BAD_REQUEST, "Please enter a value for each required field."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "A problem could not be found with the given criteria.");

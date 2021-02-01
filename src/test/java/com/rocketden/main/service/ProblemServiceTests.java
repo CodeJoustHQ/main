@@ -49,10 +49,12 @@ public class ProblemServiceTests {
 
     private static final String INPUT = "[1, 8, 2]";
     private static final String OUTPUT = "[1, 2, 8]";
+    private static final String OUTPUT_2 = "8";
     private static final String EXPLANATION = "2 < 8, so those are swapped.";
 
     private static final String INPUT_NAME = "nums";
     private static final ProblemIOType IO_TYPE = ProblemIOType.ARRAY_INTEGER;
+    private static final ProblemIOType IO_TYPE_2 = ProblemIOType.INTEGER;
 
     @Test
     public void getProblemSuccess() {
@@ -192,6 +194,8 @@ public class ProblemServiceTests {
         expected.setName(NAME);
         expected.setDescription(DESCRIPTION);
         expected.setDifficulty(ProblemDifficulty.HARD);
+
+        expected.addProblemInput(new ProblemInput("name", ProblemIOType.ARRAY_INTEGER));
 
         Mockito.doReturn(expected).when(repository).findProblemByProblemId(expected.getProblemId());
 
@@ -349,13 +353,13 @@ public class ProblemServiceTests {
 
         ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
         problem.addProblemInput(problemInput);
-        problem.setOutputType(IO_TYPE);
+        problem.setOutputType(IO_TYPE_2);
 
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(PROBLEM_ID);
 
         ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
         testCaseDto.setInput(INPUT);
-        testCaseDto.setOutput(OUTPUT);
+        testCaseDto.setOutput(OUTPUT_2);
 
         ProblemDto updatedProblem = ProblemMapper.toDto(problem);
         updatedProblem.setTestCases(Collections.singletonList(testCaseDto));
@@ -385,6 +389,31 @@ public class ProblemServiceTests {
 
         ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
         testCaseDto.setInput("[1, 2, 3");
+        testCaseDto.setOutput(OUTPUT);
+
+        ProblemDto updatedProblem = ProblemMapper.toDto(problem);
+        updatedProblem.setTestCases(Collections.singletonList(testCaseDto));
+
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.editProblem(PROBLEM_ID, updatedProblem));
+
+        assertEquals(ProblemError.INVALID_INPUT, exception.getError());
+    }
+
+    @Test
+    public void editProblemBadTestCaseOutput() {
+        Problem problem = new Problem();
+        problem.setName(NAME);
+        problem.setDescription(DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.MEDIUM);
+
+        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        problem.addProblemInput(problemInput);
+        problem.setOutputType(IO_TYPE_2);
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(PROBLEM_ID);
+
+        ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
+        testCaseDto.setInput(INPUT);
         testCaseDto.setOutput(OUTPUT);
 
         ProblemDto updatedProblem = ProblemMapper.toDto(problem);

@@ -13,6 +13,7 @@ import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.model.problem.ProblemIOType;
 import com.rocketden.main.model.problem.ProblemTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -99,7 +100,7 @@ public class ProblemService {
         // Ensure that the user entered valid inputs and outputs for the problem
         for (ProblemTestCaseDto input : updatedProblem.getTestCases()) {
             validateGsonParseable(input.getInput(), updatedProblem.getProblemInputs());
-            validateGsonParseable(input.getOutput(), updatedProblem.getProblemInputs());
+            validateGsonParseable(input.getOutput(), updatedProblem.getOutputType());
         }
 
         problem.setName(updatedProblem.getName());
@@ -214,7 +215,7 @@ public class ProblemService {
                 .collect(Collectors.toList());
 
         validateGsonParseable(request.getInput(), inputs);
-        validateGsonParseable(request.getOutput(), inputs);
+        validateGsonParseable(request.getOutput(), problem.getOutputType());
 
 
         ProblemTestCase testCase = new ProblemTestCase();
@@ -241,11 +242,15 @@ public class ProblemService {
         }
 
         for (int i = 0; i < types.size(); i++) {
-            try {
-                gson.fromJson(inputs[i], types.get(i).getType().getClassType());
-            } catch (Exception e) {
-                throw new ApiException(ProblemError.INVALID_INPUT);
-            }
+            validateGsonParseable(inputs[i], types.get(i).getType());
+        }
+    }
+
+    private void validateGsonParseable(String input, ProblemIOType type) {
+        try {
+            gson.fromJson(input, type.getClassType());
+        } catch (Exception e) {
+            throw new ApiException(ProblemError.INVALID_INPUT);
         }
     }
 }
