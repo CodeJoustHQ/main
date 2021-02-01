@@ -117,7 +117,15 @@ public class ProblemService {
     }
 
     public ProblemDto deleteProblem(String problemId) {
-        return null;
+        Problem problem = repository.findProblemByProblemId(problemId);
+
+        if (problem == null) {
+            throw new ApiException(ProblemError.NOT_FOUND);
+        }
+
+        repository.delete(problem);
+
+        return ProblemMapper.toDto(problem);
     }
 
     public List<ProblemDto> getAllProblems() {
