@@ -243,7 +243,7 @@ public class ProblemService {
         for (int i = 0; i < types.size(); i++) {
             try {
                 gson.fromJson(inputs[i], types.get(i).getType().getClassType());
-            } catch (JsonSyntaxException e) {
+            } catch (Exception e) {
                 throw new ApiException(ProblemError.INVALID_INPUT);
             }
         }
