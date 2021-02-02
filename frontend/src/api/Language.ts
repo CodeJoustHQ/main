@@ -18,18 +18,18 @@ export const languageToEditorLanguage = (key: Language): string => {
   switch (key) {
     case Language.Python:
       return 'python';
-    case Language.Ruby:
-      return 'ruby';
-    case Language.CPP:
-      return 'c++';
-    case Language.PHP:
-      return 'php';
-    case Language.C:
-      return 'objective-c';
+    // case Language.Ruby:
+    //   return 'ruby';
+    // case Language.CPP:
+    //   return 'c++';
+    // case Language.PHP:
+    //   return 'php';
+    // case Language.C:
+    //   return 'objective-c';
     case Language.Java:
       return 'java';
-    case Language.JavaScript:
-      return 'javascript';
+    // case Language.JavaScript:
+    //   return 'javascript';
     default:
       return '';
   }
