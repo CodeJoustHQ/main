@@ -1,4 +1,4 @@
-package com.rocketden.main.service;
+package com.rocketden.main.service.generators;
 
 import java.util.List;
 

@@ -15,6 +15,8 @@ import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemIOType;
 import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.model.problem.ProblemTestCase;
+import com.rocketden.main.service.generators.DefaultCodeGeneratorService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -135,8 +137,8 @@ public class ProblemService {
     }
 
     public ProblemTestCaseDto createTestCase(String problemId, CreateTestCaseRequest request) {
-        Problem problem = repository.findProblemByProblemId(problemId);
 
+        Problem problem = repository.findProblemByProblemId(problemId);
         if (problem == null) {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
@@ -165,6 +167,10 @@ public class ProblemService {
     public Map<CodeLanguage, String> getDefaultCode(String problemId) {
         // Convert from the Problem object to Problem DTOs.
         Problem problem = repository.findProblemByProblemId(problemId);
+
+        if (problem == null) {
+            throw new ApiException(ProblemError.NOT_FOUND);
+        }
         
         Map<CodeLanguage, String> defaultCodeMap = new EnumMap<>(CodeLanguage.class);
         
