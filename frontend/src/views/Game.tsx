@@ -178,7 +178,7 @@ function GamePage() {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
       });
     }
-  }, [location, history]);
+  }, [location, history, setDefaultCodeFromProblems]);
 
   // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {

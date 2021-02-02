@@ -46,7 +46,7 @@ function ResizableMonacoEditor(props: EditorProps) {
     if (codeMap != null && codeEditor != null) {
       codeEditor.setValue(codeMap[currentLanguage]);
     }
-  }, [currentLanguage, codeMap, setCodeEditor]);
+  }, [currentLanguage, codeMap, codeEditor, setCodeEditor]);
 
   return (
     <Content>
