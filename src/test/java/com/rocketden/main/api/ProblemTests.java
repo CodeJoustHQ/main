@@ -19,6 +19,7 @@ import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
+import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemIOType;
 import com.rocketden.main.util.UtilityTestMethods;
@@ -36,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
 @AutoConfigureMockMvc
@@ -51,6 +53,7 @@ class ProblemTests {
     private static final String GET_PROBLEM_ALL = "/api/v1/problems";
     private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
     private static final String POST_TEST_CASE_CREATE = "/api/v1/problems/%s/test-case";
+    private static final String GET_DEFAULT_CODE = "/api/v1/problems/%s/default-code";
 
     private static final String DIFFICULTY_KEY = "difficulty";
     private static final String NUM_PROBLEMS_KEY = "numProblems";
@@ -68,6 +71,23 @@ class ProblemTests {
     private static final String EXPLANATION_2 = "5 is the greatest number.";
     private static final String INPUT_NAME = "nums";
     private static final ProblemIOType IO_TYPE = ProblemIOType.ARRAY_INTEGER;
+
+    private static final String javaDefaultCode = String.join("\n",
+        "import java.util.*;",
+        "",
+        "public class Solution {",
+        "\tpublic int[] solve(int[] nums) {",
+        "\t\t",
+        "\t}",
+        "}",
+        ""
+    );
+
+    public static final String pythonDefaultCode = String.join("\n",
+        "class Solution(object):",
+        "\tdef solve(nums):",
+        "\t\t"
+    );
 
     /**
      * Helper method that sends a POST request to create a new problem
@@ -444,7 +464,7 @@ class ProblemTests {
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        List<ProblemDto> actual = UtilityTestMethods.toObjectList(jsonResponse, new TypeToken<List<ProblemDto>>(){}.getType());
+        List<ProblemDto> actual = UtilityTestMethods.toObjectType(jsonResponse, new TypeToken<List<ProblemDto>>(){}.getType());
 
         assertEquals(problem.getName(), actual.get(0).getName());
         assertEquals(problem.getDescription(), actual.get(0).getDescription());
@@ -462,6 +482,37 @@ class ProblemTests {
         MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_RANDOM)
                 .param(DIFFICULTY_KEY, "MEDIUM")
                 .param(NUM_PROBLEMS_KEY, "1"))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @Test
+    public void getDefaultCodeSuccess() throws Exception {
+        ProblemDto problem = createSingleProblem();
+
+        MvcResult result = this.mockMvc.perform(get(String.format(GET_DEFAULT_CODE, problem.getProblemId())))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+
+        Map<CodeLanguage, String> actual = UtilityTestMethods.toObjectType(jsonResponse, new TypeToken<Map<CodeLanguage, String>>(){}.getType());
+
+        assertEquals(javaDefaultCode, actual.get(CodeLanguage.JAVA));
+        assertEquals(pythonDefaultCode, actual.get(CodeLanguage.PYTHON));
+        assertEquals(2, actual.size());
+    }
+
+    @Test
+    public void getDefaultCodeProblemNotFound() throws Exception {
+        ApiError ERROR = ProblemError.NOT_FOUND;
+
+        MvcResult result = this.mockMvc.perform(get(String.format(GET_DEFAULT_CODE, 999999)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 

@@ -9,15 +9,22 @@ import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
+import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.model.problem.ProblemIOType;
+import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.model.problem.ProblemTestCase;
+import com.rocketden.main.service.generators.DefaultCodeGeneratorService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -25,11 +32,13 @@ import java.util.Set;
 public class ProblemService {
 
     private final ProblemRepository repository;
+    private final List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList;
     private final Random random = new Random();
 
     @Autowired
-    public ProblemService(ProblemRepository repository) {
+    public ProblemService(ProblemRepository repository, List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList) {
         this.repository = repository;
+        this.defaultCodeGeneratorServiceList = defaultCodeGeneratorServiceList;
     }
 
     public ProblemDto createProblem(CreateProblemRequest request) {
@@ -128,8 +137,8 @@ public class ProblemService {
     }
 
     public ProblemTestCaseDto createTestCase(String problemId, CreateTestCaseRequest request) {
-        Problem problem = repository.findProblemByProblemId(problemId);
 
+        Problem problem = repository.findProblemByProblemId(problemId);
         if (problem == null) {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
@@ -154,4 +163,27 @@ public class ProblemService {
 
         return ProblemMapper.toTestCaseDto(testCase);
     }
+
+    public Map<CodeLanguage, String> getDefaultCode(String problemId) {
+        Problem problem = repository.findProblemByProblemId(problemId);
+
+        if (problem == null) {
+            throw new ApiException(ProblemError.NOT_FOUND);
+        }
+        
+        Map<CodeLanguage, String> defaultCodeMap = new EnumMap<>(CodeLanguage.class);
+        
+        // Get the relevant problem type information.
+        List<ProblemInput> problemInputs = problem.getProblemInputs();
+        ProblemIOType outputType = problem.getOutputType();
+
+        // Loop through all default code generators, and add them to EnumMap.
+        for (DefaultCodeGeneratorService defaultCodeGeneratorService : defaultCodeGeneratorServiceList) {
+            CodeLanguage language = defaultCodeGeneratorService.getLanguage();
+            String defaultCode = defaultCodeGeneratorService.getDefaultCode(problemInputs, outputType);
+            defaultCodeMap.put(language, defaultCode);
+        }
+
+        return defaultCodeMap;
+    }   
 }
