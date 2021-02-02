@@ -138,6 +138,12 @@
       <artifactId>modelmapper</artifactId>
       <version>2.3.0</version>
     </dependency>
+    <!-- Apache Commons Lang library for generating random strings -->
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.6</version>
+    </dependency>
     <!-- Sending REST requests using Java -->
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>

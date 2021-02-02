@@ -1,52 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import styled from 'styled-components';
-
-type LanguageType = {
-  [key: string]: {
-    name: string,
-    defaultCode: string,
-  }
-};
-
-export const languages: LanguageType = {
-  java: {
-    name: 'Java',
-    defaultCode:
-      'public class Solution {\n'
-      + '    public static void main(String[] args) {\n'
-      + '        \n'
-      + '    }\n'
-      + '}\n',
-  },
-  python: {
-    name: 'Python',
-    defaultCode:
-      'def solution():\n'
-      + '    \n',
-  },
-  javascript: {
-    name: 'JavaScript',
-    defaultCode:
-      'function solution() {\n'
-      + '    \n'
-      + '}\n',
-  },
-  csharp: {
-    name: 'C#',
-    defaultCode:
-      'using System;\n\n'
-      + 'public class Solution\n{\n'
-      + '    public static void Main()\n'
-      + '    {\n'
-      + '        \n'
-      + '    }\n'
-      + '}\n',
-  },
-};
+import Language, { fromString, languageToEditorLanguage } from '../../api/Language';
+import { DefaultCodeType } from '../../api/Problem';
 
 type EditorProps = {
   onLanguageChange: (language: string) => void,
+  codeMap: DefaultCodeType | null,
 };
 
 const Content = styled.div`
@@ -55,10 +15,10 @@ const Content = styled.div`
 
 // This function refreshes the width of Monaco editor upon change in container size
 function ResizableMonacoEditor(props: EditorProps) {
-  const [currentLanguage, setCurrentLanguage] = useState('java');
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.Python);
   const [codeEditor, setCodeEditor] = useState<any>(null);
 
-  const { onLanguageChange } = props;
+  const { onLanguageChange, codeMap } = props;
 
   const handleEditorDidMount = (editor: any) => {
     setCodeEditor(editor);
@@ -70,34 +30,41 @@ function ResizableMonacoEditor(props: EditorProps) {
     });
   };
 
-  const handleLanguageChange = (language: string) => {
+  const handleLanguageChange = (language: Language) => {
     // Save the code for this language
-    languages[currentLanguage].defaultCode = codeEditor!.getValue();
+    if (codeMap != null && codeEditor != null) {
+      codeMap[currentLanguage] = codeEditor.getValue();
+      codeEditor.setValue(codeMap[language]);
+    }
 
     // Change the language and initial code for the editor
-    codeEditor!.setValue(languages[language].defaultCode);
     setCurrentLanguage(language);
-
     onLanguageChange(language);
   };
+
+  useEffect(() => {
+    if (codeMap != null && codeEditor != null) {
+      codeEditor.setValue(codeMap[currentLanguage]);
+    }
+  }, [currentLanguage, codeMap, codeEditor, setCodeEditor]);
 
   return (
     <Content>
       <select
-        onChange={(e) => handleLanguageChange(e.target.value)}
-        value={currentLanguage}
+        onChange={(e) => handleLanguageChange(fromString(e.target.value))}
+        value={fromString(currentLanguage)}
       >
         {
-          Object.keys(languages).map((language) => (
-            <option key={language} value={language}>{languages[language].name}</option>
+          Object.keys(Language).map((language) => (
+            <option key={language} value={language}>{language}</option>
           ))
         }
       </select>
       <MonacoEditor
         height="100%"
         editorDidMount={handleEditorDidMount}
-        language={currentLanguage}
-        defaultValue={languages[currentLanguage].defaultCode}
+        language={languageToEditorLanguage(currentLanguage)}
+        defaultValue="Loading..."
       />
     </Content>
   );

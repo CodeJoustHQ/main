@@ -6,6 +6,7 @@ import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemSettingsDto;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
+import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.service.ProblemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ProblemController extends BaseRestController {
@@ -73,5 +75,10 @@ public class ProblemController extends BaseRestController {
         List<ProblemDto> problemDtos = new ArrayList<>();
         problems.forEach(problem -> problemDtos.add(ProblemMapper.toDto(problem)));
         return new ResponseEntity<>(problemDtos, HttpStatus.OK);
+    }
+
+    @GetMapping("/problems/{problemId}/default-code")
+    public ResponseEntity<Map<CodeLanguage, String>> getDefaultCode(@PathVariable String problemId) {
+        return new ResponseEntity<>(service.getDefaultCode(problemId), HttpStatus.OK);
     }
 }
