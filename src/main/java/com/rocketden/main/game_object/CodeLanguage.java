@@ -10,7 +10,7 @@ import lombok.Getter;
 
 @Getter
 public enum CodeLanguage {
-    
+
     PYTHON,
     RUBY,
     SWIFT,

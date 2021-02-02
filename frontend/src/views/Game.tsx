@@ -4,7 +4,7 @@ import SplitterLayout from 'react-splitter-layout';
 import { useBeforeunload } from 'react-beforeunload';
 import { Message, Subscription } from 'stompjs';
 import Editor from '../components/game/Editor';
-import { Problem } from '../api/Problem';
+import { DefaultCodeType, getDefaultCodeMap, Problem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
 import {
   MainContainer, CenteredContainer, FlexContainer, FlexInfoBar,
@@ -57,6 +57,7 @@ function GamePage() {
   const [currentLanguage, setCurrentLanguage] = useState('java');
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
+  const [defaultCodeList, setDefaultCodeList] = useState<DefaultCodeType[]>([]);
 
   // When variable null, show nothing; otherwise, show notification.
   const [gameNotification, setGameNotification] = useState<GameNotification | null>(null);
@@ -83,6 +84,22 @@ function GamePage() {
     setAllSolved(newGame.allSolved);
     setTimeUp(newGame.gameTimer.timeUp);
   };
+
+  const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[]) => {
+    const promises: Promise<DefaultCodeType>[] = [];
+    problemsParam.forEach((problem) => {
+      if (problem && problem.problemId) {
+        promises.push(getDefaultCodeMap(problem.problemId));
+      }
+    });
+
+    // Get the result of promises and set the default code list.
+    Promise.all(promises).then((result) => {
+      setDefaultCodeList(result);
+    }).catch((err) => {
+      setError(err.message);
+    });
+  }, [setDefaultCodeList]);
 
   /**
    * Display the notification as a callback from the notification
@@ -149,6 +166,7 @@ function GamePage() {
       getGame(location.state.roomId)
         .then((res) => {
           setStateFromGame(res);
+          setDefaultCodeFromProblems(res.problems);
           setFullPageLoading(false);
         })
         .catch((err) => {
@@ -160,7 +178,7 @@ function GamePage() {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
       });
     }
-  }, [location, history]);
+  }, [location, history, setDefaultCodeFromProblems]);
 
   // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {
@@ -277,7 +295,10 @@ function GamePage() {
             secondaryMinSize={1}
           >
             <Panel>
-              <Editor onLanguageChange={setCurrentLanguage} />
+              <Editor
+                onLanguageChange={setCurrentLanguage}
+                codeMap={defaultCodeList[0]}
+              />
             </Panel>
 
             <Panel>
