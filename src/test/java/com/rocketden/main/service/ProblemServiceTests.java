@@ -532,38 +532,38 @@ public class ProblemServiceTests {
         inputs.add(new ProblemInputDto("p2", ProblemIOType.ARRAY_CHARACTER));
         inputs.add(new ProblemInputDto("p3", ProblemIOType.DOUBLE));
 
-        problemService.validateGsonParseable("true\n[c]\n0.5", inputs);
-        problemService.validateGsonParseable( " \n False \n [' '] \n 0.000 \n ", inputs);
-        problemService.validateGsonParseable("false\n[\"a\"]\n-5", inputs);
+        problemService.validateInputsGsonParseable("true\n[c]\n0.5", inputs);
+        problemService.validateInputsGsonParseable( " \n False \n [' '] \n 0.000 \n ", inputs);
+        problemService.validateInputsGsonParseable("false\n[\"a\"]\n-5", inputs);
 
         ApiException exception = assertThrows(ApiException.class, () ->
-                problemService.validateGsonParseable("true\n[c]\n", inputs));
+                problemService.validateInputsGsonParseable("true\n[c]\n", inputs));
 
         assertEquals(ProblemError.INCORRECT_INPUT_COUNT, exception.getError());
 
         exception = assertThrows(ApiException.class, () ->
-                problemService.validateGsonParseable("true\n[abc]\n5.0", inputs));
+                problemService.validateInputsGsonParseable("true\n[abc]\n5.0", inputs));
 
         assertEquals(ProblemError.INVALID_INPUT, exception.getError());
 
         exception = assertThrows(ApiException.class, () ->
-                problemService.validateGsonParseable("True\n'a'\n5.0", inputs));
+                problemService.validateInputsGsonParseable("True\n'a'\n5.0", inputs));
 
         assertEquals(ProblemError.INVALID_INPUT, exception.getError());
 
         exception = assertThrows(ApiException.class, () ->
-                problemService.validateGsonParseable("true\n[a]\nstring", inputs));
+                problemService.validateInputsGsonParseable("true\n[a]\nstring", inputs));
 
         assertEquals(ProblemError.INVALID_INPUT, exception.getError());
 
         exception = assertThrows(ApiException.class, () ->
-                problemService.validateGsonParseable(null, inputs));
+                problemService.validateInputsGsonParseable(null, inputs));
 
         assertEquals(ProblemError.INVALID_INPUT, exception.getError());
 
         inputs.add(new ProblemInputDto("", ProblemIOType.ARRAY_STRING));
         exception = assertThrows(ApiException.class, () ->
-                problemService.validateGsonParseable("true\n[a]\n3.0\n[]", inputs));
+                problemService.validateInputsGsonParseable("true\n[a]\n3.0\n[]", inputs));
 
         assertEquals(ProblemError.BAD_INPUT, exception.getError());
     }

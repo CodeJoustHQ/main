@@ -107,7 +107,7 @@ public class ProblemService {
 
         // Ensure that the user entered valid inputs and outputs for the problem
         for (ProblemTestCaseDto input : updatedProblem.getTestCases()) {
-            validateGsonParseable(input.getInput(), updatedProblem.getProblemInputs());
+            validateInputsGsonParseable(input.getInput(), updatedProblem.getProblemInputs());
             validateGsonParseable(input.getOutput(), updatedProblem.getOutputType());
         }
 
@@ -219,7 +219,7 @@ public class ProblemService {
                 .map(ProblemMapper::toProblemInputDto)
                 .collect(Collectors.toList());
 
-        validateGsonParseable(request.getInput(), inputs);
+        validateInputsGsonParseable(request.getInput(), inputs);
         validateGsonParseable(request.getOutput(), problem.getOutputType());
 
 
@@ -240,11 +240,12 @@ public class ProblemService {
     }
 
     // Check to make sure test case inputs and outputs are Gson-parsable
-    protected void validateGsonParseable(String input, List<ProblemInputDto> types) {
+    protected void validateInputsGsonParseable(String input, List<ProblemInputDto> types) {
         if (input == null) {
             throw new ApiException(ProblemError.INVALID_INPUT);
         }
 
+        // Each parameter input should be on a separate line
         String[] inputs = input.trim().split("\n");
         if (inputs.length != types.size()) {
             throw new ApiException(ProblemError.INCORRECT_INPUT_COUNT);
