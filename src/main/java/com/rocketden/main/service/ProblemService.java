@@ -93,7 +93,8 @@ public class ProblemService {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
 
-        if (updatedProblem.getName() == null || updatedProblem.getDescription() == null
+        if (updatedProblem == null || updatedProblem.getName() == null
+                || updatedProblem.getDescription() == null
                 || updatedProblem.getDifficulty() == null
                 || updatedProblem.getProblemInputs() == null
                 || updatedProblem.getOutputType() == null) {
@@ -251,7 +252,7 @@ public class ProblemService {
 
         for (int i = 0; i < types.size(); i++) {
             ProblemInputDto type = types.get(i);
-            if (type.getName() == null || type.getName().isEmpty() || type.getType() == null) {
+            if (type == null || type.getName() == null || type.getName().isEmpty() || type.getType() == null) {
                 throw new ApiException(ProblemError.BAD_INPUT);
             }
 
