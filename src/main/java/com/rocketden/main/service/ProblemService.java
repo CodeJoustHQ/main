@@ -117,11 +117,7 @@ public class ProblemService {
 
         problem.getProblemInputs().clear();
         for (ProblemInputDto problemInput : updatedProblem.getProblemInputs()) {
-            if (problemInput != null) {
-                problem.addProblemInput(ProblemMapper.toProblemInputEntity(problemInput));
-            } else {
-                throw new ApiException(ProblemError.BAD_INPUT);
-            }
+            problem.addProblemInput(ProblemMapper.toProblemInputEntity(problemInput));
         }
 
         for (ProblemTestCaseDto testCaseDto : updatedProblem.getTestCases()) {
