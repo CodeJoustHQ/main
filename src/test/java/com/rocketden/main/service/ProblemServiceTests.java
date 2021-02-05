@@ -373,6 +373,11 @@ public class ProblemServiceTests {
         problem.addProblemInput(problemInput);
         problem.setOutputType(IO_TYPE_2);
 
+        ProblemTestCase originalTestCase = new ProblemTestCase();
+        originalTestCase.setInput(INPUT);
+        originalTestCase.setOutput(OUTPUT_2);
+        problem.addTestCase(originalTestCase);
+
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
 
         ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
