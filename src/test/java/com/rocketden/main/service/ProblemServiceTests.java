@@ -263,8 +263,9 @@ public class ProblemServiceTests {
 
         Mockito.doReturn(expected).when(repository).findProblemByProblemId(expected.getProblemId());
 
+        String problemId = expected.getProblemId();
         ApiException exception = assertThrows(ApiException.class, () ->
-                problemService.createTestCase(expected.getProblemId(), request));
+                problemService.createTestCase(problemId, request));
 
         verify(repository, never()).save(Mockito.any());
         assertEquals(ProblemError.INVALID_INPUT, exception.getError());
@@ -418,8 +419,9 @@ public class ProblemServiceTests {
         ProblemDto updatedProblem = ProblemMapper.toDto(problem);
         updatedProblem.setTestCases(Collections.singletonList(testCaseDto));
 
+        String problemId = problem.getProblemId();
         ApiException exception = assertThrows(ApiException.class, () ->
-                problemService.editProblem(problem.getProblemId(), updatedProblem));
+                problemService.editProblem(problemId, updatedProblem));
 
         assertEquals(ProblemError.INVALID_INPUT, exception.getError());
     }
@@ -444,8 +446,9 @@ public class ProblemServiceTests {
         ProblemDto updatedProblem = ProblemMapper.toDto(problem);
         updatedProblem.setTestCases(Collections.singletonList(testCaseDto));
 
+        String problemId = problem.getProblemId();
         ApiException exception = assertThrows(ApiException.class, () ->
-                problemService.editProblem(problem.getProblemId(), updatedProblem));
+                problemService.editProblem(problemId, updatedProblem));
 
         assertEquals(ProblemError.INVALID_INPUT, exception.getError());
     }
@@ -471,8 +474,9 @@ public class ProblemServiceTests {
         updatedProblem.setTestCases(Collections.singletonList(testCaseDto));
         updatedProblem.setOutputType(null);
 
+        String problemId = problem.getProblemId();
         ApiException exception = assertThrows(ApiException.class, () ->
-                problemService.editProblem(problem.getProblemId(), updatedProblem));
+                problemService.editProblem(problemId, updatedProblem));
 
         assertEquals(ProblemError.EMPTY_FIELD, exception.getError());
     }
@@ -498,8 +502,9 @@ public class ProblemServiceTests {
         ProblemDto updatedProblem = ProblemMapper.toDto(problem);
         updatedProblem.getProblemInputs().get(0).setType(IO_TYPE_2);
 
+        String problemId = problem.getProblemId();
         ApiException exception = assertThrows(ApiException.class, () ->
-                problemService.editProblem(problem.getProblemId(), updatedProblem));
+                problemService.editProblem(problemId, updatedProblem));
 
         assertEquals(ProblemError.INVALID_INPUT, exception.getError());
     }
