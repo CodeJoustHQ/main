@@ -10,6 +10,9 @@ import JoinGamePage from '../../views/Join';
 import CreateGamePage from '../../views/Create';
 import GameResultsPage from '../../views/Results';
 import LobbyPage from '../../views/Lobby';
+import AllProblemsPage from '../../views/AllProblemsPage';
+import ProblemPage from '../../views/ProblemPage';
+import CreateProblemPage from '../../views/CreateProblemPage';
 
 function App() {
   return (
@@ -20,6 +23,9 @@ function App() {
       <CustomRoute path="/game/create" component={CreateGamePage} layout={MainLayout} exact />
       <CustomRoute path="/game/lobby" component={LobbyPage} layout={MainLayout} exact />
       <CustomRoute path="/game/results" component={GameResultsPage} layout={MainLayout} exact />
+      <CustomRoute path="/problem/all" component={AllProblemsPage} layout={MainLayout} exact />
+      <CustomRoute path="/problem/create" component={CreateProblemPage} layout={MainLayout} exact />
+      <CustomRoute path="/problem/:id" component={ProblemPage} layout={MainLayout} exact />
       <CustomRoute path="*" component={NotFound} layout={MainLayout} />
     </Switch>
   );
