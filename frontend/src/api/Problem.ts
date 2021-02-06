@@ -7,14 +7,36 @@ export type TestCase = {
   input: string,
   output: string,
   hidden: boolean,
+  explanation: string,
 };
 
 export type Problem = {
   problemId: string,
   name: string,
-  description: string;
+  description: string,
+  difficulty: Difficulty,
   testCases: TestCase[],
+  problemInputs: ProblemInput[],
+  outputType: ProblemIOType,
 };
+
+export type ProblemInput = {
+  name: string,
+  type: ProblemIOType,
+};
+
+export enum ProblemIOType {
+  String = 'STRING',
+  Integer = 'INTEGER',
+  Double = 'DOUBLE',
+  Character = 'CHARACTER',
+  Boolean = 'BOOLEAN',
+  ArrayString = 'ARRAY_STRING',
+  ArrayInteger = 'ARRAY_INTEGER',
+  ArrayDouble = 'ARRAY_DOUBLE',
+  ArrayCharacter = 'ARRAY_CHARACTER',
+  ArrayBoolean = 'ARRAY_BOOLEAN',
+}
 
 export type ProblemSettings = {
   difficulty: Difficulty,
