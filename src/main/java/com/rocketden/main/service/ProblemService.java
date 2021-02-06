@@ -1,5 +1,6 @@
 package com.rocketden.main.service;
 
+import com.google.gson.Gson;
 import com.rocketden.main.dao.ProblemRepository;
 import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ProblemService {
@@ -34,6 +36,7 @@ public class ProblemService {
     private final ProblemRepository repository;
     private final List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList;
     private final Random random = new Random();
+    private final Gson gson = new Gson();
 
     @Autowired
     public ProblemService(ProblemRepository repository, List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList) {
@@ -79,6 +82,68 @@ public class ProblemService {
         if (problem == null) {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
+
+        return ProblemMapper.toDto(problem);
+    }
+
+    public ProblemDto editProblem(String problemId, ProblemDto updatedProblem) {
+        Problem problem = repository.findProblemByProblemId(problemId);
+
+        if (problem == null) {
+            throw new ApiException(ProblemError.NOT_FOUND);
+        }
+
+        if (updatedProblem == null || updatedProblem.getName() == null
+                || updatedProblem.getDescription() == null
+                || updatedProblem.getDifficulty() == null
+                || updatedProblem.getProblemInputs() == null
+                || updatedProblem.getTestCases() == null
+                || updatedProblem.getOutputType() == null) {
+            throw new ApiException(ProblemError.EMPTY_FIELD);
+        }
+
+        if (updatedProblem.getDifficulty() == ProblemDifficulty.RANDOM) {
+            throw new ApiException(ProblemError.BAD_DIFFICULTY);
+        }
+
+        problem.setName(updatedProblem.getName());
+        problem.setDescription(updatedProblem.getDescription());
+        problem.setDifficulty(updatedProblem.getDifficulty());
+        problem.setOutputType(updatedProblem.getOutputType());
+
+        problem.getProblemInputs().clear();
+        for (ProblemInputDto problemInput : updatedProblem.getProblemInputs()) {
+            problem.addProblemInput(ProblemMapper.toProblemInputEntity(problemInput));
+        }
+
+        problem.getTestCases().clear();
+        for (ProblemTestCaseDto testCaseDto : updatedProblem.getTestCases()) {
+            // Ensure that the user entered valid inputs and outputs for the problem
+            validateInputsGsonParseable(testCaseDto.getInput(), updatedProblem.getProblemInputs());
+            validateGsonParseable(testCaseDto.getOutput(), updatedProblem.getOutputType());
+
+            ProblemTestCase testCase = new ProblemTestCase();
+            testCase.setInput(testCaseDto.getInput());
+            testCase.setOutput(testCaseDto.getOutput());
+            testCase.setHidden(testCaseDto.isHidden());
+            testCase.setExplanation(testCaseDto.getExplanation());
+
+            problem.addTestCase(testCase);
+        }
+
+        repository.save(problem);
+
+        return ProblemMapper.toDto(problem);
+    }
+
+    public ProblemDto deleteProblem(String problemId) {
+        Problem problem = repository.findProblemByProblemId(problemId);
+
+        if (problem == null) {
+            throw new ApiException(ProblemError.NOT_FOUND);
+        }
+
+        repository.delete(problem);
 
         return ProblemMapper.toDto(problem);
     }
@@ -148,6 +213,16 @@ public class ProblemService {
             throw new ApiException(ProblemError.EMPTY_FIELD);
         }
 
+        // Verify inputs are of valid form
+        List<ProblemInputDto> inputs = problem.getProblemInputs()
+                .stream()
+                .map(ProblemMapper::toProblemInputDto)
+                .collect(Collectors.toList());
+
+        validateInputsGsonParseable(request.getInput(), inputs);
+        validateGsonParseable(request.getOutput(), problem.getOutputType());
+
+
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(request.getInput());
         testCase.setOutput(request.getOutput());
@@ -164,6 +239,39 @@ public class ProblemService {
         return ProblemMapper.toTestCaseDto(testCase);
     }
 
+    // Check to make sure test case inputs and outputs are Gson-parsable
+    protected void validateInputsGsonParseable(String input, List<ProblemInputDto> types) {
+        if (input == null) {
+            throw new ApiException(ProblemError.INVALID_INPUT);
+        }
+
+        // Each parameter input should be on a separate line
+        String[] inputs = input.trim().split("\n");
+        if (inputs.length != types.size()) {
+            throw new ApiException(ProblemError.INCORRECT_INPUT_COUNT);
+        }
+
+        for (int i = 0; i < types.size(); i++) {
+            ProblemInputDto type = types.get(i);
+            if (type == null || type.getName() == null || type.getName().isEmpty() || type.getType() == null) {
+                throw new ApiException(ProblemError.BAD_INPUT);
+            }
+
+            validateGsonParseable(inputs[i], types.get(i).getType());
+        }
+    }
+
+    private void validateGsonParseable(String input, ProblemIOType type) {
+        if (input == null) {
+            throw new ApiException(ProblemError.INVALID_INPUT);
+        }
+
+        try {
+            gson.fromJson(input, type.getClassType());
+        } catch (Exception e) {
+            throw new ApiException(ProblemError.INVALID_INPUT);
+        }
+    }
     public Map<CodeLanguage, String> getDefaultCode(String problemId) {
         // Convert from the Problem object to Problem DTOs.
         Problem problem = repository.findProblemByProblemId(problemId);

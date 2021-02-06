@@ -5,12 +5,14 @@ import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.dto.problem.ProblemInputDto;
+import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemIOType;
+import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.model.problem.ProblemTestCase;
 
 import org.junit.jupiter.api.Test;
@@ -47,10 +49,12 @@ public class ProblemServiceTests {
 
     private static final String INPUT = "[1, 8, 2]";
     private static final String OUTPUT = "[1, 2, 8]";
+    private static final String OUTPUT_2 = "8";
     private static final String EXPLANATION = "2 < 8, so those are swapped.";
 
     private static final String INPUT_NAME = "nums";
     private static final ProblemIOType IO_TYPE = ProblemIOType.ARRAY_INTEGER;
+    private static final ProblemIOType IO_TYPE_2 = ProblemIOType.INTEGER;
 
     @Test
     public void getProblemSuccess() {
@@ -190,6 +194,8 @@ public class ProblemServiceTests {
         expected.setName(NAME);
         expected.setDescription(DESCRIPTION);
         expected.setDifficulty(ProblemDifficulty.HARD);
+        expected.addProblemInput(new ProblemInput("name", ProblemIOType.ARRAY_INTEGER));
+        expected.setOutputType(IO_TYPE);
 
         Mockito.doReturn(expected).when(repository).findProblemByProblemId(expected.getProblemId());
 
@@ -240,6 +246,29 @@ public class ProblemServiceTests {
 
         verify(repository, never()).save(Mockito.any());
         assertEquals(ProblemError.EMPTY_FIELD, exception.getError());
+    }
+
+    @Test
+    public void createTestCaseInvalidParsing() {
+        Problem expected = new Problem();
+        expected.setName(NAME);
+        expected.setDescription(DESCRIPTION);
+        expected.setDifficulty(ProblemDifficulty.HARD);
+        expected.addProblemInput(new ProblemInput("name", IO_TYPE));
+        expected.setOutputType(IO_TYPE_2);
+
+        CreateTestCaseRequest request = new CreateTestCaseRequest();
+        request.setInput(INPUT);
+        request.setOutput(OUTPUT);
+
+        Mockito.doReturn(expected).when(repository).findProblemByProblemId(expected.getProblemId());
+
+        String problemId = expected.getProblemId();
+        ApiException exception = assertThrows(ApiException.class, () ->
+                problemService.createTestCase(problemId, request));
+
+        verify(repository, never()).save(Mockito.any());
+        assertEquals(ProblemError.INVALID_INPUT, exception.getError());
     }
 
     @Test
@@ -332,5 +361,220 @@ public class ProblemServiceTests {
                 problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 1));
 
         assertEquals(ProblemError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void editProblemSuccess() {
+        Problem problem = new Problem();
+        problem.setName(NAME);
+        problem.setDescription(DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.MEDIUM);
+
+        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        problem.addProblemInput(problemInput);
+        problem.setOutputType(IO_TYPE_2);
+
+        ProblemTestCase originalTestCase = new ProblemTestCase();
+        originalTestCase.setInput(INPUT);
+        originalTestCase.setOutput(OUTPUT_2);
+        problem.addTestCase(originalTestCase);
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
+
+        ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
+        testCaseDto.setInput(INPUT);
+        testCaseDto.setOutput(OUTPUT_2);
+
+        ProblemDto updatedProblem = ProblemMapper.toDto(problem);
+        updatedProblem.setTestCases(Collections.singletonList(testCaseDto));
+
+        problemService.editProblem(problem.getProblemId(), updatedProblem);
+
+        verify(repository).save(problem);
+        assertEquals(1, problem.getTestCases().size());
+        assertEquals(1, problem.getProblemInputs().size());
+
+        ProblemTestCase testCase = problem.getTestCases().get(0);
+        assertEquals(testCaseDto.getInput(), testCase.getInput());
+        assertEquals(testCaseDto.getOutput(), testCase.getOutput());
+    }
+
+    @Test
+    public void editProblemBadTestCase() {
+        Problem problem = new Problem();
+        problem.setName(NAME);
+        problem.setDescription(DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.MEDIUM);
+
+        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        problem.addProblemInput(problemInput);
+        problem.setOutputType(IO_TYPE);
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
+
+        ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
+        testCaseDto.setInput("[1, 2, 3");
+        testCaseDto.setOutput(OUTPUT);
+
+        ProblemDto updatedProblem = ProblemMapper.toDto(problem);
+        updatedProblem.setTestCases(Collections.singletonList(testCaseDto));
+
+        String problemId = problem.getProblemId();
+        ApiException exception = assertThrows(ApiException.class, () ->
+                problemService.editProblem(problemId, updatedProblem));
+
+        assertEquals(ProblemError.INVALID_INPUT, exception.getError());
+    }
+
+    @Test
+    public void editProblemBadTestCaseOutput() {
+        Problem problem = new Problem();
+        problem.setName(NAME);
+        problem.setDescription(DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.MEDIUM);
+
+        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        problem.addProblemInput(problemInput);
+        problem.setOutputType(IO_TYPE_2);
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
+
+        ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
+        testCaseDto.setInput(INPUT);
+        testCaseDto.setOutput(OUTPUT);
+
+        ProblemDto updatedProblem = ProblemMapper.toDto(problem);
+        updatedProblem.setTestCases(Collections.singletonList(testCaseDto));
+
+        String problemId = problem.getProblemId();
+        ApiException exception = assertThrows(ApiException.class, () ->
+                problemService.editProblem(problemId, updatedProblem));
+
+        assertEquals(ProblemError.INVALID_INPUT, exception.getError());
+    }
+
+    @Test
+    public void editProblemEmptyFields() {
+        Problem problem = new Problem();
+        problem.setName(NAME);
+        problem.setDescription(DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.MEDIUM);
+
+        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        problem.addProblemInput(problemInput);
+        problem.setOutputType(IO_TYPE);
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
+
+        ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
+        testCaseDto.setInput(INPUT);
+        testCaseDto.setOutput(OUTPUT);
+
+        ProblemDto updatedProblem = ProblemMapper.toDto(problem);
+        updatedProblem.setTestCases(Collections.singletonList(testCaseDto));
+        updatedProblem.setOutputType(null);
+
+        String problemId = problem.getProblemId();
+        ApiException exception = assertThrows(ApiException.class, () ->
+                problemService.editProblem(problemId, updatedProblem));
+
+        assertEquals(ProblemError.EMPTY_FIELD, exception.getError());
+    }
+
+    @Test
+    public void editProblemNewProblemInputInvalidatesTestCases() {
+        Problem problem = new Problem();
+        problem.setName(NAME);
+        problem.setDescription(DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.MEDIUM);
+
+        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        problem.addProblemInput(problemInput);
+        problem.setOutputType(IO_TYPE);
+
+        ProblemTestCase testCase = new ProblemTestCase();
+        testCase.setInput(INPUT);
+        testCase.setOutput(OUTPUT);
+        problem.addTestCase(testCase);
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
+
+        ProblemDto updatedProblem = ProblemMapper.toDto(problem);
+        updatedProblem.getProblemInputs().get(0).setType(IO_TYPE_2);
+
+        String problemId = problem.getProblemId();
+        ApiException exception = assertThrows(ApiException.class, () ->
+                problemService.editProblem(problemId, updatedProblem));
+
+        assertEquals(ProblemError.INVALID_INPUT, exception.getError());
+    }
+
+    @Test
+    public void deleteProblemSuccess() {
+        Problem problem = new Problem();
+        problem.setName(NAME);
+        problem.setDescription(DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.MEDIUM);
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
+
+        ProblemDto response = problemService.deleteProblem(problem.getProblemId());
+
+        verify(repository).delete(problem);
+
+        assertEquals(problem.getName(), response.getName());
+        assertEquals(problem.getDescription(), response.getDescription());
+        assertEquals(problem.getDifficulty(), response.getDifficulty());
+    }
+
+    @Test
+    public void deleteProblemFailure() {
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.deleteProblem("ZZZ"));
+
+        verify(repository).findProblemByProblemId("ZZZ");
+        assertEquals(ProblemError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void validateGsonParseable() {
+        List<ProblemInputDto> inputs = new ArrayList<>();
+        inputs.add(new ProblemInputDto("p1", ProblemIOType.BOOLEAN));
+        inputs.add(new ProblemInputDto("p2", ProblemIOType.ARRAY_CHARACTER));
+        inputs.add(new ProblemInputDto("p3", ProblemIOType.DOUBLE));
+
+        problemService.validateInputsGsonParseable("true\n[c]\n0.5", inputs);
+        problemService.validateInputsGsonParseable( " \n False \n [' '] \n 0.000 \n ", inputs);
+        problemService.validateInputsGsonParseable("false\n[\"a\"]\n-5", inputs);
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                problemService.validateInputsGsonParseable("true\n[c]\n", inputs));
+
+        assertEquals(ProblemError.INCORRECT_INPUT_COUNT, exception.getError());
+
+        exception = assertThrows(ApiException.class, () ->
+                problemService.validateInputsGsonParseable("true\n[abc]\n5.0", inputs));
+
+        assertEquals(ProblemError.INVALID_INPUT, exception.getError());
+
+        exception = assertThrows(ApiException.class, () ->
+                problemService.validateInputsGsonParseable("True\n'a'\n5.0", inputs));
+
+        assertEquals(ProblemError.INVALID_INPUT, exception.getError());
+
+        exception = assertThrows(ApiException.class, () ->
+                problemService.validateInputsGsonParseable("true\n[a]\nstring", inputs));
+
+        assertEquals(ProblemError.INVALID_INPUT, exception.getError());
+
+        exception = assertThrows(ApiException.class, () ->
+                problemService.validateInputsGsonParseable(null, inputs));
+
+        assertEquals(ProblemError.INVALID_INPUT, exception.getError());
+
+        inputs.add(new ProblemInputDto("", ProblemIOType.ARRAY_STRING));
+        exception = assertThrows(ApiException.class, () ->
+                problemService.validateInputsGsonParseable("true\n[a]\n3.0\n[]", inputs));
+
+        assertEquals(ProblemError.BAD_INPUT, exception.getError());
     }
 }

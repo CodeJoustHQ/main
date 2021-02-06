@@ -4,8 +4,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -48,12 +51,14 @@ class ProblemTests {
     @Autowired
     private MockMvc mockMvc;
 
+    private static final String DELETE_PROBLEM = "/api/v1/problems/%s";
+    private static final String GET_DEFAULT_CODE = "/api/v1/problems/%s/default-code";
     private static final String GET_PROBLEM = "/api/v1/problems/%s";
     private static final String GET_PROBLEM_RANDOM = "/api/v1/problems/random";
     private static final String GET_PROBLEM_ALL = "/api/v1/problems";
     private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
     private static final String POST_TEST_CASE_CREATE = "/api/v1/problems/%s/test-case";
-    private static final String GET_DEFAULT_CODE = "/api/v1/problems/%s/default-code";
+    private static final String PUT_PROBLEM_EDIT = "/api/v1/problems/%s";
 
     private static final String DIFFICULTY_KEY = "difficulty";
     private static final String NUM_PROBLEMS_KEY = "numProblems";
@@ -67,8 +72,8 @@ class ProblemTests {
     private static final String OUTPUT = "[1, 2, 8]";
     private static final String EXPLANATION = "2 < 8, so those are swapped.";
     private static final String INPUT_2 = "[-1, 5, 0, 3]";
-    private static final String OUTPUT_2 = "5";
-    private static final String EXPLANATION_2 = "5 is the greatest number.";
+    private static final String OUTPUT_2 = "[-1, 0, 3, 5]";
+    private static final String EXPLANATION_2 = "5 is the largest, so it should be at the end.";
     private static final String INPUT_NAME = "nums";
     private static final ProblemIOType IO_TYPE = ProblemIOType.ARRAY_INTEGER;
 
@@ -226,6 +231,56 @@ class ProblemTests {
         assertEquals(DESCRIPTION_2, actual.get(1).getDescription());
         assertEquals(problemInputs, actual.get(1).getProblemInputs());
         assertEquals(IO_TYPE, actual.get(1).getOutputType());
+    }
+
+    @Test
+    public void createEditDeleteProblemSuccess() throws Exception {
+        ProblemDto problemDto = createSingleProblem();
+        problemDto.setOutputType(ProblemIOType.CHARACTER);
+        problemDto.setName(NAME_2);
+
+        ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
+        testCaseDto.setInput(INPUT);
+        testCaseDto.setOutput("a");
+        problemDto.setTestCases(Collections.singletonList(testCaseDto));
+
+        // Edit problem with new values
+        String endpoint = String.format(PUT_PROBLEM_EDIT, problemDto.getProblemId());
+        this.mockMvc.perform(put(endpoint)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(problemDto)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        // Perform GET request to ensure updated problem is saved
+        MvcResult result = this.mockMvc.perform(get(String.format(GET_PROBLEM, problemDto.getProblemId())))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ProblemDto actual = UtilityTestMethods.toObject(jsonResponse, ProblemDto.class);
+
+        assertEquals(problemDto.getOutputType(), actual.getOutputType());
+        assertEquals(problemDto.getName(), actual.getName());
+        assertEquals(problemDto.getTestCases().get(0).getOutput(), actual.getTestCases().get(0).getOutput());
+
+        // Delete problem from the database
+        endpoint = String.format(DELETE_PROBLEM, problemDto.getProblemId());
+        result = this.mockMvc.perform(delete(endpoint))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        ApiError ERROR = ProblemError.NOT_FOUND;
+
+        // Ensure that the GET request throws a not found error
+        result = this.mockMvc.perform(get(String.format(GET_PROBLEM, problemDto.getProblemId())))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse response = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), response);
     }
 
     @Test

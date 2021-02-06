@@ -12,9 +12,11 @@ import com.rocketden.main.service.ProblemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,6 +44,17 @@ public class ProblemController extends BaseRestController {
     public ResponseEntity<ProblemDto> getProblem(@PathVariable String problemId) {
         return new ResponseEntity<>(service.getProblem(problemId), HttpStatus.OK);
     }
+
+    @PutMapping("/problems/{problemId}")
+    public ResponseEntity<ProblemDto> editProblem(@PathVariable String problemId, @RequestBody ProblemDto updatedProblem) {
+        return new ResponseEntity<>(service.editProblem(problemId, updatedProblem), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/problems/{problemId}")
+    public ResponseEntity<ProblemDto> deleteProblem(@PathVariable String problemId) {
+        return new ResponseEntity<>(service.deleteProblem(problemId), HttpStatus.OK);
+    }
+
 
     @PostMapping("/problems/{problemId}/test-case")
     public ResponseEntity<ProblemTestCaseDto> createTestCase(@PathVariable String problemId, @RequestBody CreateTestCaseRequest request) {
