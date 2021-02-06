@@ -97,6 +97,7 @@ public class ProblemService {
                 || updatedProblem.getDescription() == null
                 || updatedProblem.getDifficulty() == null
                 || updatedProblem.getProblemInputs() == null
+                || updatedProblem.getTestCases() == null
                 || updatedProblem.getOutputType() == null) {
             throw new ApiException(ProblemError.EMPTY_FIELD);
         }
