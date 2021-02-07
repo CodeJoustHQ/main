@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const Input = styled.input`
+export const Input = styled.input`
   box-sizing: border-box;
   border-radius: 0.25rem;
   border: 3px solid ${({ theme }) => theme.colors.blue};
