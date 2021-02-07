@@ -35,7 +35,10 @@ function ProblemPage() {
       });
   }, []);
 
-  if (!problem && !loading) {
+  if (!problem) {
+    if (loading) {
+      return <Loading />;
+    }
     return <NotFound />;
   }
 
