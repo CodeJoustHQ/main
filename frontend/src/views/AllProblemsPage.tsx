@@ -33,7 +33,7 @@ function AllProblemsPage() {
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
 
-      {problems?.forEach((problem) => <ProblemCard problem={problem} />)}
+      {problems?.map((problem) => <ProblemCard problem={problem} />)}
     </Content>
   );
 }

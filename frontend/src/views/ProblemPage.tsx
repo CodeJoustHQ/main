@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
 import { getSingleProblem, Problem } from '../api/Problem';
@@ -23,27 +23,25 @@ function ProblemPage() {
 
   const params = useParams<ProblemParams>();
 
-  if (!params.id) {
-    return <NotFound />;
-  }
+  useEffect(() => {
+    getSingleProblem(params.id)
+      .then((res) => {
+        setProblem(res);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
 
-  getSingleProblem(params.id)
-    .then((res) => {
-      setProblem(res);
-      setLoading(false);
-    })
-    .catch((err) => {
-      setError(err.message);
-      setLoading(false);
-    });
-
-  if (!problem) {
+  if (!problem && !loading) {
     return <NotFound />;
   }
 
   return (
     <Content>
-      <LargeText>Problem</LargeText>
+      <LargeText>Edit Problem</LargeText>
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
 

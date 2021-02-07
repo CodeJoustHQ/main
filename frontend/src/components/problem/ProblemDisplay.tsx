@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Problem } from '../../api/Problem';
-import { Input } from '../core/Input';
+import { TextInput } from '../core/Input';
 
 const Content = styled.div`
   padding: 10px;
@@ -16,11 +16,14 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
   return (
     <Content>
-      <Input
+      Name:
+      <TextInput
         value={problem.name}
         onChange={(e) => { problem.name = e.target.value; }}
       />
-      <Input
+
+      Description:
+      <TextInput
         value={problem.description}
         onChange={(e) => { problem.description = e.target.value; }}
       />

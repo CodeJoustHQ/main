@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const Input = styled.input`
+const Input = styled.input`
   box-sizing: border-box;
   border-radius: 0.25rem;
   border: 3px solid ${({ theme }) => theme.colors.blue};
@@ -62,6 +62,21 @@ export const NumberInput = styled(Input).attrs(() => ({
 }))`
   display: inline-block;
   width: 7rem;
+  text-align: center;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  padding: 1rem;
+  color: ${({ theme }) => theme.colors.text};
+
+  &:focus {
+    border: 3px solid ${({ theme }) => theme.colors.darkBlue};
+  }
+`;
+
+export const TextInput = styled(Input).attrs(() => ({
+  type: 'text',
+}))`
+  display: block;
+  width: 15rem;
   text-align: center;
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   padding: 1rem;
