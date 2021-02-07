@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { getProblems, Problem } from '../api/Problem';
 import { LargeText } from '../components/core/Text';
@@ -11,6 +12,7 @@ const Content = styled.div`
 `;
 
 function AllProblemsPage() {
+  const history = useHistory();
   const [problems, setProblems] = useState<Problem[] | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -27,13 +29,17 @@ function AllProblemsPage() {
       });
   }, []);
 
+  const redirect = (problemId: string) => {
+    history.push(`/problem/${problemId}`);
+  };
+
   return (
     <Content>
       <LargeText>View All Problems</LargeText>
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
 
-      {problems?.map((problem) => <ProblemCard problem={problem} />)}
+      {problems?.map((problem) => <ProblemCard problem={problem} onClick={redirect} />)}
     </Content>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
-import { getSingleProblem, Problem } from '../api/Problem';
+import { editProblem, getSingleProblem, Problem } from '../api/Problem';
 import NotFound from './NotFound';
 import { LargeText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
@@ -39,13 +39,27 @@ function ProblemPage() {
     return <NotFound />;
   }
 
+  const handleEdit = (newProblem: Problem) => {
+    setLoading(true);
+
+    editProblem(newProblem.problemId, newProblem)
+      .then((res) => {
+        setProblem(res);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  };
+
   return (
     <Content>
       <LargeText>Edit Problem</LargeText>
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
 
-      <ProblemDisplay problem={problem!} />
+      <ProblemDisplay problem={problem!} onClick={handleEdit} />
     </Content>
   );
 }

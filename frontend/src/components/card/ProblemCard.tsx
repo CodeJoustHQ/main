@@ -8,6 +8,7 @@ import {
 
 type ProblemCardProps = {
   problem: Problem,
+  onClick: (problemId: string) => void,
 };
 
 const Content = styled.div`
@@ -19,10 +20,10 @@ const Content = styled.div`
 `;
 
 function ProblemCard(props: ProblemCardProps) {
-  const { problem } = props;
+  const { problem, onClick } = props;
 
   return (
-    <Content>
+    <Content onClick={() => onClick(problem.problemId)}>
       <FlexHorizontalContainer>
         <FlexLeft>
           <CenteredContainer>
