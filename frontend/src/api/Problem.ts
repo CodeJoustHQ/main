@@ -79,8 +79,8 @@ export const getSingleProblem = (problemId: string): Promise<Problem> => axios
     throw axiosErrorHandler(err);
   });
 
-export const createProblem = (problemId: string, problem: Problem): Promise<Problem> => axios
-  .post<Problem>(routes.editProblem(problemId), problem)
+export const createProblem = (problem: Problem): Promise<Problem> => axios
+  .post<Problem>(routes.createProblem, problem)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
