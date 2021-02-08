@@ -16,21 +16,35 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const { problem, onClick } = props;
   const [newProblem, setNewProblem] = useState<Problem>(problem);
 
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+    console.log({
+      ...newProblem,
+      [name]: value,
+    });
+    setNewProblem({
+      ...newProblem,
+      [name]: value,
+    });
+  };
+
   return (
     <Content>
       Name:
       <TextInput
+        name="name"
         value={newProblem.name}
-        onChange={(e) => { newProblem.name = e.target.value; }}
+        onChange={handleChange}
       />
 
       Description:
       <TextInput
+        name="description"
         value={newProblem.description}
-        onChange={(e) => { newProblem.description = e.target.value; }}
+        onChange={handleChange}
       />
 
-      <LargeInputButton onClick={() => onClick(problem)} />
+      <LargeInputButton value="Edit Problem" onClick={() => onClick(newProblem)} />
     </Content>
   );
 }

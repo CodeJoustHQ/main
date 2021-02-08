@@ -23,7 +23,7 @@ function App() {
       <CustomRoute path="/game/create" component={CreateGamePage} layout={MainLayout} exact />
       <CustomRoute path="/game/lobby" component={LobbyPage} layout={MainLayout} exact />
       <CustomRoute path="/game/results" component={GameResultsPage} layout={MainLayout} exact />
-      <CustomRoute path="/problem/all" component={AllProblemsPage} layout={MainLayout} exact />
+      <CustomRoute path="/problems/all" component={AllProblemsPage} layout={MainLayout} exact />
       <CustomRoute path="/problem/create" component={CreateProblemPage} layout={MainLayout} exact />
       <CustomRoute path="/problem/:id" component={ProblemPage} layout={MainLayout} exact />
       <CustomRoute path="*" component={NotFound} layout={MainLayout} />
