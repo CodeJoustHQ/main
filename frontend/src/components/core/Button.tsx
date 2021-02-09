@@ -78,7 +78,8 @@ type ProblemIOTypeButtonProps = {
 export const ProblemIOTypeButton = styled(DefaultButton)<ProblemIOTypeButtonProps>`  
   color: ${({ theme, active }) => (active ? theme.colors.white : theme.colors.font)};
   background-color: ${({ theme, active }) => (active ? theme.colors.blue : theme.colors.white)};
-  padding: 8px 16px;
+  padding: 4px 8px;
+  margin: 0.8rem;
   
   &:hover {
     ${({ theme }) => `

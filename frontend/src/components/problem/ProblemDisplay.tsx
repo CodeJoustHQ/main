@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { Problem, ProblemIOType } from '../../api/Problem';
 import { LargeInputButton, TextInput } from '../core/Input';
 import Difficulty from '../../api/Difficulty';
-import { DifficultyButton } from '../core/Button';
+import { DifficultyButton, ProblemIOTypeButton } from '../core/Button';
+import { MediumText, Text } from '../core/Text';
 
 const Content = styled.div`
   padding: 10px;
@@ -31,29 +32,36 @@ function ProblemDisplay(props: ProblemDisplayParams) {
     });
   };
 
+  const handleEnumChange = (name: string, value: any) => handleChange({ target: { name, value } });
+
+  const handleInputChange = (index: number, name: string, type: ProblemIOType) => {
+    return 0;
+  };
+
   return (
     <Content>
-      Name:
+      <MediumText>Name:</MediumText>
       <TextInput
         name="name"
         value={newProblem.name}
         onChange={handleChange}
       />
 
-      Description:
+      <MediumText>Description:</MediumText>
       <TextInput
         name="description"
         value={newProblem.description}
         onChange={handleChange}
       />
 
+      <MediumText>Difficulty:</MediumText>
       {Object.keys(Difficulty).map((key) => {
         const difficulty = Difficulty[key as keyof typeof Difficulty];
         if (difficulty !== Difficulty.Random) {
           return (
             <DifficultyButton
-              onClick={() => handleChange({ target: 'difficulty', value: difficulty })}
-              active={difficulty === problem.difficulty}
+              onClick={() => handleEnumChange('difficulty', difficulty)}
+              active={difficulty === newProblem.difficulty}
               enabled
             >
               {key}
@@ -63,16 +71,41 @@ function ProblemDisplay(props: ProblemDisplayParams) {
         return null;
       })}
 
+      {newProblem.problemInputs.map((input, index) => (
+        <div>
+          <Text>{`Input ${index + 1}`}</Text>
+          <TextInput
+            name="name"
+            value={newProblem.name}
+            onChange={(e) => handleInputChange(index,
+              e.target.value, newProblem.problemInputs[index].type)}
+          />
+
+          {Object.keys(ProblemIOType).map((key) => {
+            const inputType = ProblemIOType[key as keyof typeof ProblemIOType];
+            return (
+              <ProblemIOTypeButton
+                onClick={() => handleInputChange(index,
+                  newProblem.problemInputs[index].name, inputType)}
+                active={inputType === newProblem.problemInputs[index].type}
+              >
+                {key}
+              </ProblemIOTypeButton>
+            );
+          })}
+        </div>
+      ))}
+
+      <MediumText>Output Type:</MediumText>
       {Object.keys(ProblemIOType).map((key) => {
         const outputType = ProblemIOType[key as keyof typeof ProblemIOType];
         return (
-          <DifficultyButton
-            onClick={() => handleChange({ target: 'outputType', value: outputType })}
-            active={outputType === problem.outputType}
-            enabled
+          <ProblemIOTypeButton
+            onClick={() => handleEnumChange('outputType', outputType)}
+            active={outputType === newProblem.outputType}
           >
             {key}
-          </DifficultyButton>
+          </ProblemIOTypeButton>
         );
       })}
 
