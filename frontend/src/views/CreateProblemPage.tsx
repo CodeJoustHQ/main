@@ -30,6 +30,7 @@ function CreateProblemPage() {
 
   const handleSubmit = (newProblem: Problem) => {
     setLoading(true);
+    setError('');
 
     createProblem(newProblem)
       .then((res) => {
@@ -47,10 +48,10 @@ function CreateProblemPage() {
   return (
     <Content>
       <LargeText>Create Problem</LargeText>
+      <ProblemDisplay problem={problem!} onClick={handleSubmit} />
+
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
-
-      <ProblemDisplay problem={problem!} onClick={handleSubmit} />
     </Content>
   );
 }

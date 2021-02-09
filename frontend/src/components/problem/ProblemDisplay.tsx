@@ -19,11 +19,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const { problem, onClick } = props;
   const [newProblem, setNewProblem] = useState<Problem>(problem);
 
-  //   difficulty: Difficulty,
-  //   testCases: TestCase[],
-  //   problemInputs: ProblemInput[],
-  //   outputType: ProblemIOType,
-
+  // Handle updating of normal text fields
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setNewProblem({
@@ -32,10 +28,20 @@ function ProblemDisplay(props: ProblemDisplayParams) {
     });
   };
 
+  // Handle updating of enum-type fields
   const handleEnumChange = (name: string, value: any) => handleChange({ target: { name, value } });
 
+  // Handle updating of problem inputs
   const handleInputChange = (index: number, name: string, type: ProblemIOType) => {
-    return 0;
+    setNewProblem({
+      ...newProblem,
+      problemInputs: newProblem.problemInputs.map((input, i) => {
+        if (index === i) {
+          return { name, type };
+        }
+        return input;
+      }),
+    });
   };
 
   return (
@@ -71,12 +77,12 @@ function ProblemDisplay(props: ProblemDisplayParams) {
         return null;
       })}
 
+      <MediumText>Problem Inputs:</MediumText>
       {newProblem.problemInputs.map((input, index) => (
         <div>
-          <Text>{`Input ${index + 1}`}</Text>
+          <Text bold>{`Input ${index + 1}`}</Text>
           <TextInput
-            name="name"
-            value={newProblem.name}
+            value={newProblem.problemInputs[index].name}
             onChange={(e) => handleInputChange(index,
               e.target.value, newProblem.problemInputs[index].type)}
           />

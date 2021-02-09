@@ -44,6 +44,7 @@ function ProblemPage() {
 
   const handleEdit = (newProblem: Problem) => {
     setLoading(true);
+    setError('');
 
     editProblem(newProblem.problemId, newProblem)
       .then((res) => {
@@ -59,10 +60,10 @@ function ProblemPage() {
   return (
     <Content>
       <LargeText>Edit Problem</LargeText>
+      <ProblemDisplay problem={problem!} onClick={handleEdit} />
+
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
-
-      <ProblemDisplay problem={problem!} onClick={handleEdit} />
     </Content>
   );
 }
