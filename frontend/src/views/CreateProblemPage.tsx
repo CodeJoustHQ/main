@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useHistory } from 'react-router-dom';
 import { createProblem, Problem, ProblemIOType } from '../api/Problem';
 import { LargeText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import ProblemDisplay from '../components/problem/ProblemDisplay';
 import Difficulty from '../api/Difficulty';
-import { useHistory } from 'react-router-dom';
 
 const Content = styled.div`
   padding: 0 20%;
