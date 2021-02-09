@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Problem, ProblemIOType } from '../../api/Problem';
 import { LargeInputButton, TextInput } from '../core/Input';
 import Difficulty from '../../api/Difficulty';
-import { DifficultyButton, ProblemIOTypeButton } from '../core/Button';
+import { DifficultyButton, ProblemIOTypeButton, SmallButton } from '../core/Button';
 import { MediumText, Text } from '../core/Text';
 
 const Content = styled.div`
@@ -12,11 +12,12 @@ const Content = styled.div`
 
 type ProblemDisplayParams = {
   problem: Problem,
+  actionText: string,
   onClick: (newProblem: Problem) => void,
 };
 
 function ProblemDisplay(props: ProblemDisplayParams) {
-  const { problem, onClick } = props;
+  const { problem, onClick, actionText } = props;
   const [newProblem, setNewProblem] = useState<Problem>(problem);
 
   // Handle updating of normal text fields
@@ -41,6 +42,22 @@ function ProblemDisplay(props: ProblemDisplayParams) {
         }
         return input;
       }),
+    });
+  };
+
+  // Handle adding a new problem input for this problem
+  const addProblemInput = () => {
+    setNewProblem({
+      ...newProblem,
+      problemInputs: [...newProblem.problemInputs, { name: 'name', type: ProblemIOType.Integer }],
+    });
+  };
+
+  // Handle deleting a problem input for this problem
+  const deleteProblemInput = (index: number) => {
+    setNewProblem({
+      ...newProblem,
+      problemInputs: newProblem.problemInputs.filter((_, i) => index !== i),
     });
   };
 
@@ -78,6 +95,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       })}
 
       <MediumText>Problem Inputs:</MediumText>
+      <SmallButton onClick={addProblemInput}>Add Input</SmallButton>
       {newProblem.problemInputs.map((input, index) => (
         <div>
           <Text bold>{`Input ${index + 1}`}</Text>
@@ -99,6 +117,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
               </ProblemIOTypeButton>
             );
           })}
+          <SmallButton onClick={() => deleteProblemInput(index)}>Delete Input</SmallButton>
         </div>
       ))}
 
@@ -115,7 +134,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
         );
       })}
 
-      <LargeInputButton value="Edit Problem" onClick={() => onClick(newProblem)} />
+      <LargeInputButton value={actionText} onClick={() => onClick(newProblem)} />
     </Content>
   );
 }

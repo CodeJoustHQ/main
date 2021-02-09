@@ -48,7 +48,7 @@ function CreateProblemPage() {
   return (
     <Content>
       <LargeText>Create Problem</LargeText>
-      <ProblemDisplay problem={problem!} onClick={handleSubmit} />
+      <ProblemDisplay problem={problem!} onClick={handleSubmit} actionText="Create Problem" />
 
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
