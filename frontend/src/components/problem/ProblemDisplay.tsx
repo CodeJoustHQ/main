@@ -93,7 +93,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const deleteTestCase = (index: number) => {
     setNewProblem({
       ...newProblem,
-      problemInputs: newProblem.problemInputs.filter((_, i) => index !== i),
+      testCases: newProblem.testCases.filter((_, i) => index !== i),
     });
   };
 
@@ -178,12 +178,12 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           <TextInput
             value={newProblem.testCases[index].input}
             onChange={(e) => handleTestCaseChange(index,
-              e.target.value, newProblem.testCases[index].input)}
+              e.target.value, newProblem.testCases[index].output)}
           />
           <TextInput
-            value={newProblem.testCases[index].input}
+            value={newProblem.testCases[index].output}
             onChange={(e) => handleTestCaseChange(index,
-              e.target.value, newProblem.testCases[index].input)}
+              newProblem.testCases[index].input, e.target.value)}
           />
           <SmallButton onClick={() => deleteTestCase(index)}>Delete Test Case</SmallButton>
         </div>

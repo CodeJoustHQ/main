@@ -46,6 +46,7 @@ public class ProblemService {
 
     public ProblemDto createProblem(CreateProblemRequest request) {
         if (request.getName() == null || request.getDescription() == null
+                || request.getName().isEmpty() || request.getDescription().isEmpty()
                 || request.getDifficulty() == null
                 || request.getProblemInputs() == null
                 || request.getOutputType() == null) {
@@ -95,6 +96,8 @@ public class ProblemService {
 
         if (updatedProblem == null || updatedProblem.getName() == null
                 || updatedProblem.getDescription() == null
+                || updatedProblem.getName().isEmpty()
+                || updatedProblem.getDescription().isEmpty()
                 || updatedProblem.getDifficulty() == null
                 || updatedProblem.getProblemInputs() == null
                 || updatedProblem.getTestCases() == null
@@ -241,7 +244,7 @@ public class ProblemService {
 
     // Check to make sure test case inputs and outputs are Gson-parsable
     protected void validateInputsGsonParseable(String input, List<ProblemInputDto> types) {
-        if (input == null) {
+        if (input == null || input.isEmpty()) {
             throw new ApiException(ProblemError.INVALID_INPUT);
         }
 
