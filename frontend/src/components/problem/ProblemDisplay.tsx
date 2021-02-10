@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import { Problem, ProblemIOType } from '../../api/Problem';
+import { deleteProblem, Problem, ProblemIOType } from '../../api/Problem';
 import { LargeInputButton, TextInput } from '../core/Input';
 import Difficulty from '../../api/Difficulty';
 import { DifficultyButton, ProblemIOTypeButton, SmallButton } from '../core/Button';
 import { MediumText, Text } from '../core/Text';
+import Loading from '../core/Loading';
+import ErrorMessage from '../core/Error';
 
 const Content = styled.div`
   padding: 10px;
@@ -21,7 +24,30 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const {
     problem, onClick, actionText, editMode,
   } = props;
+
+  const history = useHistory();
   const [newProblem, setNewProblem] = useState<Problem>(problem);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const deleteProblemFunc = () => {
+    if (!window.confirm('Are you sure you want to delete this problem?')) {
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    deleteProblem(newProblem.problemId)
+      .then(() => {
+        setLoading(false);
+        history.replace('/problems/all');
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  };
 
   // Handle updating of normal text fields
   const handleChange = (e: any) => {
@@ -198,6 +224,10 @@ function ProblemDisplay(props: ProblemDisplayParams) {
         ) : null}
 
       <LargeInputButton value={actionText} onClick={() => onClick(newProblem)} />
+      {editMode ? <LargeInputButton value="Delete Problem" onClick={deleteProblemFunc} /> : null}
+
+      {loading ? <Loading /> : null}
+      {error ? <ErrorMessage message={error} /> : null}
     </Content>
   );
 }
