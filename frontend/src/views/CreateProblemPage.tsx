@@ -26,7 +26,7 @@ function CreateProblemPage() {
   const history = useHistory();
   const [problem, setProblem] = useState<Problem>(firstProblem);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = (newProblem: Problem) => {
     setLoading(true);
@@ -48,7 +48,7 @@ function CreateProblemPage() {
   return (
     <Content>
       <LargeText>Create Problem</LargeText>
-      <ProblemDisplay problem={problem!} onClick={handleSubmit} actionText="Create Problem" />
+      <ProblemDisplay problem={problem!} onClick={handleSubmit} actionText="Create Problem" editMode={false} />
 
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }

@@ -14,10 +14,13 @@ type ProblemDisplayParams = {
   problem: Problem,
   actionText: string,
   onClick: (newProblem: Problem) => void,
+  editMode: boolean,
 };
 
 function ProblemDisplay(props: ProblemDisplayParams) {
-  const { problem, onClick, actionText } = props;
+  const {
+    problem, onClick, actionText, editMode,
+  } = props;
   const [newProblem, setNewProblem] = useState<Problem>(problem);
 
   // Handle updating of normal text fields
@@ -170,24 +173,29 @@ function ProblemDisplay(props: ProblemDisplayParams) {
         );
       })}
 
-      <MediumText>Test Cases:</MediumText>
-      <SmallButton onClick={addTestCase}>Add Test Case</SmallButton>
-      {newProblem.testCases.map((testCase, index) => (
-        <div>
-          <Text bold>{`Test Case ${index + 1}`}</Text>
-          <TextInput
-            value={newProblem.testCases[index].input}
-            onChange={(e) => handleTestCaseChange(index,
-              e.target.value, newProblem.testCases[index].output)}
-          />
-          <TextInput
-            value={newProblem.testCases[index].output}
-            onChange={(e) => handleTestCaseChange(index,
-              newProblem.testCases[index].input, e.target.value)}
-          />
-          <SmallButton onClick={() => deleteTestCase(index)}>Delete Test Case</SmallButton>
-        </div>
-      ))}
+      {editMode
+        ? (
+          <div>
+            <MediumText>Test Cases:</MediumText>
+            <SmallButton onClick={addTestCase}>Add Test Case</SmallButton>
+            {newProblem.testCases.map((testCase, index) => (
+              <div>
+                <Text bold>{`Test Case ${index + 1}`}</Text>
+                <TextInput
+                  value={newProblem.testCases[index].input}
+                  onChange={(e) => handleTestCaseChange(index,
+                    e.target.value, newProblem.testCases[index].output)}
+                />
+                <TextInput
+                  value={newProblem.testCases[index].output}
+                  onChange={(e) => handleTestCaseChange(index,
+                    newProblem.testCases[index].input, e.target.value)}
+                />
+                <SmallButton onClick={() => deleteTestCase(index)}>Delete Test Case</SmallButton>
+              </div>
+            ))}
+          </div>
+        ) : null}
 
       <LargeInputButton value={actionText} onClick={() => onClick(newProblem)} />
     </Content>
