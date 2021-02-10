@@ -61,6 +61,42 @@ function ProblemDisplay(props: ProblemDisplayParams) {
     });
   };
 
+  // Handle updating of test case
+  const handleTestCaseChange = (index: number, input: string, output: string) => {
+    setNewProblem({
+      ...newProblem,
+      testCases: newProblem.testCases.map((testCase, i) => {
+        if (index === i) {
+          return {
+            input,
+            output,
+            hidden: false,
+            explanation: '',
+          };
+        }
+        return testCase;
+      }),
+    });
+  };
+
+  // Handle adding a new test case for this problem
+  const addTestCase = () => {
+    setNewProblem({
+      ...newProblem,
+      testCases: [...newProblem.testCases, {
+        input: '0', output: '0', hidden: false, explanation: '',
+      }],
+    });
+  };
+
+  // Handle deleting a test case for this problem
+  const deleteTestCase = (index: number) => {
+    setNewProblem({
+      ...newProblem,
+      problemInputs: newProblem.problemInputs.filter((_, i) => index !== i),
+    });
+  };
+
   return (
     <Content>
       <MediumText>Name:</MediumText>
@@ -133,6 +169,25 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           </ProblemIOTypeButton>
         );
       })}
+
+      <MediumText>Test Cases:</MediumText>
+      <SmallButton onClick={addTestCase}>Add Test Case</SmallButton>
+      {newProblem.testCases.map((testCase, index) => (
+        <div>
+          <Text bold>{`Test Case ${index + 1}`}</Text>
+          <TextInput
+            value={newProblem.testCases[index].input}
+            onChange={(e) => handleTestCaseChange(index,
+              e.target.value, newProblem.testCases[index].input)}
+          />
+          <TextInput
+            value={newProblem.testCases[index].input}
+            onChange={(e) => handleTestCaseChange(index,
+              e.target.value, newProblem.testCases[index].input)}
+          />
+          <SmallButton onClick={() => deleteTestCase(index)}>Delete Test Case</SmallButton>
+        </div>
+      ))}
 
       <LargeInputButton value={actionText} onClick={() => onClick(newProblem)} />
     </Content>
