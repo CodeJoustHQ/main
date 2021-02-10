@@ -6,6 +6,7 @@ import { LargeText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import ProblemCard from '../components/card/ProblemCard';
+import { TextLink } from '../components/core/Link';
 
 const Content = styled.div`
   padding: 0 20%;
@@ -36,6 +37,7 @@ function AllProblemsPage() {
   return (
     <Content>
       <LargeText>View All Problems</LargeText>
+      <TextLink to="/problem/create">Create new problem</TextLink>
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
 

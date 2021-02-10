@@ -7,6 +7,7 @@ import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import ProblemDisplay from '../components/problem/ProblemDisplay';
 import Difficulty from '../api/Difficulty';
+import { TextLink } from '../components/core/Link';
 
 const Content = styled.div`
   padding: 0 20%;
@@ -48,6 +49,7 @@ function CreateProblemPage() {
   return (
     <Content>
       <LargeText>Create Problem</LargeText>
+      <TextLink to="/problems/all">Back to all problems</TextLink>
       <ProblemDisplay problem={problem!} onClick={handleSubmit} actionText="Create Problem" editMode={false} />
 
       { error ? <ErrorMessage message={error} /> : null }
