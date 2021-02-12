@@ -571,6 +571,11 @@ public class ProblemServiceTests {
 
         assertEquals(ProblemError.INVALID_INPUT, exception.getError());
 
+        exception = assertThrows(ApiException.class, () ->
+                problemService.validateInputsGsonParseable("true\n\n5.0", inputs));
+
+        assertEquals(ProblemError.INVALID_INPUT, exception.getError());
+
         inputs.add(new ProblemInputDto("", ProblemIOType.ARRAY_STRING));
         exception = assertThrows(ApiException.class, () ->
                 problemService.validateInputsGsonParseable("true\n[a]\n3.0\n[]", inputs));

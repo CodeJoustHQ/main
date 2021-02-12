@@ -244,7 +244,7 @@ public class ProblemService {
 
     // Check to make sure test case inputs and outputs are Gson-parsable
     protected void validateInputsGsonParseable(String input, List<ProblemInputDto> types) {
-        if (input == null || input.isEmpty()) {
+        if (input == null) {
             throw new ApiException(ProblemError.INVALID_INPUT);
         }
 
@@ -270,7 +270,13 @@ public class ProblemService {
         }
 
         try {
-            gson.fromJson(input, type.getClassType());
+            Object result = gson.fromJson(input, type.getClassType());
+
+            // Trigger catch block to return invalid input error
+            if (result == null) {
+                throw new Exception();
+            }
+
         } catch (Exception e) {
             throw new ApiException(ProblemError.INVALID_INPUT);
         }

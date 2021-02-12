@@ -213,12 +213,11 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                     e.target.value, newProblem.testCases[index].output)}
                 />
                 <br />
-                <ConsoleTextArea
+                <TextInput
                   value={newProblem.testCases[index].output}
                   onChange={(e) => handleTestCaseChange(index,
                     newProblem.testCases[index].input, e.target.value)}
                 />
-                <br />
                 <SmallButton onClick={() => deleteTestCase(index)}>Delete Test Case</SmallButton>
               </div>
             ))}
