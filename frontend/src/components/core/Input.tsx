@@ -86,3 +86,12 @@ export const TextInput = styled(Input).attrs(() => ({
     border: 3px solid ${({ theme }) => theme.colors.darkBlue};
   }
 `;
+
+export const CheckboxInput = styled(Input).attrs(() => ({
+  type: 'checkbox',
+}))`
+  display: inline-block;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  color: ${({ theme }) => theme.colors.text};
+  margin: 5px;
+`;

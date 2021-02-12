@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { deleteProblem, Problem, ProblemIOType } from '../../api/Problem';
-import { ConsoleTextArea, LargeInputButton, TextInput } from '../core/Input';
+import {
+  ConsoleTextArea, LargeInputButton, TextInput, CheckboxInput,
+} from '../core/Input';
 import Difficulty from '../../api/Difficulty';
 import { DifficultyButton, ProblemIOTypeButton, SmallButton } from '../core/Button';
 import { MediumText, Text } from '../core/Text';
@@ -91,7 +93,8 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   };
 
   // Handle updating of test case
-  const handleTestCaseChange = (index: number, input: string, output: string) => {
+  const handleTestCaseChange = (index: number, input: string,
+    output: string, hidden: boolean, explanation: string) => {
     setNewProblem({
       ...newProblem,
       testCases: newProblem.testCases.map((testCase, i) => {
@@ -99,8 +102,8 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           return {
             input,
             output,
-            hidden: false,
-            explanation: '',
+            hidden,
+            explanation,
           };
         }
         return testCase;
@@ -207,17 +210,49 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             {newProblem.testCases.map((testCase, index) => (
               <div>
                 <Text bold>{`Test Case ${index + 1}`}</Text>
+                <Text>Input</Text>
                 <ConsoleTextArea
                   value={newProblem.testCases[index].input}
-                  onChange={(e) => handleTestCaseChange(index,
-                    e.target.value, newProblem.testCases[index].output)}
+                  onChange={(e) => {
+                    const current = newProblem.testCases[index];
+                    handleTestCaseChange(index, e.target.value,
+                      current.output, current.hidden, current.explanation);
+                  }}
                 />
                 <br />
+                <Text>Output</Text>
                 <TextInput
                   value={newProblem.testCases[index].output}
-                  onChange={(e) => handleTestCaseChange(index,
-                    newProblem.testCases[index].input, e.target.value)}
+                  onChange={(e) => {
+                    const current = newProblem.testCases[index];
+                    handleTestCaseChange(index, current.input, e.target.value,
+                      current.hidden, current.explanation);
+                  }}
                 />
+
+                <Text>Explanation</Text>
+                <TextInput
+                  value={newProblem.testCases[index].explanation}
+                  onChange={(e) => {
+                    const current = newProblem.testCases[index];
+                    handleTestCaseChange(index, current.input, current.output,
+                      current.hidden, e.target.value);
+                  }}
+                />
+
+                <label htmlFor={`problem-hidden-${index}`}>
+                  Hidden
+                  <CheckboxInput
+                    id={`problem-hidden-${index}`}
+                    checked={newProblem.testCases[index].hidden}
+                    onChange={(e) => {
+                      const current = newProblem.testCases[index];
+                      handleTestCaseChange(index, current.input,
+                        current.output, e.target.checked, current.explanation);
+                    }}
+                  />
+                </label>
+
                 <SmallButton onClick={() => deleteTestCase(index)}>Delete Test Case</SmallButton>
               </div>
             ))}
