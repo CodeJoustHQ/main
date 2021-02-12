@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { deleteProblem, Problem, ProblemIOType } from '../../api/Problem';
-import { LargeInputButton, TextInput } from '../core/Input';
+import { ConsoleTextArea, LargeInputButton, TextInput } from '../core/Input';
 import Difficulty from '../../api/Difficulty';
 import { DifficultyButton, ProblemIOTypeButton, SmallButton } from '../core/Button';
 import { MediumText, Text } from '../core/Text';
@@ -163,11 +163,12 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       {newProblem.problemInputs.map((input, index) => (
         <div>
           <Text bold>{`Input ${index + 1}`}</Text>
-          <TextInput
+          <ConsoleTextArea
             value={newProblem.problemInputs[index].name}
             onChange={(e) => handleInputChange(index,
               e.target.value, newProblem.problemInputs[index].type)}
           />
+          <br />
 
           {Object.keys(ProblemIOType).map((key) => {
             const inputType = ProblemIOType[key as keyof typeof ProblemIOType];
@@ -206,16 +207,18 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             {newProblem.testCases.map((testCase, index) => (
               <div>
                 <Text bold>{`Test Case ${index + 1}`}</Text>
-                <TextInput
+                <ConsoleTextArea
                   value={newProblem.testCases[index].input}
                   onChange={(e) => handleTestCaseChange(index,
                     e.target.value, newProblem.testCases[index].output)}
                 />
-                <TextInput
+                <br />
+                <ConsoleTextArea
                   value={newProblem.testCases[index].output}
                   onChange={(e) => handleTestCaseChange(index,
                     newProblem.testCases[index].input, e.target.value)}
                 />
+                <br />
                 <SmallButton onClick={() => deleteTestCase(index)}>Delete Test Case</SmallButton>
               </div>
             ))}
