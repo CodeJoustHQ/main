@@ -139,7 +139,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       />
 
       <MediumText>Description:</MediumText>
-      <TextInput
+      <ConsoleTextArea
         name="description"
         value={newProblem.description}
         onChange={handleChange}
@@ -166,7 +166,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       {newProblem.problemInputs.map((input, index) => (
         <div>
           <Text bold>{`Input ${index + 1}`}</Text>
-          <ConsoleTextArea
+          <TextInput
             value={newProblem.problemInputs[index].name}
             onChange={(e) => handleInputChange(index,
               e.target.value, newProblem.problemInputs[index].type)}
