@@ -34,7 +34,7 @@ function ProblemPage() {
         setError(err.message);
         setLoading(false);
       });
-  }, []);
+  }, [params]);
 
   if (!problem) {
     if (loading) {
