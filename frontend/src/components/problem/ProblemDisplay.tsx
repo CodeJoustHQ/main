@@ -160,7 +160,6 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       })}
 
       <MediumText>Problem Inputs:</MediumText>
-      <SmallButton onClick={addProblemInput}>Add Input</SmallButton>
       {newProblem.problemInputs.map((input, index) => (
         <div>
           <Text bold>{`Input ${index + 1}`}</Text>
@@ -185,6 +184,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           <SmallButton onClick={() => deleteProblemInput(index)}>Delete Input</SmallButton>
         </div>
       ))}
+      <SmallButton onClick={addProblemInput}>Add Input</SmallButton>
 
       <MediumText>Output Type:</MediumText>
       {Object.keys(ProblemIOType).map((key) => {
@@ -203,7 +203,6 @@ function ProblemDisplay(props: ProblemDisplayParams) {
         ? (
           <div>
             <MediumText>Test Cases:</MediumText>
-            <SmallButton onClick={addTestCase}>Add Test Case</SmallButton>
             {newProblem.testCases.map((testCase, index) => (
               <div>
                 <Text bold>{`Test Case ${index + 1}`}</Text>
@@ -220,6 +219,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                 <SmallButton onClick={() => deleteTestCase(index)}>Delete Test Case</SmallButton>
               </div>
             ))}
+            <SmallButton onClick={addTestCase}>Add Test Case</SmallButton>
           </div>
         ) : null}
 
