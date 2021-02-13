@@ -54,6 +54,7 @@ public class SubmitService {
         submission.setPlayerCode(playerCode);
         submission.setNumCorrect(numTestCases);
         submission.setNumTestCases(numTestCases);
+        submission.setRuntime(4.5);
 
         return submission;
     }
@@ -118,11 +119,12 @@ public class SubmitService {
 
             TesterResponse testerResponse = gson.fromJson(jsonResponse, TesterResponse.class);
 
-            // TODO: logic to convert TesterResponse into Submission object
             Submission submission = new Submission();
-            submission.setNumCorrect(request.getProblem().getTestCases().size());
-            submission.setNumTestCases(request.getProblem().getTestCases().size());
+            submission.setNumCorrect(testerResponse.getNumCorrect());
+            submission.setNumTestCases(testerResponse.getNumTestCases());
+            submission.setRuntime(testerResponse.getRuntime());
             submission.setPlayerCode(new PlayerCode(request.getCode(), request.getLanguage()));
+
 
             return submission;
         } catch (Exception e) {

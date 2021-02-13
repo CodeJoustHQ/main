@@ -20,6 +20,7 @@ public class SubmissionDto {
     private String code;
     private Integer numCorrect;
     private Integer numTestCases;
+    private Double runtime;
 
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)

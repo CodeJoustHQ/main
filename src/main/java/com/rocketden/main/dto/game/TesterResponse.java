@@ -12,7 +12,7 @@ public class TesterResponse {
     private List<TesterResultResponse> results;
     private Integer numCorrect;
     private Integer numTestCases;
-    private Long runtime;
+    private Double runtime;
 
     @Getter
     @Setter

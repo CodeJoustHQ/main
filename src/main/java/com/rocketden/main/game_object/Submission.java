@@ -19,4 +19,6 @@ public class Submission {
     private Integer numCorrect;
 
     private Integer numTestCases;
+
+    private Double runtime;
 }

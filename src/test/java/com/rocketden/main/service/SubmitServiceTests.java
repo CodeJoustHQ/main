@@ -73,6 +73,7 @@ public class SubmitServiceTests {
         assertEquals(CODE, submission.getPlayerCode().getCode());
         assertEquals(LANGUAGE, submission.getPlayerCode().getLanguage());
         assertEquals(submission.getNumCorrect(), submission.getNumTestCases());
+        assertNotNull(submission.getRuntime());
         assertTrue(game.getAllSolved());
     }
 
@@ -109,6 +110,7 @@ public class SubmitServiceTests {
         assertEquals(CODE, submission.getPlayerCode().getCode());
         assertEquals(LANGUAGE, submission.getPlayerCode().getLanguage());
         assertEquals(submission.getNumCorrect(), submission.getNumTestCases());
+        assertNotNull(submission.getRuntime());
         assertFalse(game.getAllSolved());
     }
 
