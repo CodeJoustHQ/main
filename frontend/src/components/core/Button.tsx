@@ -71,6 +71,26 @@ export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`
   }
 `;
 
+type ProblemIOTypeButtonProps = {
+  active: boolean,
+}
+
+export const ProblemIOTypeButton = styled(DefaultButton)<ProblemIOTypeButtonProps>`  
+  color: ${({ theme, active }) => (active ? theme.colors.white : theme.colors.font)};
+  background-color: ${({ theme, active }) => (active ? theme.colors.blue : theme.colors.white)};
+  padding: 4px 8px;
+  margin: 0.8rem;
+  
+  &:hover {
+    ${({ theme }) => `
+      color: ${theme.colors.white};
+      background-color: ${theme.colors.blue};
+    `};
+    
+    cursor: pointer;
+  }
+`;
+
 export const SmallButton = styled(DefaultButton)`
   color: ${({ theme }) => theme.colors.white};
   background-color: ${({ theme }) => theme.colors.blue};

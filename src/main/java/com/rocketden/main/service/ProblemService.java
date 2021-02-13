@@ -46,6 +46,7 @@ public class ProblemService {
 
     public ProblemDto createProblem(CreateProblemRequest request) {
         if (request.getName() == null || request.getDescription() == null
+                || request.getName().isEmpty() || request.getDescription().isEmpty()
                 || request.getDifficulty() == null
                 || request.getProblemInputs() == null
                 || request.getOutputType() == null) {
@@ -95,6 +96,8 @@ public class ProblemService {
 
         if (updatedProblem == null || updatedProblem.getName() == null
                 || updatedProblem.getDescription() == null
+                || updatedProblem.getName().isEmpty()
+                || updatedProblem.getDescription().isEmpty()
                 || updatedProblem.getDifficulty() == null
                 || updatedProblem.getProblemInputs() == null
                 || updatedProblem.getTestCases() == null
@@ -267,7 +270,13 @@ public class ProblemService {
         }
 
         try {
-            gson.fromJson(input, type.getClassType());
+            Object result = gson.fromJson(input, type.getClassType());
+
+            // Trigger catch block to return invalid input error
+            if (result == null) {
+                throw new Exception();
+            }
+
         } catch (Exception e) {
             throw new ApiException(ProblemError.INVALID_INPUT);
         }

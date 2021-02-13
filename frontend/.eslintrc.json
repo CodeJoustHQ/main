@@ -34,6 +34,9 @@
                 "tsx": "never"
             }
         ],
+        "jsx-a11y/label-has-associated-control": [ 2, {
+            "controlComponents": ["CheckboxInput"]
+        }],
         "react/jsx-filename-extension": [1, { "extensions": [".tsx", ".jsx"] }],
         "react/jsx-props-no-spreading": "off"
     },

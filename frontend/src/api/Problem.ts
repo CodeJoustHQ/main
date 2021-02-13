@@ -7,14 +7,36 @@ export type TestCase = {
   input: string,
   output: string,
   hidden: boolean,
+  explanation: string,
 };
 
 export type Problem = {
   problemId: string,
   name: string,
-  description: string;
+  description: string,
+  difficulty: Difficulty,
   testCases: TestCase[],
+  problemInputs: ProblemInput[],
+  outputType: ProblemIOType,
 };
+
+export type ProblemInput = {
+  name: string,
+  type: ProblemIOType,
+};
+
+export enum ProblemIOType {
+  String = 'STRING',
+  Integer = 'INTEGER',
+  Double = 'DOUBLE',
+  Character = 'CHARACTER',
+  Boolean = 'BOOLEAN',
+  ArrayString = 'ARRAY_STRING',
+  ArrayInteger = 'ARRAY_INTEGER',
+  ArrayDouble = 'ARRAY_DOUBLE',
+  ArrayCharacter = 'ARRAY_CHARACTER',
+  ArrayBoolean = 'ARRAY_BOOLEAN',
+}
 
 export type ProblemSettings = {
   difficulty: Difficulty,
@@ -30,6 +52,8 @@ const routes = {
   createProblem: `${basePath}/`,
   getRandomProblem: `${basePath}/random`,
   getSingleProblem: (problemId: string) => `${basePath}/${problemId}`,
+  editProblem: (problemId: string) => `${basePath}/${problemId}`,
+  deleteProblem: (problemId: string) => `${basePath}/${problemId}`,
   createTestCase: (problemId: string) => `${basePath}/${problemId}/test-case`,
   defaultCodeMap: (problemId: string) => `${basePath}/${problemId}/default-code`,
 };
@@ -43,6 +67,34 @@ export const getProblems = (): Promise<Problem[]> => axios
 
 export const getRandomProblem = (request: ProblemSettings): Promise<Problem> => axios
   .get<Problem>(`${routes.getRandomProblem}?${new URLSearchParams(request).toString()}`)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const getSingleProblem = (problemId: string): Promise<Problem> => axios
+  .get<Problem>(routes.getSingleProblem(problemId))
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const createProblem = (problem: Problem): Promise<Problem> => axios
+  .post<Problem>(routes.createProblem, problem)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const editProblem = (problemId: string, updatedProblem: Problem): Promise<Problem> => axios
+  .put<Problem>(routes.editProblem(problemId), updatedProblem)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const deleteProblem = (problemId: string): Promise<Problem> => axios
+  .delete<Problem>(routes.deleteProblem(problemId))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

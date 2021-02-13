@@ -71,3 +71,27 @@ export const NumberInput = styled(Input).attrs(() => ({
     border: 3px solid ${({ theme }) => theme.colors.darkBlue};
   }
 `;
+
+export const TextInput = styled(Input).attrs(() => ({
+  type: 'text',
+}))`
+  display: block;
+  width: 15rem;
+  text-align: center;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  padding: 1rem;
+  color: ${({ theme }) => theme.colors.text};
+
+  &:focus {
+    border: 3px solid ${({ theme }) => theme.colors.darkBlue};
+  }
+`;
+
+export const CheckboxInput = styled(Input).attrs(() => ({
+  type: 'checkbox',
+}))`
+  display: inline-block;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  color: ${({ theme }) => theme.colors.text};
+  margin: 5px;
+`;
