@@ -8,12 +8,20 @@ import com.rocketden.main.dto.game.TesterRequest;
 import com.rocketden.main.dto.game.TesterResponse;
 import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.exception.GameError;
+import com.rocketden.main.exception.TesterError;
+import com.rocketden.main.exception.api.ApiError;
+import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.exception.api.ApiException;
+import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.Game;
 
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.game_object.Submission;
+import com.rocketden.main.model.problem.Problem;
+import com.rocketden.main.model.problem.ProblemIOType;
+import com.rocketden.main.model.problem.ProblemInput;
+import com.rocketden.main.model.problem.ProblemTestCase;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -21,6 +29,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 /**
@@ -117,6 +126,13 @@ public class SubmitService {
             HttpResponse response = httpClient.execute(post);
             String jsonResponse = EntityUtils.toString(response.getEntity());
 
+            // Throw tester error if the tester returns an error response
+            int status = response.getStatusLine().getStatusCode();
+            if (status >= 400) {
+                ApiErrorResponse error = new Gson().fromJson(jsonResponse, ApiErrorResponse.class);
+                throw new ApiException(new TesterError(HttpStatus.valueOf(status), error));
+            }
+
             TesterResponse testerResponse = gson.fromJson(jsonResponse, TesterResponse.class);
 
             Submission submission = new Submission();
@@ -127,7 +143,11 @@ public class SubmitService {
 
 
             return submission;
+        } catch (ApiException e) {
+            // If custom ApiException is thrown, pass that as the response
+            throw e;
         } catch (Exception e) {
+            // Throw generic 500 error
             throw new ApiException(GameError.TESTER_ERROR);
         }
     }
@@ -148,5 +168,58 @@ public class SubmitService {
     // This method should only be called for testing purposes
     protected void setDebugModeForTesting(boolean debugMode) {
         this.debugMode = debugMode;
+    }
+
+    // TODO: Manual testing purposes only - delete later
+    public static void main(String[] args) {
+        Problem problem = new Problem();
+        ProblemInput input = new ProblemInput();
+        input.setName("num");
+        input.setType(ProblemIOType.INTEGER);
+        problem.addProblemInput(input);
+        problem.setOutputType(ProblemIOType.INTEGER);
+
+        ProblemTestCase testCase = new ProblemTestCase();
+        testCase.setInput("5");
+        testCase.setOutput("10");
+        problem.addTestCase(testCase);
+
+        TesterRequest testerRequest = new TesterRequest();
+        testerRequest.setCode("class Solution:\n\tdef solve(num):\n\t\t:return num * 2");
+        testerRequest.setLanguage(CodeLanguage.PYTHON);
+        testerRequest.setProblem(ProblemMapper.toDto(problem));
+
+        try {
+            HttpPost post = new HttpPost("https://rocketden-tester.herokuapp.com/api/v1/runner");
+
+            StringEntity stringEntity = new StringEntity(new Gson().toJson(testerRequest));
+            post.setEntity(stringEntity);
+            post.setHeader("Content-type", "application/json");
+
+            HttpResponse response = HttpClientBuilder.create().build().execute(post);
+            String jsonResponse = EntityUtils.toString(response.getEntity());
+
+            // Throw tester error if the tester returns an error response
+            int status = response.getStatusLine().getStatusCode();
+            if (status >= 400) {
+                ApiErrorResponse error = new Gson().fromJson(jsonResponse, ApiErrorResponse.class);
+                throw new ApiException(new TesterError(HttpStatus.valueOf(status), error));
+            }
+
+            TesterResponse testerResponse = new Gson().fromJson(jsonResponse, TesterResponse.class);
+
+            Submission submission = new Submission();
+            submission.setNumCorrect(testerResponse.getNumCorrect());
+            submission.setNumTestCases(testerResponse.getNumTestCases());
+            submission.setRuntime(testerResponse.getRuntime());
+
+            System.out.println(submission);
+        } catch (ApiException e) {
+            // If custom ApiException is thrown, pass that as the response
+            throw e;
+        } catch (Exception e) {
+            // Throw generic 500 error
+            throw new ApiException(GameError.TESTER_ERROR);
+        }
     }
 }

@@ -115,6 +115,7 @@ public class SubmitServiceTests {
     }
 
     // This is a very weak test - it simply resorts to ensuring a submission is returned in debug mode
+    // TODO: test dummy response, success response, 400 tester error response, 500 generic error response
     @Test
     public void callTesterServiceSuccess() {
         TesterRequest request = new TesterRequest();
