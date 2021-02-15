@@ -114,18 +114,34 @@ public class SubmitServiceTests {
         assertFalse(game.getAllSolved());
     }
 
-    // This is a very weak test - it simply resorts to ensuring a submission is returned in debug mode
-    // TODO: test dummy response, success response, 400 tester error response, 500 generic error response
     @Test
-    public void callTesterServiceSuccess() {
+    public void callTesterServiceReturnsDummyResponse() {
         TesterRequest request = new TesterRequest();
         request.setCode(CODE);
         request.setLanguage(LANGUAGE);
         request.setProblem(new ProblemDto());
 
-        Submission response = submitService.callTesterService(request);
+        Submission response = submitService.getSubmission(request);
 
         assertNotNull(response);
+    }
+
+    @Test
+    public void callTesterServiceSuccessfulApiCall() {
+        submitService.setDebugModeForTesting(false);
+
+    }
+
+    @Test
+    public void callTesterServiceTesterThrowsError() {
+        submitService.setDebugModeForTesting(false);
+
+    }
+
+    @Test
+    public void callTesterServiceInternalError() {
+        submitService.setDebugModeForTesting(false);
+
     }
 
     @Test

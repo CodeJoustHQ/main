@@ -85,7 +85,7 @@ public class SubmitService {
         testerRequest.setLanguage(request.getLanguage());
         testerRequest.setProblem(ProblemMapper.toDto(game.getProblems().get(0)));
 
-        Submission submission = callTesterService(testerRequest);
+        Submission submission = getSubmission(testerRequest);
         player.getSubmissions().add(submission);
 
         if (submission.getNumCorrect().equals(submission.getNumTestCases())) {
@@ -109,38 +109,21 @@ public class SubmitService {
         return GameMapper.submissionToDto(submission);
     }
 
-    // Sends a POST request to the tester service to judge the user submission
-    protected Submission callTesterService(TesterRequest request) {
+    // Get submission (either through tester or using a dummy response)
+    protected Submission getSubmission(TesterRequest request) {
         // If in debug mode (tester is unavailable), return a dummy submission
         if (getDebugMode()) {
             return getDummySubmission(request);
         }
 
         try {
-            HttpPost post = new HttpPost(getTesterUrl());
-
-            StringEntity stringEntity = new StringEntity(gson.toJson(request));
-            post.setEntity(stringEntity);
-            post.setHeader("Content-type", "application/json");
-
-            HttpResponse response = httpClient.execute(post);
-            String jsonResponse = EntityUtils.toString(response.getEntity());
-
-            // Throw tester error if the tester returns an error response
-            int status = response.getStatusLine().getStatusCode();
-            if (status >= 400) {
-                ApiErrorResponse error = new Gson().fromJson(jsonResponse, ApiErrorResponse.class);
-                throw new ApiException(new TesterError(HttpStatus.valueOf(status), error));
-            }
-
-            TesterResponse testerResponse = gson.fromJson(jsonResponse, TesterResponse.class);
+            TesterResponse testerResponse = callTesterService(request);
 
             Submission submission = new Submission();
             submission.setNumCorrect(testerResponse.getNumCorrect());
             submission.setNumTestCases(testerResponse.getNumTestCases());
             submission.setRuntime(testerResponse.getRuntime());
             submission.setPlayerCode(new PlayerCode(request.getCode(), request.getLanguage()));
-
 
             return submission;
         } catch (ApiException e) {
@@ -150,6 +133,27 @@ public class SubmitService {
             // Throw generic 500 error
             throw new ApiException(GameError.TESTER_ERROR);
         }
+    }
+
+    // Sends a POST request to the tester service to judge the user submission
+    protected TesterResponse callTesterService(TesterRequest request) throws Exception {
+        HttpPost post = new HttpPost(getTesterUrl());
+
+        StringEntity stringEntity = new StringEntity(gson.toJson(request));
+        post.setEntity(stringEntity);
+        post.setHeader("Content-type", "application/json");
+
+        HttpResponse response = httpClient.execute(post);
+        String jsonResponse = EntityUtils.toString(response.getEntity());
+
+        // Throw tester error if the tester returns an error response
+        int status = response.getStatusLine().getStatusCode();
+        if (status >= 400) {
+            ApiErrorResponse error = new Gson().fromJson(jsonResponse, ApiErrorResponse.class);
+            throw new ApiException(new TesterError(HttpStatus.valueOf(status), error));
+        }
+
+        return gson.fromJson(jsonResponse, TesterResponse.class);
     }
 
     // Is null in certain testing environments; if so, return a default value
