@@ -48,13 +48,14 @@ function GamePage() {
   const [roomId, setRoomId] = useState<string>('');
 
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
   const [game, setGame] = useState<Game | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [currentLanguage, setCurrentLanguage] = useState('java');
+  const [currentLanguage, setCurrentLanguage] = useState('python');
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
   const [defaultCodeList, setDefaultCodeList] = useState<DefaultCodeType[]>([]);
@@ -201,6 +202,7 @@ function GamePage() {
 
   // Callback when user runs code against custom test case
   const runSolution = (input: string) => {
+    setLoading(true);
     const request = {
       initiator: currentUser!,
       code: input,
@@ -209,10 +211,14 @@ function GamePage() {
 
     submitSolution(roomId, request)
       .then((res) => {
+        setLoading(false);
         setSubmission(res);
         checkSendTestCorrectNotification(res);
       })
-      .catch((err) => setError(err));
+      .catch((err) => {
+        setLoading(false);
+        setError(err.message);
+      });
   };
 
   const exitGame = () => {
@@ -272,6 +278,8 @@ function GamePage() {
       <CenteredContainer>
         {displayPlayerLeaderboard()}
       </CenteredContainer>
+
+      {loading ? <Loading /> : null}
 
       <SplitterContainer>
         <SplitterLayout
