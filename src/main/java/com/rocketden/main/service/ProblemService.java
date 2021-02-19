@@ -299,7 +299,8 @@ public class ProblemService {
         for (DefaultCodeGeneratorService defaultCodeGeneratorService : defaultCodeGeneratorServiceList) {
             CodeLanguage language = defaultCodeGeneratorService.getLanguage();
             String defaultCode = defaultCodeGeneratorService.getDefaultCode(problemInputs, outputType);
-            defaultCodeMap.put(language, defaultCode);
+            // Replace tabs with spaces
+            defaultCodeMap.put(language, defaultCode.replaceAll("\t", "    "));
         }
 
         return defaultCodeMap;
