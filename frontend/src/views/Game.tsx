@@ -46,6 +46,7 @@ function GamePage() {
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [roomId, setRoomId] = useState<string>('');
+  const [code, setCode] = useState<string>('');
 
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
@@ -201,11 +202,12 @@ function GamePage() {
   };
 
   // Callback when user runs code against custom test case
-  const runSolution = (input: string) => {
+  const runSolution = () => {
     setLoading(true);
+    setError('');
     const request = {
       initiator: currentUser!,
-      code: input,
+      code,
       language: currentLanguage,
     };
 
@@ -306,6 +308,7 @@ function GamePage() {
               <Editor
                 onLanguageChange={setCurrentLanguage}
                 codeMap={defaultCodeList[0]}
+                onChange={setCode}
               />
             </Panel>
 

@@ -7,6 +7,7 @@ import { DefaultCodeType } from '../../api/Problem';
 type EditorProps = {
   onLanguageChange: (language: string) => void,
   codeMap: DefaultCodeType | null,
+  onChange: (code: string) => void,
 };
 
 const Content = styled.div`
@@ -18,7 +19,7 @@ function ResizableMonacoEditor(props: EditorProps) {
   const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.Python);
   const [codeEditor, setCodeEditor] = useState<any>(null);
 
-  const { onLanguageChange, codeMap } = props;
+  const { onLanguageChange, codeMap, onChange } = props;
 
   const handleEditorDidMount = (editor: any) => {
     setCodeEditor(editor);
@@ -65,6 +66,7 @@ function ResizableMonacoEditor(props: EditorProps) {
         editorDidMount={handleEditorDidMount}
         language={languageToEditorLanguage(currentLanguage)}
         defaultValue="Loading..."
+        onChange={onChange}
       />
     </Content>
   );
