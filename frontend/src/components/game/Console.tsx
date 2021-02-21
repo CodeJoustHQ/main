@@ -4,7 +4,7 @@ import { TestCase } from '../../api/Problem';
 import { Text } from '../core/Text';
 import { ConsoleTextArea } from '../core/Input';
 import { SmallButton } from '../core/Button';
-import { Submission, SubmissionResult } from '../../api/Game';
+import { Submission, SubmissionResult, SubmissionType } from '../../api/Game';
 
 const Content = styled.div`
   height: 100%;
@@ -44,7 +44,9 @@ function Console(props: ConsoleProps) {
       const outputList: string[] = [];
 
       // Add submission correctness.
-      outputList.push(`${submission.numCorrect} / ${submission.numTestCases} passed`);
+      if (submission.submissionType === SubmissionType.Submit) {
+        outputList.push(`${submission.numCorrect} / ${submission.numTestCases} passed`);
+      }
 
       // If a compilation error exists, show that; otherwise, show results.
       if (submission.compilationError) {
@@ -62,7 +64,11 @@ function Console(props: ConsoleProps) {
           } else {
             outputList.push(`Input: ${result.input}`);
             outputList.push(`User output: ${result.userOutput}`);
-            outputList.push(`Correct output: ${result.correctOutput}`);
+
+            // Only show correct output if type was 'submit'.
+            if (submission.submissionType === SubmissionType.Submit) {
+              outputList.push(`Correct output: ${result.correctOutput}`);
+            }
             outputList.push(`Console: ${result.console}`);
             outputList.push(`Error: ${result.error}`);
           }

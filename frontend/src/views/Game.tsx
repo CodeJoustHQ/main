@@ -20,7 +20,7 @@ import { User } from '../api/User';
 import { GameNotification, NotificationType } from '../api/GameNotification';
 import Difficulty from '../api/Difficulty';
 import {
-  Game, getGame, Player, Submission, submitSolution, runSolution,
+  Game, getGame, Player, Submission, submitSolution, runSolution, SubmissionType,
 } from '../api/Game';
 import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
@@ -230,6 +230,9 @@ function GamePage() {
     runSolution(roomId, request)
       .then((res) => {
         setLoading(false);
+
+        // Set the 'test' submission type to correctly display result.
+        res.submissionType = SubmissionType.Test;
         setSubmission(res);
         checkSendTestCorrectNotification(res);
       })
@@ -252,6 +255,9 @@ function GamePage() {
     submitSolution(roomId, request)
       .then((res) => {
         setLoading(false);
+
+        // Set the 'submit' submission type to correctly display result.
+        res.submissionType = SubmissionType.Submit;
         setSubmission(res);
         checkSendSolutionCorrectNotification(res);
       })

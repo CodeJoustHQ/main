@@ -55,6 +55,12 @@ export type SubmissionResult = {
   correct: boolean,
 };
 
+// Distinguish on frontend between tests and submissions.
+export enum SubmissionType {
+  Test = 'TEST',
+  Submit = 'SUBMIT',
+}
+
 export type Submission = {
   code: string,
   language: string,
@@ -64,6 +70,7 @@ export type Submission = {
   runtime: number,
   compilationError: string,
   startTime: string,
+  submissionType: SubmissionType,
 };
 
 const basePath = '/api/v1';
