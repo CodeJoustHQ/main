@@ -202,11 +202,11 @@ function GamePage() {
   };
 
   // Callback when user runs code against custom test case
-  const runSolution = (input: string) => {
+  const runSolution = () => {
     setLoading(true);
+    setError('');
     const request = {
       initiator: currentUser!,
-      input,
       code: currentCode,
       language: currentLanguage,
     };

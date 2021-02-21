@@ -86,13 +86,13 @@ class ProblemTests {
         "\t}",
         "}",
         ""
-    );
+    ).replaceAll("\t", "    ");
 
     public static final String pythonDefaultCode = String.join("\n",
         "class Solution(object):",
         "\tdef solve(nums):",
         "\t\t"
-    );
+    ).replaceAll("\t", "    ");
 
     /**
      * Helper method that sends a POST request to create a new problem
