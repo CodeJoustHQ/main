@@ -148,6 +148,27 @@ public class GameManagementService {
     }
 
     // Test the submission, return the results, and send a socket update
+    public SubmissionDto runCode(String roomId, SubmissionRequest request) {
+        Game game = getGameFromRoomId(roomId);
+
+        if (request.getInitiator() == null || request.getCode() == null || request.getLanguage() == null || request.getInput() == null) {
+            throw new ApiException(GameError.EMPTY_FIELD);
+        }
+
+        String initiatorUserId = request.getInitiator().getUserId();
+        if (!game.getPlayers().containsKey(initiatorUserId)) {
+            throw new ApiException(GameError.INVALID_PERMISSIONS);
+        }
+
+        SubmissionDto submissionDto = submitService.runCode(game, request);
+
+        // Send socket update with latest leaderboard info
+        socketService.sendSocketUpdate(GameMapper.toDto(game));
+        
+        return submissionDto;
+    }
+
+    // Test the submission, return the results, and send a socket update
     public SubmissionDto submitSolution(String roomId, SubmissionRequest request) {
         Game game = getGameFromRoomId(roomId);
 

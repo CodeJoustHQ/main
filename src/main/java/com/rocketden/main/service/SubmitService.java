@@ -66,9 +66,47 @@ public class SubmitService {
         submission.setPlayerCode(playerCode);
         submission.setNumCorrect(numTestCases);
         submission.setNumTestCases(numTestCases);
-        submission.setRuntime(4.5);
+        submission.setRuntime(5.5);
 
         return submission;
+    }
+
+    // Test the submission and send a socket update.
+    public SubmissionDto runCode(Game game, SubmissionRequest request) {
+        String userId = request.getInitiator().getUserId();
+        Player player = game.getPlayers().get(userId);
+
+        PlayerCode playerCode = new PlayerCode();
+        playerCode.setCode(request.getCode());
+        playerCode.setLanguage(request.getLanguage());
+
+        player.setPlayerCode(playerCode);
+
+        // Make a call to the tester service
+        TesterRequest testerRequest = new TesterRequest();
+        testerRequest.setCode(request.getCode());
+        testerRequest.setLanguage(request.getLanguage());
+
+        // Set the problem with the single provided test case.
+        ProblemDto problemDto = ProblemMapper.toDto(game.getProblems().get(0));
+        
+        // Provide a temporary output to circumvent output parsing error.
+        // TODO: Implement run code on tester repository, so output not checked.
+        String tempOutput = problemDto.getTestCases().get(0).getOutput();
+        problemDto.getTestCases().clear();
+
+        List<ProblemTestCaseDto> problemTestCaseDtos = new ArrayList<>();
+        ProblemTestCaseDto problemTestCaseDto = new ProblemTestCaseDto();
+        problemTestCaseDto.setInput(request.getInput());
+        problemTestCaseDto.setOutput(tempOutput);
+        problemTestCaseDto.setHidden(false);
+        problemTestCaseDtos.add(problemTestCaseDto);
+        problemDto.setTestCases(problemTestCaseDtos);
+        testerRequest.setProblem(problemDto);
+
+        // Return submission, and no further records necessary for running code.
+        Submission submission = getSubmission(testerRequest);
+        return GameMapper.submissionToDto(submission);
     }
 
     // Test the submission and send a socket update.

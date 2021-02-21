@@ -45,6 +45,12 @@ public class GameController extends BaseRestController {
         return new ResponseEntity<>(service.sendNotification(roomId, new GameNotificationDto(request)), HttpStatus.OK);
     }
     
+    @PostMapping("/games/{roomId}/runCode")
+    public ResponseEntity<SubmissionDto> runCode(@PathVariable String roomId,
+                                                        @RequestBody SubmissionRequest request) {
+        return new ResponseEntity<>(service.runCode(roomId, request), HttpStatus.OK);
+    }
+    
     @PostMapping("/games/{roomId}/submission")
     public ResponseEntity<SubmissionDto> submitSolution(@PathVariable String roomId,
                                                         @RequestBody SubmissionRequest request) {
