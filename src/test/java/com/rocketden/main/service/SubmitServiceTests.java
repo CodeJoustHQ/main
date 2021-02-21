@@ -1,6 +1,7 @@
 package com.rocketden.main.service;
 
 import com.rocketden.main.dto.game.GameMapper;
+import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.game.TesterRequest;
 import com.rocketden.main.dto.game.TesterResponse;
@@ -17,6 +18,8 @@ import com.rocketden.main.game_object.Submission;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 import com.rocketden.main.model.problem.Problem;
+import com.rocketden.main.model.problem.ProblemTestCase;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -42,6 +45,10 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 public class SubmitServiceTests {
 
+    private static final String NAME = "Sort an Array";
+    private static final String INPUT = "[1, 8, 2]";
+    private static final String OUTPUT = "[1, 2, 8]";
+
     private static final String NICKNAME = "rocket";
     private static final String USER_ID = "098765";
     private static final String NICKNAME_2 = "rocketrocket";
@@ -53,6 +60,43 @@ public class SubmitServiceTests {
     @Spy
     @InjectMocks
     private SubmitService submitService;
+
+    @Test
+    public void runCodeSuccess() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        Game game = GameMapper.fromRoom(room);
+
+        List<Problem> problems = new ArrayList<>();
+        Problem problem = new Problem();
+        problem.setName(NAME);
+
+        ProblemTestCase testCase = new ProblemTestCase();
+        testCase.setInput(INPUT);
+        testCase.setOutput(OUTPUT);
+        problem.addTestCase(testCase);
+        problems.add(problem);
+        game.setProblems(problems);
+
+        SubmissionRequest request = new SubmissionRequest();
+        request.setLanguage(LANGUAGE);
+        request.setCode(CODE);
+        request.setInput(INPUT);
+        request.setInitiator(UserMapper.toDto(user));
+
+        SubmissionDto submissionDto = submitService.runCode(game, request);
+
+        assertEquals(CODE, submissionDto.getCode());
+        assertEquals(LANGUAGE, submissionDto.getLanguage());
+        assertEquals(submissionDto.getNumCorrect(), submissionDto.getNumTestCases());
+        assertNotNull(submissionDto.getRuntime());
+        assertFalse(game.getAllSolved());
+    }
 
     @Test
     public void submitSolutionSuccess() {

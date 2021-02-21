@@ -90,8 +90,12 @@ public class SubmitService {
         // Set the problem with the single provided test case.
         ProblemDto problemDto = ProblemMapper.toDto(game.getProblems().get(0));
         
-        // Provide a temporary output to circumvent output parsing error.
-        // TODO: Implement run code on tester repository, so output not checked.
+        /**
+         * Provide a temporary output to circumvent output parsing error.
+         *
+         * TODO: Implement run code on tester repository, so output not checked.
+         * The problem must have at least one test case to work.
+         */
         String tempOutput = problemDto.getTestCases().get(0).getOutput();
         problemDto.getTestCases().clear();
 
