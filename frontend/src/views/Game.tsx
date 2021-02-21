@@ -188,13 +188,28 @@ function GamePage() {
     window.dispatchEvent(event);
   };
 
-  // Send notification if submission result is correct and currentUser is set.
+  // Send notification if test submission is correct and currentUser is set.
   const checkSendTestCorrectNotification = (submissionParam: SubmissionResult) => {
     if (submissionParam.numCorrect === submissionParam.numTestCases && currentUser) {
       const notificationBody: string = JSON.stringify({
         initiator: currentUser,
         time: new Date(),
         notificationType: NotificationType.TestCorrect,
+        content: 'success',
+      });
+      send(routes(roomId).subscribe_notification, {}, notificationBody);
+    }
+  };
+
+  // Send notification if solution is correct and currentUser is set.
+  const checkSendSolutionCorrectNotification = (submissionParam: SubmissionResult) => {
+    if (currentUser) {
+      const notificationBody: string = JSON.stringify({
+        initiator: currentUser,
+        time: new Date(),
+        notificationType:
+          (submissionParam.numCorrect === submissionParam.numTestCases)
+            ? NotificationType.SubmitCorrect : NotificationType.SubmitIncorrect,
         content: 'success',
       });
       send(routes(roomId).subscribe_notification, {}, notificationBody);
@@ -238,7 +253,7 @@ function GamePage() {
       .then((res) => {
         setLoading(false);
         setSubmission(res);
-        checkSendTestCorrectNotification(res);
+        checkSendSolutionCorrectNotification(res);
       })
       .catch((err) => {
         setLoading(false);
