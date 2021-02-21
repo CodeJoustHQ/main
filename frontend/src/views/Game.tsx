@@ -210,7 +210,6 @@ function GamePage() {
         notificationType:
           (submissionParam.numCorrect === submissionParam.numTestCases)
             ? NotificationType.SubmitCorrect : NotificationType.SubmitIncorrect,
-        content: 'success',
       });
       send(routes(roomId).subscribe_notification, {}, notificationBody);
     }

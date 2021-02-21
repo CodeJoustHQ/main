@@ -55,8 +55,11 @@ function Console(props: ConsoleProps) {
         outputList.push(`Runtime: ${submission.runtime}`);
         let resultIndex: number = 1;
         submission.results.forEach((result: SubmissionResult) => {
-          outputList.push('');
-          outputList.push(`Result #${resultIndex}: ${result.correct ? 'Correct' : 'Incorrect'}`);
+          // Only show newline, result #, and correctness if type was 'submit'.
+          if (submission.submissionType === SubmissionType.Submit) {
+            outputList.push('');
+            outputList.push(`Result #${resultIndex}: ${result.correct ? 'Correct' : 'Incorrect'}`);
+          }
 
           // Show the test case details, if not hidden.
           if (result.hidden) {
