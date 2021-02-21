@@ -56,6 +56,7 @@ function GamePage() {
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
   const [currentLanguage, setCurrentLanguage] = useState('python');
+  const [currentCode, setCurrentCode] = useState('');
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
   const [defaultCodeList, setDefaultCodeList] = useState<DefaultCodeType[]>([]);
@@ -205,7 +206,8 @@ function GamePage() {
     setLoading(true);
     const request = {
       initiator: currentUser!,
-      code: input,
+      input,
+      code: currentCode,
       language: currentLanguage,
     };
 
@@ -304,6 +306,7 @@ function GamePage() {
           >
             <Panel>
               <Editor
+                onCodeChange={setCurrentCode}
                 onLanguageChange={setCurrentLanguage}
                 codeMap={defaultCodeList[0]}
               />

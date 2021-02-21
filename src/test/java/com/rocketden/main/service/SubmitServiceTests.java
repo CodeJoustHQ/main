@@ -22,7 +22,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.Spy;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 import org.springframework.http.HttpStatus;
 
 import java.util.ArrayList;
@@ -214,7 +216,12 @@ public class SubmitServiceTests {
         testerResponse.setNumTestCases(1);
         testerResponse.setRuntime(5.5);
 
-        Mockito.doThrow(new Exception()).when(submitService).callTesterService(request);
+        // Use doAnswer to avoid checked exception mock error.
+        Mockito.doAnswer(new Answer<Void>() {
+            public Void answer(InvocationOnMock invocation) throws Exception {
+                throw new Exception();
+            }})
+          .when(submitService).callTesterService(request);
 
         ApiException exception = assertThrows(ApiException.class, () -> submitService.getSubmission(request));
 

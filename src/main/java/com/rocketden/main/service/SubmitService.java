@@ -1,5 +1,7 @@
 package com.rocketden.main.service;
 
+import java.io.IOException;
+
 import com.google.gson.Gson;
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.SubmissionDto;
@@ -130,7 +132,7 @@ public class SubmitService {
     }
 
     // Sends a POST request to the tester service to judge the user submission
-    protected TesterResponse callTesterService(TesterRequest request) throws Exception {
+    protected TesterResponse callTesterService(TesterRequest request) throws IOException {
         HttpPost post = new HttpPost(getTesterUrl());
 
         StringEntity stringEntity = new StringEntity(gson.toJson(request));

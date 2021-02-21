@@ -7,20 +7,11 @@ import java.util.List;
 
 @Getter
 @Setter
-// This class is mapped directly to the tester service's RunDto class.
 public class TesterResponse {
+    // This class is mapped directly to the tester service's RunDto class.
     private List<TesterResultResponse> results;
     private Integer numCorrect;
     private Integer numTestCases;
     private Double runtime;
-
-    @Getter
-    @Setter
-    public static class TesterResultResponse {
-        private String console;
-        private String userOutput;
-        private String error;
-        private String correctOutput;
-        private boolean correct;
-    }
+    private String compilationError;
 }
