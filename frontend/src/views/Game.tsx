@@ -20,7 +20,7 @@ import { User } from '../api/User';
 import { GameNotification, NotificationType } from '../api/GameNotification';
 import Difficulty from '../api/Difficulty';
 import {
-  Game, getGame, Player, SubmissionResult, submitSolution,
+  Game, getGame, Player, SubmissionResult, submitSolution, runSolution,
 } from '../api/Game';
 import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
@@ -202,7 +202,30 @@ function GamePage() {
   };
 
   // Callback when user runs code against custom test case
-  const runSolution = () => {
+  const runCode = (input: string) => {
+    setLoading(true);
+    setError('');
+    const request = {
+      initiator: currentUser!,
+      input,
+      code: currentCode,
+      language: currentLanguage,
+    };
+
+    runSolution(roomId, request)
+      .then((res) => {
+        setLoading(false);
+        setSubmission(res);
+        checkSendTestCorrectNotification(res);
+      })
+      .catch((err) => {
+        setLoading(false);
+        setError(err.message);
+      });
+  };
+
+  // Callback when user runs code against custom test case
+  const submitCode = () => {
     setLoading(true);
     setError('');
     const request = {
@@ -316,7 +339,8 @@ function GamePage() {
               <Console
                 testCases={problems[0]?.testCases}
                 submission={submission}
-                onRun={runSolution}
+                onRun={runCode}
+                onSubmit={submitCode}
               />
             </Panel>
           </SplitterLayout>

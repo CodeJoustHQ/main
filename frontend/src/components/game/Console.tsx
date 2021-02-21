@@ -21,6 +21,7 @@ type ConsoleProps = {
   testCases: TestCase[],
   submission: SubmissionResult | null,
   onRun: (input: string) => void,
+  onSubmit: () => void,
 };
 
 // This function refreshes the width of Monaco editor upon change in size
@@ -28,7 +29,9 @@ function Console(props: ConsoleProps) {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
 
-  const { testCases, submission, onRun } = props;
+  const {
+    testCases, submission, onRun, onSubmit,
+  } = props;
 
   useEffect(() => {
     setInput(testCases?.length ? testCases[0].input : '');
@@ -42,6 +45,9 @@ function Console(props: ConsoleProps) {
     <Content>
       <FixedContent>
         <SmallButton onClick={() => onRun(input)}>Run Code</SmallButton>
+      </FixedContent>
+      <FixedContent>
+        <SmallButton onClick={() => onSubmit()}>Submit</SmallButton>
       </FixedContent>
       <div>
         <Text bold>Input</Text>

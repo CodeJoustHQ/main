@@ -32,6 +32,13 @@ export type PlayAgainParams = {
   initiator: User,
 };
 
+export type RunSolutionParams = {
+  initiator: User,
+  input: string,
+  code: string,
+  language: string,
+};
+
 export type SubmitSolutionParams = {
   initiator: User,
   code: string,
@@ -63,6 +70,13 @@ export const startGame = (roomId: string, params: StartGameParams):
 
 export const getGame = (roomId: string):
   Promise<Game> => axios.get<Game>(routes.getGame(roomId))
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const runSolution = (roomId: string, params: RunSolutionParams):
+  Promise<SubmissionResult> => axios.post<SubmissionResult>(routes.submitSolution(roomId), params)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
