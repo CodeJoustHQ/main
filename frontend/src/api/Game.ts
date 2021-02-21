@@ -49,7 +49,9 @@ export type SubmissionResult = {
   console: string,
   userOutput: string,
   error: string,
+  input: string,
   correctOutput: string,
+  hidden: boolean,
   correct: boolean,
 };
 

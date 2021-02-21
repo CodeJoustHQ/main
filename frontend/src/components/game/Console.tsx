@@ -4,7 +4,7 @@ import { TestCase } from '../../api/Problem';
 import { Text } from '../core/Text';
 import { ConsoleTextArea } from '../core/Input';
 import { SmallButton } from '../core/Button';
-import { Submission } from '../../api/Game';
+import { Submission, SubmissionResult } from '../../api/Game';
 
 const Content = styled.div`
   height: 100%;
@@ -39,7 +39,40 @@ function Console(props: ConsoleProps) {
   }, [testCases]);
 
   useEffect(() => {
-    setOutput(submission ? `${submission.numCorrect} / ${submission.numTestCases} passed` : '');
+    if (submission) {
+      // Set the submission details in the output, a list joined by new line.
+      const outputList: string[] = [];
+
+      // Add submission correctness.
+      outputList.push(`${submission.numCorrect} / ${submission.numTestCases} passed`);
+
+      // If a compilation error exists, show that; otherwise, show results.
+      if (submission.compilationError) {
+        outputList.push(`Compilation error: ${submission.compilationError}`);
+      } else {
+        outputList.push(`Runtime: ${submission.runtime}`);
+        let resultIndex: number = 1;
+        submission.results.forEach((result: SubmissionResult) => {
+          outputList.push('');
+          outputList.push(`Result #${resultIndex}: ${result.correct ? 'Correct' : 'Incorrect'}`);
+
+          // Show the test case details, if not hidden.
+          if (result.hidden) {
+            outputList.push('This test case is hidden.');
+          } else {
+            outputList.push(`Input: ${result.input}`);
+            outputList.push(`User output: ${result.userOutput}`);
+            outputList.push(`Correct output: ${result.correctOutput}`);
+            outputList.push(`Console: ${result.console}`);
+            outputList.push(`Error: ${result.error}`);
+          }
+
+          resultIndex += 1;
+        });
+      }
+
+      setOutput(outputList.join('\n'));
+    }
   }, [submission]);
 
   return (
