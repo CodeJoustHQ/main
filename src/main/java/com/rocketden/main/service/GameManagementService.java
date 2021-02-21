@@ -181,12 +181,7 @@ public class GameManagementService {
             throw new ApiException(GameError.INVALID_PERMISSIONS);
         }
 
-        SubmissionDto submissionDto = submitService.submitSolution(game, request);
-
-        // Send socket update with latest leaderboard info
-        socketService.sendSocketUpdate(GameMapper.toDto(game));
-        
-        return submissionDto;
+        return submitService.submitSolution(game, request);
     }
 
     // Send a notification through a socket update.
