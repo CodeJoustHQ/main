@@ -43,6 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.time.LocalDateTime;
@@ -81,6 +82,7 @@ public class GameManagementServiceTests {
     private static final String USER_ID_2 = "345678";
     private static final String USER_ID_3 = "678910";
     private static final String SESSION_ID = "abcdefghijk";
+    private static final String INPUT = "[1, 2, 3]";
     private static final String CODE = "print('hi')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
     private static final Integer NUM_PROBLEMS = 10;
@@ -235,6 +237,56 @@ public class GameManagementServiceTests {
     public void getGameNotFound() {
         ApiException exception = assertThrows(ApiException.class, () -> gameService.getGameDtoFromRoomId(ROOM_ID));
         assertEquals(GameError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void runCodeSuccess() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        gameService.createAddGameFromRoom(room);
+        Game game = gameService.getGameFromRoomId(ROOM_ID);
+
+        SubmissionRequest request = new SubmissionRequest();
+        request.setLanguage(LANGUAGE);
+        request.setCode(CODE);
+        request.setInput(INPUT);
+        request.setInitiator(UserMapper.toDto(user));
+
+        // Mock the return of the submissionDto, and mock update of player.
+        SubmissionDto submissionDto = new SubmissionDto();
+        submissionDto.setNumCorrect(NUM_PROBLEMS);
+        submissionDto.setNumTestCases(NUM_PROBLEMS);
+
+        gameService.runCode(ROOM_ID, request);
+
+        // Test that both submit service methods were called.
+        verify(submitService).runCode(eq(game), eq(request));
+    }
+
+    @Test
+    public void runCodeNullInputError() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        gameService.createAddGameFromRoom(room);
+
+        SubmissionRequest request = new SubmissionRequest();
+        request.setLanguage(LANGUAGE);
+        request.setCode(CODE);
+        request.setInitiator(UserMapper.toDto(user));
+
+        // Mock the return of the submissionDto, and mock update of player.
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.runCode(ROOM_ID, request));
+        assertEquals(GameError.EMPTY_FIELD, exception.getError());
     }
 
     @Test
