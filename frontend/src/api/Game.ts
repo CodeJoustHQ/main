@@ -10,7 +10,7 @@ export type Player = {
   user: User,
   code: string,
   language: string,
-  submissions: SubmissionResult[],
+  submissions: Submission[],
   solved: boolean,
   color: Color,
 };
@@ -46,10 +46,21 @@ export type SubmitSolutionParams = {
 };
 
 export type SubmissionResult = {
+  console: string,
+  userOutput: string,
+  error: string,
+  correctOutput: string,
+  correct: boolean,
+};
+
+export type Submission = {
   code: string,
   language: string,
+  results: SubmissionResult[],
   numCorrect: number,
   numTestCases: number,
+  runtime: number,
+  compilationError: string,
   startTime: string,
 };
 
@@ -76,14 +87,14 @@ export const getGame = (roomId: string):
   });
 
 export const runSolution = (roomId: string, params: RunSolutionParams):
-  Promise<SubmissionResult> => axios.post<SubmissionResult>(routes.submitSolution(roomId), params)
+  Promise<Submission> => axios.post<Submission>(routes.submitSolution(roomId), params)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
 
 export const submitSolution = (roomId: string, params: SubmitSolutionParams):
-  Promise<SubmissionResult> => axios.post<SubmissionResult>(routes.submitSolution(roomId), params)
+  Promise<Submission> => axios.post<Submission>(routes.submitSolution(roomId), params)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

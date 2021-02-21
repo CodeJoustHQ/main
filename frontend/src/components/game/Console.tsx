@@ -4,7 +4,7 @@ import { TestCase } from '../../api/Problem';
 import { Text } from '../core/Text';
 import { ConsoleTextArea } from '../core/Input';
 import { SmallButton } from '../core/Button';
-import { SubmissionResult } from '../../api/Game';
+import { Submission } from '../../api/Game';
 
 const Content = styled.div`
   height: 100%;
@@ -19,7 +19,7 @@ const FixedContent = styled.div`
 
 type ConsoleProps = {
   testCases: TestCase[],
-  submission: SubmissionResult | null,
+  submission: Submission | null,
   onRun: (input: string) => void,
   onSubmit: () => void,
 };

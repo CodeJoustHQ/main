@@ -20,7 +20,7 @@ import { User } from '../api/User';
 import { GameNotification, NotificationType } from '../api/GameNotification';
 import Difficulty from '../api/Difficulty';
 import {
-  Game, getGame, Player, SubmissionResult, submitSolution, runSolution,
+  Game, getGame, Player, Submission, submitSolution, runSolution,
 } from '../api/Game';
 import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
@@ -42,7 +42,7 @@ function GamePage() {
   const history = useHistory();
   const location = useLocation<LocationState>();
 
-  const [submission, setSubmission] = useState<SubmissionResult | null>(null);
+  const [submission, setSubmission] = useState<Submission | null>(null);
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [roomId, setRoomId] = useState<string>('');
@@ -189,7 +189,7 @@ function GamePage() {
   };
 
   // Send notification if test submission is correct and currentUser is set.
-  const checkSendTestCorrectNotification = (submissionParam: SubmissionResult) => {
+  const checkSendTestCorrectNotification = (submissionParam: Submission) => {
     if (submissionParam.numCorrect === submissionParam.numTestCases && currentUser) {
       const notificationBody: string = JSON.stringify({
         initiator: currentUser,
@@ -202,7 +202,7 @@ function GamePage() {
   };
 
   // Send notification if solution is correct and currentUser is set.
-  const checkSendSolutionCorrectNotification = (submissionParam: SubmissionResult) => {
+  const checkSendSolutionCorrectNotification = (submissionParam: Submission) => {
     if (currentUser) {
       const notificationBody: string = JSON.stringify({
         initiator: currentUser,
