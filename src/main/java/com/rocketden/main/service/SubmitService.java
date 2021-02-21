@@ -135,7 +135,7 @@ public class SubmitService {
             int index = 0;
             List<ProblemTestCaseDto> testCaseDtos = problem.getTestCases();
             List<SubmissionResult> results = new ArrayList<>();
-            for (SubmissionResult result : submission.getResults()) {
+            for (SubmissionResult result : testerResponse.getResults()) {
                 // Match the test case details with each individual result.
                 ProblemTestCaseDto testCaseDto = testCaseDtos.get(index);
                 result.setHidden(testCaseDto.isHidden());

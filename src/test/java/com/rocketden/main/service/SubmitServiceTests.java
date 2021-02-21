@@ -159,6 +159,7 @@ public class SubmitServiceTests {
         testerResponse.setNumCorrect(1);
         testerResponse.setNumTestCases(1);
         testerResponse.setRuntime(5.5);
+        testerResponse.setResults(new ArrayList<>());
 
         Mockito.doReturn(testerResponse).when(submitService).callTesterService(request);
         Submission response = submitService.getSubmission(request);
