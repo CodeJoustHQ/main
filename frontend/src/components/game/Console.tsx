@@ -15,6 +15,7 @@ const FixedContent = styled.div`
   position: absolute;
   top: 0;
   right: 0;
+  margin: 0.6rem;
 `;
 
 type ConsoleProps = {
@@ -45,8 +46,6 @@ function Console(props: ConsoleProps) {
     <Content>
       <FixedContent>
         <SmallButton onClick={() => onRun(input)}>Run Code</SmallButton>
-      </FixedContent>
-      <FixedContent>
         <SmallButton onClick={() => onSubmit()}>Submit</SmallButton>
       </FixedContent>
       <div>

@@ -95,4 +95,5 @@ export const SmallButton = styled(DefaultButton)`
   color: ${({ theme }) => theme.colors.white};
   background-color: ${({ theme }) => theme.colors.blue};
   padding: 0.5rem 1rem;
+  margin: 0.4rem;
 `;
