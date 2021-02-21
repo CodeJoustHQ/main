@@ -70,6 +70,7 @@ const basePath = '/api/v1';
 const routes = {
   startGame: (roomId: string) => `${basePath}/rooms/${roomId}/start`,
   getGame: (roomId: string) => `${basePath}/games/${roomId}`,
+  runCode: (roomId: string) => `${basePath}/games/${roomId}/run-code`,
   submitSolution: (roomId: string) => `${basePath}/games/${roomId}/submission`,
   playAgain: (roomId: string) => `${basePath}/games/${roomId}/restart`,
 };
@@ -89,7 +90,7 @@ export const getGame = (roomId: string):
   });
 
 export const runSolution = (roomId: string, params: RunSolutionParams):
-  Promise<Submission> => axios.post<Submission>(routes.submitSolution(roomId), params)
+  Promise<Submission> => axios.post<Submission>(routes.runCode(roomId), params)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
