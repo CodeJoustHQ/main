@@ -9,7 +9,7 @@ import java.util.List;
 @Setter
 public class TesterResponse {
     // This class is mapped directly to the tester service's RunDto class.
-    private List<TesterResultResponse> results;
+    private List<SubmissionResultDto> results;
     private Integer numCorrect;
     private Integer numTestCases;
     private Double runtime;

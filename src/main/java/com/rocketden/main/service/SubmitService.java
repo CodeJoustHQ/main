@@ -1,6 +1,9 @@
 package com.rocketden.main.service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gson.Gson;
 import com.rocketden.main.dto.game.GameMapper;
@@ -8,7 +11,9 @@ import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.game.TesterRequest;
 import com.rocketden.main.dto.game.TesterResponse;
+import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.dto.problem.ProblemMapper;
+import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.exception.GameError;
 import com.rocketden.main.exception.TesterError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
@@ -18,6 +23,8 @@ import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.game_object.Submission;
+import com.rocketden.main.game_object.SubmissionResult;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -114,13 +121,30 @@ public class SubmitService {
 
         try {
             TesterResponse testerResponse = callTesterService(request);
+            ProblemDto problem = request.getProblem();
 
             Submission submission = new Submission();
             submission.setNumCorrect(testerResponse.getNumCorrect());
             submission.setNumTestCases(testerResponse.getNumTestCases());
             submission.setRuntime(testerResponse.getRuntime());
+            submission.setCompilationError(testerResponse.getCompilationError());
+            submission.setStartTime(LocalDateTime.now());
             submission.setPlayerCode(new PlayerCode(request.getCode(), request.getLanguage()));
 
+            // Set the SubmissionResult objects, add to the list.
+            int index = 0;
+            List<ProblemTestCaseDto> testCaseDtos = problem.getTestCases();
+            List<SubmissionResult> results = new ArrayList<>();
+            for (SubmissionResult result : submission.getResults()) {
+                // Match the test case details with each individual result.
+                ProblemTestCaseDto testCaseDto = testCaseDtos.get(index);
+                result.setHidden(testCaseDto.isHidden());
+                result.setInput(testCaseDto.getInput());
+                results.add(result);
+                index++;
+            }
+            submission.setResults(results);
+            
             return submission;
         } catch (ApiException e) {
             // If custom ApiException is thrown, pass that as the response
