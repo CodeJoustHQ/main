@@ -70,6 +70,7 @@ public class GameTests {
     private static final String POST_ROOM = "/api/v1/rooms";
     private static final String START_GAME = "/api/v1/rooms/%s/start";
     private static final String GET_GAME = "/api/v1/games/%s";
+    private static final String POST_RUN_CODE = "/api/v1/games/%s/run-code";
     private static final String POST_SUBMISSION = "/api/v1/games/%s/submission";
     private static final String POST_NOTIFICATION = "/api/v1/games/%s/notification";
     private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
@@ -267,6 +268,53 @@ public class GameTests {
         assertEquals(ERROR.getResponse(), actual);
     }
 
+    @Test
+    public void runCodeSuccess() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
+        startGameHelper(roomDto, host);
+
+        SubmissionRequest request = new SubmissionRequest();
+        request.setInitiator(host);
+        request.setCode(CODE);
+        request.setLanguage(LANGUAGE);
+        request.setInput(INPUT);
+
+        MvcResult result = this.mockMvc.perform(post(String.format(POST_RUN_CODE, roomDto.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        SubmissionDto submissionDto = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, SubmissionDto.class);
+
+        assertNotNull(submissionDto);
+        assertEquals(CODE, submissionDto.getCode());
+        assertEquals(LANGUAGE, submissionDto.getLanguage());
+        // For now, just assert that all test cases were passed
+        assertEquals(submissionDto.getNumCorrect(), submissionDto.getNumTestCases());
+
+        // Check that the submission is stored in the game object
+        result = this.mockMvc.perform(get(String.format(GET_GAME, roomDto.getRoomId())))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        GameDto gameDto = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, GameDto.class);
+
+        // Confirm that running the code does not create a submission.
+        assertEquals(1, gameDto.getPlayers().size());
+        PlayerDto player = gameDto.getPlayers().get(0);
+        assertEquals(0, player.getSubmissions().size());
+        assertEquals(submissionDto.getCode(), player.getCode());
+        assertEquals(submissionDto.getLanguage(), player.getLanguage());
+        assertFalse(player.getSolved());
+    }
+    
     @Test
     public void submitSolutionSuccess() throws Exception {
         UserDto host = new UserDto();
