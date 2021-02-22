@@ -9,8 +9,10 @@ import com.google.gson.Gson;
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
+import com.rocketden.main.dto.game.TesterMapper;
 import com.rocketden.main.dto.game.TesterRequest;
 import com.rocketden.main.dto.game.TesterResponse;
+import com.rocketden.main.dto.game.TesterResult;
 import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.dto.problem.ProblemMapper;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
@@ -177,12 +179,11 @@ public class SubmitService {
             int index = 0;
             List<ProblemTestCaseDto> testCaseDtos = problem.getTestCases();
             List<SubmissionResult> results = new ArrayList<>();
-            for (SubmissionResult result : testerResponse.getResults()) {
+            for (TesterResult testerResult : testerResponse.getResults()) {
                 // Match the test case details with each individual result.
                 ProblemTestCaseDto testCaseDto = testCaseDtos.get(index);
-                result.setHidden(testCaseDto.isHidden());
-                result.setInput(testCaseDto.getInput());
-                results.add(result);
+                SubmissionResult submissionResult = TesterMapper.toSubmissionResult(testerResult, testCaseDto);
+                results.add(submissionResult);
                 index++;
             }
             submission.setResults(results);
