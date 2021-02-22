@@ -6,11 +6,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TesterResult {
+    // This class is mapped directly to the tester service's ResultDto class.
     private String console;
     private String userOutput;
     private String error;
-    private String input;
     private String correctOutput;
-    private boolean hidden;
     private boolean correct;
 }

@@ -5,11 +5,11 @@ import com.rocketden.main.game_object.SubmissionResult;
 
 import org.modelmapper.ModelMapper;
 
-public class TesterMapper {
+public class SubmissionMapper {
 
     private static final ModelMapper mapper = new ModelMapper();
 
-    protected TesterMapper() {}
+    protected SubmissionMapper() {}
 
     /**
      * This creates the SubmissionResult object from the TesterResult
