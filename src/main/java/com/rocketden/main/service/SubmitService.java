@@ -43,6 +43,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class SubmitService {
 
+    protected static final Double DUMMY_RUNTIME = 5.5;
+    protected static final String DUMMY_OUTPUT = "[1, 2, 3]";
+
     private final Gson gson;
 
     // Pulls value from application.properties
@@ -68,7 +71,15 @@ public class SubmitService {
         submission.setPlayerCode(playerCode);
         submission.setNumCorrect(numTestCases);
         submission.setNumTestCases(numTestCases);
-        submission.setRuntime(5.5);
+        submission.setRuntime(DUMMY_RUNTIME);
+
+        ProblemTestCaseDto testCaseDto = request.getProblem().getTestCases().get(0);
+        SubmissionResult submissionResult = new SubmissionResult();
+        submissionResult.setCorrect(true);
+        submissionResult.setUserOutput(DUMMY_OUTPUT);
+        submissionResult.setHidden(testCaseDto.isHidden());
+        submissionResult.setInput(testCaseDto.getInput());
+        submissionResult.setCorrectOutput(DUMMY_OUTPUT);
 
         return submission;
     }

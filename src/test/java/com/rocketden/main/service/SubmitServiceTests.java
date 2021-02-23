@@ -2,6 +2,7 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.game.SubmissionDto;
+import com.rocketden.main.dto.game.SubmissionResultDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.game.TesterRequest;
 import com.rocketden.main.dto.game.TesterResponse;
@@ -30,12 +31,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -46,8 +49,9 @@ import static org.mockito.Mockito.verify;
 public class SubmitServiceTests {
 
     private static final String NAME = "Sort an Array";
-    private static final String INPUT = "[1, 8, 2]";
-    private static final String OUTPUT = "[1, 2, 8]";
+    private static final String INPUT = "[1, 3, 2]";
+    private static final String OUTPUT = SubmitService.DUMMY_OUTPUT;
+    private static final Double RUNTIME = SubmitService.DUMMY_RUNTIME;
 
     private static final String NICKNAME = "rocket";
     private static final String USER_ID = "098765";
@@ -90,11 +94,22 @@ public class SubmitServiceTests {
         request.setInitiator(UserMapper.toDto(user));
 
         SubmissionDto submissionDto = submitService.runCode(game, request);
-
         assertEquals(CODE, submissionDto.getCode());
         assertEquals(LANGUAGE, submissionDto.getLanguage());
         assertEquals(submissionDto.getNumCorrect(), submissionDto.getNumTestCases());
-        assertNotNull(submissionDto.getRuntime());
+        assertNull(submissionDto.getCompilationError());
+        assertEquals(RUNTIME, submissionDto.getRuntime());
+        assertTrue(LocalDateTime.now().isAfter(submissionDto.getStartTime())
+            || LocalDateTime.now().minusSeconds((long) 1).isBefore(submissionDto.getStartTime()));
+
+        SubmissionResultDto resultDto = submissionDto.getResults().get(0);
+        assertEquals(OUTPUT, resultDto.getUserOutput());
+        assertNull(resultDto.getError());
+        assertEquals(INPUT, resultDto.getInput());
+        assertEquals(OUTPUT, resultDto.getCorrectOutput());
+        assertFalse(resultDto.isHidden());
+        assertTrue(resultDto.isCorrect());
+        
         assertFalse(game.getAllSolved());
     }
 
