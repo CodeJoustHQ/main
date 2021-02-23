@@ -7,6 +7,7 @@ import com.rocketden.main.dto.game.PlayerDto;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
+import com.rocketden.main.dto.game.SubmissionResultDto;
 import com.rocketden.main.dto.problem.CreateProblemRequest;
 import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
@@ -27,6 +28,7 @@ import com.rocketden.main.model.User;
 import com.rocketden.main.util.RoomTestMethods;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemIOType;
+import com.rocketden.main.service.SubmitService;
 import com.rocketden.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
@@ -42,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -64,8 +67,9 @@ public class GameTests {
     // Predefine problem attributes.
     private static final String NAME = "Sort a List";
     private static final String DESCRIPTION = "Sort the given list in O(n log n) time.";
-    private static final String INPUT = "[1, 8, 2]";
-    private static final String OUTPUT = "[1, 2, 8]";
+    private static final String INPUT = "[1, 3, 2]";
+    private static final String OUTPUT = SubmitService.DUMMY_OUTPUT;
+    private static final Double RUNTIME = SubmitService.DUMMY_RUNTIME;
 
     private static final String POST_ROOM = "/api/v1/rooms";
     private static final String START_GAME = "/api/v1/rooms/%s/start";
@@ -292,11 +296,21 @@ public class GameTests {
         String jsonResponse = result.getResponse().getContentAsString();
         SubmissionDto submissionDto = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, SubmissionDto.class);
 
-        assertNotNull(submissionDto);
         assertEquals(CODE, submissionDto.getCode());
         assertEquals(LANGUAGE, submissionDto.getLanguage());
-        // For now, just assert that all test cases were passed
         assertEquals(submissionDto.getNumCorrect(), submissionDto.getNumTestCases());
+        assertNull(submissionDto.getCompilationError());
+        assertEquals(RUNTIME, submissionDto.getRuntime());
+        assertTrue(LocalDateTime.now().isAfter(submissionDto.getStartTime())
+            || LocalDateTime.now().minusSeconds((long) 1).isBefore(submissionDto.getStartTime()));
+
+        SubmissionResultDto resultDto = submissionDto.getResults().get(0);
+        assertEquals(OUTPUT, resultDto.getUserOutput());
+        assertNull(resultDto.getError());
+        assertEquals(INPUT, resultDto.getInput());
+        assertEquals(OUTPUT, resultDto.getCorrectOutput());
+        assertFalse(resultDto.isHidden());
+        assertTrue(resultDto.isCorrect());
 
         // Check that the submission is stored in the game object
         result = this.mockMvc.perform(get(String.format(GET_GAME, roomDto.getRoomId())))
@@ -310,9 +324,7 @@ public class GameTests {
         assertEquals(1, gameDto.getPlayers().size());
         PlayerDto player = gameDto.getPlayers().get(0);
         assertEquals(0, player.getSubmissions().size());
-        assertEquals(submissionDto.getCode(), player.getCode());
-        assertEquals(submissionDto.getLanguage(), player.getLanguage());
-        assertFalse(player.getSolved());
+        assertFalse(gameDto.getAllSolved());
     }
     
     @Test
@@ -354,10 +366,24 @@ public class GameTests {
 
         assertEquals(1, gameDto.getPlayers().size());
         PlayerDto player = gameDto.getPlayers().get(0);
-        assertEquals(submissionDto, player.getSubmissions().get(0));
-        assertEquals(submissionDto.getCode(), player.getCode());
-        assertEquals(submissionDto.getLanguage(), player.getLanguage());
-        assertTrue(player.getSolved());
+        submissionDto = player.getSubmissions().get(0);
+        assertEquals(CODE, submissionDto.getCode());
+        assertEquals(LANGUAGE, submissionDto.getLanguage());
+        assertEquals(submissionDto.getNumCorrect(), submissionDto.getNumTestCases());
+        assertNull(submissionDto.getCompilationError());
+        assertEquals(RUNTIME, submissionDto.getRuntime());
+        assertTrue(LocalDateTime.now().isAfter(submissionDto.getStartTime())
+            || LocalDateTime.now().minusSeconds((long) 1).isBefore(submissionDto.getStartTime()));
+
+        SubmissionResultDto resultDto = submissionDto.getResults().get(0);
+        assertEquals(OUTPUT, resultDto.getUserOutput());
+        assertNull(resultDto.getError());
+        assertEquals(INPUT, resultDto.getInput());
+        assertEquals(OUTPUT, resultDto.getCorrectOutput());
+        assertFalse(resultDto.isHidden());
+        assertTrue(resultDto.isCorrect());
+        
+        assertTrue(gameDto.getAllSolved());
     }
 
     @Test

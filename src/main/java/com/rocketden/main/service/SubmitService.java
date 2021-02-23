@@ -43,8 +43,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class SubmitService {
 
-    protected static final Double DUMMY_RUNTIME = 5.5;
-    protected static final String DUMMY_OUTPUT = "[1, 2, 3]";
+    public static final Double DUMMY_RUNTIME = 5.5;
+    public static final String DUMMY_OUTPUT = "[1, 2, 3]";
 
     private final Gson gson;
 
