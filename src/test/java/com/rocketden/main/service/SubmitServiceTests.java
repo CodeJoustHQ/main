@@ -16,6 +16,7 @@ import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.Submission;
+import com.rocketden.main.game_object.SubmissionResult;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 import com.rocketden.main.model.problem.Problem;
@@ -125,7 +126,14 @@ public class SubmitServiceTests {
         Game game = GameMapper.fromRoom(room);
 
         List<Problem> problems = new ArrayList<>();
-        problems.add(new Problem());
+        Problem problem = new Problem();
+        problem.setName(NAME);
+
+        ProblemTestCase testCase = new ProblemTestCase();
+        testCase.setInput(INPUT);
+        testCase.setOutput(OUTPUT);
+        problem.addTestCase(testCase);
+        problems.add(problem);
         game.setProblems(problems);
 
         SubmissionRequest request = new SubmissionRequest();
@@ -139,11 +147,22 @@ public class SubmitServiceTests {
         assertEquals(1, submissions.size());
 
         Submission submission = submissions.get(0);
-
         assertEquals(CODE, submission.getPlayerCode().getCode());
         assertEquals(LANGUAGE, submission.getPlayerCode().getLanguage());
         assertEquals(submission.getNumCorrect(), submission.getNumTestCases());
-        assertNotNull(submission.getRuntime());
+        assertNull(submission.getCompilationError());
+        assertEquals(RUNTIME, submission.getRuntime());
+        assertTrue(LocalDateTime.now().isAfter(submission.getStartTime())
+            || LocalDateTime.now().minusSeconds((long) 1).isBefore(submission.getStartTime()));
+
+        SubmissionResult submissionResult = submission.getResults().get(0);
+        assertEquals(OUTPUT, submissionResult.getUserOutput());
+        assertNull(submissionResult.getError());
+        assertEquals(INPUT, submissionResult.getInput());
+        assertEquals(OUTPUT, submissionResult.getCorrectOutput());
+        assertFalse(submissionResult.isHidden());
+        assertTrue(submissionResult.isCorrect());
+        
         assertTrue(game.getAllSolved());
     }
 
@@ -162,7 +181,14 @@ public class SubmitServiceTests {
 
         Game game = GameMapper.fromRoom(room);
         List<Problem> problems = new ArrayList<>();
-        problems.add(new Problem());
+        Problem problem = new Problem();
+        problem.setName(NAME);
+
+        ProblemTestCase testCase = new ProblemTestCase();
+        testCase.setInput(INPUT);
+        testCase.setOutput(OUTPUT);
+        problem.addTestCase(testCase);
+        problems.add(problem);
         game.setProblems(problems);
 
         SubmissionRequest request = new SubmissionRequest();
@@ -176,11 +202,22 @@ public class SubmitServiceTests {
         assertEquals(1, submissions.size());
 
         Submission submission = submissions.get(0);
-
         assertEquals(CODE, submission.getPlayerCode().getCode());
         assertEquals(LANGUAGE, submission.getPlayerCode().getLanguage());
         assertEquals(submission.getNumCorrect(), submission.getNumTestCases());
-        assertNotNull(submission.getRuntime());
+        assertNull(submission.getCompilationError());
+        assertEquals(RUNTIME, submission.getRuntime());
+        assertTrue(LocalDateTime.now().isAfter(submission.getStartTime())
+            || LocalDateTime.now().minusSeconds((long) 1).isBefore(submission.getStartTime()));
+
+        SubmissionResult submissionResult = submission.getResults().get(0);
+        assertEquals(OUTPUT, submissionResult.getUserOutput());
+        assertNull(submissionResult.getError());
+        assertEquals(INPUT, submissionResult.getInput());
+        assertEquals(OUTPUT, submissionResult.getCorrectOutput());
+        assertFalse(submissionResult.isHidden());
+        assertTrue(submissionResult.isCorrect());
+        
         assertFalse(game.getAllSolved());
     }
 

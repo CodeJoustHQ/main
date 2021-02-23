@@ -74,12 +74,15 @@ public class SubmitService {
         submission.setRuntime(DUMMY_RUNTIME);
 
         ProblemTestCaseDto testCaseDto = request.getProblem().getTestCases().get(0);
+        List<SubmissionResult> submissionResults = new ArrayList<>();
         SubmissionResult submissionResult = new SubmissionResult();
         submissionResult.setCorrect(true);
         submissionResult.setUserOutput(DUMMY_OUTPUT);
         submissionResult.setHidden(testCaseDto.isHidden());
         submissionResult.setInput(testCaseDto.getInput());
         submissionResult.setCorrectOutput(DUMMY_OUTPUT);
+        submissionResults.add(submissionResult);
+        submission.setResults(submissionResults);
 
         return submission;
     }
