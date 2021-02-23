@@ -26,8 +26,7 @@ const GameNotificationBox = styled.div`
 const notificationToString = (notification: GameNotification): string => {
   switch (notification.notificationType) {
     case NotificationType.SubmitCorrect: {
-      return `${notification.initiator.nickname} just submitted correctly
-        ${notification.content ? `, taking ${notification.content} place, ` : ''}.`;
+      return `${notification.initiator.nickname} just submitted correctly${notification.content ? `, taking ${notification.content} place` : ''}.`;
     }
     case NotificationType.SubmitIncorrect: {
       return `${notification.initiator.nickname} just submitted incorrectly.`;

@@ -10,5 +10,6 @@ import lombok.Setter;
 public class SubmissionRequest {
     private CodeLanguage language;
     private String code;
+    private String input;
     private UserDto initiator;
 }

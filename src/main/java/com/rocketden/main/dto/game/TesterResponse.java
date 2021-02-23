@@ -3,10 +3,15 @@ package com.rocketden.main.dto.game;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
-// This class is mapped directly to the tester service's RunDto class.
 public class TesterResponse {
-    private Boolean status;
-    private String output;
+    // This class is mapped directly to the tester service's RunDto class.
+    private List<TesterResult> results;
+    private Integer numCorrect;
+    private Integer numTestCases;
+    private Double runtime;
+    private String compilationError;
 }

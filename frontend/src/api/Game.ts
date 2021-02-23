@@ -10,7 +10,7 @@ export type Player = {
   user: User,
   code: string,
   language: string,
-  submissions: SubmissionResult[],
+  submissions: Submission[],
   solved: boolean,
   color: Color,
 };
@@ -32,6 +32,13 @@ export type PlayAgainParams = {
   initiator: User,
 };
 
+export type RunSolutionParams = {
+  initiator: User,
+  input: string,
+  code: string,
+  language: string,
+};
+
 export type SubmitSolutionParams = {
   initiator: User,
   code: string,
@@ -39,17 +46,38 @@ export type SubmitSolutionParams = {
 };
 
 export type SubmissionResult = {
+  console: string,
+  userOutput: string,
+  error: string,
+  input: string,
+  correctOutput: string,
+  hidden: boolean,
+  correct: boolean,
+};
+
+// Distinguish on frontend between tests and submissions.
+export enum SubmissionType {
+  Test = 'TEST',
+  Submit = 'SUBMIT',
+}
+
+export type Submission = {
   code: string,
   language: string,
+  results: SubmissionResult[],
   numCorrect: number,
   numTestCases: number,
+  runtime: number,
+  compilationError: string,
   startTime: string,
+  submissionType: SubmissionType,
 };
 
 const basePath = '/api/v1';
 const routes = {
   startGame: (roomId: string) => `${basePath}/rooms/${roomId}/start`,
   getGame: (roomId: string) => `${basePath}/games/${roomId}`,
+  runCode: (roomId: string) => `${basePath}/games/${roomId}/run-code`,
   submitSolution: (roomId: string) => `${basePath}/games/${roomId}/submission`,
   playAgain: (roomId: string) => `${basePath}/games/${roomId}/restart`,
 };
@@ -68,8 +96,15 @@ export const getGame = (roomId: string):
     throw axiosErrorHandler(err);
   });
 
+export const runSolution = (roomId: string, params: RunSolutionParams):
+  Promise<Submission> => axios.post<Submission>(routes.runCode(roomId), params)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
 export const submitSolution = (roomId: string, params: SubmitSolutionParams):
-  Promise<SubmissionResult> => axios.post<SubmissionResult>(routes.submitSolution(roomId), params)
+  Promise<Submission> => axios.post<Submission>(routes.submitSolution(roomId), params)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

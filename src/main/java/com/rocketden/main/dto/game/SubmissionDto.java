@@ -10,16 +10,19 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
 @EqualsAndHashCode
 public class SubmissionDto {
-
     private CodeLanguage language;
     private String code;
+    private List<SubmissionResultDto> results;
     private Integer numCorrect;
     private Integer numTestCases;
+    private Double runtime;
+    private String compilationError;
 
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)

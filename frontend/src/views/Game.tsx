@@ -20,7 +20,7 @@ import { User } from '../api/User';
 import { GameNotification, NotificationType } from '../api/GameNotification';
 import Difficulty from '../api/Difficulty';
 import {
-  Game, getGame, Player, SubmissionResult, submitSolution,
+  Game, getGame, Player, Submission, submitSolution, runSolution, SubmissionType,
 } from '../api/Game';
 import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
@@ -42,19 +42,21 @@ function GamePage() {
   const history = useHistory();
   const location = useLocation<LocationState>();
 
-  const [submission, setSubmission] = useState<SubmissionResult | null>(null);
+  const [submission, setSubmission] = useState<Submission | null>(null);
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [roomId, setRoomId] = useState<string>('');
 
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
   const [game, setGame] = useState<Game | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [currentLanguage, setCurrentLanguage] = useState('java');
+  const [currentLanguage, setCurrentLanguage] = useState('python');
+  const [currentCode, setCurrentCode] = useState('');
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
   const [defaultCodeList, setDefaultCodeList] = useState<DefaultCodeType[]>([]);
@@ -186,8 +188,8 @@ function GamePage() {
     window.dispatchEvent(event);
   };
 
-  // Send notification if submission result is correct and currentUser is set.
-  const checkSendTestCorrectNotification = (submissionParam: SubmissionResult) => {
+  // Send notification if test submission is correct and currentUser is set.
+  const checkSendTestCorrectNotification = (submissionParam: Submission) => {
     if (submissionParam.numCorrect === submissionParam.numTestCases && currentUser) {
       const notificationBody: string = JSON.stringify({
         initiator: currentUser,
@@ -199,20 +201,69 @@ function GamePage() {
     }
   };
 
+  // Send notification if solution is correct and currentUser is set.
+  const checkSendSolutionCorrectNotification = (submissionParam: Submission) => {
+    if (currentUser) {
+      const notificationBody: string = JSON.stringify({
+        initiator: currentUser,
+        time: new Date(),
+        notificationType:
+          (submissionParam.numCorrect === submissionParam.numTestCases)
+            ? NotificationType.SubmitCorrect : NotificationType.SubmitIncorrect,
+      });
+      send(routes(roomId).subscribe_notification, {}, notificationBody);
+    }
+  };
+
   // Callback when user runs code against custom test case
-  const runSolution = (input: string) => {
+  const runCode = (input: string) => {
+    setLoading(true);
+    setError('');
     const request = {
       initiator: currentUser!,
-      code: input,
+      input,
+      code: currentCode,
+      language: currentLanguage,
+    };
+
+    runSolution(roomId, request)
+      .then((res) => {
+        setLoading(false);
+
+        // Set the 'test' submission type to correctly display result.
+        res.submissionType = SubmissionType.Test;
+        setSubmission(res);
+        checkSendTestCorrectNotification(res);
+      })
+      .catch((err) => {
+        setLoading(false);
+        setError(err.message);
+      });
+  };
+
+  // Callback when user runs code against custom test case
+  const submitCode = () => {
+    setLoading(true);
+    setError('');
+    const request = {
+      initiator: currentUser!,
+      code: currentCode,
       language: currentLanguage,
     };
 
     submitSolution(roomId, request)
       .then((res) => {
+        setLoading(false);
+
+        // Set the 'submit' submission type to correctly display result.
+        res.submissionType = SubmissionType.Submit;
         setSubmission(res);
-        checkSendTestCorrectNotification(res);
+        checkSendSolutionCorrectNotification(res);
       })
-      .catch((err) => setError(err));
+      .catch((err) => {
+        setLoading(false);
+        setError(err.message);
+      });
   };
 
   const exitGame = () => {
@@ -273,6 +324,8 @@ function GamePage() {
         {displayPlayerLeaderboard()}
       </CenteredContainer>
 
+      {loading ? <Loading /> : null}
+
       <SplitterContainer>
         <SplitterLayout
           onSecondaryPaneSizeChange={onSecondaryPanelSizeChange}
@@ -296,6 +349,7 @@ function GamePage() {
           >
             <Panel>
               <Editor
+                onCodeChange={setCurrentCode}
                 onLanguageChange={setCurrentLanguage}
                 codeMap={defaultCodeList[0]}
               />
@@ -305,7 +359,8 @@ function GamePage() {
               <Console
                 testCases={problems[0]?.testCases}
                 submission={submission}
-                onRun={runSolution}
+                onRun={runCode}
+                onSubmit={submitCode}
               />
             </Panel>
           </SplitterLayout>

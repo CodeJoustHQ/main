@@ -146,12 +146,14 @@ public class GameMapperTests {
         submission.setPlayerCode(playerCode);
         submission.setNumTestCases(TEST_CASES);
         submission.setNumCorrect(TEST_CASES);
+        submission.setRuntime(5.5);
 
         SubmissionDto submissionDto = GameMapper.submissionToDto(submission);
         assertEquals(submission.getPlayerCode().getCode(), submissionDto.getCode());
         assertEquals(submission.getPlayerCode().getLanguage(), submissionDto.getLanguage());
         assertEquals(submission.getNumCorrect(), submissionDto.getNumCorrect());
         assertEquals(submission.getStartTime(), submissionDto.getStartTime());
+        assertEquals(submission.getRuntime(), submissionDto.getRuntime());
     }
 
     @Test
