@@ -71,7 +71,8 @@ function LeaderboardCard(props: LeaderboardCardProps) {
       return 'Never';
     }
 
-    const diffMilliseconds = Date.now() - new Date(latestSubmission.startTime).getTime();
+    const currentTime = new Date().getTime();
+    const diffMilliseconds = currentTime - new Date(latestSubmission.startTime).getTime();
     const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
     return `${diffMinutes} min ago`;
   };

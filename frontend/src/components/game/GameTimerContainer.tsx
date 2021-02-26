@@ -10,12 +10,8 @@ function GameTimerContainer(props: GameTimerProps) {
 
   // Calculate and set the new clock on the frontend.
   const calculateSetClock = useCallback((gameTimerParam: GameTimer) => {
-    console.log(Date.now());
-    console.log(new Date());
-    console.log(new Date(gameTimerParam.startTime).getTime());
-    console.log(new Date(gameTimerParam.endTime).getTime());
-    console.log(new Date(gameTimerParam.endTime).getTime() - Date.now());
-    const newCurrentClock = (new Date(gameTimerParam.endTime).getTime() - Date.now()) / 1000;
+    const currentTime = new Date().getTime();
+    const newCurrentClock = (new Date(gameTimerParam.endTime).getTime() - currentTime) / 1000;
     if (newCurrentClock > 0) {
       // Set minutes and its string.
       const minutes: number = Math.floor(newCurrentClock / 60);
