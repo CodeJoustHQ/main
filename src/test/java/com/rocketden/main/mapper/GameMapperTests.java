@@ -24,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +49,7 @@ public class GameMapperTests {
     private void addSubmissionHelper(PlayerDto playerDto, int numCorrect) {
         SubmissionDto submissionDto = new SubmissionDto();
         submissionDto.setNumCorrect(numCorrect);
-        submissionDto.setStartTime(LocalDateTime.now());
+        submissionDto.setStartTime(Instant.now());
 
         playerDto.getSubmissions().add(submissionDto);
     }

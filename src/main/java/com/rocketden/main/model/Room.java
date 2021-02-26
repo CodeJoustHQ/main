@@ -18,6 +18,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ public class Room {
 
     private String roomId;
 
-    private LocalDateTime createdDateTime = LocalDateTime.now();
+    private Instant createdDateTime = Instant.now();
 
     // host_id column in room table holds the primary key of the user host
     @OneToOne(fetch = FetchType.EAGER)

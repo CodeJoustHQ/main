@@ -12,6 +12,13 @@ function GameTimerContainer(props: GameTimerProps) {
   const calculateSetClock = useCallback((gameTimerParam: GameTimer) => {
     const currentTime = new Date().getTime();
     const newCurrentClock = (new Date(gameTimerParam.endTime).getTime() - currentTime) / 1000;
+    console.log(Date.now());
+    console.log(currentTime);
+    console.log(new Date(gameTimerParam.endTime));
+    console.log(new Date(gameTimerParam.startTime));
+    console.log(gameTimerParam.endTime);
+    console.log(gameTimerParam.startTime);
+    console.log(newCurrentClock);
     if (newCurrentClock > 0) {
       // Set minutes and its string.
       const minutes: number = Math.floor(newCurrentClock / 60);

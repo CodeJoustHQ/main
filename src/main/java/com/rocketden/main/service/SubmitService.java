@@ -1,6 +1,7 @@
 package com.rocketden.main.service;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -186,7 +187,7 @@ public class SubmitService {
             submission.setNumTestCases(testerResponse.getNumTestCases());
             submission.setRuntime(testerResponse.getRuntime());
             submission.setCompilationError(testerResponse.getCompilationError());
-            submission.setStartTime(LocalDateTime.now());
+            submission.setStartTime(Instant.now());
             submission.setPlayerCode(new PlayerCode(request.getCode(), request.getLanguage()));
 
             // Set the SubmissionResult objects, add to the list.

@@ -32,6 +32,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.springframework.http.HttpStatus;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -100,8 +101,8 @@ public class SubmitServiceTests {
         assertEquals(submissionDto.getNumCorrect(), submissionDto.getNumTestCases());
         assertNull(submissionDto.getCompilationError());
         assertEquals(RUNTIME, submissionDto.getRuntime());
-        assertTrue(LocalDateTime.now().isAfter(submissionDto.getStartTime())
-            || LocalDateTime.now().minusSeconds((long) 1).isBefore(submissionDto.getStartTime()));
+        assertTrue(Instant.now().isAfter(submissionDto.getStartTime())
+            || Instant.now().minusSeconds((long) 1).isBefore(submissionDto.getStartTime()));
 
         SubmissionResultDto resultDto = submissionDto.getResults().get(0);
         assertEquals(OUTPUT, resultDto.getUserOutput());
@@ -152,8 +153,8 @@ public class SubmitServiceTests {
         assertEquals(submission.getNumCorrect(), submission.getNumTestCases());
         assertNull(submission.getCompilationError());
         assertEquals(RUNTIME, submission.getRuntime());
-        assertTrue(LocalDateTime.now().isAfter(submission.getStartTime())
-            || LocalDateTime.now().minusSeconds((long) 1).isBefore(submission.getStartTime()));
+        assertTrue(Instant.now().isAfter(submission.getStartTime())
+            || Instant.now().minusSeconds((long) 1).isBefore(submission.getStartTime()));
 
         SubmissionResult submissionResult = submission.getResults().get(0);
         assertEquals(OUTPUT, submissionResult.getUserOutput());
@@ -207,8 +208,8 @@ public class SubmitServiceTests {
         assertEquals(submission.getNumCorrect(), submission.getNumTestCases());
         assertNull(submission.getCompilationError());
         assertEquals(RUNTIME, submission.getRuntime());
-        assertTrue(LocalDateTime.now().isAfter(submission.getStartTime())
-            || LocalDateTime.now().minusSeconds((long) 1).isBefore(submission.getStartTime()));
+        assertTrue(Instant.now().isAfter(submission.getStartTime())
+            || Instant.now().minusSeconds((long) 1).isBefore(submission.getStartTime()));
 
         SubmissionResult submissionResult = submission.getResults().get(0);
         assertEquals(OUTPUT, submissionResult.getUserOutput());

@@ -1,5 +1,6 @@
 package com.rocketden.main.util;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.TimerTask;
 
@@ -37,7 +38,7 @@ public class NotificationTimerTask extends TimerTask {
         GameNotificationDto notificationDto = new GameNotificationDto();
         notificationDto.setInitiator(null);
         notificationDto.setNotificationType(NotificationType.TIME_LEFT);
-        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setTime(Instant.now());
         notificationDto.setContent(timeRemaining);
 
         // Get the Game DTO and send the relevant socket update.

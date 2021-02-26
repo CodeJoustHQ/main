@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 import com.rocketden.main.dto.game.GameNotificationDto;
@@ -65,7 +66,7 @@ public class NotificationServiceTests {
 
         GameNotificationDto notificationDto = new GameNotificationDto();
         notificationDto.setInitiator(UserMapper.toDto(user));
-        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setTime(Instant.now());
         notificationDto.setContent(CONTENT);
         notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
 

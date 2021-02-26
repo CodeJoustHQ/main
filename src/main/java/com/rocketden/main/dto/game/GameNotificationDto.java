@@ -1,5 +1,6 @@
 package com.rocketden.main.dto.game;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -21,7 +22,7 @@ public class GameNotificationDto {
 
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private LocalDateTime time;
+    private Instant time;
 
     private NotificationType notificationType;
     private String content;
@@ -30,7 +31,7 @@ public class GameNotificationDto {
     
     public GameNotificationDto(GameNotificationRequest request) {
         this.initiator = request.getInitiator();
-        this.time = LocalDateTime.now();
+        this.time = Instant.now();
         this.notificationType = request.getNotificationType();
         this.content = request.getContent();
     }

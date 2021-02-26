@@ -51,6 +51,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -301,8 +302,8 @@ public class GameTests {
         assertEquals(submissionDto.getNumCorrect(), submissionDto.getNumTestCases());
         assertNull(submissionDto.getCompilationError());
         assertEquals(RUNTIME, submissionDto.getRuntime());
-        assertTrue(LocalDateTime.now().isAfter(submissionDto.getStartTime())
-            || LocalDateTime.now().minusSeconds((long) 1).isBefore(submissionDto.getStartTime()));
+        assertTrue(Instant.now().isAfter(submissionDto.getStartTime())
+            || Instant.now().minusSeconds((long) 1).isBefore(submissionDto.getStartTime()));
 
         SubmissionResultDto resultDto = submissionDto.getResults().get(0);
         assertEquals(OUTPUT, resultDto.getUserOutput());
@@ -372,8 +373,8 @@ public class GameTests {
         assertEquals(submissionDto.getNumCorrect(), submissionDto.getNumTestCases());
         assertNull(submissionDto.getCompilationError());
         assertEquals(RUNTIME, submissionDto.getRuntime());
-        assertTrue(LocalDateTime.now().isAfter(submissionDto.getStartTime())
-            || LocalDateTime.now().minusSeconds((long) 1).isBefore(submissionDto.getStartTime()));
+        assertTrue(Instant.now().isAfter(submissionDto.getStartTime())
+            || Instant.now().minusSeconds((long) 1).isBefore(submissionDto.getStartTime()));
 
         SubmissionResultDto resultDto = submissionDto.getResults().get(0);
         assertEquals(OUTPUT, resultDto.getUserOutput());
@@ -413,8 +414,8 @@ public class GameTests {
         assertEquals(request.getInitiator(), notificationDtoResult.getInitiator());
         assertEquals(request.getNotificationType(), notificationDtoResult.getNotificationType());
         assertEquals(request.getContent(), notificationDtoResult.getContent());
-        assertTrue(LocalDateTime.now().isAfter(notificationDtoResult.getTime())
-            || LocalDateTime.now().minusSeconds((long) 1).isBefore(notificationDtoResult.getTime()));
+        assertTrue(Instant.now().isAfter(notificationDtoResult.getTime())
+            || Instant.now().minusSeconds((long) 1).isBefore(notificationDtoResult.getTime()));
     }
 
     @Test

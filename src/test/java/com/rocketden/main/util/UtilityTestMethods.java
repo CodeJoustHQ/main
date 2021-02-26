@@ -1,6 +1,7 @@
 package com.rocketden.main.util;
 
 import java.lang.reflect.Type;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -34,10 +35,10 @@ public class UtilityTestMethods {
 
     // Include type adapter to appropriately convert LocalDateTime.
     public static <T> T toObjectLocalDateTime(String json, Class<T> c) {
-        Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class,
-            new JsonDeserializer<LocalDateTime>() { 
+        Gson gson = new GsonBuilder().registerTypeAdapter(Instant.class,
+            new JsonDeserializer<Instant>() { 
             @Override 
-            public LocalDateTime deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            public Instant deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
                     DateTimeFormatter formatter = new DateTimeFormatterBuilder()
                         .appendPattern(DATE_TIME_FORMAT_PATTERN)
                         // optional decimal point followed by 1 to 6 digits
@@ -45,7 +46,7 @@ public class UtilityTestMethods {
                         .appendFraction(ChronoField.MICRO_OF_SECOND, 1, 6, true)
                         .optionalEnd()
                         .toFormatter(); 
-                    return LocalDateTime.parse(json.getAsString(), formatter);
+                    return Instant.parse(json.getAsString());
                 } 
             }).create();
         return gson.fromJson(json, c);
