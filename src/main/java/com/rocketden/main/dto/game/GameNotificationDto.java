@@ -20,8 +20,8 @@ import lombok.Setter;
 public class GameNotificationDto {
     private UserDto initiator;
 
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    // @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    // @JsonSerialize(using = LocalDateTimeSerializer.class)
     private Instant time;
 
     private NotificationType notificationType;

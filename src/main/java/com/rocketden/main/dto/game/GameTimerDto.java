@@ -16,12 +16,12 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 public class GameTimerDto {
 
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    // @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    // @JsonSerialize(using = LocalDateTimeSerializer.class)
     private Instant startTime;
 
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    // @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    // @JsonSerialize(using = LocalDateTimeSerializer.class)
     private Instant endTime;
 
     private Long duration;
