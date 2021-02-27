@@ -8,7 +8,7 @@ const routes = {
 
 // Get the current Instant from the backend, rather than local system.
 export const getInstant = ():
-  Promise<string> => axios.post<string>(routes.getInstant())
+  Promise<string> => axios.get<string>(routes.getInstant())
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
