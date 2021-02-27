@@ -7,9 +7,11 @@ type GameTimerProps = {
 
 function GameTimerContainer(props: GameTimerProps) {
   const [currentClock, setCurrentClock] = useState<GameClock | null>(null);
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   // Calculate and set the new clock on the frontend.
   const calculateSetClock = useCallback((gameTimerParam: GameTimer) => {
+    // Replace this to be not dependent on the local system time.
     const currentTime = new Date().getTime();
     const newCurrentClock = (new Date(gameTimerParam.endTime).getTime() - currentTime) / 1000;
     console.log(Date.now());
@@ -46,15 +48,23 @@ function GameTimerContainer(props: GameTimerProps) {
         minutes: minutesStr,
         seconds: secondsStr,
       });
+
+      // Update countdown.
+      console.log(countdown);
+      if (countdown) {
+        setCountdown(countdown - 1);
+      }
     } else {
       // Set null to indicate that the timer has ended.
       setCurrentClock(null);
     }
-  }, []);
+  }, [countdown, setCountdown]);
 
   const updateClock = useCallback((gameTimerParam: GameTimer) => {
+    // Get current time here, get difference, then begin countdown.
+    setCountdown(60 * 60 * 15);
     setInterval(() => calculateSetClock(gameTimerParam), 1000);
-  }, [calculateSetClock]);
+  }, [calculateSetClock, setCountdown]);
 
   useEffect(() => {
     // Set timer if applicable; otherwise, default of null to display loading.
