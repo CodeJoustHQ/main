@@ -62,7 +62,7 @@ function ResizableMonacoEditor(props: EditorProps) {
         }
       </select>
       <MonacoEditor
-        height="100%"
+        height="100vh"
         editorDidMount={handleEditorDidMount}
         onChange={() => onCodeChange(codeEditor.getValue())}
         language={languageToEditorLanguage(currentLanguage)}
