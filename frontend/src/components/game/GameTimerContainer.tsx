@@ -8,25 +8,27 @@ type GameTimerProps = {
 function GameTimerContainer(props: GameTimerProps) {
   const [currentClock, setCurrentClock] = useState<GameClock | null>(null);
   const [countdown, setCountdown] = useState<number | null>(null);
+  const [countdownStarted, setCountdownStarted] = useState<boolean>(false);
 
-  const updateClock = useCallback((gameTimerParam: GameTimer) => {
+  const startClock = useCallback((gameTimerParam: GameTimer) => {
     // Get current time here, get difference, then begin countdown.
     let tempCountdown: number = (new Date(gameTimerParam.endTime).getTime()
       - new Date(gameTimerParam.startTime).getTime()) / 1000;
+    setCountdownStarted(true);
     setInterval(() => {
       setCountdown(tempCountdown);
       tempCountdown -= 1;
     }, 1000);
-  }, [setCountdown]);
+  }, [setCountdown, setCountdownStarted]);
 
   useEffect(() => {
     // Set timer if applicable; otherwise, default of null to display loading.
-    if (props.gameTimer) {
-      updateClock(props.gameTimer);
-    } else {
+    if (props.gameTimer && !countdownStarted) {
+      startClock(props.gameTimer);
+    } else if (!countdownStarted) {
       setCurrentClock(null);
     }
-  }, [updateClock, props]);
+  }, [startClock, props, countdownStarted]);
 
   useEffect(() => {
     if (countdown && countdown > 0) {
