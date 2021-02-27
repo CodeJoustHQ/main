@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { GameClock, GameTimer } from '../../api/GameTimer';
+import getInstant from '../../api/Utility';
+import ErrorMessage from '../core/Error';
 
 type GameTimerProps = {
   gameTimer: GameTimer | null,
@@ -9,16 +11,22 @@ function GameTimerContainer(props: GameTimerProps) {
   const [currentClock, setCurrentClock] = useState<GameClock | null>(null);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [countdownStarted, setCountdownStarted] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
 
   const startClock = useCallback((gameTimerParam: GameTimer) => {
     // Get current time here, get difference, then begin countdown.
-    let tempCountdown: number = (new Date(gameTimerParam.endTime).getTime()
-      - new Date(gameTimerParam.startTime).getTime()) / 1000;
-    setCountdownStarted(true);
-    setInterval(() => {
-      setCountdown(tempCountdown);
-      tempCountdown -= 1;
-    }, 1000);
+    getInstant().then((res) => {
+      let tempCountdown: number = (new Date(gameTimerParam.endTime).getTime()
+        - new Date(res).getTime()) / 1000;
+      setCountdownStarted(true);
+      setInterval(() => {
+        setCountdown(tempCountdown);
+        tempCountdown -= 1;
+      }, 1000);
+    }).catch((err) => {
+      // Set an error if the current instant could not be retrieved.
+      setError(err.message);
+    });
   }, [setCountdown, setCountdownStarted]);
 
   useEffect(() => {
@@ -68,6 +76,7 @@ function GameTimerContainer(props: GameTimerProps) {
       Time:
       {' '}
       {(currentClock) ? `${currentClock.minutes}:${currentClock.seconds}` : 'Loading...'}
+      {error ? <ErrorMessage message={error} /> : null}
     </div>
   );
 }
