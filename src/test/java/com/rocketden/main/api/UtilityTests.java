@@ -39,7 +39,7 @@ public class UtilityTests {
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        Instant instant = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, Instant.class);
+        Instant instant = UtilityTestMethods.toObjectInstant(jsonResponse, Instant.class);
 
         assertTrue(Instant.now().isAfter(instant)
             || Instant.now().minusSeconds((long) 1).isBefore(instant));
