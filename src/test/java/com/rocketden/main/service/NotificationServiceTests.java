@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 import com.rocketden.main.dto.game.GameNotificationDto;
 import com.rocketden.main.dto.user.UserMapper;

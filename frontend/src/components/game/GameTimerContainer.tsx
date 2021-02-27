@@ -14,6 +14,7 @@ function GameTimerContainer(props: GameTimerProps) {
     const newCurrentClock = (new Date(gameTimerParam.endTime).getTime() - currentTime) / 1000;
     console.log(Date.now());
     console.log(currentTime);
+    console.log(new Date());
     console.log(new Date(gameTimerParam.endTime));
     console.log(new Date(gameTimerParam.startTime));
     console.log(gameTimerParam.endTime);

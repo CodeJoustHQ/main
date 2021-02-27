@@ -1,16 +1,11 @@
 package com.rocketden.main.dto.game;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.rocketden.main.game_object.CodeLanguage;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -24,8 +19,5 @@ public class SubmissionDto {
     private Integer numTestCases;
     private Double runtime;
     private String compilationError;
-
-    // @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    // @JsonSerialize(using = LocalDateTimeSerializer.class)
     private Instant startTime;
 }
