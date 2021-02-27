@@ -108,8 +108,6 @@ public class SubmitService {
         
         /**
          * Provide a temporary output to circumvent output parsing error.
-         *
-         * TODO: Implement run code on tester repository, so output not checked.
          * The problem must have at least one test case to work.
          */
         String tempOutput = problemDto.getTestCases().get(0).getOutput();

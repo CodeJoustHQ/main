@@ -14,10 +14,11 @@ function GameTimerContainer(props: GameTimerProps) {
   const [error, setError] = useState<string>('');
 
   const startClock = useCallback((gameTimerParam: GameTimer) => {
-    // Get current time here, get difference, then begin countdown.
+    // Get current time here, find the difference, then begin countdown.
     getInstant().then((res) => {
+      // Get the difference to end time minus one to match delay.
       let tempCountdown: number = (new Date(gameTimerParam.endTime).getTime()
-        - new Date(res).getTime()) / 1000;
+        - new Date(res).getTime()) / 1000 - 1;
       setCountdownStarted(true);
       setInterval(() => {
         setCountdown(tempCountdown);
