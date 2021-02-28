@@ -46,7 +46,8 @@ export type DefaultCodeType = {
   [language in Language]: string
 };
 
-const basePath = '/api/v1/problems';
+// const basePath = '/api/v1/problems';
+const basePath = 'https://cors-anywhere.herokuapp.com/http://rocketden.herokuapp.com/api/v1/problems';
 const routes = {
   getProblems: `${basePath}/`,
   createProblem: `${basePath}/`,

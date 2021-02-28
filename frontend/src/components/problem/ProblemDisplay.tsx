@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
+import MarkdownEditor from 'rich-markdown-editor';
 import { deleteProblem, Problem, ProblemIOType } from '../../api/Problem';
 import {
   ConsoleTextArea, LargeInputButton, TextInput, CheckboxInput,
@@ -62,6 +63,9 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
   // Handle updating of enum-type fields
   const handleEnumChange = (name: string, value: any) => handleChange({ target: { name, value } });
+
+  // Handle description change
+  const handleDescriptionChange = (value: string) => handleChange({ target: { name: 'description', value } });
 
   // Handle updating of problem inputs
   const handleInputChange = (index: number, name: string, type: ProblemIOType) => {
@@ -139,10 +143,9 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       />
 
       <MediumText>Description:</MediumText>
-      <ConsoleTextArea
-        name="description"
-        value={newProblem.description}
-        onChange={handleChange}
+      <MarkdownEditor
+        defaultValue={newProblem.description}
+        onChange={(getNewValue) => handleDescriptionChange(getNewValue())}
       />
 
       <MediumText>Difficulty:</MediumText>
