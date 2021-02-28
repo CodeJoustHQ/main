@@ -27,7 +27,7 @@ public class UtilityTestMethods {
         return gson.fromJson(json, type);
     }
 
-    // Include type adapter to appropriately convert LocalDateTime.
+    // Include type adapter to appropriately convert Instant.
     public static <T> T toObjectInstant(String json, Class<T> c) {
         Gson gson = new GsonBuilder().registerTypeAdapter(Instant.class,
             new JsonDeserializer<Instant>() { 

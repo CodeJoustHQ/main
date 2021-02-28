@@ -2,6 +2,7 @@ package com.rocketden.main.util;
 
 import java.util.TimerTask;
 
+import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.exception.TimerError;
 import com.rocketden.main.exception.api.ApiException;
@@ -30,7 +31,8 @@ public class EndGameTimerTask extends TimerTask {
         game.getGameTimer().setTimeUp(true);
 
         // Get the Game DTO and send the relevant socket update.
-        socketService.sendSocketUpdate(GameMapper.toDto(game));
+        GameDto gameDto = GameMapper.toDto(game);
+        socketService.sendSocketUpdate(gameDto);
     }
     
 }

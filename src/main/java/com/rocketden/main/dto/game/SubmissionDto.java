@@ -1,5 +1,9 @@
 package com.rocketden.main.dto.game;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer;
 import com.rocketden.main.game_object.CodeLanguage;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,5 +23,8 @@ public class SubmissionDto {
     private Integer numTestCases;
     private Double runtime;
     private String compilationError;
+
+    @JsonSerialize(using = InstantSerializer.class)
+    @JsonDeserialize(using = InstantDeserializer.class)
     private Instant startTime;
 }
