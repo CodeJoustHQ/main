@@ -12,6 +12,14 @@ import { MediumText, Text } from '../core/Text';
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
 
+const StyledMarkdownEditor = styled(MarkdownEditor)`
+  text-align: left;
+  padding: 35px;
+  border-radius: 5px;
+  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
+  background: ${({ theme }) => theme.colors.white};
+`;
+
 const Content = styled.div`
   padding: 10px;
 `;
@@ -143,7 +151,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       />
 
       <MediumText>Description:</MediumText>
-      <MarkdownEditor
+      <StyledMarkdownEditor
         defaultValue={newProblem.description}
         onChange={(getNewValue) => handleDescriptionChange(getNewValue())}
       />
