@@ -5,7 +5,7 @@ import { useBeforeunload } from 'react-beforeunload';
 import { Message, Subscription } from 'stompjs';
 import Editor from '../components/game/Editor';
 import { DefaultCodeType, getDefaultCodeMap, Problem } from '../api/Problem';
-import { errorHandler } from '../api/Error';
+// import { errorHandler } from '../api/Error';
 import {
   MainContainer, CenteredContainer, FlexContainer, FlexInfoBar,
   Panel, SplitterContainer, FlexLeft, FlexCenter, FlexRight,
@@ -30,6 +30,7 @@ import {
   disconnect, routes, send, subscribe,
 } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
+import styled from 'styled-components';
 
 type LocationState = {
   roomId: string,
@@ -176,9 +177,10 @@ function GamePage() {
           setError(err);
         });
     } else {
-      history.replace('/game/join', {
-        error: errorHandler('No valid room details were provided, so you could not view the game page.'),
-      });
+      setFullPageLoading(false);
+      // history.replace('/game/join', {
+      //   error: errorHandler('No [vd rm dts wr prvd], so you could not view the game page.'),
+      // });
     }
   }, [location, history, setDefaultCodeFromProblems]);
 
@@ -300,6 +302,13 @@ function GamePage() {
     );
   }
 
+  const SplitterLayoutFull = styled(SplitterLayout)`
+    height: 100%;
+    & > .layout-pane {
+      height: 100%;
+    }
+  `;
+
   return (
     <FlexContainer>
       <GameNotificationContainer
@@ -319,13 +328,11 @@ function GamePage() {
           <TextButton onClick={exitGame}>Exit Game</TextButton>
         </FlexRight>
       </FlexInfoBar>
-
       <CenteredContainer>
         {displayPlayerLeaderboard()}
       </CenteredContainer>
 
       {loading ? <Loading /> : null}
-
       <SplitterContainer>
         <SplitterLayout
           onSecondaryPaneSizeChange={onSecondaryPanelSizeChange}
@@ -341,9 +348,10 @@ function GamePage() {
           </Panel>
 
           {/* Code editor and console panels */}
-          <SplitterLayout
-            percentage
+          <SplitterLayoutFull
+            customClassName=".splitter-layout > .layout-splitter"
             vertical
+            percentage
             primaryMinSize={20}
             secondaryMinSize={1}
           >
@@ -363,7 +371,7 @@ function GamePage() {
                 onSubmit={submitCode}
               />
             </Panel>
-          </SplitterLayout>
+          </SplitterLayoutFull>
         </SplitterLayout>
       </SplitterContainer>
     </FlexContainer>

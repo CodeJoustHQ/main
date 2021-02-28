@@ -12,6 +12,19 @@ type EditorProps = {
 
 const Content = styled.div`
   height: 100%;
+  display: flex;
+  flex-direction: column;
+`;
+
+const EditorContainer = styled.div`
+  flex:1;
+  overflow: hidden;
+`;
+
+const Footer = styled.div`
+  flex-shrink: 0; 
+  background:#f8f8f8;
+  border-top: 1px solid #e7e7e7;
 `;
 
 // This function refreshes the width of Monaco editor upon change in container size
@@ -51,7 +64,40 @@ function ResizableMonacoEditor(props: EditorProps) {
 
   return (
     <Content>
-      <select
+      <div>
+        1
+        <br />
+        2
+        <br />
+        3
+        <br />
+        4
+        <br />
+      </div>
+      <EditorContainer>
+        <MonacoEditor
+          options={{
+            fixedOverflowWidgets: true,
+            minimap: { enabled: false },
+            automaticLayout: true,
+            scrollBeyondLastLine: false,
+          }}
+          height="100%"
+          editorDidMount={handleEditorDidMount}
+          onChange={() => onCodeChange(codeEditor.getValue())}
+          language={languageToEditorLanguage(currentLanguage)}
+          defaultValue="Loading..."
+        />
+      </EditorContainer>
+      <Footer>haha</Footer>
+    </Content>
+  );
+}
+
+export default ResizableMonacoEditor;
+
+/**
+<select
         onChange={(e) => handleLanguageChange(fromString(e.target.value))}
         value={fromString(currentLanguage)}
       >
@@ -61,15 +107,4 @@ function ResizableMonacoEditor(props: EditorProps) {
           ))
         }
       </select>
-      <MonacoEditor
-        height="100vh"
-        editorDidMount={handleEditorDidMount}
-        onChange={() => onCodeChange(codeEditor.getValue())}
-        language={languageToEditorLanguage(currentLanguage)}
-        defaultValue="Loading..."
-      />
-    </Content>
-  );
-}
-
-export default ResizableMonacoEditor;
+ */
