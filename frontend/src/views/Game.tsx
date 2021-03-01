@@ -30,7 +30,6 @@ import {
   disconnect, routes, send, subscribe,
 } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
-import styled from 'styled-components';
 
 type LocationState = {
   roomId: string,
@@ -174,7 +173,7 @@ function GamePage() {
         })
         .catch((err) => {
           setFullPageLoading(false);
-          setError(err);
+          setError(err.message);
         });
     } else {
       setFullPageLoading(false);
@@ -302,13 +301,6 @@ function GamePage() {
     );
   }
 
-  const SplitterLayoutFull = styled(SplitterLayout)`
-    height: 100%;
-    & > .layout-pane {
-      height: 100%;
-    }
-  `;
-
   return (
     <FlexContainer>
       <GameNotificationContainer
@@ -348,8 +340,7 @@ function GamePage() {
           </Panel>
 
           {/* Code editor and console panels */}
-          <SplitterLayoutFull
-            customClassName=".splitter-layout > .layout-splitter"
+          <SplitterLayout
             vertical
             percentage
             primaryMinSize={20}
@@ -371,7 +362,7 @@ function GamePage() {
                 onSubmit={submitCode}
               />
             </Panel>
-          </SplitterLayoutFull>
+          </SplitterLayout>
         </SplitterLayout>
       </SplitterContainer>
     </FlexContainer>

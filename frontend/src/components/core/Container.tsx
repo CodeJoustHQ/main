@@ -52,6 +52,18 @@ export const Panel = styled.div`
 export const SplitterContainer = styled.div`
   flex: auto;
   position: relative;
+  
+  .layout-pane {
+    height: 100%;
+  }
+  
+  .layout-splitter {
+    background-color: transparent;
+    
+    &:hover {
+      background-color: transparent;
+    }
+  }
 `;
 
 export const MainContainer = styled.div`

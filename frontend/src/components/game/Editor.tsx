@@ -21,12 +21,6 @@ const EditorContainer = styled.div`
   overflow: hidden;
 `;
 
-const Footer = styled.div`
-  flex-shrink: 0; 
-  background:#f8f8f8;
-  border-top: 1px solid #e7e7e7;
-`;
-
 // This function refreshes the width of Monaco editor upon change in container size
 function ResizableMonacoEditor(props: EditorProps) {
   const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.Python);
@@ -64,16 +58,6 @@ function ResizableMonacoEditor(props: EditorProps) {
 
   return (
     <Content>
-      <div>
-        1
-        <br />
-        2
-        <br />
-        3
-        <br />
-        4
-        <br />
-      </div>
       <EditorContainer>
         <MonacoEditor
           options={{
@@ -89,7 +73,6 @@ function ResizableMonacoEditor(props: EditorProps) {
           defaultValue="Loading..."
         />
       </EditorContainer>
-      <Footer>haha</Footer>
     </Content>
   );
 }
