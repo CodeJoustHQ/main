@@ -9,6 +9,7 @@ type GameTimerProps = {
 
 function GameTimerContainer(props: GameTimerProps) {
   const [currentClock, setCurrentClock] = useState<GameClock | null>(null);
+  const [prevLocalTime, setPrevLocalTime] = useState<number | null>(null);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [countdownStarted, setCountdownStarted] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -16,13 +17,22 @@ function GameTimerContainer(props: GameTimerProps) {
   const startClock = useCallback((gameTimerParam: GameTimer) => {
     // Get current time here, find the difference, then begin countdown.
     getInstant().then((res) => {
+      // Get the local system clock time, and set this last-calculated time.
+      setPrevLocalTime(Date.now());
+
       // Get the difference to end time minus one to match delay.
       let tempCountdown: number = (new Date(gameTimerParam.endTime).getTime()
         - new Date(res).getTime()) / 1000 - 1;
       setCountdownStarted(true);
       setInterval(() => {
-        setCountdown(tempCountdown);
-        tempCountdown -= 1;
+        const currentLocalTime: number = Date.now();
+        if (prevLocalTime) {
+          tempCountdown -= currentLocalTime - prevLocalTime;
+          setPrevLocalTime(currentLocalTime);
+          setCountdown(tempCountdown);
+        } else {
+          setPrevLocalTime(Date.now());
+        }
       }, 1000);
     }).catch((err) => {
       // Set an error if the current instant could not be retrieved.
