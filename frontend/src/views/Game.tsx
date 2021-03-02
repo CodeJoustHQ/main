@@ -5,7 +5,7 @@ import { useBeforeunload } from 'react-beforeunload';
 import { Message, Subscription } from 'stompjs';
 import Editor from '../components/game/Editor';
 import { DefaultCodeType, getDefaultCodeMap, Problem } from '../api/Problem';
-// import { errorHandler } from '../api/Error';
+import { errorHandler } from '../api/Error';
 import {
   MainContainer, CenteredContainer, FlexContainer, FlexInfoBar,
   Panel, SplitterContainer, FlexLeft, FlexCenter, FlexRight,

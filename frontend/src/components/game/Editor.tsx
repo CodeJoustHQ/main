@@ -107,16 +107,3 @@ function ResizableMonacoEditor(props: EditorProps) {
 }
 
 export default ResizableMonacoEditor;
-
-/**
-<select
-        onChange={(e) => handleLanguageChange(fromString(e.target.value))}
-        value={fromString(currentLanguage)}
-      >
-        {
-          Object.keys(Language).map((language) => (
-            <option key={language} value={language}>{language}</option>
-          ))
-        }
-      </select>
- */
