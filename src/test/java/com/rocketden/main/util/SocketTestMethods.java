@@ -49,7 +49,7 @@ public class SocketTestMethods {
         StompHeaders headers = new StompHeaders();
         headers.add(WebSocketConnectionEvents.USER_ID_KEY, userId);
 
-        return newStompClient
+        return (StompSession) newStompClient
                 .connect(endpoint, new WebSocketHttpHeaders(), headers, new StompSessionHandlerAdapter() {
                     @Override
                     public void handleException(StompSession session, StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
