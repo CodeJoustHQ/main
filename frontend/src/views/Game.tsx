@@ -37,6 +37,11 @@ const StyledMarkdownEditor = styled(MarkdownEditor)`
   padding: 0;
 `;
 
+const OverflowPanel = styled(Panel)`
+  overflow-y: auto;
+  height: 100%;
+`;
+
 type LocationState = {
   roomId: string,
   currentUser: User,
@@ -340,15 +345,15 @@ function GamePage() {
           secondaryMinSize={35}
         >
           {/* Problem title/description panel */}
-          <Panel>
+          <OverflowPanel>
             <ProblemHeaderText>{problems[0]?.name}</ProblemHeaderText>
+            {error ? <ErrorMessage message={error} /> : null}
             <StyledMarkdownEditor
               defaultValue={problems[0]?.description}
               onChange={() => ''}
               readOnly
             />
-            {error ? <ErrorMessage message={error} /> : null}
-          </Panel>
+          </OverflowPanel>
 
           {/* Code editor and console panels */}
           <SplitterLayout
