@@ -17,8 +17,25 @@ const Content = styled.div`
 `;
 
 const EditorContainer = styled.div`
-  flex:1;
+  flex: 1;
   overflow: hidden;
+`;
+
+const LanguageContainer = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  margin: 5px;
+  padding: 7.5px;
+  background: white;
+`;
+
+const LanguageSelect = styled.select`
+  padding: 2.5px 10px;
+  border: 2px solid ${({ theme }) => theme.colors.blue};
+  border-radius: 5px;
+  font-style: italic;
 `;
 
 // This function refreshes the width of Monaco editor upon change in container size
@@ -58,6 +75,18 @@ function ResizableMonacoEditor(props: EditorProps) {
 
   return (
     <Content>
+      <LanguageContainer>
+        <LanguageSelect
+          onChange={(e) => handleLanguageChange(fromString(e.target.value))}
+          value={fromString(currentLanguage)}
+        >
+          {
+            Object.keys(Language).map((language) => (
+              <option key={language} value={language}>{language}</option>
+            ))
+          }
+        </LanguageSelect>
+      </LanguageContainer>
       <EditorContainer>
         <MonacoEditor
           options={{
