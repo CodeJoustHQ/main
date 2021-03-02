@@ -21,7 +21,7 @@ function GameTimerContainer(props: GameTimerProps) {
 
       // Get the difference to end time minus one to match delay.
       let tempCountdown: number = (new Date(gameTimerParam.endTime).getTime()
-        - new Date(res).getTime()) / 1000 - 1;
+        - new Date(res).getTime()) / 1000;
       setCountdownStarted(true);
       setInterval(() => {
         const currentLocalTime: number = Date.now();
