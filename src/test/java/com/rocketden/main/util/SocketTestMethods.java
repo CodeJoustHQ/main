@@ -53,6 +53,7 @@ public class SocketTestMethods {
                 .connect(endpoint, new WebSocketHttpHeaders(), headers, new StompSessionHandlerAdapter() {
                     @Override
                     public void handleException(StompSession session, StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
+                        // This method can be used as a useful breakpoint.
                         throw new RuntimeException("Failure in WebSocket handling", exception);
                     }
                 }, port)
