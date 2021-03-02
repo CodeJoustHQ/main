@@ -19,7 +19,7 @@ function GameTimerContainer(props: GameTimerProps) {
       // Get the local system clock time, and set this last-calculated time.
       let prevLocalTime: number = Date.now();
 
-      // Get the difference to end time minus one to match delay.
+      // Get the difference to end time.
       let tempCountdown: number = (new Date(gameTimerParam.endTime).getTime()
         - new Date(res).getTime()) / 1000;
       setCountdownStarted(true);
