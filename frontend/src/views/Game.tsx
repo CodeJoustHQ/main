@@ -184,7 +184,7 @@ function GamePage() {
         })
         .catch((err) => {
           setFullPageLoading(false);
-          setError(err);
+          setError(err.message);
         });
     } else {
       history.replace('/game/join', {
@@ -330,13 +330,11 @@ function GamePage() {
           <TextButton onClick={exitGame}>Exit Game</TextButton>
         </FlexRight>
       </FlexInfoBar>
-
       <CenteredContainer>
         {displayPlayerLeaderboard()}
       </CenteredContainer>
 
       {loading ? <Loading /> : null}
-
       <SplitterContainer>
         <SplitterLayout
           onSecondaryPaneSizeChange={onSecondaryPanelSizeChange}
@@ -357,10 +355,10 @@ function GamePage() {
 
           {/* Code editor and console panels */}
           <SplitterLayout
-            percentage
             vertical
+            percentage
             primaryMinSize={20}
-            secondaryMinSize={1}
+            secondaryMinSize={0}
           >
             <Panel>
               <Editor
