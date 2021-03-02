@@ -27,6 +27,7 @@ import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
 import { TextButton } from '../components/core/Button';
 import {
+  connect,
   disconnect, routes, send, subscribe,
 } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
@@ -131,31 +132,34 @@ function GamePage() {
   }, [timeUp, allSolved, game, history, currentUser, gameSocket, notificationSocket]);
 
   // Re-subscribe in order to get the correct subscription callback.
-  const subscribePrimary = useCallback((roomIdParam: string) => {
+  const subscribePrimary = useCallback((roomIdParam: string, userId: string) => {
     const subscribeUserCallback = (result: Message) => {
       const updatedGame: Game = JSON.parse(result.body);
       setStateFromGame(updatedGame);
     };
 
-    // Subscribe to the main Game channel to receive Game updates.
-    if (!gameSocket) {
-      subscribe(routes(roomIdParam).subscribe_game, subscribeUserCallback)
-        .then((subscription) => {
-          setGameSocket(subscription);
-        }).catch((err) => {
-          setError(err.message);
-        });
-    }
+    // Connect to the socket if not already
+    connect(roomId, userId).then(() => {
+      // Subscribe to the main Game channel to receive Game updates.
+      if (!gameSocket) {
+        subscribe(routes(roomIdParam).subscribe_game, subscribeUserCallback)
+          .then((subscription) => {
+            setGameSocket(subscription);
+          }).catch((err) => {
+            setError(err.message);
+          });
+      }
 
-    // Subscribe for Game Notifications.
-    if (!notificationSocket) {
-      subscribe(routes(roomIdParam).subscribe_notification, displayNotification)
-        .then((subscription) => {
-          setNotificationSocket(subscription);
-        }).catch((err) => {
-          setError(err.message);
-        });
-    }
+      // Subscribe for Game Notifications.
+      if (!notificationSocket) {
+        subscribe(routes(roomIdParam).subscribe_notification, displayNotification)
+          .then((subscription) => {
+            setNotificationSocket(subscription);
+          }).catch((err) => {
+            setError(err.message);
+          });
+      }
+    });
   }, [displayNotification, gameSocket, notificationSocket]);
 
   // Called every time location changes
@@ -286,10 +290,10 @@ function GamePage() {
 
   // Subscribe user to primary socket and to notifications.
   useEffect(() => {
-    if (!gameSocket && roomId) {
-      subscribePrimary(roomId);
+    if (!gameSocket && roomId && currentUser?.userId) {
+      subscribePrimary(roomId, currentUser!.userId);
     }
-  }, [gameSocket, roomId, subscribePrimary]);
+  }, [gameSocket, roomId, currentUser, subscribePrimary]);
 
   // If the page is loading, return a centered Loading object.
   if (fullPageLoading) {
