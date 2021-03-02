@@ -177,9 +177,9 @@ function GamePage() {
         });
     } else {
       setFullPageLoading(false);
-      // history.replace('/game/join', {
-      //   error: errorHandler('No [vd rm dts wr prvd], so you could not view the game page.'),
-      // });
+      history.replace('/game/join', {
+        error: errorHandler('No [vd rm dts wr prvd], so you could not view the game page.'),
+      });
     }
   }, [location, history, setDefaultCodeFromProblems]);
 
