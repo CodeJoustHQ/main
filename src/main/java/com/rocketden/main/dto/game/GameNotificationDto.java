@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.game_object.NotificationType;
 
+import com.rocketden.main.util.InstantDeserializer;
+import com.rocketden.main.util.InstantSerializer;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,27 +42,5 @@ public class GameNotificationDto {
         this.time = Instant.now();
         this.notificationType = request.getNotificationType();
         this.content = request.getContent();
-    }
-
-    public static class InstantSerializer extends JsonSerializer<Instant> {
-
-        private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.UTC);
-
-        @Override
-        public void serialize(Instant instant, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-            String str = dateTimeFormatter.format(instant);
-
-            jsonGenerator.writeString(str);
-        }
-    }
-
-    public static class InstantDeserializer extends JsonDeserializer<Instant> {
-
-        private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.UTC);
-
-        @Override
-        public Instant deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-            return Instant.from(dateTimeFormatter.parse(jsonParser.getText()));
-        }
     }
 }

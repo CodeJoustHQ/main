@@ -2,9 +2,9 @@ package com.rocketden.main.dto.game;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer;
 import com.rocketden.main.game_object.CodeLanguage;
+import com.rocketden.main.util.InstantDeserializer;
+import com.rocketden.main.util.InstantSerializer;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
