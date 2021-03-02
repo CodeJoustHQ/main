@@ -176,7 +176,6 @@ function GamePage() {
           setError(err.message);
         });
     } else {
-      setFullPageLoading(false);
       history.replace('/game/join', {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
       });
@@ -344,7 +343,7 @@ function GamePage() {
             vertical
             percentage
             primaryMinSize={20}
-            secondaryMinSize={1}
+            secondaryMinSize={0}
           >
             <Panel>
               <Editor
