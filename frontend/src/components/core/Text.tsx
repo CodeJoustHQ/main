@@ -34,8 +34,8 @@ export const UserNicknameText = styled(LargeText)`
   margin: 0;
 `;
 
-export const ProblemHeaderText = styled.h3`
-  font-size: ${({ theme }) => theme.fontSize.default};
+export const ProblemHeaderText = styled.h2`
+  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
 `;
 
 export const SmallActionText = styled.p`

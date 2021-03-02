@@ -41,7 +41,13 @@ function AllProblemsPage() {
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
 
-      {problems?.map((problem) => <ProblemCard problem={problem} onClick={redirect} />)}
+      {problems?.map((problem, index) => (
+        <ProblemCard
+          key={index}
+          problem={problem}
+          onClick={redirect}
+        />
+      ))}
     </Content>
   );
 }

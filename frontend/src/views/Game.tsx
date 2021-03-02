@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import SplitterLayout from 'react-splitter-layout';
+import MarkdownEditor from 'rich-markdown-editor';
 import { useBeforeunload } from 'react-beforeunload';
 import { Message, Subscription } from 'stompjs';
 import Editor from '../components/game/Editor';
@@ -11,7 +13,7 @@ import {
   Panel, SplitterContainer, FlexLeft, FlexCenter, FlexRight,
 } from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
-import { ProblemHeaderText, Text } from '../components/core/Text';
+import { ProblemHeaderText } from '../components/core/Text';
 import 'react-splitter-layout/lib/index.css';
 import { checkLocationState } from '../util/Utility';
 import Console from '../components/game/Console';
@@ -30,6 +32,15 @@ import {
   disconnect, routes, send, subscribe,
 } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
+
+const StyledMarkdownEditor = styled(MarkdownEditor)`
+  padding: 0;
+`;
+
+const OverflowPanel = styled(Panel)`
+  overflow-y: auto;
+  height: 100%;
+`;
 
 type LocationState = {
   roomId: string,
@@ -334,11 +345,15 @@ function GamePage() {
           secondaryMinSize={35}
         >
           {/* Problem title/description panel */}
-          <Panel>
+          <OverflowPanel>
             <ProblemHeaderText>{problems[0]?.name}</ProblemHeaderText>
-            <Text>{problems[0]?.description}</Text>
             {error ? <ErrorMessage message={error} /> : null}
-          </Panel>
+            <StyledMarkdownEditor
+              defaultValue={problems[0]?.description}
+              onChange={() => ''}
+              readOnly
+            />
+          </OverflowPanel>
 
           {/* Code editor and console panels */}
           <SplitterLayout
