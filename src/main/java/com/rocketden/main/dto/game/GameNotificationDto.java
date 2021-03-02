@@ -1,11 +1,18 @@
 package com.rocketden.main.dto.game;
 
+import java.io.IOException;
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.game_object.NotificationType;
 
@@ -33,5 +40,27 @@ public class GameNotificationDto {
         this.time = Instant.now();
         this.notificationType = request.getNotificationType();
         this.content = request.getContent();
+    }
+
+    public static class InstantSerializer extends JsonSerializer<Instant> {
+
+        private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.UTC);
+
+        @Override
+        public void serialize(Instant instant, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+            String str = dateTimeFormatter.format(instant);
+
+            jsonGenerator.writeString(str);
+        }
+    }
+
+    public static class InstantDeserializer extends JsonDeserializer<Instant> {
+
+        private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.UTC);
+
+        @Override
+        public Instant deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+            return Instant.from(dateTimeFormatter.parse(jsonParser.getText()));
+        }
     }
 }
