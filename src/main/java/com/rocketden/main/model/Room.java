@@ -45,7 +45,7 @@ public class Room {
      * If the room is deleted or users removed from this list, those users will also be deleted.
      * Setter is set to private to ensure proper use of addUser and removeUser methods.
      */
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Setter(AccessLevel.PRIVATE)
     private List<User> users = new ArrayList<>();
 

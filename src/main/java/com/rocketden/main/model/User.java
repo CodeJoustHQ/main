@@ -37,7 +37,7 @@ public class User {
     private String sessionId;
 
     // This column holds the primary key of the room (not the roomId variable)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "room_table_id")
     private Room room;
 }
