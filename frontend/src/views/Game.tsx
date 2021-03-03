@@ -125,7 +125,7 @@ function GamePage() {
       notificationSocket?.unsubscribe();
 
       history.replace('/game/results', {
-        game,
+        roomId,
         currentUser,
       });
     }
