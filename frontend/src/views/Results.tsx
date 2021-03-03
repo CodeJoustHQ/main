@@ -11,7 +11,7 @@ import { PrimaryButton } from '../components/core/Button';
 import { Room } from '../api/Room';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
-import { disconnect, routes, subscribe } from '../api/Socket';
+import { connect, disconnect, routes, subscribe } from '../api/Socket';
 import { User } from '../api/User';
 
 const Content = styled.div`
@@ -56,8 +56,10 @@ function GameResultsPage() {
         }
       };
 
-      subscribe(routes(location.state.game.room.roomId).subscribe_game, subscribeCallback)
-        .catch((err) => setError(err.message));
+      connect(location.state.game.room.roomId, location.state.currentUser.userId!).then(() => {
+        subscribe(routes(location.state.game.room.roomId).subscribe_game, subscribeCallback)
+          .catch((err) => setError(err.message));
+      });
     } else {
       history.replace('/game/join', {
         error: errorHandler('Please join and play a game before viewing the results page.'),
