@@ -40,19 +40,27 @@ function GameResultsPage() {
       setRoom(location.state.game.room);
       setCurrentUser(location.state.currentUser);
 
+      const disconnectAction = (game: Game) => {
+        disconnect()
+          .then(() => {
+            history.replace(`/game/lobby?room=${game.room.roomId}`, {
+              user: location.state.currentUser,
+              roomId: game.room.roomId,
+            });
+          })
+          .catch((err) => setError(err.message));
+      };
+
+      if (location.state.game.playAgain) {
+        disconnectAction(location.state.game);
+      }
+
       const subscribeCallback = (result: Message) => {
         const updatedGame: Game = JSON.parse(result.body);
 
         // Disconnect users from socket and then redirect them to the lobby page
         if (updatedGame.playAgain) {
-          disconnect()
-            .then(() => {
-              history.replace(`/game/lobby?room=${updatedGame.room.roomId}`, {
-                user: location.state.currentUser,
-                roomId: updatedGame.room.roomId,
-              });
-            })
-            .catch((err) => setError(err.message));
+          disconnectAction(updatedGame);
         }
       };
 
