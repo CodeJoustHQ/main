@@ -84,17 +84,17 @@ export const send = (sendUrl: string, headers?: {}, body?: string):
   });
 
 /**
- * Disconnect the user by sending a message via socket.
- * @returns void, or an error if the socket is not connected.
+ * Disconnect the user by sending a message via socket (do nothing if already disconnected).
+ * @returns void
 */
 export const disconnect = ():
-  Promise<void> => new Promise<void>((resolve, reject) => {
+  Promise<void> => new Promise<void>((resolve) => {
     if (stompClient && stompClient.connected) {
       // Stomp client is already set from last connection.
       stompClient.disconnect(() => {
         resolve();
       });
     } else {
-      reject(errorHandler('The socket is not connected.'));
+      resolve();
     }
   });

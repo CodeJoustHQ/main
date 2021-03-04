@@ -48,8 +48,7 @@ function GameResultsPage() {
               user: location.state.currentUser,
               roomId: game.room.roomId,
             });
-          })
-          .catch((err) => setError(err.message));
+          });
       };
 
       // Get latest game information
