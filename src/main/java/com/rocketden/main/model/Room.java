@@ -18,7 +18,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class Room {
 
     private String roomId;
 
-    private LocalDateTime createdDateTime = LocalDateTime.now();
+    private Instant createdDateTime = Instant.now();
 
     // host_id column in room table holds the primary key of the user host
     @OneToOne(fetch = FetchType.EAGER)
@@ -45,7 +45,7 @@ public class Room {
      * If the room is deleted or users removed from this list, those users will also be deleted.
      * Setter is set to private to ensure proper use of addUser and removeUser methods.
      */
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Setter(AccessLevel.PRIVATE)
     private List<User> users = new ArrayList<>();
 

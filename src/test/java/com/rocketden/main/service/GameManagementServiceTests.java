@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @ExtendWith(MockitoExtension.class)
 public class GameManagementServiceTests {
@@ -97,7 +97,7 @@ public class GameManagementServiceTests {
         Submission submission = new Submission();
         submission.setNumCorrect(numCorrect);
         submission.setNumTestCases(NUM_PROBLEMS);
-        submission.setStartTime(LocalDateTime.now());
+        submission.setStartTime(Instant.now());
 
         player.getSubmissions().add(submission);
         if (numCorrect == NUM_PROBLEMS) {
@@ -570,7 +570,7 @@ public class GameManagementServiceTests {
 
         GameNotificationDto notificationDto = new GameNotificationDto();
         notificationDto.setInitiator(UserMapper.toDto(user));
-        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setTime(Instant.now());
         notificationDto.setContent(CONTENT);
         notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
 
@@ -599,7 +599,7 @@ public class GameManagementServiceTests {
         // Change notification type to time left, as no initiator is required.
         GameNotificationDto notificationDto = new GameNotificationDto();
         notificationDto.setInitiator(null);
-        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setTime(Instant.now());
         notificationDto.setContent(TIME_CONTENT);
         notificationDto.setNotificationType(NotificationType.TIME_LEFT);
 
@@ -629,7 +629,7 @@ public class GameManagementServiceTests {
         // Change notification type to time left, as no initiator is required.
         GameNotificationDto notificationDto = new GameNotificationDto();
         notificationDto.setInitiator(null);
-        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setTime(Instant.now());
         notificationDto.setContent(TIME_CONTENT);
         notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
 
@@ -658,7 +658,7 @@ public class GameManagementServiceTests {
         // Change notification type to time left, as no initiator is required.
         GameNotificationDto notificationDto = new GameNotificationDto();
         notificationDto.setInitiator(UserMapper.toDto(user));
-        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setTime(Instant.now());
         notificationDto.setContent(null);
         notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
 
@@ -685,7 +685,7 @@ public class GameManagementServiceTests {
 
         GameNotificationDto notificationDto = new GameNotificationDto();
         notificationDto.setInitiator(UserMapper.toDto(user));
-        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setTime(Instant.now());
         notificationDto.setContent(CONTENT);
         notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
 
@@ -712,7 +712,7 @@ public class GameManagementServiceTests {
 
         GameNotificationDto notificationDto = new GameNotificationDto();
         notificationDto.setInitiator(UserMapper.toDto(user));
-        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setTime(Instant.now());
         notificationDto.setContent(CONTENT);
 
         ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification(ROOM_ID, notificationDto));
@@ -739,7 +739,7 @@ public class GameManagementServiceTests {
 
         GameNotificationDto notificationDto = new GameNotificationDto();
         notificationDto.setInitiator(UserMapper.toDto(user));
-        notificationDto.setTime(LocalDateTime.now());
+        notificationDto.setTime(Instant.now());
         notificationDto.setContent(CONTENT);
         notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
 

@@ -39,6 +39,7 @@ export const connect = (roomId: string, userId: string):
       socketRoomId = roomId;
       const socket: WebSocket = new SockJS(routes(socketRoomId).connect);
       stompClient = Stomp.over(socket);
+      stompClient.debug = () => {};
 
       // Headers to be retrieved on the backend to update the user information.
       const connectHeaders: any = {

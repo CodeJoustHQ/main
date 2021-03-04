@@ -12,6 +12,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
@@ -49,7 +50,13 @@ public class SocketTestMethods {
         headers.add(WebSocketConnectionEvents.USER_ID_KEY, userId);
 
         return newStompClient
-                .connect(endpoint, new WebSocketHttpHeaders(), headers, new StompSessionHandlerAdapter() {}, port)
+            .connect(endpoint, new WebSocketHttpHeaders(), headers, new StompSessionHandlerAdapter() {
+                    @Override
+                    public void handleException(StompSession session, StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
+                        // This method can be used as a useful breakpoint.
+                        throw new RuntimeException("Failure in WebSocket handling", exception);
+                    }
+                }, port)
                 .get(3, SECONDS);
     }
 

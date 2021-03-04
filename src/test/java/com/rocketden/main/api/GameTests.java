@@ -51,7 +51,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -207,7 +207,7 @@ public class GameTests {
                 .andReturn();
 
         jsonResponse = result.getResponse().getContentAsString();
-        GameDto gameDto = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, GameDto.class);
+        GameDto gameDto = UtilityTestMethods.toObjectInstant(jsonResponse, GameDto.class);
 
         assertEquals(actual, gameDto.getRoom());
         assertEquals(1, gameDto.getPlayers().size());
@@ -294,15 +294,15 @@ public class GameTests {
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        SubmissionDto submissionDto = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, SubmissionDto.class);
+        SubmissionDto submissionDto = UtilityTestMethods.toObjectInstant(jsonResponse, SubmissionDto.class);
 
         assertEquals(CODE, submissionDto.getCode());
         assertEquals(LANGUAGE, submissionDto.getLanguage());
         assertEquals(submissionDto.getNumCorrect(), submissionDto.getNumTestCases());
         assertNull(submissionDto.getCompilationError());
         assertEquals(RUNTIME, submissionDto.getRuntime());
-        assertTrue(LocalDateTime.now().isAfter(submissionDto.getStartTime())
-            || LocalDateTime.now().minusSeconds((long) 1).isBefore(submissionDto.getStartTime()));
+        assertTrue(Instant.now().isAfter(submissionDto.getStartTime())
+            || Instant.now().minusSeconds((long) 1).isBefore(submissionDto.getStartTime()));
 
         SubmissionResultDto resultDto = submissionDto.getResults().get(0);
         assertEquals(OUTPUT, resultDto.getUserOutput());
@@ -318,7 +318,7 @@ public class GameTests {
                 .andReturn();
 
         jsonResponse = result.getResponse().getContentAsString();
-        GameDto gameDto = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, GameDto.class);
+        GameDto gameDto = UtilityTestMethods.toObjectInstant(jsonResponse, GameDto.class);
 
         // Confirm that running the code does not create a submission.
         assertEquals(1, gameDto.getPlayers().size());
@@ -348,7 +348,7 @@ public class GameTests {
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        SubmissionDto submissionDto = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, SubmissionDto.class);
+        SubmissionDto submissionDto = UtilityTestMethods.toObjectInstant(jsonResponse, SubmissionDto.class);
 
         assertNotNull(submissionDto);
         assertEquals(CODE, submissionDto.getCode());
@@ -362,7 +362,7 @@ public class GameTests {
                 .andReturn();
 
         jsonResponse = result.getResponse().getContentAsString();
-        GameDto gameDto = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, GameDto.class);
+        GameDto gameDto = UtilityTestMethods.toObjectInstant(jsonResponse, GameDto.class);
 
         assertEquals(1, gameDto.getPlayers().size());
         PlayerDto player = gameDto.getPlayers().get(0);
@@ -372,8 +372,8 @@ public class GameTests {
         assertEquals(submissionDto.getNumCorrect(), submissionDto.getNumTestCases());
         assertNull(submissionDto.getCompilationError());
         assertEquals(RUNTIME, submissionDto.getRuntime());
-        assertTrue(LocalDateTime.now().isAfter(submissionDto.getStartTime())
-            || LocalDateTime.now().minusSeconds((long) 1).isBefore(submissionDto.getStartTime()));
+        assertTrue(Instant.now().isAfter(submissionDto.getStartTime())
+            || Instant.now().minusSeconds((long) 1).isBefore(submissionDto.getStartTime()));
 
         SubmissionResultDto resultDto = submissionDto.getResults().get(0);
         assertEquals(OUTPUT, resultDto.getUserOutput());
@@ -407,14 +407,14 @@ public class GameTests {
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        GameNotificationDto notificationDtoResult = UtilityTestMethods.toObjectLocalDateTime(jsonResponse, GameNotificationDto.class);
+        GameNotificationDto notificationDtoResult = UtilityTestMethods.toObjectInstant(jsonResponse, GameNotificationDto.class);
 
         assertNotNull(notificationDtoResult);
         assertEquals(request.getInitiator(), notificationDtoResult.getInitiator());
         assertEquals(request.getNotificationType(), notificationDtoResult.getNotificationType());
         assertEquals(request.getContent(), notificationDtoResult.getContent());
-        assertTrue(LocalDateTime.now().isAfter(notificationDtoResult.getTime())
-            || LocalDateTime.now().minusSeconds((long) 1).isBefore(notificationDtoResult.getTime()));
+        assertTrue(Instant.now().isAfter(notificationDtoResult.getTime())
+            || Instant.now().minusSeconds((long) 1).isBefore(notificationDtoResult.getTime()));
     }
 
     @Test

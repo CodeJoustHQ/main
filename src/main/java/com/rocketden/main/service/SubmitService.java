@@ -1,7 +1,7 @@
 package com.rocketden.main.service;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,8 +108,6 @@ public class SubmitService {
         
         /**
          * Provide a temporary output to circumvent output parsing error.
-         *
-         * TODO: Implement run code on tester repository, so output not checked.
          * The problem must have at least one test case to work.
          */
         String tempOutput = problemDto.getTestCases().get(0).getOutput();
@@ -186,7 +184,7 @@ public class SubmitService {
             submission.setNumTestCases(testerResponse.getNumTestCases());
             submission.setRuntime(testerResponse.getRuntime());
             submission.setCompilationError(testerResponse.getCompilationError());
-            submission.setStartTime(LocalDateTime.now());
+            submission.setStartTime(Instant.now());
             submission.setPlayerCode(new PlayerCode(request.getCode(), request.getLanguage()));
 
             // Set the SubmissionResult objects, add to the list.

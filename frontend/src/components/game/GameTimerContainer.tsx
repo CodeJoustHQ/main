@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { GameClock, GameTimer } from '../../api/GameTimer';
+import getInstant from '../../api/Utility';
+import ErrorMessage from '../core/Error';
 
 type GameTimerProps = {
   gameTimer: GameTimer | null,
@@ -7,13 +9,45 @@ type GameTimerProps = {
 
 function GameTimerContainer(props: GameTimerProps) {
   const [currentClock, setCurrentClock] = useState<GameClock | null>(null);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [countdownStarted, setCountdownStarted] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
 
-  // Calculate and set the new clock on the frontend.
-  const calculateSetClock = useCallback((gameTimerParam: GameTimer) => {
-    const newCurrentClock = (new Date(gameTimerParam.endTime).getTime() - Date.now()) / 1000;
-    if (newCurrentClock > 0) {
+  const startClock = useCallback((gameTimerParam: GameTimer) => {
+    // Get current time here, find the difference, then begin countdown.
+    getInstant().then((res) => {
+      // Get the local system clock time, and set this last-calculated time.
+      let prevLocalTime: number = Date.now();
+
+      // Get the difference to end time.
+      let tempCountdown: number = (new Date(gameTimerParam.endTime).getTime()
+        - new Date(res).getTime()) / 1000;
+      setCountdownStarted(true);
+      setInterval(() => {
+        const currentLocalTime: number = Date.now();
+        tempCountdown -= (currentLocalTime - prevLocalTime) / 1000;
+        prevLocalTime = currentLocalTime;
+        setCountdown(tempCountdown);
+      }, 1000);
+    }).catch((err) => {
+      // Set an error if the current instant could not be retrieved.
+      setError(err.message);
+    });
+  }, [setCountdown, setCountdownStarted]);
+
+  useEffect(() => {
+    // Set timer if applicable; otherwise, default of null to display loading.
+    if (props.gameTimer && !countdownStarted) {
+      startClock(props.gameTimer);
+    } else if (!countdownStarted) {
+      setCurrentClock(null);
+    }
+  }, [startClock, props, countdownStarted]);
+
+  useEffect(() => {
+    if (countdown && countdown > 0) {
       // Set minutes and its string.
-      const minutes: number = Math.floor(newCurrentClock / 60);
+      const minutes: number = Math.floor(countdown / 60);
       let minutesStr: string;
       if (minutes >= 10) {
         minutesStr = `${minutes}`;
@@ -23,7 +57,7 @@ function GameTimerContainer(props: GameTimerProps) {
         minutesStr = '00';
       }
 
-      const seconds: number = Math.floor(newCurrentClock % 60);
+      const seconds: number = Math.floor(countdown % 60);
       let secondsStr: string;
       if (seconds >= 10) {
         secondsStr = `${seconds}`;
@@ -41,26 +75,14 @@ function GameTimerContainer(props: GameTimerProps) {
       // Set null to indicate that the timer has ended.
       setCurrentClock(null);
     }
-  }, []);
-
-  const updateClock = useCallback((gameTimerParam: GameTimer) => {
-    setInterval(() => calculateSetClock(gameTimerParam), 1000);
-  }, [calculateSetClock]);
-
-  useEffect(() => {
-    // Set timer if applicable; otherwise, default of null to display loading.
-    if (props.gameTimer) {
-      updateClock(props.gameTimer);
-    } else {
-      setCurrentClock(null);
-    }
-  }, [updateClock, props]);
+  }, [countdown]);
 
   return (
     <div>
       Time:
       {' '}
       {(currentClock) ? `${currentClock.minutes}:${currentClock.seconds}` : 'Loading...'}
+      {error ? <ErrorMessage message={error} /> : null}
     </div>
   );
 }

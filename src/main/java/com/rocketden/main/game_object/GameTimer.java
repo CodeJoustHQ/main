@@ -3,7 +3,7 @@ package com.rocketden.main.game_object;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Timer;
 
@@ -30,12 +30,12 @@ public class GameTimer {
     );
 
     // The time that the game began.
-    private LocalDateTime startTime = LocalDateTime.now();
+    private Instant startTime = Instant.now();
 
     // The projected game duration, in seconds.
     private Long duration;
 
-    private LocalDateTime endTime;
+    private Instant endTime;
 
     private boolean timeUp = false;
 

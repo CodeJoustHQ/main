@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Getter
@@ -17,7 +17,7 @@ public class Submission {
     private List<SubmissionResult> results;
 
     // The time that the submission was received.
-    private LocalDateTime startTime = LocalDateTime.now();
+    private Instant startTime = Instant.now();
 
     private Integer numCorrect;
 

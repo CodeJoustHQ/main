@@ -31,7 +31,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -175,8 +175,8 @@ public class GameSocketTests {
         assertNull(notificationDto.getInitiator());
         assertEquals(NotificationType.TIME_LEFT,
             notificationDto.getNotificationType());
-        assertTrue(LocalDateTime.now().isAfter(notificationDto.getTime())
-            || LocalDateTime.now().minusSeconds((long) 1).isBefore(notificationDto.getTime()));
+        assertTrue(Instant.now().isAfter(notificationDto.getTime())
+            || Instant.now().minusSeconds((long) 1).isBefore(notificationDto.getTime()));
         assertEquals(TIME_LEFT, notificationDto.getContent());
     }
 
