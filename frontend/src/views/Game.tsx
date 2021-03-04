@@ -189,15 +189,20 @@ function GamePage() {
           setStateFromGame(res);
           setFullPageLoading(false);
 
+          let matchFound = false;
+
           // If this user refreshed and has already submitted code, load and save their latest code
           res.players.forEach((player) => {
             if (player.user.userId === location.state.currentUser.userId && player.code) {
               setDefaultCodeFromProblems(res.problems, player.code, player.language as Language);
-            } else {
-              // Otherwise, proceed as normal with the default Python language
-              setDefaultCodeFromProblems(res.problems, '', Language.Python);
+              matchFound = true;
             }
           });
+
+          // If no previous code, proceed as normal with the default Python language
+          if (!matchFound) {
+            setDefaultCodeFromProblems(res.problems, '', Language.Python);
+          }
         })
         .catch((err) => {
           setFullPageLoading(false);

@@ -51,29 +51,38 @@ function GameResultsPage() {
           });
       };
 
-      // Get latest game information
-      getGame(location.state.roomId).then((res) => {
-        setPlayers(res.players);
-        setHost(res.room.host);
+      const subscribeCallback = (result: Message) => {
+        const updatedGame: Game = JSON.parse(result.body);
 
-        // Check if host elected to play again
-        if (res.playAgain) {
-          playAgainAction(res);
+        // Update leaderboard with last second submissions
+        setPlayers(updatedGame.players);
+
+        // Disconnect users from socket and then redirect them to the lobby page
+        if (updatedGame.playAgain) {
+          playAgainAction(updatedGame);
         }
+      };
 
-        const subscribeCallback = (result: Message) => {
-          const updatedGame: Game = JSON.parse(result.body);
+      /**
+       * Connect, subscribe, and then finally get the game details. Doing so in this order ensures
+       * that any late submissions are properly received (either through the socket update or
+       * through the get game request) and reflected on the leaderboard.
+       */
+      connect(location.state.roomId, location.state.currentUser.userId!).then(() => {
+        subscribe(routes(location.state.roomId).subscribe_game, subscribeCallback)
+          .then(() => {
+            // Get latest game information
+            getGame(location.state.roomId).then((res) => {
+              setPlayers(res.players);
+              setHost(res.room.host);
 
-          // Disconnect users from socket and then redirect them to the lobby page
-          if (updatedGame.playAgain) {
-            playAgainAction(updatedGame);
-          }
-        };
-
-        connect(res.room.roomId, location.state.currentUser.userId!).then(() => {
-          subscribe(routes(res.room.roomId).subscribe_game, subscribeCallback)
-            .catch((err) => setError(err.message));
-        }).catch((err) => setError(err.message));
+              // Check if host elected to play again
+              if (res.playAgain) {
+                playAgainAction(res);
+              }
+            }).catch((err) => setError(err.message));
+          })
+          .catch((err) => setError(err.message));
       }).catch((err) => setError(err.message));
     } else {
       history.replace('/game/join', {
