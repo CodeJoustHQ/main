@@ -5,10 +5,10 @@ import Language, { fromString, languageToEditorLanguage } from '../../api/Langua
 import { DefaultCodeType } from '../../api/Problem';
 
 type EditorProps = {
-  onLanguageChange: (language: string) => void,
+  onLanguageChange: (language: Language) => void,
   onCodeChange: (code: string) => void,
   codeMap: DefaultCodeType | null,
-  defaultLanguage: string,
+  defaultLanguage: Language,
 };
 
 const Content = styled.div`
@@ -21,8 +21,12 @@ function ResizableMonacoEditor(props: EditorProps) {
     onLanguageChange, onCodeChange, codeMap, defaultLanguage,
   } = props;
 
-  const [currentLanguage, setCurrentLanguage] = useState<Language>(fromString(defaultLanguage));
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(defaultLanguage);
   const [codeEditor, setCodeEditor] = useState<any>(null);
+
+  useEffect(() => {
+    setCurrentLanguage(defaultLanguage);
+  }, [defaultLanguage]);
 
   const handleEditorDidMount = (editor: any) => {
     setCodeEditor(editor);
@@ -55,12 +59,12 @@ function ResizableMonacoEditor(props: EditorProps) {
   return (
     <Content>
       <select
-        onChange={(e) => handleLanguageChange(fromString(e.target.value))}
-        value={fromString(currentLanguage)}
+        onChange={(e) => handleLanguageChange(e.target.value as Language)}
+        value={currentLanguage}
       >
         {
           Object.keys(Language).map((language) => (
-            <option key={language} value={language}>{language}</option>
+            <option key={language} value={fromString(language)}>{language}</option>
           ))
         }
       </select>

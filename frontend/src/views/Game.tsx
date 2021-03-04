@@ -33,7 +33,7 @@ import { GameTimer } from '../api/GameTimer';
 import { TextButton } from '../components/core/Button';
 import { connect, disconnect, routes, send, subscribe, } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
-import Language, { languageToEditorLanguage } from '../api/Language';
+import Language, { fromString } from '../api/Language';
 
 type LocationState = {
   roomId: string,
@@ -59,7 +59,7 @@ function GamePage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [currentLanguage, setCurrentLanguage] = useState('python');
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.Python);
   const [currentCode, setCurrentCode] = useState('');
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
@@ -111,7 +111,7 @@ function GamePage() {
 
       // Set this user's current code and language
       setCurrentCode(codeMap[language]);
-      setCurrentLanguage(languageToEditorLanguage(language));
+      setCurrentLanguage(language);
 
       setDefaultCodeList(result);
     }).catch((err) => {
