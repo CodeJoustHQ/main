@@ -8,6 +8,7 @@ type EditorProps = {
   onLanguageChange: (language: string) => void,
   onCodeChange: (code: string) => void,
   codeMap: DefaultCodeType | null,
+  defaultLanguage: string,
 };
 
 const Content = styled.div`
@@ -16,10 +17,12 @@ const Content = styled.div`
 
 // This function refreshes the width of Monaco editor upon change in container size
 function ResizableMonacoEditor(props: EditorProps) {
-  const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.Python);
-  const [codeEditor, setCodeEditor] = useState<any>(null);
+  const {
+    onLanguageChange, onCodeChange, codeMap, defaultLanguage,
+  } = props;
 
-  const { onLanguageChange, onCodeChange, codeMap } = props;
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(fromString(defaultLanguage));
+  const [codeEditor, setCodeEditor] = useState<any>(null);
 
   const handleEditorDidMount = (editor: any) => {
     setCodeEditor(editor);

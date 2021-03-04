@@ -7,8 +7,15 @@ import Editor from '../components/game/Editor';
 import { DefaultCodeType, getDefaultCodeMap, Problem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
 import {
-  MainContainer, CenteredContainer, FlexContainer, FlexInfoBar,
-  Panel, SplitterContainer, FlexLeft, FlexCenter, FlexRight,
+  CenteredContainer,
+  FlexCenter,
+  FlexContainer,
+  FlexInfoBar,
+  FlexLeft,
+  FlexRight,
+  MainContainer,
+  Panel,
+  SplitterContainer,
 } from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
 import { ProblemHeaderText, Text } from '../components/core/Text';
@@ -19,18 +26,14 @@ import Loading from '../components/core/Loading';
 import { User } from '../api/User';
 import { GameNotification, NotificationType } from '../api/GameNotification';
 import Difficulty from '../api/Difficulty';
-import {
-  Game, getGame, Player, Submission, submitSolution, runSolution, SubmissionType,
-} from '../api/Game';
+import { Game, getGame, Player, runSolution, Submission, SubmissionType, submitSolution, } from '../api/Game';
 import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
 import { TextButton } from '../components/core/Button';
-import {
-  connect,
-  disconnect, routes, send, subscribe,
-} from '../api/Socket';
+import { connect, disconnect, routes, send, subscribe, } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
+import Language, { languageToEditorLanguage } from '../api/Language';
 
 type LocationState = {
   roomId: string,
@@ -88,7 +91,8 @@ function GamePage() {
     setTimeUp(newGame.gameTimer.timeUp);
   };
 
-  const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[]) => {
+  const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
+    code: string, language: Language) => {
     const promises: Promise<DefaultCodeType>[] = [];
     problemsParam.forEach((problem) => {
       if (problem && problem.problemId) {
@@ -98,11 +102,22 @@ function GamePage() {
 
     // Get the result of promises and set the default code list.
     Promise.all(promises).then((result) => {
+      const codeMap = result[0];
+
+      // If previous code and language specified, save those as defaults
+      if (code) {
+        codeMap[language] = code;
+      }
+
+      // Set this user's current code and language
+      setCurrentCode(codeMap[language]);
+      setCurrentLanguage(languageToEditorLanguage(language));
+
       setDefaultCodeList(result);
     }).catch((err) => {
       setError(err.message);
     });
-  }, [setDefaultCodeList]);
+  }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage]);
 
   /**
    * Display the notification as a callback from the notification
@@ -172,8 +187,17 @@ function GamePage() {
       getGame(location.state.roomId)
         .then((res) => {
           setStateFromGame(res);
-          setDefaultCodeFromProblems(res.problems);
           setFullPageLoading(false);
+
+          // If this user refreshed and has already submitted code, load and save their latest code
+          res.players.forEach((player) => {
+            if (player.user.userId === location.state.currentUser.userId && player.code) {
+              setDefaultCodeFromProblems(res.problems, player.code, player.language as Language);
+            } else {
+              // Otherwise, proceed as normal with the default Python language
+              setDefaultCodeFromProblems(res.problems, '', Language.Python);
+            }
+          });
         })
         .catch((err) => {
           setFullPageLoading(false);
@@ -356,6 +380,7 @@ function GamePage() {
                 onCodeChange={setCurrentCode}
                 onLanguageChange={setCurrentLanguage}
                 codeMap={defaultCodeList[0]}
+                defaultLanguage={currentLanguage}
               />
             </Panel>
 
