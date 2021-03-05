@@ -1,6 +1,7 @@
 package com.rocketden.main.model.problem;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -32,6 +33,7 @@ public class Problem {
     private String problemId = UUID.randomUUID().toString();
 
     private String name;
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     /**

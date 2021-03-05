@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
+import MarkdownEditor from 'rich-markdown-editor';
 import { deleteProblem, Problem, ProblemIOType } from '../../api/Problem';
 import {
   ConsoleTextArea, LargeInputButton, TextInput, CheckboxInput,
@@ -10,6 +11,14 @@ import { DifficultyButton, ProblemIOTypeButton, SmallButton } from '../core/Butt
 import { MediumText, Text } from '../core/Text';
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
+
+const StyledMarkdownEditor = styled(MarkdownEditor)`
+  text-align: left;
+  padding: 35px;
+  border-radius: 5px;
+  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
+  background: ${({ theme }) => theme.colors.white};
+`;
 
 const Content = styled.div`
   padding: 10px;
@@ -62,6 +71,9 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
   // Handle updating of enum-type fields
   const handleEnumChange = (name: string, value: any) => handleChange({ target: { name, value } });
+
+  // Handle description change
+  const handleDescriptionChange = (value: string) => handleChange({ target: { name: 'description', value } });
 
   // Handle updating of problem inputs
   const handleInputChange = (index: number, name: string, type: ProblemIOType) => {
@@ -139,10 +151,9 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       />
 
       <MediumText>Description:</MediumText>
-      <ConsoleTextArea
-        name="description"
-        value={newProblem.description}
-        onChange={handleChange}
+      <StyledMarkdownEditor
+        defaultValue={newProblem.description}
+        onChange={(getNewValue) => handleDescriptionChange(getNewValue())}
       />
 
       <MediumText>Difficulty:</MediumText>
