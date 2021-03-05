@@ -7,15 +7,9 @@ import Editor from '../components/game/Editor';
 import { DefaultCodeType, getDefaultCodeMap, Problem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
 import {
-  CenteredContainer,
-  FlexCenter,
-  FlexContainer,
-  FlexInfoBar,
-  FlexLeft,
-  FlexRight,
-  MainContainer,
-  Panel,
-  SplitterContainer,
+  CenteredContainer, FlexCenter, FlexContainer,
+  FlexInfoBar, FlexLeft, FlexRight, MainContainer,
+  Panel, SplitterContainer,
 } from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
 import { ProblemHeaderText, Text } from '../components/core/Text';
@@ -26,14 +20,19 @@ import Loading from '../components/core/Loading';
 import { User } from '../api/User';
 import { GameNotification, NotificationType } from '../api/GameNotification';
 import Difficulty from '../api/Difficulty';
-import { Game, getGame, Player, runSolution, Submission, SubmissionType, submitSolution, } from '../api/Game';
+import {
+  Game, getGame, Player, runSolution,
+  Submission, SubmissionType, submitSolution,
+} from '../api/Game';
 import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
 import { TextButton } from '../components/core/Button';
-import { connect, disconnect, routes, send, subscribe, } from '../api/Socket';
+import {
+  connect, disconnect, routes, send, subscribe,
+} from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
-import Language, { fromString } from '../api/Language';
+import Language from '../api/Language';
 
 type LocationState = {
   roomId: string,

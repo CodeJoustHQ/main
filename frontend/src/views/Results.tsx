@@ -3,15 +3,18 @@ import styled from 'styled-components';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
 import { LargeText, Text } from '../components/core/Text';
-import { getGame, Game, Player, playAgain } from '../api/Game';
+import {
+  getGame, Game, Player, playAgain,
+} from '../api/Game';
 import { checkLocationState } from '../util/Utility';
 import { errorHandler } from '../api/Error';
 import PlayerResultsCard from '../components/card/PlayerResultsCard';
 import { PrimaryButton } from '../components/core/Button';
-import { Room } from '../api/Room';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
-import { connect, disconnect, routes, subscribe } from '../api/Socket';
+import {
+  connect, disconnect, routes, subscribe,
+} from '../api/Socket';
 import { User } from '../api/User';
 
 const Content = styled.div`
@@ -56,6 +59,8 @@ function GameResultsPage() {
 
         // Update leaderboard with last second submissions
         setPlayers(updatedGame.players);
+        // Set new host if the previous host refreshes or leaves
+        setHost(updatedGame.room.host);
 
         // Disconnect users from socket and then redirect them to the lobby page
         if (updatedGame.playAgain) {
