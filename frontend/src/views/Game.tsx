@@ -83,7 +83,7 @@ function GamePage() {
 
   const setStateFromGame = (newGame: Game) => {
     setGame(newGame);
-    setPlayers(newGame.players.map((p) => ({ ...p })));
+    setPlayers(newGame.players);
     setGameTimer(newGame.gameTimer);
     setProblems(newGame.problems);
     setAllSolved(newGame.allSolved);

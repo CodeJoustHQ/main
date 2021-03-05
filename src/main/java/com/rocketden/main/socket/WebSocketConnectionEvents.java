@@ -93,6 +93,7 @@ public class WebSocketConnectionEvents {
             try {
                 Game game = gameService.getGameFromRoomId(room.getRoomId());
                 game.setRoom(room);
+                game.getPlayers().get(user.getUserId()).setUser(user);
                 socketService.sendSocketUpdate(GameMapper.toDto(game));
             } catch (ApiException ignored) {}
         }
@@ -120,6 +121,7 @@ public class WebSocketConnectionEvents {
             try {
                 Game game = gameService.getGameFromRoomId(room.getRoomId());
                 game.setRoom(room);
+                game.getPlayers().get(user.getUserId()).setUser(user);
                 socketService.sendSocketUpdate(GameMapper.toDto(game));
             } catch (ApiException ignored) {}
         }

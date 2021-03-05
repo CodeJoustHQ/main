@@ -20,7 +20,6 @@ with an explanation if you would like access to this for some reason. Otherwise,
 replace the `spring.datasource` variables in `application.properties` with your
 own database to proceed. 
 
-
 Run `./mvnw clean install` to build.
 
 Run `./mvnw test` to run tests.
@@ -37,3 +36,41 @@ and run `cd ./frontend && npm start` in another. You can then use
 [localhost:3000](http://localhost:3000) instead, and any changes to frontend files will
 immediately be reflected (so you don't need to re-run Maven every time). Be aware that 
 occasional socket connection errors can occur when using this method. 
+
+## File Structure
+
+The service is written using Java + Spring Boot on the backend and TypeScript + React on
+the frontend. Data is stored in an SQL database. 
+
+The frontend files are mostly located in `frontend/src`:
+
+| `frontend/src/*`           | Description                |
+| -------------------------- | -------------------------- |
+| `api`                   | Temp                 |
+| `components`                  | Temp                       |
+| `util`                   | Temp                    |
+| `views`                | Temp                        |
+
+
+The backend files are located under `src/main/java/com/rocketden/main`:
+
+
+| `src/.../main/*`           | Description                |
+| -------------------------- | -------------------------- |
+| `config`                   | Temp                 |
+| `controller`                  | Temp                       |
+| `dao`                   | Temp                    |
+| `dto`                | Temp                        |
+| `exception`                | Temp                        |
+| `game_object`                | Temp                        |
+| `model`                | Temp                        |
+| `service`                | Temp                        |
+| `socket`                | Temp                        |
+| `util`                | Temp                        |
+
+
+Various configuration properties are set in 
+`src/main/resources/application.properties`, and unit/integration tests are
+located under `src/test/java/com/rocketden/main`. 
+
+

@@ -4,6 +4,7 @@ import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameNotificationDto;
 import com.rocketden.main.dto.game.PlayAgainRequest;
+import com.rocketden.main.dto.game.PlayerDto;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
@@ -225,7 +226,8 @@ public class GameSocketTests {
     @Test
     public void socketReceivesMessageOnConnectDisconnect() throws Exception {
         UserDto user = room.getUsers().get(1);
-        assertNotEquals(room.getHost(), user);
+        UserDto prevHost = room.getHost();
+        assertNotEquals(prevHost, user);
         assertNull(user.getSessionId());
 
         // The second user connects to the stomp client
@@ -248,7 +250,13 @@ public class GameSocketTests {
         assertNotNull(gameDto);
 
         user = gameDto.getRoom().getUsers().get(1);
+        // Check sessionId for user is not null in both room and player list
         assertNotNull(user.getSessionId());
+        for (PlayerDto player : gameDto.getPlayers()) {
+            if (player.getUser().equals(user)) {
+                assertNotNull(player.getUser().getSessionId());
+            }
+        }
 
         // The host then disconnects
         hostSession.disconnect();
@@ -257,5 +265,11 @@ public class GameSocketTests {
         gameDto = userBlockingQueue.poll(DURATION, SECONDS);
         assertNotNull(gameDto);
         assertEquals(gameDto.getRoom().getHost(), user);
+
+        for (PlayerDto player : gameDto.getPlayers()) {
+            if (player.getUser().equals(prevHost)) {
+                assertNull(player.getUser().getSessionId());
+            }
+        }
     }
 }

@@ -28,7 +28,7 @@ const HoverBar = styled.div`
   border-radius: 5px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   
-  height: 50px;
+  //height: 50px;
   padding: 10px;
   
   // -(height + 2 * padding - 15px)
@@ -77,14 +77,15 @@ function LeaderboardCard(props: LeaderboardCardProps) {
     return `${diffMinutes} min ago`;
   };
 
-  if (!isCurrentPlayer) console.log(player); // TODO
-
   return (
     <Content
       onMouseEnter={() => setShowHover(true)}
       onMouseLeave={() => setShowHover(false)}
     >
-      <PlayerIcon hexColor={color.hexColor} active={Boolean(player.user.sessionId)} />
+      <PlayerIcon
+        hexColor={color.hexColor}
+        active={Boolean(player.user.sessionId || isCurrentPlayer)}
+      />
       <LowMarginText>{`${place}. ${getDisplayNickname()}`}</LowMarginText>
 
       {showHover ? (
