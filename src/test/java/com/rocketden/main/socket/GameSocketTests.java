@@ -37,6 +37,7 @@ import java.util.concurrent.BlockingQueue;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -221,6 +222,40 @@ public class GameSocketTests {
         assertTrue(gameDto.getPlayAgain());
     }
 
-    // TODO: message sent on disconnect and reconnect
-    // TODO: host updated and session id updated
+    @Test
+    public void socketReceivesMessageOnConnectDisconnect() throws Exception {
+        UserDto user = room.getUsers().get(1);
+        assertNotEquals(room.getHost(), user);
+        assertNull(user.getSessionId());
+
+        // The second user connects to the stomp client
+        StompSession session = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, user.getUserId(), this.port);
+
+        session.subscribe(String.format(GAME_SUBSCRIBE_ENDPOINT, room.getRoomId()), new StompFrameHandler() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return GameDto.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                userBlockingQueue.add((GameDto) payload);
+            }
+        });
+
+        // Message should be received on user connect
+        GameDto gameDto = userBlockingQueue.poll(DURATION, SECONDS);
+        assertNotNull(gameDto);
+
+        user = gameDto.getRoom().getUsers().get(1);
+        assertNotNull(user.getSessionId());
+
+        // The host then disconnects
+        hostSession.disconnect();
+
+        // After disconnecting, the host should be changed
+        gameDto = userBlockingQueue.poll(DURATION, SECONDS);
+        assertNotNull(gameDto);
+        assertEquals(gameDto.getRoom().getHost(), user);
+    }
 }
