@@ -317,6 +317,7 @@ function LobbyPage() {
   // Redirect user to game page if room is active.
   useEffect(() => {
     if (active) {
+      // eslint-disable-next-line no-unused-expressions
       subscription?.unsubscribe();
       history.replace('/game', {
         roomId: currentRoomId,
