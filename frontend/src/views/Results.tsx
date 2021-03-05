@@ -28,7 +28,7 @@ function GameResultsPage() {
   const location = useLocation<LocationState>();
 
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -73,6 +73,7 @@ function GameResultsPage() {
           .then(() => {
             // Get latest game information
             getGame(location.state.roomId).then((res) => {
+              setLoading(false);
               setPlayers(res.players);
               setHost(res.room.host);
 
@@ -118,7 +119,7 @@ function GameResultsPage() {
 
       {currentUser && currentUser?.userId === host?.userId
         ? <PrimaryButton onClick={playAgainAction}>Play Again</PrimaryButton>
-        : <Text>Waiting for the host to choose whether to play again...</Text>}
+        : <Text>{!loading && 'Waiting for the host to choose whether to play again...'}</Text>}
     </Content>
   );
 }

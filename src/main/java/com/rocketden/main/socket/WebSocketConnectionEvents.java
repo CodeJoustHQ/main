@@ -4,10 +4,14 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import com.rocketden.main.dao.UserRepository;
+import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
+import com.rocketden.main.exception.api.ApiException;
+import com.rocketden.main.game_object.Game;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
+import com.rocketden.main.service.GameManagementService;
 import com.rocketden.main.service.RoomService;
 import com.rocketden.main.service.SocketService;
 
@@ -29,16 +33,19 @@ public class WebSocketConnectionEvents {
     private final UserRepository userRepository;
     private final SocketService socketService;
     private final RoomService roomService;
+    private final GameManagementService gameService;
 
     private static final String CONNECT_MESSAGE = "simpConnectMessage";
     private static final String NATIVE_HEADERS = "nativeHeaders";
     public static final String USER_ID_KEY = "userId";
 
     @Autowired
-    public WebSocketConnectionEvents(UserRepository userRepository, SocketService socketService, RoomService roomService) {
+    public WebSocketConnectionEvents(UserRepository userRepository, SocketService socketService,
+                                     RoomService roomService, GameManagementService gameService) {
         this.userRepository = userRepository;
         this.socketService = socketService;
         this.roomService = roomService;
+        this.gameService = gameService;
     }
 
     @EventListener
@@ -81,6 +88,13 @@ public class WebSocketConnectionEvents {
             Room room = user.getRoom();
             RoomDto roomDto = RoomMapper.toDto(room);
             socketService.sendSocketUpdate(roomDto);
+
+            // If a game exists, update the room info for that game
+            try {
+                Game game = gameService.getGameFromRoomId(room.getRoomId());
+                game.setRoom(room);
+                socketService.sendSocketUpdate(GameMapper.toDto(game));
+            } catch (ApiException ignored) {}
         }
     }
 
@@ -101,6 +115,13 @@ public class WebSocketConnectionEvents {
             Room room = user.getRoom();
             RoomDto roomDto = roomService.conditionallyUpdateRoomHost(room, user);
             socketService.sendSocketUpdate(roomDto);
+
+            // If a game exists, update the room info for that game
+            try {
+                Game game = gameService.getGameFromRoomId(room.getRoomId());
+                game.setRoom(room);
+                socketService.sendSocketUpdate(GameMapper.toDto(game));
+            } catch (ApiException ignored) {}
         }
     }
 }

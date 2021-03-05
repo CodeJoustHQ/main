@@ -54,7 +54,7 @@ public class GameManagementService {
         currentGameMap = new HashMap<>();
     }
 
-    protected Game getGameFromRoomId(String roomId) {
+    public Game getGameFromRoomId(String roomId) {
         Game game = currentGameMap.get(roomId);
         if (game == null) {
             throw new ApiException(GameError.NOT_FOUND);

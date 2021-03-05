@@ -220,4 +220,7 @@ public class GameSocketTests {
 
         assertTrue(gameDto.getPlayAgain());
     }
+
+    // TODO: message sent on disconnect and reconnect
+    // TODO: host updated and session id updated
 }
