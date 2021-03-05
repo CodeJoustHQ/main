@@ -77,7 +77,7 @@ function LeaderboardCard(props: LeaderboardCardProps) {
     return `${diffMinutes} min ago`;
   };
 
-  console.log(player);
+  if (!isCurrentPlayer) console.log(player); // TODO
 
   return (
     <Content
