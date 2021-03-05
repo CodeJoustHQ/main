@@ -77,18 +77,21 @@ function LeaderboardCard(props: LeaderboardCardProps) {
     return `${diffMinutes} min ago`;
   };
 
+  console.log(player);
+
   return (
     <Content
       onMouseEnter={() => setShowHover(true)}
       onMouseLeave={() => setShowHover(false)}
     >
-      <PlayerIcon hexColor={color.hexColor} />
+      <PlayerIcon hexColor={color.hexColor} active={Boolean(player.user.sessionId)} />
       <LowMarginText>{`${place}. ${getDisplayNickname()}`}</LowMarginText>
 
       {showHover ? (
         <HoverBar>
           <SmallText>{getScoreDisplay()}</SmallText>
           <SmallText>{`Last submitted: ${getSubmissionTime()}`}</SmallText>
+          {!player.user.sessionId ? <SmallText>(inactive)</SmallText> : null}
         </HoverBar>
       ) : null}
     </Content>

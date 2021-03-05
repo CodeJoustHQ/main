@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Player } from '../../api/Game';
-import { LowMarginText, Text } from '../core/Text';
+import { LowMarginText, SmallText, Text } from '../core/Text';
 import PlayerIcon from './PlayerIcon';
 import {
   CenteredContainer, FlexHorizontalContainer, FlexLeft, FlexRight,
@@ -48,9 +48,10 @@ function PlayerResultsCard(props: PlayerResultsCardProps) {
       <FlexHorizontalContainer>
         <FlexLeft>
           <CenteredContainer>
-            <PlayerIcon hexColor={color.hexColor} />
+            <PlayerIcon hexColor={color.hexColor} active={Boolean(player.user.sessionId)} />
             <br />
             <LowMarginText>{`${place}. ${getDisplayNickname()}`}</LowMarginText>
+            {player.user.sessionId ? <LowMarginText> (inactive)</LowMarginText> : null}
           </CenteredContainer>
         </FlexLeft>
 
