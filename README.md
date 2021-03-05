@@ -46,10 +46,10 @@ The frontend files are mostly located in `frontend/src`:
 
 | `frontend/src/*`           | Description                |
 | -------------------------- | -------------------------- |
-| `api`                   | Temp                 |
-| `components`                  | Temp                       |
-| `util`                   | Temp                    |
-| `views`                | Temp                        |
+| `api`                      | Functions to initiate calls to the backend REST endpoints |
+| `components`               | React components that can be used/reused on various pages |
+| `util`                     | Utility functions |
+| `views`                    | Different pages of the application |
 
 
 The backend files are located under `src/main/java/com/rocketden/main`:
@@ -57,16 +57,16 @@ The backend files are located under `src/main/java/com/rocketden/main`:
 
 | `src/.../main/*`           | Description                |
 | -------------------------- | -------------------------- |
-| `config`                   | Temp                 |
-| `controller`                  | Temp                       |
-| `dao`                   | Temp                    |
-| `dto`                | Temp                        |
-| `exception`                | Temp                        |
-| `game_object`                | Temp                        |
-| `model`                | Temp                        |
-| `service`                | Temp                        |
-| `socket`                | Temp                        |
-| `util`                | Temp                        |
+| `config`                   | Code used for configuration purposes |
+| `controller`               | Classes used to handle incoming REST calls |
+| `dao`                      | Interfaces containing methods used to fetch from the database |
+| `dto`                      | Objects passed to and from the frontend (plus mapper classes) |
+| `exception`                | Exception handlers and error enums |
+| `game_object`              | Game-related objects used on the backend |
+| `model`                    | Entity classes corresponding to database return objects |
+| `service`                  | Service classes that implement most of the app's functionality |
+| `socket`                   | Socket events that occur on connect/disconnect |
+| `util`                     | Utility functions |
 
 
 Various configuration properties are set in 
