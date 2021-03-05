@@ -1,22 +1,18 @@
 import styled from 'styled-components';
 
-type PositionProps = {
-  top: number,
+export type Coordinate = {
+  x: number,
+  y: number,
 }
 
-const FloatingUserCircle = styled.div<PositionProps>`
+export const FloatingUserCircle = styled.div<Coordinate>`
   position: absolute;
-  top: ${(props) => (props.top ? '20px' : '0px')};
+  top: 20px;
   left: 20px;
   width: 100px;
   height: 100px;
   background: linear-gradient(207.68deg, #14D633 10.68%, #DAFFB5 91.96%);
   border-radius: 50%;
   transition: left 0.25s ease;
-  
-  &:hover {
-    left: 30px;
-  }
+  transform: translate(${({ x }) => x}px, ${({ y }) => y}px);
 `;
-
-export default FloatingUserCircle;
