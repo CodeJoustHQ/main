@@ -1,5 +1,6 @@
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
+import '@fontsource/titillium-web';
 
 export const ThemeConfig: any = {
   colors: {
@@ -14,7 +15,7 @@ export const ThemeConfig: any = {
     lightGray: 'lightgray',
     white: 'white',
   },
-  font: 'Roboto',
+  font: 'Titillium Web',
   fontSize: {
     xSmall: '0.4rem',
     small: '0.6rem',

@@ -6,6 +6,7 @@ export const DefaultButton = styled.button`
   border-radius: 0.25rem;
   margin: 1.2rem;
   font-size: ${({ theme }) => theme.fontSize.default};
+  font-family: ${({ theme }) => theme.font};
   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
   
   &:hover {
