@@ -79,5 +79,4 @@ export const LandingPageContainer = styled.div`
   position: relative;
   margin: 0 auto;
   width: 66.666%;
-  min-width: 450px;
 `;
