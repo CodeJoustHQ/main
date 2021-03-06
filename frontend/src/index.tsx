@@ -11,15 +11,12 @@ const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
   html {
     height: 100vh;
     min-width: 640px;
-    // @ts-ignore
     font-family: ${({ theme }) => theme.font};
-    // @ts-ignore
+    font-weight: 400;
     font-size: ${({ theme }) => theme.fontSize.globalDefault};
-    // @ts-ignore
     color: ${({ theme }) => theme.colors.text};
     
     @media (max-width: 800px) {
-      // @ts-ignore
       font-size: ${({ theme }) => theme.fontSize.globalSmall};
     }
   }

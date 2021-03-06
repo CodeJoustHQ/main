@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { PrimaryButtonLink, TextLink } from '../components/core/Link';
-import { LandingHeaderText } from '../components/core/Text';
+import { LandingHeaderText, LandingHeaderTitle } from '../components/core/Text';
 import { FloatingUserCircle, Coordinate } from '../components/special/FloatingUserCircle';
 
 function LandingPage() {
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
+  const movementReduction: number = 40;
 
   const mouseMoveHandler = useCallback((e: MouseEvent) => {
     setMousePosition({ x: e.clientX, y: e.clientY });
@@ -17,18 +18,21 @@ function LandingPage() {
   return (
     <div>
       <FloatingUserCircle
-        x={mousePosition.x / 50}
-        y={mousePosition.x / 50}
+        x={mousePosition.x / movementReduction}
+        y={mousePosition.y / movementReduction}
       />
+      <LandingHeaderTitle>
+        CodeJoust
+      </LandingHeaderTitle>
       <LandingHeaderText>
-        Practice coding by competing against your friends.
+        Compete live against friends and classmates to solve coding challenges.
       </LandingHeaderText>
-      <PrimaryButtonLink to="/game/join">
-        Join a Game
+      <PrimaryButtonLink to="/game/create">
+        Create a room
       </PrimaryButtonLink>
       <br />
-      <TextLink to="/game/create">
-        Or create a room &#8594;
+      <TextLink to="/game/join">
+        Or join an existing room &#8594;
       </TextLink>
     </div>
   );

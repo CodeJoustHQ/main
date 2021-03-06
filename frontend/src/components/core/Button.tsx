@@ -21,14 +21,14 @@ export const DefaultButton = styled.button`
 `;
 
 export const PrimaryButton = styled(DefaultButton)<any>`
-  font-size: ${({ theme }) => theme.fontSize.large};
-  font-weight: bold;
-  background-color: ${({ theme }) => theme.colors.blue};
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  font-weight: 400;
+  background: linear-gradient(228.67deg, #133ED7 15.07%, #91BDFF 89.32%);
   color: ${({ theme }) => theme.colors.white};
-  width: ${({ width }) => width || '32vw'};
-  height: ${({ height }) => height || '8vw'};
-  min-width: 280px;
-  min-height: 70px;
+  width: ${({ width }) => width || '16vw'};
+  height: ${({ height }) => height || '4vw'};
+  min-width: 70px;
+  min-height: 20px;
 
   &:disabled {
     background-color: ${({ theme }) => theme.colors.gray};

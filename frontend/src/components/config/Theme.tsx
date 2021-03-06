@@ -1,6 +1,7 @@
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
 import '@fontsource/titillium-web';
+import '@fontsource/titillium-web/700.css';
 
 export const ThemeConfig: any = {
   colors: {
