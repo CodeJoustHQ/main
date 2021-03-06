@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { LandingPageContainer } from '../components/core/Container';
 import { PrimaryButtonLink, TextLink } from '../components/core/Link';
 import { LandingHeaderText, LandingHeaderTitle } from '../components/core/Text';
 import { FloatingUserCircle, Coordinate } from '../components/special/FloatingUserCircle';
@@ -16,7 +17,7 @@ function LandingPage() {
   }, [mouseMoveHandler]);
 
   return (
-    <div>
+    <LandingPageContainer>
       <FloatingUserCircle
         x={mousePosition.x / movementReduction}
         y={mousePosition.y / movementReduction}
@@ -34,7 +35,7 @@ function LandingPage() {
       <TextLink to="/game/join">
         Or join an existing room &#8594;
       </TextLink>
-    </div>
+    </LandingPageContainer>
   );
 }
 

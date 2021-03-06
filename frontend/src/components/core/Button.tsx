@@ -27,8 +27,8 @@ export const PrimaryButton = styled(DefaultButton)<any>`
   color: ${({ theme }) => theme.colors.white};
   width: ${({ width }) => width || '16vw'};
   height: ${({ height }) => height || '4vw'};
-  min-width: 70px;
-  min-height: 20px;
+  min-width: 150px;
+  min-height: 40px;
 
   &:disabled {
     background-color: ${({ theme }) => theme.colors.gray};

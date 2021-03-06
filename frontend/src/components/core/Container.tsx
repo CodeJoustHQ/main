@@ -66,11 +66,18 @@ export const SplitterContainer = styled.div`
 
 export const MainContainer = styled.div`
   margin: 0 auto;
-  padding: 10vw 0;
+  padding: 5vw 0;
   width: 80%;
 `;
 
 export const CenteredContainer = styled.div`
   text-align: center;
   justify-content: center;
+`;
+
+export const LandingPageContainer = styled.div`
+  position: relative;
+  margin: 0 auto;
+  width: 66.666%;
+  min-width: 450px;
 `;
