@@ -163,7 +163,9 @@ public class GameSocketTests {
         assertNotNull(gameDto);
         assertNotNull(gameDto.getGameTimer());
 
-        assertEquals(room, gameDto.getRoom());
+        assertEquals(room.getRoomId(), gameDto.getRoom().getRoomId());
+        assertEquals(room.getHost(), gameDto.getRoom().getHost());
+        assertEquals(room.getUsers(), gameDto.getRoom().getUsers());
         assertEquals(DURATION, gameDto.getGameTimer().getDuration());
         assertTrue(gameDto.getGameTimer().isTimeUp());
     }
