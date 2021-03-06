@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { PrimaryButtonLink, TextLink } from '../components/core/Link';
 import { LandingHeaderText } from '../components/core/Text';
 import { FloatingUserCircle, Coordinate } from '../components/special/FloatingUserCircle';
@@ -6,9 +6,9 @@ import { FloatingUserCircle, Coordinate } from '../components/special/FloatingUs
 function LandingPage() {
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
 
-  const mouseMoveHandler = (e: MouseEvent) => {
+  const mouseMoveHandler = useCallback((e: MouseEvent) => {
     setMousePosition({ x: e.clientX, y: e.clientY });
-  };
+  }, [setMousePosition]);
 
   useEffect(() => {
     window.onmousemove = mouseMoveHandler;
