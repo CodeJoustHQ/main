@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
+import { ThemeConfig } from '../config/Theme';
 import { NavbarLink } from '../core/Link';
+import { FloatingCircleHeader } from '../special/FloatingCircle';
 
 const Content = styled.div`
   height: 50px;
@@ -26,7 +28,15 @@ function Header() {
     <Content>
       <nav>
         <LeftHeader to="/">
-          Our Site Name
+          <FloatingCircleHeader
+            color={ThemeConfig.colors.purpleCircle}
+            x={0}
+            y={0}
+            bottom={93}
+            left={4}
+            size={0.9}
+          />
+          CodeJoust
         </LeftHeader>
         <RightHeader to="/roadmap">
           See our roadmap
