@@ -30,10 +30,6 @@ function Header() {
         <LeftHeader to="/">
           <FloatingCircleHeader
             color={ThemeConfig.colors.purpleCircle}
-            x={0}
-            y={0}
-            bottom={93}
-            left={4}
             size={0.9}
           />
           CodeJoust

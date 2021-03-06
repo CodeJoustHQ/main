@@ -37,11 +37,14 @@ export const FloatingCircle = styled.div.attrs((props: CircleParams) => ({
   transition: left 0.25s ease;
 `;
 
-export const FloatingCircleHeader = styled.div<CircleParams>`
+export const FloatingCircleHeader = styled.div.attrs((props: CircleHeaderParams) => ({
+  style: {
+    background: props.color,
+    width: `${props.size}rem`,
+    height: `${props.size}rem`,
+  },
+}))<CircleHeaderParams>`
   display: inline-block;
   margin-right: 7px;
-  width: ${({ size }) => size}rem;
-  height: ${({ size }) => size}rem;
-  background: ${({ color }) => color};
   border-radius: 50%;
 `;
