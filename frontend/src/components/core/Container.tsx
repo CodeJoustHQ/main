@@ -79,4 +79,8 @@ export const LandingPageContainer = styled.div`
   position: relative;
   margin: 0 auto;
   width: 66.666%;
+
+  @media(max-width: 640px) {
+    width: 100%;
+  }
 `;
