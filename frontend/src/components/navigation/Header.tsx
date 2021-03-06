@@ -13,7 +13,6 @@ const Content = styled.div`
 const LeftHeader = styled(NavbarLink)`
   float: left;
   margin-left: 50px;
-  font-weight: bold;
 `;
 
 const RightHeader = styled(NavbarLink)`

@@ -23,7 +23,7 @@ export const DefaultButton = styled.button`
 export const PrimaryButton = styled(DefaultButton)<any>`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   font-weight: 400;
-  background: linear-gradient(228.67deg, #133ED7 15.07%, #91BDFF 89.32%);
+  background: ${({ theme }) => theme.colors.blueCircle};
   color: ${({ theme }) => theme.colors.white};
   width: ${({ width }) => width || '16vw'};
   height: ${({ height }) => height || '4vw'};
