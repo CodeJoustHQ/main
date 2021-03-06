@@ -154,7 +154,7 @@ function GamePage() {
         currentUser,
       });
     }
-  }, [timeUp, allSolved, game, history, currentUser, gameSocket, notificationSocket]);
+  }, [timeUp, allSolved, game, history, currentUser, gameSocket, notificationSocket, roomId]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string, userId: string) => {
@@ -164,7 +164,7 @@ function GamePage() {
     };
 
     // Connect to the socket if not already
-    connect(roomId, userId).then(() => {
+    connect(roomIdParam, userId).then(() => {
       // Subscribe to the main Game channel to receive Game updates.
       if (!gameSocket) {
         subscribe(routes(roomIdParam).subscribe_game, subscribeUserCallback)
