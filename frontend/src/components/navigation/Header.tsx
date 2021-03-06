@@ -38,8 +38,8 @@ function Header() {
           />
           CodeJoust
         </LeftHeader>
-        <RightHeader to="/roadmap">
-          See our roadmap
+        <RightHeader to="contact-us">
+          Contact Us
         </RightHeader>
       </nav>
     </Content>
