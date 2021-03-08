@@ -28,10 +28,7 @@ const HoverBar = styled.div`
   border-radius: 5px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   
-  //height: 50px;
   padding: 10px;
-  
-  // -(height + 2 * padding - 15px)
   margin-top: -55px;
 `;
 
