@@ -42,6 +42,15 @@ const OverflowPanel = styled(Panel)`
   height: 100%;
 `;
 
+const Temp = styled.div`
+  //position: relative;
+
+  //.layout-pane {
+  //  box-shadow: none;
+  //  //overflow: visible;
+  //}
+`;
+
 type LocationState = {
   roomId: string,
   currentUser: User,
@@ -343,7 +352,7 @@ function GamePage() {
           secondaryMinSize={35}
         >
           {/* Problem title/description panel */}
-          <OverflowPanel>
+          <OverflowPanel className="display-box-shadow">
             <ProblemHeaderText>{problems[0]?.name}</ProblemHeaderText>
             {error ? <ErrorMessage message={error} /> : null}
             <StyledMarkdownEditor
@@ -360,7 +369,7 @@ function GamePage() {
             primaryMinSize={20}
             secondaryMinSize={0}
           >
-            <Panel>
+            <Panel className="display-box-shadow">
               <Editor
                 onCodeChange={setCurrentCode}
                 onLanguageChange={setCurrentLanguage}
@@ -368,7 +377,7 @@ function GamePage() {
               />
             </Panel>
 
-            <Panel>
+            <Panel className="display-box-shadow">
               <Console
                 testCases={problems[0]?.testCases}
                 submission={submission}
