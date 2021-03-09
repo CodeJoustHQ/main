@@ -28,11 +28,8 @@ const HoverBar = styled.div`
   border-radius: 5px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   
-  height: 50px;
   padding: 10px;
-  
-  // -(height + 2 * padding - 15px)
-  margin-top: -55px;
+  margin-top: -40px;
 `;
 
 type LeaderboardCardProps = {
@@ -49,20 +46,21 @@ function LeaderboardCard(props: LeaderboardCardProps) {
 
   const [showHover, setShowHover] = useState(false);
 
-  const getDisplayNickname = () => {
-    const { nickname } = player.user;
-    const maxLength = isCurrentPlayer ? 5 : 9;
-
-    const shortenedNickname = (nickname.length > maxLength) ? `${nickname.substring(0, maxLength - 3)}...` : nickname;
-    return `${shortenedNickname} ${isCurrentPlayer ? '(you)' : ''}`;
-  };
-
   const getScoreDisplay = () => {
     const latestSubmission = player.submissions.slice(-1)[0];
     if (!latestSubmission) {
       return '0 correct';
     }
     return `${latestSubmission.numCorrect} / ${latestSubmission.numTestCases} correct`;
+  };
+
+  const getScorePercentage = () => {
+    const latestSubmission = player.submissions.slice(-1)[0];
+    if (!latestSubmission) {
+      return '';
+    }
+
+    return ` ${Math.round((latestSubmission.numCorrect / latestSubmission.numTestCases) * 100)}%`;
   };
 
   const getSubmissionTime = () => {
@@ -82,11 +80,12 @@ function LeaderboardCard(props: LeaderboardCardProps) {
       onMouseEnter={() => setShowHover(true)}
       onMouseLeave={() => setShowHover(false)}
     >
-      <PlayerIcon gradientColor={color.gradientColor} />
-      <LowMarginText>{`${place}. ${getDisplayNickname()}`}</LowMarginText>
+      <PlayerIcon gradientColor={color.gradientColor} nickname={player.user.nickname} />
+      <LowMarginText bold={player.solved}>{`${place}.${getScorePercentage()}`}</LowMarginText>
 
       {showHover ? (
         <HoverBar>
+          <SmallText>{`${player.user.nickname} ${isCurrentPlayer && ' (you)'}`}</SmallText>
           <SmallText>{getScoreDisplay()}</SmallText>
           <SmallText>{`Last submitted: ${getSubmissionTime()}`}</SmallText>
         </HoverBar>
