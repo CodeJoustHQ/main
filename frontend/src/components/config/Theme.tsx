@@ -6,7 +6,7 @@ import '@fontsource/titillium-web/700.css';
 export const ThemeConfig: any = {
   colors: {
     text: '#444',
-    background: '#f0f4f8',
+    background: '#f8f8f8',
     border: '#ccc',
     lightBlue: '#AED2EA',
     blue: '#3E93CD',
