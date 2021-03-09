@@ -4,17 +4,15 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import com.rocketden.main.dao.UserRepository;
-import com.rocketden.main.dto.game.GameMapper;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
-import com.rocketden.main.exception.api.ApiException;
-import com.rocketden.main.game_object.Game;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 import com.rocketden.main.service.GameManagementService;
 import com.rocketden.main.service.RoomService;
 import com.rocketden.main.service.SocketService;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
@@ -25,6 +23,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+@Log4j2
 @Configuration
 @EnableWebSocketMessageBroker
 @Transactional
@@ -90,12 +89,9 @@ public class WebSocketConnectionEvents {
             socketService.sendSocketUpdate(roomDto);
 
             // If a game exists, update the room info for that game
-            try {
-                Game game = gameService.getGameFromRoomId(room.getRoomId());
-                game.setRoom(room);
-                game.getPlayers().get(user.getUserId()).setUser(user);
-                socketService.sendSocketUpdate(GameMapper.toDto(game));
-            } catch (ApiException ignored) {}
+            gameService.conditionallyUpdateSocketInfo(room, user);
+
+            log.info("User {} connected to room {}", user.getNickname(), room.getRoomId());
         }
     }
 
@@ -118,12 +114,9 @@ public class WebSocketConnectionEvents {
             socketService.sendSocketUpdate(roomDto);
 
             // If a game exists, update the room info for that game
-            try {
-                Game game = gameService.getGameFromRoomId(room.getRoomId());
-                game.setRoom(room);
-                game.getPlayers().get(user.getUserId()).setUser(user);
-                socketService.sendSocketUpdate(GameMapper.toDto(game));
-            } catch (ApiException ignored) {}
+            gameService.conditionallyUpdateSocketInfo(room, user);
+
+            log.info("User {} disconnected from room {}", user.getNickname(), room.getRoomId());
         }
     }
 }

@@ -43,6 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.time.Instant;
@@ -832,5 +833,46 @@ public class GameManagementServiceTests {
         game.setAllSolved(false);
         game.setGameTimer(null);
         assertFalse(gameService.isGameOver(game));
+    }
+
+    @Test
+    public void conditionallyUpdateSocketInfoSuccess() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        gameService.createAddGameFromRoom(room);
+
+        User newUser = new User();
+        newUser.setNickname(NICKNAME);
+        newUser.setUserId(USER_ID);
+        newUser.setSessionId(SESSION_ID);
+
+        Room newRoom = new Room();
+        newRoom.setRoomId(ROOM_ID);
+        newRoom.addUser(newUser);
+
+        gameService.conditionallyUpdateSocketInfo(newRoom, newUser);
+
+        Game game = gameService.getGameFromRoomId(room.getRoomId());
+
+        assertEquals(newRoom, game.getRoom());
+        assertEquals(user, game.getRoom().getUsers().get(0));
+        assertEquals(user, game.getPlayers().get(user.getUserId()).getUser());
+
+        verify(socketService).sendSocketUpdate(GameMapper.toDto(game));
+    }
+
+    @Test
+    public void conditionallyUpdateSocketInfoNoGameFound() {
+        Room room = new Room();
+        room.setRoomId("999998");
+
+        gameService.conditionallyUpdateSocketInfo(room, null);
+
+        verify(socketService, never()).sendSocketUpdate(Mockito.any(GameDto.class));
     }
 }

@@ -27,9 +27,11 @@ import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.util.EndGameTimerTask;
 import com.rocketden.main.util.Utility;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@Log4j2
 @Service
 public class GameManagementService {
 
@@ -54,7 +56,7 @@ public class GameManagementService {
         currentGameMap = new HashMap<>();
     }
 
-    public Game getGameFromRoomId(String roomId) {
+    protected Game getGameFromRoomId(String roomId) {
         Game game = currentGameMap.get(roomId);
         if (game == null) {
             throw new ApiException(GameError.NOT_FOUND);
@@ -233,5 +235,17 @@ public class GameManagementService {
 
     protected boolean isGameOver(Game game) {
         return game.getAllSolved() || (game.getGameTimer() != null && game.getGameTimer().isTimeUp());
+    }
+
+    // Update people's socket active status
+    public void conditionallyUpdateSocketInfo(Room room, User user) {
+        Game game = currentGameMap.get(room.getRoomId());
+
+        if (game != null) {
+            log.info("Updating socket info for game {}", room.getRoomId());
+            game.setRoom(room);
+            game.getPlayers().get(user.getUserId()).setUser(user);
+            socketService.sendSocketUpdate(GameMapper.toDto(game));
+        }
     }
 }
