@@ -48,7 +48,7 @@ function PlayerResultsCard(props: PlayerResultsCardProps) {
       <FlexHorizontalContainer>
         <FlexLeft>
           <CenteredContainer>
-            <PlayerIcon hexColor={color.hexColor} />
+            <PlayerIcon gradientColor={color.gradientColor} />
             <br />
             <LowMarginText>{`${place}. ${getDisplayNickname()}`}</LowMarginText>
           </CenteredContainer>

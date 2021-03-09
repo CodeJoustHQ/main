@@ -2,11 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 
 type PlayerIconProps = {
-  hexColor: string,
+  gradientColor: string,
 };
 
 const PlayerIconContent = styled.div<PlayerIconProps>`
-  background-color: ${({ hexColor }) => hexColor};
+  background: ${({ theme, gradientColor }) => theme.colors[gradientColor]};
   border-radius: 50%;
   margin: 0 auto;
   
@@ -15,10 +15,10 @@ const PlayerIconContent = styled.div<PlayerIconProps>`
 `;
 
 function PlayerIcon(props: PlayerIconProps) {
-  const { hexColor } = props;
+  const { gradientColor } = props;
 
   return (
-    <PlayerIconContent hexColor={hexColor} />
+    <PlayerIconContent gradientColor={gradientColor} />
   );
 }
 

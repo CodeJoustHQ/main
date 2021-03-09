@@ -82,7 +82,7 @@ function LeaderboardCard(props: LeaderboardCardProps) {
       onMouseEnter={() => setShowHover(true)}
       onMouseLeave={() => setShowHover(false)}
     >
-      <PlayerIcon hexColor={color.hexColor} />
+      <PlayerIcon gradientColor={color.gradientColor} />
       <LowMarginText>{`${place}. ${getDisplayNickname()}`}</LowMarginText>
 
       {showHover ? (
