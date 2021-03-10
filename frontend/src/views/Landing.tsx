@@ -19,7 +19,7 @@ function LandingPage() {
   return (
     <LandingPageContainer>
       <FloatingCircle
-        color={ThemeConfig.colors.redCircle}
+        color={ThemeConfig.colors.gradients.red}
         x={mousePosition.x}
         y={mousePosition.y}
         bottom={50}
@@ -27,7 +27,7 @@ function LandingPage() {
         size={4}
       />
       <FloatingCircle
-        color={ThemeConfig.colors.greenCircle}
+        color={ThemeConfig.colors.gradients.green}
         x={mousePosition.x}
         y={mousePosition.y}
         bottom={-30}
@@ -35,7 +35,7 @@ function LandingPage() {
         size={8}
       />
       <FloatingCircle
-        color={ThemeConfig.colors.yellowCircle}
+        color={ThemeConfig.colors.gradients.yellow}
         x={mousePosition.x}
         y={mousePosition.y}
         bottom={-20}
@@ -43,7 +43,7 @@ function LandingPage() {
         size={2}
       />
       <FloatingCircle
-        color={ThemeConfig.colors.pinkCircle}
+        color={ThemeConfig.colors.gradients.pink}
         x={mousePosition.x}
         y={mousePosition.y}
         bottom={-25}
@@ -51,7 +51,7 @@ function LandingPage() {
         size={7}
       />
       <FloatingCircle
-        color={ThemeConfig.colors.blueCircle}
+        color={ThemeConfig.colors.gradients.blue}
         x={mousePosition.x}
         y={mousePosition.y}
         bottom={100}

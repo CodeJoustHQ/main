@@ -28,7 +28,7 @@ function Header() {
       <nav>
         <LeftHeader to="/">
           <FloatingCircleHeader
-            color={ThemeConfig.colors.purpleCircle}
+            color={ThemeConfig.colors.gradients.purple}
             size={0.9}
           />
           CodeJoust
