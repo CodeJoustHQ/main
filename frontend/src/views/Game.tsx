@@ -350,6 +350,7 @@ function GamePage() {
           percentage
           primaryMinSize={20}
           secondaryMinSize={35}
+          customClassName="game-splitter-container"
         >
           {/* Problem title/description panel */}
           <OverflowPanel className="display-box-shadow">
@@ -369,7 +370,7 @@ function GamePage() {
             primaryMinSize={20}
             secondaryMinSize={0}
           >
-            <Panel className="display-box-shadow">
+            <Panel>
               <Editor
                 onCodeChange={setCurrentCode}
                 onLanguageChange={setCurrentLanguage}
@@ -377,7 +378,7 @@ function GamePage() {
               />
             </Panel>
 
-            <Panel className="display-box-shadow">
+            <Panel>
               <Console
                 testCases={problems[0]?.testCases}
                 submission={submission}
