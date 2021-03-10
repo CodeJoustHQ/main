@@ -13,11 +13,12 @@ import LobbyPage from '../../views/Lobby';
 import AllProblemsPage from '../../views/AllProblemsPage';
 import ProblemPage from '../../views/ProblemPage';
 import CreateProblemPage from '../../views/CreateProblemPage';
+import CircleBackgroundLayout from '../layout/CircleBackground';
 
 function App() {
   return (
     <Switch>
-      <CustomRoute path="/" component={LandingPage} layout={MainLayout} exact />
+      <CustomRoute path="/" component={LandingPage} layout={CircleBackgroundLayout} exact />
       <CustomRoute path="/game" component={GamePage} layout={GameLayout} exact />
       <CustomRoute path="/game/join" component={JoinGamePage} layout={MainLayout} exact />
       <CustomRoute path="/game/create" component={CreateGamePage} layout={MainLayout} exact />

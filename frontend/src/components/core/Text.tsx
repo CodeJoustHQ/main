@@ -26,8 +26,14 @@ export const LargeText = styled.h3`
   font-size: ${({ theme }) => theme.fontSize.xLarge};
 `;
 
-export const LandingHeaderText = styled.h1`
+export const LandingHeaderTitle = styled.h1`
   font-size: ${({ theme }) => theme.fontSize.xxLarge};
+  font-weight: 700;
+`;
+
+export const LandingHeaderText = styled.h1`
+  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+  font-weight: 400;
 `;
 
 export const UserNicknameText = styled(LargeText)`

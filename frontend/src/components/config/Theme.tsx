@@ -1,5 +1,7 @@
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
+import '@fontsource/titillium-web';
+import '@fontsource/titillium-web/700.css';
 
 export const ThemeConfig: any = {
   colors: {
@@ -13,8 +15,16 @@ export const ThemeConfig: any = {
     gray: 'gray',
     lightGray: 'lightgray',
     white: 'white',
+    gradients: {
+      green: 'linear-gradient(207.68deg, #14D633 10.68%, #DAFFB5 91.96%)',
+      red: 'linear-gradient(207.68deg, #DD145D 10.68%, #FFB7B7 91.96%)',
+      blue: 'linear-gradient(207.68deg, #133ED7 10.68%, #B7D4FF 91.96%)',
+      pink: 'linear-gradient(207.68deg, #F25AFF 10.68%, #F5DAFF 91.96%)',
+      yellow: 'linear-gradient(207.68deg, #FFC700 10.68%, #FFFDC1 91.96%)',
+      purple: 'linear-gradient(207.68deg, #9845EC 21.37%, #D9B4FF 102.65%)',
+    },
   },
-  font: 'Roboto',
+  font: 'Titillium Web',
   fontSize: {
     xSmall: '0.4rem',
     small: '0.6rem',
