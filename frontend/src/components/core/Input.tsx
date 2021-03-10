@@ -45,8 +45,8 @@ export const LargeInputButton = styled(Input).attrs(() => ({
 export const ConsoleTextArea = styled.textarea`
   font-family: monospace;
   margin: 2px;
-  min-width: 20%;
-  max-width: 70%;
+  min-width: 50px;
+  max-width: 80%;
   min-height: 24px;
   max-height: 150px;
 
