@@ -53,7 +53,7 @@ export const Panel = styled.div`
 export const SplitterContainer = styled.div`
   flex: auto;
   position: relative;
-  margin: 20px;
+  margin: 5px 20px 20px 20px;
   
   .splitter-layout {
     overflow: visible;

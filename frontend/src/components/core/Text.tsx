@@ -42,7 +42,7 @@ export const UserNicknameText = styled(LargeText)`
 `;
 
 export const ProblemHeaderText = styled.h2`
-  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+  font-size: ${({ theme }) => theme.fontSize.large};
   color: ${({ theme }) => theme.colors.darkText};
 `;
 

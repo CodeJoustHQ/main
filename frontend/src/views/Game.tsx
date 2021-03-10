@@ -40,15 +40,7 @@ const StyledMarkdownEditor = styled(MarkdownEditor)`
 const OverflowPanel = styled(Panel)`
   overflow-y: auto;
   height: 100%;
-`;
-
-const Temp = styled.div`
-  //position: relative;
-
-  //.layout-pane {
-  //  box-shadow: none;
-  //  //overflow: visible;
-  //}
+  padding: 0 25px;
 `;
 
 type LocationState = {
@@ -343,7 +335,7 @@ function GamePage() {
         {displayPlayerLeaderboard()}
       </CenteredContainer>
 
-      {loading ? <Loading /> : null}
+      {loading ? <CenteredContainer><Loading /></CenteredContainer> : null}
       <SplitterContainer>
         <SplitterLayout
           onSecondaryPaneSizeChange={onSecondaryPanelSizeChange}

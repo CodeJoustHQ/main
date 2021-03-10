@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { TestCase } from '../../api/Problem';
-import { Text } from '../core/Text';
+import { LowMarginText } from '../core/Text';
 import { ConsoleTextArea } from '../core/Input';
 import { GreenSmallButton, SmallButton } from '../core/Button';
 import { Submission, SubmissionResult, SubmissionType } from '../../api/Game';
@@ -17,7 +17,7 @@ const RightAlignedContent = styled.div`
   text-align: right;
   top: 0;
   right: 0;
-  margin: 0.6rem;
+  margin: 10px 0;
 `;
 
 const MainContent = styled.div`
@@ -94,11 +94,12 @@ function Console(props: ConsoleProps) {
     <Content>
       <MainContent>
         <div>
-          <Text bold>Input</Text>
+          <br />
+          <LowMarginText>Input</LowMarginText>
           <ConsoleTextArea value={input} onChange={(e) => setInput(e.target.value)} />
         </div>
         <div>
-          <Text bold>Output</Text>
+          <LowMarginText>Output</LowMarginText>
           <ConsoleTextArea value={output} readOnly />
         </div>
       </MainContent>
