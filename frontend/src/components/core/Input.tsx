@@ -91,12 +91,11 @@ export const TextInput = styled(Input).attrs(() => ({
   type: 'text',
 }))`
   display: block;
-  width: 15rem;
-  text-align: center;
+  width: 10rem;
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   font-family: ${({ theme }) => theme.font};
   font-weight: 400;
-  padding: 1rem;
+  padding: 0.5rem 1rem;
   color: ${({ theme }) => theme.colors.text};
 
   &:focus {

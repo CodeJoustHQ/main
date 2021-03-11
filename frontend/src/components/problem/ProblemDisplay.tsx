@@ -2,7 +2,12 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import MarkdownEditor from 'rich-markdown-editor';
-import { deleteProblem, Problem, ProblemIOType } from '../../api/Problem';
+import {
+  deleteProblem,
+  Problem,
+  ProblemIOType,
+  problemIOTypeToString,
+} from '../../api/Problem';
 import {
   ConsoleTextArea,
   PureTextInputTitle,
@@ -16,6 +21,7 @@ import {
   ProblemIOTypeButton,
   SmallButton,
 } from '../core/Button';
+import PrimarySelect from '../core/Select';
 import { MediumText, Text } from '../core/Text';
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
@@ -197,6 +203,21 @@ function ProblemDisplay(props: ProblemDisplayParams) {
               e.target.value, newProblem.problemInputs[index].type)}
           />
           <br />
+
+          <PrimarySelect
+            onChange={(e) => handleInputChange(
+              index,
+              newProblem.problemInputs[index].name,
+              ProblemIOType[e.target.value as keyof typeof ProblemIOType],
+            )}
+            value={problemIOTypeToString(newProblem.problemInputs[index].type)}
+          >
+            {
+              Object.keys(ProblemIOType).map((key) => (
+                <option key={key} value={key}>{key}</option>
+              ))
+            }
+          </PrimarySelect>
 
           {Object.keys(ProblemIOType).map((key) => {
             const inputType = ProblemIOType[key as keyof typeof ProblemIOType];
