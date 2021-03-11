@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { Difficulty } from '../../api/Difficulty';
 import { ThemeType } from '../config/Theme';
 
 export const DefaultButton = styled.button`
@@ -53,14 +54,30 @@ export const TextButton = styled.button<ThemeType>`
 `;
 
 type DifficultyProps = {
+  difficulty: Difficulty | null,
   active: boolean,
   enabled: boolean,
 }
 
-export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`  
-  color: ${({ theme, active }) => (active ? theme.colors.white : theme.colors.font)};
-  background-color: ${({ theme, active }) => (active ? theme.colors.blue : theme.colors.white)};
-  padding: 8px 16px;
+export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  font-weight: 700;
+  background: ${({ theme, active }) => (active ? theme.colors.blue : theme.colors.white)};
+  color: ${({ theme, active }) => (active ? theme.colors.white : theme.colors.blue)};
+  width: 12vw;
+  height: 4vw;
+  min-width: 90px;
+  min-height: 40px;
+  border-radius: 20px;
+
+  &:disabled {
+    background-color: ${({ theme }) => theme.colors.gray};
+
+    &:hover {
+      cursor: default;
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
+    }
+  }
   
   &:hover {
     ${({ theme, enabled }) => enabled && `

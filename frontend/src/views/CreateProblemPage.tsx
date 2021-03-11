@@ -6,7 +6,7 @@ import { LargeText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import ProblemDisplay from '../components/problem/ProblemDisplay';
-import Difficulty from '../api/Difficulty';
+import { Difficulty } from '../api/Difficulty';
 import { TextLink } from '../components/core/Link';
 
 const Content = styled.div`

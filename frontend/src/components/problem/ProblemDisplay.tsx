@@ -10,7 +10,7 @@ import {
   TextInput,
   CheckboxInput,
 } from '../core/Input';
-import Difficulty from '../../api/Difficulty';
+import { Difficulty } from '../../api/Difficulty';
 import { DifficultyButton, ProblemIOTypeButton, SmallButton } from '../core/Button';
 import { MediumText, Text } from '../core/Text';
 import Loading from '../core/Loading';
@@ -151,12 +151,14 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       <MediumText>Problem</MediumText>
       <TitleDescriptionContainer>
         <PureTextInputTitle
+          placeholder="Write a nice title"
           name="name"
           value={newProblem.name}
           onChange={handleChange}
         />
         <hr style={{ margin: '1rem 0' }} />
         <MarkdownEditor
+          placeholder="Write a nice description"
           defaultValue={newProblem.description}
           onChange={(getNewValue) => handleDescriptionChange(getNewValue())}
         />
@@ -168,6 +170,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
         if (difficulty !== Difficulty.Random) {
           return (
             <DifficultyButton
+              difficulty={difficulty}
               onClick={() => handleEnumChange('difficulty', difficulty)}
               active={difficulty === newProblem.difficulty}
               enabled

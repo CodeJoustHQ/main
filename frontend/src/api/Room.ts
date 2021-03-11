@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { axiosErrorHandler } from './Error';
 import { User } from './User';
-import Difficulty from './Difficulty';
+import { Difficulty } from './Difficulty';
 
 export type Room = {
   roomId: string,

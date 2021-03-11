@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { axiosErrorHandler } from './Error';
-import Difficulty from './Difficulty';
+import { Difficulty } from './Difficulty';
 import Language from './Language';
 
 export type TestCase = {

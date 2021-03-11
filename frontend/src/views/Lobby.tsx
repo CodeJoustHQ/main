@@ -8,7 +8,7 @@ import {
 } from '../api/Socket';
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
-import Difficulty from '../api/Difficulty';
+import { Difficulty } from '../api/Difficulty';
 import { PrimaryButton, DifficultyButton } from '../components/core/Button';
 import Loading from '../components/core/Loading';
 import PlayerCard from '../components/card/PlayerCard';
@@ -354,6 +354,7 @@ function LobbyPage() {
       <MediumText>Difficulty Settings</MediumText>
       {Object.keys(Difficulty).map((key) => (
         <DifficultyButton
+          difficulty={difficulty}
           onClick={() => updateDifficultySetting(key)}
           active={difficulty === Difficulty[key as keyof typeof Difficulty]}
           enabled={isHost(currentUser)}
