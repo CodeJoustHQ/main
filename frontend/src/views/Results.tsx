@@ -13,6 +13,7 @@ import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import { disconnect, routes, subscribe } from '../api/Socket';
 import { User } from '../api/User';
+import { ThemeConfig } from '../components/config/Theme';
 
 const Content = styled.div`
   padding: 0 20%;
@@ -91,7 +92,14 @@ function GameResultsPage() {
       ))}
 
       {currentUser?.userId === room?.host.userId
-        ? <PrimaryButton onClick={playAgainAction}>Play Again</PrimaryButton>
+        ? (
+          <PrimaryButton
+            color={ThemeConfig.colors.gradients.blue}
+            onClick={playAgainAction}
+          >
+            Play Again
+          </PrimaryButton>
+        )
         : <Text>Waiting for the host to choose whether to play again...</Text>}
     </Content>
   );

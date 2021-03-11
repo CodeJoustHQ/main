@@ -19,6 +19,7 @@ import {
 } from '../api/Room';
 import { NumberInput } from '../components/core/Input';
 import { errorHandler } from '../api/Error';
+import { ThemeConfig } from '../components/config/Theme';
 
 type LobbyPageLocation = {
   user: User,
@@ -396,7 +397,15 @@ function LobbyPage() {
       <br />
 
       {isHost(currentUser)
-        ? <PrimaryButton onClick={handleStartGame} disabled={loading}>Start Game</PrimaryButton>
+        ? (
+          <PrimaryButton
+            color={ThemeConfig.colors.gradients.blue}
+            onClick={handleStartGame}
+            disabled={loading}
+          >
+            Start Game
+          </PrimaryButton>
+        )
         : <MediumText>Waiting for the host to start the game...</MediumText>}
     </div>
   );

@@ -22,6 +22,7 @@ export const ThemeConfig: any = {
       pink: 'linear-gradient(207.68deg, #F25AFF 10.68%, #F5DAFF 91.96%)',
       yellow: 'linear-gradient(207.68deg, #FFC700 10.68%, #FFFDC1 91.96%)',
       purple: 'linear-gradient(207.68deg, #9845EC 21.37%, #D9B4FF 102.65%)',
+      gray: 'linear-gradient(228.67deg, #555555 15.07%, #C8C8C8 89.32%)',
     },
   },
   font: 'Titillium Web',
