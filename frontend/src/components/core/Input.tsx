@@ -94,6 +94,8 @@ export const TextInput = styled(Input).attrs(() => ({
   width: 15rem;
   text-align: center;
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  font-family: ${({ theme }) => theme.font};
+  font-weight: 400;
   padding: 1rem;
   color: ${({ theme }) => theme.colors.text};
 

@@ -6,15 +6,20 @@ import { deleteProblem, Problem, ProblemIOType } from '../../api/Problem';
 import {
   ConsoleTextArea,
   PureTextInputTitle,
-  LargeInputButton,
   TextInput,
   CheckboxInput,
 } from '../core/Input';
 import { Difficulty } from '../../api/Difficulty';
-import { DifficultyButton, ProblemIOTypeButton, SmallButton } from '../core/Button';
+import {
+  DifficultyButton,
+  PrimaryButton,
+  ProblemIOTypeButton,
+  SmallButton,
+} from '../core/Button';
 import { MediumText, Text } from '../core/Text';
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
+import { ThemeConfig } from '../config/Theme';
 
 const Content = styled.div`
   padding: 10px;
@@ -280,8 +285,25 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           </div>
         ) : null}
 
-      <LargeInputButton value={actionText} onClick={() => onClick(newProblem)} />
-      {editMode ? <LargeInputButton value="Delete Problem" onClick={deleteProblemFunc} /> : null}
+      <PrimaryButton
+        width="8vw"
+        color={ThemeConfig.colors.gradients.blue}
+        value={actionText}
+        onClick={() => onClick(newProblem)}
+      >
+        {actionText}
+      </PrimaryButton>
+      {editMode
+        ? (
+          <PrimaryButton
+            width="12vw"
+            color={ThemeConfig.colors.gradients.red}
+            onClick={deleteProblemFunc}
+          >
+            Delete Problem
+          </PrimaryButton>
+        )
+        : null}
 
       {loading ? <Loading /> : null}
       {error ? <ErrorMessage message={error} /> : null}

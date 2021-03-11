@@ -16,8 +16,8 @@ type DifficultyColorMap = {
 
 export const difficultyToColor: DifficultyColorMap = {
   RANDOM: {
-    color: ThemeConfig.colors.gray,
-    background: ThemeConfig.colors.gradients.gray,
+    color: ThemeConfig.colors.purple,
+    background: ThemeConfig.colors.gradients.purple,
   },
   EASY: {
     color: ThemeConfig.colors.green,

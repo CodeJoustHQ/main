@@ -352,17 +352,20 @@ function LobbyPage() {
       </div>
 
       <MediumText>Difficulty Settings</MediumText>
-      {Object.keys(Difficulty).map((key) => (
-        <DifficultyButton
-          difficulty={difficulty || Difficulty.Random}
-          onClick={() => updateDifficultySetting(key)}
-          active={difficulty === Difficulty[key as keyof typeof Difficulty]}
-          enabled={isHost(currentUser)}
-          title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
-        >
-          {key}
-        </DifficultyButton>
-      ))}
+      {Object.keys(Difficulty).map((key) => {
+        const difficultyKey: Difficulty = Difficulty[key as keyof typeof Difficulty];
+        return (
+          <DifficultyButton
+            difficulty={difficultyKey}
+            onClick={() => updateDifficultySetting(key)}
+            active={difficulty === difficultyKey}
+            enabled={isHost(currentUser)}
+            title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
+          >
+            {key}
+          </DifficultyButton>
+        );
+      })}
 
       <MediumText>Duration</MediumText>
       <Text>
