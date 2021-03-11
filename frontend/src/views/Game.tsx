@@ -336,6 +336,7 @@ function GamePage() {
       </CenteredContainer>
 
       {loading ? <CenteredContainer><Loading /></CenteredContainer> : null}
+      {error ? <CenteredContainer><ErrorMessage message={error} /></CenteredContainer> : null}
       <SplitterContainer>
         <SplitterLayout
           onSecondaryPaneSizeChange={onSecondaryPanelSizeChange}
@@ -347,7 +348,6 @@ function GamePage() {
           {/* Problem title/description panel */}
           <OverflowPanel className="display-box-shadow">
             <ProblemHeaderText>{problems[0]?.name}</ProblemHeaderText>
-            {error ? <ErrorMessage message={error} /> : null}
             <StyledMarkdownEditor
               defaultValue={problems[0]?.description}
               onChange={() => ''}

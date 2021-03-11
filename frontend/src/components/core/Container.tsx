@@ -4,7 +4,7 @@ export const FlexContainer = styled.div`
   display: flex;
   flex: auto;
   flex-direction: column;
-  margin: 1rem;
+  margin: 0 1rem;
 `;
 
 export const FlexHorizontalContainer = styled.div`
@@ -53,7 +53,7 @@ export const Panel = styled.div`
 export const SplitterContainer = styled.div`
   flex: auto;
   position: relative;
-  margin: 5px 20px 20px 20px;
+  margin: 5px 20px 25px 20px;
   
   .splitter-layout {
     overflow: visible;

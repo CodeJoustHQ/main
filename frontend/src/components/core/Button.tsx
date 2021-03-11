@@ -43,8 +43,9 @@ export const PrimaryButton = styled(DefaultButton)<any>`
 export const TextButton = styled.button<ThemeType>`
   background: none;
   border: none;
-  color: ${({ theme }) => theme.colors.gray};
+  color: ${({ theme }) => theme.colors.text};
   font-size: ${({ theme }) => theme.fontSize.default};
+  font-family: ${({ theme }) => theme.font};
   cursor: pointer;
   
   &:focus {
