@@ -5,31 +5,60 @@ import { LowMarginText, SmallText } from '../core/Text';
 import PlayerIcon from './PlayerIcon';
 import { Color } from '../../api/Color';
 
-const Content = styled.div`
+type ContentStyleType = {
+  isCurrentPlayer: boolean,
+}
+
+const Content = styled.div<ContentStyleType>`
   display: inline-block;
   position: relative;
-  margin: 10px;
-  width: 7rem;
+  margin: 10px 5px;
+  width: 60px;
+  height: 80px;
+  padding: 10px 10px 5px 10px;
   
   &:hover {
     cursor: pointer;
   }
+  
+  ${({ theme, isCurrentPlayer }) => isCurrentPlayer && `
+    border-radius: 5px;
+    box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.12);
+    background: ${theme.colors.white};
+  `};
+`;
+
+const CenteredScrollableContent = styled.div`
+  text-align: center;
+  overflow-x: scroll;
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 `;
 
 const HoverBar = styled.div`
-  // Center div above parent
+  // Center div over parent
   position: absolute;
+  z-index: 5;
   top: 0;
   left: 50%;
   transform: translate(-50%, 0);
   
-  width: 160px;
+  // width+padding, height+padding must match that of Content to perfect overlap
+  width: 70px;
+  min-height: 85px;
+  padding: 5px;
+  
+  text-align: left;
   background-color: ${({ theme }) => theme.colors.white};
   border-radius: 5px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
-  
-  padding: 10px;
-  margin-top: -40px;
 `;
 
 type LeaderboardCardProps = {
@@ -49,9 +78,9 @@ function LeaderboardCard(props: LeaderboardCardProps) {
   const getScoreDisplay = () => {
     const latestSubmission = player.submissions.slice(-1)[0];
     if (!latestSubmission) {
-      return '0 correct';
+      return '0';
     }
-    return `${latestSubmission.numCorrect} / ${latestSubmission.numTestCases} correct`;
+    return `${latestSubmission.numCorrect}/${latestSubmission.numTestCases}`;
   };
 
   const getScorePercentage = () => {
@@ -72,22 +101,25 @@ function LeaderboardCard(props: LeaderboardCardProps) {
     const currentTime = new Date().getTime();
     const diffMilliseconds = currentTime - new Date(latestSubmission.startTime).getTime();
     const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
-    return `${diffMinutes} min ago`;
+    return `${diffMinutes}m ago`;
   };
 
   return (
     <Content
       onMouseEnter={() => setShowHover(true)}
       onMouseLeave={() => setShowHover(false)}
+      isCurrentPlayer={isCurrentPlayer}
     >
       <PlayerIcon gradientColor={color.gradientColor} nickname={player.user.nickname} />
       <LowMarginText bold={player.solved}>{`${place}.${getScorePercentage()}`}</LowMarginText>
 
       {showHover ? (
         <HoverBar>
-          <SmallText>{`${player.user.nickname} ${isCurrentPlayer && ' (you)'}`}</SmallText>
-          <SmallText>{getScoreDisplay()}</SmallText>
-          <SmallText>{`Last submitted: ${getSubmissionTime()}`}</SmallText>
+          <CenteredScrollableContent>
+            <SmallText bold>{player.user.nickname}</SmallText>
+          </CenteredScrollableContent>
+          <SmallText>{`Score: ${getScoreDisplay()}`}</SmallText>
+          <SmallText>{`Last: ${getSubmissionTime()}`}</SmallText>
         </HoverBar>
       ) : null}
     </Content>

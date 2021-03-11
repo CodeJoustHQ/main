@@ -13,7 +13,7 @@ export const ErrorText = styled(Text)`
    color: ${({ theme }) => theme.colors.red};
 `;
 
-export const SmallText = styled.p`
+export const SmallText = styled(Text)`
   font-size: ${({ theme }) => theme.fontSize.mediumSmall};
   margin: 6px 0;
 `;

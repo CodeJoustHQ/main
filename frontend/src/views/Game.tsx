@@ -287,14 +287,14 @@ function GamePage() {
     }
   };
 
-  const displayPlayerLeaderboard = () => players.map((player, index) => (
+  const displayPlayerLeaderboard = useCallback(() => players.map((player, index) => (
     <LeaderboardCard
       player={player}
       isCurrentPlayer={player.user.userId === currentUser?.userId}
       place={index + 1}
       color={player.color}
     />
-  ));
+  )), [players, currentUser]);
 
   // Subscribe user to primary socket and to notifications.
   useEffect(() => {
