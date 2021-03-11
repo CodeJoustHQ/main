@@ -354,7 +354,7 @@ function LobbyPage() {
       <MediumText>Difficulty Settings</MediumText>
       {Object.keys(Difficulty).map((key) => (
         <DifficultyButton
-          difficulty={difficulty}
+          difficulty={difficulty || Difficulty.Random}
           onClick={() => updateDifficultySetting(key)}
           active={difficulty === Difficulty[key as keyof typeof Difficulty]}
           enabled={isHost(currentUser)}

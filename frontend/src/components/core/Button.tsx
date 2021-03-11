@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Difficulty } from '../../api/Difficulty';
+import { Difficulty, difficultyToColor } from '../../api/Difficulty';
 import { ThemeType } from '../config/Theme';
 
 export const DefaultButton = styled.button`
@@ -54,7 +54,7 @@ export const TextButton = styled.button<ThemeType>`
 `;
 
 type DifficultyProps = {
-  difficulty: Difficulty | null,
+  difficulty: Difficulty,
   active: boolean,
   enabled: boolean,
 }
@@ -62,10 +62,10 @@ type DifficultyProps = {
 export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   font-weight: 700;
-  background: ${({ theme, active }) => (active ? theme.colors.blue : theme.colors.white)};
-  color: ${({ theme, active }) => (active ? theme.colors.white : theme.colors.blue)};
-  width: 12vw;
-  height: 4vw;
+  background: ${({ active, difficulty, theme }) => (active ? difficultyToColor[difficulty].background : theme.colors.white)};
+  color: ${({ active, difficulty, theme }) => (active ? theme.colors.white : difficultyToColor[difficulty].color)};
+  width: 8vw;
+  height: 3vw;
   min-width: 90px;
   min-height: 40px;
   border-radius: 20px;
@@ -80,9 +80,13 @@ export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`
   }
   
   &:hover {
-    ${({ theme, enabled }) => enabled && `
+    ${({
+    difficulty,
+    theme,
+    enabled,
+  }) => enabled && `
       color: ${theme.colors.white};
-      background-color: ${theme.colors.blue};
+      background: ${difficultyToColor[difficulty].background};
     `};
     
     cursor: ${({ enabled }) => (enabled ? 'pointer' : 'default')};

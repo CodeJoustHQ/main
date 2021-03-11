@@ -170,7 +170,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
         if (difficulty !== Difficulty.Random) {
           return (
             <DifficultyButton
-              difficulty={difficulty}
+              difficulty={difficulty || Difficulty.Random}
               onClick={() => handleEnumChange('difficulty', difficulty)}
               active={difficulty === newProblem.difficulty}
               enabled
