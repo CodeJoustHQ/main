@@ -70,6 +70,12 @@ export const MainContainer = styled.div`
   width: 80%;
 `;
 
+export const TopContainer = styled.div`
+  margin: 0 auto;
+  padding-bottom: 5vw;
+  width: 80%;
+`;
+
 export const CenteredContainer = styled.div`
   text-align: center;
   justify-content: center;

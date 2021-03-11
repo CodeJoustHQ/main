@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ThemeConfig } from '../config/Theme';
 import { FloatingCircle, Coordinate } from '../special/FloatingCircle';
-import Header from '../navigation/Header';
+import { Header } from '../navigation/Header';
 import { MainContainer, LandingPageContainer } from '../core/Container';
 
 const Content = styled.div`
