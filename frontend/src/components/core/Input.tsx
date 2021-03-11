@@ -10,6 +10,21 @@ const Input = styled.input`
   font-weight: 700;
 `;
 
+export const PureTextInputTitle = styled.input.attrs(() => ({
+  type: 'text',
+}))`
+  border: none;
+  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+  font-weight: 700;
+  padding: 0;
+  width: 100%;
+
+  &:focus {
+    border: none;
+    outline: none;
+  }
+`;
+
 export const LargeCenterInputText = styled(Input).attrs(() => ({
   type: 'text',
 }))`

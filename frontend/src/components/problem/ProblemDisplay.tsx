@@ -4,7 +4,11 @@ import styled from 'styled-components';
 import MarkdownEditor from 'rich-markdown-editor';
 import { deleteProblem, Problem, ProblemIOType } from '../../api/Problem';
 import {
-  ConsoleTextArea, LargeInputButton, TextInput, CheckboxInput,
+  ConsoleTextArea,
+  PureTextInputTitle,
+  LargeInputButton,
+  TextInput,
+  CheckboxInput,
 } from '../core/Input';
 import Difficulty from '../../api/Difficulty';
 import { DifficultyButton, ProblemIOTypeButton, SmallButton } from '../core/Button';
@@ -12,16 +16,16 @@ import { MediumText, Text } from '../core/Text';
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
 
-const StyledMarkdownEditor = styled(MarkdownEditor)`
+const Content = styled.div`
+  padding: 10px;
+`;
+
+const TitleDescriptionContainer = styled.div`
   text-align: left;
-  padding: 35px;
+  padding: 2rem;
   border-radius: 5px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   background: ${({ theme }) => theme.colors.white};
-`;
-
-const Content = styled.div`
-  padding: 10px;
 `;
 
 type ProblemDisplayParams = {
@@ -42,6 +46,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const [error, setError] = useState('');
 
   const deleteProblemFunc = () => {
+    // eslint-disable-next-line no-alert
     if (!window.confirm('Are you sure you want to delete this problem?')) {
       return;
     }
@@ -143,18 +148,19 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
   return (
     <Content>
-      <MediumText>Name:</MediumText>
-      <TextInput
-        name="name"
-        value={newProblem.name}
-        onChange={handleChange}
-      />
-
-      <MediumText>Description:</MediumText>
-      <StyledMarkdownEditor
-        defaultValue={newProblem.description}
-        onChange={(getNewValue) => handleDescriptionChange(getNewValue())}
-      />
+      <MediumText>Problem</MediumText>
+      <TitleDescriptionContainer>
+        <PureTextInputTitle
+          name="name"
+          value={newProblem.name}
+          onChange={handleChange}
+        />
+        <hr style={{ margin: '1rem 0' }} />
+        <MarkdownEditor
+          defaultValue={newProblem.description}
+          onChange={(getNewValue) => handleDescriptionChange(getNewValue())}
+        />
+      </TitleDescriptionContainer>
 
       <MediumText>Difficulty:</MediumText>
       {Object.keys(Difficulty).map((key) => {
