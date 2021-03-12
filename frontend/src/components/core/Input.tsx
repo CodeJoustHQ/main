@@ -75,8 +75,7 @@ export const ConsoleTextArea = styled.textarea`
 export const FixedTextArea = styled.textarea`
   font-family: monospace;
   margin: 2px;
-  min-width: 20%;
-  max-width: 70%;
+  width: 100%;
   min-height: 24px;
   max-height: 150px;
   resize: none;
@@ -85,7 +84,7 @@ export const FixedTextArea = styled.textarea`
   border: 3px solid ${({ theme }) => theme.colors.darkBlue};
   border-radius: 0.25rem;
   
-  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  font-size: ${({ theme }) => theme.fontSize.default};
 `;
 
 export const NumberInput = styled(Input).attrs(() => ({
