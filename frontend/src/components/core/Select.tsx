@@ -1,8 +1,11 @@
 import styled from 'styled-components';
 
 const PrimarySelect = styled.select`
-  padding: 2.5px 10px;
-  border: 2px solid ${({ theme }) => theme.colors.blue};
+  color: ${({ theme }) => theme.colors.text};
+  font-family: ${({ theme }) => theme.font};
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  padding: 0.5rem 1rem;
+  border: 3px solid ${({ theme }) => theme.colors.blue};
   border-radius: 5px;
 `;
 

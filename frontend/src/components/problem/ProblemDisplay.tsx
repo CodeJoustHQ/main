@@ -219,18 +219,6 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             }
           </PrimarySelect>
 
-          {Object.keys(ProblemIOType).map((key) => {
-            const inputType = ProblemIOType[key as keyof typeof ProblemIOType];
-            return (
-              <ProblemIOTypeButton
-                onClick={() => handleInputChange(index,
-                  newProblem.problemInputs[index].name, inputType)}
-                active={inputType === newProblem.problemInputs[index].type}
-              >
-                {key}
-              </ProblemIOTypeButton>
-            );
-          })}
           <SmallButton onClick={() => deleteProblemInput(index)}>Delete Input</SmallButton>
         </div>
       ))}
