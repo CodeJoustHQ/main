@@ -314,7 +314,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
           <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
           {newProblem.problemInputs.map((input, index) => (
-            <div>
+            <div style={{ marginBottom: '5px' }}>
               <TextInput
                 value={newProblem.problemInputs[index].name}
                 onChange={(e) => handleInputChange(index,
@@ -336,7 +336,16 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                 }
               </PrimarySelect>
 
-              <SmallButton onClick={() => deleteProblemInput(index)}>Delete Input</SmallButton>
+              <TextButton
+                style={{
+                  display: 'inline-block',
+                  marginLeft: '2.5px',
+                }}
+                color={ThemeConfig.colors.gray}
+                onClick={() => deleteProblemInput(index)}
+              >
+                ✕
+              </TextButton>
             </div>
           ))}
           <TextButton
