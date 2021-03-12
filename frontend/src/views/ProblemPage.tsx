@@ -60,11 +60,10 @@ function ProblemPage() {
   return (
     <>
       <LargeText>Edit Problem</LargeText>
+      { error ? <ErrorMessage message={error} /> : null }
+      { loading ? <Loading /> : null }
       <Content>
         <ProblemDisplay problem={problem!} onClick={handleEdit} actionText="Save" editMode />
-
-        { error ? <ErrorMessage message={error} /> : null }
-        { loading ? <Loading /> : null }
       </Content>
     </>
   );

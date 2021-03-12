@@ -15,8 +15,8 @@ const Content = styled.div`
 function CreateProblemPage() {
   const firstProblem = {
     problemId: '',
-    name: 'Name',
-    description: 'Description',
+    name: '',
+    description: '',
     difficulty: Difficulty.Easy,
     testCases: [],
     problemInputs: [],
@@ -48,11 +48,10 @@ function CreateProblemPage() {
   return (
     <>
       <LargeText>Create Problem</LargeText>
+      { error ? <ErrorMessage message={error} /> : null }
+      { loading ? <Loading /> : null }
       <Content>
-        <ProblemDisplay problem={problem!} onClick={handleSubmit} actionText="Create Problem" editMode={false} />
-
-        { error ? <ErrorMessage message={error} /> : null }
-        { loading ? <Loading /> : null }
+        <ProblemDisplay problem={problem!} onClick={handleSubmit} actionText="Create" editMode={false} />
       </Content>
     </>
   );

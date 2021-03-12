@@ -280,6 +280,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                 </SettingsContainer>
               ))}
               <SmallButton
+                style={{ display: 'block' }}
                 color={ThemeConfig.colors.gradients.green}
                 onClick={addTestCase}
               >
@@ -349,7 +350,6 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             </div>
           ))}
           <TextButton
-            style={{ margin: '0.5rem 0' }}
             color={ThemeConfig.colors.gray}
             onClick={addProblemInput}
           >
