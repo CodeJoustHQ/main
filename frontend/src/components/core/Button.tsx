@@ -45,6 +45,7 @@ export const TextButton = styled.button<ThemeType>`
   background: none;
   border: none;
   color: ${({ color }) => color};
+  font-family: ${({ theme }) => theme.font};
   font-size: ${({ theme }) => theme.fontSize.default};
   cursor: pointer;
   

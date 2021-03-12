@@ -320,7 +320,6 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                 onChange={(e) => handleInputChange(index,
                   e.target.value, newProblem.problemInputs[index].type)}
               />
-              <br />
 
               <PrimarySelect
                 onChange={(e) => handleInputChange(
@@ -340,7 +339,13 @@ function ProblemDisplay(props: ProblemDisplayParams) {
               <SmallButton onClick={() => deleteProblemInput(index)}>Delete Input</SmallButton>
             </div>
           ))}
-          <SmallButton onClick={addProblemInput}>Add Input</SmallButton>
+          <TextButton
+            style={{ margin: '0.5rem 0' }}
+            color={ThemeConfig.colors.gray}
+            onClick={addProblemInput}
+          >
+            Add +
+          </TextButton>
 
           <LowMarginMediumText>Problem Output</LowMarginMediumText>
           <PrimarySelect

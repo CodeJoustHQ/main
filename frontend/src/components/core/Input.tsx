@@ -105,12 +105,13 @@ export const NumberInput = styled(Input).attrs(() => ({
 export const TextInput = styled(Input).attrs(() => ({
   type: 'text',
 }))`
-  display: block;
-  width: 10rem;
-  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  display: inline-block;
+  margin: 0 0.5rem 0 0;
+  width: 5rem;
+  font-size: ${({ theme }) => theme.fontSize.default};
   font-family: ${({ theme }) => theme.font};
   font-weight: 400;
-  padding: 0.5rem 1rem;
+  padding: 0 0.25rem;
   color: ${({ theme }) => theme.colors.text};
 
   &:focus {
