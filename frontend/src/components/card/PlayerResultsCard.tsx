@@ -50,7 +50,7 @@ function PlayerResultsCard(props: PlayerResultsCardProps) {
           <CenteredContainer>
             <PlayerIcon
               hexColor={color.hexColor}
-              active={Boolean(player.user.sessionId || isCurrentPlayer)}
+              active={Boolean(player.user.sessionId)}
             />
             <br />
             <LowMarginText>{`${place}. ${getDisplayNickname()}`}</LowMarginText>

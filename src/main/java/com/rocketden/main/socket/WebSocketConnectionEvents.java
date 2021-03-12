@@ -74,7 +74,7 @@ public class WebSocketConnectionEvents {
         try {
             Thread.sleep(500);
         } catch (Exception e) {
-            System.out.println("Thread sleep failed on socket connection");
+            log.info("Thread sleep failed on socket connection");
         }
 
         // Update the session ID of the relevant user, if it is found.
@@ -91,7 +91,8 @@ public class WebSocketConnectionEvents {
             // If a game exists, update the room info for that game
             gameService.conditionallyUpdateSocketInfo(room, user);
 
-            log.info("User {} connected to room {}", user.getNickname(), room.getRoomId());
+            log.info("User [nickname: {}, userId: {}] connected to room {}",
+                    user.getNickname(), user.getUserId(), room.getRoomId());
         }
     }
 
@@ -116,7 +117,8 @@ public class WebSocketConnectionEvents {
             // If a game exists, update the room info for that game
             gameService.conditionallyUpdateSocketInfo(room, user);
 
-            log.info("User {} disconnected from room {}", user.getNickname(), room.getRoomId());
+            log.info("User [nickname: {}, userId: {}] disconnected from room {}",
+                    user.getNickname(), user.getUserId(), room.getRoomId());
         }
     }
 }
