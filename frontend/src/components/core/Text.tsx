@@ -28,6 +28,11 @@ export const MediumText = styled.h5`
   font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
 `;
 
+export const LowMarginMediumText = styled.h5`
+  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+  margin: 1rem 0;
+`;
+
 export const LargeText = styled.h3`
   font-size: ${({ theme }) => theme.fontSize.xLarge};
 `;

@@ -66,10 +66,10 @@ export const SmallDifficultyButton = styled(DefaultButton)<DifficultyProps>`
   color: ${({ active, difficulty, theme }) => (active ? theme.colors.white : difficultyToColor[difficulty].color)};
   width: 6vw;
   height: 3vw;
-  min-width: 50px;
+  min-width: 80px;
   min-height: 20px;
   border-radius: 20px;
-  margin: 0 1rem 0 0;
+  margin: 0.5rem 1rem 0 0;
 
   &:disabled {
     background-color: ${({ theme }) => theme.colors.gray};

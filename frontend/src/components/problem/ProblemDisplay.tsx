@@ -17,13 +17,12 @@ import {
 import { Difficulty } from '../../api/Difficulty';
 import {
   SmallDifficultyButton,
-  DifficultyButton,
   PrimaryButton,
   TextButton,
   SmallButton,
 } from '../core/Button';
 import PrimarySelect from '../core/Select';
-import { SmallHeaderText, MediumText, Text } from '../core/Text';
+import { SmallHeaderText, LowMarginMediumText, Text } from '../core/Text';
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
 import { ThemeConfig } from '../config/Theme';
@@ -295,7 +294,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       <SidebarContent>
         <SmallHeaderText>Options</SmallHeaderText>
         <SettingsContainer>
-          <MediumText>Difficulty</MediumText>
+          <LowMarginMediumText>Difficulty</LowMarginMediumText>
           {Object.keys(Difficulty).map((key) => {
             const difficulty = Difficulty[key as keyof typeof Difficulty];
             if (difficulty !== Difficulty.Random) {
@@ -313,7 +312,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             return null;
           })}
 
-          <MediumText>Problem Inputs</MediumText>
+          <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
           {newProblem.problemInputs.map((input, index) => (
             <div>
               <TextInput
@@ -343,7 +342,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           ))}
           <SmallButton onClick={addProblemInput}>Add Input</SmallButton>
 
-          <MediumText>Problem Output</MediumText>
+          <LowMarginMediumText>Problem Output</LowMarginMediumText>
           <PrimarySelect
             onChange={(e) => handleEnumChange('outputType', ProblemIOType[e.target.value as keyof typeof ProblemIOType])}
             value={problemIOTypeToString(newProblem.outputType)}
@@ -358,8 +357,9 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           {editMode
             ? (
               <>
-                <MediumText>Danger Zone</MediumText>
+                <LowMarginMediumText>Danger Zone</LowMarginMediumText>
                 <PrimaryButton
+                  style={{ margin: '0 0 1rem 0' }}
                   color={ThemeConfig.colors.gradients.red}
                   onClick={deleteProblemFunc}
                 >
