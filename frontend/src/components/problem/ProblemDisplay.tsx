@@ -18,6 +18,7 @@ import { Difficulty } from '../../api/Difficulty';
 import {
   DifficultyButton,
   PrimaryButton,
+  TextButton,
   SmallButton,
 } from '../core/Button';
 import PrimarySelect from '../core/Select';
@@ -49,8 +50,8 @@ const SettingsContainer = styled.div<any>`
   background: ${({ theme }) => theme.colors.white};
 `;
 
-const MarginRightContainer = styled.div`
-  margin-right: 1rem;
+const MarginRightContainer = styled.div<any>`
+  margin-right: ${({ marginRight }) => marginRight}%;
 `;
 
 type ProblemDisplayParams = {
@@ -213,7 +214,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
               {newProblem.testCases.map((testCase, index) => (
                 <SettingsContainer>
                   <FlexBareContainer>
-                    <MarginRightContainer>
+                    <MarginRightContainer marginRight="10">
                       <Text style={{ marginTop: 0 }}>Input</Text>
                       <FixedTextArea
                         value={newProblem.testCases[index].input}
@@ -224,7 +225,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                         }}
                       />
                     </MarginRightContainer>
-                    <MarginRightContainer style={{ marginLeft: 'auto' }}>
+                    <MarginRightContainer marginRight="5" style={{ marginLeft: 'auto' }}>
                       <Text style={{ marginTop: 0 }}>Output</Text>
                       <FixedTextArea
                         value={newProblem.testCases[index].output}
@@ -237,8 +238,8 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                     </MarginRightContainer>
                   </FlexBareContainer>
 
-                  <FlexBareContainer>
-                    <MarginRightContainer style={{ flex: 2 }}>
+                  <FlexBareContainer style={{ marginBottom: '10px' }}>
+                    <MarginRightContainer marginRight="5" style={{ flex: 2 }}>
                       <Text>Explanation</Text>
                       <FixedTextArea
                         value={newProblem.testCases[index].explanation}
@@ -252,7 +253,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                   </FlexBareContainer>
 
                   <FlexBareContainer>
-                    <MarginRightContainer>
+                    <MarginRightContainer marginRight="5">
                       <label htmlFor={`problem-hidden-${index}`}>
                         Hidden
                         <CheckboxInput
@@ -267,12 +268,13 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                       </label>
                     </MarginRightContainer>
 
-                    <MarginRightContainer style={{ marginLeft: 'auto' }}>
-                      <SmallButton
+                    <MarginRightContainer marginRight="5" style={{ marginLeft: 'auto' }}>
+                      <TextButton
+                        color={ThemeConfig.colors.red2}
                         onClick={() => deleteTestCase(index)}
                       >
-                        Delete Test Case
-                      </SmallButton>
+                        Delete
+                      </TextButton>
                     </MarginRightContainer>
                   </FlexBareContainer>
                 </SettingsContainer>
