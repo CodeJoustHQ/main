@@ -7,7 +7,6 @@ import { LargeText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import ProblemDisplay from '../components/problem/ProblemDisplay';
-import { TextLink } from '../components/core/Link';
 
 const Content = styled.div`
   padding: 0 20%;
@@ -61,7 +60,6 @@ function ProblemPage() {
   return (
     <Content>
       <LargeText>Edit Problem</LargeText>
-      <TextLink to="/problems/all">Back to all problems</TextLink>
       <ProblemDisplay problem={problem!} onClick={handleEdit} actionText="Save" editMode />
 
       { error ? <ErrorMessage message={error} /> : null }

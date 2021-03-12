@@ -21,19 +21,21 @@ import {
   SmallButton,
 } from '../core/Button';
 import PrimarySelect from '../core/Select';
-import { MediumText, Text } from '../core/Text';
+import { SmallHeaderText, MediumText, Text } from '../core/Text';
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
 import { ThemeConfig } from '../config/Theme';
+import { PrimaryButtonLink } from '../core/Link';
 
 const Content = styled.div`
+  text-align: left;
   padding: 10px;
 `;
 
 const TitleDescriptionContainer = styled.div`
   text-align: left;
-  padding: 2rem;
-  border-radius: 5px;
+  padding: 3rem;
+  border-radius: 10px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   background: ${({ theme }) => theme.colors.white};
 `;
@@ -158,7 +160,24 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
   return (
     <Content>
-      <MediumText>Problem</MediumText>
+      <SmallHeaderText>Problem</SmallHeaderText>
+      <PrimaryButton
+        fontWeight="700"
+        width="8vw"
+        color={ThemeConfig.colors.gradients.blue}
+        onClick={() => onClick(newProblem)}
+      >
+        {actionText}
+      </PrimaryButton>
+      <PrimaryButtonLink
+        fontWeight="700"
+        width="8vw"
+        color={ThemeConfig.colors.gradients.gray}
+        onClick={() => onClick(newProblem)}
+        to="/problems/all"
+      >
+        Back
+      </PrimaryButtonLink>
       <TitleDescriptionContainer>
         <PureTextInputTitle
           placeholder="Write a nice title"
@@ -174,7 +193,8 @@ function ProblemDisplay(props: ProblemDisplayParams) {
         />
       </TitleDescriptionContainer>
 
-      <MediumText>Difficulty:</MediumText>
+      <SmallHeaderText>Options</SmallHeaderText>
+      <MediumText>Difficulty</MediumText>
       {Object.keys(Difficulty).map((key) => {
         const difficulty = Difficulty[key as keyof typeof Difficulty];
         if (difficulty !== Difficulty.Random) {
@@ -192,10 +212,9 @@ function ProblemDisplay(props: ProblemDisplayParams) {
         return null;
       })}
 
-      <MediumText>Problem Inputs:</MediumText>
+      <MediumText>Problem Inputs</MediumText>
       {newProblem.problemInputs.map((input, index) => (
         <div>
-          <Text bold>{`Input ${index + 1}`}</Text>
           <TextInput
             value={newProblem.problemInputs[index].name}
             onChange={(e) => handleInputChange(index,
@@ -223,7 +242,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       ))}
       <SmallButton onClick={addProblemInput}>Add Input</SmallButton>
 
-      <MediumText>Output Type:</MediumText>
+      <MediumText>Problem Output</MediumText>
       <PrimarySelect
         onChange={(e) => handleEnumChange('outputType', ProblemIOType[e.target.value as keyof typeof ProblemIOType])}
         value={problemIOTypeToString(newProblem.outputType)}
@@ -237,11 +256,26 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
       {editMode
         ? (
+          <>
+            <MediumText>Danger Zone</MediumText>
+            <PrimaryButton
+              fontWeight="700"
+              width="12vw"
+              color={ThemeConfig.colors.gradients.red}
+              onClick={deleteProblemFunc}
+            >
+              Delete Problem
+            </PrimaryButton>
+          </>
+        )
+        : null}
+
+      {editMode
+        ? (
           <div>
             <MediumText>Test Cases:</MediumText>
             {newProblem.testCases.map((testCase, index) => (
               <div>
-                <Text bold>{`Test Case ${index + 1}`}</Text>
                 <Text>Input</Text>
                 <ConsoleTextArea
                   value={newProblem.testCases[index].input}
@@ -291,35 +325,6 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             <SmallButton onClick={addTestCase}>Add Test Case</SmallButton>
           </div>
         ) : null}
-
-      <PrimaryButton
-        fontWeight="700"
-        width="8vw"
-        color={ThemeConfig.colors.gradients.blue}
-        onClick={() => onClick(newProblem)}
-      >
-        {actionText}
-      </PrimaryButton>
-      <PrimaryButton
-        fontWeight="700"
-        width="8vw"
-        color={ThemeConfig.colors.gradients.gray}
-        onClick={() => onClick(newProblem)}
-      >
-        Back
-      </PrimaryButton>
-      {editMode
-        ? (
-          <PrimaryButton
-            fontWeight="700"
-            width="12vw"
-            color={ThemeConfig.colors.gradients.red}
-            onClick={deleteProblemFunc}
-          >
-            Delete Problem
-          </PrimaryButton>
-        )
-        : null}
 
       {loading ? <Loading /> : null}
       {error ? <ErrorMessage message={error} /> : null}

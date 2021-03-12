@@ -18,6 +18,11 @@ export const SmallText = styled.p`
   margin: 6px 0;
 `;
 
+export const SmallHeaderText = styled.p`
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  margin: 6px 0;
+`;
+
 export const MediumText = styled.h5`
   font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
 `;
