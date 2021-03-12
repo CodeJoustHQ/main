@@ -867,12 +867,27 @@ public class GameManagementServiceTests {
     }
 
     @Test
-    public void conditionallyUpdateSocketInfoNoGameFound() {
+    public void conditionallyUpdateSocketInfoNotFound() {
         Room room = new Room();
         room.setRoomId("999998");
 
         gameService.conditionallyUpdateSocketInfo(room, null);
 
+        verify(socketService, never()).sendSocketUpdate(Mockito.any(GameDto.class));
+
+        room.setRoomId(ROOM_ID);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        gameService.createAddGameFromRoom(room);
+
+        User newUser = new User();
+        newUser.setNickname(NICKNAME_2);
+        newUser.setUserId(USER_ID_2);
+
+        gameService.conditionallyUpdateSocketInfo(room, newUser);
         verify(socketService, never()).sendSocketUpdate(Mockito.any(GameDto.class));
     }
 }

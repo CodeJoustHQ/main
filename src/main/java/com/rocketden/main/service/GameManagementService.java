@@ -20,6 +20,7 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.GameTimer;
+import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
@@ -242,10 +243,13 @@ public class GameManagementService {
         Game game = currentGameMap.get(room.getRoomId());
 
         if (game != null) {
-            log.info("Updating socket info for game {}", room.getRoomId());
-            game.setRoom(room);
-            game.getPlayers().get(user.getUserId()).setUser(user);
-            socketService.sendSocketUpdate(GameMapper.toDto(game));
+            Player player = game.getPlayers().get(user.getUserId());
+            if (player != null) {
+                log.info("Updating socket info for game {}", room.getRoomId());
+                game.setRoom(room);
+                player.setUser(user);
+                socketService.sendSocketUpdate(GameMapper.toDto(game));
+            }
         }
     }
 }
