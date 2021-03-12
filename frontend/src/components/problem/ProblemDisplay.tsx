@@ -27,9 +27,16 @@ import ErrorMessage from '../core/Error';
 import { ThemeConfig } from '../config/Theme';
 import { PrimaryButtonLink } from '../core/Link';
 
-const Content = styled.div`
+const MainContent = styled.div`
   text-align: left;
   padding: 10px;
+  flex: 6;
+`;
+
+const SidebarContent = styled.div`
+  text-align: left;
+  padding: 10px;
+  flex: 4;
 `;
 
 const TitleDescriptionContainer = styled.div`
@@ -159,176 +166,179 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   };
 
   return (
-    <Content>
-      <SmallHeaderText>Problem</SmallHeaderText>
-      <PrimaryButton
-        fontWeight="700"
-        width="8vw"
-        color={ThemeConfig.colors.gradients.blue}
-        onClick={() => onClick(newProblem)}
-      >
-        {actionText}
-      </PrimaryButton>
-      <PrimaryButtonLink
-        fontWeight="700"
-        width="8vw"
-        color={ThemeConfig.colors.gradients.gray}
-        onClick={() => onClick(newProblem)}
-        to="/problems/all"
-      >
-        Back
-      </PrimaryButtonLink>
-      <TitleDescriptionContainer>
-        <PureTextInputTitle
-          placeholder="Write a nice title"
-          name="name"
-          value={newProblem.name}
-          onChange={handleChange}
-        />
-        <hr style={{ margin: '1rem 0' }} />
-        <MarkdownEditor
-          placeholder="Write a nice description"
-          defaultValue={newProblem.description}
-          onChange={(getNewValue) => handleDescriptionChange(getNewValue())}
-        />
-      </TitleDescriptionContainer>
-
-      <SmallHeaderText>Options</SmallHeaderText>
-      <MediumText>Difficulty</MediumText>
-      {Object.keys(Difficulty).map((key) => {
-        const difficulty = Difficulty[key as keyof typeof Difficulty];
-        if (difficulty !== Difficulty.Random) {
-          return (
-            <DifficultyButton
-              difficulty={difficulty || Difficulty.Random}
-              onClick={() => handleEnumChange('difficulty', difficulty)}
-              active={difficulty === newProblem.difficulty}
-              enabled
-            >
-              {key}
-            </DifficultyButton>
-          );
-        }
-        return null;
-      })}
-
-      <MediumText>Problem Inputs</MediumText>
-      {newProblem.problemInputs.map((input, index) => (
-        <div>
-          <TextInput
-            value={newProblem.problemInputs[index].name}
-            onChange={(e) => handleInputChange(index,
-              e.target.value, newProblem.problemInputs[index].type)}
+    <>
+      <MainContent>
+        <SmallHeaderText>Problem</SmallHeaderText>
+        <PrimaryButton
+          fontWeight="700"
+          width="8vw"
+          color={ThemeConfig.colors.gradients.blue}
+          onClick={() => onClick(newProblem)}
+        >
+          {actionText}
+        </PrimaryButton>
+        <PrimaryButtonLink
+          fontWeight="700"
+          width="8vw"
+          color={ThemeConfig.colors.gradients.gray}
+          onClick={() => onClick(newProblem)}
+          to="/problems/all"
+        >
+          Back
+        </PrimaryButtonLink>
+        <TitleDescriptionContainer>
+          <PureTextInputTitle
+            placeholder="Write a nice title"
+            name="name"
+            value={newProblem.name}
+            onChange={handleChange}
           />
-          <br />
+          <hr style={{ margin: '1rem 0' }} />
+          <MarkdownEditor
+            placeholder="Write a nice description"
+            defaultValue={newProblem.description}
+            onChange={(getNewValue) => handleDescriptionChange(getNewValue())}
+          />
+        </TitleDescriptionContainer>
 
-          <PrimarySelect
-            onChange={(e) => handleInputChange(
-              index,
-              newProblem.problemInputs[index].name,
-              ProblemIOType[e.target.value as keyof typeof ProblemIOType],
-            )}
-            value={problemIOTypeToString(newProblem.problemInputs[index].type)}
-          >
-            {
-              Object.keys(ProblemIOType).map((key) => (
-                <option key={key} value={key}>{key}</option>
-              ))
-            }
-          </PrimarySelect>
-
-          <SmallButton onClick={() => deleteProblemInput(index)}>Delete Input</SmallButton>
-        </div>
-      ))}
-      <SmallButton onClick={addProblemInput}>Add Input</SmallButton>
-
-      <MediumText>Problem Output</MediumText>
-      <PrimarySelect
-        onChange={(e) => handleEnumChange('outputType', ProblemIOType[e.target.value as keyof typeof ProblemIOType])}
-        value={problemIOTypeToString(newProblem.outputType)}
-      >
-        {
-          Object.keys(ProblemIOType).map((key) => (
-            <option key={key} value={key}>{key}</option>
-          ))
-        }
-      </PrimarySelect>
-
-      {editMode
-        ? (
-          <>
-            <MediumText>Danger Zone</MediumText>
-            <PrimaryButton
-              fontWeight="700"
-              width="12vw"
-              color={ThemeConfig.colors.gradients.red}
-              onClick={deleteProblemFunc}
-            >
-              Delete Problem
-            </PrimaryButton>
-          </>
-        )
-        : null}
-
-      {editMode
-        ? (
-          <div>
-            <MediumText>Test Cases:</MediumText>
-            {newProblem.testCases.map((testCase, index) => (
-              <div>
-                <Text>Input</Text>
-                <ConsoleTextArea
-                  value={newProblem.testCases[index].input}
-                  onChange={(e) => {
-                    const current = newProblem.testCases[index];
-                    handleTestCaseChange(index, e.target.value,
-                      current.output, current.hidden, current.explanation);
-                  }}
-                />
-                <br />
-                <Text>Output</Text>
-                <TextInput
-                  value={newProblem.testCases[index].output}
-                  onChange={(e) => {
-                    const current = newProblem.testCases[index];
-                    handleTestCaseChange(index, current.input, e.target.value,
-                      current.hidden, current.explanation);
-                  }}
-                />
-
-                <Text>Explanation</Text>
-                <TextInput
-                  value={newProblem.testCases[index].explanation}
-                  onChange={(e) => {
-                    const current = newProblem.testCases[index];
-                    handleTestCaseChange(index, current.input, current.output,
-                      current.hidden, e.target.value);
-                  }}
-                />
-
-                <label htmlFor={`problem-hidden-${index}`}>
-                  Hidden
-                  <CheckboxInput
-                    id={`problem-hidden-${index}`}
-                    checked={newProblem.testCases[index].hidden}
+        {editMode
+          ? (
+            <div>
+              <MediumText>Test Cases:</MediumText>
+              {newProblem.testCases.map((testCase, index) => (
+                <div>
+                  <Text>Input</Text>
+                  <ConsoleTextArea
+                    value={newProblem.testCases[index].input}
                     onChange={(e) => {
                       const current = newProblem.testCases[index];
-                      handleTestCaseChange(index, current.input,
-                        current.output, e.target.checked, current.explanation);
+                      handleTestCaseChange(index, e.target.value,
+                        current.output, current.hidden, current.explanation);
                     }}
                   />
-                </label>
+                  <br />
+                  <Text>Output</Text>
+                  <TextInput
+                    value={newProblem.testCases[index].output}
+                    onChange={(e) => {
+                      const current = newProblem.testCases[index];
+                      handleTestCaseChange(index, current.input, e.target.value,
+                        current.hidden, current.explanation);
+                    }}
+                  />
 
-                <SmallButton onClick={() => deleteTestCase(index)}>Delete Test Case</SmallButton>
-              </div>
-            ))}
-            <SmallButton onClick={addTestCase}>Add Test Case</SmallButton>
+                  <Text>Explanation</Text>
+                  <TextInput
+                    value={newProblem.testCases[index].explanation}
+                    onChange={(e) => {
+                      const current = newProblem.testCases[index];
+                      handleTestCaseChange(index, current.input, current.output,
+                        current.hidden, e.target.value);
+                    }}
+                  />
+
+                  <label htmlFor={`problem-hidden-${index}`}>
+                    Hidden
+                    <CheckboxInput
+                      id={`problem-hidden-${index}`}
+                      checked={newProblem.testCases[index].hidden}
+                      onChange={(e) => {
+                        const current = newProblem.testCases[index];
+                        handleTestCaseChange(index, current.input,
+                          current.output, e.target.checked, current.explanation);
+                      }}
+                    />
+                  </label>
+
+                  <SmallButton onClick={() => deleteTestCase(index)}>Delete Test Case</SmallButton>
+                </div>
+              ))}
+              <SmallButton onClick={addTestCase}>Add Test Case</SmallButton>
+            </div>
+          ) : null}
+
+        {loading ? <Loading /> : null}
+        {error ? <ErrorMessage message={error} /> : null}
+      </MainContent>
+      <SidebarContent>
+        <SmallHeaderText>Options</SmallHeaderText>
+        <MediumText>Difficulty</MediumText>
+        {Object.keys(Difficulty).map((key) => {
+          const difficulty = Difficulty[key as keyof typeof Difficulty];
+          if (difficulty !== Difficulty.Random) {
+            return (
+              <DifficultyButton
+                difficulty={difficulty || Difficulty.Random}
+                onClick={() => handleEnumChange('difficulty', difficulty)}
+                active={difficulty === newProblem.difficulty}
+                enabled
+              >
+                {key}
+              </DifficultyButton>
+            );
+          }
+          return null;
+        })}
+
+        <MediumText>Problem Inputs</MediumText>
+        {newProblem.problemInputs.map((input, index) => (
+          <div>
+            <TextInput
+              value={newProblem.problemInputs[index].name}
+              onChange={(e) => handleInputChange(index,
+                e.target.value, newProblem.problemInputs[index].type)}
+            />
+            <br />
+
+            <PrimarySelect
+              onChange={(e) => handleInputChange(
+                index,
+                newProblem.problemInputs[index].name,
+                ProblemIOType[e.target.value as keyof typeof ProblemIOType],
+              )}
+              value={problemIOTypeToString(newProblem.problemInputs[index].type)}
+            >
+              {
+                Object.keys(ProblemIOType).map((key) => (
+                  <option key={key} value={key}>{key}</option>
+                ))
+              }
+            </PrimarySelect>
+
+            <SmallButton onClick={() => deleteProblemInput(index)}>Delete Input</SmallButton>
           </div>
-        ) : null}
+        ))}
+        <SmallButton onClick={addProblemInput}>Add Input</SmallButton>
 
-      {loading ? <Loading /> : null}
-      {error ? <ErrorMessage message={error} /> : null}
-    </Content>
+        <MediumText>Problem Output</MediumText>
+        <PrimarySelect
+          onChange={(e) => handleEnumChange('outputType', ProblemIOType[e.target.value as keyof typeof ProblemIOType])}
+          value={problemIOTypeToString(newProblem.outputType)}
+        >
+          {
+            Object.keys(ProblemIOType).map((key) => (
+              <option key={key} value={key}>{key}</option>
+            ))
+          }
+        </PrimarySelect>
+
+        {editMode
+          ? (
+            <>
+              <MediumText>Danger Zone</MediumText>
+              <PrimaryButton
+                fontWeight="700"
+                width="12vw"
+                color={ThemeConfig.colors.gradients.red}
+                onClick={deleteProblemFunc}
+              >
+                Delete Problem
+              </PrimaryButton>
+            </>
+          )
+          : null}
+      </SidebarContent>
+    </>
   );
 }
 

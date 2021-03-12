@@ -9,7 +9,7 @@ import Loading from '../components/core/Loading';
 import ProblemDisplay from '../components/problem/ProblemDisplay';
 
 const Content = styled.div`
-  padding: 0 20%;
+  display: flex;
 `;
 
 type ProblemParams = {
@@ -58,13 +58,15 @@ function ProblemPage() {
   };
 
   return (
-    <Content>
+    <>
       <LargeText>Edit Problem</LargeText>
-      <ProblemDisplay problem={problem!} onClick={handleEdit} actionText="Save" editMode />
+      <Content>
+        <ProblemDisplay problem={problem!} onClick={handleEdit} actionText="Save" editMode />
 
-      { error ? <ErrorMessage message={error} /> : null }
-      { loading ? <Loading /> : null }
-    </Content>
+        { error ? <ErrorMessage message={error} /> : null }
+        { loading ? <Loading /> : null }
+      </Content>
+    </>
   );
 }
 
