@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 
@@ -40,6 +42,8 @@ public class GameTimer {
     private boolean timeUp = false;
 
     private Timer timer;
+
+    private List<Timer> notificationTimers = new ArrayList<>();
 
     /**
      * Instantiate the GameTimer class, and schedule the end game task after

@@ -3,6 +3,7 @@ package com.rocketden.main.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
@@ -137,7 +138,7 @@ public class GameManagementService {
         setStartGameTimer(game, time);
 
         currentGameMap.put(room.getRoomId(), game);
-        notificationService.scheduleTimeLeftNotifications(room.getRoomId(), time);
+        notificationService.scheduleTimeLeftNotifications(game, time);
     }
 
     // Set and start the Game Timer.
@@ -180,6 +181,10 @@ public class GameManagementService {
         }
 
         SubmissionDto submissionDto = submitService.submitSolution(game, request);
+
+        if (isGameOver(game)) {
+            endGame(game);
+        }
 
         // Send socket update with latest leaderboard info
         socketService.sendSocketUpdate(GameMapper.toDto(game));
@@ -232,6 +237,16 @@ public class GameManagementService {
         }
 
         liveGameService.updateCode(game.getPlayers().get(userId), playerCode);
+    }
+
+    protected void endGame(Game game) {
+        // Cancel all previously scheduled timers
+        GameTimer gameTimer = game.getGameTimer();
+        gameTimer.getTimer().cancel();
+
+        for (Timer timer : gameTimer.getNotificationTimers()) {
+            timer.cancel();
+        }
     }
 
     protected boolean isGameOver(Game game) {
