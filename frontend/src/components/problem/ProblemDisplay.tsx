@@ -18,7 +18,6 @@ import { Difficulty } from '../../api/Difficulty';
 import {
   DifficultyButton,
   PrimaryButton,
-  ProblemIOTypeButton,
   SmallButton,
 } from '../core/Button';
 import PrimarySelect from '../core/Select';
@@ -225,17 +224,16 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       <SmallButton onClick={addProblemInput}>Add Input</SmallButton>
 
       <MediumText>Output Type:</MediumText>
-      {Object.keys(ProblemIOType).map((key) => {
-        const outputType = ProblemIOType[key as keyof typeof ProblemIOType];
-        return (
-          <ProblemIOTypeButton
-            onClick={() => handleEnumChange('outputType', outputType)}
-            active={outputType === newProblem.outputType}
-          >
-            {key}
-          </ProblemIOTypeButton>
-        );
-      })}
+      <PrimarySelect
+        onChange={(e) => handleEnumChange('outputType', ProblemIOType[e.target.value as keyof typeof ProblemIOType])}
+        value={problemIOTypeToString(newProblem.outputType)}
+      >
+        {
+          Object.keys(ProblemIOType).map((key) => (
+            <option key={key} value={key}>{key}</option>
+          ))
+        }
+      </PrimarySelect>
 
       {editMode
         ? (
@@ -295,16 +293,25 @@ function ProblemDisplay(props: ProblemDisplayParams) {
         ) : null}
 
       <PrimaryButton
+        fontWeight="700"
         width="8vw"
         color={ThemeConfig.colors.gradients.blue}
-        value={actionText}
         onClick={() => onClick(newProblem)}
       >
         {actionText}
       </PrimaryButton>
+      <PrimaryButton
+        fontWeight="700"
+        width="8vw"
+        color={ThemeConfig.colors.gradients.gray}
+        onClick={() => onClick(newProblem)}
+      >
+        Back
+      </PrimaryButton>
       {editMode
         ? (
           <PrimaryButton
+            fontWeight="700"
             width="12vw"
             color={ThemeConfig.colors.gradients.red}
             onClick={deleteProblemFunc}

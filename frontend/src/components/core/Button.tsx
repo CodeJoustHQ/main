@@ -23,7 +23,7 @@ export const DefaultButton = styled.button`
 
 export const PrimaryButton = styled(DefaultButton)<any>`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
-  font-weight: 400;
+  font-weight: ${({ fontWeight }) => (fontWeight || 400)};
   background: ${({ color }) => color};
   color: ${({ theme }) => theme.colors.white};
   width: ${({ width }) => width || '16vw'};
@@ -90,26 +90,6 @@ export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`
     `};
     
     cursor: ${({ enabled }) => (enabled ? 'pointer' : 'default')};
-  }
-`;
-
-type ProblemIOTypeButtonProps = {
-  active: boolean,
-}
-
-export const ProblemIOTypeButton = styled(DefaultButton)<ProblemIOTypeButtonProps>`  
-  color: ${({ theme, active }) => (active ? theme.colors.white : theme.colors.font)};
-  background-color: ${({ theme, active }) => (active ? theme.colors.blue : theme.colors.white)};
-  padding: 4px 8px;
-  margin: 0.8rem;
-  
-  &:hover {
-    ${({ theme }) => `
-      color: ${theme.colors.white};
-      background-color: ${theme.colors.blue};
-    `};
-    
-    cursor: pointer;
   }
 `;
 
