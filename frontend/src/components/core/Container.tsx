@@ -7,6 +7,10 @@ export const FlexContainer = styled.div`
   margin: 1rem;
 `;
 
+export const FlexBareContainer = styled.div`
+  display: flex;
+`;
+
 export const FlexHorizontalContainer = styled.div`
   display: flex;
   flex: auto;
