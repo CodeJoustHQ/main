@@ -21,7 +21,7 @@ export const SmallText = styled.p`
 export const SmallHeaderText = styled.p`
   display: inline-block;
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
-  margin: 6px 0;
+  margin: 10px 0;
 `;
 
 export const MediumText = styled.h5`

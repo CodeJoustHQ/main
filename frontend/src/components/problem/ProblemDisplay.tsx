@@ -16,6 +16,7 @@ import {
 } from '../core/Input';
 import { Difficulty } from '../../api/Difficulty';
 import {
+  SmallDifficultyButton,
   DifficultyButton,
   PrimaryButton,
   TextButton,
@@ -279,7 +280,12 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                   </FlexBareContainer>
                 </SettingsContainer>
               ))}
-              <SmallButton onClick={addTestCase}>Add Test Case</SmallButton>
+              <SmallButton
+                color={ThemeConfig.colors.gradients.green}
+                onClick={addTestCase}
+              >
+                Add
+              </SmallButton>
             </>
           ) : null}
 
@@ -294,14 +300,14 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             const difficulty = Difficulty[key as keyof typeof Difficulty];
             if (difficulty !== Difficulty.Random) {
               return (
-                <DifficultyButton
+                <SmallDifficultyButton
                   difficulty={difficulty || Difficulty.Random}
                   onClick={() => handleEnumChange('difficulty', difficulty)}
                   active={difficulty === newProblem.difficulty}
                   enabled
                 >
                   {key}
-                </DifficultyButton>
+                </SmallDifficultyButton>
               );
             }
             return null;

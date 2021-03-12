@@ -59,6 +59,41 @@ type DifficultyProps = {
   enabled: boolean,
 }
 
+export const SmallDifficultyButton = styled(DefaultButton)<DifficultyProps>`
+  font-size: ${({ theme }) => theme.fontSize.default};
+  font-weight: 700;
+  background: ${({ active, difficulty, theme }) => (active ? difficultyToColor[difficulty].background : theme.colors.white)};
+  color: ${({ active, difficulty, theme }) => (active ? theme.colors.white : difficultyToColor[difficulty].color)};
+  width: 6vw;
+  height: 3vw;
+  min-width: 50px;
+  min-height: 20px;
+  border-radius: 20px;
+  margin: 0 1rem 0 0;
+
+  &:disabled {
+    background-color: ${({ theme }) => theme.colors.gray};
+
+    &:hover {
+      cursor: default;
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
+    }
+  }
+  
+  &:hover {
+    ${({
+    difficulty,
+    theme,
+    enabled,
+  }) => enabled && `
+      color: ${theme.colors.white};
+      background: ${difficultyToColor[difficulty].background};
+    `};
+    
+    cursor: ${({ enabled }) => (enabled ? 'pointer' : 'default')};
+  }
+`;
+
 export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   font-weight: 700;
