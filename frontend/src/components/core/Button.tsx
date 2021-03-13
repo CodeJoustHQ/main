@@ -95,7 +95,7 @@ export const ProblemIOTypeButton = styled(DefaultButton)<ProblemIOTypeButtonProp
 
 export const SmallButton = styled(DefaultButton)`
   color: ${({ theme }) => theme.colors.white};
-  background: ${({ theme }) => theme.colors.blueCircle};
+  background: ${({ theme }) => theme.colors.gradients.blue};
   font-size: ${({ theme }) => theme.fontSize.xMediumSmall};
   padding: 0;
   margin: 0.4rem;
@@ -105,5 +105,5 @@ export const SmallButton = styled(DefaultButton)`
 `;
 
 export const GreenSmallButton = styled(SmallButton)`
-  background: ${({ theme }) => theme.colors.greenCircle};
+  background: ${({ theme }) => theme.colors.gradients.green};
 `;

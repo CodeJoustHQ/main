@@ -12,7 +12,7 @@ type PlayerIconContentProps = {
 };
 
 const PlayerIconContent = styled.div<PlayerIconContentProps>`
-  background: ${({ theme, gradientColor }) => theme.colors[gradientColor]};
+  background: ${({ theme, gradientColor }) => theme.colors.gradients[gradientColor]};
   border-radius: 50%;
   margin: 0 auto;
   

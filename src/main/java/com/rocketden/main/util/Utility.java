@@ -31,12 +31,12 @@ public class Utility {
     /**
      * Colors to be generated for players.
      */
-    public static final Color RED = new Color("redCircle");
-    public static final Color YELLOW = new Color("yellowCircle");
-    public static final Color GREEN = new Color("greenCircle");
-    public static final Color BLUE = new Color("blueCircle");
-    public static final Color PURPLE = new Color("purpleCircle");
-    public static final Color PINK = new Color("pinkCircle");
+    public static final Color RED = new Color("red");
+    public static final Color YELLOW = new Color("yellow");
+    public static final Color GREEN = new Color("green");
+    public static final Color BLUE = new Color("blue");
+    public static final Color PURPLE = new Color("purple");
+    public static final Color PINK = new Color("pink");
     public static final List<Color> COLOR_LIST = List.of(RED, YELLOW, GREEN, BLUE, PURPLE, PINK);
 
     private final RoomRepository roomRepository;
