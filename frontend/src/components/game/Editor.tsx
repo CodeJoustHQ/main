@@ -29,7 +29,7 @@ const LanguageContainer = styled.div`
   z-index: 1;
   margin: 5px;
   padding: 7.5px;
-  background: white;
+  background: transparent;
   text-align: center;
 `;
 
@@ -70,6 +70,15 @@ function ResizableMonacoEditor(props: EditorProps) {
     window.addEventListener('secondaryPanelSizeChange', () => {
       editor.layout();
     });
+
+    // editor.defineTheme('default-theme', {
+    //   base: 'vs',
+    //   inherit: true,
+    //   rules: [],
+    //   colors: {
+    //     'editor.background': '#000000',
+    //   },
+    // });
   };
 
   const handleLanguageChange = (language: Language) => {
@@ -111,6 +120,13 @@ function ResizableMonacoEditor(props: EditorProps) {
             minimap: { enabled: false },
             automaticLayout: true,
             scrollBeyondLastLine: false,
+            renderIndentGuides: false,
+            overviewRulerLanes: 0,
+            hideCursorInOverviewRuler: true,
+            overviewRulerBorder: false,
+            renderLineHighlight: 'line',
+            quickSuggestions: false,
+            // fontFamily: 'Titillium Web',
           }}
           height="100%"
           editorDidMount={handleEditorDidMount}
