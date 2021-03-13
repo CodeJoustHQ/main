@@ -9,6 +9,15 @@ export const Text = styled.p<TextAttributes>`
   font-weight: ${({ bold }) => (bold ? 'bold' : 'normal')};
 `;
 
+export const LabelAbsoluteText = styled.p<TextAttributes>`
+  position: absolute;
+  top: 10px;
+  right: 5%;
+  margin: 0;
+  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+  font-weight: 700;
+`;
+
 export const ErrorText = styled(Text)`
    color: ${({ theme }) => theme.colors.red};
 `;

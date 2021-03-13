@@ -24,7 +24,12 @@ import {
   SmallButton,
 } from '../core/Button';
 import PrimarySelect from '../core/Select';
-import { SmallHeaderText, LowMarginMediumText, Text } from '../core/Text';
+import {
+  SmallHeaderText,
+  LowMarginMediumText,
+  Text,
+  LabelAbsoluteText,
+} from '../core/Text';
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
 import { ThemeConfig } from '../config/Theme';
@@ -257,17 +262,9 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                               style={providedDraggable.draggableProps.style}
                             >
                               <SettingsContainer style={{ position: 'relative' }}>
-                                <Text style={{
-                                  position: 'absolute',
-                                  top: '10px',
-                                  right: '5%',
-                                  margin: 0,
-                                  fontWeight: 700,
-                                  fontSize: '1.5rem',
-                                }}
-                                >
+                                <LabelAbsoluteText>
                                   {index + 1}
-                                </Text>
+                                </LabelAbsoluteText>
                                 <FlexBareContainer>
                                   <MarginRightContainer marginRight="10">
                                     <Text style={{ marginTop: 0 }}>Input</Text>
