@@ -35,6 +35,7 @@ import ErrorMessage from '../core/Error';
 import { ThemeConfig } from '../config/Theme';
 import { SmallButtonLink } from '../core/Link';
 import { FlexBareContainer } from '../core/Container';
+import { generateRandomId } from '../../util/Utility';
 
 const MainContent = styled.div`
   text-align: left;
@@ -97,6 +98,8 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       result.source.index,
       result.destination.index,
     );
+
+    console.log(newTestCases);
 
     const updatedProblem: Problem = newProblem;
     updatedProblem.testCases = newTestCases;
@@ -169,13 +172,14 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   };
 
   // Handle updating of test case
-  const handleTestCaseChange = (index: number, input: string,
+  const handleTestCaseChange = (index: number, id: string, input: string,
     output: string, hidden: boolean, explanation: string) => {
     setNewProblem({
       ...newProblem,
       testCases: newProblem.testCases.map((testCase, i) => {
         if (index === i) {
           return {
+            id,
             input,
             output,
             hidden,
@@ -192,7 +196,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
     setNewProblem({
       ...newProblem,
       testCases: [...newProblem.testCases, {
-        input: '0', output: '0', hidden: false, explanation: '',
+        id: generateRandomId(), input: '0', output: '0', hidden: false, explanation: '',
       }],
     });
   };
@@ -252,8 +256,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                       ref={providedDroppable.innerRef}
                     >
                       {newProblem.testCases.map((testCase, index) => (
-                        // eslint-disable-next-line max-len
-                        <Draggable key={testCase.input} draggableId={testCase.input} index={index}>
+                        <Draggable key={testCase.id} draggableId={testCase.id} index={index}>
                           {(providedDraggable) => (
                             <div
                               ref={providedDraggable.innerRef}
@@ -272,7 +275,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                                       value={newProblem.testCases[index].input}
                                       onChange={(e) => {
                                         const current = newProblem.testCases[index];
-                                        handleTestCaseChange(index, e.target.value,
+                                        handleTestCaseChange(index, current.id, e.target.value,
                                           current.output, current.hidden, current.explanation);
                                       }}
                                     />
@@ -283,7 +286,8 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                                       value={newProblem.testCases[index].output}
                                       onChange={(e) => {
                                         const current = newProblem.testCases[index];
-                                        handleTestCaseChange(index, current.input, e.target.value,
+                                        handleTestCaseChange(index, current.id,
+                                          current.input, e.target.value,
                                           current.hidden, current.explanation);
                                       }}
                                     />
@@ -297,8 +301,10 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                                       value={newProblem.testCases[index].explanation}
                                       onChange={(e) => {
                                         const current = newProblem.testCases[index];
-                                        handleTestCaseChange(index, current.input, current.output,
-                                          current.hidden, e.target.value);
+                                        handleTestCaseChange(index,
+                                          current.id, current.input,
+                                          current.output, current.hidden,
+                                          e.target.value);
                                       }}
                                     />
                                   </MarginRightContainer>
@@ -313,7 +319,8 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                                         checked={newProblem.testCases[index].hidden}
                                         onChange={(e) => {
                                           const current = newProblem.testCases[index];
-                                          handleTestCaseChange(index, current.input,
+                                          handleTestCaseChange(index,
+                                            current.id, current.input,
                                             current.output, e.target.checked, current.explanation);
                                         }}
                                       />
