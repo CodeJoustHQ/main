@@ -4,6 +4,7 @@ import { Difficulty } from './Difficulty';
 import Language from './Language';
 
 export type TestCase = {
+  id: string,
   input: string,
   output: string,
   hidden: boolean,
