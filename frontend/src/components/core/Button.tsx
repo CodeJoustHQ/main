@@ -23,7 +23,7 @@ export const DefaultButton = styled.button`
 export const PrimaryButton = styled(DefaultButton)<any>`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   font-weight: 400;
-  background: ${({ theme }) => theme.colors.blueCircle};
+  background: ${({ theme }) => theme.colors.gradients.blue};
   color: ${({ theme }) => theme.colors.white};
   width: ${({ width }) => width || '16vw'};
   height: ${({ height }) => height || '4vw'};
