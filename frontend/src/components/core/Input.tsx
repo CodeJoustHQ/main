@@ -52,7 +52,7 @@ export const PrimaryInput = styled(Input).attrs(() => ({
 export const ConsoleTextArea = styled.textarea`
   font-family: Monaco, monospace;
   font-size: ${({ theme }) => theme.fontSize.default};
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.darkText};
   margin: 2px;
   min-width: 50px;
   max-width: 90%;

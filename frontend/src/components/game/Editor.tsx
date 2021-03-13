@@ -14,7 +14,8 @@ const Content = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 0.5rem 0;
+  padding: 0;
+  margin: 0 -5px;
 `;
 
 const EditorContainer = styled.div`
@@ -70,15 +71,18 @@ function ResizableMonacoEditor(props: EditorProps) {
     window.addEventListener('secondaryPanelSizeChange', () => {
       editor.layout();
     });
+  };
 
-    // editor.defineTheme('default-theme', {
-    //   base: 'vs',
-    //   inherit: true,
-    //   rules: [],
-    //   colors: {
-    //     'editor.background': '#000000',
-    //   },
-    // });
+  const handleEditorWillMount = (editor: any) => {
+    editor.editor.defineTheme('default-theme', {
+      base: 'vs',
+      inherit: true,
+      rules: [],
+      colors: {
+        'editor.lineHighlightBorder': '#f8f8f8',
+        'editor.lineHighlightBackground': '#f8f8f8',
+      },
+    });
   };
 
   const handleLanguageChange = (language: Language) => {
@@ -116,20 +120,29 @@ function ResizableMonacoEditor(props: EditorProps) {
       <EditorContainer>
         <MonacoEditor
           options={{
-            fixedOverflowWidgets: true,
-            minimap: { enabled: false },
             automaticLayout: true,
-            scrollBeyondLastLine: false,
-            renderIndentGuides: false,
-            overviewRulerLanes: 0,
+            fixedOverflowWidgets: true,
+            fontFamily: 'Monaco',
             hideCursorInOverviewRuler: true,
+            minimap: { enabled: false },
             overviewRulerBorder: false,
-            renderLineHighlight: 'line',
+            overviewRulerLanes: 0,
+            padding: { top: 10, bottom: 10 },
             quickSuggestions: false,
-            // fontFamily: 'Titillium Web',
+            renderLineHighlight: 'all',
+            renderIndentGuides: false,
+            renderWhitespace: 'none',
+            scrollbar: {
+              verticalScrollbarSize: 5,
+              horizontalScrollbarSize: 5,
+              useShadows: false,
+            },
+            scrollBeyondLastLine: false,
           }}
+          theme="default-theme"
           height="100%"
           editorDidMount={handleEditorDidMount}
+          editorWillMount={handleEditorWillMount}
           onChange={() => onCodeChange(codeEditor.getValue())}
           language={languageToEditorLanguage(currentLanguage)}
           defaultValue="Loading..."
