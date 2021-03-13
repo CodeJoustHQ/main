@@ -1,7 +1,7 @@
 /**
  * Check whether all keys in param exist in location.state
  */
- export const checkLocationState = (location: any, ...params: string[]) => {
+export const checkLocationState = (location: any, ...params: string[]) => {
   if (!(location && location.state)) {
     return false;
   }

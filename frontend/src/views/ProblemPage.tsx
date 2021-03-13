@@ -7,6 +7,7 @@ import { LargeText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import ProblemDisplay from '../components/problem/ProblemDisplay';
+import { generateRandomId } from '../util/Utility';
 
 const Content = styled.div`
   display: flex;
@@ -26,6 +27,10 @@ function ProblemPage() {
   useEffect(() => {
     getSingleProblem(params.id)
       .then((res) => {
+        res.testCases.forEach((testCase) => {
+          // eslint-disable-next-line no-param-reassign
+          testCase.id = generateRandomId();
+        });
         setProblem(res);
         setLoading(false);
       })
