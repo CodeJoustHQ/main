@@ -12,6 +12,7 @@ export const ThemeConfig: any = {
     lightBlue: '#AED2EA',
     blue: '#3E93CD',
     darkBlue: '#2E7DB2',
+    purple: '#9845EC',
     red: 'red',
     gray: 'gray',
     lightGray: 'lightgray',

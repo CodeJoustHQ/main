@@ -30,13 +30,29 @@ const LanguageContainer = styled.div`
   margin: 5px;
   padding: 7.5px;
   background: white;
+  text-align: center;
 `;
 
 const LanguageSelect = styled.select`
-  padding: 2.5px 10px;
-  border: 2px solid ${({ theme }) => theme.colors.blue};
+  padding: 4px 10px;
+  border: 1.5px solid ${({ theme }) => theme.colors.purple};
   border-radius: 5px;
-  font-style: italic;
+  color: ${({ theme }) => theme.colors.text};
+  text-align: center;
+  
+  &:hover {
+    cursor: pointer;
+  }
+  
+  // Clear effects on Safari and Firefox
+  -moz-appearance: none; 
+  -webkit-appearance: none; 
+  appearance: none;
+  
+  &:focus {
+    border: 2px solid ${({ theme }) => theme.colors.purple};
+    outline: none;
+  }
 `;
 
 // This function refreshes the width of Monaco editor upon change in container size
