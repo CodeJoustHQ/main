@@ -1,7 +1,7 @@
 /**
  * Check whether all keys in param exist in location.state
  */
-export const checkLocationState = (location: any, ...params: string[]) => {
+ export const checkLocationState = (location: any, ...params: string[]) => {
   if (!(location && location.state)) {
     return false;
   }
@@ -19,3 +19,9 @@ export const checkLocationState = (location: any, ...params: string[]) => {
  * numeric characters.
  */
 export const isValidRoomId = (roomIdParam: string): boolean => (roomIdParam.length === 6) && /^\d+$/.test(roomIdParam);
+
+/**
+ * Generate a random id used for various purposes, including
+ * the frontend Draggable test cases on the edit problem page.
+ */
+export const generateRandomId = (): string => Math.random().toString(36);
