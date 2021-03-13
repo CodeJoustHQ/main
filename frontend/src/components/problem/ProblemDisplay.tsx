@@ -367,6 +367,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             if (difficulty !== Difficulty.Random) {
               return (
                 <SmallDifficultyButton
+                  key={generateRandomId()}
                   difficulty={difficulty || Difficulty.Random}
                   onClick={() => handleEnumChange('difficulty', difficulty)}
                   active={difficulty === newProblem.difficulty}
@@ -381,7 +382,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
           <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
           {newProblem.problemInputs.map((input, index) => (
-            <div style={{ marginBottom: '5px' }}>
+            <div key={generateRandomId()} style={{ marginBottom: '5px' }}>
               <TextInput
                 value={newProblem.problemInputs[index].name}
                 onChange={(e) => handleInputChange(index,
