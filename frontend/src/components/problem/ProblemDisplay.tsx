@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import MarkdownEditor from 'rich-markdown-editor';
 import {
@@ -7,6 +8,7 @@ import {
   Problem,
   ProblemIOType,
   problemIOTypeToString,
+  TestCase,
 } from '../../api/Problem';
 import {
   FixedTextArea,
@@ -22,12 +24,18 @@ import {
   SmallButton,
 } from '../core/Button';
 import PrimarySelect from '../core/Select';
-import { SmallHeaderText, LowMarginMediumText, Text } from '../core/Text';
+import {
+  SmallHeaderText,
+  LowMarginMediumText,
+  Text,
+  LabelAbsoluteText,
+} from '../core/Text';
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
 import { ThemeConfig } from '../config/Theme';
 import { SmallButtonLink } from '../core/Link';
 import { FlexBareContainer } from '../core/Container';
+import { generateRandomId } from '../../util/Utility';
 
 const MainContent = styled.div`
   text-align: left;
@@ -61,6 +69,14 @@ type ProblemDisplayParams = {
   editMode: boolean,
 };
 
+// a little function to help us with reordering the result
+const reorder = (list: TestCase[], startIndex: number, endIndex: number): TestCase[] => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+  return result;
+};
+
 function ProblemDisplay(props: ProblemDisplayParams) {
   const {
     problem, onClick, actionText, editMode,
@@ -70,6 +86,24 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const [newProblem, setNewProblem] = useState<Problem>(problem);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const onDragEnd = (result: any) => {
+    // dropped outside the list
+    if (!result.destination) {
+      return;
+    }
+
+    const newTestCases: TestCase[] = reorder(
+      newProblem.testCases,
+      result.source.index,
+      result.destination.index,
+    );
+
+    const updatedProblem: Problem = newProblem;
+    updatedProblem.testCases = newTestCases;
+
+    setNewProblem(updatedProblem);
+  };
 
   const deleteProblemFunc = () => {
     // eslint-disable-next-line no-alert
@@ -136,13 +170,14 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   };
 
   // Handle updating of test case
-  const handleTestCaseChange = (index: number, input: string,
+  const handleTestCaseChange = (index: number, id: string, input: string,
     output: string, hidden: boolean, explanation: string) => {
     setNewProblem({
       ...newProblem,
       testCases: newProblem.testCases.map((testCase, i) => {
         if (index === i) {
           return {
+            id,
             input,
             output,
             hidden,
@@ -159,7 +194,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
     setNewProblem({
       ...newProblem,
       testCases: [...newProblem.testCases, {
-        input: '0', output: '0', hidden: false, explanation: '',
+        id: generateRandomId(), input: '0', output: '0', hidden: false, explanation: '',
       }],
     });
   };
@@ -211,74 +246,103 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           ? (
             <>
               <SmallHeaderText>Test Cases</SmallHeaderText>
-              {newProblem.testCases.map((testCase, index) => (
-                <SettingsContainer>
-                  <FlexBareContainer>
-                    <MarginRightContainer marginRight="10">
-                      <Text style={{ marginTop: 0 }}>Input</Text>
-                      <FixedTextArea
-                        value={newProblem.testCases[index].input}
-                        onChange={(e) => {
-                          const current = newProblem.testCases[index];
-                          handleTestCaseChange(index, e.target.value,
-                            current.output, current.hidden, current.explanation);
-                        }}
-                      />
-                    </MarginRightContainer>
-                    <MarginRightContainer marginRight="5" style={{ marginLeft: 'auto' }}>
-                      <Text style={{ marginTop: 0 }}>Output</Text>
-                      <FixedTextArea
-                        value={newProblem.testCases[index].output}
-                        onChange={(e) => {
-                          const current = newProblem.testCases[index];
-                          handleTestCaseChange(index, current.input, e.target.value,
-                            current.hidden, current.explanation);
-                        }}
-                      />
-                    </MarginRightContainer>
-                  </FlexBareContainer>
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="droppable">
+                  {(providedDroppable) => (
+                    <div
+                      {...providedDroppable.droppableProps}
+                      ref={providedDroppable.innerRef}
+                    >
+                      {newProblem.testCases.map((testCase, index) => (
+                        <Draggable key={testCase.id} draggableId={testCase.id} index={index}>
+                          {(providedDraggable) => (
+                            <div
+                              ref={providedDraggable.innerRef}
+                              {...providedDraggable.draggableProps}
+                              {...providedDraggable.dragHandleProps}
+                              style={providedDraggable.draggableProps.style}
+                            >
+                              <SettingsContainer style={{ position: 'relative' }}>
+                                <LabelAbsoluteText>
+                                  {index + 1}
+                                </LabelAbsoluteText>
+                                <FlexBareContainer>
+                                  <MarginRightContainer marginRight="10">
+                                    <Text style={{ marginTop: 0 }}>Input</Text>
+                                    <FixedTextArea
+                                      value={newProblem.testCases[index].input}
+                                      onChange={(e) => {
+                                        const current = newProblem.testCases[index];
+                                        handleTestCaseChange(index, current.id, e.target.value,
+                                          current.output, current.hidden, current.explanation);
+                                      }}
+                                    />
+                                  </MarginRightContainer>
+                                  <MarginRightContainer marginRight="5" style={{ marginLeft: 'auto' }}>
+                                    <Text style={{ marginTop: 0 }}>Output</Text>
+                                    <FixedTextArea
+                                      value={newProblem.testCases[index].output}
+                                      onChange={(e) => {
+                                        const current = newProblem.testCases[index];
+                                        handleTestCaseChange(index, current.id,
+                                          current.input, e.target.value,
+                                          current.hidden, current.explanation);
+                                      }}
+                                    />
+                                  </MarginRightContainer>
+                                </FlexBareContainer>
 
-                  <FlexBareContainer style={{ marginBottom: '10px' }}>
-                    <MarginRightContainer marginRight="5" style={{ flex: 2 }}>
-                      <Text>Explanation</Text>
-                      <FixedTextArea
-                        value={newProblem.testCases[index].explanation}
-                        onChange={(e) => {
-                          const current = newProblem.testCases[index];
-                          handleTestCaseChange(index, current.input, current.output,
-                            current.hidden, e.target.value);
-                        }}
-                      />
-                    </MarginRightContainer>
-                  </FlexBareContainer>
+                                <FlexBareContainer style={{ marginBottom: '10px' }}>
+                                  <MarginRightContainer marginRight="5" style={{ flex: 2 }}>
+                                    <Text>Explanation</Text>
+                                    <FixedTextArea
+                                      value={newProblem.testCases[index].explanation}
+                                      onChange={(e) => {
+                                        const current = newProblem.testCases[index];
+                                        handleTestCaseChange(index,
+                                          current.id, current.input,
+                                          current.output, current.hidden,
+                                          e.target.value);
+                                      }}
+                                    />
+                                  </MarginRightContainer>
+                                </FlexBareContainer>
 
-                  <FlexBareContainer>
-                    <MarginRightContainer marginRight="5">
-                      <label htmlFor={`problem-hidden-${index}`}>
-                        Hidden
-                        <CheckboxInput
-                          id={`problem-hidden-${index}`}
-                          checked={newProblem.testCases[index].hidden}
-                          onChange={(e) => {
-                            const current = newProblem.testCases[index];
-                            handleTestCaseChange(index, current.input,
-                              current.output, e.target.checked, current.explanation);
-                          }}
-                        />
-                      </label>
-                    </MarginRightContainer>
+                                <FlexBareContainer>
+                                  <MarginRightContainer marginRight="5">
+                                    <label htmlFor={`problem-hidden-${index}`}>
+                                      Hidden
+                                      <CheckboxInput
+                                        id={`problem-hidden-${index}`}
+                                        checked={newProblem.testCases[index].hidden}
+                                        onChange={(e) => {
+                                          const current = newProblem.testCases[index];
+                                          handleTestCaseChange(index,
+                                            current.id, current.input,
+                                            current.output, e.target.checked, current.explanation);
+                                        }}
+                                      />
+                                    </label>
+                                  </MarginRightContainer>
 
-                    <MarginRightContainer marginRight="5" style={{ marginLeft: 'auto' }}>
-                      <TextButton
-                        color={ThemeConfig.colors.red2}
-                        onClick={() => deleteTestCase(index)}
-                      >
-                        Delete
-                      </TextButton>
-                    </MarginRightContainer>
-                  </FlexBareContainer>
-                </SettingsContainer>
-              ))}
+                                  <MarginRightContainer marginRight="5" style={{ marginLeft: 'auto' }}>
+                                    <TextButton
+                                      color={ThemeConfig.colors.red2}
+                                      onClick={() => deleteTestCase(index)}
+                                    >
+                                      Delete
+                                    </TextButton>
+                                  </MarginRightContainer>
+                                </FlexBareContainer>
+                              </SettingsContainer>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
               <SmallButton
                 style={{ display: 'block' }}
                 color={ThemeConfig.colors.gradients.green}
@@ -301,6 +365,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             if (difficulty !== Difficulty.Random) {
               return (
                 <SmallDifficultyButton
+                  key={generateRandomId()}
                   difficulty={difficulty || Difficulty.Random}
                   onClick={() => handleEnumChange('difficulty', difficulty)}
                   active={difficulty === newProblem.difficulty}
@@ -315,7 +380,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
           <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
           {newProblem.problemInputs.map((input, index) => (
-            <div style={{ marginBottom: '5px' }}>
+            <div key={generateRandomId()} style={{ marginBottom: '5px' }}>
               <TextInput
                 value={newProblem.problemInputs[index].name}
                 onChange={(e) => handleInputChange(index,
