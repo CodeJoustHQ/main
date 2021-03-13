@@ -3,7 +3,7 @@ import styled from 'styled-components';
 const Input = styled.input`
   box-sizing: border-box;
   border-radius: 0.25rem;
-  border: 3px solid ${({ theme }) => theme.colors.blue};
+  border: 2px solid ${({ theme }) => theme.colors.blue};
   display: block;
   margin: 1rem auto;
   outline: none;
@@ -13,32 +13,38 @@ const Input = styled.input`
 export const LargeCenterInputText = styled(Input).attrs(() => ({
   type: 'text',
 }))`
-  width: 20rem;
+  width: 18rem;
+  height: 3.5rem;
   text-align: center;
-  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
-  padding: 1rem;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  font-family: ${({ theme }) => theme.font};
+  font-weight: normal;
   color: ${({ theme }) => theme.colors.text};
+  padding: 1rem;
 
   &:focus {
     border: 3px solid ${({ theme }) => theme.colors.darkBlue};
   }
 `;
 
-export const LargeInputButton = styled(Input).attrs(() => ({
+export const PrimaryInput = styled(Input).attrs(() => ({
   type: 'button',
 }))`
-  width: 20rem;
-  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
-  padding: 1rem;
-  color: white;
-  background-color: ${({ theme }) => theme.colors.blue};
-  font-weight: 700;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  background: ${({ theme }) => theme.colors.gradients.blue};
+  color: ${({ theme }) => theme.colors.white};
+  width: ${({ width }) => width || '12rem'};
+  height: ${({ height }) => height || '3rem'};
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
+  border: none !important;
+  font-weight: 400;
+  min-width: 150px;
+  min-height: 40px;
   cursor: pointer;
 
-  &:disabled {
-    background-color: ${({ theme }) => theme.colors.lightBlue};
-    border: 3px solid ${({ theme }) => theme.colors.lightBlue};
-    cursor: default;
+  &:hover {
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.24);
   }
 `;
 

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import MarkdownEditor from 'rich-markdown-editor';
 import { deleteProblem, Problem, ProblemIOType } from '../../api/Problem';
 import {
-  ConsoleTextArea, LargeInputButton, TextInput, CheckboxInput,
+  ConsoleTextArea, PrimaryInput, TextInput, CheckboxInput,
 } from '../core/Input';
 import Difficulty from '../../api/Difficulty';
 import { DifficultyButton, ProblemIOTypeButton, SmallButton } from '../core/Button';
@@ -271,8 +271,8 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           </div>
         ) : null}
 
-      <LargeInputButton value={actionText} onClick={() => onClick(newProblem)} />
-      {editMode ? <LargeInputButton value="Delete Problem" onClick={deleteProblemFunc} /> : null}
+      <PrimaryInput value={actionText} onClick={() => onClick(newProblem)} />
+      {editMode ? <PrimaryInput value="Delete Problem" onClick={deleteProblemFunc} /> : null}
 
       {loading ? <Loading /> : null}
       {error ? <ErrorMessage message={error} /> : null}

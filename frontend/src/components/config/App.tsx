@@ -20,8 +20,8 @@ function App() {
     <Switch>
       <CustomRoute path="/" component={LandingPage} layout={CircleBackgroundLayout} exact />
       <CustomRoute path="/game" component={GamePage} layout={GameLayout} exact />
-      <CustomRoute path="/game/join" component={JoinGamePage} layout={MainLayout} exact />
-      <CustomRoute path="/game/create" component={CreateGamePage} layout={MainLayout} exact />
+      <CustomRoute path="/game/join" component={JoinGamePage} layout={CircleBackgroundLayout} exact />
+      <CustomRoute path="/game/create" component={CreateGamePage} layout={CircleBackgroundLayout} exact />
       <CustomRoute path="/game/lobby" component={LobbyPage} layout={MainLayout} exact />
       <CustomRoute path="/game/results" component={GameResultsPage} layout={MainLayout} exact />
       <CustomRoute path="/problems/all" component={AllProblemsPage} layout={MainLayout} exact />

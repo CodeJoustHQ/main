@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ErrorMessage from './Error';
 import Loading from './Loading';
 import { LargeText, Text } from './Text';
-import { LargeCenterInputText, LargeInputButton } from './Input';
+import { LargeCenterInputText, PrimaryInput } from './Input';
 import { ErrorResponse } from '../../api/Error';
 import { isValidNickname } from '../../api/Socket';
 
@@ -79,7 +79,7 @@ export default function EnterNicknamePage(props: EnterNicknameProps) {
           }
         }}
       />
-      <LargeInputButton
+      <PrimaryInput
         onClick={() => {
           enterNicknameActionUpdatePage(nickname);
         }}
