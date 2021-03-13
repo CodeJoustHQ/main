@@ -71,11 +71,6 @@ const reorder = (list: TestCase[], startIndex: number, endIndex: number): TestCa
   return result;
 };
 
-const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
-  // styles we need to apply on draggables
-  ...draggableStyle,
-});
-
 function ProblemDisplay(props: ProblemDisplayParams) {
   const {
     problem, onClick, actionText, editMode,
@@ -246,23 +241,20 @@ function ProblemDisplay(props: ProblemDisplayParams) {
               <SmallHeaderText>Test Cases</SmallHeaderText>
               <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId="droppable">
-                  {(provided) => (
+                  {(providedDroppable) => (
                     <div
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
+                      {...providedDroppable.droppableProps}
+                      ref={providedDroppable.innerRef}
                     >
                       {newProblem.testCases.map((testCase, index) => (
                         // eslint-disable-next-line max-len
                         <Draggable key={testCase.input} draggableId={testCase.input} index={index}>
-                          {(providedTemp, snapshotTemp) => (
+                          {(providedDraggable) => (
                             <div
-                              ref={providedTemp.innerRef}
-                              {...providedTemp.draggableProps}
-                              {...providedTemp.dragHandleProps}
-                              style={getItemStyle(
-                                snapshotTemp.isDragging,
-                                providedTemp.draggableProps.style,
-                              )}
+                              ref={providedDraggable.innerRef}
+                              {...providedDraggable.draggableProps}
+                              {...providedDraggable.dragHandleProps}
+                              style={providedDraggable.draggableProps.style}
                             >
                               <SettingsContainer>
                                 <FlexBareContainer>
