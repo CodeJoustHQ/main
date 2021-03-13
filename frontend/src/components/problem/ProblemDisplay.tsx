@@ -256,7 +256,18 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                               {...providedDraggable.dragHandleProps}
                               style={providedDraggable.draggableProps.style}
                             >
-                              <SettingsContainer>
+                              <SettingsContainer style={{ position: 'relative' }}>
+                                <Text style={{
+                                  position: 'absolute',
+                                  top: '10px',
+                                  right: '5%',
+                                  margin: 0,
+                                  fontWeight: 700,
+                                  fontSize: '1.5rem',
+                                }}
+                                >
+                                  {index + 1}
+                                </Text>
                                 <FlexBareContainer>
                                   <MarginRightContainer marginRight="10">
                                     <Text style={{ marginTop: 0 }}>Input</Text>
