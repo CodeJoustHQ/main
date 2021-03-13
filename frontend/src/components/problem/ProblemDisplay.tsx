@@ -99,8 +99,6 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       result.destination.index,
     );
 
-    console.log(newTestCases);
-
     const updatedProblem: Problem = newProblem;
     updatedProblem.testCases = newTestCases;
 
