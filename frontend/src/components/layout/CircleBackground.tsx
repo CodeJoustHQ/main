@@ -3,11 +3,13 @@ import styled from 'styled-components';
 import { ThemeConfig } from '../config/Theme';
 import { FloatingCircle, Coordinate } from '../special/FloatingCircle';
 import Header from '../navigation/Header';
-import { MainContainer, LandingPageContainer } from '../core/Container';
+import { MainContainer, CircleBackgroundContainer } from '../core/Container';
 
 const Content = styled.div`
+  position: relative;
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 750px;
   text-align: center;
   background-color: ${({ theme }) => theme.colors.background};
 `;
@@ -31,49 +33,51 @@ function CircleBackgroundLayout({ children }: MyProps) {
     <Content>
       <Header />
       <MainContainer>
-        <LandingPageContainer>
+        <CircleBackgroundContainer>
+          {children}
+        </CircleBackgroundContainer>
+        <div>
           <FloatingCircle
             color={ThemeConfig.colors.gradients.red}
             x={mousePosition.x}
             y={mousePosition.y}
-            bottom={50}
-            left={-30}
+            bottom={60}
+            left={7}
             size={4}
           />
           <FloatingCircle
             color={ThemeConfig.colors.gradients.green}
             x={mousePosition.x}
             y={mousePosition.y}
-            bottom={-30}
-            left={-20}
+            bottom={35}
+            left={13}
             size={8}
           />
           <FloatingCircle
             color={ThemeConfig.colors.gradients.yellow}
             x={mousePosition.x}
             y={mousePosition.y}
-            bottom={-20}
-            left={47.5}
+            bottom={32}
+            left={48}
             size={2}
           />
           <FloatingCircle
             color={ThemeConfig.colors.gradients.pink}
             x={mousePosition.x}
             y={mousePosition.y}
-            bottom={-25}
-            left={95}
+            bottom={35}
+            left={74}
             size={7}
           />
           <FloatingCircle
             color={ThemeConfig.colors.gradients.blue}
             x={mousePosition.x}
             y={mousePosition.y}
-            bottom={100}
-            left={90}
+            bottom={76}
+            left={71}
             size={4}
           />
-          {children}
-        </LandingPageContainer>
+        </div>
       </MainContainer>
     </Content>
   );

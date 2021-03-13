@@ -117,6 +117,7 @@ function JoinGamePage() {
           <LargeCenterInputText
             id="roomIdInput"
             placeholder="123456"
+            width="16rem"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setError('');
               setRoomId(event.target.value);

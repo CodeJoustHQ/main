@@ -1,6 +1,11 @@
 import styled from 'styled-components';
 
-const Input = styled.input`
+type Dimensions = {
+  width?: string,
+  height?: string,
+};
+
+const Input = styled.input<Dimensions>`
   box-sizing: border-box;
   border-radius: 0.25rem;
   border: 2px solid ${({ theme }) => theme.colors.blue};
@@ -13,18 +18,14 @@ const Input = styled.input`
 export const LargeCenterInputText = styled(Input).attrs(() => ({
   type: 'text',
 }))`
-  width: 18rem;
-  height: 3.5rem;
+  width: ${({ width }) => width || '18rem'};
+  height: ${({ height }) => height || '3.5rem'};
   text-align: center;
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   font-family: ${({ theme }) => theme.font};
   font-weight: normal;
   color: ${({ theme }) => theme.colors.text};
   padding: 1rem;
-
-  &:focus {
-    border: 3px solid ${({ theme }) => theme.colors.darkBlue};
-  }
 `;
 
 export const PrimaryInput = styled(Input).attrs(() => ({

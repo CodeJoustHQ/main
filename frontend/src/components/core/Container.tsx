@@ -98,10 +98,11 @@ export const CenteredContainer = styled.div`
   justify-content: center;
 `;
 
-export const LandingPageContainer = styled.div`
+export const CircleBackgroundContainer = styled.div`
   position: relative;
   margin: 0 auto;
   width: 66.666%;
+  z-index: 1;
 
   @media(max-width: 640px) {
     width: 100%;

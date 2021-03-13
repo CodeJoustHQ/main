@@ -1,7 +1,12 @@
 import styled from 'styled-components';
 import { ThemeType } from '../config/Theme';
 
-export const DefaultButton = styled.button`
+type Dimensions = {
+  width?: string,
+  height?: string,
+};
+
+export const DefaultButton = styled.button<Dimensions>`
   border: none;
   border-radius: 0.25rem;
   margin: 1.2rem;
@@ -20,7 +25,7 @@ export const DefaultButton = styled.button`
   }
 `;
 
-export const PrimaryButton = styled(DefaultButton)<any>`
+export const PrimaryButton = styled(DefaultButton)`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   font-weight: 400;
   background: ${({ theme }) => theme.colors.gradients.blue};

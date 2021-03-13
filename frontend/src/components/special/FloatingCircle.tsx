@@ -33,7 +33,6 @@ export const FloatingCircle = styled.div.attrs((props: CircleParams) => ({
 }))<CircleParams>`
   position: absolute;
   border-radius: 50%;
-  transition: transform 250ms, opacity 400ms;
   transition: left 0.25s ease;
 
   @media(max-width: 640px) {
