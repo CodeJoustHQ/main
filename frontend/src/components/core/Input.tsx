@@ -60,9 +60,17 @@ export const ConsoleTextArea = styled.textarea`
   min-height: 24px;
   max-height: 150px;
 
-  padding: 5px;
-  border: 2px solid ${({ theme }) => theme.colors.blue};
-  border-radius: 0.3rem;
+  padding: 1px;
+  border: double 1px transparent;
+  border-radius: 3px;
+  background-image: linear-gradient(white, white), 
+                    ${({ theme }) => theme.colors.gradients.blue};
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+  
+  &:focus {
+    outline: none;
+  }
 `;
 
 export const NumberInput = styled(Input).attrs(() => ({
