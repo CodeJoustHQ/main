@@ -49,7 +49,7 @@ export const ConsoleTextArea = styled.textarea`
   margin: 2px;
   min-width: 50px;
   max-width: 90%;
-  width: 70%;
+  width: 90%;
   min-height: 24px;
   max-height: 150px;
 

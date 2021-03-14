@@ -5,14 +5,16 @@ import { WhiteText } from '../core/Text';
 type PlayerIconProps = {
   gradientColor: string,
   nickname: string,
+  active: boolean,
 };
 
 type PlayerIconContentProps = {
   gradientColor: string,
+  active: boolean,
 };
 
 const PlayerIconContent = styled.div<PlayerIconContentProps>`
-  background: ${({ theme, gradientColor }) => theme.colors.gradients[gradientColor]};
+  background: ${({ theme, gradientColor, active }) => (active ? theme.colors.gradients[gradientColor] : theme.colors.gray)};
   border-radius: 50%;
   margin: 0 auto;
   
@@ -22,12 +24,12 @@ const PlayerIconContent = styled.div<PlayerIconContentProps>`
 `;
 
 function PlayerIcon(props: PlayerIconProps) {
-  const { gradientColor, nickname } = props;
+  const { gradientColor, nickname, active } = props;
 
   const getDisplayNickname = () => nickname.charAt(0).toUpperCase();
 
   return (
-    <PlayerIconContent gradientColor={gradientColor}>
+    <PlayerIconContent gradientColor={gradientColor} active={active}>
       <WhiteText>{getDisplayNickname()}</WhiteText>
     </PlayerIconContent>
   );

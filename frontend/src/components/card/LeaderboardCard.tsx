@@ -110,7 +110,11 @@ function LeaderboardCard(props: LeaderboardCardProps) {
       onMouseLeave={() => setShowHover(false)}
       isCurrentPlayer={isCurrentPlayer}
     >
-      <PlayerIcon gradientColor={color.gradientColor} nickname={player.user.nickname} />
+      <PlayerIcon
+        gradientColor={color.gradientColor}
+        nickname={player.user.nickname}
+        active={Boolean(player.user.sessionId)}
+      />
       <LowMarginText bold={player.solved}>{`${place}.${getScorePercentage()}`}</LowMarginText>
 
       {showHover ? (

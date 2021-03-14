@@ -43,6 +43,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.after;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.time.Instant;
@@ -374,6 +376,7 @@ public class GameManagementServiceTests {
         gameService.submitSolution(ROOM_ID, request);
 
         verify(submitService).submitSolution(eq(game), eq(request));
+        verify(gameService).endGame(eq(game));
 
         // Confirm that socket sent updated GameDto object.
         verify(socketService).sendSocketUpdate(eq(GameMapper.toDto(game)));
@@ -832,5 +835,84 @@ public class GameManagementServiceTests {
         game.setAllSolved(false);
         game.setGameTimer(null);
         assertFalse(gameService.isGameOver(game));
+    }
+
+    @Test
+    public void endGameCancelsTimers() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setDuration(12L);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        gameService.createAddGameFromRoom(room);
+        Game game = gameService.getGameFromRoomId(room.getRoomId());
+
+        // Manually schedule notification tasks due to service being mocked
+        new NotificationService(socketService).scheduleTimeLeftNotifications(game, 12L);
+
+        gameService.endGame(game);
+
+        // Neither the end game nor time left notifications are sent
+        verify(socketService, after(13000).never()).sendSocketUpdate(Mockito.any(String.class), Mockito.any(GameNotificationDto.class));
+        verify(socketService, never()).sendSocketUpdate(Mockito.any(GameDto.class));
+    }
+
+    @Test
+    public void conditionallyUpdateSocketInfoSuccess() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        gameService.createAddGameFromRoom(room);
+
+        User newUser = new User();
+        newUser.setNickname(NICKNAME);
+        newUser.setUserId(USER_ID);
+        newUser.setSessionId(SESSION_ID);
+
+        Room newRoom = new Room();
+        newRoom.setRoomId(ROOM_ID);
+        newRoom.addUser(newUser);
+
+        gameService.conditionallyUpdateSocketInfo(newRoom, newUser);
+
+        Game game = gameService.getGameFromRoomId(room.getRoomId());
+
+        assertEquals(newRoom, game.getRoom());
+        assertEquals(user, game.getRoom().getUsers().get(0));
+        assertEquals(user, game.getPlayers().get(user.getUserId()).getUser());
+
+        verify(socketService).sendSocketUpdate(GameMapper.toDto(game));
+    }
+
+    @Test
+    public void conditionallyUpdateSocketInfoNotFound() {
+        Room room = new Room();
+        room.setRoomId("999998");
+
+        gameService.conditionallyUpdateSocketInfo(room, null);
+
+        verify(socketService, never()).sendSocketUpdate(Mockito.any(GameDto.class));
+
+        room.setRoomId(ROOM_ID);
+        User user = new User();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+        room.addUser(user);
+
+        gameService.createAddGameFromRoom(room);
+
+        User newUser = new User();
+        newUser.setNickname(NICKNAME_2);
+        newUser.setUserId(USER_ID_2);
+
+        gameService.conditionallyUpdateSocketInfo(room, newUser);
+        verify(socketService, never()).sendSocketUpdate(Mockito.any(GameDto.class));
     }
 }

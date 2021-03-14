@@ -5,9 +5,10 @@ import Language, { fromString, languageToEditorLanguage } from '../../api/Langua
 import { DefaultCodeType } from '../../api/Problem';
 
 type EditorProps = {
-  onLanguageChange: (language: string) => void,
+  onLanguageChange: (language: Language) => void,
   onCodeChange: (code: string) => void,
   codeMap: DefaultCodeType | null,
+  defaultLanguage: Language,
 };
 
 const Content = styled.div`
@@ -41,10 +42,16 @@ const LanguageSelect = styled.select`
 
 // This function refreshes the width of Monaco editor upon change in container size
 function ResizableMonacoEditor(props: EditorProps) {
-  const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.Python);
+  const {
+    onLanguageChange, onCodeChange, codeMap, defaultLanguage,
+  } = props;
+
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(defaultLanguage);
   const [codeEditor, setCodeEditor] = useState<any>(null);
 
-  const { onLanguageChange, onCodeChange, codeMap } = props;
+  useEffect(() => {
+    setCurrentLanguage(defaultLanguage);
+  }, [defaultLanguage]);
 
   const handleEditorDidMount = (editor: any) => {
     setCodeEditor(editor);
@@ -78,12 +85,12 @@ function ResizableMonacoEditor(props: EditorProps) {
     <Content>
       <LanguageContainer>
         <LanguageSelect
-          onChange={(e) => handleLanguageChange(fromString(e.target.value))}
-          value={fromString(currentLanguage)}
+          onChange={(e) => handleLanguageChange(e.target.value as Language)}
+          value={currentLanguage}
         >
           {
             Object.keys(Language).map((language) => (
-              <option key={language} value={language}>{language}</option>
+              <option key={language} value={fromString(language)}>{language}</option>
             ))
           }
         </LanguageSelect>
