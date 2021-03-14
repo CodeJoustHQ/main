@@ -9,8 +9,9 @@ import Editor from '../components/game/Editor';
 import { DefaultCodeType, getDefaultCodeMap, Problem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
 import {
-  MainContainer, CenteredContainer, FlexContainer, FlexInfoBar,
-  Panel, SplitterContainer, FlexLeft, FlexCenter, FlexRight,
+  CenteredContainer, FlexCenter, FlexContainer,
+  FlexInfoBar, FlexLeft, FlexRight, MainContainer,
+  Panel, SplitterContainer,
 } from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
 import { ProblemHeaderText } from '../components/core/Text';
@@ -22,16 +23,18 @@ import { User } from '../api/User';
 import { GameNotification, NotificationType } from '../api/GameNotification';
 import Difficulty from '../api/Difficulty';
 import {
-  Game, getGame, Player, Submission, submitSolution, runSolution, SubmissionType,
+  Game, getGame, Player, runSolution,
+  Submission, SubmissionType, submitSolution,
 } from '../api/Game';
 import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
 import { TextButton } from '../components/core/Button';
 import {
-  disconnect, routes, send, subscribe,
+  connect, disconnect, routes, send, subscribe,
 } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
+import Language from '../api/Language';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
   padding: 0;
@@ -66,7 +69,7 @@ function GamePage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [currentLanguage, setCurrentLanguage] = useState('python');
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.Python);
   const [currentCode, setCurrentCode] = useState('');
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
@@ -98,7 +101,8 @@ function GamePage() {
     setTimeUp(newGame.gameTimer.timeUp);
   };
 
-  const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[]) => {
+  const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
+    code: string, language: Language) => {
     const promises: Promise<DefaultCodeType>[] = [];
     problemsParam.forEach((problem) => {
       if (problem && problem.problemId) {
@@ -108,11 +112,22 @@ function GamePage() {
 
     // Get the result of promises and set the default code list.
     Promise.all(promises).then((result) => {
+      const codeMap = result[0];
+
+      // If previous code and language specified, save those as defaults
+      if (code) {
+        codeMap[language] = code;
+      }
+
+      // Set this user's current code and language
+      setCurrentCode(codeMap[language]);
+      setCurrentLanguage(language);
+
       setDefaultCodeList(result);
     }).catch((err) => {
       setError(err.message);
     });
-  }, [setDefaultCodeList]);
+  }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage]);
 
   /**
    * Display the notification as a callback from the notification
@@ -135,38 +150,41 @@ function GamePage() {
       notificationSocket?.unsubscribe();
 
       history.replace('/game/results', {
-        game,
+        roomId,
         currentUser,
       });
     }
-  }, [timeUp, allSolved, game, history, currentUser, gameSocket, notificationSocket]);
+  }, [timeUp, allSolved, game, history, currentUser, gameSocket, notificationSocket, roomId]);
 
   // Re-subscribe in order to get the correct subscription callback.
-  const subscribePrimary = useCallback((roomIdParam: string) => {
+  const subscribePrimary = useCallback((roomIdParam: string, userId: string) => {
     const subscribeUserCallback = (result: Message) => {
       const updatedGame: Game = JSON.parse(result.body);
       setStateFromGame(updatedGame);
     };
 
-    // Subscribe to the main Game channel to receive Game updates.
-    if (!gameSocket) {
-      subscribe(routes(roomIdParam).subscribe_game, subscribeUserCallback)
-        .then((subscription) => {
-          setGameSocket(subscription);
-        }).catch((err) => {
-          setError(err.message);
-        });
-    }
+    // Connect to the socket if not already
+    connect(roomIdParam, userId).then(() => {
+      // Subscribe to the main Game channel to receive Game updates.
+      if (!gameSocket) {
+        subscribe(routes(roomIdParam).subscribe_game, subscribeUserCallback)
+          .then((subscription) => {
+            setGameSocket(subscription);
+          }).catch((err) => {
+            setError(err.message);
+          });
+      }
 
-    // Subscribe for Game Notifications.
-    if (!notificationSocket) {
-      subscribe(routes(roomIdParam).subscribe_notification, displayNotification)
-        .then((subscription) => {
-          setNotificationSocket(subscription);
-        }).catch((err) => {
-          setError(err.message);
-        });
-    }
+      // Subscribe for Game Notifications.
+      if (!notificationSocket) {
+        subscribe(routes(roomIdParam).subscribe_notification, displayNotification)
+          .then((subscription) => {
+            setNotificationSocket(subscription);
+          }).catch((err) => {
+            setError(err.message);
+          });
+      }
+    });
   }, [displayNotification, gameSocket, notificationSocket]);
 
   // Called every time location changes
@@ -179,8 +197,22 @@ function GamePage() {
       getGame(location.state.roomId)
         .then((res) => {
           setStateFromGame(res);
-          setDefaultCodeFromProblems(res.problems);
           setFullPageLoading(false);
+
+          let matchFound = false;
+
+          // If this user refreshed and has already submitted code, load and save their latest code
+          res.players.forEach((player) => {
+            if (player.user.userId === location.state.currentUser.userId && player.code) {
+              setDefaultCodeFromProblems(res.problems, player.code, player.language as Language);
+              matchFound = true;
+            }
+          });
+
+          // If no previous code, proceed as normal with the default Python language
+          if (!matchFound) {
+            setDefaultCodeFromProblems(res.problems, '', Language.Python);
+          }
         })
         .catch((err) => {
           setFullPageLoading(false);
@@ -297,10 +329,10 @@ function GamePage() {
 
   // Subscribe user to primary socket and to notifications.
   useEffect(() => {
-    if (!gameSocket && roomId) {
-      subscribePrimary(roomId);
+    if (!gameSocket && roomId && currentUser?.userId) {
+      subscribePrimary(roomId, currentUser!.userId);
     }
-  }, [gameSocket, roomId, subscribePrimary]);
+  }, [gameSocket, roomId, currentUser, subscribePrimary]);
 
   // If the page is loading, return a centered Loading object.
   if (fullPageLoading) {
@@ -365,6 +397,7 @@ function GamePage() {
                 onCodeChange={setCurrentCode}
                 onLanguageChange={setCurrentLanguage}
                 codeMap={defaultCodeList[0]}
+                defaultLanguage={currentLanguage}
               />
             </Panel>
 

@@ -48,7 +48,10 @@ function PlayerResultsCard(props: PlayerResultsCardProps) {
       <FlexHorizontalContainer>
         <FlexLeft>
           <CenteredContainer>
-            <PlayerIcon hexColor={color.hexColor} />
+            <PlayerIcon
+              hexColor={color.hexColor}
+              active={Boolean(player.user.sessionId)}
+            />
             <br />
             <LowMarginText>{`${place}. ${getDisplayNickname()}`}</LowMarginText>
           </CenteredContainer>

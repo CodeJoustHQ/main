@@ -3,10 +3,11 @@ import styled from 'styled-components';
 
 type PlayerIconProps = {
   hexColor: string,
+  active: boolean,
 };
 
 const PlayerIconContent = styled.div<PlayerIconProps>`
-  background-color: ${({ hexColor }) => hexColor};
+  background-color: ${({ theme, hexColor, active }) => (active ? hexColor : theme.colors.gray)};
   border-radius: 50%;
   margin: 0 auto;
   
@@ -15,10 +16,10 @@ const PlayerIconContent = styled.div<PlayerIconProps>`
 `;
 
 function PlayerIcon(props: PlayerIconProps) {
-  const { hexColor } = props;
+  const { hexColor, active } = props;
 
   return (
-    <PlayerIconContent hexColor={hexColor} />
+    <PlayerIconContent hexColor={hexColor} active={active} />
   );
 }
 

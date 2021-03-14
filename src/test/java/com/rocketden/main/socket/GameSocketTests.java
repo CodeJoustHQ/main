@@ -4,6 +4,7 @@ import com.rocketden.main.controller.v1.BaseRestController;
 import com.rocketden.main.dto.game.GameDto;
 import com.rocketden.main.dto.game.GameNotificationDto;
 import com.rocketden.main.dto.game.PlayAgainRequest;
+import com.rocketden.main.dto.game.PlayerDto;
 import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
@@ -37,6 +38,7 @@ import java.util.concurrent.BlockingQueue;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -161,7 +163,9 @@ public class GameSocketTests {
         assertNotNull(gameDto);
         assertNotNull(gameDto.getGameTimer());
 
-        assertEquals(room, gameDto.getRoom());
+        assertEquals(room.getRoomId(), gameDto.getRoom().getRoomId());
+        assertEquals(room.getHost(), gameDto.getRoom().getHost());
+        assertEquals(room.getUsers(), gameDto.getRoom().getUsers());
         assertEquals(DURATION, gameDto.getGameTimer().getDuration());
         assertTrue(gameDto.getGameTimer().isTimeUp());
     }
@@ -219,5 +223,55 @@ public class GameSocketTests {
         assertNotNull(gameDto);
 
         assertTrue(gameDto.getPlayAgain());
+    }
+
+    @Test
+    public void socketReceivesMessageOnConnectDisconnect() throws Exception {
+        UserDto user = room.getUsers().get(1);
+        UserDto prevHost = room.getHost();
+        assertNotEquals(prevHost, user);
+        assertNull(user.getSessionId());
+
+        // The second user connects to the stomp client
+        StompSession session = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, user.getUserId(), this.port);
+
+        session.subscribe(String.format(GAME_SUBSCRIBE_ENDPOINT, room.getRoomId()), new StompFrameHandler() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return GameDto.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                userBlockingQueue.add((GameDto) payload);
+            }
+        });
+
+        // Message should be received on user connect
+        GameDto gameDto = userBlockingQueue.poll(DURATION, SECONDS);
+        assertNotNull(gameDto);
+
+        user = gameDto.getRoom().getUsers().get(1);
+        // Check sessionId for user is not null in both room and player list
+        assertNotNull(user.getSessionId());
+        for (PlayerDto player : gameDto.getPlayers()) {
+            if (player.getUser().equals(user)) {
+                assertNotNull(player.getUser().getSessionId());
+            }
+        }
+
+        // The host then disconnects
+        hostSession.disconnect();
+
+        // After disconnecting, the host should be changed
+        gameDto = userBlockingQueue.poll(DURATION, SECONDS);
+        assertNotNull(gameDto);
+        assertEquals(gameDto.getRoom().getHost(), user);
+
+        for (PlayerDto player : gameDto.getPlayers()) {
+            if (player.getUser().equals(prevHost)) {
+                assertNull(player.getUser().getSessionId());
+            }
+        }
     }
 }

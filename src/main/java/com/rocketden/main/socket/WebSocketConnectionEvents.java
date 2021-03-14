@@ -8,9 +8,11 @@ import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
+import com.rocketden.main.service.GameManagementService;
 import com.rocketden.main.service.RoomService;
 import com.rocketden.main.service.SocketService;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
@@ -21,6 +23,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+@Log4j2
 @Configuration
 @EnableWebSocketMessageBroker
 @Transactional
@@ -29,16 +32,19 @@ public class WebSocketConnectionEvents {
     private final UserRepository userRepository;
     private final SocketService socketService;
     private final RoomService roomService;
+    private final GameManagementService gameService;
 
     private static final String CONNECT_MESSAGE = "simpConnectMessage";
     private static final String NATIVE_HEADERS = "nativeHeaders";
     public static final String USER_ID_KEY = "userId";
 
     @Autowired
-    public WebSocketConnectionEvents(UserRepository userRepository, SocketService socketService, RoomService roomService) {
+    public WebSocketConnectionEvents(UserRepository userRepository, SocketService socketService,
+                                     RoomService roomService, GameManagementService gameService) {
         this.userRepository = userRepository;
         this.socketService = socketService;
         this.roomService = roomService;
+        this.gameService = gameService;
     }
 
     @EventListener
@@ -68,7 +74,7 @@ public class WebSocketConnectionEvents {
         try {
             Thread.sleep(500);
         } catch (Exception e) {
-            System.out.println("Thread sleep failed on socket connection");
+            log.info("Thread sleep failed on socket connection");
         }
 
         // Update the session ID of the relevant user, if it is found.
@@ -81,6 +87,12 @@ public class WebSocketConnectionEvents {
             Room room = user.getRoom();
             RoomDto roomDto = RoomMapper.toDto(room);
             socketService.sendSocketUpdate(roomDto);
+
+            // If a game exists, update the room info for that game
+            gameService.conditionallyUpdateSocketInfo(room, user);
+
+            log.info("User [nickname: {}, userId: {}] connected to room {}",
+                    user.getNickname(), user.getUserId(), room.getRoomId());
         }
     }
 
@@ -101,6 +113,12 @@ public class WebSocketConnectionEvents {
             Room room = user.getRoom();
             RoomDto roomDto = roomService.conditionallyUpdateRoomHost(room, user);
             socketService.sendSocketUpdate(roomDto);
+
+            // If a game exists, update the room info for that game
+            gameService.conditionallyUpdateSocketInfo(room, user);
+
+            log.info("User [nickname: {}, userId: {}] disconnected from room {}",
+                    user.getNickname(), user.getUserId(), room.getRoomId());
         }
     }
 }

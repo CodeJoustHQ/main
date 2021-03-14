@@ -156,7 +156,7 @@ public class RoomHostTests {
     }
 
     @Test
-    public void changeRoomHostNewHostNotFound() throws Exception {
+    public void changeRoomHostNewHostNotFound() {
         UserDto user = new UserDto();
         user.setNickname("unknown");
         user.setUserId("101010");
