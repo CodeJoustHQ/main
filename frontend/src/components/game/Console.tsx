@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { ThemeConfig } from '../config/Theme';
 import { TestCase } from '../../api/Problem';
 import { Text } from '../core/Text';
 import { ConsoleTextArea } from '../core/Input';
@@ -87,8 +88,18 @@ function Console(props: ConsoleProps) {
   return (
     <Content>
       <FixedContent>
-        <SmallButton onClick={() => onRun(input)}>Run Code</SmallButton>
-        <SmallButton onClick={() => onSubmit()}>Submit</SmallButton>
+        <SmallButton
+          color={ThemeConfig.gradients.green}
+          onClick={() => onRun(input)}
+        >
+          Run Code
+        </SmallButton>
+        <SmallButton
+          color={ThemeConfig.gradients.blue}
+          onClick={() => onSubmit()}
+        >
+          Submit
+        </SmallButton>
       </FixedContent>
       <div>
         <Text bold>Input</Text>
