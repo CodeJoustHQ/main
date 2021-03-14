@@ -89,13 +89,13 @@ function Console(props: ConsoleProps) {
     <Content>
       <FixedContent>
         <SmallButton
-          color={ThemeConfig.gradients.green}
+          color={ThemeConfig.colors.gradients.green}
           onClick={() => onRun(input)}
         >
           Run Code
         </SmallButton>
         <SmallButton
-          color={ThemeConfig.gradients.blue}
+          color={ThemeConfig.colors.gradients.blue}
           onClick={() => onSubmit()}
         >
           Submit
