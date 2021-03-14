@@ -4,6 +4,7 @@ import java.util.Timer;
 import java.util.Map.Entry;
 
 import com.rocketden.main.dto.game.GameNotificationDto;
+import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.util.NotificationTimerTask;
 
@@ -27,16 +28,17 @@ public class NotificationService {
         return notificationDto;
     }
 
-    public void scheduleTimeLeftNotifications(String roomId, Long time) {
+    public void scheduleTimeLeftNotifications(Game game, Long time) {
         // Create notifications for different "time left" milestones.
         for (Entry<Long, String> timeLeft : GameTimer.TIME_LEFT_DURATION_CONTENT.entrySet()) {
             if (timeLeft.getKey() < time) {
                 Timer timer = new Timer();
                 NotificationTimerTask notificationTimerTask =
-                    new NotificationTimerTask(socketService, roomId,
-                    timeLeft.getValue());
-                timer.schedule(notificationTimerTask,
-                    (time - timeLeft.getKey()) * 1000);
+                        new NotificationTimerTask(socketService, game.getRoom().getRoomId(), timeLeft.getValue());
+                timer.schedule(notificationTimerTask, (time - timeLeft.getKey()) * 1000);
+
+                // Add timer to GameTimer list to keep track of
+                game.getGameTimer().getNotificationTimers().add(timer);
             }
         }
     }
