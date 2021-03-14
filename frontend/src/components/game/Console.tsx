@@ -14,9 +14,10 @@ const Content = styled.div`
 `;
 
 const RightAlignedContent = styled.div`
+  position: absolute;
   text-align: right;
   top: 0;
-  right: 0;
+  right: 10px;
   margin: 10px 0;
 `;
 

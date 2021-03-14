@@ -46,6 +46,14 @@ const OverflowPanel = styled(Panel)`
   padding: 0 25px;
 `;
 
+const LeaderboardContent = styled.div`
+  text-align: center;
+  margin: 0 auto;
+  width: 75%;
+  overflow-x: scroll;
+  white-space: nowrap;
+`;
+
 type LocationState = {
   roomId: string,
   currentUser: User,
@@ -363,9 +371,9 @@ function GamePage() {
           <TextButton onClick={exitGame}>Exit Game</TextButton>
         </FlexRight>
       </FlexInfoBar>
-      <CenteredContainer>
+      <LeaderboardContent>
         {displayPlayerLeaderboard()}
-      </CenteredContainer>
+      </LeaderboardContent>
 
       {loading ? <CenteredContainer><Loading /></CenteredContainer> : null}
       {error ? <CenteredContainer><ErrorMessage message={error} /></CenteredContainer> : null}
