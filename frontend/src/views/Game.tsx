@@ -52,6 +52,22 @@ const LeaderboardContent = styled.div`
   width: 75%;
   overflow-x: scroll;
   white-space: nowrap;
+    
+  // Show shadows if there is scrollable content  
+  background-image: 
+    /* Shadow covers */ 
+    ${({ theme: { colors: { background } } }) => `linear-gradient(to right, ${background}, ${background})`},
+    ${({ theme: { colors: { background } } }) => `linear-gradient(to left, ${background}, ${background})`},
+  
+    /* Shadows */ 
+    ${({ theme: { colors: { background } } }) => `linear-gradient(to right, rgba(0,0,0.8,.12), ${background})`},
+    ${({ theme: { colors: { background } } }) => `linear-gradient(to left, rgba(0,0,0,.12), ${background})`};
+
+  background-position: left center, right center, left center, right center;
+  background-repeat: no-repeat;
+  background-color: ${({ theme }) => theme.colors.background};
+  background-size: 20px 100%, 20px 100%, 10px 100%, 10px 100%;
+  background-attachment: local, local, scroll, scroll;
 `;
 
 type LocationState = {
