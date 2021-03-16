@@ -17,14 +17,14 @@ const FlexContent = styled.div`
   margin: 10px 0;
 `;
 
-const TitleContent = styled.div`
-  //position: absolute;
-  padding: 2px;
-`;
-
-const ConsoleTitle = styled.p`
+const ConsoleTitle = styled.h2`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   margin: 0;
+`;
+
+const ConsoleSubtitle = styled.p`
+  font-size: ${({ theme }) => theme.fontSize.default};
+  margin: 0 0 5px 0;
 `;
 
 const ConsoleLabel = styled.p`
@@ -56,7 +56,7 @@ type ConsoleProps = {
 function Console(props: ConsoleProps) {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
-  const [console, setConsole] = useState('');
+  const [consoleOutput, setConsoleOutput] = useState('');
   const [title, setTitle] = useState('Console');
   const [subtitle, setSubtitle] = useState('');
 
@@ -74,21 +74,24 @@ function Console(props: ConsoleProps) {
       setTitle('Compilation Error');
       setSubtitle('');
       setOutput(newSubmission.compilationError);
-      setConsole('');
+      setConsoleOutput('');
     };
 
     const handleRun = (newSubmission: Submission) => {
-      setTitle('Results');
+      const res = newSubmission.results[0];
+      setTitle(res.error ? 'Runtime Error' : 'Results');
       setSubtitle('');
-      setOutput(newSubmission.results[0].userOutput);
-      setConsole(newSubmission.results[0].console);
+      setOutput(res.error || res.userOutput.trim());
+      setConsoleOutput(res.console);
     };
 
     const handleSubmit = (newSubmission: Submission) => {
       if (newSubmission.numCorrect === newSubmission.numTestCases) {
-        // Set only title and subtitle, leave rest untouched
+        // Set only title and subtitle, clear console/output
         setTitle('Correct');
         setSubtitle(`${newSubmission.numCorrect} / ${newSubmission.numTestCases} passed`);
+        setOutput('');
+        setConsoleOutput('');
       } else {
         let firstFailure: SubmissionResult | undefined;
         let firstNonHiddenFailure: SubmissionResult | undefined;
@@ -104,21 +107,21 @@ function Console(props: ConsoleProps) {
         });
 
         // Ideally display non-hidden failure but otherwise just any failure
-        const res: SubmissionResult = (firstNonHiddenFailure || firstNonHiddenFailure)!;
+        const res: SubmissionResult = (firstNonHiddenFailure || firstFailure)!;
 
         // Set state to the latest results
-        setTitle('Wrong Answer');
+        setTitle(res.error ? 'Runtime Error' : 'Wrong Answer');
         setSubtitle(`${newSubmission.numCorrect} / ${newSubmission.numTestCases} passed`);
-        setInput(res.hidden ? 'Hidden' : res.input);
-        setOutput(res.hidden ? 'Hidden' : res.userOutput);
-        setConsole(res.hidden ? 'Hidden' : res.console);
+        setInput(res.hidden ? 'hidden' : res.input);
+        setOutput(res.hidden ? 'hidden' : res.error || res.userOutput.trim());
+        setConsoleOutput(res.hidden ? 'hidden' : res.console);
       }
     };
 
-    if (submission && submission.results && submission.results.length) {
-      if (submission.compilationError) {
-        setCompilationError(submission);
-      } else if (submission.submissionType === SubmissionType.Submit) {
+    if (submission && submission.compilationError) {
+      setCompilationError(submission);
+    } else if (submission && submission.results && submission.results.length) {
+      if (submission.submissionType === SubmissionType.Submit) {
         handleSubmit(submission);
       } else {
         handleRun(submission);
@@ -129,7 +132,7 @@ function Console(props: ConsoleProps) {
       setSubtitle('');
       setInput(testCases[0].input);
       setOutput('');
-      setConsole('');
+      setConsoleOutput('');
     }
   }, [submission]);
 
@@ -138,7 +141,8 @@ function Console(props: ConsoleProps) {
   return (
     <Content>
       <MainContent>
-        <br />
+        <ConsoleTitle>{title}</ConsoleTitle>
+        <ConsoleSubtitle>{subtitle}</ConsoleSubtitle>
         <FlexContent>
           <ConsoleLabel>Input</ConsoleLabel>
           <ConsoleTextArea
@@ -153,7 +157,7 @@ function Console(props: ConsoleProps) {
         </FlexContent>
         <FlexContent>
           <ConsoleLabel>Console</ConsoleLabel>
-          <ConsoleTextArea value={console} rows={calculateRows(console)} readOnly />
+          <ConsoleTextArea value={consoleOutput} rows={calculateRows(consoleOutput)} readOnly />
         </FlexContent>
         <br />
       </MainContent>
