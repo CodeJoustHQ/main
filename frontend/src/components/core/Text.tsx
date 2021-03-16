@@ -69,3 +69,8 @@ export const WhiteText = styled(Text)`
   color: ${({ theme }) => theme.colors.white};
   margin: 0;
 `;
+
+export const BottomFooterText = styled(Text)`
+  color: ${({ theme }) => theme.colors.gray};
+  font-size: ${({ theme }) => theme.fontSize.mediumSmall};
+`;

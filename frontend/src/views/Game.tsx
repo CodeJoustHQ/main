@@ -5,6 +5,7 @@ import SplitterLayout from 'react-splitter-layout';
 import MarkdownEditor from 'rich-markdown-editor';
 import { useBeforeunload } from 'react-beforeunload';
 import { Message, Subscription } from 'stompjs';
+import 'react-splitter-layout/lib/index.css';
 import Editor from '../components/game/Editor';
 import { DefaultCodeType, getDefaultCodeMap, Problem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
@@ -13,8 +14,7 @@ import {
   Panel, SplitterContainer, FlexLeft, FlexCenter, FlexRight,
 } from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
-import { ProblemHeaderText } from '../components/core/Text';
-import 'react-splitter-layout/lib/index.css';
+import { ProblemHeaderText, BottomFooterText } from '../components/core/Text';
 import { checkLocationState } from '../util/Utility';
 import Console from '../components/game/Console';
 import Loading from '../components/core/Loading';
@@ -32,9 +32,15 @@ import {
   disconnect, routes, send, subscribe,
 } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
+import { NoColorExternalLink } from '../components/core/Link';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
   padding: 0;
+  
+  p {
+    color: ${({ theme }) => theme.colors.text};
+    font-family: ${({ theme }) => theme.font};
+  }
 `;
 
 const OverflowPanel = styled(Panel)`
@@ -353,6 +359,10 @@ function GamePage() {
               onChange={() => ''}
               readOnly
             />
+            <BottomFooterText>
+              {'Notice an issue? Contact us at '}
+              <NoColorExternalLink href="mailto:support@codejoust.co">support@codejoust.co</NoColorExternalLink>
+            </BottomFooterText>
           </OverflowPanel>
 
           {/* Code editor and console panels */}
