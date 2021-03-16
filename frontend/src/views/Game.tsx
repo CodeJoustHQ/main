@@ -43,6 +43,31 @@ const StyledMarkdownEditor = styled(MarkdownEditor)`
 const OverflowPanel = styled(Panel)`
   overflow-y: auto;
   height: 100%;
+  padding: 0 25px;
+`;
+
+const LeaderboardContent = styled.div`
+  text-align: center;
+  margin: 0 auto;
+  width: 75%;
+  overflow-x: scroll;
+  white-space: nowrap;
+    
+  // Show shadows if there is scrollable content  
+  background-image: 
+    /* Shadow covers */ 
+    ${({ theme: { colors: { background } } }) => `linear-gradient(to right, ${background}, ${background})`},
+    ${({ theme: { colors: { background } } }) => `linear-gradient(to left, ${background}, ${background})`},
+  
+    /* Shadows */ 
+    ${({ theme: { colors: { background } } }) => `linear-gradient(to right, rgba(0,0,0.8,.12), ${background})`},
+    ${({ theme: { colors: { background } } }) => `linear-gradient(to left, rgba(0,0,0,.12), ${background})`};
+
+  background-position: left center, right center, left center, right center;
+  background-repeat: no-repeat;
+  background-color: ${({ theme }) => theme.colors.background};
+  background-size: 20px 100%, 20px 100%, 10px 100%, 10px 100%;
+  background-attachment: local, local, scroll, scroll;
 `;
 
 type LocationState = {
@@ -318,14 +343,14 @@ function GamePage() {
     }
   };
 
-  const displayPlayerLeaderboard = () => players.map((player, index) => (
+  const displayPlayerLeaderboard = useCallback(() => players.map((player, index) => (
     <LeaderboardCard
       player={player}
       isCurrentPlayer={player.user.userId === currentUser?.userId}
       place={index + 1}
       color={player.color}
     />
-  ));
+  )), [players, currentUser]);
 
   // Subscribe user to primary socket and to notifications.
   useEffect(() => {
@@ -362,22 +387,23 @@ function GamePage() {
           <TextButton onClick={exitGame}>Exit Game</TextButton>
         </FlexRight>
       </FlexInfoBar>
-      <CenteredContainer>
+      <LeaderboardContent>
         {displayPlayerLeaderboard()}
-      </CenteredContainer>
+      </LeaderboardContent>
 
-      {loading ? <Loading /> : null}
+      {loading ? <CenteredContainer><Loading /></CenteredContainer> : null}
+      {error ? <CenteredContainer><ErrorMessage message={error} /></CenteredContainer> : null}
       <SplitterContainer>
         <SplitterLayout
           onSecondaryPaneSizeChange={onSecondaryPanelSizeChange}
           percentage
           primaryMinSize={20}
           secondaryMinSize={35}
+          customClassName="game-splitter-container"
         >
           {/* Problem title/description panel */}
-          <OverflowPanel>
+          <OverflowPanel className="display-box-shadow">
             <ProblemHeaderText>{problems[0]?.name}</ProblemHeaderText>
-            {error ? <ErrorMessage message={error} /> : null}
             <StyledMarkdownEditor
               defaultValue={problems[0]?.description}
               onChange={() => ''}

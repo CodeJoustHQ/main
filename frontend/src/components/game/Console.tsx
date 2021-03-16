@@ -1,21 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { TestCase } from '../../api/Problem';
-import { Text } from '../core/Text';
+import { LowMarginText } from '../core/Text';
 import { ConsoleTextArea } from '../core/Input';
-import { SmallButton } from '../core/Button';
+import { GreenSmallButton, SmallButton } from '../core/Button';
 import { Submission, SubmissionResult, SubmissionType } from '../../api/Game';
 
 const Content = styled.div`
   height: 100%;
   overflow-y: auto;
+  display: flex;
+  justify-content: space-between;
 `;
 
-const FixedContent = styled.div`
+const RightAlignedContent = styled.div`
   position: absolute;
+  text-align: right;
   top: 0;
-  right: 0;
-  margin: 0.6rem;
+  right: 10px;
+  margin: 10px 0;
+`;
+
+const MainContent = styled.div`
+  width: 55%;
 `;
 
 type ConsoleProps = {
@@ -86,18 +93,21 @@ function Console(props: ConsoleProps) {
 
   return (
     <Content>
-      <FixedContent>
-        <SmallButton onClick={() => onRun(input)}>Run Code</SmallButton>
+      <MainContent>
+        <div>
+          <br />
+          <LowMarginText>Input</LowMarginText>
+          <ConsoleTextArea value={input} onChange={(e) => setInput(e.target.value)} />
+        </div>
+        <div>
+          <LowMarginText>Output</LowMarginText>
+          <ConsoleTextArea value={output} readOnly />
+        </div>
+      </MainContent>
+      <RightAlignedContent>
+        <GreenSmallButton onClick={() => onRun(input)}>Run Code</GreenSmallButton>
         <SmallButton onClick={() => onSubmit()}>Submit</SmallButton>
-      </FixedContent>
-      <div>
-        <Text bold>Input</Text>
-        <ConsoleTextArea value={input} onChange={(e) => setInput(e.target.value)} />
-      </div>
-      <div>
-        <Text bold>Output</Text>
-        <ConsoleTextArea value={output} readOnly />
-      </div>
+      </RightAlignedContent>
     </Content>
   );
 }

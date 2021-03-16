@@ -43,8 +43,9 @@ export const PrimaryButton = styled(DefaultButton)<any>`
 export const TextButton = styled.button<ThemeType>`
   background: none;
   border: none;
-  color: ${({ theme }) => theme.colors.gray};
+  color: ${({ theme }) => theme.colors.text};
   font-size: ${({ theme }) => theme.fontSize.default};
+  font-family: ${({ theme }) => theme.font};
   cursor: pointer;
   
   &:focus {
@@ -94,7 +95,15 @@ export const ProblemIOTypeButton = styled(DefaultButton)<ProblemIOTypeButtonProp
 
 export const SmallButton = styled(DefaultButton)`
   color: ${({ theme }) => theme.colors.white};
-  background-color: ${({ theme }) => theme.colors.blue};
-  padding: 0.5rem 1rem;
+  background: ${({ theme }) => theme.colors.gradients.blue};
+  font-size: ${({ theme }) => theme.fontSize.medium};
+  padding: 0;
   margin: 0.4rem;
+  width: 6rem;
+  height: 2.25rem;
+  line-height: 2rem;
+`;
+
+export const GreenSmallButton = styled(SmallButton)`
+  background: ${({ theme }) => theme.colors.gradients.green};
 `;

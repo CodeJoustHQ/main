@@ -49,7 +49,8 @@ function PlayerResultsCard(props: PlayerResultsCardProps) {
         <FlexLeft>
           <CenteredContainer>
             <PlayerIcon
-              hexColor={color.hexColor}
+              gradientColor={color.gradientColor}
+              nickname={player.user.nickname}
               active={Boolean(player.user.sessionId)}
             />
             <br />

@@ -43,18 +43,19 @@ export const LargeInputButton = styled(Input).attrs(() => ({
 `;
 
 export const ConsoleTextArea = styled.textarea`
-  font-family: monospace;
+  font-family: Monaco, monospace;
+  font-size: ${({ theme }) => theme.fontSize.default};
+  color: ${({ theme }) => theme.colors.text};
   margin: 2px;
-  min-width: 20%;
-  max-width: 70%;
+  min-width: 50px;
+  max-width: 90%;
+  width: 90%;
   min-height: 24px;
   max-height: 150px;
 
   padding: 5px;
-  border: 3px solid ${({ theme }) => theme.colors.darkBlue};
-  border-radius: 0.25rem;
-  
-  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  border: 2px solid ${({ theme }) => theme.colors.blue};
+  border-radius: 0.3rem;
 `;
 
 export const NumberInput = styled(Input).attrs(() => ({
