@@ -101,11 +101,11 @@ export const ProblemIOTypeButton = styled(DefaultButton)<ProblemIOTypeButtonProp
 export const SmallButton = styled(DefaultButton)`
   color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.gradients.blue};
-  font-size: ${({ theme }) => theme.fontSize.xMediumSmall};
+  font-size: ${({ theme }) => theme.fontSize.medium};
   padding: 0;
   margin: 0.4rem;
-  width: 5.8rem;
-  height: 2.1rem;
+  width: 6rem;
+  height: 2.25rem;
   line-height: 2rem;
 `;
 

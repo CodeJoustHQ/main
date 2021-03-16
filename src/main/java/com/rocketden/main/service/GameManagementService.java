@@ -3,6 +3,7 @@ package com.rocketden.main.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.game.GameDto;
@@ -20,6 +21,7 @@ import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.Game;
 import com.rocketden.main.game_object.GameTimer;
+import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
@@ -27,9 +29,11 @@ import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.util.EndGameTimerTask;
 import com.rocketden.main.util.Utility;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@Log4j2
 @Service
 public class GameManagementService {
 
@@ -134,7 +138,7 @@ public class GameManagementService {
         setStartGameTimer(game, time);
 
         currentGameMap.put(room.getRoomId(), game);
-        notificationService.scheduleTimeLeftNotifications(room.getRoomId(), time);
+        notificationService.scheduleTimeLeftNotifications(game, time);
     }
 
     // Set and start the Game Timer.
@@ -177,6 +181,10 @@ public class GameManagementService {
         }
 
         SubmissionDto submissionDto = submitService.submitSolution(game, request);
+
+        if (isGameOver(game)) {
+            endGame(game);
+        }
 
         // Send socket update with latest leaderboard info
         socketService.sendSocketUpdate(GameMapper.toDto(game));
@@ -231,7 +239,32 @@ public class GameManagementService {
         liveGameService.updateCode(game.getPlayers().get(userId), playerCode);
     }
 
+    protected void endGame(Game game) {
+        // Cancel all previously scheduled timers
+        GameTimer gameTimer = game.getGameTimer();
+        gameTimer.getTimer().cancel();
+
+        for (Timer timer : gameTimer.getNotificationTimers()) {
+            timer.cancel();
+        }
+    }
+
     protected boolean isGameOver(Game game) {
         return game.getAllSolved() || (game.getGameTimer() != null && game.getGameTimer().isTimeUp());
+    }
+
+    // Update people's socket active status
+    public void conditionallyUpdateSocketInfo(Room room, User user) {
+        Game game = currentGameMap.get(room.getRoomId());
+
+        if (game != null) {
+            Player player = game.getPlayers().get(user.getUserId());
+            if (player != null) {
+                log.info("Updating socket info for game {}", room.getRoomId());
+                game.setRoom(room);
+                player.setUser(user);
+                socketService.sendSocketUpdate(GameMapper.toDto(game));
+            }
+        }
     }
 }

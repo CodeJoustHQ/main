@@ -31,7 +31,7 @@ export const ThemeConfig: any = {
     xSmall: '0.4rem',
     small: '0.6rem',
     mediumSmall: '0.8rem',
-    xMediumSmall: '0.9rem',
+    medium: '0.9rem',
     default: '1rem',
     mediumLarge: '1.2rem',
     xMediumLarge: '1.5rem',
