@@ -17,20 +17,32 @@ const FlexContent = styled.div`
   margin: 10px 0;
 `;
 
+const TitleContent = styled.div`
+  //position: absolute;
+  padding: 2px;
+`;
+
+const ConsoleTitle = styled.p`
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  margin: 0;
+`;
+
 const ConsoleLabel = styled.p`
   flex: 0 0 60px;
   margin: auto 0;
 `;
 
 const RightAlignedContent = styled.div`
+  position: absolute;
   text-align: right;
   top: 0;
-  right: 0;
+  right: 10px;
   margin: 10px 0;
 `;
 
 const MainContent = styled.div`
-  width: 55%;
+  width: 80%;
+  padding: 10px 0;
 `;
 
 type ConsoleProps = {
@@ -45,6 +57,8 @@ function Console(props: ConsoleProps) {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
   const [console, setConsole] = useState('');
+  const [title, setTitle] = useState('Console');
+  const [subtitle, setSubtitle] = useState('');
 
   const {
     testCases, submission, onRun, onSubmit,
@@ -55,48 +69,67 @@ function Console(props: ConsoleProps) {
   }, [testCases]);
 
   useEffect(() => {
-    if (submission) {
-      // Set the submission details in the output, a list joined by new line.
-      const outputList: string[] = [];
+    const setCompilationError = (newSubmission: Submission) => {
+      // If it's a compilation error, no subtitle or console
+      setTitle('Compilation Error');
+      setSubtitle('');
+      setOutput(newSubmission.compilationError);
+      setConsole('');
+    };
 
-      // Add submission correctness.
-      if (submission.submissionType === SubmissionType.Submit) {
-        outputList.push(`${submission.numCorrect} / ${submission.numTestCases} passed`);
-      }
+    const handleRun = (newSubmission: Submission) => {
+      setTitle('Results');
+      setSubtitle('');
+      setOutput(newSubmission.results[0].userOutput);
+      setConsole(newSubmission.results[0].console);
+    };
 
-      // If a compilation error exists, show that; otherwise, show results.
-      if (submission.compilationError) {
-        outputList.push(`Compilation error: ${submission.compilationError}`);
+    const handleSubmit = (newSubmission: Submission) => {
+      if (newSubmission.numCorrect === newSubmission.numTestCases) {
+        // Set only title and subtitle, leave rest untouched
+        setTitle('Correct');
+        setSubtitle(`${newSubmission.numCorrect} / ${newSubmission.numTestCases} passed`);
       } else {
-        outputList.push(`Runtime: ${submission.runtime}`);
-        let resultIndex: number = 1;
-        submission.results.forEach((result: SubmissionResult) => {
-          // Only show newline, result #, and correctness if type was 'submit'.
-          if (submission.submissionType === SubmissionType.Submit) {
-            outputList.push('');
-            outputList.push(`Result #${resultIndex}: ${result.correct ? 'Correct' : 'Incorrect'}`);
+        let firstFailure: SubmissionResult | undefined;
+        let firstNonHiddenFailure: SubmissionResult | undefined;
+
+        // Find the first incorrect and non-hidden incorrect results
+        newSubmission.results.forEach((result) => {
+          if (!firstFailure && !result.correct) {
+            firstFailure = result;
           }
-
-          // Show the test case details, if not hidden.
-          if (result.hidden) {
-            outputList.push('This test case is hidden.');
-          } else {
-            outputList.push(`Input: ${result.input}`);
-            outputList.push(`User output: ${result.userOutput}`);
-
-            // Only show correct output if type was 'submit'.
-            if (submission.submissionType === SubmissionType.Submit) {
-              outputList.push(`Correct output: ${result.correctOutput}`);
-            }
-            outputList.push(`Console: ${result.console}`);
-            outputList.push(`Error: ${result.error}`);
+          if (!firstNonHiddenFailure && !result.correct && !result.hidden) {
+            firstNonHiddenFailure = result;
           }
-
-          resultIndex += 1;
         });
-      }
 
-      setOutput(outputList.join('\n'));
+        // Ideally display non-hidden failure but otherwise just any failure
+        const res: SubmissionResult = (firstNonHiddenFailure || firstNonHiddenFailure)!;
+
+        // Set state to the latest results
+        setTitle('Wrong Answer');
+        setSubtitle(`${newSubmission.numCorrect} / ${newSubmission.numTestCases} passed`);
+        setInput(res.hidden ? 'Hidden' : res.input);
+        setOutput(res.hidden ? 'Hidden' : res.userOutput);
+        setConsole(res.hidden ? 'Hidden' : res.console);
+      }
+    };
+
+    if (submission && submission.results && submission.results.length) {
+      if (submission.compilationError) {
+        setCompilationError(submission);
+      } else if (submission.submissionType === SubmissionType.Submit) {
+        handleSubmit(submission);
+      } else {
+        handleRun(submission);
+      }
+    } else {
+      // Default values
+      setTitle('Console');
+      setSubtitle('');
+      setInput(testCases[0].input);
+      setOutput('');
+      setConsole('');
     }
   }, [submission]);
 
@@ -122,6 +155,7 @@ function Console(props: ConsoleProps) {
           <ConsoleLabel>Console</ConsoleLabel>
           <ConsoleTextArea value={console} rows={calculateRows(console)} readOnly />
         </FlexContent>
+        <br />
       </MainContent>
       <RightAlignedContent>
         <GreenSmallButton onClick={() => onRun(input)}>Run Code</GreenSmallButton>
