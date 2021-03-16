@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { TestCase } from '../../api/Problem';
-import { LowMarginText } from '../core/Text';
 import { ConsoleTextArea } from '../core/Input';
 import { GreenSmallButton, SmallButton } from '../core/Button';
 import { Submission, SubmissionResult, SubmissionType } from '../../api/Game';
@@ -11,6 +10,16 @@ const Content = styled.div`
   overflow-y: auto;
   display: flex;
   justify-content: space-between;
+`;
+
+const FlexContent = styled.div`
+  display: flex;
+  margin: 10px 0;
+`;
+
+const ConsoleLabel = styled.p`
+  flex: 0 0 60px;
+  margin: auto 0;
 `;
 
 const RightAlignedContent = styled.div`
@@ -35,6 +44,7 @@ type ConsoleProps = {
 function Console(props: ConsoleProps) {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
+  const [console, setConsole] = useState('');
 
   const {
     testCases, submission, onRun, onSubmit,
@@ -90,18 +100,28 @@ function Console(props: ConsoleProps) {
     }
   }, [submission]);
 
+  const calculateRows = (val: string): number => (val ? val.split('\n').length : 1);
+
   return (
     <Content>
       <MainContent>
-        <div>
-          <br />
-          <LowMarginText>Input</LowMarginText>
-          <ConsoleTextArea value={input} onChange={(e) => setInput(e.target.value)} />
-        </div>
-        <div>
-          <LowMarginText>Output</LowMarginText>
-          <ConsoleTextArea value={output} readOnly />
-        </div>
+        <br />
+        <FlexContent>
+          <ConsoleLabel>Input</ConsoleLabel>
+          <ConsoleTextArea
+            rows={calculateRows(input)}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+        </FlexContent>
+        <FlexContent>
+          <ConsoleLabel>Output</ConsoleLabel>
+          <ConsoleTextArea value={output} rows={calculateRows(output)} readOnly />
+        </FlexContent>
+        <FlexContent>
+          <ConsoleLabel>Console</ConsoleLabel>
+          <ConsoleTextArea value={console} rows={calculateRows(console)} readOnly />
+        </FlexContent>
       </MainContent>
       <RightAlignedContent>
         <GreenSmallButton onClick={() => onRun(input)}>Run Code</GreenSmallButton>

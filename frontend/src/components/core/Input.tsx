@@ -54,19 +54,27 @@ export const ConsoleTextArea = styled.textarea`
   font-size: ${({ theme }) => theme.fontSize.default};
   color: ${({ theme }) => theme.colors.darkText};
   margin: 2px;
+  padding: 8px;
+  
   min-width: 50px;
   max-width: 90%;
   width: 70%;
-  min-height: 24px;
+  min-height: 22px;
+  height: unset;
   max-height: 150px;
+  white-space: pre;
+  
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 
-  padding: 1px;
-  border: double 1px transparent;
-  border-radius: 3px;
-  background-image: linear-gradient(white, white), 
-                    ${({ theme }) => theme.colors.gradients.blue};
-  background-origin: border-box;
-  background-clip: content-box, border-box;
+  border: 2px solid ${({ theme }) => theme.colors.blue};
+  border-radius: 0.3rem;
   
   &:focus {
     outline: none;
