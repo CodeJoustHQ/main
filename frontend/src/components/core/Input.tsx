@@ -14,6 +14,8 @@ export const PureTextInputTitle = styled.input.attrs(() => ({
   type: 'text',
 }))`
   border: none;
+  color: ${({ theme }) => theme.colors.text};
+  font-family: ${({ theme }) => theme.font};
   font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
   font-weight: 700;
   padding: 0;

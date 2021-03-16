@@ -54,6 +54,17 @@ const MarginRightContainer = styled.div<any>`
   margin-right: ${({ marginRight }) => marginRight}%;
 `;
 
+const StyledMarkdownEditor = styled(MarkdownEditor)`
+  p {
+    font-family: ${({ theme }) => theme.font};
+  }
+
+  // The specific list of attributes to have dark text color.
+  .ProseMirror > p, blockquote > p, h1, h2, h3, ul, ol, table {
+    color: ${({ theme }) => theme.colors.text};
+  }
+`;
+
 type ProblemDisplayParams = {
   problem: Problem,
   actionText: string,
@@ -200,7 +211,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             onChange={handleChange}
           />
           <hr style={{ margin: '1rem 0' }} />
-          <MarkdownEditor
+          <StyledMarkdownEditor
             placeholder="Write a nice description"
             defaultValue={newProblem.description}
             onChange={(getNewValue) => handleDescriptionChange(getNewValue())}
