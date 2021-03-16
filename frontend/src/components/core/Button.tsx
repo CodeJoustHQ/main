@@ -44,9 +44,9 @@ export const PrimaryButton = styled(DefaultButton)<any>`
 export const TextButton = styled.button<ThemeType>`
   background: none;
   border: none;
-  color: ${({ color }) => color};
-  font-family: ${({ theme }) => theme.font};
+  color: ${({ theme }) => theme.colors.text};
   font-size: ${({ theme }) => theme.fontSize.default};
+  font-family: ${({ theme }) => theme.font};
   cursor: pointer;
   
   &:focus {
@@ -131,21 +131,15 @@ export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`
 
 export const SmallButton = styled(DefaultButton)`
   color: ${({ theme }) => theme.colors.white};
-  background: ${({ color }) => color};
-  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
-  font-weight: 700;
+  background: ${({ theme }) => theme.colors.gradients.blue};
+  font-size: ${({ theme }) => theme.fontSize.medium};
   padding: 0;
   margin: 0.4rem;
-  width: 5.8rem;
-  height: 2.1rem;
+  width: 6rem;
+  height: 2.25rem;
   line-height: 2rem;
+`;
 
-  &:disabled {
-    background-color: ${({ theme }) => theme.colors.gray};
-
-    &:hover {
-      cursor: default;
-      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
-    }
-  }
+export const GreenSmallButton = styled(SmallButton)`
+  background: ${({ theme }) => theme.colors.gradients.green};
 `;

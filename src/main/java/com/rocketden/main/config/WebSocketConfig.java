@@ -27,6 +27,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint(BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint").withSockJS();
+        registry.addEndpoint(BaseRestController.BASE_SOCKET_URL + "/join-room-endpoint").setAllowedOrigins("*").withSockJS();
     }
 }

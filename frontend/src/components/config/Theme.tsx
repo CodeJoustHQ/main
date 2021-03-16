@@ -5,8 +5,9 @@ import '@fontsource/titillium-web/700.css';
 
 export const ThemeConfig: any = {
   colors: {
-    text: '#444',
-    background: '#f0f4f8',
+    text: '#555',
+    darkText: '#333',
+    background: '#f8f8f8',
     border: '#ccc',
     lightBlue: '#AED2EA',
     blue: '#3E93CD',
@@ -34,6 +35,7 @@ export const ThemeConfig: any = {
     xSmall: '0.4rem',
     small: '0.6rem',
     mediumSmall: '0.8rem',
+    medium: '0.9rem',
     default: '1rem',
     mediumLarge: '1.2rem',
     xMediumLarge: '1.5rem',

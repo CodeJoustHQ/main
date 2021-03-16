@@ -9,28 +9,11 @@ import lombok.Setter;
 @EqualsAndHashCode
 public class Color {
 
-    private static final String INVALID_COLOR_STR =
-        "The hexadecimal fields must all be of the form '#XXXXXX'.";
-
-    private String hexColor;
+    private String gradientColor;
 
     public Color() {}
 
-    public Color(String hexColor) {
-        if (hexColor.charAt(0) != '#' || hexColor.length() != 7) {
-            throw new IllegalArgumentException(INVALID_COLOR_STR);
-        }
-
-        // Ensure that all characters are of valid hexadecimal form.
-        for (int index = 1; index < 7; index++) {
-            char hexChar = Character.toUpperCase(hexColor.charAt(index));
-            
-            if ((hexChar < '0' || hexChar > '9') &&
-                (hexChar < 'A' || hexChar > 'F')) {
-                throw new IllegalArgumentException(INVALID_COLOR_STR);
-            }
-        }
-
-        this.hexColor = hexColor;
+    public Color(String gradientColor) {
+        this.gradientColor = gradientColor;
     }
 }
