@@ -60,7 +60,7 @@ const StyledMarkdownEditor = styled(MarkdownEditor)`
   }
 
   // The specific list of attributes to have dark text color.
-  .ProseMirror > p, blockquote > p, h1, h2, h3, ul, ol, table {
+  .ProseMirror > p, blockquote, h1, h2, h3, ul, ol, table {
     color: ${({ theme }) => theme.colors.text};
   }
 `;
