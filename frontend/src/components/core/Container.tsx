@@ -99,7 +99,7 @@ export const MainContainer = styled.div`
   width: 80%;
 `;
 
-export const TopContainer = styled.div`
+export const ProblemContainer = styled.div`
   margin: 0 auto;
   padding-bottom: 5vw;
   width: 80%;
