@@ -134,7 +134,7 @@ function Console(props: ConsoleProps) {
       setOutput('');
       setConsoleOutput('');
     }
-  }, [submission]);
+  }, [submission, testCases]);
 
   const calculateRows = (val: string): number => (val ? val.split('\n').length : 1);
 
