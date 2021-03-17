@@ -51,8 +51,26 @@ const SettingsContainer = styled.div<any>`
   background: ${({ theme }) => theme.colors.white};
 `;
 
-const MarginRightContainer = styled.div<any>`
-  margin-right: ${({ marginRight }) => marginRight}%;
+const SettingsContainerHighPadding = styled(SettingsContainer)`
+  padding: 3rem;
+`;
+
+const InputContainer = styled.div`
+  margin-right: 10%;
+`;
+
+const HiddenContainer = styled.div`
+  margin-right: 5%;
+`;
+
+const ExplanationContainer = styled.div`
+  margin-right: 5%;
+  flex: 2;
+`;
+
+const MarginLeftRightAutoContainer = styled.div`
+  margin-right: 5%;
+  margin-left: auto;
 `;
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
@@ -196,13 +214,12 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             Back
           </GraySmallButtonLinkAutoLeftMargin>
           <SmallButton
-            color={ThemeConfig.colors.gradients.blue}
             onClick={() => onClick(newProblem)}
           >
             {actionText}
           </SmallButton>
         </FlexBareContainer>
-        <SettingsContainer padding="3rem">
+        <SettingsContainerHighPadding>
           <PureTextInputTitle
             placeholder="Write a nice title"
             name="name"
@@ -215,7 +232,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             defaultValue={newProblem.description}
             onChange={(getNewValue) => handleDescriptionChange(getNewValue())}
           />
-        </SettingsContainer>
+        </SettingsContainerHighPadding>
 
         {editMode
           ? (
@@ -224,7 +241,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
               {newProblem.testCases.map((testCase, index) => (
                 <SettingsContainer>
                   <FlexBareContainer>
-                    <MarginRightContainer marginRight="10">
+                    <InputContainer>
                       <Text style={{ marginTop: 0 }}>Input</Text>
                       <FixedTextArea
                         value={newProblem.testCases[index].input}
@@ -234,8 +251,8 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                             current.output, current.hidden, current.explanation);
                         }}
                       />
-                    </MarginRightContainer>
-                    <MarginRightContainer marginRight="5" style={{ marginLeft: 'auto' }}>
+                    </InputContainer>
+                    <MarginLeftRightAutoContainer>
                       <Text style={{ marginTop: 0 }}>Output</Text>
                       <FixedTextArea
                         value={newProblem.testCases[index].output}
@@ -245,11 +262,11 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                             current.hidden, current.explanation);
                         }}
                       />
-                    </MarginRightContainer>
+                    </MarginLeftRightAutoContainer>
                   </FlexBareContainer>
 
                   <FlexBareContainer style={{ marginBottom: '10px' }}>
-                    <MarginRightContainer marginRight="5" style={{ flex: 2 }}>
+                    <ExplanationContainer>
                       <Text>Explanation</Text>
                       <FixedTextArea
                         value={newProblem.testCases[index].explanation}
@@ -259,11 +276,11 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                             current.hidden, e.target.value);
                         }}
                       />
-                    </MarginRightContainer>
+                    </ExplanationContainer>
                   </FlexBareContainer>
 
                   <FlexBareContainer>
-                    <MarginRightContainer marginRight="5">
+                    <HiddenContainer>
                       <label htmlFor={`problem-hidden-${index}`}>
                         Hidden
                         <CheckboxInput
@@ -276,16 +293,16 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                           }}
                         />
                       </label>
-                    </MarginRightContainer>
+                    </HiddenContainer>
 
-                    <MarginRightContainer marginRight="5" style={{ marginLeft: 'auto' }}>
+                    <MarginLeftRightAutoContainer>
                       <TextButton
                         color={ThemeConfig.colors.red2}
                         onClick={() => deleteTestCase(index)}
                       >
                         Delete
                       </TextButton>
-                    </MarginRightContainer>
+                    </MarginLeftRightAutoContainer>
                   </FlexBareContainer>
                 </SettingsContainer>
               ))}
