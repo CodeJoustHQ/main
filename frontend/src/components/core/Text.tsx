@@ -11,11 +11,10 @@ export const Text = styled.p<TextAttributes>`
 
 export const LabelAbsoluteText = styled.p<TextAttributes>`
   position: absolute;
-  top: 10px;
+  top: 1rem;
   right: 5%;
   margin: 0;
-  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
-  font-weight: 700;
+  font-size: ${({ theme }) => theme.fontSize.default};
 `;
 
 export const ErrorText = styled(Text)`

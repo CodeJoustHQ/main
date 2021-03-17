@@ -321,6 +321,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                             >
                               <SettingsContainerRelative>
                                 <LabelAbsoluteText>
+                                  #
                                   {index + 1}
                                 </LabelAbsoluteText>
                                 <FlexBareContainer>
