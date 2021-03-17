@@ -95,13 +95,13 @@ export const SplitterContainer = styled.div`
 
 export const MainContainer = styled.div`
   margin: 0 auto;
-  padding: 5vw 0;
+  padding: 3rem 0;
   width: 80%;
 `;
 
 export const ProblemContainer = styled.div`
   margin: 0 auto;
-  padding-bottom: 5vw;
+  padding-bottom: 3rem;
   width: 80%;
 `;
 
