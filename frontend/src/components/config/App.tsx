@@ -14,6 +14,7 @@ import AllProblemsPage from '../../views/AllProblemsPage';
 import ProblemPage from '../../views/ProblemPage';
 import CreateProblemPage from '../../views/CreateProblemPage';
 import CircleBackgroundLayout from '../layout/CircleBackground';
+import ContactUsPage from '../../views/ContactUs';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
       <CustomRoute path="/problems/all" component={AllProblemsPage} layout={MainLayout} exact />
       <CustomRoute path="/problem/create" component={CreateProblemPage} layout={MainLayout} exact />
       <CustomRoute path="/problem/:id" component={ProblemPage} layout={MainLayout} exact />
+      <CustomRoute path="/contact-us" component={ContactUsPage} layout={MainLayout} exact />
       <CustomRoute path="*" component={NotFound} layout={MainLayout} />
     </Switch>
   );

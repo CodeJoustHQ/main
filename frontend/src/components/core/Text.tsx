@@ -37,6 +37,18 @@ export const LandingHeaderText = styled.h1`
   font-weight: 400;
 `;
 
+export const ContactHeaderTitle = styled.h1`
+  font-size: ${({ theme }) => theme.fontSize.xLarge};
+  color: ${({ theme }) => theme.colors.darkText};
+  font-weight: 700;
+`;
+
+export const ContactHeaderText = styled.h1`
+  text-align: left;
+  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+  font-weight: 400;
+`;
+
 export const UserNicknameText = styled(LargeText)`
   margin: 0;
 `;
