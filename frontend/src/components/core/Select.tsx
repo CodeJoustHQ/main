@@ -6,7 +6,7 @@ const PrimarySelect = styled.select`
   font-family: ${({ theme }) => theme.font};
   font-size: ${({ theme }) => theme.fontSize.default};
   padding: 0.25rem 0.5rem;
-  border: 1px solid ${({ theme }) => theme.colors.blue};
+  border: 2px solid ${({ theme }) => theme.colors.blue};
   border-radius: 5px;
 `;
 

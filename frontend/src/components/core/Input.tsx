@@ -84,7 +84,7 @@ export const FixedTextArea = styled.textarea`
   resize: none;
 
   padding: 5px;
-  border: 1px solid ${({ theme }) => theme.colors.darkBlue};
+  border: 2px solid ${({ theme }) => theme.colors.darkBlue};
   border-radius: 0.25rem;
   
   font-size: ${({ theme }) => theme.fontSize.default};
@@ -116,10 +116,10 @@ export const TextInput = styled(Input).attrs(() => ({
   font-weight: 400;
   padding: 0.25rem 0.5rem;
   color: ${({ theme }) => theme.colors.text};
-  border: 1px solid ${({ theme }) => theme.colors.darkBlue};
+  border: 2px solid ${({ theme }) => theme.colors.darkBlue};
 
   &:focus {
-    border: 1px solid ${({ theme }) => theme.colors.darkBlue};
+    border: 2px solid ${({ theme }) => theme.colors.darkBlue};
   }
 `;
 
