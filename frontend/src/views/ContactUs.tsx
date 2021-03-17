@@ -1,7 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { LandingPageContainer } from '../components/core/Container';
-import { ContactHeaderTitle, ContactHeaderText } from '../components/core/Text';
+import { InlineExternalLink } from '../components/core/Link';
+import { ContactHeaderTitle, ContactHeaderText, InlineHeaderCopyText } from '../components/core/Text';
 
 function ContactUsPage() {
   return (
@@ -15,17 +15,22 @@ function ContactUsPage() {
       <ContactHeaderText>
         You can follow our progress on our
         {' '}
-        <Link to="https://github.com/rocketden" target="_blank">GitHub</Link>
+        <InlineExternalLink href="https://github.com/rocketden" target="_blank">GitHub</InlineExternalLink>
         {' '}
         or our
         {' '}
-        <Link to="https://trello.com/b/jb0SgY1b/sprint-board" target="_blank">public roadmap on Trello</Link>
+        <InlineExternalLink href="https://trello.com/b/jb0SgY1b/sprint-board" target="_blank">public roadmap on Trello</InlineExternalLink>
         .
       </ContactHeaderText>
       <ContactHeaderText>
         You can contact us at
         {' '}
-        <Link to="mailto::support@codejoust.co" target="_blank">support@codejoust.co</Link>
+        <InlineHeaderCopyText>
+          support@codejoust.co
+          <span className="material-icons-outlined">
+            content_copy
+          </span>
+        </InlineHeaderCopyText>
         . Say hello!
       </ContactHeaderText>
     </LandingPageContainer>

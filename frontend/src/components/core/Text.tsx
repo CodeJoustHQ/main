@@ -49,6 +49,14 @@ export const ContactHeaderText = styled.h1`
   font-weight: 400;
 `;
 
+export const InlineHeaderCopyText = styled(ContactHeaderText)`
+  display: inline-block;
+  padding: 0.2rem 1rem;
+  border-radius: 1rem;
+  background: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.white};
+`;
+
 export const UserNicknameText = styled(LargeText)`
   margin: 0;
 `;
