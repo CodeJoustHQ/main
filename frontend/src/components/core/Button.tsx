@@ -21,12 +21,7 @@ export const DefaultButton = styled.button`
   }
 `;
 
-type PrimaryButtonSize = {
-  width: string,
-  height: string,
-};
-
-export const PrimaryButton = styled(DefaultButton)<PrimaryButtonSize>`
+export const PrimaryButton = styled(DefaultButton)<any>`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   background: ${({ theme }) => theme.colors.gradients.blue};
   color: ${({ theme }) => theme.colors.white};
@@ -74,7 +69,6 @@ type DifficultyProps = {
 
 export const SmallDifficultyButton = styled(DefaultButton)<DifficultyProps>`
   font-size: ${({ theme }) => theme.fontSize.default};
-  font-weight: 700;
   background: ${({ active, difficulty, theme }) => (active ? difficultyToColor[difficulty].background : theme.colors.white)};
   color: ${({ active, difficulty, theme }) => (active ? theme.colors.white : difficultyToColor[difficulty].color)};
   width: 6vw;
@@ -109,7 +103,6 @@ export const SmallDifficultyButton = styled(DefaultButton)<DifficultyProps>`
 
 export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
-  font-weight: 700;
   background: ${({ active, difficulty, theme }) => (active ? difficultyToColor[difficulty].background : theme.colors.white)};
   color: ${({ active, difficulty, theme }) => (active ? theme.colors.white : difficultyToColor[difficulty].color)};
   width: 8vw;

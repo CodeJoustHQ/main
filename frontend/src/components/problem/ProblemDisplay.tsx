@@ -62,6 +62,8 @@ const FlexBareContainerMarginBottom = styled(FlexBareContainer)`
 
 const TitleDescriptionSeparator = styled.hr`
   margin: 1rem 0;
+  border: none;
+  border-top: 1.5px solid ${({ theme }) => theme.colors.border};
 `;
 
 const InputContainer = styled.div`
