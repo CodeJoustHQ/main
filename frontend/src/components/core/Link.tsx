@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { PrimaryButton, GraySmallButton } from './Button';
+import { PrimaryButton, InvertedSmallButton } from './Button';
 
 const AutoLeftMarginLink = styled(Link)`
   margin-left: auto;
@@ -41,8 +41,8 @@ const createButtonLinkAutoLeftMargin = (Button:any, props:any) => {
 
 export const PrimaryButtonLink = (props:any) => createButtonLink(PrimaryButton, props);
 
-export const GraySmallButtonLinkAutoLeftMargin = (props: any) => createButtonLinkAutoLeftMargin(
-  GraySmallButton,
+export const InvertedSmallButtonLinkAutoLeftMargin = (props: any) => createButtonLinkAutoLeftMargin(
+  InvertedSmallButton,
   props,
 );
 

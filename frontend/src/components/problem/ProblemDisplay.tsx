@@ -28,7 +28,7 @@ import PrimarySelect from '../core/Select';
 import { SmallHeaderText, LowMarginMediumText, Text } from '../core/Text';
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
-import { GraySmallButtonLinkAutoLeftMargin } from '../core/Link';
+import { InvertedSmallButtonLinkAutoLeftMargin } from '../core/Link';
 import { FlexBareContainer } from '../core/Container';
 
 const MainContent = styled.div`
@@ -110,7 +110,8 @@ const CancelTextButton = styled(TextButton)`
 
 const DeleteButton = styled(PrimaryButton)`
   margin: 0 0 1rem 0;
-  background: ${({ theme }) => theme.colors.gradients.red};
+  color: ${({ theme }) => theme.colors.red2};
+  background: ${({ theme }) => theme.colors.white};
 `;
 
 type ProblemDisplayParams = {
@@ -236,12 +237,12 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       <MainContent>
         <FlexBareContainer>
           <SmallHeaderText>Problem</SmallHeaderText>
-          <GraySmallButtonLinkAutoLeftMargin
+          <InvertedSmallButtonLinkAutoLeftMargin
             onClick={() => onClick(newProblem)}
             to="/problems/all"
           >
             Back
-          </GraySmallButtonLinkAutoLeftMargin>
+          </InvertedSmallButtonLinkAutoLeftMargin>
           <SmallButton
             onClick={() => onClick(newProblem)}
           >

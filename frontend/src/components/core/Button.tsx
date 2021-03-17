@@ -152,6 +152,7 @@ export const GreenSmallButtonBlock = styled(SmallButton)`
   background: ${({ theme }) => theme.colors.gradients.green};
 `;
 
-export const GraySmallButton = styled(SmallButton)`
-  background: ${({ theme }) => theme.colors.gradients.gray};
+export const InvertedSmallButton = styled(SmallButton)`
+  color: ${({ theme }) => theme.colors.text};
+  background: ${({ theme }) => theme.colors.background};
 `;

@@ -116,7 +116,7 @@ export const TextInput = styled(Input).attrs(() => ({
   font-weight: 400;
   padding: 0.25rem 0.5rem;
   color: ${({ theme }) => theme.colors.text};
-  border: 2px solid ${({ theme }) => theme.colors.darkBlue};
+  border: 2px solid ${({ theme }) => theme.colors.blue};
 
   &:focus {
     border: 2px solid ${({ theme }) => theme.colors.darkBlue};
