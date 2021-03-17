@@ -3,11 +3,14 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { PrimaryButton, SmallButton } from './Button';
 
+const AutoLeftMarginLink = styled(Link)`
+  margin-left: auto;
+`;
+
 // Wrap a button inside of a Link to get the styling of a button
 const createButtonLink = (Button:any, props:any) => {
   const {
     to,
-    style,
     children,
     ...rest
   } = props;
@@ -17,12 +20,31 @@ const createButtonLink = (Button:any, props:any) => {
     </Button>
   );
 
-  return <Link style={style} to={to}>{button}</Link>;
+  return <Link to={to}>{button}</Link>;
+};
+
+// Wrap a button inside of a link with an auto margin-left
+const createButtonLinkAutoLeftMargin = (Button:any, props:any) => {
+  const {
+    to,
+    children,
+    ...rest
+  } = props;
+  const button = (
+    <Button {...rest}>
+      {children}
+    </Button>
+  );
+
+  return <AutoLeftMarginLink to={to}>{button}</AutoLeftMarginLink>;
 };
 
 export const PrimaryButtonLink = (props:any) => createButtonLink(PrimaryButton, props);
 
-export const SmallButtonLink = (props:any) => createButtonLink(SmallButton, props);
+export const SmallButtonLinkAutoLeftMargin = (props: any) => createButtonLinkAutoLeftMargin(
+  SmallButton,
+  props,
+);
 
 export const NavbarLink = styled(Link)`
   color: ${({ theme }) => theme.colors.text};

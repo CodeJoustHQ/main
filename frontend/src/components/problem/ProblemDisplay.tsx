@@ -26,7 +26,7 @@ import { SmallHeaderText, LowMarginMediumText, Text } from '../core/Text';
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
 import { ThemeConfig } from '../config/Theme';
-import { SmallButtonLink } from '../core/Link';
+import { SmallButtonLinkAutoLeftMargin } from '../core/Link';
 import { FlexBareContainer } from '../core/Container';
 
 const MainContent = styled.div`
@@ -188,14 +188,13 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       <MainContent>
         <FlexBareContainer>
           <SmallHeaderText>Problem</SmallHeaderText>
-          <SmallButtonLink
+          <SmallButtonLinkAutoLeftMargin
             color={ThemeConfig.colors.gradients.gray}
             onClick={() => onClick(newProblem)}
             to="/problems/all"
-            style={{ marginLeft: 'auto' }}
           >
             Back
-          </SmallButtonLink>
+          </SmallButtonLinkAutoLeftMargin>
           <SmallButton
             color={ThemeConfig.colors.gradients.blue}
             onClick={() => onClick(newProblem)}
