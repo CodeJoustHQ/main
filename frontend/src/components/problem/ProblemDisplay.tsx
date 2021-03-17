@@ -162,10 +162,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       result.destination.index,
     );
 
-    const updatedProblem: Problem = newProblem;
-    updatedProblem.testCases = newTestCases;
-
-    setNewProblem(updatedProblem);
+    setNewProblem({ ...newProblem, testCases: newTestCases });
   };
 
   const deleteProblemFunc = () => {
