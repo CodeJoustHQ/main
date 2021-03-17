@@ -1,9 +1,21 @@
 import React from 'react';
+import styled from 'styled-components';
 import { LandingPageContainer } from '../components/core/Container';
 import { InlineExternalLink } from '../components/core/Link';
-import { ContactHeaderTitle, ContactHeaderText, InlineHeaderCopyText } from '../components/core/Text';
+import { ContactHeaderTitle, ContactHeaderText } from '../components/core/Text';
 
 function ContactUsPage() {
+  const InlineEmailCopyText = styled(ContactHeaderText)`
+    display: inline-block;
+    margin: 0;
+    cursor: pointer;
+    border-bottom: 1px solid ${({ theme }) => theme.colors.text};
+  `;
+
+  const CopyIcon = styled.i`
+    margin-left: 5px;
+  `;
+
   return (
     <LandingPageContainer>
       <ContactHeaderTitle>
@@ -25,12 +37,12 @@ function ContactUsPage() {
       <ContactHeaderText>
         You can contact us at
         {' '}
-        <InlineHeaderCopyText>
+        <InlineEmailCopyText
+          onClick={() => navigator.clipboard.writeText('support@codejoust.co')}
+        >
           support@codejoust.co
-          <span className="material-icons-outlined">
-            content_copy
-          </span>
-        </InlineHeaderCopyText>
+          <CopyIcon className="material-icons">content_copy</CopyIcon>
+        </InlineEmailCopyText>
         . Say hello!
       </ContactHeaderText>
     </LandingPageContainer>
