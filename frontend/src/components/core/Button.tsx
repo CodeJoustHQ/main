@@ -54,6 +54,14 @@ export const TextButton = styled.button<ThemeType>`
   }
 `;
 
+export const RedTextButton = styled(TextButton)`
+  color: ${({ theme }) => theme.colors.red2};
+`;
+
+export const GrayTextButton = styled(TextButton)`
+  color: ${({ theme }) => theme.colors.regrayd2};
+`;
+
 type DifficultyProps = {
   difficulty: Difficulty,
   active: boolean,

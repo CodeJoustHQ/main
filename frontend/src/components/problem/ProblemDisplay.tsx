@@ -19,6 +19,8 @@ import {
   SmallDifficultyButton,
   PrimaryButton,
   TextButton,
+  RedTextButton,
+  GrayTextButton,
   SmallButton,
   GreenSmallButtonBlock,
 } from '../core/Button';
@@ -26,7 +28,6 @@ import PrimarySelect from '../core/Select';
 import { SmallHeaderText, LowMarginMediumText, Text } from '../core/Text';
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
-import { ThemeConfig } from '../config/Theme';
 import { GraySmallButtonLinkAutoLeftMargin } from '../core/Link';
 import { FlexBareContainer } from '../core/Container';
 
@@ -53,6 +54,14 @@ const SettingsContainer = styled.div<any>`
 
 const SettingsContainerHighPadding = styled(SettingsContainer)`
   padding: 3rem;
+`;
+
+const FlexBareContainerMarginBottom = styled(FlexBareContainer)`
+  margin-bottom: 10px;
+`;
+
+const TitleDescriptionSeparator = styled.hr`
+  margin: 1rem 0;
 `;
 
 const InputContainer = styled.div`
@@ -82,6 +91,24 @@ const StyledMarkdownEditor = styled(MarkdownEditor)`
   .ProseMirror > p, blockquote, h1, h2, h3, ul, ol, table {
     color: ${({ theme }) => theme.colors.text};
   }
+`;
+
+const NoMarginTopText = styled(Text)`
+  margin-top: 0px;
+`;
+
+const InputTypeContainer = styled.div`
+  margin-bottom: 5px;
+`;
+
+const CancelTextButton = styled(TextButton)`
+  margin-left: 2.5px;
+  color: ${({ theme }) => theme.colors.gray};
+`;
+
+const DeleteButton = styled(PrimaryButton)`
+  margin: 0 0 1rem 0;
+  background: ${({ theme }) => theme.colors.gradients.red};
 `;
 
 type ProblemDisplayParams = {
@@ -226,7 +253,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             value={newProblem.name}
             onChange={handleChange}
           />
-          <hr style={{ margin: '1rem 0' }} />
+          <TitleDescriptionSeparator />
           <StyledMarkdownEditor
             placeholder="Write a nice description"
             defaultValue={newProblem.description}
@@ -242,7 +269,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                 <SettingsContainer>
                   <FlexBareContainer>
                     <InputContainer>
-                      <Text style={{ marginTop: 0 }}>Input</Text>
+                      <NoMarginTopText>Input</NoMarginTopText>
                       <FixedTextArea
                         value={newProblem.testCases[index].input}
                         onChange={(e) => {
@@ -253,7 +280,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                       />
                     </InputContainer>
                     <MarginLeftRightAutoContainer>
-                      <Text style={{ marginTop: 0 }}>Output</Text>
+                      <NoMarginTopText>Output</NoMarginTopText>
                       <FixedTextArea
                         value={newProblem.testCases[index].output}
                         onChange={(e) => {
@@ -265,7 +292,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                     </MarginLeftRightAutoContainer>
                   </FlexBareContainer>
 
-                  <FlexBareContainer style={{ marginBottom: '10px' }}>
+                  <FlexBareContainerMarginBottom>
                     <ExplanationContainer>
                       <Text>Explanation</Text>
                       <FixedTextArea
@@ -277,7 +304,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                         }}
                       />
                     </ExplanationContainer>
-                  </FlexBareContainer>
+                  </FlexBareContainerMarginBottom>
 
                   <FlexBareContainer>
                     <HiddenContainer>
@@ -296,12 +323,11 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                     </HiddenContainer>
 
                     <MarginLeftRightAutoContainer>
-                      <TextButton
-                        color={ThemeConfig.colors.red2}
+                      <RedTextButton
                         onClick={() => deleteTestCase(index)}
                       >
                         Delete
-                      </TextButton>
+                      </RedTextButton>
                     </MarginLeftRightAutoContainer>
                   </FlexBareContainer>
                 </SettingsContainer>
@@ -340,7 +366,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
           <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
           {newProblem.problemInputs.map((input, index) => (
-            <div style={{ marginBottom: '5px' }}>
+            <InputTypeContainer>
               <TextInput
                 value={newProblem.problemInputs[index].name}
                 onChange={(e) => handleInputChange(index,
@@ -362,24 +388,18 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                 }
               </PrimarySelect>
 
-              <TextButton
-                style={{
-                  display: 'inline-block',
-                  marginLeft: '2.5px',
-                }}
-                color={ThemeConfig.colors.gray}
+              <CancelTextButton
                 onClick={() => deleteProblemInput(index)}
               >
                 ✕
-              </TextButton>
-            </div>
+              </CancelTextButton>
+            </InputTypeContainer>
           ))}
-          <TextButton
-            color={ThemeConfig.colors.gray}
+          <GrayTextButton
             onClick={addProblemInput}
           >
             Add +
-          </TextButton>
+          </GrayTextButton>
 
           <LowMarginMediumText>Problem Output</LowMarginMediumText>
           <PrimarySelect
@@ -397,13 +417,11 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             ? (
               <>
                 <LowMarginMediumText>Danger Zone</LowMarginMediumText>
-                <PrimaryButton
-                  style={{ margin: '0 0 1rem 0' }}
-                  color={ThemeConfig.colors.gradients.red}
+                <DeleteButton
                   onClick={deleteProblemFunc}
                 >
                   Delete Problem
-                </PrimaryButton>
+                </DeleteButton>
               </>
             )
             : null}
