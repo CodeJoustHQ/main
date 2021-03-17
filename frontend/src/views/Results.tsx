@@ -3,15 +3,18 @@ import styled from 'styled-components';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
 import { LargeText, Text } from '../components/core/Text';
-import { Game, Player, playAgain } from '../api/Game';
+import {
+  getGame, Game, Player, playAgain,
+} from '../api/Game';
 import { checkLocationState } from '../util/Utility';
 import { errorHandler } from '../api/Error';
 import PlayerResultsCard from '../components/card/PlayerResultsCard';
 import { PrimaryButton } from '../components/core/Button';
-import { Room } from '../api/Room';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
-import { disconnect, routes, subscribe } from '../api/Socket';
+import {
+  connect, disconnect, routes, subscribe,
+} from '../api/Socket';
 import { User } from '../api/User';
 import { ThemeConfig } from '../components/config/Theme';
 
@@ -20,7 +23,7 @@ const Content = styled.div`
 `;
 
 type LocationState = {
-  game: Game,
+  roomId: string,
   currentUser: User,
 };
 
@@ -29,36 +32,65 @@ function GameResultsPage() {
   const location = useLocation<LocationState>();
 
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const [players, setPlayers] = useState<Player[]>();
+  const [players, setPlayers] = useState<Player[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [room, setRoom] = useState<Room | null>(null);
+  const [host, setHost] = useState<User | null>(null);
+  const [roomId, setRoomId] = useState('');
 
   useEffect(() => {
-    if (checkLocationState(location, 'game', 'currentUser')) {
-      setPlayers(location.state.game.players);
-      setRoom(location.state.game.room);
+    if (checkLocationState(location, 'roomId', 'currentUser')) {
+      setRoomId(location.state.roomId);
       setCurrentUser(location.state.currentUser);
+
+      // Function that's called when playAgain is triggered
+      const playAgainAction = (game: Game) => {
+        disconnect()
+          .then(() => {
+            history.replace(`/game/lobby?room=${game.room.roomId}`, {
+              user: location.state.currentUser,
+              roomId: game.room.roomId,
+            });
+          });
+      };
 
       const subscribeCallback = (result: Message) => {
         const updatedGame: Game = JSON.parse(result.body);
 
+        // Update leaderboard with last second submissions
+        setPlayers(updatedGame.players);
+        // Set new host if the previous host refreshes or leaves
+        setHost(updatedGame.room.host);
+
         // Disconnect users from socket and then redirect them to the lobby page
         if (updatedGame.playAgain) {
-          disconnect()
-            .then(() => {
-              history.replace(`/game/lobby?room=${updatedGame.room.roomId}`, {
-                user: location.state.currentUser,
-                roomId: updatedGame.room.roomId,
-              });
-            })
-            .catch((err) => setError(err.message));
+          playAgainAction(updatedGame);
         }
       };
 
-      subscribe(routes(location.state.game.room.roomId).subscribe_game, subscribeCallback)
-        .catch((err) => setError(err.message));
+      /**
+       * Connect, subscribe, and then finally get the game details. Doing so in this order ensures
+       * that any late submissions are properly received (either through the socket update or
+       * through the get game request) and reflected on the leaderboard.
+       */
+      connect(location.state.roomId, location.state.currentUser.userId!).then(() => {
+        subscribe(routes(location.state.roomId).subscribe_game, subscribeCallback)
+          .then(() => {
+            // Get latest game information
+            getGame(location.state.roomId).then((res) => {
+              setLoading(false);
+              setPlayers(res.players);
+              setHost(res.room.host);
+
+              // Check if host elected to play again
+              if (res.playAgain) {
+                playAgainAction(res);
+              }
+            }).catch((err) => setError(err.message));
+          })
+          .catch((err) => setError(err.message));
+      }).catch((err) => setError(err.message));
     } else {
       history.replace('/game/join', {
         error: errorHandler('Please join and play a game before viewing the results page.'),
@@ -66,11 +98,11 @@ function GameResultsPage() {
     }
   }, [location, history]);
 
-  const playAgainAction = () => {
+  const callPlayAgain = () => {
     setError('');
     setLoading(true);
 
-    playAgain(room!.roomId, { initiator: currentUser! })
+    playAgain(roomId, { initiator: currentUser! })
       .catch((err) => {
         setLoading(false);
         setError(err.message);
@@ -91,16 +123,16 @@ function GameResultsPage() {
         />
       ))}
 
-      {currentUser?.userId === room?.host.userId
+      {currentUser && currentUser?.userId === host?.userId
         ? (
           <PrimaryButton
             color={ThemeConfig.colors.gradients.blue}
-            onClick={playAgainAction}
+            onClick={callPlayAgain}
           >
             Play Again
           </PrimaryButton>
         )
-        : <Text>Waiting for the host to choose whether to play again...</Text>}
+        : <Text>{!loading && 'Waiting for the host to choose whether to play again...'}</Text>}
     </Content>
   );
 }

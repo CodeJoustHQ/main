@@ -8,12 +8,14 @@ import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.Submission;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
+import com.rocketden.main.util.Color;
 import com.rocketden.main.util.Utility;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -57,14 +59,17 @@ public class GameMapper {
         Game game = new Game();
         game.setRoom(room);
 
-        // Create players and assign colors in order.
+        // Create players and assign colors in random order.
         int index = 0;
         Map<String, Player> players = game.getPlayers();
+        List<Color> colorList = new ArrayList<>(Utility.COLOR_LIST);
+        Collections.shuffle(colorList);
+
         for (User user : room.getUsers()) {
             Player player = PlayerMapper.playerFromUser(user);
-            player.setColor(Utility.COLOR_LIST.get(index));
+            player.setColor(colorList.get(index));
             players.put(user.getUserId(), player);
-            index = (index + 1) % Utility.COLOR_LIST.size();
+            index = (index + 1) % colorList.size();
         }
 
         return game;

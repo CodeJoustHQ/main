@@ -21,7 +21,10 @@ import {
   SmallDifficultyButton,
   PrimaryButton,
   TextButton,
+  RedTextButton,
+  GrayTextButton,
   SmallButton,
+  GreenSmallButtonBlock,
 } from '../core/Button';
 import PrimarySelect from '../core/Select';
 import {
@@ -32,8 +35,7 @@ import {
 } from '../core/Text';
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
-import { ThemeConfig } from '../config/Theme';
-import { SmallButtonLink } from '../core/Link';
+import { GraySmallButtonLinkAutoLeftMargin } from '../core/Link';
 import { FlexBareContainer } from '../core/Container';
 import { generateRandomId } from '../../util/Utility';
 
@@ -49,17 +51,78 @@ const SidebarContent = styled.div`
   flex: 4;
 `;
 
-const SettingsContainer = styled.div<any>`
+const SettingsContainer = styled.div`
   text-align: left;
   margin: 0.25rem 0 1rem 0;
-  padding: ${({ padding }) => padding || '1rem'};
+  padding: 1rem;
   border-radius: 10px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   background: ${({ theme }) => theme.colors.white};
 `;
 
-const MarginRightContainer = styled.div<any>`
-  margin-right: ${({ marginRight }) => marginRight}%;
+const SettingsContainerRelative = styled(SettingsContainer)`
+  position: relative;
+`;
+
+const SettingsContainerHighPadding = styled(SettingsContainer)`
+  padding: 3rem;
+`;
+
+const FlexBareContainerMarginBottom = styled(FlexBareContainer)`
+  margin-bottom: 10px;
+`;
+
+const TitleDescriptionSeparator = styled.hr`
+  margin: 1rem 0;
+  border: none;
+  border-top: 1px solid ${({ theme }) => theme.colors.border};
+`;
+
+const InputContainer = styled.div`
+  margin-right: 10%;
+`;
+
+const HiddenContainer = styled.div`
+  margin-right: 5%;
+`;
+
+const ExplanationContainer = styled.div`
+  margin-right: 5%;
+  flex: 2;
+`;
+
+const MarginLeftRightAutoContainer = styled.div`
+  margin-right: 5%;
+  margin-left: auto;
+`;
+
+const StyledMarkdownEditor = styled(MarkdownEditor)`
+  p {
+    font-family: ${({ theme }) => theme.font};
+  }
+
+  // The specific list of attributes to have dark text color.
+  .ProseMirror > p, blockquote, h1, h2, h3, ul, ol, table {
+    color: ${({ theme }) => theme.colors.text};
+  }
+`;
+
+const NoMarginTopText = styled(Text)`
+  margin-top: 0px;
+`;
+
+const InputTypeContainer = styled.div`
+  margin-bottom: 5px;
+`;
+
+const CancelTextButton = styled(TextButton)`
+  margin-left: 2.5px;
+  color: ${({ theme }) => theme.colors.gray};
+`;
+
+const DeleteButton = styled(PrimaryButton)`
+  margin: 0 0 1rem 0;
+  background: ${({ theme }) => theme.colors.gradients.red};
 `;
 
 type ProblemDisplayParams = {
@@ -212,35 +275,32 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       <MainContent>
         <FlexBareContainer>
           <SmallHeaderText>Problem</SmallHeaderText>
-          <SmallButtonLink
-            color={ThemeConfig.colors.gradients.gray}
+          <GraySmallButtonLinkAutoLeftMargin
             onClick={() => onClick(newProblem)}
             to="/problems/all"
-            style={{ marginLeft: 'auto' }}
           >
             Back
-          </SmallButtonLink>
+          </GraySmallButtonLinkAutoLeftMargin>
           <SmallButton
-            color={ThemeConfig.colors.gradients.blue}
             onClick={() => onClick(newProblem)}
           >
             {actionText}
           </SmallButton>
         </FlexBareContainer>
-        <SettingsContainer padding="3rem">
+        <SettingsContainerHighPadding>
           <PureTextInputTitle
             placeholder="Write a nice title"
             name="name"
             value={newProblem.name}
             onChange={handleChange}
           />
-          <hr style={{ margin: '1rem 0' }} />
-          <MarkdownEditor
+          <TitleDescriptionSeparator />
+          <StyledMarkdownEditor
             placeholder="Write a nice description"
             defaultValue={newProblem.description}
             onChange={(getNewValue) => handleDescriptionChange(getNewValue())}
           />
-        </SettingsContainer>
+        </SettingsContainerHighPadding>
 
         {editMode
           ? (
@@ -262,13 +322,13 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                               {...providedDraggable.dragHandleProps}
                               style={providedDraggable.draggableProps.style}
                             >
-                              <SettingsContainer style={{ position: 'relative' }}>
+                              <SettingsContainerRelative>
                                 <LabelAbsoluteText>
                                   {index + 1}
                                 </LabelAbsoluteText>
                                 <FlexBareContainer>
-                                  <MarginRightContainer marginRight="10">
-                                    <Text style={{ marginTop: 0 }}>Input</Text>
+                                  <InputContainer>
+                                    <NoMarginTopText>Input</NoMarginTopText>
                                     <FixedTextArea
                                       value={newProblem.testCases[index].input}
                                       onChange={(e) => {
@@ -277,9 +337,9 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                                           current.output, current.hidden, current.explanation);
                                       }}
                                     />
-                                  </MarginRightContainer>
-                                  <MarginRightContainer marginRight="5" style={{ marginLeft: 'auto' }}>
-                                    <Text style={{ marginTop: 0 }}>Output</Text>
+                                  </InputContainer>
+                                  <MarginLeftRightAutoContainer>
+                                    <NoMarginTopText>Output</NoMarginTopText>
                                     <FixedTextArea
                                       value={newProblem.testCases[index].output}
                                       onChange={(e) => {
@@ -289,11 +349,11 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                                           current.hidden, current.explanation);
                                       }}
                                     />
-                                  </MarginRightContainer>
+                                  </MarginLeftRightAutoContainer>
                                 </FlexBareContainer>
 
-                                <FlexBareContainer style={{ marginBottom: '10px' }}>
-                                  <MarginRightContainer marginRight="5" style={{ flex: 2 }}>
+                                <FlexBareContainerMarginBottom>
+                                  <ExplanationContainer>
                                     <Text>Explanation</Text>
                                     <FixedTextArea
                                       value={newProblem.testCases[index].explanation}
@@ -305,11 +365,11 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                                           e.target.value);
                                       }}
                                     />
-                                  </MarginRightContainer>
-                                </FlexBareContainer>
+                                  </ExplanationContainer>
+                                </FlexBareContainerMarginBottom>
 
                                 <FlexBareContainer>
-                                  <MarginRightContainer marginRight="5">
+                                  <HiddenContainer>
                                     <label htmlFor={`problem-hidden-${index}`}>
                                       Hidden
                                       <CheckboxInput
@@ -323,18 +383,17 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                                         }}
                                       />
                                     </label>
-                                  </MarginRightContainer>
+                                  </HiddenContainer>
 
-                                  <MarginRightContainer marginRight="5" style={{ marginLeft: 'auto' }}>
-                                    <TextButton
-                                      color={ThemeConfig.colors.red2}
+                                  <MarginLeftRightAutoContainer>
+                                    <RedTextButton
                                       onClick={() => deleteTestCase(index)}
                                     >
                                       Delete
-                                    </TextButton>
-                                  </MarginRightContainer>
+                                    </RedTextButton>
+                                  </MarginLeftRightAutoContainer>
                                 </FlexBareContainer>
-                              </SettingsContainer>
+                              </SettingsContainerRelative>
                             </div>
                           )}
                         </Draggable>
@@ -343,13 +402,11 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                   )}
                 </Droppable>
               </DragDropContext>
-              <SmallButton
-                style={{ display: 'block' }}
-                color={ThemeConfig.colors.gradients.green}
+              <GreenSmallButtonBlock
                 onClick={addTestCase}
               >
                 Add
-              </SmallButton>
+              </GreenSmallButtonBlock>
             </>
           ) : null}
 
@@ -380,7 +437,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
           <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
           {newProblem.problemInputs.map((input, index) => (
-            <div key={generateRandomId()} style={{ marginBottom: '5px' }}>
+            <InputTypeContainer>
               <TextInput
                 value={newProblem.problemInputs[index].name}
                 onChange={(e) => handleInputChange(index,
@@ -402,24 +459,18 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                 }
               </PrimarySelect>
 
-              <TextButton
-                style={{
-                  display: 'inline-block',
-                  marginLeft: '2.5px',
-                }}
-                color={ThemeConfig.colors.gray}
+              <CancelTextButton
                 onClick={() => deleteProblemInput(index)}
               >
                 ✕
-              </TextButton>
-            </div>
+              </CancelTextButton>
+            </InputTypeContainer>
           ))}
-          <TextButton
-            color={ThemeConfig.colors.gray}
+          <GrayTextButton
             onClick={addProblemInput}
           >
             Add +
-          </TextButton>
+          </GrayTextButton>
 
           <LowMarginMediumText>Problem Output</LowMarginMediumText>
           <PrimarySelect
@@ -437,13 +488,11 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             ? (
               <>
                 <LowMarginMediumText>Danger Zone</LowMarginMediumText>
-                <PrimaryButton
-                  style={{ margin: '0 0 1rem 0' }}
-                  color={ThemeConfig.colors.gradients.red}
+                <DeleteButton
                   onClick={deleteProblemFunc}
                 >
                   Delete Problem
-                </PrimaryButton>
+                </DeleteButton>
               </>
             )
             : null}

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { MinimalHeader } from '../navigation/Header';
-import { TopContainer } from '../core/Container';
+import { ProblemContainer } from '../core/Container';
 
 const Content = styled.div`
   width: 100%;
@@ -14,15 +14,15 @@ type MyProps = {
   children: React.ReactNode,
 }
 
-function TopLayout({ children }: MyProps) {
+function ProblemLayout({ children }: MyProps) {
   return (
     <Content>
       <MinimalHeader />
-      <TopContainer>
+      <ProblemContainer>
         {children}
-      </TopContainer>
+      </ProblemContainer>
     </Content>
   );
 }
 
-export default TopLayout;
+export default ProblemLayout;

@@ -22,7 +22,7 @@ export const ErrorText = styled(Text)`
    color: ${({ theme }) => theme.colors.red};
 `;
 
-export const SmallText = styled.p`
+export const SmallText = styled(Text)`
   font-size: ${({ theme }) => theme.fontSize.mediumSmall};
   margin: 6px 0;
 `;
@@ -48,6 +48,7 @@ export const LargeText = styled.h3`
 
 export const LandingHeaderTitle = styled.h1`
   font-size: ${({ theme }) => theme.fontSize.xxLarge};
+  color: ${({ theme }) => theme.colors.darkText};
   font-weight: 700;
 `;
 
@@ -61,7 +62,8 @@ export const UserNicknameText = styled(LargeText)`
 `;
 
 export const ProblemHeaderText = styled.h2`
-  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+  font-size: ${({ theme }) => theme.fontSize.large};
+  color: ${({ theme }) => theme.colors.darkText};
 `;
 
 export const SmallActionText = styled.p`
@@ -79,5 +81,11 @@ export const SmallActionText = styled.p`
 
 export const LowMarginText = styled(Text)`
   font-size: ${({ theme }) => theme.fontSize.default};
-  margin: 10px 0;
+  margin: 4px 0;
+`;
+
+export const WhiteText = styled(Text)`
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  color: ${({ theme }) => theme.colors.white};
+  margin: 0;
 `;

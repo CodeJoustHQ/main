@@ -14,7 +14,7 @@ import AllProblemsPage from '../../views/AllProblemsPage';
 import ProblemPage from '../../views/ProblemPage';
 import CreateProblemPage from '../../views/CreateProblemPage';
 import CircleBackgroundLayout from '../layout/CircleBackground';
-import TopLayout from '../layout/TopLayout';
+import ProblemLayout from '../layout/ProblemLayout';
 
 function App() {
   return (
@@ -25,9 +25,9 @@ function App() {
       <CustomRoute path="/game/create" component={CreateGamePage} layout={MainLayout} exact />
       <CustomRoute path="/game/lobby" component={LobbyPage} layout={MainLayout} exact />
       <CustomRoute path="/game/results" component={GameResultsPage} layout={MainLayout} exact />
-      <CustomRoute path="/problems/all" component={AllProblemsPage} layout={TopLayout} exact />
-      <CustomRoute path="/problem/create" component={CreateProblemPage} layout={TopLayout} exact />
-      <CustomRoute path="/problem/:id" component={ProblemPage} layout={TopLayout} exact />
+      <CustomRoute path="/problems/all" component={AllProblemsPage} layout={ProblemLayout} exact />
+      <CustomRoute path="/problem/create" component={CreateProblemPage} layout={ProblemLayout} exact />
+      <CustomRoute path="/problem/:id" component={ProblemPage} layout={ProblemLayout} exact />
       <CustomRoute path="*" component={NotFound} layout={MainLayout} />
     </Switch>
   );
