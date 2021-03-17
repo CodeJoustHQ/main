@@ -143,3 +143,12 @@ export const SmallButton = styled(DefaultButton)`
 export const GreenSmallButton = styled(SmallButton)`
   background: ${({ theme }) => theme.colors.gradients.green};
 `;
+
+export const GreenSmallButtonBlock = styled(SmallButton)`
+  display: block;
+  background: ${({ theme }) => theme.colors.gradients.green};
+`;
+
+export const GraySmallButton = styled(SmallButton)`
+  background: ${({ theme }) => theme.colors.gradients.gray};
+`;

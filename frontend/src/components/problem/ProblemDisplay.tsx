@@ -20,13 +20,14 @@ import {
   PrimaryButton,
   TextButton,
   SmallButton,
+  GreenSmallButtonBlock,
 } from '../core/Button';
 import PrimarySelect from '../core/Select';
 import { SmallHeaderText, LowMarginMediumText, Text } from '../core/Text';
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
 import { ThemeConfig } from '../config/Theme';
-import { SmallButtonLinkAutoLeftMargin } from '../core/Link';
+import { GraySmallButtonLinkAutoLeftMargin } from '../core/Link';
 import { FlexBareContainer } from '../core/Container';
 
 const MainContent = styled.div`
@@ -188,13 +189,12 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       <MainContent>
         <FlexBareContainer>
           <SmallHeaderText>Problem</SmallHeaderText>
-          <SmallButtonLinkAutoLeftMargin
-            color={ThemeConfig.colors.gradients.gray}
+          <GraySmallButtonLinkAutoLeftMargin
             onClick={() => onClick(newProblem)}
             to="/problems/all"
           >
             Back
-          </SmallButtonLinkAutoLeftMargin>
+          </GraySmallButtonLinkAutoLeftMargin>
           <SmallButton
             color={ThemeConfig.colors.gradients.blue}
             onClick={() => onClick(newProblem)}
@@ -289,13 +289,11 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                   </FlexBareContainer>
                 </SettingsContainer>
               ))}
-              <SmallButton
-                style={{ display: 'block' }}
-                color={ThemeConfig.colors.gradients.green}
+              <GreenSmallButtonBlock
                 onClick={addTestCase}
               >
                 Add
-              </SmallButton>
+              </GreenSmallButtonBlock>
             </>
           ) : null}
 
