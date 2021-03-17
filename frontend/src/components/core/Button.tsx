@@ -21,10 +21,14 @@ export const DefaultButton = styled.button`
   }
 `;
 
-export const PrimaryButton = styled(DefaultButton)<any>`
+type PrimaryButtonSize = {
+  width: string,
+  height: string,
+};
+
+export const PrimaryButton = styled(DefaultButton)<PrimaryButtonSize>`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
-  font-weight: ${({ fontWeight }) => (fontWeight || 400)};
-  background: ${({ color }) => color};
+  background: ${({ theme }) => theme.colors.gradients.blue};
   color: ${({ theme }) => theme.colors.white};
   width: ${({ width }) => width || '16vw'};
   height: ${({ height }) => height || '4vw'};
