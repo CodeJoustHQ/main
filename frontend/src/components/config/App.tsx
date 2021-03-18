@@ -3,7 +3,7 @@ import { Switch } from 'react-router-dom';
 import MainLayout from '../layout/Main';
 import LandingPage from '../../views/Landing';
 import NotFound from '../../views/NotFound';
-import CustomRoute from './Route';
+import { CustomRoute, CustomRedirect } from './Route';
 import GamePage from '../../views/Game';
 import GameLayout from '../layout/Game';
 import JoinGamePage from '../../views/Join';
@@ -30,6 +30,7 @@ function App() {
       <CustomRoute path="/problem/create" component={CreateProblemPage} layout={MinimalLayout} exact />
       <CustomRoute path="/problem/:id" component={ProblemPage} layout={MinimalLayout} exact />
       <CustomRoute path="/contact-us" component={ContactUsPage} layout={MainLayout} exact />
+      <CustomRedirect from="/play" to="/game/join" />
       <CustomRoute path="*" component={NotFound} layout={MainLayout} />
     </Switch>
   );

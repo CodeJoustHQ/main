@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message, Subscription } from 'stompjs';
+import styled from 'styled-components';
 import ErrorMessage from '../components/core/Error';
 import { LargeText, MediumText, Text } from '../components/core/Text';
 import {
@@ -25,6 +26,11 @@ type LobbyPageLocation = {
   user: User,
   roomId: string,
 };
+
+const HeaderContainer = styled.div`
+  width: 80%;
+  margin: 0 auto;
+`;
 
 function LobbyPage() {
   // Get history object to be able to move between different pages
@@ -331,15 +337,17 @@ function LobbyPage() {
 
   // Render the lobby.
   return (
-    <div>
-      <LargeText>
-        You have entered the lobby for room
-        {' #'}
-        {currentRoomId}
-        ! Your nickname is &quot;
-        {currentUser?.nickname}
-        &quot;.
-      </LargeText>
+    <>
+      <HeaderContainer>
+        <LargeText>
+          You have entered the lobby for room
+          {' #'}
+          {currentRoomId}
+          ! Your nickname is &quot;
+          {currentUser?.nickname}
+          &quot;.
+        </LargeText>
+      </HeaderContainer>
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
 
@@ -412,7 +420,7 @@ function LobbyPage() {
           </PrimaryButton>
         )
         : <MediumText>Waiting for the host to start the game...</MediumText>}
-    </div>
+    </>
   );
 }
 
