@@ -10,17 +10,25 @@ type ContentProps = {
 const Content = styled.div<ContentProps>`
   display: inline-block;
   position: relative;
-  padding: 10px;
-  background-color: ${({ theme, isActive }) => (isActive ? theme.colors.lightBlue : theme.colors.lightGray)};
-  background-clip: padding-box;
-  
-  // Invisible border to make hover effect last longer
-  border: 15px solid transparent;
-  
-  // Add above border width from margin for actual effect
-  margin: -5px;
+  box-shadow: 0 1px 8px rgb(0 0 0 / 24%);
+  padding: 0.25rem 1rem;
+  background-color: ${({ theme }) => theme.colors.white};
+
   // Subtract above border width from border-radius for actual effect 
-  border-radius: 20px;
+  border-radius: 1rem;
+`;
+
+type PlayerIconType = {
+  isActive: boolean,
+};
+
+const PlayerCardActiveIcon = styled.div<PlayerIconType>`
+  display: inline-block;
+  margin-right: 10px;
+  background: ${({ theme, isActive }) => (isActive ? theme.colors.gradients.green : theme.colors.gradients.red)};
+  border-radius: 1rem;
+  height: 1.3rem;
+  width: 1.3rem;
 `;
 
 type PlayerCardProps = {
@@ -37,6 +45,12 @@ function PlayerCard(props: PlayerCardProps) {
 
   const [showActionCard, setShowActionCard] = useState(false);
 
+  const InlineHostIcon = styled.i.attrs(() => ({
+    className: 'material-icons',
+  }))`
+    margin-left: 5px;
+  `;
+
   return (
     <Content
       onMouseEnter={() => setShowActionCard(true)}
@@ -44,8 +58,9 @@ function PlayerCard(props: PlayerCardProps) {
       isActive={isActive}
     >
       <UserNicknameText>
+        <PlayerCardActiveIcon isActive={isActive} />
         {user.nickname}
-        {isHost ? ' (host)' : ''}
+        {isHost ? <InlineHostIcon>flag</InlineHostIcon> : null}
       </UserNicknameText>
 
       {showActionCard ? actionCard : null}
