@@ -3,12 +3,20 @@ import styled from 'styled-components';
 import { UserNicknameText } from '../core/Text';
 import { User } from '../../api/User';
 
-type ContentProps = {
-  isActive: boolean,
-};
-
-const Content = styled.div<ContentProps>`
+const TransparentHoverContainer = styled.div`
   display: inline-block;
+  background-clip: padding-box;
+
+  // Invisible border to make hover effect last longer
+  border: 5px solid transparent;
+
+  // Undo the margin effects of the invisible border
+  margin: -5px;
+`;
+
+const Content = styled.div`
+  display: inline-block;
+  position: relative;
   margin: 0.5rem 0.75rem;
   padding: 0.25rem 1rem;
   box-shadow: 0 1px 8px rgb(0 0 0 / 24%);
@@ -51,19 +59,20 @@ function PlayerCard(props: PlayerCardProps) {
   `;
 
   return (
-    <Content
+    <TransparentHoverContainer
       onMouseEnter={() => setShowActionCard(true)}
       onMouseLeave={() => setShowActionCard(false)}
-      isActive={isActive}
     >
-      <UserNicknameText me={me}>
-        <PlayerCardActiveIcon isActive={isActive} />
-        {user.nickname}
-        {isHost ? <InlineHostIcon>flag</InlineHostIcon> : null}
-      </UserNicknameText>
+      <Content>
+        <UserNicknameText me={me}>
+          <PlayerCardActiveIcon isActive={isActive} />
+          {user.nickname}
+          {isHost ? <InlineHostIcon>flag</InlineHostIcon> : null}
+        </UserNicknameText>
 
-      {showActionCard ? actionCard : null}
-    </Content>
+        {showActionCard ? actionCard : null}
+      </Content>
+    </TransparentHoverContainer>
   );
 }
 
