@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import copy from 'copy-to-clipboard';
 import { LandingPageContainer } from '../components/core/Container';
 import { InlineExternalLink } from '../components/core/Link';
 import { ContactHeaderTitle, ContactHeaderText } from '../components/core/Text';
@@ -41,7 +42,7 @@ function ContactUsPage() {
           {' '}
           <InlineCopyText
             onClick={() => {
-              navigator.clipboard.writeText('support@codejoust.co');
+              copy('support@codejoust.co');
               setCopiedEmail(true);
             }}
           >

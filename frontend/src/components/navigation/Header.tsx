@@ -33,7 +33,7 @@ function Header() {
           />
           CodeJoust
         </LeftHeader>
-        <RightHeader to="contact-us">
+        <RightHeader to="/contact-us">
           Contact Us
         </RightHeader>
       </nav>
