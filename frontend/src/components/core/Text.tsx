@@ -68,9 +68,13 @@ export const ContactHeaderText = styled.h1`
   font-weight: 400;
 `;
 
-export const UserNicknameText = styled(Text)`
+type NicknameType = {
+  me: boolean,
+};
+
+export const UserNicknameText = styled(Text)<NicknameType>`
   font-size: ${({ theme }) => theme.fontSize.large};
-  font-weight: 400;
+  font-weight: ${({ me }) => (me ? 700 : 400)};
   margin: 0;
 `;
 

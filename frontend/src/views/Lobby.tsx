@@ -233,6 +233,7 @@ function LobbyPage() {
       return userList.map((user) => (
         <PlayerCard
           user={user}
+          me={currentUser !== null && (user.nickname === currentUser.nickname)}
           isHost={isHost(user)}
           isActive={isActive}
         >

@@ -9,12 +9,10 @@ type ContentProps = {
 
 const Content = styled.div<ContentProps>`
   display: inline-block;
-  position: relative;
-  box-shadow: 0 1px 8px rgb(0 0 0 / 24%);
+  margin: 0.5rem 0.75rem;
   padding: 0.25rem 1rem;
+  box-shadow: 0 1px 8px rgb(0 0 0 / 24%);
   background-color: ${({ theme }) => theme.colors.white};
-
-  // Subtract above border width from border-radius for actual effect 
   border-radius: 1rem;
 `;
 
@@ -33,6 +31,7 @@ const PlayerCardActiveIcon = styled.div<PlayerIconType>`
 
 type PlayerCardProps = {
   user: User,
+  me: boolean,
   isActive: boolean,
   isHost: boolean,
   children: React.ReactNode,
@@ -40,7 +39,7 @@ type PlayerCardProps = {
 
 function PlayerCard(props: PlayerCardProps) {
   const {
-    user, isActive, isHost, children: actionCard,
+    user, me, isActive, isHost, children: actionCard,
   } = props;
 
   const [showActionCard, setShowActionCard] = useState(false);
@@ -57,7 +56,7 @@ function PlayerCard(props: PlayerCardProps) {
       onMouseLeave={() => setShowActionCard(false)}
       isActive={isActive}
     >
-      <UserNicknameText>
+      <UserNicknameText me={me}>
         <PlayerCardActiveIcon isActive={isActive} />
         {user.nickname}
         {isHost ? <InlineHostIcon>flag</InlineHostIcon> : null}
