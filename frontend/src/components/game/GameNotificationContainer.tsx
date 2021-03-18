@@ -7,7 +7,7 @@ const GameNotificationBox = styled.div`
   bottom: 25px;
   left: 25px;
   padding: 25px;
-  max-width: 20vw;
+  max-width: 15rem;
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   text-align: center;
   color: ${({ theme }) => theme.colors.gray};
