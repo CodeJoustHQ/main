@@ -3,10 +3,6 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { PrimaryButton, InvertedSmallButton } from './Button';
 
-const AutoLeftMarginLink = styled(Link)`
-  margin-left: auto;
-`;
-
 // Wrap a button inside of a Link to get the styling of a button
 const createButtonLink = (Button:any, props:any) => {
   const {
@@ -23,25 +19,9 @@ const createButtonLink = (Button:any, props:any) => {
   return <Link to={to}>{button}</Link>;
 };
 
-// Wrap a button inside of a link with an auto margin-left
-const createButtonLinkAutoLeftMargin = (Button:any, props:any) => {
-  const {
-    to,
-    children,
-    ...rest
-  } = props;
-  const button = (
-    <Button {...rest}>
-      {children}
-    </Button>
-  );
-
-  return <AutoLeftMarginLink to={to}>{button}</AutoLeftMarginLink>;
-};
-
 export const PrimaryButtonLink = (props:any) => createButtonLink(PrimaryButton, props);
 
-export const InvertedSmallButtonLinkAutoLeftMargin = (props: any) => createButtonLinkAutoLeftMargin(
+export const InvertedSmallButtonLink = (props: any) => createButtonLink(
   InvertedSmallButton,
   props,
 );

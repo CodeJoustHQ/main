@@ -28,7 +28,7 @@ import PrimarySelect from '../core/Select';
 import { SmallHeaderText, LowMarginMediumText, Text } from '../core/Text';
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
-import { InvertedSmallButtonLinkAutoLeftMargin } from '../core/Link';
+import { InvertedSmallButtonLink } from '../core/Link';
 import { FlexBareContainer } from '../core/Container';
 
 const MainContent = styled.div`
@@ -41,6 +41,10 @@ const SidebarContent = styled.div`
   text-align: left;
   padding: 20px;
   flex: 4;
+`;
+
+const TopButtonsContainer = styled.div`
+  margin-left: auto;
 `;
 
 const SettingsContainer = styled.div`
@@ -237,17 +241,19 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       <MainContent>
         <FlexBareContainer>
           <SmallHeaderText>Problem</SmallHeaderText>
-          <InvertedSmallButtonLinkAutoLeftMargin
-            onClick={() => onClick(newProblem)}
-            to="/problems/all"
-          >
-            Back
-          </InvertedSmallButtonLinkAutoLeftMargin>
-          <SmallButton
-            onClick={() => onClick(newProblem)}
-          >
-            {actionText}
-          </SmallButton>
+          <TopButtonsContainer>
+            <InvertedSmallButtonLink
+              onClick={() => onClick(newProblem)}
+              to="/problems/all"
+            >
+              Back
+            </InvertedSmallButtonLink>
+            <SmallButton
+              onClick={() => onClick(newProblem)}
+            >
+              {actionText}
+            </SmallButton>
+          </TopButtonsContainer>
         </FlexBareContainer>
         <SettingsContainerHighPadding>
           <PureTextInputTitle
