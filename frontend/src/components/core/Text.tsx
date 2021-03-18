@@ -83,11 +83,15 @@ export const ProblemHeaderText = styled.h2`
   color: ${({ theme }) => theme.colors.darkText};
 `;
 
+export const SmallActionHeaderText = styled.p`
+  display: inline-block;
+  font-size: ${({ theme }) => theme.fontSize.medium};
+  margin: 0;
+`;
+
 export const SmallActionText = styled.p`
-  font-size: ${({ theme }) => theme.fontSize.mediumSmall};
-  display: inline;
-  margin: 1px 4px;
-  padding: 2px 4px;
+  font-size: ${({ theme }) => theme.fontSize.medium};
+  margin: 2px 0px;
 
   &:hover {
     cursor: pointer;
