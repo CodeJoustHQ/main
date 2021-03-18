@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { Difficulty, difficultyToColor } from '../../api/Difficulty';
 import { ThemeType } from '../config/Theme';
 
 export const DefaultButton = styled.button`
@@ -22,11 +23,10 @@ export const DefaultButton = styled.button`
 
 export const PrimaryButton = styled(DefaultButton)<any>`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
-  font-weight: 400;
   background: ${({ theme }) => theme.colors.gradients.blue};
   color: ${({ theme }) => theme.colors.white};
-  width: ${({ width }) => width || '16vw'};
-  height: ${({ height }) => height || '4vw'};
+  width: ${({ width }) => width || '10rem'};
+  height: ${({ height }) => height || '2.75rem'};
   min-width: 150px;
   min-height: 40px;
 
@@ -53,43 +53,82 @@ export const TextButton = styled.button<ThemeType>`
   }
 `;
 
+export const RedTextButton = styled(TextButton)`
+  color: ${({ theme }) => theme.colors.red2};
+`;
+
+export const GrayTextButton = styled(TextButton)`
+  color: ${({ theme }) => theme.colors.gray};
+`;
+
 type DifficultyProps = {
+  difficulty: Difficulty,
   active: boolean,
   enabled: boolean,
 }
 
-export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`  
-  color: ${({ theme, active }) => (active ? theme.colors.white : theme.colors.font)};
-  background-color: ${({ theme, active }) => (active ? theme.colors.blue : theme.colors.white)};
-  padding: 8px 16px;
+export const SmallDifficultyButton = styled(DefaultButton)<DifficultyProps>`
+  font-size: ${({ theme }) => theme.fontSize.default};
+  background: ${({ active, difficulty, theme }) => (active ? difficultyToColor[difficulty].background : theme.colors.white)};
+  color: ${({ active, difficulty, theme }) => (active ? theme.colors.white : difficultyToColor[difficulty].color)};
+  width: 5rem;
+  height: 2rem;
+  border-radius: 20px;
+  margin: 0.5rem 1rem 0 0;
+
+  &:disabled {
+    background-color: ${({ theme }) => theme.colors.gray};
+
+    &:hover {
+      cursor: default;
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
+    }
+  }
   
   &:hover {
-    ${({ theme, enabled }) => enabled && `
+    ${({
+    difficulty,
+    theme,
+    enabled,
+  }) => enabled && `
       color: ${theme.colors.white};
-      background-color: ${theme.colors.blue};
+      background: ${difficultyToColor[difficulty].background};
     `};
     
     cursor: ${({ enabled }) => (enabled ? 'pointer' : 'default')};
   }
 `;
 
-type ProblemIOTypeButtonProps = {
-  active: boolean,
-}
+export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  background: ${({ active, difficulty, theme }) => (active ? difficultyToColor[difficulty].background : theme.colors.white)};
+  color: ${({ active, difficulty, theme }) => (active ? theme.colors.white : difficultyToColor[difficulty].color)};
+  width: 6rem;
+  height: 2rem;
+  min-width: 90px;
+  min-height: 40px;
+  border-radius: 20px;
 
-export const ProblemIOTypeButton = styled(DefaultButton)<ProblemIOTypeButtonProps>`  
-  color: ${({ theme, active }) => (active ? theme.colors.white : theme.colors.font)};
-  background-color: ${({ theme, active }) => (active ? theme.colors.blue : theme.colors.white)};
-  padding: 4px 8px;
-  margin: 0.8rem;
+  &:disabled {
+    background-color: ${({ theme }) => theme.colors.gray};
+
+    &:hover {
+      cursor: default;
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
+    }
+  }
   
   &:hover {
-    ${({ theme }) => `
+    ${({
+    difficulty,
+    theme,
+    enabled,
+  }) => enabled && `
       color: ${theme.colors.white};
-      background-color: ${theme.colors.blue};
+      background: ${difficultyToColor[difficulty].background};
     `};
     
-    cursor: pointer;
+    cursor: ${({ enabled }) => (enabled ? 'pointer' : 'default')};
   }
 `;
 
@@ -106,4 +145,14 @@ export const SmallButton = styled(DefaultButton)`
 
 export const GreenSmallButton = styled(SmallButton)`
   background: ${({ theme }) => theme.colors.gradients.green};
+`;
+
+export const GreenSmallButtonBlock = styled(SmallButton)`
+  display: block;
+  background: ${({ theme }) => theme.colors.gradients.green};
+`;
+
+export const InvertedSmallButton = styled(SmallButton)`
+  color: ${({ theme }) => theme.colors.text};
+  background: ${({ theme }) => theme.colors.background};
 `;

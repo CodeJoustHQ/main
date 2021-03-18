@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { axiosErrorHandler } from './Error';
-import Difficulty from './Difficulty';
+import { Difficulty } from './Difficulty';
 import Language from './Language';
 
 export type TestCase = {
@@ -37,6 +37,33 @@ export enum ProblemIOType {
   ArrayCharacter = 'ARRAY_CHARACTER',
   ArrayBoolean = 'ARRAY_BOOLEAN',
 }
+
+export const problemIOTypeToString = (key: ProblemIOType): string => {
+  switch (key) {
+    case ProblemIOType.String:
+      return 'String';
+    case ProblemIOType.Integer:
+      return 'Integer';
+    case ProblemIOType.Double:
+      return 'Double';
+    case ProblemIOType.Character:
+      return 'Character';
+    case ProblemIOType.Boolean:
+      return 'Boolean';
+    case ProblemIOType.ArrayString:
+      return 'ArrayString';
+    case ProblemIOType.ArrayInteger:
+      return 'ArrayInteger';
+    case ProblemIOType.ArrayDouble:
+      return 'ArrayDouble';
+    case ProblemIOType.ArrayCharacter:
+      return 'ArrayCharacter';
+    case ProblemIOType.ArrayBoolean:
+      return 'ArrayBoolean';
+    default:
+      return '';
+  }
+};
 
 export type ProblemSettings = {
   difficulty: Difficulty,

@@ -1,11 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { PrimaryButton } from './Button';
+import { PrimaryButton, InvertedSmallButton } from './Button';
 
 // Wrap a button inside of a Link to get the styling of a button
 const createButtonLink = (Button:any, props:any) => {
-  const { to, children, ...rest } = props;
+  const {
+    to,
+    children,
+    ...rest
+  } = props;
   const button = (
     <Button {...rest}>
       {children}
@@ -16,6 +20,11 @@ const createButtonLink = (Button:any, props:any) => {
 };
 
 export const PrimaryButtonLink = (props:any) => createButtonLink(PrimaryButton, props);
+
+export const InvertedSmallButtonLink = (props: any) => createButtonLink(
+  InvertedSmallButton,
+  props,
+);
 
 export const NavbarLink = styled(Link)`
   color: ${({ theme }) => theme.colors.text};

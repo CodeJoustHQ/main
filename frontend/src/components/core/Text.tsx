@@ -18,8 +18,19 @@ export const SmallText = styled(Text)`
   margin: 6px 0;
 `;
 
+export const SmallHeaderText = styled.p`
+  display: inline-block;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  margin: 10px 0;
+`;
+
 export const MediumText = styled.h5`
   font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+`;
+
+export const LowMarginMediumText = styled.h5`
+  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+  margin: 1rem 0;
 `;
 
 export const LargeText = styled.h3`

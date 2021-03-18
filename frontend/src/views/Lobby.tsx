@@ -8,7 +8,7 @@ import {
 } from '../api/Socket';
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
-import Difficulty from '../api/Difficulty';
+import { Difficulty } from '../api/Difficulty';
 import { PrimaryButton, DifficultyButton } from '../components/core/Button';
 import Loading from '../components/core/Loading';
 import PlayerCard from '../components/card/PlayerCard';
@@ -19,6 +19,7 @@ import {
 } from '../api/Room';
 import { NumberInput } from '../components/core/Input';
 import { errorHandler } from '../api/Error';
+import { ThemeConfig } from '../components/config/Theme';
 
 type LobbyPageLocation = {
   user: User,
@@ -351,16 +352,20 @@ function LobbyPage() {
       </div>
 
       <MediumText>Difficulty Settings</MediumText>
-      {Object.keys(Difficulty).map((key) => (
-        <DifficultyButton
-          onClick={() => updateDifficultySetting(key)}
-          active={difficulty === Difficulty[key as keyof typeof Difficulty]}
-          enabled={isHost(currentUser)}
-          title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
-        >
-          {key}
-        </DifficultyButton>
-      ))}
+      {Object.keys(Difficulty).map((key) => {
+        const difficultyKey: Difficulty = Difficulty[key as keyof typeof Difficulty];
+        return (
+          <DifficultyButton
+            difficulty={difficultyKey}
+            onClick={() => updateDifficultySetting(key)}
+            active={difficulty === difficultyKey}
+            enabled={isHost(currentUser)}
+            title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
+          >
+            {key}
+          </DifficultyButton>
+        );
+      })}
 
       <MediumText>Duration</MediumText>
       <Text>
@@ -396,7 +401,15 @@ function LobbyPage() {
       <br />
 
       {isHost(currentUser)
-        ? <PrimaryButton onClick={handleStartGame} disabled={loading}>Start Game</PrimaryButton>
+        ? (
+          <PrimaryButton
+            color={ThemeConfig.colors.gradients.blue}
+            onClick={handleStartGame}
+            disabled={loading}
+          >
+            Start Game
+          </PrimaryButton>
+        )
         : <MediumText>Waiting for the host to start the game...</MediumText>}
     </div>
   );

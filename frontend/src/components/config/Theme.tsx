@@ -16,6 +16,10 @@ export const ThemeConfig: any = {
     gray: 'gray',
     lightGray: 'lightgray',
     white: 'white',
+    green: '#6cc964',
+    red2: '#dd4b4b',
+    yellow: '#f3d251',
+    purple: '#b97df6',
     gradients: {
       green: 'linear-gradient(207.68deg, #14D633 10.68%, #DAFFB5 91.96%)',
       red: 'linear-gradient(207.68deg, #DD145D 10.68%, #FFB7B7 91.96%)',
@@ -23,6 +27,7 @@ export const ThemeConfig: any = {
       pink: 'linear-gradient(207.68deg, #F25AFF 10.68%, #F5DAFF 91.96%)',
       yellow: 'linear-gradient(207.68deg, #FFC700 10.68%, #FFFDC1 91.96%)',
       purple: 'linear-gradient(207.68deg, #9845EC 21.37%, #D9B4FF 102.65%)',
+      gray: 'linear-gradient(228.67deg, #555555 15.07%, #C8C8C8 89.32%)',
     },
   },
   font: 'Titillium Web',
