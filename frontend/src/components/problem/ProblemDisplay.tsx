@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import MarkdownEditor from 'rich-markdown-editor';
 import {
@@ -7,6 +8,7 @@ import {
   Problem,
   ProblemIOType,
   problemIOTypeToString,
+  TestCase,
 } from '../../api/Problem';
 import {
   FixedTextArea,
@@ -25,11 +27,17 @@ import {
   GreenSmallButtonBlock,
 } from '../core/Button';
 import PrimarySelect from '../core/Select';
-import { SmallHeaderText, LowMarginMediumText, Text } from '../core/Text';
+import {
+  SmallHeaderText,
+  LowMarginMediumText,
+  Text,
+  LabelAbsoluteText,
+} from '../core/Text';
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
 import { InvertedSmallButtonLink } from '../core/Link';
 import { FlexBareContainer } from '../core/Container';
+import { generateRandomId } from '../../util/Utility';
 
 const MainContent = styled.div`
   text-align: left;
@@ -54,6 +62,10 @@ const SettingsContainer = styled.div`
   border-radius: 10px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   background: ${({ theme }) => theme.colors.white};
+`;
+
+const SettingsContainerRelative = styled(SettingsContainer)`
+  position: relative;
 `;
 
 const SettingsContainerHighPadding = styled(SettingsContainer)`
@@ -125,6 +137,14 @@ type ProblemDisplayParams = {
   editMode: boolean,
 };
 
+// a little function to help us with reordering the result
+const reorder = (list: TestCase[], startIndex: number, endIndex: number): TestCase[] => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+  return result;
+};
+
 function ProblemDisplay(props: ProblemDisplayParams) {
   const {
     problem, onClick, actionText, editMode,
@@ -134,6 +154,21 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const [newProblem, setNewProblem] = useState<Problem>(problem);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const onDragEnd = (result: any) => {
+    // dropped outside the list
+    if (!result.destination) {
+      return;
+    }
+
+    const newTestCases: TestCase[] = reorder(
+      newProblem.testCases,
+      result.source.index,
+      result.destination.index,
+    );
+
+    setNewProblem({ ...newProblem, testCases: newTestCases });
+  };
 
   const deleteProblemFunc = () => {
     // eslint-disable-next-line no-alert
@@ -200,13 +235,14 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   };
 
   // Handle updating of test case
-  const handleTestCaseChange = (index: number, input: string,
+  const handleTestCaseChange = (index: number, id: string, input: string,
     output: string, hidden: boolean, explanation: string) => {
     setNewProblem({
       ...newProblem,
       testCases: newProblem.testCases.map((testCase, i) => {
         if (index === i) {
           return {
+            id,
             input,
             output,
             hidden,
@@ -223,7 +259,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
     setNewProblem({
       ...newProblem,
       testCases: [...newProblem.testCases, {
-        input: '0', output: '0', hidden: false, explanation: '',
+        id: generateRandomId(), input: '0', output: '0', hidden: false, explanation: '',
       }],
     });
   };
@@ -274,73 +310,103 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           ? (
             <>
               <SmallHeaderText>Test Cases</SmallHeaderText>
-              {newProblem.testCases.map((testCase, index) => (
-                <SettingsContainer>
-                  <FlexBareContainer>
-                    <InputContainer>
-                      <NoMarginTopText>Input</NoMarginTopText>
-                      <FixedTextArea
-                        value={newProblem.testCases[index].input}
-                        onChange={(e) => {
-                          const current = newProblem.testCases[index];
-                          handleTestCaseChange(index, e.target.value,
-                            current.output, current.hidden, current.explanation);
-                        }}
-                      />
-                    </InputContainer>
-                    <MarginLeftRightAutoContainer>
-                      <NoMarginTopText>Output</NoMarginTopText>
-                      <FixedTextArea
-                        value={newProblem.testCases[index].output}
-                        onChange={(e) => {
-                          const current = newProblem.testCases[index];
-                          handleTestCaseChange(index, current.input, e.target.value,
-                            current.hidden, current.explanation);
-                        }}
-                      />
-                    </MarginLeftRightAutoContainer>
-                  </FlexBareContainer>
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="droppable">
+                  {(providedDroppable) => (
+                    <div
+                      {...providedDroppable.droppableProps}
+                      ref={providedDroppable.innerRef}
+                    >
+                      {newProblem.testCases.map((testCase, index) => (
+                        <Draggable key={testCase.id} draggableId={testCase.id} index={index}>
+                          {(providedDraggable) => (
+                            <div
+                              ref={providedDraggable.innerRef}
+                              {...providedDraggable.draggableProps}
+                              {...providedDraggable.dragHandleProps}
+                              style={providedDraggable.draggableProps.style}
+                            >
+                              <SettingsContainerRelative>
+                                <LabelAbsoluteText>
+                                  #
+                                  {index + 1}
+                                </LabelAbsoluteText>
+                                <FlexBareContainer>
+                                  <InputContainer>
+                                    <NoMarginTopText>Input</NoMarginTopText>
+                                    <FixedTextArea
+                                      value={newProblem.testCases[index].input}
+                                      onChange={(e) => {
+                                        const current = newProblem.testCases[index];
+                                        handleTestCaseChange(index, current.id, e.target.value,
+                                          current.output, current.hidden, current.explanation);
+                                      }}
+                                    />
+                                  </InputContainer>
+                                  <MarginLeftRightAutoContainer>
+                                    <NoMarginTopText>Output</NoMarginTopText>
+                                    <FixedTextArea
+                                      value={newProblem.testCases[index].output}
+                                      onChange={(e) => {
+                                        const current = newProblem.testCases[index];
+                                        handleTestCaseChange(index, current.id,
+                                          current.input, e.target.value,
+                                          current.hidden, current.explanation);
+                                      }}
+                                    />
+                                  </MarginLeftRightAutoContainer>
+                                </FlexBareContainer>
 
-                  <FlexBareContainerMarginBottom>
-                    <ExplanationContainer>
-                      <Text>Explanation</Text>
-                      <FixedTextArea
-                        value={newProblem.testCases[index].explanation}
-                        onChange={(e) => {
-                          const current = newProblem.testCases[index];
-                          handleTestCaseChange(index, current.input, current.output,
-                            current.hidden, e.target.value);
-                        }}
-                      />
-                    </ExplanationContainer>
-                  </FlexBareContainerMarginBottom>
+                                <FlexBareContainerMarginBottom>
+                                  <ExplanationContainer>
+                                    <Text>Explanation</Text>
+                                    <FixedTextArea
+                                      value={newProblem.testCases[index].explanation}
+                                      onChange={(e) => {
+                                        const current = newProblem.testCases[index];
+                                        handleTestCaseChange(index,
+                                          current.id, current.input,
+                                          current.output, current.hidden,
+                                          e.target.value);
+                                      }}
+                                    />
+                                  </ExplanationContainer>
+                                </FlexBareContainerMarginBottom>
 
-                  <FlexBareContainer>
-                    <HiddenContainer>
-                      <label htmlFor={`problem-hidden-${index}`}>
-                        Hidden
-                        <CheckboxInput
-                          id={`problem-hidden-${index}`}
-                          checked={newProblem.testCases[index].hidden}
-                          onChange={(e) => {
-                            const current = newProblem.testCases[index];
-                            handleTestCaseChange(index, current.input,
-                              current.output, e.target.checked, current.explanation);
-                          }}
-                        />
-                      </label>
-                    </HiddenContainer>
+                                <FlexBareContainer>
+                                  <HiddenContainer>
+                                    <label htmlFor={`problem-hidden-${index}`}>
+                                      Hidden
+                                      <CheckboxInput
+                                        id={`problem-hidden-${index}`}
+                                        checked={newProblem.testCases[index].hidden}
+                                        onChange={(e) => {
+                                          const current = newProblem.testCases[index];
+                                          handleTestCaseChange(index,
+                                            current.id, current.input,
+                                            current.output, e.target.checked, current.explanation);
+                                        }}
+                                      />
+                                    </label>
+                                  </HiddenContainer>
 
-                    <MarginLeftRightAutoContainer>
-                      <RedTextButton
-                        onClick={() => deleteTestCase(index)}
-                      >
-                        Delete
-                      </RedTextButton>
-                    </MarginLeftRightAutoContainer>
-                  </FlexBareContainer>
-                </SettingsContainer>
-              ))}
+                                  <MarginLeftRightAutoContainer>
+                                    <RedTextButton
+                                      onClick={() => deleteTestCase(index)}
+                                    >
+                                      Delete
+                                    </RedTextButton>
+                                  </MarginLeftRightAutoContainer>
+                                </FlexBareContainer>
+                              </SettingsContainerRelative>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
               <GreenSmallButtonBlock
                 onClick={addTestCase}
               >
@@ -361,6 +427,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             if (difficulty !== Difficulty.Random) {
               return (
                 <SmallDifficultyButton
+                  key={generateRandomId()}
                   difficulty={difficulty || Difficulty.Random}
                   onClick={() => handleEnumChange('difficulty', difficulty)}
                   active={difficulty === newProblem.difficulty}
