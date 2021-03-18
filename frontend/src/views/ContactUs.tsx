@@ -5,6 +5,30 @@ import { LandingPageContainer } from '../components/core/Container';
 import { InlineExternalLink } from '../components/core/Link';
 import { ContactHeaderTitle, ContactHeaderText } from '../components/core/Text';
 
+type CopyIndicator = {
+  copiedEmail: boolean,
+}
+
+const CopyIndicatorContainer = styled.div.attrs((props: CopyIndicator) => ({
+  style: {
+    transform: (!props.copiedEmail) ? 'translateY(-60px)' : null,
+  },
+}))<CopyIndicator>`
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transition: transform 0.25s;
+`;
+
+const CopyIndicator = styled(DefaultButton)`
+  position: relative;
+  left: -50%;
+  margin: 0 auto;
+  padding: 0.25rem 1rem;
+  color: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }) => theme.colors.gradients.green};
+`;
+
 function ContactUsPage() {
   const InlineEmailCopyText = styled(ContactHeaderText)`
     display: inline-block;
@@ -19,30 +43,13 @@ function ContactUsPage() {
 
   const [copiedEmail, setCopiedEmail] = useState<boolean>(false);
 
-  const CopyIndicatorContainer = styled.div`
-    position: absolute;
-    top: 20px;
-    left: 50%;
-  `;
-
-  const CopyIndicator = styled(DefaultButton)`
-    position: relative;
-    left: -50%;
-    margin: 0 auto;
-    padding: 0.25rem 1rem;
-    color: ${({ theme }) => theme.colors.white};
-    background: ${({ theme }) => theme.colors.gradients.green};
-  `;
-
   return (
     <>
-      {copiedEmail ? (
-        <CopyIndicatorContainer>
-          <CopyIndicator onClick={() => setCopiedEmail(false)}>
-            Email copied to clipboard!&nbsp;&nbsp;✕
-          </CopyIndicator>
-        </CopyIndicatorContainer>
-      ) : null}
+      <CopyIndicatorContainer copiedEmail={copiedEmail}>
+        <CopyIndicator onClick={() => setCopiedEmail(false)}>
+          Email copied to clipboard!&nbsp;&nbsp;✕
+        </CopyIndicator>
+      </CopyIndicatorContainer>
       <LandingPageContainer>
         <ContactHeaderTitle>
           Contact Us
