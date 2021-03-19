@@ -21,13 +21,13 @@ import {
 } from '../api/Room';
 import { NumberInput } from '../components/core/Input';
 import { errorHandler } from '../api/Error';
-import { ThemeConfig } from '../components/config/Theme';
 import {
   CopyIndicator,
   CopyIndicatorContainer,
   InlineCopyIcon,
   InlineBackgroundCopyText,
 } from '../components/special/CopyIndicator';
+import IdContainer from '../components/special/IdContainer';
 
 type LobbyPageLocation = {
   user: User,
@@ -35,8 +35,20 @@ type LobbyPageLocation = {
 };
 
 const HeaderContainer = styled.div`
-  width: 70%;
+  text-align: left;
+  width: 66%;
   margin: 2rem auto;
+
+  @media (max-width: 750px) {
+    width: 80%;
+  }
+  @media (max-width: 600px) {
+    width: 100%;
+  }
+`;
+
+const PrimaryButtonZeroLeftMargin = styled(PrimaryButton)`
+  margin-left: 0;
 `;
 
 function LobbyPage() {
@@ -373,9 +385,14 @@ function LobbyPage() {
           <i>codejoust.co/play</i>
           {' '}
           with Room ID:
-          {' '}
-          {currentRoomId || 'loading...'}
         </MainHeaderText>
+        <IdContainer id={currentRoomId} />
+        <PrimaryButtonZeroLeftMargin
+          onClick={handleStartGame}
+          disabled={loading || !isHost(currentUser)}
+        >
+          Start Game
+        </PrimaryButtonZeroLeftMargin>
       </HeaderContainer>
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
@@ -436,19 +453,6 @@ function LobbyPage() {
         }}
         onBlur={updateRoomDuration}
       />
-      <br />
-
-      {isHost(currentUser)
-        ? (
-          <PrimaryButton
-            color={ThemeConfig.colors.gradients.blue}
-            onClick={handleStartGame}
-            disabled={loading}
-          >
-            Start Game
-          </PrimaryButton>
-        )
-        : <MediumText>Waiting for the host to start the game...</MediumText>}
     </>
   );
 }

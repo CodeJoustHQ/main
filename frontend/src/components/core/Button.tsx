@@ -31,7 +31,7 @@ export const PrimaryButton = styled(DefaultButton)<any>`
   min-height: 40px;
 
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.gray};
+    background: ${({ theme }) => theme.colors.gradients.gray};
 
     &:hover {
       cursor: default;
