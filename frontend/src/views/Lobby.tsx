@@ -4,7 +4,12 @@ import { Message, Subscription } from 'stompjs';
 import styled from 'styled-components';
 import copy from 'copy-to-clipboard';
 import ErrorMessage from '../components/core/Error';
-import { MainHeaderText, MediumText, Text } from '../components/core/Text';
+import {
+  MainHeaderText,
+  MediumText,
+  SmallHeaderText,
+  Text,
+} from '../components/core/Text';
 import {
   connect, routes, subscribe, disconnect,
 } from '../api/Socket';
@@ -28,6 +33,7 @@ import {
   InlineBackgroundCopyText,
 } from '../components/special/CopyIndicator';
 import IdContainer from '../components/special/IdContainer';
+import { FlexBareContainer } from '../components/core/Container';
 
 type LobbyPageLocation = {
   user: User,
@@ -37,7 +43,7 @@ type LobbyPageLocation = {
 const HeaderContainer = styled.div`
   text-align: left;
   width: 66%;
-  margin: 2rem auto;
+  margin: 2rem auto 0;
 
   @media (max-width: 750px) {
     width: 80%;
@@ -49,6 +55,29 @@ const HeaderContainer = styled.div`
 
 const PrimaryButtonZeroLeftMargin = styled(PrimaryButton)`
   margin-left: 0;
+`;
+
+const FlexBareContainerLeft = styled(FlexBareContainer)`
+  text-align: left;
+`;
+
+const PlayersContainer = styled.div`
+  flex: 6;
+  padding-right: 5px;
+`;
+
+const OptionsContainer = styled.div`
+  flex: 4;
+  padding-left: 5px;
+`;
+
+const BackgroundContainer = styled.div`
+  height: 12rem;
+  background: ${({ theme }) => theme.colors.white};
+  padding: 0.5rem;
+  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
+  border-radius: 0.75rem;
+  overflow: auto;
 `;
 
 function LobbyPage() {
@@ -394,17 +423,35 @@ function LobbyPage() {
           Start Game
         </PrimaryButtonZeroLeftMargin>
       </HeaderContainer>
-      { error ? <ErrorMessage message={error} /> : null }
-      { loading ? <Loading /> : null }
 
-      <div>
-        {
-          displayUsers(activeUsers, true)
-        }
-        {
-          displayUsers(inactiveUsers, false)
-        }
-      </div>
+      <FlexBareContainerLeft>
+        <PlayersContainer>
+          <SmallHeaderText>
+            Players
+            {
+              (activeUsers && inactiveUsers)
+                ? ` (${activeUsers.length + inactiveUsers.length})`
+                : null
+            }
+          </SmallHeaderText>
+          <BackgroundContainer>
+            {
+              displayUsers(activeUsers, true)
+            }
+            {
+              displayUsers(inactiveUsers, false)
+            }
+            { error ? <ErrorMessage message={error} /> : null }
+            { loading ? <Loading /> : null }
+          </BackgroundContainer>
+        </PlayersContainer>
+        <OptionsContainer>
+          <SmallHeaderText>Options</SmallHeaderText>
+          <BackgroundContainer>
+            Test
+          </BackgroundContainer>
+        </OptionsContainer>
+      </FlexBareContainerLeft>
 
       <MediumText>Difficulty Settings</MediumText>
       {Object.keys(Difficulty).map((key) => {
