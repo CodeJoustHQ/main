@@ -5,8 +5,8 @@ import styled from 'styled-components';
 import copy from 'copy-to-clipboard';
 import ErrorMessage from '../components/core/Error';
 import {
+  NoMarginMediumText,
   MainHeaderText,
-  MediumText,
   SmallHeaderText,
   Text,
 } from '../components/core/Text';
@@ -16,7 +16,7 @@ import {
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
 import { Difficulty } from '../api/Difficulty';
-import { PrimaryButton, DifficultyButton } from '../components/core/Button';
+import { PrimaryButton, SmallDifficultyButton } from '../components/core/Button';
 import Loading from '../components/core/Loading';
 import PlayerCard from '../components/card/PlayerCard';
 import HostActionCard from '../components/card/HostActionCard';
@@ -78,10 +78,14 @@ const SmallHeaderTextZeroTopMargin = styled(SmallHeaderText)`
 const BackgroundContainer = styled.div`
   height: 12rem;
   background: ${({ theme }) => theme.colors.white};
-  padding: 0.5rem;
+  padding: 1rem;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   border-radius: 0.75rem;
   overflow: auto;
+`;
+
+const DifficultyContainer = styled.div`
+  margin-bottom: 10px;
 `;
 
 function LobbyPage() {
@@ -452,58 +456,57 @@ function LobbyPage() {
         <OptionsContainer>
           <SmallHeaderTextZeroTopMargin>Options</SmallHeaderTextZeroTopMargin>
           <BackgroundContainer>
-            Test
+            <NoMarginMediumText>Difficulty</NoMarginMediumText>
+            <DifficultyContainer>
+              {Object.keys(Difficulty).map((key) => {
+                const difficultyKey: Difficulty = Difficulty[key as keyof typeof Difficulty];
+                return (
+                  <SmallDifficultyButton
+                    difficulty={difficultyKey}
+                    onClick={() => updateDifficultySetting(key)}
+                    active={difficulty === difficultyKey}
+                    enabled={isHost(currentUser)}
+                    title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
+                  >
+                    {key}
+                  </SmallDifficultyButton>
+                );
+              })}
+            </DifficultyContainer>
+            <NoMarginMediumText>Duration</NoMarginMediumText>
+            <Text>
+              {isHost(currentUser) ? 'Choose a game duration between 1-60 minutes:'
+                : 'The game will last for the following minutes:'}
+            </Text>
+            <NumberInput
+              min={1}
+              max={60}
+              value={duration}
+              disabled={!isHost(currentUser)}
+              onKeyPress={(e) => {
+                // Prevent user from using any of these non-numeric characters
+                if (e.key === 'e' || e.key === '.' || e.key === '-') {
+                  e.preventDefault();
+                }
+              }}
+              onChange={(e) => {
+                const { value } = e.target;
+
+                // Set duration to undefined to allow users to clear field
+                if (!value) {
+                  setDuration(undefined);
+                } else {
+                  const newDuration = Number(value);
+                  if (newDuration >= 0 && newDuration <= 60) {
+                    setDuration(newDuration);
+                  }
+                }
+              }}
+              onBlur={updateRoomDuration}
+            />
           </BackgroundContainer>
         </OptionsContainer>
       </FlexBareContainerLeft>
-
-      <MediumText>Difficulty Settings</MediumText>
-      {Object.keys(Difficulty).map((key) => {
-        const difficultyKey: Difficulty = Difficulty[key as keyof typeof Difficulty];
-        return (
-          <DifficultyButton
-            difficulty={difficultyKey}
-            onClick={() => updateDifficultySetting(key)}
-            active={difficulty === difficultyKey}
-            enabled={isHost(currentUser)}
-            title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
-          >
-            {key}
-          </DifficultyButton>
-        );
-      })}
-
-      <MediumText>Duration</MediumText>
-      <Text>
-        {isHost(currentUser) ? 'Choose a game duration between 1-60 minutes:'
-          : 'The game will last for the following minutes:'}
-      </Text>
-      <NumberInput
-        min={1}
-        max={60}
-        value={duration}
-        disabled={!isHost(currentUser)}
-        onKeyPress={(e) => {
-          // Prevent user from using any of these non-numeric characters
-          if (e.key === 'e' || e.key === '.' || e.key === '-') {
-            e.preventDefault();
-          }
-        }}
-        onChange={(e) => {
-          const { value } = e.target;
-
-          // Set duration to undefined to allow users to clear field
-          if (!value) {
-            setDuration(undefined);
-          } else {
-            const newDuration = Number(value);
-            if (newDuration >= 0 && newDuration <= 60) {
-              setDuration(newDuration);
-            }
-          }
-        }}
-        onBlur={updateRoomDuration}
-      />
     </>
   );
 }
