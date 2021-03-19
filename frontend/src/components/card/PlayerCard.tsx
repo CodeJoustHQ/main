@@ -8,16 +8,12 @@ const TransparentHoverContainer = styled.div`
   background-clip: padding-box;
 
   // Invisible border to make hover effect last longer
-  border: 5px solid transparent;
-
-  // Undo the margin effects of the invisible border
-  margin: -5px;
+  border: 10px solid transparent;
 `;
 
 const Content = styled.div`
   display: inline-block;
   position: relative;
-  margin: 0.5rem 0.75rem;
   padding: 0.25rem 1rem;
   box-shadow: 0 1px 8px rgb(0 0 0 / 24%);
   background-color: ${({ theme }) => theme.colors.white};

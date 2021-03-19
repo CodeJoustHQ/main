@@ -43,7 +43,6 @@ export const ThemeConfig: any = {
     large: '1.8rem',
     xLarge: '2rem',
     xxLarge: '2.5rem',
-    largest: '2.8rem',
     globalDefault: '16px',
     globalSmall: '14px',
   },

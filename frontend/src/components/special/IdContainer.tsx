@@ -6,7 +6,7 @@ const NumberContainer = styled.div`
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
   padding: 0.5rem 1rem;
   margin: 0 1rem 0 0;
-  font-size: ${({ theme }) => theme.fontSize.largest};
+  font-size: ${({ theme }) => theme.fontSize.xxLarge};
   font-weight: 700;
   border-radius: 0.5rem;
 `;

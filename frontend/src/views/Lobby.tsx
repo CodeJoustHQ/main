@@ -71,6 +71,10 @@ const OptionsContainer = styled.div`
   padding-left: 5px;
 `;
 
+const SmallHeaderTextZeroTopMargin = styled(SmallHeaderText)`
+  margin: 0 0 10px 0;
+`;
+
 const BackgroundContainer = styled.div`
   height: 12rem;
   background: ${({ theme }) => theme.colors.white};
@@ -426,14 +430,14 @@ function LobbyPage() {
 
       <FlexBareContainerLeft>
         <PlayersContainer>
-          <SmallHeaderText>
+          <SmallHeaderTextZeroTopMargin>
             Players
             {
               (activeUsers && inactiveUsers)
                 ? ` (${activeUsers.length + inactiveUsers.length})`
                 : null
             }
-          </SmallHeaderText>
+          </SmallHeaderTextZeroTopMargin>
           <BackgroundContainer>
             {
               displayUsers(activeUsers, true)
@@ -446,7 +450,7 @@ function LobbyPage() {
           </BackgroundContainer>
         </PlayersContainer>
         <OptionsContainer>
-          <SmallHeaderText>Options</SmallHeaderText>
+          <SmallHeaderTextZeroTopMargin>Options</SmallHeaderTextZeroTopMargin>
           <BackgroundContainer>
             Test
           </BackgroundContainer>

@@ -10,7 +10,7 @@ type PlayerIconType = {
 const Content = styled.div<PlayerIconType>`
   // Center div above parent
   position: absolute;
-  top: ${({ isActive }) => (isActive ? '-115px' : '-90px')};
+  top: 55px;
   left: 50%;
   transform: translate(-50%, 0);
   
@@ -21,6 +21,9 @@ const Content = styled.div<PlayerIconType>`
   
   height: ${({ isActive }) => (isActive ? '90px' : '65px')};
   padding: 8px;
+
+  z-index: 2;
+  text-align: center;
 `;
 
 const ActionCardActiveIcon = styled.div<PlayerIconType>`
