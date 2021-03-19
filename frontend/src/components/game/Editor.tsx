@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
-import MonacoEditor from 'react-monaco-editor';
+import MonacoEditor, { EditorConstructionOptions } from 'react-monaco-editor';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import styled, { ThemeContext } from 'styled-components';
 import Language, { fromString, languageToEditorLanguage } from '../../api/Language';
 import { DefaultCodeType } from '../../api/Problem';
@@ -61,7 +62,7 @@ const LanguageSelect = styled.select`
  * Options used to style the Monaco code editor
  * https://microsoft.github.io/monaco-editor/api/enums/monaco.editor.editoroption.html
  */
-const monacoEditorOptions: any = {
+const monacoEditorOptions: EditorConstructionOptions = {
   automaticLayout: true,
   fixedOverflowWidgets: true,
   fontFamily: 'Monaco',
@@ -90,13 +91,13 @@ function ResizableMonacoEditor(props: EditorProps) {
 
   const theme = useContext(ThemeContext);
   const [currentLanguage, setCurrentLanguage] = useState<Language>(defaultLanguage);
-  const [codeEditor, setCodeEditor] = useState<any>(null);
+  const [codeEditor, setCodeEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
 
   useEffect(() => {
     setCurrentLanguage(defaultLanguage);
   }, [defaultLanguage]);
 
-  const handleEditorDidMount = (editor: any) => {
+  const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor) => {
     setCodeEditor(editor);
     window.addEventListener('resize', () => {
       editor.layout();
@@ -106,7 +107,7 @@ function ResizableMonacoEditor(props: EditorProps) {
     });
   };
 
-  const handleEditorWillMount = (editor: any) => {
+  const handleEditorWillMount = (editor: typeof monaco) => {
     editor.editor.defineTheme('default-theme', {
       base: 'vs',
       inherit: true,
@@ -157,7 +158,7 @@ function ResizableMonacoEditor(props: EditorProps) {
           height="100%"
           editorDidMount={handleEditorDidMount}
           editorWillMount={handleEditorWillMount}
-          onChange={() => onCodeChange(codeEditor.getValue())}
+          onChange={() => onCodeChange(codeEditor?.getValue() || 'Loading...')}
           language={languageToEditorLanguage(currentLanguage)}
           defaultValue="Loading..."
         />
