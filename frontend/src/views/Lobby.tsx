@@ -359,7 +359,7 @@ function LobbyPage() {
           {' '}
           <InlineBackgroundCopyText
             onClick={() => {
-              copy(`codejoust.co/play?room=${currentRoomId}`);
+              copy(`https://codejoust.co/play?room=${currentRoomId}`);
               setCopiedRoomLink(true);
             }}
           >
