@@ -56,6 +56,10 @@ const OverflowPanel = styled(Panel)`
   padding: 0 25px;
 `;
 
+const LowPaddingPanel = styled(Panel)`
+  padding: 0;
+`;
+
 const LeaderboardContent = styled.div`
   text-align: center;
   margin: 0 auto;
@@ -432,14 +436,14 @@ function GamePage() {
             primaryMinSize={20}
             secondaryMinSize={0}
           >
-            <Panel>
+            <LowPaddingPanel>
               <Editor
                 onCodeChange={setCurrentCode}
                 onLanguageChange={setCurrentLanguage}
                 codeMap={defaultCodeList[0]}
                 defaultLanguage={currentLanguage}
               />
-            </Panel>
+            </LowPaddingPanel>
 
             <Panel>
               <Console
