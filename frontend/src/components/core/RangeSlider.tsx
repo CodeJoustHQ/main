@@ -47,11 +47,17 @@ export const Slider = styled.input.attrs((props: SliderRange) => ({
   }
 
   &:disabled {
-    cursor: default;
     opacity: 0.5;
 
-    &:hover {
+    &::-webkit-slider-thumb {
       cursor: default;
+    }
+
+    &::-moz-range-thumb {
+      cursor: default;
+    }
+
+    &:hover {
       opacity: 0.5;
     }
   }
