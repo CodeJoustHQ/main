@@ -2,8 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message, Subscription } from 'stompjs';
 import styled from 'styled-components';
+import copy from 'copy-to-clipboard';
 import ErrorMessage from '../components/core/Error';
-import { LargeText, MediumText, Text } from '../components/core/Text';
+import { MainHeaderText, MediumText, Text } from '../components/core/Text';
 import {
   connect, routes, subscribe, disconnect,
 } from '../api/Socket';
@@ -21,6 +22,12 @@ import {
 import { NumberInput } from '../components/core/Input';
 import { errorHandler } from '../api/Error';
 import { ThemeConfig } from '../components/config/Theme';
+import {
+  CopyIndicator,
+  CopyIndicatorContainer,
+  InlineCopyIcon,
+  InlineBackgroundCopyText,
+} from '../components/special/CopyIndicator';
 
 type LobbyPageLocation = {
   user: User,
@@ -28,8 +35,8 @@ type LobbyPageLocation = {
 };
 
 const HeaderContainer = styled.div`
-  width: 80%;
-  margin: 0 auto;
+  width: 70%;
+  margin: 2rem auto;
 `;
 
 function LobbyPage() {
@@ -60,6 +67,9 @@ function LobbyPage() {
 
   // Variable to hold the subscription return, which can be unsubscribed.
   const [subscription, setSubscription] = useState<Subscription | null>(null);
+
+  // Variable to hold whether the room link was copied.
+  const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
 
   /**
    * Set state variables from an updated room object
@@ -338,15 +348,34 @@ function LobbyPage() {
   // Render the lobby.
   return (
     <>
+      <CopyIndicatorContainer copied={copiedRoomLink}>
+        <CopyIndicator onClick={() => setCopiedRoomLink(false)}>
+          Link copied!&nbsp;&nbsp;✕
+        </CopyIndicator>
+      </CopyIndicatorContainer>
       <HeaderContainer>
-        <LargeText>
-          You have entered the lobby for room
-          {' #'}
-          {currentRoomId}
-          ! Your nickname is &quot;
-          {currentUser?.nickname}
-          &quot;.
-        </LargeText>
+        <MainHeaderText>
+          Join with the link
+          {' '}
+          <InlineBackgroundCopyText
+            onClick={() => {
+              copy(`codejoust.co/play?room=${currentRoomId}`);
+              setCopiedRoomLink(true);
+            }}
+          >
+            codejoust.co/play?room=
+            {currentRoomId}
+            <InlineCopyIcon>content_copy</InlineCopyIcon>
+          </InlineBackgroundCopyText>
+          {' '}
+          or at
+          {' '}
+          <i>codejoust.co/play</i>
+          {' '}
+          with Room ID:
+          {' '}
+          {currentRoomId || 'loading...'}
+        </MainHeaderText>
       </HeaderContainer>
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }

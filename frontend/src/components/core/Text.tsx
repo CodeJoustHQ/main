@@ -51,7 +51,7 @@ export const LandingHeaderTitle = styled.h1`
   font-weight: 700;
 `;
 
-export const LandingHeaderText = styled.h1`
+export const MainHeaderText = styled.h1`
   font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
   font-weight: 400;
 `;
