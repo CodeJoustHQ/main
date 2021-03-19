@@ -1,5 +1,6 @@
-import React from 'react';
-import { Switch } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import ReactGA from 'react-ga';
+import { Switch, useLocation } from 'react-router-dom';
 import MainLayout from '../layout/Main';
 import LandingPage from '../../views/Landing';
 import NotFound from '../../views/NotFound';
@@ -16,7 +17,18 @@ import CreateProblemPage from '../../views/CreateProblemPage';
 import CircleBackgroundLayout from '../layout/CircleBackground';
 import ProblemLayout from '../layout/ProblemLayout';
 
+// Set up Google Analytics
+ReactGA.initialize('UA-192641172-2');
+
 function App() {
+  const location = useLocation();
+
+  // Track page view on every change in location
+  useEffect(() => {
+    ReactGA.pageview(location.pathname);
+    console.log(location.pathname);
+  }, [location]);
+
   return (
     <Switch>
       <CustomRoute path="/" component={LandingPage} layout={CircleBackgroundLayout} exact />
