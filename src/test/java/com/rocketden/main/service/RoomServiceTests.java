@@ -444,7 +444,7 @@ public class RoomServiceTests {
     }
 
     @Test
-    public void removeUserSuccess() {
+    public void removeUserSuccessHostInitiator() {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
 
@@ -464,6 +464,35 @@ public class RoomServiceTests {
 
         RemoveUserRequest request = new RemoveUserRequest();
         request.setInitiator(UserMapper.toDto(host));
+        request.setUserToDelete(UserMapper.toDto(user));
+        RoomDto response = roomService.removeUser(ROOM_ID, request);
+
+        verify(socketService).sendSocketUpdate(eq(response));
+        assertEquals(1, response.getUsers().size());
+        assertFalse(response.getUsers().contains(UserMapper.toDto(user)));
+    }
+
+    @Test
+    public void removeUserSuccessSelfInitiator() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User host = new User();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        room.setHost(host);
+        room.addUser(host);
+
+        User user = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(user);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiator(UserMapper.toDto(user));
         request.setUserToDelete(UserMapper.toDto(user));
         RoomDto response = roomService.removeUser(ROOM_ID, request);
 
@@ -547,11 +576,16 @@ public class RoomServiceTests {
         user.setUserId(USER_ID_2);
         room.addUser(user);
 
+        User user2 = new User();
+        user2.setNickname(NICKNAME_2);
+        user2.setUserId(USER_ID_3);
+        room.addUser(user2);
+
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
 
         RemoveUserRequest request = new RemoveUserRequest();
         request.setInitiator(UserMapper.toDto(user));
-        request.setUserToDelete(UserMapper.toDto(user));
+        request.setUserToDelete(UserMapper.toDto(user2));
 
         ApiException exception = assertThrows(ApiException.class, () ->
                 roomService.removeUser(ROOM_ID, request));

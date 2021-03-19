@@ -126,8 +126,8 @@ public class RoomService {
         User initiator = UserMapper.toEntity(request.getInitiator());
         User userToDelete = UserMapper.toEntity(request.getUserToDelete());
 
-        // Return error if the initiator is not the host
-        if (!room.getHost().equals(initiator)) {
+        // Return error if the initiator is not the host or user themselves
+        if (!room.getHost().equals(initiator) && !initiator.equals(userToDelete)) {
             throw new ApiException(RoomError.INVALID_PERMISSIONS);
         }
 

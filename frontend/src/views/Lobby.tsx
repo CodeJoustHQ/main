@@ -20,6 +20,7 @@ import {
   PrimaryButton,
   SmallDifficultyButton,
   InlineRefreshIcon,
+  SecondaryRedButton,
 } from '../components/core/Button';
 import Loading from '../components/core/Loading';
 import PlayerCard from '../components/card/PlayerCard';
@@ -350,9 +351,11 @@ function LobbyPage() {
         setLoading(false);
       }).catch((err) => {
         setError(err.message);
+        setLoading(false);
       });
     }).catch((err) => {
       setError(err.message);
+      setLoading(false);
     });
   }, [currentUser, conditionallyBootKickedUser]);
 
@@ -363,6 +366,8 @@ function LobbyPage() {
       getRoom(location.state.roomId)
         .then((res) => {
           setStateFromRoom(res);
+
+          // Boot the user from the room, if they are not present.
           updateCurrentUserDetails(res.users);
 
           // Attempt to connect the user to the socket.
@@ -370,8 +375,28 @@ function LobbyPage() {
             connectUserToRoom(res.roomId, currentUser.userId);
           }
           setLoading(false);
+          setError('');
         })
         .catch((err) => setError(err));
+    }
+  };
+
+  const leaveRoom = () => {
+    // eslint-disable-next-line no-alert
+    if (window.confirm('Are you sure you want to leave the room?')) {
+      if (currentUser && currentUser.userId) {
+        setLoading(true);
+        setError('');
+        removeUser(currentRoomId, {
+          initiator: currentUser,
+          userToDelete: currentUser,
+        });
+      }
+
+      // Redirect user regardless of POST request effectiveness.
+      history.replace('/game/join', {
+        error: errorHandler('You left the room.'),
+      });
     }
   };
 
@@ -456,6 +481,11 @@ function LobbyPage() {
         >
           Start Game
         </PrimaryButtonZeroLeftMargin>
+        <SecondaryRedButton
+          onClick={leaveRoom}
+        >
+          Leave Room
+        </SecondaryRedButton>
       </HeaderContainer>
 
       <FlexBareContainerLeft>

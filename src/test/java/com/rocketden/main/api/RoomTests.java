@@ -57,8 +57,10 @@ public class RoomTests {
     // Predefine user and room attributes.
     private static final String NICKNAME = "rocket";
     private static final String NICKNAME_2 = "rocketrocket";
+    private static final String NICKNAME_3 = "rocketandrocket";
     private static final String USER_ID = "012345";
     private static final String USER_ID_2 = "678910";
+    private static final String USER_ID_3 = "024681";
     private static final String ROOM_ID = "012345";
     private static final long DURATION = 600;
 
@@ -497,7 +499,7 @@ public class RoomTests {
     }
 
     @Test
-    public void removeUserSuccess() throws Exception {
+    public void removeUserSuccessHostInitiator() throws Exception {
         UserDto host = new UserDto();
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
@@ -510,6 +512,35 @@ public class RoomTests {
 
         RemoveUserRequest request = new RemoveUserRequest();
         request.setInitiator(host);
+        request.setUserToDelete(user);
+
+        MvcResult result = this.mockMvc.perform(delete(String.format(REMOVE_USER, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        room = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+
+        assertEquals(1, room.getUsers().size());
+        assertFalse(room.getUsers().contains(user));
+    }
+
+    @Test
+    public void removeUserSuccessSelfInitiator() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        UserDto user = new UserDto();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+
+        RoomDto room = RoomTestMethods.setUpRoomWithTwoUsers(this.mockMvc, host, user);
+
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiator(user);
         request.setUserToDelete(user);
 
         MvcResult result = this.mockMvc.perform(delete(String.format(REMOVE_USER, room.getRoomId()))
@@ -564,10 +595,14 @@ public class RoomTests {
         user.setNickname(NICKNAME_2);
         user.setUserId(USER_ID_2);
 
+        UserDto user2 = new UserDto();
+        user2.setNickname(NICKNAME_3);
+        user2.setUserId(USER_ID_3);
+
         RoomDto room = RoomTestMethods.setUpRoomWithTwoUsers(this.mockMvc, host, user);
 
         RemoveUserRequest request = new RemoveUserRequest();
-        request.setInitiator(user);
+        request.setInitiator(user2);
         request.setUserToDelete(user);
 
         ApiError ERROR = RoomError.INVALID_PERMISSIONS;
