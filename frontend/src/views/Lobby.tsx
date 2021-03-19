@@ -341,11 +341,13 @@ function LobbyPage() {
       conditionallyBootKickedUser(room, currentUser);
     };
 
+    setLoading(true);
     connect(roomId, userId).then(() => {
       // Body encrypt through JSON.
       subscribe(routes(roomId).subscribe_lobby, subscribeCallback).then((subscriptionParam) => {
         setSubscription(subscriptionParam);
         setSocketConnected(true);
+        setLoading(false);
       }).catch((err) => {
         setError(err.message);
       });
@@ -362,6 +364,11 @@ function LobbyPage() {
         .then((res) => {
           setStateFromRoom(res);
           updateCurrentUserDetails(res.users);
+
+          // Attempt to connect the user to the socket.
+          if (currentUser && currentUser.userId) {
+            connectUserToRoom(res.roomId, currentUser.userId);
+          }
           setLoading(false);
         })
         .catch((err) => setError(err));
