@@ -32,6 +32,11 @@ export const SmallHeaderText = styled.p`
   margin: 10px 0;
 `;
 
+export const NoMarginSubtitleText = styled.p`
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  margin: 0;
+`;
+
 export const MediumText = styled.h5`
   font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
 `;

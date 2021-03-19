@@ -8,7 +8,7 @@ import {
   NoMarginMediumText,
   MainHeaderText,
   SmallHeaderText,
-  Text,
+  NoMarginSubtitleText,
 } from '../components/core/Text';
 import {
   connect, routes, subscribe, disconnect,
@@ -24,7 +24,6 @@ import { startGame } from '../api/Game';
 import {
   getRoom, Room, changeRoomHost, updateRoomSettings, removeUser,
 } from '../api/Room';
-import { NumberInput } from '../components/core/Input';
 import { errorHandler } from '../api/Error';
 import {
   CopyIndicator,
@@ -34,6 +33,7 @@ import {
 } from '../components/special/CopyIndicator';
 import IdContainer from '../components/special/IdContainer';
 import { FlexBareContainer } from '../components/core/Container';
+import { Slider, SliderContainer } from '../components/core/RangeSlider';
 
 type LobbyPageLocation = {
   user: User,
@@ -474,36 +474,31 @@ function LobbyPage() {
               })}
             </DifficultyContainer>
             <NoMarginMediumText>Duration</NoMarginMediumText>
-            <Text>
-              {isHost(currentUser) ? 'Choose a game duration between 1-60 minutes:'
-                : 'The game will last for the following minutes:'}
-            </Text>
-            <NumberInput
-              min={1}
-              max={60}
-              value={duration}
-              disabled={!isHost(currentUser)}
-              onKeyPress={(e) => {
-                // Prevent user from using any of these non-numeric characters
-                if (e.key === 'e' || e.key === '.' || e.key === '-') {
-                  e.preventDefault();
-                }
-              }}
-              onChange={(e) => {
-                const { value } = e.target;
+            <NoMarginSubtitleText>
+              {`${duration} minutes`}
+            </NoMarginSubtitleText>
+            <SliderContainer>
+              <Slider
+                min={1}
+                max={60}
+                value={duration}
+                disabled={!isHost(currentUser)}
+                onChange={(e) => {
+                  const { value } = e.target;
 
-                // Set duration to undefined to allow users to clear field
-                if (!value) {
-                  setDuration(undefined);
-                } else {
-                  const newDuration = Number(value);
-                  if (newDuration >= 0 && newDuration <= 60) {
-                    setDuration(newDuration);
+                  // Set duration to undefined to allow users to clear field
+                  if (!value) {
+                    setDuration(undefined);
+                  } else {
+                    const newDuration = Number(value);
+                    if (newDuration >= 0 && newDuration <= 60) {
+                      setDuration(newDuration);
+                      updateRoomDuration();
+                    }
                   }
-                }
-              }}
-              onBlur={updateRoomDuration}
-            />
+                }}
+              />
+            </SliderContainer>
           </BackgroundContainer>
         </OptionsContainer>
       </FlexBareContainerLeft>
