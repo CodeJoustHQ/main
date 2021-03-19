@@ -37,3 +37,7 @@ export const TextLink = styled(Link)`
   color: ${({ theme }) => theme.colors.gray};
   text-decoration: none;
 `;
+
+export const InlineExternalLink = styled.a`
+  color: ${({ theme }) => theme.colors.blueLink};
+`;
