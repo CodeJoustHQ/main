@@ -45,4 +45,14 @@ export const Slider = styled.input.attrs((props: SliderRange) => ({
     background: linear-gradient(180deg, #133ED7 0%, #90BDFF 100%);
     cursor: pointer;
   }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.5;
+
+    &:hover {
+      cursor: default;
+      opacity: 0.5;
+    }
+  }
 `;

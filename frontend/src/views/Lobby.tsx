@@ -66,7 +66,7 @@ const PlayersContainer = styled.div`
   padding-right: 5px;
 `;
 
-const OptionsContainer = styled.div`
+const RoomSettingsContainer = styled.div`
   flex: 4;
   padding-left: 5px;
 `;
@@ -427,6 +427,7 @@ function LobbyPage() {
         <PrimaryButtonZeroLeftMargin
           onClick={handleStartGame}
           disabled={loading || !isHost(currentUser)}
+          title={!isHost(currentUser) ? 'Only the host can start the game' : undefined}
         >
           Start Game
         </PrimaryButtonZeroLeftMargin>
@@ -453,8 +454,8 @@ function LobbyPage() {
             { loading ? <Loading /> : null }
           </BackgroundContainer>
         </PlayersContainer>
-        <OptionsContainer>
-          <SmallHeaderTextZeroTopMargin>Options</SmallHeaderTextZeroTopMargin>
+        <RoomSettingsContainer>
+          <SmallHeaderTextZeroTopMargin>Room Settings</SmallHeaderTextZeroTopMargin>
           <BackgroundContainer>
             <NoMarginMediumText>Difficulty</NoMarginMediumText>
             <DifficultyContainer>
@@ -466,6 +467,7 @@ function LobbyPage() {
                     onClick={() => updateDifficultySetting(key)}
                     active={difficulty === difficultyKey}
                     enabled={isHost(currentUser)}
+                    disabled={!isHost(currentUser)}
                     title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
                   >
                     {key}
@@ -483,6 +485,7 @@ function LobbyPage() {
                 max={60}
                 value={duration}
                 disabled={!isHost(currentUser)}
+                title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
                 onChange={(e) => {
                   const { value } = e.target;
 
@@ -493,14 +496,14 @@ function LobbyPage() {
                     const newDuration = Number(value);
                     if (newDuration >= 0 && newDuration <= 60) {
                       setDuration(newDuration);
-                      updateRoomDuration();
                     }
                   }
                 }}
+                onMouseUp={updateRoomDuration}
               />
             </SliderContainer>
           </BackgroundContainer>
-        </OptionsContainer>
+        </RoomSettingsContainer>
       </FlexBareContainerLeft>
     </>
   );
