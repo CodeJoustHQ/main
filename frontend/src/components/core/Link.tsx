@@ -38,7 +38,7 @@ export const TextLink = styled(Link)`
   text-decoration: none;
 `;
 
-export const NoColorExternalLink = styled.a`
+export const GrayExternalLink = styled.a`
   color: ${({ theme }) => theme.colors.gray};
   text-decoration: underline;
 `;

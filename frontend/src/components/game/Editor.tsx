@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import MonacoEditor from 'react-monaco-editor';
-import styled from 'styled-components';
+import styled, { ThemeContext } from 'styled-components';
 import Language, { fromString, languageToEditorLanguage } from '../../api/Language';
 import { DefaultCodeType } from '../../api/Problem';
 
@@ -57,12 +57,38 @@ const LanguageSelect = styled.select`
   }
 `;
 
+/**
+ * Options used to style the Monaco code editor
+ * https://microsoft.github.io/monaco-editor/api/enums/monaco.editor.editoroption.html
+ */
+const monacoEditorOptions: any = {
+  automaticLayout: true,
+  fixedOverflowWidgets: true,
+  fontFamily: 'Monaco',
+  hideCursorInOverviewRuler: true,
+  minimap: { enabled: false },
+  overviewRulerBorder: false,
+  overviewRulerLanes: 0,
+  padding: { top: 10, bottom: 10 },
+  quickSuggestions: false,
+  renderLineHighlight: 'all',
+  renderIndentGuides: false,
+  renderWhitespace: 'none',
+  scrollbar: {
+    verticalScrollbarSize: 5,
+    horizontalScrollbarSize: 5,
+    useShadows: false,
+  },
+  scrollBeyondLastLine: false,
+};
+
 // This function refreshes the width of Monaco editor upon change in container size
 function ResizableMonacoEditor(props: EditorProps) {
   const {
     onLanguageChange, onCodeChange, codeMap, defaultLanguage,
   } = props;
 
+  const theme = useContext(ThemeContext);
   const [currentLanguage, setCurrentLanguage] = useState<Language>(defaultLanguage);
   const [codeEditor, setCodeEditor] = useState<any>(null);
 
@@ -86,8 +112,8 @@ function ResizableMonacoEditor(props: EditorProps) {
       inherit: true,
       rules: [],
       colors: {
-        'editor.lineHighlightBorder': '#f8f8f8',
-        'editor.lineHighlightBackground': '#f8f8f8',
+        'editor.lineHighlightBorder': theme.colors.background,
+        'editor.lineHighlightBackground': theme.colors.background,
       },
     });
   };
@@ -126,26 +152,7 @@ function ResizableMonacoEditor(props: EditorProps) {
       </LanguageContainer>
       <EditorContainer>
         <MonacoEditor
-          options={{
-            automaticLayout: true,
-            fixedOverflowWidgets: true,
-            fontFamily: 'Monaco',
-            hideCursorInOverviewRuler: true,
-            minimap: { enabled: false },
-            overviewRulerBorder: false,
-            overviewRulerLanes: 0,
-            padding: { top: 10, bottom: 10 },
-            quickSuggestions: false,
-            renderLineHighlight: 'all',
-            renderIndentGuides: false,
-            renderWhitespace: 'none',
-            scrollbar: {
-              verticalScrollbarSize: 5,
-              horizontalScrollbarSize: 5,
-              useShadows: false,
-            },
-            scrollBeyondLastLine: false,
-          }}
+          options={monacoEditorOptions}
           theme="default-theme"
           height="100%"
           editorDidMount={handleEditorDidMount}

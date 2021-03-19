@@ -34,7 +34,7 @@ import {
   connect, disconnect, routes, send, subscribe,
 } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
-import { NoColorExternalLink } from '../components/core/Link';
+import { GrayExternalLink } from '../components/core/Link';
 import Language from '../api/Language';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
@@ -425,7 +425,7 @@ function GamePage() {
             />
             <BottomFooterText>
               {'Notice an issue? Contact us at '}
-              <NoColorExternalLink href="mailto:support@codejoust.co">support@codejoust.co</NoColorExternalLink>
+              <GrayExternalLink href="mailto:support@codejoust.co">support@codejoust.co</GrayExternalLink>
             </BottomFooterText>
           </OverflowPanel>
 
