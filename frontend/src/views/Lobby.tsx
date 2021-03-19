@@ -354,6 +354,20 @@ function LobbyPage() {
     });
   }, [currentUser, conditionallyBootKickedUser]);
 
+  const refreshRoomDetails = () => {
+    // Call GET endpoint to get latest room info
+    if (!loading) {
+      setLoading(true);
+      getRoom(location.state.roomId)
+        .then((res) => {
+          setStateFromRoom(res);
+          updateCurrentUserDetails(res.users);
+          setLoading(false);
+        })
+        .catch((err) => setError(err));
+    }
+  };
+
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
     // Grab the user and room information; otherwise, redirect to the join page
@@ -447,9 +461,7 @@ function LobbyPage() {
                 : null
             }
             <InlineRefreshIcon
-              onClick={() => {
-                alert('Hello!');
-              }}
+              onClick={refreshRoomDetails}
             >
               refresh
             </InlineRefreshIcon>
