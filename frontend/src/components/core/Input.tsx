@@ -15,6 +15,23 @@ const Input = styled.input<Dimensions>`
   font-weight: 700;
 `;
 
+export const PureTextInputTitle = styled.input.attrs(() => ({
+  type: 'text',
+}))`
+  border: none;
+  color: ${({ theme }) => theme.colors.text};
+  font-family: ${({ theme }) => theme.font};
+  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+  font-weight: 700;
+  padding: 0;
+  width: 100%;
+
+  &:focus {
+    border: none;
+    outline: none;
+  }
+`;
+
 export const LargeCenterInputText = styled(Input).attrs(() => ({
   type: 'text',
 }))`
@@ -82,6 +99,21 @@ export const ConsoleTextArea = styled.textarea`
   }
 `;
 
+export const FixedTextArea = styled.textarea`
+  font-family: monospace;
+  margin: 2px;
+  width: 100%;
+  min-height: 24px;
+  max-height: 150px;
+  resize: none;
+
+  padding: 5px;
+  border: 2px solid ${({ theme }) => theme.colors.darkBlue};
+  border-radius: 0.25rem;
+  
+  font-size: ${({ theme }) => theme.fontSize.default};
+`;
+
 export const NumberInput = styled(Input).attrs(() => ({
   type: 'number',
 }))`
@@ -100,15 +132,18 @@ export const NumberInput = styled(Input).attrs(() => ({
 export const TextInput = styled(Input).attrs(() => ({
   type: 'text',
 }))`
-  display: block;
-  width: 15rem;
-  text-align: center;
-  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
-  padding: 1rem;
+  display: inline-block;
+  margin: 0 0.5rem 0 0;
+  width: 5rem;
+  font-size: ${({ theme }) => theme.fontSize.default};
+  font-family: ${({ theme }) => theme.font};
+  font-weight: 400;
+  padding: 0.25rem 0.5rem;
   color: ${({ theme }) => theme.colors.text};
+  border: 2px solid ${({ theme }) => theme.colors.blue};
 
   &:focus {
-    border: 3px solid ${({ theme }) => theme.colors.darkBlue};
+    border: 2px solid ${({ theme }) => theme.colors.darkBlue};
   }
 `;
 

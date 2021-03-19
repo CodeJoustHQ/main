@@ -9,6 +9,14 @@ export const Text = styled.p<TextAttributes>`
   font-weight: ${({ bold }) => (bold ? 'bold' : 'normal')};
 `;
 
+export const LabelAbsoluteText = styled.p<TextAttributes>`
+  position: absolute;
+  top: 1rem;
+  right: 5%;
+  margin: 0;
+  font-size: ${({ theme }) => theme.fontSize.default};
+`;
+
 export const ErrorText = styled(Text)`
    color: ${({ theme }) => theme.colors.red};
 `;
@@ -18,8 +26,19 @@ export const SmallText = styled(Text)`
   margin: 6px 0;
 `;
 
+export const SmallHeaderText = styled.p`
+  display: inline-block;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  margin: 10px 0;
+`;
+
 export const MediumText = styled.h5`
   font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+`;
+
+export const LowMarginMediumText = styled.h5`
+  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+  margin: 1rem 0;
 `;
 
 export const LargeText = styled.h3`

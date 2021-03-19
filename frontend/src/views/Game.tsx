@@ -21,7 +21,7 @@ import Console from '../components/game/Console';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
 import { GameNotification, NotificationType } from '../api/GameNotification';
-import Difficulty from '../api/Difficulty';
+import { Difficulty } from '../api/Difficulty';
 import {
   Game, getGame, Player, runSolution,
   Submission, SubmissionType, submitSolution,

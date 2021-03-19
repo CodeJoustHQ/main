@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ThemeConfig } from '../config/Theme';
 import { FloatingCircle, Coordinate } from '../special/FloatingCircle';
-import Header from '../navigation/Header';
 import { MainContainer, CircleBackgroundContainer } from '../core/Container';
+import { Header } from '../navigation/Header';
 
 const Content = styled.div`
   position: relative;

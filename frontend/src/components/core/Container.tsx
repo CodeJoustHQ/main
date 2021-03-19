@@ -7,6 +7,10 @@ export const FlexContainer = styled.div`
   margin: 0 1rem;
 `;
 
+export const FlexBareContainer = styled.div`
+  display: flex;
+`;
+
 export const FlexHorizontalContainer = styled.div`
   display: flex;
   flex: auto;
@@ -91,7 +95,13 @@ export const SplitterContainer = styled.div`
 
 export const MainContainer = styled.div`
   margin: 0 auto;
-  padding: 5vw 0;
+  padding: 3rem 0;
+  width: 80%;
+`;
+
+export const ProblemContainer = styled.div`
+  margin: 0 auto;
+  padding-bottom: 3rem;
   width: 80%;
 `;
 

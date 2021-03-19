@@ -16,6 +16,7 @@ import {
   connect, disconnect, routes, subscribe,
 } from '../api/Socket';
 import { User } from '../api/User';
+import { ThemeConfig } from '../components/config/Theme';
 
 const Content = styled.div`
   padding: 0 20%;
@@ -97,7 +98,7 @@ function GameResultsPage() {
     }
   }, [location, history]);
 
-  const playAgainAction = () => {
+  const callPlayAgain = () => {
     setError('');
     setLoading(true);
 
@@ -123,7 +124,14 @@ function GameResultsPage() {
       ))}
 
       {currentUser && currentUser?.userId === host?.userId
-        ? <PrimaryButton onClick={playAgainAction}>Play Again</PrimaryButton>
+        ? (
+          <PrimaryButton
+            color={ThemeConfig.colors.gradients.blue}
+            onClick={callPlayAgain}
+          >
+            Play Again
+          </PrimaryButton>
+        )
         : <Text>{!loading && 'Waiting for the host to choose whether to play again...'}</Text>}
     </Content>
   );
