@@ -16,7 +16,11 @@ import {
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
 import { Difficulty } from '../api/Difficulty';
-import { PrimaryButton, SmallDifficultyButton } from '../components/core/Button';
+import {
+  PrimaryButton,
+  SmallDifficultyButton,
+  InlineRefreshIcon,
+} from '../components/core/Button';
 import Loading from '../components/core/Loading';
 import PlayerCard from '../components/card/PlayerCard';
 import HostActionCard from '../components/card/HostActionCard';
@@ -442,6 +446,13 @@ function LobbyPage() {
                 ? ` (${activeUsers.length + inactiveUsers.length})`
                 : null
             }
+            <InlineRefreshIcon
+              onClick={() => {
+                alert('Hello!');
+              }}
+            >
+              refresh
+            </InlineRefreshIcon>
           </SmallHeaderTextZeroTopMargin>
           <BackgroundContainer>
             {

@@ -158,3 +158,21 @@ export const InvertedSmallButton = styled(SmallButton)`
   color: ${({ theme }) => theme.colors.text};
   background: ${({ theme }) => theme.colors.background};
 `;
+
+export const InlineRefreshIcon = styled.i.attrs(() => ({
+  className: 'material-icons',
+}))`
+  display: inline-block;
+  margin: 0 0 0 10px;
+  padding: 0.25rem;
+  border-radius: 1rem;
+  font-size: ${({ theme }) => theme.fontSize.default};
+  background: ${({ theme }) => theme.colors.white};
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
+  color: ${({ theme }) => theme.colors.font};
+
+  &:hover {
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.24);
+  }
+`;
