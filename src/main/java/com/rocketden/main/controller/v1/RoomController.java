@@ -47,7 +47,7 @@ public class RoomController extends BaseRestController {
 
     @DeleteMapping("/rooms/{roomId}")
     public ResponseEntity<RoomDto> deleteRoom(@PathVariable String roomId, @RequestBody DeleteRoomRequest request) {
-        return new ResponseEntity<>(service.deleteRoom(roomId, request), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.deleteRoom(roomId, request), HttpStatus.OK);
     }
 
     @DeleteMapping("/rooms/{roomId}/users")

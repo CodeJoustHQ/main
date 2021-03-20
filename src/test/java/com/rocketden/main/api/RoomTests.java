@@ -1,6 +1,7 @@
 package com.rocketden.main.api;
 
 import com.rocketden.main.dto.room.CreateRoomRequest;
+import com.rocketden.main.dto.room.DeleteRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
@@ -53,6 +54,7 @@ public class RoomTests {
     private static final String PUT_ROOM_HOST = "/api/v1/rooms/%s/host";
     private static final String PUT_ROOM_SETTINGS = "/api/v1/rooms/%s/settings";
     private static final String REMOVE_USER = "/api/v1/rooms/%s/users";
+    private static final String DELETE_ROOM = "/api/v1/rooms/%s";
 
     // Predefine user and room attributes.
     private static final String NICKNAME = "rocket";
@@ -595,11 +597,11 @@ public class RoomTests {
         user.setNickname(NICKNAME_2);
         user.setUserId(USER_ID_2);
 
+        RoomDto room = RoomTestMethods.setUpRoomWithTwoUsers(this.mockMvc, host, user);
+
         UserDto user2 = new UserDto();
         user2.setNickname(NICKNAME_3);
         user2.setUserId(USER_ID_3);
-
-        RoomDto room = RoomTestMethods.setUpRoomWithTwoUsers(this.mockMvc, host, user);
 
         RemoveUserRequest request = new RemoveUserRequest();
         request.setInitiator(user2);
@@ -608,6 +610,72 @@ public class RoomTests {
         ApiError ERROR = RoomError.INVALID_PERMISSIONS;
 
         MvcResult result = this.mockMvc.perform(delete(String.format(REMOVE_USER, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse errorResponse = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), errorResponse);
+    }
+
+    @Test
+    public void deleteRoomSuccess() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        UserDto user = new UserDto();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+
+        RoomDto room = RoomTestMethods.setUpRoomWithTwoUsers(this.mockMvc, host, user);
+
+        DeleteRoomRequest request = new DeleteRoomRequest();
+        request.setHost(host);
+
+        MvcResult result = this.mockMvc.perform(delete(String.format(DELETE_ROOM, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        RoomDto returnedRoom = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+        assertEquals(room, returnedRoom);
+
+        // The room should not exist any more.
+        ApiError ERROR = RoomError.NOT_FOUND;
+        MvcResult getResult = this.mockMvc.perform(get(String.format(GET_ROOM, room.getRoomId())))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String getJsonResponse = getResult.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(getJsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @Test
+    public void deleteRoomBadHost() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        UserDto user = new UserDto();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+
+        RoomDto room = RoomTestMethods.setUpRoomWithTwoUsers(this.mockMvc, host, user);
+
+        DeleteRoomRequest request = new DeleteRoomRequest();
+        request.setHost(user);
+
+        ApiError ERROR = RoomError.INVALID_PERMISSIONS;
+
+        MvcResult result = this.mockMvc.perform(delete(String.format(DELETE_ROOM, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andExpect(status().is(ERROR.getStatus().value()))
