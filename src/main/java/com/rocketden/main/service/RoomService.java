@@ -114,7 +114,11 @@ public class RoomService {
             throw new ApiException(RoomError.INVALID_PERMISSIONS);
         }
 
-        return RoomMapper.toDto(room);
+        RoomDto roomDto = RoomMapper.toDto(room);
+
+        // Delete the room and all users within as well.
+        repository.delete(room);
+        return roomDto;
     }
 
     public RoomDto getRoom(String roomId) {
@@ -151,6 +155,14 @@ public class RoomService {
 
         // Assign new host if user being kicked is host
         if (room.getHost().equals(userToDelete)) {
+
+            // If the host is the last user, delete the room and return info.
+            if (room.getUsers().size() == 1) {
+                DeleteRoomRequest deleteRoomRequest = new DeleteRoomRequest();
+                deleteRoomRequest.setHost(request.getUserToDelete());
+                return deleteRoom(roomId, deleteRoomRequest);
+            }
+
             return conditionallyUpdateRoomHost(room, userToDelete, true);
         }
 
