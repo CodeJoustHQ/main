@@ -220,7 +220,7 @@ public class RoomServiceTests {
         request.setInitiator(UserMapper.toDto(host));
         request.setNewHost(UserMapper.toDto(user));
 
-        RoomDto response = roomService.updateRoomHost(room.getRoomId(), request);
+        RoomDto response = roomService.updateRoomHost(room.getRoomId(), request, false);
 
         verify(socketService).sendSocketUpdate(eq(response));
         assertEquals(user, UserMapper.toEntity(response.getHost()));
@@ -251,7 +251,7 @@ public class RoomServiceTests {
         invalidPermRequest.setNewHost(UserMapper.toDto(host));
 
         ApiException exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomHost(ROOM_ID, invalidPermRequest));
+                roomService.updateRoomHost(ROOM_ID, invalidPermRequest, false));
         assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
 
         // Nonexistent room
@@ -260,7 +260,7 @@ public class RoomServiceTests {
         noRoomRequest.setNewHost(UserMapper.toDto(user));
 
         exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomHost("999999", noRoomRequest));
+                roomService.updateRoomHost("999999", noRoomRequest, false));
         assertEquals(RoomError.NOT_FOUND, exception.getError());
 
         // Nonexistent new host
@@ -272,7 +272,7 @@ public class RoomServiceTests {
         noUserRequest.setNewHost(nonExistentUser);
 
         exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomHost(ROOM_ID, noUserRequest));
+                roomService.updateRoomHost(ROOM_ID, noUserRequest, false));
         assertEquals(UserError.NOT_FOUND, exception.getError());
 
         // New host inactive
@@ -282,7 +282,7 @@ public class RoomServiceTests {
         inactiveUserRequest.setNewHost(UserMapper.toDto(user));
 
         exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomHost(ROOM_ID, inactiveUserRequest));
+                roomService.updateRoomHost(ROOM_ID, inactiveUserRequest, false));
         assertEquals(RoomError.INACTIVE_USER, exception.getError());
     }
 

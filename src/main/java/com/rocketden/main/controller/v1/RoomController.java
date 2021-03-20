@@ -53,7 +53,7 @@ public class RoomController extends BaseRestController {
     @PutMapping("/rooms/{roomId}/host")
     public ResponseEntity<RoomDto> updateRoomHost(@PathVariable String roomId,
                                                   @RequestBody UpdateHostRequest request) {
-        return new ResponseEntity<>(service.updateRoomHost(roomId, request), HttpStatus.OK);
+        return new ResponseEntity<>(service.updateRoomHost(roomId, request, false), HttpStatus.OK);
     }
 
     @PutMapping("/rooms/{roomId}/settings")

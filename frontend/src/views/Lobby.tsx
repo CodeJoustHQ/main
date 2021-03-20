@@ -389,19 +389,14 @@ function LobbyPage() {
         removeUser(currentRoomId, {
           initiator: currentUser,
           userToDelete: currentUser,
-        }).catch(() => {
-          // Redirect user regardless of POST request effectiveness.
-          history.replace('/game/join', {
-            error: errorHandler('You left the room.'),
-          });
         });
       }
-    } else {
-      // Redirect user regardless of POST request effectiveness.
-      history.replace('/game/join', {
-        error: errorHandler('You left the room.'),
-      });
     }
+
+    // Redirect user regardless of POST request effectiveness.
+    history.replace('/game/join', {
+      error: errorHandler('You left the room.'),
+    });
   };
 
   // Grab the nickname variable and add the user to the lobby.
