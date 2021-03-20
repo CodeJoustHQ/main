@@ -632,13 +632,13 @@ public class RoomServiceTests {
         room.addUser(user3);
 
         // Passing in a non-host user has no effect on the room
-        roomService.conditionallyUpdateRoomHost(room, user2);
+        roomService.conditionallyUpdateRoomHost(room, user2, false);
         assertEquals(user1, room.getHost());
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(room.getRoomId()));
 
         // Passing in the host will assign the first active user to be the new host
-        roomService.conditionallyUpdateRoomHost(room, user1);
+        roomService.conditionallyUpdateRoomHost(room, user1, false);
         assertEquals(user3, room.getHost());
 
         verify(repository).save(room);

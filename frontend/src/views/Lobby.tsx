@@ -348,6 +348,7 @@ function LobbyPage() {
       subscribe(routes(roomId).subscribe_lobby, subscribeCallback).then((subscriptionParam) => {
         setSubscription(subscriptionParam);
         setSocketConnected(true);
+        setError('');
         setLoading(false);
       }).catch((err) => {
         setError(err.message);
@@ -374,8 +375,6 @@ function LobbyPage() {
           if (currentUser && currentUser.userId) {
             connectUserToRoom(res.roomId, currentUser.userId);
           }
-          setLoading(false);
-          setError('');
         })
         .catch((err) => setError(err));
     }
@@ -390,9 +389,14 @@ function LobbyPage() {
         removeUser(currentRoomId, {
           initiator: currentUser,
           userToDelete: currentUser,
+        }).catch(() => {
+          // Redirect user regardless of POST request effectiveness.
+          history.replace('/game/join', {
+            error: errorHandler('You left the room.'),
+          });
         });
       }
-
+    } else {
       // Redirect user regardless of POST request effectiveness.
       history.replace('/game/join', {
         error: errorHandler('You left the room.'),

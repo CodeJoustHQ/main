@@ -137,7 +137,9 @@ public class RoomService {
         }
 
         // Assign new host if user being kicked is host
-        conditionallyUpdateRoomHost(room, userToDelete);
+        if (room.getHost().equals(userToDelete)) {
+            return conditionallyUpdateRoomHost(room, userToDelete, true);
+        }
 
         room.removeUser(userToDelete);
         repository.save(room);
@@ -147,7 +149,7 @@ public class RoomService {
         return roomDto;
     }
 
-    public RoomDto updateRoomHost(String roomId, UpdateHostRequest request) {
+    public RoomDto updateRoomHost(String roomId, UpdateHostRequest request, boolean deleteOldHost) {
         Room room = repository.findRoomByRoomId(roomId);
 
         // Return error if room could not be found
@@ -178,6 +180,11 @@ public class RoomService {
 
         // Change the host to the new user
         room.setHost(newHost);
+        
+        // Remove the old host and initiator.
+        if (deleteOldHost) {
+            room.removeUser(initiator);
+        }
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
@@ -186,7 +193,7 @@ public class RoomService {
     }
 
     // This function randomly assigns a new host in the room
-    public RoomDto conditionallyUpdateRoomHost(Room room, User user) {
+    public RoomDto conditionallyUpdateRoomHost(Room room, User user, boolean deleteOldHost) {
         // If the disconnected user is the host and another active user is present, reassign the host for the room.
         if (room.getHost().equals(user)) {
             UpdateHostRequest request = new UpdateHostRequest();
@@ -202,7 +209,7 @@ public class RoomService {
 
             // Determine whether an active non-host user was found, and if so, send an update room host request.
             if (request.getNewHost() != null) {
-                return updateRoomHost(room.getRoomId(), request);
+                return updateRoomHost(room.getRoomId(), request, deleteOldHost);
             }
         }
         // If conditions fail to match, just return the room as it is
