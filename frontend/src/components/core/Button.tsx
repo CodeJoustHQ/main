@@ -43,7 +43,7 @@ export const PrimaryButton = styled(DefaultButton)<any>`
 
 export const SecondaryRedButton = styled(PrimaryButton)<any>`
   background: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.red};
+  color: ${({ theme }) => theme.colors.red2};
   margin: 1.2rem 0;
 `;
 

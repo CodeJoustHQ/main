@@ -173,6 +173,7 @@ function LobbyPage() {
           userIncluded = true;
         }
       });
+
       // If user is no longer present in room, boot the user.
       if (!userIncluded) {
         disconnect().then(() => {
@@ -390,10 +391,11 @@ function LobbyPage() {
           initiator: currentUser,
           userToDelete: currentUser,
         });
+        disconnect();
       }
     }
 
-    // Redirect user regardless of POST request effectiveness.
+    // Redirect user regardless of POST request success.
     history.replace('/game/join', {
       error: errorHandler('You left the room.'),
     });
