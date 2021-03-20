@@ -42,6 +42,7 @@ const LanguageSelect = styled.select`
   border-radius: 5px;
   color: ${({ theme }) => theme.colors.text};
   text-align: center;
+  text-align-last: center;
   
   &:hover {
     cursor: pointer;
