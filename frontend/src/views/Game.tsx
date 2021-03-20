@@ -5,6 +5,7 @@ import SplitterLayout from 'react-splitter-layout';
 import MarkdownEditor from 'rich-markdown-editor';
 import { useBeforeunload } from 'react-beforeunload';
 import { Message, Subscription } from 'stompjs';
+import copy from 'copy-to-clipboard';
 import 'react-splitter-layout/lib/index.css';
 import Editor from '../components/game/Editor';
 import { DefaultCodeType, getDefaultCodeMap, Problem } from '../api/Problem';
@@ -34,8 +35,13 @@ import {
   connect, disconnect, routes, send, subscribe,
 } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
-import { GrayExternalLink } from '../components/core/Link';
 import Language from '../api/Language';
+import {
+  CopyIndicator,
+  BottomCopyIndicatorContainer,
+  SmallInlineCopyIcon,
+  SmallInlineCopyText,
+} from '../components/special/CopyIndicator';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
   padding: 0;
@@ -95,6 +101,7 @@ function GamePage() {
   const history = useHistory();
   const location = useLocation<LocationState>();
 
+  const [copiedEmail, setCopiedEmail] = useState(false);
   const [submission, setSubmission] = useState<Submission | null>(null);
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -425,7 +432,15 @@ function GamePage() {
             />
             <BottomFooterText>
               {'Notice an issue? Contact us at '}
-              <GrayExternalLink href="mailto:support@codejoust.co">support@codejoust.co</GrayExternalLink>
+              <SmallInlineCopyText
+                onClick={() => {
+                  copy('support@codejoust.co');
+                  setCopiedEmail(true);
+                }}
+              >
+                support@codejoust.co
+                <SmallInlineCopyIcon>content_copy</SmallInlineCopyIcon>
+              </SmallInlineCopyText>
             </BottomFooterText>
           </OverflowPanel>
 
@@ -456,6 +471,11 @@ function GamePage() {
           </SplitterLayout>
         </SplitterLayout>
       </SplitterContainer>
+      <BottomCopyIndicatorContainer copied={copiedEmail}>
+        <CopyIndicator onClick={() => setCopiedEmail(false)}>
+          Email copied!&nbsp;&nbsp;✕
+        </CopyIndicator>
+      </BottomCopyIndicatorContainer>
     </FlexContainer>
   );
 }

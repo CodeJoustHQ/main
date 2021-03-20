@@ -27,7 +27,6 @@ function App() {
   // Track page view on every change in location
   useEffect(() => {
     ReactGA.pageview(location.pathname);
-    console.log(location.pathname);
   }, [location]);
 
   return (

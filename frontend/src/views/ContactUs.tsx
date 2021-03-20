@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import copy from 'copy-to-clipboard';
-import { LandingPageContainer } from '../components/core/Container';
+import { CircleBackgroundContainer } from '../components/core/Container';
 import { InlineExternalLink } from '../components/core/Link';
 import { ContactHeaderTitle, ContactHeaderText } from '../components/core/Text';
 import {
@@ -20,7 +20,7 @@ function ContactUsPage() {
           Email copied!&nbsp;&nbsp;✕
         </CopyIndicator>
       </CopyIndicatorContainer>
-      <LandingPageContainer>
+      <CircleBackgroundContainer>
         <ContactHeaderTitle>
           Contact Us
         </ContactHeaderTitle>
@@ -51,7 +51,7 @@ function ContactUsPage() {
           </InlineCopyText>
           . Say hello!
         </ContactHeaderText>
-      </LandingPageContainer>
+      </CircleBackgroundContainer>
     </>
   );
 }

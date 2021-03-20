@@ -17,6 +17,17 @@ export const CopyIndicatorContainer = styled.div.attrs((props: CopyIndicator) =>
   transition: transform 0.25s;
 `;
 
+export const BottomCopyIndicatorContainer = styled.div.attrs((props: CopyIndicator) => ({
+  style: {
+    transform: (!props.copied) ? 'translateY(60px)' : null,
+  },
+}))<CopyIndicator>`
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transition: transform 0.25s;
+`;
+
 export const CopyIndicator = styled(DefaultButton)`
   position: relative;
   left: -50%;
@@ -33,8 +44,16 @@ export const InlineCopyText = styled(ContactHeaderText)`
   border-bottom: 1px solid ${({ theme }) => theme.colors.text};
 `;
 
+export const SmallInlineCopyText = styled(InlineCopyText).attrs({ as: 'p' })`
+  font-size: ${({ theme }) => theme.fontSize.mediumSmall};
+`;
+
 export const InlineCopyIcon = styled.i.attrs(() => ({
   className: 'material-icons',
 }))`
   margin-left: 5px;
+`;
+
+export const SmallInlineCopyIcon = styled(InlineCopyIcon)`
+  font-size: ${({ theme }) => theme.fontSize.mediumSmall};
 `;
