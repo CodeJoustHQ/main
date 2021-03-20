@@ -2,6 +2,7 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
+import com.rocketden.main.dto.room.DeleteRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
@@ -28,6 +29,7 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -642,5 +644,56 @@ public class RoomServiceTests {
         assertEquals(user3, room.getHost());
 
         verify(repository).save(room);
+    }
+
+    @Test
+    public void deleteRoomSuccess() {
+        User host = new User();
+        host.setUserId(USER_ID);
+        host.setSessionId(SESSION_ID);
+
+        User user = new User();
+        user.setUserId(USER_ID_2);
+        user.setSessionId(SESSION_ID_2);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(host);
+        room.addUser(host);
+        room.addUser(user);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        DeleteRoomRequest deleteRoomRequest = new DeleteRoomRequest();
+        deleteRoomRequest.setHost(UserMapper.toDto(host));
+        roomService.deleteRoom(ROOM_ID, deleteRoomRequest);
+        verify(repository).delete(eq(room));
+    }
+
+    @Test
+    public void deleteRoomBadHost() {
+        User host = new User();
+        host.setUserId(USER_ID);
+        host.setSessionId(SESSION_ID);
+
+        User user = new User();
+        user.setUserId(USER_ID_2);
+        user.setSessionId(SESSION_ID_2);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(host);
+        room.addUser(host);
+        room.addUser(user);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        DeleteRoomRequest deleteRoomRequest = new DeleteRoomRequest();
+        deleteRoomRequest.setHost(UserMapper.toDto(user));
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.deleteRoom(ROOM_ID, deleteRoomRequest));
+        assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
+        assertNotNull(roomService.getRoom(ROOM_ID));
     }
 }
