@@ -23,7 +23,7 @@ export const ErrorText = styled(Text)`
 
 export const SmallText = styled(Text)`
   font-size: ${({ theme }) => theme.fontSize.mediumSmall};
-  margin: 6px 0;
+  margin: 3px 0;
 `;
 
 export const SmallHeaderText = styled.p`

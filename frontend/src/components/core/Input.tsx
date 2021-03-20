@@ -89,7 +89,7 @@ export const ConsoleTextArea = styled.textarea`
   height: unset;
   max-height: 150px;
   white-space: pre;
-  resize: horizontal;
+  resize: both;
   
   /* Hide scrollbar for Chrome, Safari and Opera */
   &::-webkit-scrollbar {

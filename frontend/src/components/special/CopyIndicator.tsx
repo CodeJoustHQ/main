@@ -4,7 +4,7 @@ import { ContactHeaderText } from '../core/Text';
 
 type CopyIndicator = {
   copied: boolean,
-}
+};
 
 export const CopyIndicatorContainer = styled.div.attrs((props: CopyIndicator) => ({
   style: {
@@ -20,9 +20,10 @@ export const CopyIndicatorContainer = styled.div.attrs((props: CopyIndicator) =>
 export const BottomCopyIndicatorContainer = styled.div.attrs((props: CopyIndicator) => ({
   style: {
     transform: (!props.copied) ? 'translateY(60px)' : null,
+    visibility: (props.copied) ? 'visible' : 'hidden',
   },
 }))<CopyIndicator>`
-  position: absolute;
+  position: fixed;
   bottom: 20px;
   left: 50%;
   transition: transform 0.25s;
