@@ -16,6 +16,7 @@ export const ThemeConfig: any = {
     gray: 'gray',
     lightGray: 'lightgray',
     white: 'white',
+    blueLink: '#0000EE',
     green: '#6cc964',
     red2: '#dd4b4b',
     yellow: '#f3d251',

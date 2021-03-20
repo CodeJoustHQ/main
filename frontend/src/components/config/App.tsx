@@ -15,6 +15,7 @@ import AllProblemsPage from '../../views/AllProblemsPage';
 import ProblemPage from '../../views/ProblemPage';
 import CreateProblemPage from '../../views/CreateProblemPage';
 import CircleBackgroundLayout from '../layout/CircleBackground';
+import ContactUsPage from '../../views/ContactUs';
 import ProblemLayout from '../layout/ProblemLayout';
 
 // Set up Google Analytics
@@ -40,6 +41,7 @@ function App() {
       <CustomRoute path="/problems/all" component={AllProblemsPage} layout={ProblemLayout} exact />
       <CustomRoute path="/problem/create" component={CreateProblemPage} layout={ProblemLayout} exact />
       <CustomRoute path="/problem/:id" component={ProblemPage} layout={ProblemLayout} exact />
+      <CustomRoute path="/contact-us" component={ContactUsPage} layout={MainLayout} exact />
       <CustomRoute path="*" component={NotFound} layout={MainLayout} />
     </Switch>
   );
