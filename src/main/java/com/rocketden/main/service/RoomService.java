@@ -2,6 +2,7 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
+import com.rocketden.main.dto.room.DeleteRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
@@ -100,6 +101,18 @@ public class RoomService {
         room.setHost(host);
         room.addUser(host);
         repository.save(room);
+
+        return RoomMapper.toDto(room);
+    }
+
+    public RoomDto deleteRoom(String roomId, DeleteRoomRequest request) {
+        Room room = repository.findRoomByRoomId(roomId);
+        User host = UserMapper.toEntity(request.getHost());
+
+        // Do not create room if provided user is not the host.
+        if (!room.getHost().equals(host)) {
+            throw new ApiException(RoomError.INVALID_PERMISSIONS);
+        }
 
         return RoomMapper.toDto(room);
     }
