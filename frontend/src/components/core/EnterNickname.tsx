@@ -58,6 +58,7 @@ export default function EnterNicknamePage(props: EnterNicknameProps) {
 
   return (
     <div>
+      <br />
       <LargeText>
         {enterNicknameHeaderText}
       </LargeText>

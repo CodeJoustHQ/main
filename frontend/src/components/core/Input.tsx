@@ -35,8 +35,8 @@ export const PureTextInputTitle = styled.input.attrs(() => ({
 export const LargeCenterInputText = styled(Input).attrs(() => ({
   type: 'text',
 }))`
-  width: ${({ width }) => width || '18rem'};
-  height: ${({ height }) => height || '3.5rem'};
+  width: ${({ width }) => width || '16rem'};
+  height: ${({ height }) => height || '3rem'};
   text-align: center;
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   font-family: ${({ theme }) => theme.font};
@@ -51,7 +51,7 @@ export const PrimaryInput = styled(Input).attrs(() => ({
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   background: ${({ theme }) => theme.colors.gradients.blue};
   color: ${({ theme }) => theme.colors.white};
-  width: ${({ width }) => width || '12rem'};
+  width: ${({ width }) => width || '16rem'};
   height: ${({ height }) => height || '3rem'};
   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
   border: none !important;
@@ -63,6 +63,15 @@ export const PrimaryInput = styled(Input).attrs(() => ({
   &:hover {
     cursor: pointer;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.24);
+  }
+  
+  &:disabled {
+    background: ${({ theme }) => theme.colors.gray};
+
+    &:hover {
+      cursor: default;
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
+    }
   }
 `;
 

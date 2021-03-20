@@ -30,8 +30,8 @@ export const PrimaryButton = styled(DefaultButton)`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   background: ${({ theme }) => theme.colors.gradients.blue};
   color: ${({ theme }) => theme.colors.white};
-  width: ${({ width }) => width || '10rem'};
-  height: ${({ height }) => height || '2.75rem'};
+  width: ${({ width }) => width || '12rem'};
+  height: ${({ height }) => height || '3rem'};
   min-width: 150px;
   min-height: 40px;
 

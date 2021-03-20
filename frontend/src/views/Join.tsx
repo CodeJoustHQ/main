@@ -111,6 +111,7 @@ function JoinGamePage() {
       // Render the "Enter room ID" state.
       joinPageContent = (
         <div>
+          <br />
           <LargeText>
             Enter the six-digit room ID to join the game!
           </LargeText>
