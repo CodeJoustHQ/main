@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Player, Submission } from '../../api/Game';
-import { MediumText, SmallerMediumText } from '../core/Text';
-import Language from '../../api/Language';
+import { SmallerMediumText, MediumText } from '../core/Text';
+import Language, { displayNameFromLanguage } from '../../api/Language';
 
 type PodiumProps = {
   place: number,
@@ -15,26 +15,34 @@ type MedalProps = {
 };
 
 const PodiumContainer = styled.div`
-  display: block;
+  position: relative;
+  display: inline-block;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-  width: 300px;
-  height: 500px;
+  width: 220px;
+  height: 340px;
   padding: 10px;
-  margin: 20px;
+  margin: 10px;
   background: ${({ theme }) => theme.colors.white};
   border-radius: 8px;
+`;
+
+const ScoreText = styled(MediumText)`
+  font-weight: normal;
+  margin: 0;
 `;
 
 const BottomContent = styled.div`
   position: absolute;
   bottom: 5px;
-  left: 50%;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
 `;
 
 const Medal = styled.div<MedalProps>`
   background: ${({ theme, color }) => theme.colors.gradients[color]};
   border-radius: 50%;
-  margin: 0 auto;
+  margin: 15px auto;
   
   height: 50px;
   width: 50px;  
@@ -59,16 +67,21 @@ function Podium(props: PodiumProps) {
 
   const getScoreText = () => {
     if (!bestSubmission) {
-      return '';
+      return <p />;
     }
 
     const percent = Math.round((bestSubmission.numCorrect / bestSubmission.numTestCases) * 100);
-    return `Scored <b>${percent}%</b>`;
+    return (
+      <ScoreText>
+        Scored
+        <b>{` ${percent}%`}</b>
+      </ScoreText>
+    );
   };
 
   const getTimeText = () => {
     if (!bestSubmission) {
-      return '';
+      return <p />;
     }
 
     // Calculate time from start of game till best submission
@@ -76,25 +89,38 @@ function Podium(props: PodiumProps) {
     const diffMilliseconds = new Date(bestSubmission.startTime).getTime() - startTime;
     const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
 
-    return `in <b>${diffMinutes} minutes</b>`;
+    return (
+      <SmallerMediumText>
+        in
+        <b>{` ${diffMinutes} minutes`}</b>
+      </SmallerMediumText>
+    );
   };
 
   const getLanguageText = () => {
     if (!bestSubmission) {
-      return '';
+      return <p />;
     }
-
-    return `Language: <b>${bestSubmission.language as Language}</b>`;
+    // console.log(bestSubmission);
+    // console.log(fromString(bestSubmission.language));
+    // console.log(bestSubmission.language as Language);
+    // debugger;
+    return (
+      <SmallerMediumText>
+        Language:
+        <b>{` ${displayNameFromLanguage(bestSubmission.language as Language)}`}</b>
+      </SmallerMediumText>
+    );
   };
 
   return (
     <PodiumContainer>
       <Medal color="yellow" />
-      <MediumText>{getScoreText()}</MediumText>
-      <SmallerMediumText>{getTimeText()}</SmallerMediumText>
+      {getScoreText()}
+      {getTimeText()}
 
       <BottomContent>
-        <SmallerMediumText>{getLanguageText()}</SmallerMediumText>
+        {getLanguageText()}
       </BottomContent>
     </PodiumContainer>
   );

@@ -39,6 +39,7 @@ export const NoMarginSubtitleText = styled.p`
 
 export const SmallerMediumText = styled.p`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  margin: 5px 0;
 `;
 
 export const MediumText = styled.h5`

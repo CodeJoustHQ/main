@@ -20,7 +20,7 @@ import { ThemeConfig } from '../components/config/Theme';
 import Podium from '../components/special/Podium';
 
 const Content = styled.div`
-  padding: 0 20%;
+  padding: 0;
 `;
 
 type LocationState = {
@@ -119,11 +119,23 @@ function GameResultsPage() {
       { loading ? <Loading /> : null }
       <LargeText>Winners</LargeText>
 
-      <Podium
-        place={1}
-        player={players[0]}
-        gameStartTime={startTime}
-      />
+      <div>
+        <Podium
+          place={1}
+          player={players[0]}
+          gameStartTime={startTime}
+        />
+        <Podium
+          place={2}
+          player={players[1]}
+          gameStartTime={startTime}
+        />
+        <Podium
+          place={3}
+          player={players[2]}
+          gameStartTime={startTime}
+        />
+      </div>
 
       {players?.map((player, index) => (
         <PlayerResultsCard
