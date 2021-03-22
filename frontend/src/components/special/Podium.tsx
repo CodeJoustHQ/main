@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Player } from '../../api/Game';
+import { MediumText } from '../core/Text';
 
 type PodiumProps = {
   place: string,
@@ -8,8 +9,7 @@ type PodiumProps = {
 };
 
 type MedalProps = {
-  place: number,
-  player?: Player,
+  color: string,
 };
 
 const PodiumContainer = styled.div`
@@ -24,7 +24,7 @@ const PodiumContainer = styled.div`
 `;
 
 const Medal = styled.div<MedalProps>`
-  background: ${({ theme }) => theme.colors.gradients.yellow};
+  background: ${({ theme, color }) => theme.colors.gradients[color]};
   border-radius: 50%;
   margin: 0 auto;
   
@@ -34,11 +34,12 @@ const Medal = styled.div<MedalProps>`
 `;
 
 function Podium(props: PodiumProps) {
-  const { place } = props;
+  const { place, player } = props;
 
   return (
     <PodiumContainer>
-      <Medal />
+      <Medal color="yellow" />
+      <MediumText>temp</MediumText>
       Score
       Time
       Language
