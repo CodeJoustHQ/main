@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Player } from '../../api/Game';
-import { MediumText } from '../core/Text';
+import { Player, Submission } from '../../api/Game';
+import { MediumText, SmallerMediumText } from '../core/Text';
 
 type PodiumProps = {
   place: string,
   player?: Player,
+  gameStartTime: string,
 };
 
 type MedalProps = {
@@ -34,12 +35,35 @@ const Medal = styled.div<MedalProps>`
 `;
 
 function Podium(props: PodiumProps) {
-  const { place, player } = props;
+  const { place, player, gameStartTime } = props;
+
+  const [bestSubmission, setBestSubmission] = useState<Submission | null>(null);
+
+  useEffect(() => {
+    if (player) {
+      // Find best submission
+      player.submissions.forEach((submission) => {
+        if (!bestSubmission || submission.numCorrect > bestSubmission.numCorrect) {
+          setBestSubmission(submission);
+        }
+      });
+    }
+  }, [player, setBestSubmission]);
+
+  const getScoreText = () => {
+    if (!bestSubmission) {
+      return '';
+    }
+
+    const percent = Math.round((bestSubmission.numCorrect / bestSubmission.numTestCases) * 100);
+    return `Scored <b>${percent}%</b>`;
+  };
 
   return (
     <PodiumContainer>
       <Medal color="yellow" />
-      <MediumText>temp</MediumText>
+      <MediumText>{getScoreText()}</MediumText>
+      <SmallerMediumText>{getTimeText()}</SmallerMediumText>
       Score
       Time
       Language
