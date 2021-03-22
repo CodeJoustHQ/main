@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Player, Submission } from '../../api/Game';
 import { MediumText, SmallerMediumText } from '../core/Text';
+import Language from '../../api/Language';
 
 type PodiumProps = {
-  place: string,
-  player?: Player,
+  place: number,
+  player: Player | undefined,
   gameStartTime: string,
 };
 
@@ -22,6 +23,12 @@ const PodiumContainer = styled.div`
   margin: 20px;
   background: ${({ theme }) => theme.colors.white};
   border-radius: 8px;
+`;
+
+const BottomContent = styled.div`
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
 `;
 
 const Medal = styled.div<MedalProps>`
@@ -59,14 +66,36 @@ function Podium(props: PodiumProps) {
     return `Scored <b>${percent}%</b>`;
   };
 
+  const getTimeText = () => {
+    if (!bestSubmission) {
+      return '';
+    }
+
+    // Calculate time from start of game till best submission
+    const startTime = new Date(gameStartTime).getTime();
+    const diffMilliseconds = new Date(bestSubmission.startTime).getTime() - startTime;
+    const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
+
+    return `in <b>${diffMinutes} minutes</b>`;
+  };
+
+  const getLanguageText = () => {
+    if (!bestSubmission) {
+      return '';
+    }
+
+    return `Language: <b>${bestSubmission.language as Language}</b>`;
+  };
+
   return (
     <PodiumContainer>
       <Medal color="yellow" />
       <MediumText>{getScoreText()}</MediumText>
       <SmallerMediumText>{getTimeText()}</SmallerMediumText>
-      Score
-      Time
-      Language
+
+      <BottomContent>
+        <SmallerMediumText>{getLanguageText()}</SmallerMediumText>
+      </BottomContent>
     </PodiumContainer>
   );
 }

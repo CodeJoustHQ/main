@@ -17,6 +17,7 @@ import {
 } from '../api/Socket';
 import { User } from '../api/User';
 import { ThemeConfig } from '../components/config/Theme';
+import Podium from '../components/special/Podium';
 
 const Content = styled.div`
   padding: 0 20%;
@@ -37,6 +38,7 @@ function GameResultsPage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [host, setHost] = useState<User | null>(null);
+  const [startTime, setStartTime] = useState<string>('');
   const [roomId, setRoomId] = useState('');
 
   useEffect(() => {
@@ -58,6 +60,7 @@ function GameResultsPage() {
       const subscribeCallback = (result: Message) => {
         const updatedGame: Game = JSON.parse(result.body);
 
+        setStartTime(updatedGame.gameTimer.startTime);
         // Update leaderboard with last second submissions
         setPlayers(updatedGame.players);
         // Set new host if the previous host refreshes or leaves
@@ -82,6 +85,7 @@ function GameResultsPage() {
               setLoading(false);
               setPlayers(res.players);
               setHost(res.room.host);
+              setStartTime(res.gameTimer.startTime);
 
               // Check if host elected to play again
               if (res.playAgain) {
@@ -114,6 +118,13 @@ function GameResultsPage() {
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
       <LargeText>Winners</LargeText>
+
+      <Podium
+        place={1}
+        player={players[0]}
+        gameStartTime={startTime}
+      />
+
       {players?.map((player, index) => (
         <PlayerResultsCard
           player={player}
