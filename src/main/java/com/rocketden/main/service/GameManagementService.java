@@ -108,9 +108,13 @@ public class GameManagementService {
             throw new ApiException(GameError.GAME_NOT_OVER);
         }
 
-        // TODO: use repository to get updated info if player leaves room
+        // Get up to date room using repository
+        Room room = repository.findRoomByRoomId(game.getRoom().getRoomId());
 
-        Room room = game.getRoom();
+        if (room == null) {
+            throw new ApiException(RoomError.NOT_FOUND);
+        }
+
         User initiator = UserMapper.toEntity(request.getInitiator());
         if (!room.getHost().equals(initiator)) {
             throw new ApiException(GameError.INVALID_PERMISSIONS);
