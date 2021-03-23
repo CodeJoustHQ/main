@@ -71,7 +71,7 @@ const RoomSettingsContainer = styled.div`
   padding-left: 5px;
 `;
 
-const SmallHeaderTextZeroTopMargin = styled(SmallHeaderText)`
+const LobbyContainerTitle = styled(SmallHeaderText)`
   margin: 0 0 10px 0;
 `;
 
@@ -437,14 +437,14 @@ function LobbyPage() {
 
       <FlexBareContainerLeft>
         <PlayersContainer>
-          <SmallHeaderTextZeroTopMargin>
+          <LobbyContainerTitle>
             Players
             {
               users
                 ? ` (${users.length})`
                 : null
             }
-          </SmallHeaderTextZeroTopMargin>
+          </LobbyContainerTitle>
           <BackgroundContainer>
             {
               displayUsers(activeUsers, true)
@@ -457,7 +457,7 @@ function LobbyPage() {
           </BackgroundContainer>
         </PlayersContainer>
         <RoomSettingsContainer>
-          <SmallHeaderTextZeroTopMargin>Room Settings</SmallHeaderTextZeroTopMargin>
+          <LobbyContainerTitle>Room Settings</LobbyContainerTitle>
           <BackgroundContainer>
             <NoMarginMediumText>Difficulty</NoMarginMediumText>
             <DifficultyContainer>
