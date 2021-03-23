@@ -62,7 +62,7 @@ const OverflowPanel = styled(Panel)`
   padding: 0 25px;
 `;
 
-const LowPaddingPanel = styled(Panel)`
+const NoPaddingPanel = styled(Panel)`
   padding: 0;
 `;
 
