@@ -98,6 +98,7 @@ function LobbyPage() {
 
   // Set all the different variables in the room object
   const [host, setHost] = useState<User | null>(null);
+  const [users, setUsers] = useState<User[] | null>(null);
   const [activeUsers, setActiveUsers] = useState<User[] | null>(null);
   const [inactiveUsers, setInactiveUsers] = useState<User[] | null>(null);
   const [currentRoomId, setRoomId] = useState('');
@@ -125,6 +126,7 @@ function LobbyPage() {
    */
   const setStateFromRoom = (room: Room) => {
     setHost(room.host);
+    setUsers(room.users);
     setActiveUsers(room.activeUsers);
     setInactiveUsers(room.inactiveUsers);
     setRoomId(room.roomId);
@@ -438,8 +440,8 @@ function LobbyPage() {
           <SmallHeaderTextZeroTopMargin>
             Players
             {
-              (activeUsers && inactiveUsers)
-                ? ` (${activeUsers.length + inactiveUsers.length})`
+              users
+                ? ` (${users.length})`
                 : null
             }
           </SmallHeaderTextZeroTopMargin>
