@@ -66,7 +66,7 @@ export const PrimaryInput = styled(Input).attrs(() => ({
   }
   
   &:disabled {
-    background: ${({ theme }) => theme.colors.gray};
+    background: ${({ theme }) => theme.colors.gradients.gray};
 
     &:hover {
       cursor: default;
