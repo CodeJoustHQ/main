@@ -9,7 +9,7 @@ import {
 import { checkLocationState } from '../util/Utility';
 import { errorHandler } from '../api/Error';
 import PlayerResultsCard from '../components/card/PlayerResultsCard';
-import { PrimaryButton } from '../components/core/Button';
+import { PrimaryButton, SecondaryRedButton } from '../components/core/Button';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import {
@@ -18,6 +18,7 @@ import {
 import { User } from '../api/User';
 import { ThemeConfig } from '../components/config/Theme';
 import Podium from '../components/special/Podium';
+import { removeUser } from '../api/Room';
 
 const Content = styled.div`
   padding: 0;
@@ -118,6 +119,25 @@ function GameResultsPage() {
       });
   };
 
+  const leaveRoom = () => {
+    // eslint-disable-next-line no-alert
+    if (window.confirm('Are you sure you want to leave the room?')) {
+      if (currentUser && currentUser.userId) {
+        setLoading(true);
+        setError('');
+        removeUser(roomId, {
+          initiator: currentUser,
+          userToDelete: currentUser,
+        });
+        disconnect();
+      }
+
+      history.replace('/game/join', {
+        error: errorHandler('You left the game.'),
+      });
+    }
+  };
+
   return (
     <Content>
       { error ? <ErrorMessage message={error} /> : null }
@@ -129,18 +149,36 @@ function GameResultsPage() {
           place={2}
           player={players[1]}
           gameStartTime={startTime}
+          loading={loading}
         />
         <Podium
           place={1}
           player={players[0]}
           gameStartTime={startTime}
+          loading={loading}
         />
         <Podium
           place={3}
           player={players[2]}
           gameStartTime={startTime}
+          loading={loading}
         />
       </PodiumContainer>
+
+      <div>
+        <PrimaryButton
+          color={ThemeConfig.colors.gradients.blue}
+          onClick={callPlayAgain}
+          disabled={!currentUser || currentUser?.userId !== host?.userId}
+        >
+          Play Again
+        </PrimaryButton>
+        <SecondaryRedButton
+          onClick={leaveRoom}
+        >
+          Leave Room
+        </SecondaryRedButton>
+      </div>
 
       {players?.map((player, index) => (
         <PlayerResultsCard
@@ -156,6 +194,7 @@ function GameResultsPage() {
           <PrimaryButton
             color={ThemeConfig.colors.gradients.blue}
             onClick={callPlayAgain}
+            title="Only the host can perform this action."
           >
             Play Again
           </PrimaryButton>

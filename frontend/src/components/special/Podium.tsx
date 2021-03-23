@@ -8,6 +8,7 @@ type PodiumProps = {
   place: number,
   player: Player | undefined,
   gameStartTime: string,
+  loading: boolean,
 };
 
 type MedalProps = {
@@ -31,7 +32,7 @@ const PodiumContainer = styled.div<HeightProps>`
   width: 180px;
   height: ${({ height }) => height}px;
   padding: 10px;
-  margin: 10px;
+  margin: 5px 10px;
   background: ${({ theme }) => theme.colors.white};
   border-radius: 8px;
 `;
@@ -69,7 +70,9 @@ const Medal = styled.div<MedalProps>`
 `;
 
 function Podium(props: PodiumProps) {
-  const { place, player, gameStartTime } = props;
+  const {
+    place, player, gameStartTime, loading,
+  } = props;
 
   const [bestSubmission, setBestSubmission] = useState<Submission | null>(null);
 
@@ -108,7 +111,7 @@ function Podium(props: PodiumProps) {
 
   const getScoreText = () => {
     if (!bestSubmission) {
-      return <ScoreText />;
+      return <ScoreText>{loading ? 'Scoring...' : 'Invite'}</ScoreText>;
     }
 
     const percent = Math.round((bestSubmission.numCorrect / bestSubmission.numTestCases) * 100);
@@ -154,7 +157,7 @@ function Podium(props: PodiumProps) {
   return (
     <Content>
       <div>
-        <WinnerText>{player?.user.nickname || 'Invite'}</WinnerText>
+        <WinnerText>{player?.user.nickname || ''}</WinnerText>
         <PodiumContainer height={getPodiumHeight()}>
           <Medal color={getMedalColor()} />
           {getScoreText()}

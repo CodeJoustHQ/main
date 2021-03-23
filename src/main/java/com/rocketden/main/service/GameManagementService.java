@@ -108,6 +108,8 @@ public class GameManagementService {
             throw new ApiException(GameError.GAME_NOT_OVER);
         }
 
+        // TODO: use repository to get updated info if player leaves room
+
         Room room = game.getRoom();
         User initiator = UserMapper.toEntity(request.getInitiator());
         if (!room.getHost().equals(initiator)) {
