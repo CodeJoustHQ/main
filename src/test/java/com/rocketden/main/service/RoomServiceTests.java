@@ -57,6 +57,8 @@ public class RoomServiceTests {
     private static final String NICKNAME = "rocket";
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String NICKNAME_3 = "rocketandrocket";
+    private static final String NICKNAME_4 = "rocketrocketrocket";
+    private static final String NICKNAME_5 = "rocketandrocketrocket";
     private static final String SESSION_ID = "abcdef";
     private static final String SESSION_ID_2 = "ghijkl";
     private static final String ROOM_ID = "012345";
@@ -167,6 +169,44 @@ public class RoomServiceTests {
         verify(repository).findRoomByRoomId(ROOM_ID);
         assertEquals(RoomError.DUPLICATE_USERNAME, exception.getError());
     }
+
+    @Test
+    public void joinFullRoomFailure() {
+        /**
+         * Verify join room request fails when the room is already full
+         * Define five users, and add to the room
+         */
+        User firstUser = new User();
+        firstUser.setNickname(NICKNAME);
+        User secondUser = new User();
+        secondUser.setNickname(NICKNAME_2);
+        User thirdUser = new User();
+        thirdUser.setNickname(NICKNAME_3);
+        User fourthUser = new User();
+        fourthUser.setNickname(NICKNAME_4);
+        UserDto fifthUser = new UserDto();
+        fifthUser.setNickname(NICKNAME_5);
+
+        JoinRoomRequest request = new JoinRoomRequest();
+        request.setUser(fifthUser);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(firstUser);
+        room.addUser(firstUser);
+        
+        room.addUser(secondUser);
+        room.addUser(thirdUser);
+        room.addUser(fourthUser);
+
+        // Mock repository to return room when called
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.joinRoom(ROOM_ID, request));
+
+        verify(repository).findRoomByRoomId(ROOM_ID);
+        assertEquals(RoomError.ALREADY_FULL, exception.getError());
+    }
+
 
     @Test
     public void getRoomSuccess() {

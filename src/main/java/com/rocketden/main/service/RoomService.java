@@ -47,6 +47,10 @@ public class RoomService {
             throw new ApiException(RoomError.NOT_FOUND);
         }
 
+        if (room.isFull()) {
+            throw new ApiException(RoomError.ALREADY_FULL);
+        }
+
         // Get the user who initialized the request.
         User user = UserMapper.toEntity(request.getUser());
 

@@ -58,6 +58,8 @@ public class Room {
 
     private Integer numProblems = 1;
 
+    private Integer maxSize = 4;
+
     public void addUser(User user) {
         users.add(user);
         user.setRoom(this);
@@ -119,5 +121,15 @@ public class Room {
             }
         }
         return false;
+    }
+
+
+    /**
+     * Determine whether the room has already reached the maximum capacity.
+     * @return true if the number of users in the room is equal to or greater
+     * than the maximum size of the room
+     */
+    public boolean isFull() {
+        return users.size() >= maxSize;
     }
 }
