@@ -110,7 +110,7 @@ export const CenteredContainer = styled.div`
   justify-content: center;
 `;
 
-export const CircleBackgroundContainer = styled.div`
+export const DynamicWidthContainer = styled.div`
   position: relative;
   margin: 0 auto;
   width: 66.666%;

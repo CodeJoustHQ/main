@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ThemeConfig } from '../config/Theme';
 import { FloatingCircle, Coordinate } from '../special/FloatingCircle';
-import { MainContainer, CircleBackgroundContainer } from '../core/Container';
+import { MainContainer, DynamicWidthContainer } from '../core/Container';
 import { Header } from '../navigation/Header';
 
 const Content = styled.div`
@@ -33,9 +33,9 @@ function CircleBackgroundLayout({ children }: MyProps) {
     <Content>
       <Header />
       <MainContainer>
-        <CircleBackgroundContainer>
+        <DynamicWidthContainer>
           {children}
-        </CircleBackgroundContainer>
+        </DynamicWidthContainer>
         <div>
           <FloatingCircle
             color={ThemeConfig.colors.gradients.red}

@@ -6,6 +6,7 @@ type Dimensions = {
 };
 
 const Input = styled.input<Dimensions>`
+  font-family: ${({ theme }) => theme.font};
   box-sizing: border-box;
   border-radius: 0.25rem;
   border: 2px solid ${({ theme }) => theme.colors.blue};
@@ -39,7 +40,6 @@ export const LargeCenterInputText = styled(Input).attrs(() => ({
   height: ${({ height }) => height || '3rem'};
   text-align: center;
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
-  font-family: ${({ theme }) => theme.font};
   font-weight: normal;
   color: ${({ theme }) => theme.colors.text};
   padding: 1rem;
@@ -145,7 +145,6 @@ export const TextInput = styled(Input).attrs(() => ({
   margin: 0 0.5rem 0 0;
   width: 5rem;
   font-size: ${({ theme }) => theme.fontSize.default};
-  font-family: ${({ theme }) => theme.font};
   font-weight: 400;
   padding: 0.25rem 0.5rem;
   color: ${({ theme }) => theme.colors.text};

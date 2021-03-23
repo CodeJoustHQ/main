@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import ErrorMessage from './Error';
 import Loading from './Loading';
 import { LargeText, Text } from './Text';
@@ -10,6 +11,10 @@ type EnterNicknameProps = {
   enterNicknameHeaderText: string,
   enterNicknameAction: (nickname: string) => Promise<void>;
 }
+
+const Content = styled.div`
+  padding-top: 20px;
+`;
 
 export default function EnterNicknamePage(props: EnterNicknameProps) {
   // Grab props variables.
@@ -57,8 +62,7 @@ export default function EnterNicknamePage(props: EnterNicknameProps) {
   };
 
   return (
-    <div>
-      <br />
+    <Content>
       <LargeText>
         {enterNicknameHeaderText}
       </LargeText>
@@ -95,6 +99,6 @@ export default function EnterNicknamePage(props: EnterNicknameProps) {
       ) : null}
       { loading ? <Loading /> : null }
       { error ? <ErrorMessage message={error} /> : null }
-    </div>
+    </Content>
   );
 }

@@ -7,7 +7,7 @@ type Dimensions = {
   height?: string,
 };
 
-export const DefaultButton = styled.button<Dimensions>`
+export const DefaultButton = styled.button`
   border: none;
   border-radius: 0.25rem;
   margin: 1.2rem;
@@ -26,7 +26,7 @@ export const DefaultButton = styled.button<Dimensions>`
   }
 `;
 
-export const PrimaryButton = styled(DefaultButton)`
+export const PrimaryButton = styled(DefaultButton)<Dimensions>`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   background: ${({ theme }) => theme.colors.gradients.blue};
   color: ${({ theme }) => theme.colors.white};
