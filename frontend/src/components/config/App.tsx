@@ -25,7 +25,7 @@ function App() {
       <CustomRoute path="/game/join" component={JoinGamePage} layout={MainLayout} exact />
       <CustomRoute path="/game/create" component={CreateGamePage} layout={MainLayout} exact />
       <CustomRoute path="/game/lobby" component={LobbyPage} layout={MinimalLayout} exact />
-      <CustomRoute path="/game/results" component={GameResultsPage} layout={MainLayout} exact />
+      <CustomRoute path="/game/results" component={GameResultsPage} layout={MinimalLayout} exact />
       <CustomRoute path="/problems/all" component={AllProblemsPage} layout={MinimalLayout} exact />
       <CustomRoute path="/problem/create" component={CreateProblemPage} layout={MinimalLayout} exact />
       <CustomRoute path="/problem/:id" component={ProblemPage} layout={MinimalLayout} exact />

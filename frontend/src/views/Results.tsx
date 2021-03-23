@@ -23,6 +23,14 @@ const Content = styled.div`
   padding: 0;
 `;
 
+const PodiumContainer = styled.div`
+  //position: relative;
+  //display: flex;
+  ////justify-content: flex-end;
+  //flex-direction: column;
+  //justify-content: space-between;
+`;
+
 type LocationState = {
   roomId: string,
   currentUser: User,
@@ -119,15 +127,15 @@ function GameResultsPage() {
       { loading ? <Loading /> : null }
       <LargeText>Winners</LargeText>
 
-      <div>
-        <Podium
-          place={1}
-          player={players[0]}
-          gameStartTime={startTime}
-        />
+      <PodiumContainer>
         <Podium
           place={2}
           player={players[1]}
+          gameStartTime={startTime}
+        />
+        <Podium
+          place={1}
+          player={players[0]}
           gameStartTime={startTime}
         />
         <Podium
@@ -135,7 +143,7 @@ function GameResultsPage() {
           player={players[2]}
           gameStartTime={startTime}
         />
-      </div>
+      </PodiumContainer>
 
       {players?.map((player, index) => (
         <PlayerResultsCard
