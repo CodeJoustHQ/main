@@ -24,11 +24,8 @@ const Content = styled.div`
 `;
 
 const PodiumContainer = styled.div`
-  //position: relative;
-  //display: flex;
-  ////justify-content: flex-end;
-  //flex-direction: column;
-  //justify-content: space-between;
+  display: flex;
+  justify-content: center;
 `;
 
 type LocationState = {

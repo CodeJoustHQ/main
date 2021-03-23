@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Player, Submission } from '../../api/Game';
-import { SmallerMediumText, MediumText } from '../core/Text';
+import { Text, MediumText } from '../core/Text';
 import Language, { displayNameFromLanguage } from '../../api/Language';
-
-const totalPodiumHeight = 350;
 
 type PodiumProps = {
   place: number,
@@ -20,17 +18,17 @@ type HeightProps = {
   height: number,
 };
 
-const Content = styled.div<HeightProps>`
-  padding-top: ${({ height }) => (totalPodiumHeight - height) * 2}px;
-  display: inline-block;
-  justify-content: space-between;
+const Content = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 `;
 
 const PodiumContainer = styled.div<HeightProps>`
   position: relative;
   display: inline-block;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-  width: 200px;
+  width: 180px;
   height: ${({ height }) => height}px;
   padding: 10px;
   margin: 10px;
@@ -46,6 +44,10 @@ const WinnerText = styled(MediumText)`
 const ScoreText = styled(MediumText)`
   font-weight: normal;
   margin: 0;
+`;
+
+const SmallerText = styled(Text)`
+  margin: 5px 0;
 `;
 
 const BottomContent = styled.div`
@@ -96,17 +98,17 @@ function Podium(props: PodiumProps) {
   const getPodiumHeight = () => {
     switch (place) {
       case 1:
-        return 320;
-      case 2:
         return 280;
-      default:
+      case 2:
         return 240;
+      default:
+        return 200;
     }
   };
 
   const getScoreText = () => {
     if (!bestSubmission) {
-      return <ScoreText>N/A</ScoreText>;
+      return <ScoreText />;
     }
 
     const percent = Math.round((bestSubmission.numCorrect / bestSubmission.numTestCases) * 100);
@@ -120,7 +122,7 @@ function Podium(props: PodiumProps) {
 
   const getTimeText = () => {
     if (!bestSubmission) {
-      return <SmallerMediumText>N/A</SmallerMediumText>;
+      return <SmallerText />;
     }
 
     // Calculate time from start of game till best submission
@@ -129,28 +131,28 @@ function Podium(props: PodiumProps) {
     const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
 
     return (
-      <SmallerMediumText>
+      <SmallerText>
         in
         <b>{` ${diffMinutes} minutes`}</b>
-      </SmallerMediumText>
+      </SmallerText>
     );
   };
 
   const getLanguageText = () => {
     if (!bestSubmission) {
-      return <SmallerMediumText>Language: N/A</SmallerMediumText>;
+      return <SmallerText />;
     }
 
     return (
-      <SmallerMediumText>
+      <SmallerText>
         Language:
         <b>{` ${displayNameFromLanguage(bestSubmission.language as Language)}`}</b>
-      </SmallerMediumText>
+      </SmallerText>
     );
   };
 
   return (
-    <Content height={getPodiumHeight()}>
+    <Content>
       <div>
         <WinnerText>{player?.user.nickname || 'Invite'}</WinnerText>
         <PodiumContainer height={getPodiumHeight()}>
