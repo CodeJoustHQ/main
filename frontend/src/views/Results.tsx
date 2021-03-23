@@ -140,10 +140,7 @@ function GameResultsPage() {
 
   return (
     <Content>
-      { error ? <ErrorMessage message={error} /> : null }
-      { loading ? <Loading /> : null }
       <LargeText>Winners</LargeText>
-
       <PodiumContainer>
         <Podium
           place={2}
@@ -180,6 +177,10 @@ function GameResultsPage() {
         </SecondaryRedButton>
       </div>
 
+      { error ? <ErrorMessage message={error} /> : null }
+      { loading ? <Loading /> : null }
+
+      {/* TODO: convert to table */}
       {players?.map((player, index) => (
         <PlayerResultsCard
           player={player}
@@ -188,18 +189,6 @@ function GameResultsPage() {
           color={player.color}
         />
       ))}
-
-      {currentUser && currentUser?.userId === host?.userId
-        ? (
-          <PrimaryButton
-            color={ThemeConfig.colors.gradients.blue}
-            onClick={callPlayAgain}
-            title="Only the host can perform this action."
-          >
-            Play Again
-          </PrimaryButton>
-        )
-        : <Text>{!loading && 'Waiting for the host to choose whether to play again...'}</Text>}
     </Content>
   );
 }
