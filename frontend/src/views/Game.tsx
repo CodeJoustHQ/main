@@ -451,14 +451,14 @@ function GamePage() {
             primaryMinSize={20}
             secondaryMinSize={0}
           >
-            <LowPaddingPanel>
+            <NoPaddingPanel>
               <Editor
                 onCodeChange={setCurrentCode}
                 onLanguageChange={setCurrentLanguage}
                 codeMap={defaultCodeList[0]}
                 defaultLanguage={currentLanguage}
               />
-            </LowPaddingPanel>
+            </NoPaddingPanel>
 
             <Panel>
               <Console

@@ -38,11 +38,6 @@ export const TextLink = styled(Link)`
   text-decoration: none;
 `;
 
-export const GrayExternalLink = styled.a`
-  color: ${({ theme }) => theme.colors.gray};
-  text-decoration: underline;
-`;
-
 export const InlineExternalLink = styled.a`
   color: ${({ theme }) => theme.colors.blueLink};
 `;

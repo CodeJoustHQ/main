@@ -91,7 +91,7 @@ export const ConsoleTextArea = styled.textarea`
   white-space: pre;
   resize: both;
   
-  /* Hide scrollbar for Chrome, Safari and Opera */
+  /* Hide scrollbar for Chrome and Safari */
   &::-webkit-scrollbar {
     display: none;
   }
