@@ -479,7 +479,7 @@ function LobbyPage() {
         x={mousePosition.x}
         y={mousePosition.y}
       >
-        Only the host can start the game
+        Only the host can start the game and update settings
       </HoverTooltip>
       <CopyIndicatorContainer copied={copiedRoomLink}>
         <CopyIndicator onClick={() => setCopiedRoomLink(false)}>
