@@ -114,20 +114,42 @@ const HoverTooltip = styled.div.attrs((props: HoverTooltipType) => ({
 `;
 
 const HoverContainer = styled.div`
+  position: relative;
   padding: 0;
   display: inline-block;
+`;
+
+const HoverElement = styled.div`
+  position: absolute;
+  z-index: 1;
 `;
 
 const HoverContainerPrimaryButton = styled(HoverContainer)`
   margin: 1.2rem 0;
 `;
 
+const HoverElementPrimaryButton = styled(HoverElement)`
+  width: 10rem;
+  height: 2.75rem;
+`;
+
 const HoverContainerSmallDifficultyButton = styled(HoverContainer)`
   margin: 0.5rem 1rem 0 0;
 `;
 
+const HoverElementSmallDifficultyButton = styled(HoverElement)`
+  width: 5rem;
+  height: 2rem;
+`;
+
 const HoverContainerSlider = styled(HoverContainer)`
   margin: 0.5rem 0;
+`;
+
+const HoverElementSlider = styled(HoverElement)`
+  max-width: 370px;
+  width: 100%;
+  height: 20px;
 `;
 
 function LobbyPage() {
@@ -459,13 +481,6 @@ function LobbyPage() {
       >
         Only the host can start the game
       </HoverTooltip>
-      <HoverTooltip
-        visible
-        x={400}
-        y={400}
-      >
-        This is a test.
-      </HoverTooltip>
       <CopyIndicatorContainer copied={copiedRoomLink}>
         <CopyIndicator onClick={() => setCopiedRoomLink(false)}>
           Link copied!&nbsp;&nbsp;✕
@@ -493,18 +508,19 @@ function LobbyPage() {
           with Room ID:
         </SecondaryHeaderText>
         <IdContainer id={currentRoomId} />
-        <HoverContainerPrimaryButton
-          onMouseEnter={() => {
-            if (!isHost(currentUser)) {
-              setHoverVisible(true);
-            }
-          }}
-          onMouseLeave={() => {
-            if (!isHost(currentUser)) {
-              setHoverVisible(false);
-            }
-          }}
-        >
+        <HoverContainerPrimaryButton>
+          <HoverElementPrimaryButton
+            onMouseEnter={() => {
+              if (!isHost(currentUser)) {
+                setHoverVisible(true);
+              }
+            }}
+            onMouseLeave={() => {
+              if (!isHost(currentUser)) {
+                setHoverVisible(false);
+              }
+            }}
+          />
           <PrimaryButtonNoMargin
             onClick={handleStartGame}
             disabled={loading || !isHost(currentUser)}
@@ -545,18 +561,19 @@ function LobbyPage() {
               {Object.keys(Difficulty).map((key) => {
                 const difficultyKey: Difficulty = Difficulty[key as keyof typeof Difficulty];
                 return (
-                  <HoverContainerSmallDifficultyButton
-                    onMouseEnter={() => {
-                      if (!isHost(currentUser)) {
-                        setHoverVisible(true);
-                      }
-                    }}
-                    onMouseLeave={() => {
-                      if (!isHost(currentUser)) {
-                        setHoverVisible(false);
-                      }
-                    }}
-                  >
+                  <HoverContainerSmallDifficultyButton>
+                    <HoverElementSmallDifficultyButton
+                      onMouseEnter={() => {
+                        if (!isHost(currentUser)) {
+                          setHoverVisible(true);
+                        }
+                      }}
+                      onMouseLeave={() => {
+                        if (!isHost(currentUser)) {
+                          setHoverVisible(false);
+                        }
+                      }}
+                    />
                     <SmallDifficultyButtonNoMargin
                       difficulty={difficultyKey}
                       onClick={() => updateDifficultySetting(key)}
@@ -575,18 +592,19 @@ function LobbyPage() {
             <NoMarginSubtitleText>
               {`${duration} minutes`}
             </NoMarginSubtitleText>
-            <HoverContainerSlider
-              onMouseEnter={() => {
-                if (!isHost(currentUser)) {
-                  setHoverVisible(true);
-                }
-              }}
-              onMouseLeave={() => {
-                if (!isHost(currentUser)) {
-                  setHoverVisible(false);
-                }
-              }}
-            >
+            <HoverContainerSlider>
+              <HoverElementSlider
+                onMouseEnter={() => {
+                  if (!isHost(currentUser)) {
+                    setHoverVisible(true);
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (!isHost(currentUser)) {
+                    setHoverVisible(false);
+                  }
+                }}
+              />
               <SliderContainer>
                 <Slider
                   min={1}
