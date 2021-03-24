@@ -32,13 +32,21 @@ export const SmallHeaderText = styled.p`
   margin: 10px 0;
 `;
 
+export const NoMarginSubtitleText = styled.p`
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  margin: 0;
+`;
+
 export const MediumText = styled.h5`
   font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
 `;
 
-export const LowMarginMediumText = styled.h5`
-  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+export const LowMarginMediumText = styled(MediumText)`
   margin: 1rem 0;
+`;
+
+export const NoMarginMediumText = styled(MediumText)`
+  margin: 0;
 `;
 
 export const LargeText = styled.h3`
@@ -51,8 +59,13 @@ export const LandingHeaderTitle = styled.h1`
   font-weight: 700;
 `;
 
-export const LandingHeaderText = styled.h1`
+export const MainHeaderText = styled.h1`
   font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+  font-weight: 400;
+`;
+
+export const SecondaryHeaderText = styled.h1`
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   font-weight: 400;
 `;
 
@@ -68,7 +81,13 @@ export const ContactHeaderText = styled.h1`
   font-weight: 400;
 `;
 
-export const UserNicknameText = styled(LargeText)`
+type NicknameType = {
+  me: boolean,
+};
+
+export const UserNicknameText = styled(Text)<NicknameType>`
+  font-size: ${({ theme }) => theme.fontSize.large};
+  font-weight: ${({ me }) => (me ? 700 : 400)};
   margin: 0;
 `;
 
@@ -77,11 +96,15 @@ export const ProblemHeaderText = styled.h2`
   color: ${({ theme }) => theme.colors.darkText};
 `;
 
+export const SmallActionHeaderText = styled.p`
+  display: inline-block;
+  font-size: ${({ theme }) => theme.fontSize.medium};
+  margin: 0;
+`;
+
 export const SmallActionText = styled.p`
-  font-size: ${({ theme }) => theme.fontSize.mediumSmall};
-  display: inline;
-  margin: 1px 4px;
-  padding: 2px 4px;
+  font-size: ${({ theme }) => theme.fontSize.medium};
+  margin: 2px 0px;
 
   &:hover {
     cursor: pointer;

@@ -1,25 +1,43 @@
 import React from 'react';
 import styled from 'styled-components';
-import { SmallActionText } from '../core/Text';
+import { SmallActionHeaderText, SmallActionText } from '../core/Text';
 import { User } from '../../api/User';
 
-const Content = styled.div`
+type PlayerIconType = {
+  isActive: boolean,
+};
+
+const Content = styled.div<PlayerIconType>`
   // Center div above parent
   position: absolute;
-  top: 0;
+  top: 55px;
   left: 50%;
   transform: translate(-50%, 0);
   
-  width: 150px;
+  width: 120px;
   background-color: ${({ theme }) => theme.colors.white};
-  border-radius: 5px 5px 0 0;
+  border-radius: 0.5rem;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   
-  height: 20px;
+  height: ${({ isActive }) => (isActive ? '90px' : '65px')};
   padding: 8px;
-  
-  // -(height + 2 * padding - 3px)
-  margin-top: -36px;
+
+  z-index: 2;
+  text-align: center;
+`;
+
+const ActionCardActiveIcon = styled.div<PlayerIconType>`
+  display: inline-block;
+  margin-right: 5px;
+  background: ${({ theme, isActive }) => (isActive ? theme.colors.gradients.green : theme.colors.gradients.red)};
+  border-radius: 0.5rem;
+  height: 0.5rem;
+  width: 0.5rem;
+`;
+
+const ActionCardSeparator = styled.hr`
+  border: none;
+  border-top: 1px solid ${({ theme }) => theme.colors.text};
 `;
 
 type HostActionCardProps = {
@@ -35,7 +53,10 @@ function HostActionCard(props: HostActionCardProps) {
   } = props;
 
   return (
-    <Content>
+    <Content isActive={userIsActive}>
+      <ActionCardActiveIcon isActive={userIsActive} />
+      <SmallActionHeaderText>{userIsActive ? 'active' : 'inactive'}</SmallActionHeaderText>
+      <ActionCardSeparator />
       {
         // Only show the make host button if user is active
         userIsActive

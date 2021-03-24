@@ -1,7 +1,7 @@
 import React from 'react';
-import { Route } from 'react-router-dom';
+import { Redirect, Route } from 'react-router-dom';
 
-function CustomRoute(props: any) {
+export function CustomRoute(props: any) {
   const { component: Component, layout: Layout, ...rest } = props;
   return (
     <Route
@@ -15,4 +15,11 @@ function CustomRoute(props: any) {
   );
 }
 
-export default CustomRoute;
+// Redirect preserving the query string.
+export function CustomRedirect(props: any) {
+  const { to, from, location } = props;
+  const newTo: string = `${to}${location.search}`;
+  return (
+    <Redirect to={newTo} from={from} />
+  );
+}

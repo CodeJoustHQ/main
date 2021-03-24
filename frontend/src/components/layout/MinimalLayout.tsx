@@ -14,7 +14,7 @@ type MyProps = {
   children: React.ReactNode,
 }
 
-function ProblemLayout({ children }: MyProps) {
+function MinimalLayout({ children }: MyProps) {
   return (
     <Content>
       <MinimalHeader />
@@ -25,4 +25,4 @@ function ProblemLayout({ children }: MyProps) {
   );
 }
 
-export default ProblemLayout;
+export default MinimalLayout;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ThemeConfig } from '../components/config/Theme';
 import { PrimaryButtonLink, TextLink } from '../components/core/Link';
-import { LandingHeaderText, LandingHeaderTitle } from '../components/core/Text';
+import { MainHeaderText, LandingHeaderTitle } from '../components/core/Text';
 
 function LandingPage() {
   return (
@@ -9,9 +9,9 @@ function LandingPage() {
       <LandingHeaderTitle>
         CodeJoust
       </LandingHeaderTitle>
-      <LandingHeaderText>
+      <MainHeaderText>
         Compete live against friends and classmates to solve coding challenges.
-      </LandingHeaderText>
+      </MainHeaderText>
       <PrimaryButtonLink
         color={ThemeConfig.colors.gradients.blue}
         to="/game/create"
