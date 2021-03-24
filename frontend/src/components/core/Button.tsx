@@ -101,6 +101,10 @@ export const SmallDifficultyButton = styled(DefaultButton)<DifficultyProps>`
   }
 `;
 
+export const SmallDifficultyButtonNoMargin = styled(SmallDifficultyButton)`
+  margin: 0;
+`;
+
 export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   background: ${({ active, difficulty, theme }) => (active ? difficultyToColor[difficulty].background : theme.colors.white)};

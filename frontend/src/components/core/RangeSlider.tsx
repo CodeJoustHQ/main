@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const SliderContainer = styled.div`
   width: 100%;
-  margin: 0.5rem 0;
+  margin: 0;
 `;
 
 type SliderRange = {
