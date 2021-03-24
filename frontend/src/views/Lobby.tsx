@@ -524,7 +524,6 @@ function LobbyPage() {
           <PrimaryButtonNoMargin
             onClick={handleStartGame}
             disabled={loading || !isHost(currentUser)}
-            title={!isHost(currentUser) ? 'Only the host can start the game' : undefined}
           >
             Start Game
           </PrimaryButtonNoMargin>
@@ -580,7 +579,6 @@ function LobbyPage() {
                       active={difficulty === difficultyKey}
                       enabled={isHost(currentUser)}
                       disabled={!isHost(currentUser)}
-                      title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
                     >
                       {key}
                     </SmallDifficultyButtonNoMargin>
@@ -611,7 +609,6 @@ function LobbyPage() {
                   max={60}
                   value={duration}
                   disabled={!isHost(currentUser)}
-                  title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
                   onChange={(e) => {
                     const { value } = e.target;
 
