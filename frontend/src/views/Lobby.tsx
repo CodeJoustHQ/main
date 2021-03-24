@@ -124,13 +124,21 @@ const HoverContainer = styled.div`
   display: inline-block;
 `;
 
-const HoverElement = styled.div`
+type HoverElementDisplay = {
+  enabled: boolean,
+}
+
+const HoverElement = styled.div.attrs((props: HoverElementDisplay) => ({
+  style: {
+    display: `${props.enabled ? 'none' : 'block'}`,
+  },
+}))<HoverElementDisplay>`
   position: absolute;
   z-index: 1;
 `;
 
 const HoverContainerPrimaryButton = styled(HoverContainer)`
-  margin: 1.2rem 0;
+  margin: 1.2rem 1.2rem 1.2rem 0;
 `;
 
 const HoverElementPrimaryButton = styled(HoverElement)`
@@ -148,6 +156,7 @@ const HoverElementSmallDifficultyButton = styled(HoverElement)`
 `;
 
 const HoverContainerSlider = styled(HoverContainer)`
+  width: 100%;
   margin: 0.5rem 0;
 `;
 
@@ -561,6 +570,7 @@ function LobbyPage() {
         <IdContainer id={currentRoomId} />
         <HoverContainerPrimaryButton>
           <HoverElementPrimaryButton
+            enabled={isHost(currentUser)}
             onMouseEnter={() => {
               if (!isHost(currentUser)) {
                 setHoverVisible(true);
@@ -575,7 +585,6 @@ function LobbyPage() {
           <PrimaryButtonNoMargin
             onClick={handleStartGame}
             disabled={loading || !isHost(currentUser)}
-            title={!isHost(currentUser) ? 'Only the host can start the game' : undefined}
           >
             Start Game
           </PrimaryButtonNoMargin>
@@ -625,6 +634,7 @@ function LobbyPage() {
                 return (
                   <HoverContainerSmallDifficultyButton>
                     <HoverElementSmallDifficultyButton
+                      enabled={isHost(currentUser)}
                       onMouseEnter={() => {
                         if (!isHost(currentUser)) {
                           setHoverVisible(true);
@@ -642,7 +652,6 @@ function LobbyPage() {
                       active={difficulty === difficultyKey}
                       enabled={isHost(currentUser)}
                       disabled={!isHost(currentUser)}
-                      title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
                     >
                       {key}
                     </SmallDifficultyButtonNoMargin>
@@ -656,6 +665,7 @@ function LobbyPage() {
             </NoMarginSubtitleText>
             <HoverContainerSlider>
               <HoverElementSlider
+                enabled={isHost(currentUser)}
                 onMouseEnter={() => {
                   if (!isHost(currentUser)) {
                     setHoverVisible(true);
@@ -673,7 +683,6 @@ function LobbyPage() {
                   max={60}
                   value={duration}
                   disabled={!isHost(currentUser)}
-                  title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
                   onChange={(e) => {
                     const { value } = e.target;
 
