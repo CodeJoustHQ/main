@@ -119,13 +119,21 @@ const HoverContainer = styled.div`
   display: inline-block;
 `;
 
-const HoverElement = styled.div`
+type HoverElementDisplay = {
+  enabled: boolean,
+}
+
+const HoverElement = styled.div.attrs((props: HoverElementDisplay) => ({
+  style: {
+    display: `${props.enabled ? 'none' : 'block'}`,
+  },
+}))<HoverElementDisplay>`
   position: absolute;
   z-index: 1;
 `;
 
 const HoverContainerPrimaryButton = styled(HoverContainer)`
-  margin: 1.2rem 0;
+  margin: 1.2rem 1.2rem 1.2rem 0;
 `;
 
 const HoverElementPrimaryButton = styled(HoverElement)`
@@ -510,6 +518,7 @@ function LobbyPage() {
         <IdContainer id={currentRoomId} />
         <HoverContainerPrimaryButton>
           <HoverElementPrimaryButton
+            enabled={!isHost(currentUser)}
             onMouseEnter={() => {
               if (!isHost(currentUser)) {
                 setHoverVisible(true);
@@ -562,6 +571,7 @@ function LobbyPage() {
                 return (
                   <HoverContainerSmallDifficultyButton>
                     <HoverElementSmallDifficultyButton
+                      enabled={!isHost(currentUser)}
                       onMouseEnter={() => {
                         if (!isHost(currentUser)) {
                           setHoverVisible(true);
@@ -592,6 +602,7 @@ function LobbyPage() {
             </NoMarginSubtitleText>
             <HoverContainerSlider>
               <HoverElementSlider
+                enabled={!isHost(currentUser)}
                 onMouseEnter={() => {
                   if (!isHost(currentUser)) {
                     setHoverVisible(true);
