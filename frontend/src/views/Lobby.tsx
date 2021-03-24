@@ -151,6 +151,7 @@ const HoverElementSmallDifficultyButton = styled(HoverElement)`
 `;
 
 const HoverContainerSlider = styled(HoverContainer)`
+  width: 100%;
   margin: 0.5rem 0;
 `;
 
@@ -518,7 +519,7 @@ function LobbyPage() {
         <IdContainer id={currentRoomId} />
         <HoverContainerPrimaryButton>
           <HoverElementPrimaryButton
-            enabled={!isHost(currentUser)}
+            enabled={isHost(currentUser)}
             onMouseEnter={() => {
               if (!isHost(currentUser)) {
                 setHoverVisible(true);
@@ -571,7 +572,7 @@ function LobbyPage() {
                 return (
                   <HoverContainerSmallDifficultyButton>
                     <HoverElementSmallDifficultyButton
-                      enabled={!isHost(currentUser)}
+                      enabled={isHost(currentUser)}
                       onMouseEnter={() => {
                         if (!isHost(currentUser)) {
                           setHoverVisible(true);
@@ -602,7 +603,7 @@ function LobbyPage() {
             </NoMarginSubtitleText>
             <HoverContainerSlider>
               <HoverElementSlider
-                enabled={!isHost(currentUser)}
+                enabled={isHost(currentUser)}
                 onMouseEnter={() => {
                   if (!isHost(currentUser)) {
                     setHoverVisible(true);
