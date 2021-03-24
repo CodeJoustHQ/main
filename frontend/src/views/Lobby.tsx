@@ -34,6 +34,7 @@ import {
 import IdContainer from '../components/special/IdContainer';
 import { FlexBareContainer } from '../components/core/Container';
 import { Slider, SliderContainer } from '../components/core/RangeSlider';
+import { Coordinate } from '../components/special/FloatingCircle';
 
 type LobbyPageLocation = {
   user: User,
@@ -54,8 +55,8 @@ const HeaderContainer = styled.div`
   }
 `;
 
-const PrimaryButtonZeroLeftMargin = styled(PrimaryButton)`
-  margin-left: 0;
+const PrimaryButtonNoMargin = styled(PrimaryButton)`
+  margin: 0;
 `;
 
 const FlexBareContainerLeft = styled(FlexBareContainer)`
@@ -89,6 +90,35 @@ const DifficultyContainer = styled.div`
   margin-bottom: 10px;
 `;
 
+type HoverTooltipType = {
+  x: number,
+  y: number,
+  visible: boolean,
+}
+
+const HoverTooltip = styled.div.attrs((props: HoverTooltipType) => ({
+  style: {
+    display: `${props.visible ? 'block' : 'none'}`,
+    transform: `translate(${props.x + 2}px, ${props.y + 2}px)`,
+  },
+}))<HoverTooltipType>`
+  z-index: 3;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  background: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.white};
+  font-size: ${({ theme }) => theme.fontSize.medium};
+  position: absolute;
+  top: 0;
+  left: 0;
+`;
+
+const HoverContainer = styled.div`
+  margin: 1.2rem 0;
+  padding: 0;
+  display: inline-block;
+`;
+
 function LobbyPage() {
   // Get history object to be able to move between different pages
   const history = useHistory();
@@ -106,6 +136,8 @@ function LobbyPage() {
   const [active, setActive] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [duration, setDuration] = useState<number | undefined>(15);
+  const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
+  const [hoverVisible, setHoverVisible] = useState<boolean>(false);
 
   // Hold error text.
   const [error, setError] = useState('');
@@ -353,6 +385,15 @@ function LobbyPage() {
     });
   }, [currentUser, conditionallyBootKickedUser]);
 
+  // Get current mouse position.
+  const mouseMoveHandler = useCallback((e: MouseEvent) => {
+    setMousePosition({ x: e.clientX, y: e.clientY });
+  }, [setMousePosition]);
+
+  useEffect(() => {
+    window.onmousemove = mouseMoveHandler;
+  }, [mouseMoveHandler]);
+
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
     // Grab the user and room information; otherwise, redirect to the join page
@@ -400,6 +441,20 @@ function LobbyPage() {
   // Render the lobby.
   return (
     <>
+      <HoverTooltip
+        visible={hoverVisible}
+        x={mousePosition.x}
+        y={mousePosition.y}
+      >
+        Only the host can start the game
+      </HoverTooltip>
+      <HoverTooltip
+        visible
+        x={400}
+        y={400}
+      >
+        This is a test.
+      </HoverTooltip>
       <CopyIndicatorContainer copied={copiedRoomLink}>
         <CopyIndicator onClick={() => setCopiedRoomLink(false)}>
           Link copied!&nbsp;&nbsp;✕
@@ -427,13 +482,27 @@ function LobbyPage() {
           with Room ID:
         </SecondaryHeaderText>
         <IdContainer id={currentRoomId} />
-        <PrimaryButtonZeroLeftMargin
-          onClick={handleStartGame}
-          disabled={loading || !isHost(currentUser)}
-          title={!isHost(currentUser) ? 'Only the host can start the game' : undefined}
+        <HoverContainer
+          onMouseEnter={() => {
+            if (!isHost(currentUser)) {
+              setHoverVisible(true);
+            }
+          }}
+          onMouseLeave={() => {
+            if (!isHost(currentUser)) {
+              setHoverVisible(false);
+            }
+          }}
         >
-          Start Game
-        </PrimaryButtonZeroLeftMargin>
+          <PrimaryButtonNoMargin
+            onClick={handleStartGame}
+            disabled={loading || !isHost(currentUser)}
+            title={!isHost(currentUser) ? 'Only the host can start the game' : undefined}
+          >
+            Start Game
+          </PrimaryButtonNoMargin>
+        </HoverContainer>
+
       </HeaderContainer>
 
       <FlexBareContainerLeft>
@@ -472,6 +541,16 @@ function LobbyPage() {
                     enabled={isHost(currentUser)}
                     disabled={!isHost(currentUser)}
                     title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
+                    onMouseEnter={() => {
+                      if (!isHost(currentUser)) {
+                        setHoverVisible(true);
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      if (!isHost(currentUser)) {
+                        setHoverVisible(false);
+                      }
+                    }}
                   >
                     {key}
                   </SmallDifficultyButton>
@@ -489,6 +568,16 @@ function LobbyPage() {
                 value={duration}
                 disabled={!isHost(currentUser)}
                 title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
+                onMouseEnter={() => {
+                  if (!isHost(currentUser)) {
+                    setHoverVisible(true);
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (!isHost(currentUser)) {
+                    setHoverVisible(false);
+                  }
+                }}
                 onChange={(e) => {
                   const { value } = e.target;
 
