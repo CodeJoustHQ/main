@@ -6,7 +6,7 @@ import copy from 'copy-to-clipboard';
 import ErrorMessage from '../components/core/Error';
 import {
   NoMarginMediumText,
-  MainHeaderText,
+  SecondaryHeaderText,
   SmallHeaderText,
   NoMarginSubtitleText,
 } from '../components/core/Text';
@@ -41,6 +41,7 @@ type LobbyPageLocation = {
 };
 
 const HeaderContainer = styled.div`
+  max-width: 500px;
   text-align: left;
   width: 66%;
   margin: 2rem auto 0;
@@ -62,12 +63,12 @@ const FlexBareContainerLeft = styled(FlexBareContainer)`
 `;
 
 const PlayersContainer = styled.div`
-  flex: 6;
+  flex: 1;
   padding-right: 5px;
 `;
 
 const RoomSettingsContainer = styled.div`
-  flex: 4;
+  flex: 1;
   padding-left: 5px;
 `;
 
@@ -76,7 +77,7 @@ const LobbyContainerTitle = styled(SmallHeaderText)`
 `;
 
 const BackgroundContainer = styled.div`
-  height: 12rem;
+  height: 16rem;
   background: ${({ theme }) => theme.colors.white};
   padding: 1rem;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
@@ -405,7 +406,7 @@ function LobbyPage() {
         </CopyIndicator>
       </CopyIndicatorContainer>
       <HeaderContainer>
-        <MainHeaderText>
+        <SecondaryHeaderText>
           Join with the link
           {' '}
           <InlineBackgroundCopyText
@@ -424,7 +425,7 @@ function LobbyPage() {
           <i>codejoust.co/play</i>
           {' '}
           with Room ID:
-        </MainHeaderText>
+        </SecondaryHeaderText>
         <IdContainer id={currentRoomId} />
         <PrimaryButtonZeroLeftMargin
           onClick={handleStartGame}

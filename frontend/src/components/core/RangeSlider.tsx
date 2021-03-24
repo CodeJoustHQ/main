@@ -15,6 +15,7 @@ export const Slider = styled.input.attrs((props: SliderRange) => ({
   value: props.value,
 }))<SliderRange>`
   -webkit-appearance: none;
+  max-width: 370px;
   width: 100%;
   height: 15px;
   border-radius: 5px;

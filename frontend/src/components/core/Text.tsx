@@ -64,6 +64,11 @@ export const MainHeaderText = styled.h1`
   font-weight: 400;
 `;
 
+export const SecondaryHeaderText = styled.h1`
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  font-weight: 400;
+`;
+
 export const ContactHeaderTitle = styled.h1`
   font-size: ${({ theme }) => theme.fontSize.xLarge};
   color: ${({ theme }) => theme.colors.darkText};

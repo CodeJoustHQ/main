@@ -7,7 +7,7 @@ const NumberContainer = styled.div`
   padding: 0.5rem 1rem;
   margin: 0 1rem 0 0;
   background: ${({ theme }) => theme.colors.white};
-  font-size: ${({ theme }) => theme.fontSize.xxLarge};
+  font-size: ${({ theme }) => theme.fontSize.xLarge};
   font-weight: 700;
   border-radius: 0.5rem;
 `;
