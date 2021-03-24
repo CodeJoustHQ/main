@@ -393,12 +393,12 @@ function LobbyPage() {
         });
         disconnect();
       }
-    }
 
-    // Redirect user regardless of POST request success.
-    history.replace('/game/join', {
-      error: errorHandler('You left the room.'),
-    });
+      // Redirect user regardless of POST request success.
+      history.replace('/game/join', {
+        error: errorHandler('You left the room.'),
+      });
+    }
   };
 
   // Grab the nickname variable and add the user to the lobby.
