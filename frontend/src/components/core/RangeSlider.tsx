@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const SliderContainer = styled.div`
   width: 100%;
-  margin: 0.5rem 0;
+  margin: 0;
 `;
 
 type SliderRange = {
@@ -15,10 +15,11 @@ export const Slider = styled.input.attrs((props: SliderRange) => ({
   value: props.value,
 }))<SliderRange>`
   -webkit-appearance: none;
+  max-width: 370px;
   width: 100%;
   height: 15px;
   border-radius: 5px;
-  background: #B7D4FF;
+  background: ${({ theme }) => theme.colors.sliderBlue};
   outline: none;
   opacity: 0.7;
   -webkit-transition: .2s;
@@ -34,7 +35,7 @@ export const Slider = styled.input.attrs((props: SliderRange) => ({
     width: 25px;
     height: 25px;
     border-radius: 10px;
-    background: linear-gradient(180deg, #133ED7 0%, #90BDFF 100%);
+    background: ${({ theme }) => theme.colors.gradients.blue};
     cursor: pointer;
   }
 
@@ -42,7 +43,7 @@ export const Slider = styled.input.attrs((props: SliderRange) => ({
     width: 25px;
     height: 25px;
     border-radius: 10px;
-    background: linear-gradient(180deg, #133ED7 0%, #90BDFF 100%);
+    background: ${({ theme }) => theme.colors.gradients.blue};
     cursor: pointer;
   }
 

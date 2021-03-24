@@ -36,7 +36,8 @@ export const InlineCopyText = styled(ContactHeaderText)`
 export const InlineBackgroundCopyText = styled(ContactHeaderText)`
   display: inline-block;
   margin: 0;
-  padding: 0.25rem 1rem;
+  padding: 0.25rem 0.5rem;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   background: ${({ theme }) => theme.colors.text};
   color: ${({ theme }) => theme.colors.white};
   border-radius: 0.5rem;
@@ -46,5 +47,6 @@ export const InlineBackgroundCopyText = styled(ContactHeaderText)`
 export const InlineCopyIcon = styled.i.attrs(() => ({
   className: 'material-icons',
 }))`
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   margin-left: 5px;
 `;
