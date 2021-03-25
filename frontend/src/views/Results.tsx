@@ -9,7 +9,6 @@ import {
 } from '../api/Game';
 import { checkLocationState, leaveRoom } from '../util/Utility';
 import { errorHandler } from '../api/Error';
-import PlayerResultsCard from '../components/card/PlayerResultsCard';
 import { PrimaryButton, SecondaryRedButton } from '../components/core/Button';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
@@ -25,6 +24,7 @@ import {
   CopyIndicatorContainer,
   InlineCopyIcon,
 } from '../components/special/CopyIndicator';
+import ResultsTable from '../components/results/ResultsTable';
 
 const Content = styled.div`
   padding: 0;
@@ -251,15 +251,7 @@ function GameResultsPage() {
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
 
-      {/* TODO: convert to table */}
-      {players?.map((player, index) => (
-        <PlayerResultsCard
-          player={player}
-          place={index + 1}
-          isCurrentPlayer={currentUser?.userId === player.user.userId}
-          color={player.color}
-        />
-      ))}
+      {players ? <ResultsTable players={players} currentUser={currentUser} /> : null}
     </Content>
   );
 }

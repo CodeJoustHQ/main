@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
-import PlayerIcon from './PlayerIcon';
+import PlayerIcon from '../card/PlayerIcon';
 import {
   CenteredContainer, FlexHorizontalContainer, FlexLeft, FlexRight,
 } from '../core/Container';
@@ -23,7 +23,7 @@ type PlayerResultsCardProps = {
   color: Color,
 };
 
-function PlayerResultsCard(props: PlayerResultsCardProps) {
+function PlayerResultsItem(props: PlayerResultsCardProps) {
   const {
     player, place, isCurrentPlayer, color,
   } = props;
@@ -70,4 +70,4 @@ function PlayerResultsCard(props: PlayerResultsCardProps) {
   );
 }
 
-export default PlayerResultsCard;
+export default PlayerResultsItem;
