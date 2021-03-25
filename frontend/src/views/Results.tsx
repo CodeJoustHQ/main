@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
@@ -19,6 +19,8 @@ import { User } from '../api/User';
 import { ThemeConfig } from '../components/config/Theme';
 import Podium from '../components/special/Podium';
 import { removeUser } from '../api/Room';
+import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
+import { Coordinate } from '../components/special/FloatingCircle';
 
 const Content = styled.div`
   padding: 0;
@@ -46,6 +48,9 @@ function GameResultsPage() {
   const [host, setHost] = useState<User | null>(null);
   const [startTime, setStartTime] = useState<string>('');
   const [roomId, setRoomId] = useState('');
+
+  const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
+  const [hoverVisible, setHoverVisible] = useState<boolean>(false);
 
   useEffect(() => {
     if (checkLocationState(location, 'roomId', 'currentUser')) {
@@ -138,8 +143,17 @@ function GameResultsPage() {
     }
   };
 
+  const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
+
   return (
     <Content>
+      <HoverTooltip
+        visible={hoverVisible}
+        x={mousePosition.x}
+        y={mousePosition.y}
+      >
+        Only the host can start the game and update settings
+      </HoverTooltip>
       <LargeText>Winners</LargeText>
       <PodiumContainer>
         <Podium
@@ -163,13 +177,23 @@ function GameResultsPage() {
       </PodiumContainer>
 
       <div>
-        <PrimaryButton
-          color={ThemeConfig.colors.gradients.blue}
-          onClick={callPlayAgain}
-          disabled={!currentUser || currentUser?.userId !== host?.userId}
-        >
-          Play Again
-        </PrimaryButton>
+        <HoverContainer>
+          <HoverElement
+            onClick={callPlayAgain}
+            enabled={isHost(currentUser)}
+            onMouseEnter={() => {
+              if (!isHost(currentUser)) {
+                setHoverVisible(true);
+              }
+            }}
+            onMouseLeave={() => {
+              if (!isHost(currentUser)) {
+                setHoverVisible(false);
+              }
+            }}
+          />
+        </HoverContainer>
+
         <SecondaryRedButton
           onClick={leaveRoom}
         >
