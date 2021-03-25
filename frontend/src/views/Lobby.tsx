@@ -16,7 +16,12 @@ import {
 import { User } from '../api/User';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
 import { Difficulty } from '../api/Difficulty';
-import { PrimaryButton, SmallDifficultyButtonNoMargin } from '../components/core/Button';
+import {
+  PrimaryButton,
+  SmallDifficultyButtonNoMargin,
+  InlineRefreshIcon,
+  SecondaryRedButton,
+} from '../components/core/Button';
 import Loading from '../components/core/Loading';
 import PlayerCard from '../components/card/PlayerCard';
 import HostActionCard from '../components/card/HostActionCard';
@@ -204,6 +209,7 @@ function LobbyPage() {
           userIncluded = true;
         }
       });
+
       // If user is no longer present in room, boot the user.
       if (!userIncluded) {
         disconnect().then(() => {
@@ -373,18 +379,63 @@ function LobbyPage() {
       conditionallyBootKickedUser(room, currentUser);
     };
 
+    setLoading(true);
     connect(roomId, userId).then(() => {
       // Body encrypt through JSON.
       subscribe(routes(roomId).subscribe_lobby, subscribeCallback).then((subscriptionParam) => {
         setSubscription(subscriptionParam);
         setSocketConnected(true);
+        setError('');
+        setLoading(false);
       }).catch((err) => {
         setError(err.message);
+        setLoading(false);
       });
     }).catch((err) => {
       setError(err.message);
+      setLoading(false);
     });
   }, [currentUser, conditionallyBootKickedUser]);
+
+  const refreshRoomDetails = () => {
+    // Call GET endpoint to get latest room info
+    if (!loading) {
+      setLoading(true);
+      getRoom(location.state.roomId)
+        .then((res) => {
+          setStateFromRoom(res);
+
+          // Boot the user from the room, if they are not present.
+          updateCurrentUserDetails(res.users);
+
+          // Attempt to connect the user to the socket.
+          if (currentUser && currentUser.userId) {
+            connectUserToRoom(res.roomId, currentUser.userId);
+          }
+        })
+        .catch((err) => setError(err));
+    }
+  };
+
+  const leaveRoom = () => {
+    // eslint-disable-next-line no-alert
+    if (window.confirm('Are you sure you want to leave the room?')) {
+      if (currentUser && currentUser.userId) {
+        setLoading(true);
+        setError('');
+        removeUser(currentRoomId, {
+          initiator: currentUser,
+          userToDelete: currentUser,
+        });
+        disconnect();
+      }
+
+      // Redirect user regardless of POST request success.
+      history.replace('/game/join', {
+        error: errorHandler('You left the room.'),
+      });
+    }
+  };
 
   // Get current mouse position.
   const mouseMoveHandler = useCallback((e: MouseEvent) => {
@@ -498,6 +549,12 @@ function LobbyPage() {
           </PrimaryButtonNoMargin>
         </HoverContainerPrimaryButton>
 
+        <SecondaryRedButton
+          onClick={leaveRoom}
+        >
+          Leave Room
+        </SecondaryRedButton>
+
       </HeaderContainer>
 
       <FlexBareContainerLeft>
@@ -509,6 +566,11 @@ function LobbyPage() {
                 ? ` (${users.length})`
                 : null
             }
+            <InlineRefreshIcon
+              onClick={refreshRoomDetails}
+            >
+              refresh
+            </InlineRefreshIcon>
           </LobbyContainerTitle>
           <BackgroundContainer>
             {

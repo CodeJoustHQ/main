@@ -1,5 +1,4 @@
 import React from 'react';
-import { ThemeConfig } from '../components/config/Theme';
 import { PrimaryButtonLink, TextLink } from '../components/core/Link';
 import { MainHeaderText, LandingHeaderTitle } from '../components/core/Text';
 
@@ -13,7 +12,8 @@ function LandingPage() {
         Compete live against friends and classmates to solve coding challenges.
       </MainHeaderText>
       <PrimaryButtonLink
-        color={ThemeConfig.colors.gradients.blue}
+        width="12rem"
+        height="3.25rem"
         to="/game/create"
       >
         Create a room

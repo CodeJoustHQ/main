@@ -41,6 +41,12 @@ export const PrimaryButton = styled(DefaultButton)<any>`
   }
 `;
 
+export const SecondaryRedButton = styled(PrimaryButton)`
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.red2};
+  margin: 1.2rem 0;
+`;
+
 export const TextButton = styled.button<ThemeType>`
   background: none;
   border: none;
@@ -161,4 +167,22 @@ export const GreenSmallButtonBlock = styled(SmallButton)`
 export const InvertedSmallButton = styled(SmallButton)`
   color: ${({ theme }) => theme.colors.text};
   background: ${({ theme }) => theme.colors.background};
+`;
+
+export const InlineRefreshIcon = styled.i.attrs(() => ({
+  className: 'material-icons',
+}))`
+  display: inline-block;
+  margin: 0 0 0 10px;
+  padding: 0.25rem;
+  border-radius: 1rem;
+  font-size: ${({ theme }) => theme.fontSize.default};
+  background: ${({ theme }) => theme.colors.white};
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
+  color: ${({ theme }) => theme.colors.font};
+
+  &:hover {
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.24);
+  }
 `;

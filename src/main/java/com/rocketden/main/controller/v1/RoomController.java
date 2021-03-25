@@ -1,6 +1,7 @@
 package com.rocketden.main.controller.v1;
 
 import com.rocketden.main.dto.room.CreateRoomRequest;
+import com.rocketden.main.dto.room.DeleteRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
@@ -44,6 +45,11 @@ public class RoomController extends BaseRestController {
         return new ResponseEntity<>(service.createRoom(request), HttpStatus.CREATED);
     }
 
+    @DeleteMapping("/rooms/{roomId}")
+    public ResponseEntity<RoomDto> deleteRoom(@PathVariable String roomId, @RequestBody DeleteRoomRequest request) {
+        return new ResponseEntity<>(service.deleteRoom(roomId, request), HttpStatus.OK);
+    }
+
     @DeleteMapping("/rooms/{roomId}/users")
     public ResponseEntity<RoomDto> removeUser(@PathVariable String roomId,
                                               @RequestBody RemoveUserRequest request) {
@@ -53,7 +59,7 @@ public class RoomController extends BaseRestController {
     @PutMapping("/rooms/{roomId}/host")
     public ResponseEntity<RoomDto> updateRoomHost(@PathVariable String roomId,
                                                   @RequestBody UpdateHostRequest request) {
-        return new ResponseEntity<>(service.updateRoomHost(roomId, request), HttpStatus.OK);
+        return new ResponseEntity<>(service.updateRoomHost(roomId, request, false), HttpStatus.OK);
     }
 
     @PutMapping("/rooms/{roomId}/settings")

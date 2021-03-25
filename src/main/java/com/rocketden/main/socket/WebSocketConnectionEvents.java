@@ -111,7 +111,7 @@ public class WebSocketConnectionEvents {
 
             // Get room, conditionally update the host, and send socket update.
             Room room = user.getRoom();
-            RoomDto roomDto = roomService.conditionallyUpdateRoomHost(room, user);
+            RoomDto roomDto = roomService.conditionallyUpdateRoomHost(room, user, false);
             socketService.sendSocketUpdate(roomDto);
 
             // If a game exists, update the room info for that game

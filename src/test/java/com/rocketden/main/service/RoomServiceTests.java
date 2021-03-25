@@ -2,6 +2,7 @@ package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dto.room.CreateRoomRequest;
+import com.rocketden.main.dto.room.DeleteRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
@@ -28,6 +29,7 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -220,7 +222,7 @@ public class RoomServiceTests {
         request.setInitiator(UserMapper.toDto(host));
         request.setNewHost(UserMapper.toDto(user));
 
-        RoomDto response = roomService.updateRoomHost(room.getRoomId(), request);
+        RoomDto response = roomService.updateRoomHost(room.getRoomId(), request, false);
 
         verify(socketService).sendSocketUpdate(eq(response));
         assertEquals(user, UserMapper.toEntity(response.getHost()));
@@ -251,7 +253,7 @@ public class RoomServiceTests {
         invalidPermRequest.setNewHost(UserMapper.toDto(host));
 
         ApiException exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomHost(ROOM_ID, invalidPermRequest));
+                roomService.updateRoomHost(ROOM_ID, invalidPermRequest, false));
         assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
 
         // Nonexistent room
@@ -260,7 +262,7 @@ public class RoomServiceTests {
         noRoomRequest.setNewHost(UserMapper.toDto(user));
 
         exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomHost("999999", noRoomRequest));
+                roomService.updateRoomHost("999999", noRoomRequest, false));
         assertEquals(RoomError.NOT_FOUND, exception.getError());
 
         // Nonexistent new host
@@ -272,7 +274,7 @@ public class RoomServiceTests {
         noUserRequest.setNewHost(nonExistentUser);
 
         exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomHost(ROOM_ID, noUserRequest));
+                roomService.updateRoomHost(ROOM_ID, noUserRequest, false));
         assertEquals(UserError.NOT_FOUND, exception.getError());
 
         // New host inactive
@@ -282,7 +284,7 @@ public class RoomServiceTests {
         inactiveUserRequest.setNewHost(UserMapper.toDto(user));
 
         exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomHost(ROOM_ID, inactiveUserRequest));
+                roomService.updateRoomHost(ROOM_ID, inactiveUserRequest, false));
         assertEquals(RoomError.INACTIVE_USER, exception.getError());
     }
 
@@ -444,7 +446,7 @@ public class RoomServiceTests {
     }
 
     @Test
-    public void removeUserSuccess() {
+    public void removeUserSuccessHostInitiator() {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
 
@@ -464,6 +466,35 @@ public class RoomServiceTests {
 
         RemoveUserRequest request = new RemoveUserRequest();
         request.setInitiator(UserMapper.toDto(host));
+        request.setUserToDelete(UserMapper.toDto(user));
+        RoomDto response = roomService.removeUser(ROOM_ID, request);
+
+        verify(socketService).sendSocketUpdate(eq(response));
+        assertEquals(1, response.getUsers().size());
+        assertFalse(response.getUsers().contains(UserMapper.toDto(user)));
+    }
+
+    @Test
+    public void removeUserSuccessSelfInitiator() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+
+        User host = new User();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        room.setHost(host);
+        room.addUser(host);
+
+        User user = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+        room.addUser(user);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        RemoveUserRequest request = new RemoveUserRequest();
+        request.setInitiator(UserMapper.toDto(user));
         request.setUserToDelete(UserMapper.toDto(user));
         RoomDto response = roomService.removeUser(ROOM_ID, request);
 
@@ -547,11 +578,16 @@ public class RoomServiceTests {
         user.setUserId(USER_ID_2);
         room.addUser(user);
 
+        User user2 = new User();
+        user2.setNickname(NICKNAME_2);
+        user2.setUserId(USER_ID_3);
+        room.addUser(user2);
+
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
 
         RemoveUserRequest request = new RemoveUserRequest();
         request.setInitiator(UserMapper.toDto(user));
-        request.setUserToDelete(UserMapper.toDto(user));
+        request.setUserToDelete(UserMapper.toDto(user2));
 
         ApiException exception = assertThrows(ApiException.class, () ->
                 roomService.removeUser(ROOM_ID, request));
@@ -598,15 +634,66 @@ public class RoomServiceTests {
         room.addUser(user3);
 
         // Passing in a non-host user has no effect on the room
-        roomService.conditionallyUpdateRoomHost(room, user2);
+        roomService.conditionallyUpdateRoomHost(room, user2, false);
         assertEquals(user1, room.getHost());
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(room.getRoomId()));
 
         // Passing in the host will assign the first active user to be the new host
-        roomService.conditionallyUpdateRoomHost(room, user1);
+        roomService.conditionallyUpdateRoomHost(room, user1, false);
         assertEquals(user3, room.getHost());
 
         verify(repository).save(room);
+    }
+
+    @Test
+    public void deleteRoomSuccess() {
+        User host = new User();
+        host.setUserId(USER_ID);
+        host.setSessionId(SESSION_ID);
+
+        User user = new User();
+        user.setUserId(USER_ID_2);
+        user.setSessionId(SESSION_ID_2);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(host);
+        room.addUser(host);
+        room.addUser(user);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        DeleteRoomRequest deleteRoomRequest = new DeleteRoomRequest();
+        deleteRoomRequest.setHost(UserMapper.toDto(host));
+        roomService.deleteRoom(ROOM_ID, deleteRoomRequest);
+        verify(repository).delete(eq(room));
+    }
+
+    @Test
+    public void deleteRoomBadHost() {
+        User host = new User();
+        host.setUserId(USER_ID);
+        host.setSessionId(SESSION_ID);
+
+        User user = new User();
+        user.setUserId(USER_ID_2);
+        user.setSessionId(SESSION_ID_2);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(host);
+        room.addUser(host);
+        room.addUser(user);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        DeleteRoomRequest deleteRoomRequest = new DeleteRoomRequest();
+        deleteRoomRequest.setHost(UserMapper.toDto(user));
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.deleteRoom(ROOM_ID, deleteRoomRequest));
+        assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
+        assertNotNull(roomService.getRoom(ROOM_ID));
     }
 }
