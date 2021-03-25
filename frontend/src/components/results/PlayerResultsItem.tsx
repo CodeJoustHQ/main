@@ -3,17 +3,16 @@ import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
 import PlayerIcon from '../card/PlayerIcon';
-import {
-  CenteredContainer, FlexHorizontalContainer, FlexLeft, FlexRight,
-} from '../core/Container';
 import { Color } from '../../api/Color';
 
-const Content = styled.div`
-  display: block;
-  margin: 10px;
+const Content = styled.tr`
   border-radius: 5px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   background-color: ${({ theme }) => theme.colors.white};
+`;
+
+const PlayerContent = styled.td`
+  
 `;
 
 type PlayerResultsCardProps = {
@@ -33,7 +32,7 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
     return `${nickname} ${isCurrentPlayer ? '(you)' : ''}`;
   };
 
-  const getScoreDisplay = () => {
+  const getScore = () => {
     const latestSubmission = player.submissions.slice(-1)[0];
     if (!latestSubmission) {
       return 'Final Score: 0 correct';
@@ -41,31 +40,41 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
     return `Final Score: ${latestSubmission.numCorrect} / ${latestSubmission.numTestCases} correct`;
   };
 
+  const getSubmissionTime = () => {
+    return '0';
+  };
+
   const getSubmissionCount = () => `Submissions: ${player.submissions.length}`;
+
+  const getSubmissionCode = () => {
+    return 'Python';
+  };
 
   return (
     <Content>
-      <FlexHorizontalContainer>
-        <FlexLeft>
-          <CenteredContainer>
-            <PlayerIcon
-              gradientColor={color.gradientColor}
-              nickname={player.user.nickname}
-              active={Boolean(player.user.sessionId)}
-            />
-            <br />
-            <LowMarginText>{`${place}. ${getDisplayNickname()}`}</LowMarginText>
-          </CenteredContainer>
-        </FlexLeft>
+      <PlayerContent>
+        <LowMarginText bold>{`${place}. `}</LowMarginText>
+        <PlayerIcon
+          gradientColor={color.gradientColor}
+          nickname={player.user.nickname}
+          active={Boolean(player.user.sessionId)}
+        />
+        <br />
+        <LowMarginText>{getDisplayNickname()}</LowMarginText>
+      </PlayerContent>
 
-        <FlexRight>
-          <CenteredContainer>
-            <Text>{getScoreDisplay()}</Text>
-            <br />
-            <Text>{getSubmissionCount()}</Text>
-          </CenteredContainer>
-        </FlexRight>
-      </FlexHorizontalContainer>
+      <td>
+        <Text>{getScore()}</Text>
+      </td>
+      <td>
+        <Text>{getSubmissionTime()}</Text>
+      </td>
+      <td>
+        <Text>{getSubmissionCount()}</Text>
+      </td>
+      <td>
+        <Text>{getSubmissionCode()}</Text>
+      </td>
     </Content>
   );
 }

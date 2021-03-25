@@ -5,7 +5,11 @@ import PlayerResultsItem from './PlayerResultsItem';
 import { User } from '../../api/User';
 
 const Content = styled.table`
+  width: 80%;
+  margin: 0 auto;
   
+  border-collapse: separate; 
+  border-spacing: 0 10px;
 `;
 
 type ResultsTableProps = {
