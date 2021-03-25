@@ -17,7 +17,7 @@ import {
   connect, disconnect, routes, subscribe,
 } from '../api/Socket';
 import { User } from '../api/User';
-import Podium from '../components/special/Podium';
+import Podium from '../components/results/Podium';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
 import { Coordinate } from '../components/special/FloatingCircle';
 import {
