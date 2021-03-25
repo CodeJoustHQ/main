@@ -1,7 +1,8 @@
 import React, { ReactElement, useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import EnterNicknamePage from '../components/core/EnterNickname';
-import { LargeCenterInputText, LargeInputButton } from '../components/core/Input';
+import { LargeCenterInputText, PrimaryInput } from '../components/core/Input';
 import { LargeText, Text } from '../components/core/Text';
 import { User } from '../api/User';
 import { joinRoom, getRoom } from '../api/Room';
@@ -9,6 +10,10 @@ import Loading from '../components/core/Loading';
 import ErrorMessage from '../components/core/Error';
 import { ErrorResponse } from '../api/Error';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
+
+const Content = styled.div`
+  padding-top: 20px;
+`;
 
 type JoinPageLocation = {
   error: ErrorResponse,
@@ -110,7 +115,7 @@ function JoinGamePage() {
     case 1:
       // Render the "Enter room ID" state.
       joinPageContent = (
-        <div>
+        <Content>
           <LargeText>
             Enter the six-digit room ID to join the game!
           </LargeText>
@@ -142,7 +147,7 @@ function JoinGamePage() {
               }
             }}
           />
-          <LargeInputButton
+          <PrimaryInput
             onClick={() => {
               checkRoom(roomId);
             }}
@@ -157,7 +162,7 @@ function JoinGamePage() {
           ) : null}
           { loading ? <Loading /> : null }
           { error ? <ErrorMessage message={error} /> : null }
-        </div>
+        </Content>
       );
       break;
     case 2:

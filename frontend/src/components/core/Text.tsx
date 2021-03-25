@@ -23,7 +23,7 @@ export const ErrorText = styled(Text)`
 
 export const SmallText = styled(Text)`
   font-size: ${({ theme }) => theme.fontSize.mediumSmall};
-  margin: 6px 0;
+  margin: 3px 0;
 `;
 
 export const SmallHeaderText = styled.p`
@@ -94,6 +94,7 @@ export const UserNicknameText = styled(Text)<NicknameType>`
 export const ProblemHeaderText = styled.h2`
   font-size: ${({ theme }) => theme.fontSize.large};
   color: ${({ theme }) => theme.colors.darkText};
+  margin-bottom: 5px;
 `;
 
 export const SmallActionHeaderText = styled.p`
@@ -104,7 +105,7 @@ export const SmallActionHeaderText = styled.p`
 
 export const SmallActionText = styled.p`
   font-size: ${({ theme }) => theme.fontSize.medium};
-  margin: 2px 0px;
+  margin: 2px 0;
 
   &:hover {
     cursor: pointer;
@@ -122,4 +123,9 @@ export const WhiteText = styled(Text)`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   color: ${({ theme }) => theme.colors.white};
   margin: 0;
+`;
+
+export const BottomFooterText = styled(Text)`
+  color: ${({ theme }) => theme.colors.gray};
+  font-size: ${({ theme }) => theme.fontSize.mediumSmall};
 `;

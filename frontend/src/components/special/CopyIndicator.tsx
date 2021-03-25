@@ -4,7 +4,7 @@ import { ContactHeaderText } from '../core/Text';
 
 type CopyIndicator = {
   copied: boolean,
-}
+};
 
 export const CopyIndicatorContainer = styled.div.attrs((props: CopyIndicator) => ({
   style: {
@@ -13,6 +13,18 @@ export const CopyIndicatorContainer = styled.div.attrs((props: CopyIndicator) =>
 }))<CopyIndicator>`
   position: absolute;
   top: 20px;
+  left: 50%;
+  transition: transform 0.25s;
+`;
+
+export const BottomCopyIndicatorContainer = styled.div.attrs((props: CopyIndicator) => ({
+  style: {
+    transform: (!props.copied) ? 'translateY(60px)' : null,
+    visibility: (props.copied) ? 'visible' : 'hidden',
+  },
+}))<CopyIndicator>`
+  position: fixed;
+  bottom: 20px;
   left: 50%;
   transition: transform 0.25s;
 `;
@@ -33,6 +45,10 @@ export const InlineCopyText = styled(ContactHeaderText)`
   border-bottom: 1px solid ${({ theme }) => theme.colors.text};
 `;
 
+export const SmallInlineCopyText = styled(InlineCopyText).attrs({ as: 'p' })`
+  font-size: ${({ theme }) => theme.fontSize.mediumSmall};
+`;
+
 export const InlineBackgroundCopyText = styled(ContactHeaderText)`
   display: inline-block;
   margin: 0;
@@ -49,4 +65,8 @@ export const InlineCopyIcon = styled.i.attrs(() => ({
 }))`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   margin-left: 5px;
+`;
+
+export const SmallInlineCopyIcon = styled(InlineCopyIcon)`
+  font-size: ${({ theme }) => theme.fontSize.mediumSmall};
 `;

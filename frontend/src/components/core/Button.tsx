@@ -2,6 +2,11 @@ import styled from 'styled-components';
 import { Difficulty, difficultyToColor } from '../../api/Difficulty';
 import { ThemeType } from '../config/Theme';
 
+type Dimensions = {
+  width?: string,
+  height?: string,
+};
+
 export const DefaultButton = styled.button`
   border: none;
   border-radius: 0.25rem;
@@ -21,12 +26,12 @@ export const DefaultButton = styled.button`
   }
 `;
 
-export const PrimaryButton = styled(DefaultButton)<any>`
+export const PrimaryButton = styled(DefaultButton)<Dimensions>`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   background: ${({ theme }) => theme.colors.gradients.blue};
   color: ${({ theme }) => theme.colors.white};
-  width: ${({ width }) => width || '10rem'};
-  height: ${({ height }) => height || '2.75rem'};
+  width: ${({ width }) => width || '12rem'};
+  height: ${({ height }) => height || '3rem'};
   min-width: 150px;
   min-height: 40px;
 
@@ -104,6 +109,19 @@ export const SmallDifficultyButton = styled(DefaultButton)<DifficultyProps>`
     `};
     
     cursor: ${({ enabled }) => (enabled ? 'pointer' : 'default')};
+  }
+`;
+
+export const DifficultyDisplayButton = styled(SmallDifficultyButton)`
+  font-size: ${({ theme }) => theme.fontSize.medium};
+  width: unset;
+  padding: 2px 15px;
+  height: 1.75rem;
+  margin: 0 0 15px 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);
+  
+  &:hover {
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.24);
   }
 `;
 

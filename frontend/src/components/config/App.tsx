@@ -1,5 +1,6 @@
-import React from 'react';
-import { Switch } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import ReactGA from 'react-ga';
+import { Switch, useLocation } from 'react-router-dom';
 import MainLayout from '../layout/Main';
 import LandingPage from '../../views/Landing';
 import NotFound from '../../views/NotFound';
@@ -17,13 +18,23 @@ import CircleBackgroundLayout from '../layout/CircleBackground';
 import ContactUsPage from '../../views/ContactUs';
 import MinimalLayout from '../layout/MinimalLayout';
 
+// Set up Google Analytics
+ReactGA.initialize('UA-192641172-2');
+
 function App() {
+  const location = useLocation();
+
+  // Track page view on every change in location
+  useEffect(() => {
+    ReactGA.pageview(location.pathname);
+  }, [location]);
+
   return (
     <Switch>
       <CustomRoute path="/" component={LandingPage} layout={CircleBackgroundLayout} exact />
       <CustomRoute path="/game" component={GamePage} layout={GameLayout} exact />
-      <CustomRoute path="/game/join" component={JoinGamePage} layout={MainLayout} exact />
-      <CustomRoute path="/game/create" component={CreateGamePage} layout={MainLayout} exact />
+      <CustomRoute path="/game/join" component={JoinGamePage} layout={CircleBackgroundLayout} exact />
+      <CustomRoute path="/game/create" component={CreateGamePage} layout={CircleBackgroundLayout} exact />
       <CustomRoute path="/game/lobby" component={LobbyPage} layout={MinimalLayout} exact />
       <CustomRoute path="/game/results" component={GameResultsPage} layout={MinimalLayout} exact />
       <CustomRoute path="/problems/all" component={AllProblemsPage} layout={MinimalLayout} exact />

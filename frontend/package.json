@@ -27,6 +27,7 @@
     "react-beautiful-dnd": "^13.0.0",
     "react-beforeunload": "^2.2.4",
     "react-dom": "^16.13.1",
+    "react-ga": "^3.3.0",
     "react-monaco-editor": "^0.40.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
