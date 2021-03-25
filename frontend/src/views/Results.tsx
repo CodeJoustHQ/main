@@ -26,6 +26,13 @@ const Content = styled.div`
   padding: 0;
 `;
 
+const PrimaryButtonHoverElement = styled(HoverElement)`
+  width: 10rem;
+  height: 2.75rem;
+  top: 1.2rem;
+  left: 1.2rem;
+`;
+
 const PodiumContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -145,6 +152,15 @@ function GameResultsPage() {
 
   const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
 
+  // Get current mouse position.
+  const mouseMoveHandler = useCallback((e: MouseEvent) => {
+    setMousePosition({ x: e.clientX, y: e.clientY });
+  }, [setMousePosition]);
+
+  useEffect(() => {
+    window.onmousemove = mouseMoveHandler;
+  }, [mouseMoveHandler]);
+
   return (
     <Content>
       <HoverTooltip
@@ -178,7 +194,7 @@ function GameResultsPage() {
 
       <div>
         <HoverContainer>
-          <HoverElement
+          <PrimaryButtonHoverElement
             onClick={callPlayAgain}
             enabled={isHost(currentUser)}
             onMouseEnter={() => {
@@ -192,6 +208,12 @@ function GameResultsPage() {
               }
             }}
           />
+          <PrimaryButton
+            onClick={callPlayAgain}
+            disabled={!currentUser || currentUser?.userId !== host?.userId}
+          >
+            Play Again
+          </PrimaryButton>
         </HoverContainer>
 
         <SecondaryRedButton

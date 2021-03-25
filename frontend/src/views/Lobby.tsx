@@ -413,7 +413,7 @@ function LobbyPage() {
             connectUserToRoom(res.roomId, currentUser.userId);
           }
         })
-        .catch((err) => setError(err));
+        .catch((err) => setError(err.message));
     }
   };
 
@@ -456,7 +456,7 @@ function LobbyPage() {
           setStateFromRoom(res);
           updateCurrentUserDetails(res.users);
         })
-        .catch((err) => setError(err));
+        .catch((err) => setError(err.message));
     } else {
       // Get URL query params to determine if the roomId is provided.
       const urlParams = new URLSearchParams(window.location.search);

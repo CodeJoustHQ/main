@@ -115,7 +115,7 @@ function Podium(props: PodiumProps) {
     }
 
     if (!bestSubmission) {
-      return <ScoreText>{loading ? 'Loading...' : '0 submissions'}</ScoreText>;
+      return <ScoreText>{loading ? 'Loading...' : 'Scored 0'}</ScoreText>;
     }
 
     const percent = Math.round((bestSubmission.numCorrect / bestSubmission.numTestCases) * 100);
