@@ -16,7 +16,7 @@ import {
 import ErrorMessage from '../components/core/Error';
 import { ProblemHeaderText } from '../components/core/Text';
 import 'react-splitter-layout/lib/index.css';
-import { checkLocationState } from '../util/Utility';
+import { checkLocationState, leaveRoom } from '../util/Utility';
 import Console from '../components/game/Console';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
@@ -31,7 +31,7 @@ import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
 import { TextButton } from '../components/core/Button';
 import {
-  connect, disconnect, routes, send, subscribe,
+  connect, routes, send, subscribe,
 } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
 import Language from '../api/Language';
@@ -334,15 +334,6 @@ function GamePage() {
       });
   };
 
-  const exitGame = () => {
-    // eslint-disable-next-line no-alert
-    if (window.confirm('Exit the game? You will not be able to rejoin.')) {
-      disconnect()
-        .then(() => history.replace('/'))
-        .catch((err) => setError(err.message));
-    }
-  };
-
   const displayPlayerLeaderboard = useCallback(() => players.map((player, index) => (
     <LeaderboardCard
       player={player}
@@ -384,7 +375,7 @@ function GamePage() {
           <GameTimerContainer gameTimer={gameTimer || null} />
         </FlexCenter>
         <FlexRight>
-          <TextButton onClick={exitGame}>Exit Game</TextButton>
+          <TextButton onClick={() => leaveRoom(history, roomId, currentUser)}>Exit Game</TextButton>
         </FlexRight>
       </FlexInfoBar>
       <LeaderboardContent>

@@ -51,7 +51,7 @@ const HeaderContainer = styled.div`
   max-width: 500px;
   text-align: left;
   width: 66%;
-  margin: 1rem auto 1rem auto;
+  margin: 2rem auto 1rem auto;
 
   @media (max-width: 750px) {
     width: 80%;
