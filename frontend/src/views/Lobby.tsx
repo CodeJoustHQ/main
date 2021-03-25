@@ -51,7 +51,7 @@ const HeaderContainer = styled.div`
   max-width: 500px;
   text-align: left;
   width: 66%;
-  margin: 2rem auto 0;
+  margin: 1rem auto 1rem auto;
 
   @media (max-width: 750px) {
     width: 80%;
@@ -439,7 +439,7 @@ function LobbyPage() {
 
   // Get current mouse position.
   const mouseMoveHandler = useCallback((e: MouseEvent) => {
-    setMousePosition({ x: e.clientX, y: e.clientY });
+    setMousePosition({ x: e.pageX, y: e.pageY });
   }, [setMousePosition]);
 
   useEffect(() => {

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
-import { LargeText, Text } from '../components/core/Text';
+import { LargeText } from '../components/core/Text';
 import {
   getGame, Game, Player, playAgain,
 } from '../api/Game';
@@ -16,7 +16,6 @@ import {
   connect, disconnect, routes, subscribe,
 } from '../api/Socket';
 import { User } from '../api/User';
-import { ThemeConfig } from '../components/config/Theme';
 import Podium from '../components/special/Podium';
 import { removeUser } from '../api/Room';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
@@ -154,7 +153,7 @@ function GameResultsPage() {
 
   // Get current mouse position.
   const mouseMoveHandler = useCallback((e: MouseEvent) => {
-    setMousePosition({ x: e.clientX, y: e.clientY });
+    setMousePosition({ x: e.pageX, y: e.pageY });
   }, [setMousePosition]);
 
   useEffect(() => {
