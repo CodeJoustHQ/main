@@ -312,14 +312,14 @@ function ProblemDisplay(props: ProblemDisplayParams) {
               <SmallHeaderText>Test Cases</SmallHeaderText>
               <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId="droppable">
-                  {(providedDroppable) => (
+                  {(providedDroppable: any) => (
                     <div
                       {...providedDroppable.droppableProps}
                       ref={providedDroppable.innerRef}
                     >
                       {newProblem.testCases.map((testCase, index) => (
                         <Draggable key={testCase.id} draggableId={testCase.id} index={index}>
-                          {(providedDraggable) => (
+                          {(providedDraggable: any) => (
                             <div
                               ref={providedDraggable.innerRef}
                               {...providedDraggable.draggableProps}

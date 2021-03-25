@@ -1,9 +1,15 @@
 import styled from 'styled-components';
 
-const Input = styled.input`
+type Dimensions = {
+  width?: string,
+  height?: string,
+};
+
+const Input = styled.input<Dimensions>`
+  font-family: ${({ theme }) => theme.font};
   box-sizing: border-box;
   border-radius: 0.25rem;
-  border: 3px solid ${({ theme }) => theme.colors.blue};
+  border: 2px solid ${({ theme }) => theme.colors.blue};
   display: block;
   margin: 1rem auto;
   outline: none;
@@ -30,49 +36,76 @@ export const PureTextInputTitle = styled.input.attrs(() => ({
 export const LargeCenterInputText = styled(Input).attrs(() => ({
   type: 'text',
 }))`
-  width: 20rem;
+  width: ${({ width }) => width || '16rem'};
+  height: ${({ height }) => height || '3rem'};
   text-align: center;
-  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
-  padding: 1rem;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  font-weight: normal;
   color: ${({ theme }) => theme.colors.text};
-
-  &:focus {
-    border: 3px solid ${({ theme }) => theme.colors.darkBlue};
-  }
+  padding: 1rem;
 `;
 
-export const LargeInputButton = styled(Input).attrs(() => ({
+export const PrimaryInput = styled(Input).attrs(() => ({
   type: 'button',
 }))`
-  width: 20rem;
-  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
-  padding: 1rem;
-  color: white;
-  background-color: ${({ theme }) => theme.colors.blue};
-  font-weight: 700;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  background: ${({ theme }) => theme.colors.gradients.blue};
+  color: ${({ theme }) => theme.colors.white};
+  width: ${({ width }) => width || '16rem'};
+  height: ${({ height }) => height || '3rem'};
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
+  border: none !important;
+  font-weight: 400;
+  min-width: 150px;
+  min-height: 40px;
   cursor: pointer;
 
+  &:hover {
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.24);
+  }
+  
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.lightBlue};
-    border: 3px solid ${({ theme }) => theme.colors.lightBlue};
-    cursor: default;
+    background: ${({ theme }) => theme.colors.gradients.gray};
+
+    &:hover {
+      cursor: default;
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
+    }
   }
 `;
 
 export const ConsoleTextArea = styled.textarea`
   font-family: Monaco, monospace;
   font-size: ${({ theme }) => theme.fontSize.default};
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.darkText};
   margin: 2px;
+  padding: 8px;
+  
   min-width: 50px;
   max-width: 90%;
-  width: 90%;
-  min-height: 24px;
+  width: 50%;
+  min-height: 22px;
+  height: unset;
   max-height: 150px;
+  white-space: pre;
+  resize: both;
+  
+  /* Hide scrollbar for Chrome and Safari */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 
-  padding: 5px;
   border: 2px solid ${({ theme }) => theme.colors.blue};
   border-radius: 0.3rem;
+  
+  &:focus {
+    outline: none;
+  }
 `;
 
 export const FixedTextArea = styled.textarea`
@@ -112,7 +145,6 @@ export const TextInput = styled(Input).attrs(() => ({
   margin: 0 0.5rem 0 0;
   width: 5rem;
   font-size: ${({ theme }) => theme.fontSize.default};
-  font-family: ${({ theme }) => theme.font};
   font-weight: 400;
   padding: 0.25rem 0.5rem;
   color: ${({ theme }) => theme.colors.text};

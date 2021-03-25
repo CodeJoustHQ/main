@@ -122,8 +122,12 @@ function LeaderboardCard(props: LeaderboardCardProps) {
           <CenteredScrollableContent>
             <SmallText bold>{player.user.nickname}</SmallText>
           </CenteredScrollableContent>
-          <SmallText>{`Score: ${getScoreDisplay()}`}</SmallText>
-          <SmallText>{`Last: ${getSubmissionTime()}`}</SmallText>
+          <CenteredScrollableContent>
+            <SmallText>{`Score: ${getScoreDisplay()}`}</SmallText>
+          </CenteredScrollableContent>
+          <CenteredScrollableContent>
+            <SmallText>{`Last: ${getSubmissionTime()}`}</SmallText>
+          </CenteredScrollableContent>
         </HoverBar>
       ) : null}
     </Content>

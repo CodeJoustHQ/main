@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import ErrorMessage from './Error';
 import Loading from './Loading';
 import { LargeText, Text } from './Text';
-import { LargeCenterInputText, LargeInputButton } from './Input';
+import { LargeCenterInputText, PrimaryInput } from './Input';
 import { ErrorResponse } from '../../api/Error';
 import { isValidNickname } from '../../api/Socket';
 
@@ -10,6 +11,10 @@ type EnterNicknameProps = {
   enterNicknameHeaderText: string,
   enterNicknameAction: (nickname: string) => Promise<void>;
 }
+
+const Content = styled.div`
+  padding-top: 20px;
+`;
 
 export default function EnterNicknamePage(props: EnterNicknameProps) {
   // Grab props variables.
@@ -57,7 +62,7 @@ export default function EnterNicknamePage(props: EnterNicknameProps) {
   };
 
   return (
-    <div>
+    <Content>
       <LargeText>
         {enterNicknameHeaderText}
       </LargeText>
@@ -79,7 +84,7 @@ export default function EnterNicknamePage(props: EnterNicknameProps) {
           }
         }}
       />
-      <LargeInputButton
+      <PrimaryInput
         onClick={() => {
           enterNicknameActionUpdatePage(nickname);
         }}
@@ -94,6 +99,6 @@ export default function EnterNicknamePage(props: EnterNicknameProps) {
       ) : null}
       { loading ? <Loading /> : null }
       { error ? <ErrorMessage message={error} /> : null }
-    </div>
+    </Content>
   );
 }

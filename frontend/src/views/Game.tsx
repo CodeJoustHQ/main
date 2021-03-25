@@ -5,6 +5,8 @@ import SplitterLayout from 'react-splitter-layout';
 import MarkdownEditor from 'rich-markdown-editor';
 import { useBeforeunload } from 'react-beforeunload';
 import { Message, Subscription } from 'stompjs';
+import copy from 'copy-to-clipboard';
+import 'react-splitter-layout/lib/index.css';
 import Editor from '../components/game/Editor';
 import { DefaultCodeType, getDefaultCodeMap, Problem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
@@ -14,14 +16,13 @@ import {
   Panel, SplitterContainer,
 } from '../components/core/Container';
 import ErrorMessage from '../components/core/Error';
-import { ProblemHeaderText } from '../components/core/Text';
-import 'react-splitter-layout/lib/index.css';
+import { ProblemHeaderText, BottomFooterText } from '../components/core/Text';
 import { checkLocationState } from '../util/Utility';
 import Console from '../components/game/Console';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
 import { GameNotification, NotificationType } from '../api/GameNotification';
-import { Difficulty } from '../api/Difficulty';
+import { Difficulty, displayNameFromDifficulty } from '../api/Difficulty';
 import {
   Game, getGame, Player, runSolution,
   Submission, SubmissionType, submitSolution,
@@ -29,21 +30,40 @@ import {
 import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
-import { TextButton } from '../components/core/Button';
+import { TextButton, DifficultyDisplayButton } from '../components/core/Button';
 import {
   connect, disconnect, routes, send, subscribe,
 } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
 import Language from '../api/Language';
+import {
+  CopyIndicator,
+  BottomCopyIndicatorContainer,
+  SmallInlineCopyIcon,
+  SmallInlineCopyText,
+} from '../components/special/CopyIndicator';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
   padding: 0;
+  
+  p {
+    font-family: ${({ theme }) => theme.font};
+  }
+
+  // The specific list of attributes to have dark text color.
+  .ProseMirror > p, blockquote, h1, h2, h3, ul, ol, table {
+    color: ${({ theme }) => theme.colors.text};
+  }
 `;
 
 const OverflowPanel = styled(Panel)`
   overflow-y: auto;
   height: 100%;
   padding: 0 25px;
+`;
+
+const NoPaddingPanel = styled(Panel)`
+  padding: 0;
 `;
 
 const LeaderboardContent = styled.div`
@@ -63,7 +83,7 @@ const LeaderboardContent = styled.div`
     ${({ theme: { colors: { background } } }) => `linear-gradient(to right, rgba(0,0,0.8,.12), ${background})`},
     ${({ theme: { colors: { background } } }) => `linear-gradient(to left, rgba(0,0,0,.12), ${background})`};
 
-  background-position: left center, right center, left center, right center;
+  background-position: left center, right center, 0.15% center, 99.85% center;
   background-repeat: no-repeat;
   background-color: ${({ theme }) => theme.colors.background};
   background-size: 20px 100%, 20px 100%, 10px 100%, 10px 100%;
@@ -81,6 +101,7 @@ function GamePage() {
   const history = useHistory();
   const location = useLocation<LocationState>();
 
+  const [copiedEmail, setCopiedEmail] = useState(false);
   const [submission, setSubmission] = useState<Submission | null>(null);
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -404,11 +425,32 @@ function GamePage() {
           {/* Problem title/description panel */}
           <OverflowPanel className="display-box-shadow">
             <ProblemHeaderText>{problems[0]?.name}</ProblemHeaderText>
+            {problems[0] ? (
+              <DifficultyDisplayButton
+                difficulty={problems[0].difficulty!}
+                enabled={false}
+                active
+              >
+                {displayNameFromDifficulty(problems[0].difficulty!)}
+              </DifficultyDisplayButton>
+            ) : null}
             <StyledMarkdownEditor
               defaultValue={problems[0]?.description}
               onChange={() => ''}
               readOnly
             />
+            <BottomFooterText>
+              {'Notice an issue? Contact us at '}
+              <SmallInlineCopyText
+                onClick={() => {
+                  copy('support@codejoust.co');
+                  setCopiedEmail(true);
+                }}
+              >
+                support@codejoust.co
+                <SmallInlineCopyIcon>content_copy</SmallInlineCopyIcon>
+              </SmallInlineCopyText>
+            </BottomFooterText>
           </OverflowPanel>
 
           {/* Code editor and console panels */}
@@ -418,14 +460,14 @@ function GamePage() {
             primaryMinSize={20}
             secondaryMinSize={0}
           >
-            <Panel>
+            <NoPaddingPanel>
               <Editor
                 onCodeChange={setCurrentCode}
                 onLanguageChange={setCurrentLanguage}
                 codeMap={defaultCodeList[0]}
                 defaultLanguage={currentLanguage}
               />
-            </Panel>
+            </NoPaddingPanel>
 
             <Panel>
               <Console
@@ -438,6 +480,11 @@ function GamePage() {
           </SplitterLayout>
         </SplitterLayout>
       </SplitterContainer>
+      <BottomCopyIndicatorContainer copied={copiedEmail}>
+        <CopyIndicator onClick={() => setCopiedEmail(false)}>
+          Email copied!&nbsp;&nbsp;✕
+        </CopyIndicator>
+      </BottomCopyIndicatorContainer>
     </FlexContainer>
   );
 }

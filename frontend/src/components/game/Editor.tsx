@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import MonacoEditor from 'react-monaco-editor';
-import styled from 'styled-components';
+import React, { useContext, useEffect, useState } from 'react';
+import MonacoEditor, { EditorConstructionOptions } from 'react-monaco-editor';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import styled, { ThemeContext } from 'styled-components';
 import Language, { fromString, languageToEditorLanguage } from '../../api/Language';
 import { DefaultCodeType } from '../../api/Problem';
 
@@ -15,7 +16,8 @@ const Content = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 0.5rem 0;
+  padding: 0;
+  margin: 0;
 `;
 
 const EditorContainer = styled.div`
@@ -30,15 +32,57 @@ const LanguageContainer = styled.div`
   z-index: 1;
   margin: 5px;
   padding: 7.5px;
-  background: white;
+  background: transparent;
+  text-align: center;
 `;
 
 const LanguageSelect = styled.select`
-  padding: 2.5px 10px;
-  border: 2px solid ${({ theme }) => theme.colors.blue};
+  padding: 4px 10px;
+  border: 1.5px solid ${({ theme }) => theme.colors.purple};
   border-radius: 5px;
-  font-style: italic;
+  color: ${({ theme }) => theme.colors.text};
+  text-align: center;
+  text-align-last: center;
+  
+  &:hover {
+    cursor: pointer;
+  }
+  
+  // Clear effects on Safari and Firefox
+  -moz-appearance: none; 
+  -webkit-appearance: none; 
+  appearance: none;
+  
+  &:focus {
+    border: 2px solid ${({ theme }) => theme.colors.purple};
+    outline: none;
+  }
 `;
+
+/**
+ * Options used to style the Monaco code editor
+ * https://microsoft.github.io/monaco-editor/api/enums/monaco.editor.editoroption.html
+ */
+const monacoEditorOptions: EditorConstructionOptions = {
+  automaticLayout: true,
+  fixedOverflowWidgets: true,
+  fontFamily: 'Monaco',
+  hideCursorInOverviewRuler: true,
+  minimap: { enabled: false },
+  overviewRulerBorder: false,
+  overviewRulerLanes: 0,
+  padding: { top: 10, bottom: 10 },
+  quickSuggestions: false,
+  renderLineHighlight: 'all',
+  renderIndentGuides: false,
+  renderWhitespace: 'none',
+  scrollbar: {
+    verticalScrollbarSize: 5,
+    horizontalScrollbarSize: 5,
+    useShadows: false,
+  },
+  scrollBeyondLastLine: false,
+};
 
 // This function refreshes the width of Monaco editor upon change in container size
 function ResizableMonacoEditor(props: EditorProps) {
@@ -46,20 +90,33 @@ function ResizableMonacoEditor(props: EditorProps) {
     onLanguageChange, onCodeChange, codeMap, defaultLanguage,
   } = props;
 
+  const theme = useContext(ThemeContext);
   const [currentLanguage, setCurrentLanguage] = useState<Language>(defaultLanguage);
-  const [codeEditor, setCodeEditor] = useState<any>(null);
+  const [codeEditor, setCodeEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
 
   useEffect(() => {
     setCurrentLanguage(defaultLanguage);
   }, [defaultLanguage]);
 
-  const handleEditorDidMount = (editor: any) => {
+  const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor) => {
     setCodeEditor(editor);
     window.addEventListener('resize', () => {
       editor.layout();
     });
     window.addEventListener('secondaryPanelSizeChange', () => {
       editor.layout();
+    });
+  };
+
+  const handleEditorWillMount = (editor: typeof monaco) => {
+    editor.editor.defineTheme('default-theme', {
+      base: 'vs',
+      inherit: true,
+      rules: [],
+      colors: {
+        'editor.lineHighlightBorder': theme.colors.background,
+        'editor.lineHighlightBackground': theme.colors.background,
+      },
     });
   };
 
@@ -97,15 +154,12 @@ function ResizableMonacoEditor(props: EditorProps) {
       </LanguageContainer>
       <EditorContainer>
         <MonacoEditor
-          options={{
-            fixedOverflowWidgets: true,
-            minimap: { enabled: false },
-            automaticLayout: true,
-            scrollBeyondLastLine: false,
-          }}
+          options={monacoEditorOptions}
+          theme="default-theme"
           height="100%"
           editorDidMount={handleEditorDidMount}
-          onChange={() => onCodeChange(codeEditor.getValue())}
+          editorWillMount={handleEditorWillMount}
+          onChange={() => onCodeChange(codeEditor?.getValue() || 'Loading...')}
           language={languageToEditorLanguage(currentLanguage)}
           defaultValue="Loading..."
         />
