@@ -1,13 +1,13 @@
 import React from 'react';
 import { TextLink } from '../components/core/Link';
-import { LandingHeaderText } from '../components/core/Text';
+import { MainHeaderText } from '../components/core/Text';
 
 function NotFound() {
   return (
     <div>
-      <LandingHeaderText>
+      <MainHeaderText>
         Uh oh! Page not found
-      </LandingHeaderText>
+      </MainHeaderText>
       <TextLink to="/">
         Click here to return to home &#8594;
       </TextLink>

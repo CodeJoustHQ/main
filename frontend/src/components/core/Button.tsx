@@ -36,7 +36,8 @@ export const PrimaryButton = styled(DefaultButton)<Dimensions>`
   min-height: 40px;
 
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.gray};
+    opacity: 0.5;
+    background: ${({ theme }) => theme.colors.gradients.gray};
 
     &:hover {
       cursor: default;
@@ -82,10 +83,11 @@ export const SmallDifficultyButton = styled(DefaultButton)<DifficultyProps>`
   margin: 0.5rem 1rem 0 0;
 
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.gray};
+    opacity: 0.5;
 
     &:hover {
       cursor: default;
+      opacity: 0.5;
       box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
     }
   }
@@ -102,6 +104,10 @@ export const SmallDifficultyButton = styled(DefaultButton)<DifficultyProps>`
     
     cursor: ${({ enabled }) => (enabled ? 'pointer' : 'default')};
   }
+`;
+
+export const SmallDifficultyButtonNoMargin = styled(SmallDifficultyButton)`
+  margin: 0;
 `;
 
 export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`

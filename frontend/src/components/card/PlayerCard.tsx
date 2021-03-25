@@ -3,28 +3,39 @@ import styled from 'styled-components';
 import { UserNicknameText } from '../core/Text';
 import { User } from '../../api/User';
 
-type ContentProps = {
+const TransparentHoverContainer = styled.div`
+  display: inline-block;
+  background-clip: padding-box;
+
+  // Invisible border to make hover effect last longer
+  border: 10px solid transparent;
+`;
+
+const Content = styled.div`
+  display: inline-block;
+  position: relative;
+  padding: 0.25rem 1rem;
+  box-shadow: 0 1px 8px rgb(0 0 0 / 24%);
+  background-color: ${({ theme }) => theme.colors.white};
+  border-radius: 1rem;
+`;
+
+type PlayerIconType = {
   isActive: boolean,
 };
 
-const Content = styled.div<ContentProps>`
+const PlayerCardActiveIcon = styled.div<PlayerIconType>`
   display: inline-block;
-  position: relative;
-  padding: 10px;
-  background-color: ${({ theme, isActive }) => (isActive ? theme.colors.lightBlue : theme.colors.lightGray)};
-  background-clip: padding-box;
-  
-  // Invisible border to make hover effect last longer
-  border: 15px solid transparent;
-  
-  // Add above border width from margin for actual effect
-  margin: -5px;
-  // Subtract above border width from border-radius for actual effect 
-  border-radius: 20px;
+  margin-right: 10px;
+  background: ${({ theme, isActive }) => (isActive ? theme.colors.gradients.green : theme.colors.gradients.red)};
+  border-radius: 1rem;
+  height: 1.3rem;
+  width: 1.3rem;
 `;
 
 type PlayerCardProps = {
   user: User,
+  me: boolean,
   isActive: boolean,
   isHost: boolean,
   children: React.ReactNode,
@@ -32,24 +43,32 @@ type PlayerCardProps = {
 
 function PlayerCard(props: PlayerCardProps) {
   const {
-    user, isActive, isHost, children: actionCard,
+    user, me, isActive, isHost, children: actionCard,
   } = props;
 
   const [showActionCard, setShowActionCard] = useState(false);
 
+  const InlineHostIcon = styled.i.attrs(() => ({
+    className: 'material-icons',
+  }))`
+    margin-left: 5px;
+  `;
+
   return (
-    <Content
+    <TransparentHoverContainer
       onMouseEnter={() => setShowActionCard(true)}
       onMouseLeave={() => setShowActionCard(false)}
-      isActive={isActive}
     >
-      <UserNicknameText>
-        {user.nickname}
-        {isHost ? ' (host)' : ''}
-      </UserNicknameText>
+      <Content>
+        <UserNicknameText me={me}>
+          <PlayerCardActiveIcon isActive={isActive} />
+          {user.nickname}
+          {isHost ? <InlineHostIcon>flag</InlineHostIcon> : null}
+        </UserNicknameText>
 
-      {showActionCard ? actionCard : null}
-    </Content>
+        {showActionCard ? actionCard : null}
+      </Content>
+    </TransparentHoverContainer>
   );
 }
 

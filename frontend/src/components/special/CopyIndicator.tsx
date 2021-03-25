@@ -49,9 +49,21 @@ export const SmallInlineCopyText = styled(InlineCopyText).attrs({ as: 'p' })`
   font-size: ${({ theme }) => theme.fontSize.mediumSmall};
 `;
 
+export const InlineBackgroundCopyText = styled(ContactHeaderText)`
+  display: inline-block;
+  margin: 0;
+  padding: 0.25rem 0.5rem;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  background: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.white};
+  border-radius: 0.5rem;
+  cursor: pointer;
+`;
+
 export const InlineCopyIcon = styled.i.attrs(() => ({
   className: 'material-icons',
 }))`
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   margin-left: 5px;
 `;
 

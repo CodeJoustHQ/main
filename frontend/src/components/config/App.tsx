@@ -4,7 +4,7 @@ import { Switch, useLocation } from 'react-router-dom';
 import MainLayout from '../layout/Main';
 import LandingPage from '../../views/Landing';
 import NotFound from '../../views/NotFound';
-import CustomRoute from './Route';
+import { CustomRoute, CustomRedirect } from './Route';
 import GamePage from '../../views/Game';
 import GameLayout from '../layout/Game';
 import JoinGamePage from '../../views/Join';
@@ -16,7 +16,7 @@ import ProblemPage from '../../views/ProblemPage';
 import CreateProblemPage from '../../views/CreateProblemPage';
 import CircleBackgroundLayout from '../layout/CircleBackground';
 import ContactUsPage from '../../views/ContactUs';
-import ProblemLayout from '../layout/ProblemLayout';
+import MinimalLayout from '../layout/MinimalLayout';
 
 // Set up Google Analytics
 ReactGA.initialize('UA-192641172-2');
@@ -37,10 +37,11 @@ function App() {
       <CustomRoute path="/game/create" component={CreateGamePage} layout={CircleBackgroundLayout} exact />
       <CustomRoute path="/game/lobby" component={LobbyPage} layout={MainLayout} exact />
       <CustomRoute path="/game/results" component={GameResultsPage} layout={MainLayout} exact />
-      <CustomRoute path="/problems/all" component={AllProblemsPage} layout={ProblemLayout} exact />
-      <CustomRoute path="/problem/create" component={CreateProblemPage} layout={ProblemLayout} exact />
-      <CustomRoute path="/problem/:id" component={ProblemPage} layout={ProblemLayout} exact />
+      <CustomRoute path="/problems/all" component={AllProblemsPage} layout={MinimalLayout} exact />
+      <CustomRoute path="/problem/create" component={CreateProblemPage} layout={MinimalLayout} exact />
+      <CustomRoute path="/problem/:id" component={ProblemPage} layout={MinimalLayout} exact />
       <CustomRoute path="/contact-us" component={ContactUsPage} layout={MainLayout} exact />
+      <CustomRedirect from="/play" to="/game/join" />
       <CustomRoute path="*" component={NotFound} layout={MainLayout} />
     </Switch>
   );
