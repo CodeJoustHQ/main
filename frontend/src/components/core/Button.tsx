@@ -108,8 +108,9 @@ export const SmallDifficultyButton = styled(DefaultButton)<DifficultyProps>`
 
 export const DifficultyDisplayButton = styled(SmallDifficultyButton)`
   font-size: ${({ theme }) => theme.fontSize.medium};
-  width: 4.75rem;
-  height: 1.5rem;
+  width: unset;
+  padding: 2px 15px;
+  height: 1.75rem;
   margin: 0 0 15px 0;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);
   
