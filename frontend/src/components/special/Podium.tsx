@@ -8,6 +8,7 @@ type PodiumProps = {
   place: number,
   player: Player | undefined,
   gameStartTime: string,
+  inviteContent: React.ReactNode,
   loading: boolean,
 };
 
@@ -71,7 +72,7 @@ const Medal = styled.div<MedalProps>`
 
 function Podium(props: PodiumProps) {
   const {
-    place, player, gameStartTime, loading,
+    place, player, gameStartTime, loading, inviteContent,
   } = props;
 
   const [bestSubmission, setBestSubmission] = useState<Submission | null>(null);
@@ -115,7 +116,10 @@ function Podium(props: PodiumProps) {
 
   const getScoreText = () => {
     if (!player) {
-      return <ScoreText>{loading ? 'Loading...' : 'Invite'}</ScoreText>;
+      if (loading) {
+        return <ScoreText>{loading ? 'Loading...' : 'Invite'}</ScoreText>;
+      }
+      return inviteContent;
     }
 
     if (!bestSubmission) {

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import copy from 'copy-to-clipboard';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
 import { LargeText } from '../components/core/Text';
@@ -19,6 +20,11 @@ import { User } from '../api/User';
 import Podium from '../components/special/Podium';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
 import { Coordinate } from '../components/special/FloatingCircle';
+import {
+  CopyIndicator,
+  CopyIndicatorContainer,
+  InlineCopyIcon,
+} from '../components/special/CopyIndicator';
 
 const Content = styled.div`
   padding: 0;
@@ -34,6 +40,23 @@ const PrimaryButtonHoverElement = styled(HoverElement)`
 const PodiumContainer = styled.div`
   display: flex;
   justify-content: center;
+`;
+
+const InviteContainer = styled.div`
+  width: 70%;
+  margin: 20px auto 0 auto;
+  border-radius: 5px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);
+  padding: 5px;
+  
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+const InviteText = styled.p`
+  margin: 0;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
 `;
 
 type LocationState = {
@@ -56,6 +79,7 @@ function GameResultsPage() {
 
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
+  const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
 
   useEffect(() => {
     if (checkLocationState(location, 'roomId', 'currentUser')) {
@@ -140,8 +164,28 @@ function GameResultsPage() {
     window.onmousemove = mouseMoveHandler;
   }, [mouseMoveHandler]);
 
+  // Content to display for inviting players (if not enough players on the podium)
+  const inviteContent = () => (
+    <InviteContainer>
+      <InviteText
+        onClick={() => {
+          copy(`https://codejoust.co/play?room=${roomId}`);
+          setCopiedRoomLink(true);
+        }}
+      >
+        Invite
+        <InlineCopyIcon>content_copy</InlineCopyIcon>
+      </InviteText>
+    </InviteContainer>
+  );
+
   return (
     <Content>
+      <CopyIndicatorContainer copied={copiedRoomLink}>
+        <CopyIndicator onClick={() => setCopiedRoomLink(false)}>
+          Link copied!&nbsp;&nbsp;✕
+        </CopyIndicator>
+      </CopyIndicatorContainer>
       <HoverTooltip
         visible={hoverVisible}
         x={mousePosition.x}
@@ -155,18 +199,21 @@ function GameResultsPage() {
           place={2}
           player={players[1]}
           gameStartTime={startTime}
+          inviteContent={inviteContent()}
           loading={loading}
         />
         <Podium
           place={1}
           player={players[0]}
           gameStartTime={startTime}
+          inviteContent={inviteContent()}
           loading={loading}
         />
         <Podium
           place={3}
           player={players[2]}
           gameStartTime={startTime}
+          inviteContent={inviteContent()}
           loading={loading}
         />
       </PodiumContainer>
