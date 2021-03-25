@@ -6,7 +6,7 @@ import { LargeText } from '../components/core/Text';
 import {
   getGame, Game, Player, playAgain,
 } from '../api/Game';
-import { checkLocationState } from '../util/Utility';
+import { checkLocationState, leaveRoom } from '../util/Utility';
 import { errorHandler } from '../api/Error';
 import PlayerResultsCard from '../components/card/PlayerResultsCard';
 import { PrimaryButton, SecondaryRedButton } from '../components/core/Button';
@@ -17,7 +17,6 @@ import {
 } from '../api/Socket';
 import { User } from '../api/User';
 import Podium from '../components/special/Podium';
-import { removeUser } from '../api/Room';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
 import { Coordinate } from '../components/special/FloatingCircle';
 
@@ -130,25 +129,6 @@ function GameResultsPage() {
       });
   };
 
-  const leaveRoom = () => {
-    // eslint-disable-next-line no-alert
-    if (window.confirm('Are you sure you want to leave the room?')) {
-      if (currentUser && currentUser.userId) {
-        setLoading(true);
-        setError('');
-        removeUser(roomId, {
-          initiator: currentUser,
-          userToDelete: currentUser,
-        });
-        disconnect();
-      }
-
-      history.replace('/game/join', {
-        error: errorHandler('You left the game.'),
-      });
-    }
-  };
-
   const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
 
   // Get current mouse position.
@@ -215,7 +195,7 @@ function GameResultsPage() {
         </HoverContainer>
 
         <SecondaryRedButton
-          onClick={leaveRoom}
+          onClick={() => leaveRoom(history, roomId, currentUser)}
         >
           Leave Room
         </SecondaryRedButton>

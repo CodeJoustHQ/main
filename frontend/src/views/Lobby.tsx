@@ -14,7 +14,7 @@ import {
   connect, routes, subscribe, disconnect,
 } from '../api/Socket';
 import { User } from '../api/User';
-import { checkLocationState, isValidRoomId } from '../util/Utility';
+import { checkLocationState, isValidRoomId, leaveRoom } from '../util/Utility';
 import { Difficulty } from '../api/Difficulty';
 import {
   PrimaryButton,
@@ -417,26 +417,6 @@ function LobbyPage() {
     }
   };
 
-  const leaveRoom = () => {
-    // eslint-disable-next-line no-alert
-    if (window.confirm('Are you sure you want to leave the room?')) {
-      if (currentUser && currentUser.userId) {
-        setLoading(true);
-        setError('');
-        removeUser(currentRoomId, {
-          initiator: currentUser,
-          userToDelete: currentUser,
-        });
-        disconnect();
-      }
-
-      // Redirect user regardless of POST request success.
-      history.replace('/game/join', {
-        error: errorHandler('You left the room.'),
-      });
-    }
-  };
-
   // Get current mouse position.
   const mouseMoveHandler = useCallback((e: MouseEvent) => {
     setMousePosition({ x: e.pageX, y: e.pageY });
@@ -550,7 +530,7 @@ function LobbyPage() {
         </HoverContainerPrimaryButton>
 
         <SecondaryRedButton
-          onClick={leaveRoom}
+          onClick={() => leaveRoom(history, currentRoomId, currentUser)}
         >
           Leave Room
         </SecondaryRedButton>
