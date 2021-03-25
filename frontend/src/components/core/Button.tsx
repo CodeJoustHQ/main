@@ -107,9 +107,15 @@ export const SmallDifficultyButton = styled(DefaultButton)<DifficultyProps>`
 `;
 
 export const DifficultyDisplayButton = styled(SmallDifficultyButton)`
-  width: 4.5rem;
-  height: 1.75rem;
-  margin: 8px;
+  font-size: ${({ theme }) => theme.fontSize.medium};
+  width: 4.75rem;
+  height: 1.5rem;
+  margin: 0 0 15px 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);
+  
+  &:hover {
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.24);
+  }
 `;
 
 export const SmallDifficultyButtonNoMargin = styled(SmallDifficultyButton)`
