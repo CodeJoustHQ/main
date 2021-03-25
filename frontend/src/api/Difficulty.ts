@@ -15,7 +15,8 @@ type DifficultyColorMap = {
 };
 
 export const displayNameFromDifficulty = (difficulty: Difficulty) => {
-  const keys = Object.keys(Difficulty).filter((key) => Difficulty[key as keyof typeof Difficulty] === difficulty);
+  const keys = Object.keys(Difficulty)
+    .filter((key) => Difficulty[key as keyof typeof Difficulty] === difficulty);
   return keys.length > 0 ? keys[0] : '';
 };
 

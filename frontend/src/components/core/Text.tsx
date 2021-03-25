@@ -105,7 +105,7 @@ export const SmallActionHeaderText = styled.p`
 
 export const SmallActionText = styled.p`
   font-size: ${({ theme }) => theme.fontSize.medium};
-  margin: 2px 0px;
+  margin: 2px 0;
 
   &:hover {
     cursor: pointer;
