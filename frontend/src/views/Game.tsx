@@ -30,7 +30,7 @@ import {
 import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
-import { TextButton } from '../components/core/Button';
+import { TextButton, SmallDifficultyButton } from '../components/core/Button';
 import {
   connect, disconnect, routes, send, subscribe,
 } from '../api/Socket';
@@ -425,6 +425,13 @@ function GamePage() {
           {/* Problem title/description panel */}
           <OverflowPanel className="display-box-shadow">
             <ProblemHeaderText>{problems[0]?.name}</ProblemHeaderText>
+            {problems[0] ? (
+              <SmallDifficultyButton
+                difficulty={problems[0].difficulty!}
+                enabled={false}
+                active
+              />
+            ) : null}
             <StyledMarkdownEditor
               defaultValue={problems[0]?.description}
               onChange={() => ''}
