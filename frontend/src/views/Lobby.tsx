@@ -40,6 +40,7 @@ import IdContainer from '../components/special/IdContainer';
 import { FlexBareContainer } from '../components/core/Container';
 import { Slider, SliderContainer } from '../components/core/RangeSlider';
 import { Coordinate } from '../components/special/FloatingCircle';
+import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
 
 type LobbyPageLocation = {
   user: User,
@@ -93,48 +94,6 @@ const BackgroundContainer = styled.div`
 
 const DifficultyContainer = styled.div`
   margin-bottom: 10px;
-`;
-
-type HoverTooltipType = {
-  x: number,
-  y: number,
-  visible: boolean,
-}
-
-const HoverTooltip = styled.div.attrs((props: HoverTooltipType) => ({
-  style: {
-    display: `${props.visible ? 'block' : 'none'}`,
-    transform: `translate(${props.x + 2}px, ${props.y + 2}px)`,
-  },
-}))<HoverTooltipType>`
-  z-index: 3;
-  padding: 0.25rem;
-  border-radius: 0.25rem;
-  background: ${({ theme }) => theme.colors.text};
-  color: ${({ theme }) => theme.colors.white};
-  font-size: ${({ theme }) => theme.fontSize.medium};
-  position: absolute;
-  top: 0;
-  left: 0;
-`;
-
-const HoverContainer = styled.div`
-  position: relative;
-  padding: 0;
-  display: inline-block;
-`;
-
-type HoverElementDisplay = {
-  enabled: boolean,
-}
-
-const HoverElement = styled.div.attrs((props: HoverElementDisplay) => ({
-  style: {
-    display: `${props.enabled ? 'none' : 'block'}`,
-  },
-}))<HoverElementDisplay>`
-  position: absolute;
-  z-index: 1;
 `;
 
 const HoverContainerPrimaryButton = styled(HoverContainer)`
