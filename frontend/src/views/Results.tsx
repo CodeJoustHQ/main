@@ -167,7 +167,7 @@ function GameResultsPage() {
         x={mousePosition.x}
         y={mousePosition.y}
       >
-        Only the host can start the game and update settings
+        Only the host can restart the room
       </HoverTooltip>
       <LargeText>Winners</LargeText>
       <PodiumContainer>
