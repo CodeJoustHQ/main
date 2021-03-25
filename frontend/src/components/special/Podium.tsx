@@ -78,12 +78,16 @@ function Podium(props: PodiumProps) {
 
   useEffect(() => {
     if (player) {
+      let newBestSubmission: Submission | null = bestSubmission;
+
       // Find best submission
       player.submissions.forEach((submission) => {
-        if (!bestSubmission || submission.numCorrect > bestSubmission.numCorrect) {
-          setBestSubmission(submission);
+        if (!newBestSubmission || submission.numCorrect > newBestSubmission.numCorrect) {
+          newBestSubmission = submission;
         }
       });
+
+      setBestSubmission(newBestSubmission);
     }
   }, [player, setBestSubmission]);
 
@@ -115,7 +119,7 @@ function Podium(props: PodiumProps) {
     }
 
     if (!bestSubmission) {
-      return <ScoreText>{loading ? 'Loading...' : 'Scored 0'}</ScoreText>;
+      return <ScoreText>Scored 0</ScoreText>;
     }
 
     const percent = Math.round((bestSubmission.numCorrect / bestSubmission.numTestCases) * 100);
@@ -140,7 +144,7 @@ function Podium(props: PodiumProps) {
     return (
       <SmallerText>
         in
-        <b>{` ${diffMinutes} minutes`}</b>
+        <b>{` ${diffMinutes} minute${diffMinutes === 1 ? '' : 's'}`}</b>
       </SmallerText>
     );
   };

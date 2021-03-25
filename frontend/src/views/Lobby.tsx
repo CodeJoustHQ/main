@@ -620,7 +620,7 @@ function LobbyPage() {
             </DifficultyContainer>
             <NoMarginMediumText>Duration</NoMarginMediumText>
             <NoMarginSubtitleText>
-              {`${duration} minutes`}
+              {`${duration} minute${duration === 1 ? '' : 's'}`}
             </NoMarginSubtitleText>
             <HoverContainerSlider>
               <HoverElementSlider

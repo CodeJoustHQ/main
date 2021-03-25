@@ -194,7 +194,6 @@ function GameResultsPage() {
       <div>
         <HoverContainer>
           <PrimaryButtonHoverElement
-            onClick={callPlayAgain}
             enabled={isHost(currentUser)}
             onMouseEnter={() => {
               if (!isHost(currentUser)) {
@@ -209,7 +208,7 @@ function GameResultsPage() {
           />
           <PrimaryButton
             onClick={callPlayAgain}
-            disabled={!currentUser || currentUser?.userId !== host?.userId}
+            disabled={loading || !isHost(currentUser)}
           >
             Play Again
           </PrimaryButton>
