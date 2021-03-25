@@ -41,7 +41,7 @@ export const PrimaryButton = styled(DefaultButton)<any>`
   }
 `;
 
-export const SecondaryRedButton = styled(PrimaryButton)<any>`
+export const SecondaryRedButton = styled(PrimaryButton)`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.red2};
   margin: 1.2rem 0;
@@ -105,6 +105,10 @@ export const SmallDifficultyButton = styled(DefaultButton)<DifficultyProps>`
     
     cursor: ${({ enabled }) => (enabled ? 'pointer' : 'default')};
   }
+`;
+
+export const SmallDifficultyButtonNoMargin = styled(SmallDifficultyButton)`
+  margin: 0;
 `;
 
 export const DifficultyButton = styled(DefaultButton)<DifficultyProps>`

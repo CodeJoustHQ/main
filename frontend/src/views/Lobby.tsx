@@ -6,7 +6,7 @@ import copy from 'copy-to-clipboard';
 import ErrorMessage from '../components/core/Error';
 import {
   NoMarginMediumText,
-  MainHeaderText,
+  SecondaryHeaderText,
   SmallHeaderText,
   NoMarginSubtitleText,
 } from '../components/core/Text';
@@ -18,7 +18,7 @@ import { checkLocationState, isValidRoomId } from '../util/Utility';
 import { Difficulty } from '../api/Difficulty';
 import {
   PrimaryButton,
-  SmallDifficultyButton,
+  SmallDifficultyButtonNoMargin,
   InlineRefreshIcon,
   SecondaryRedButton,
 } from '../components/core/Button';
@@ -39,6 +39,8 @@ import {
 import IdContainer from '../components/special/IdContainer';
 import { FlexBareContainer } from '../components/core/Container';
 import { Slider, SliderContainer } from '../components/core/RangeSlider';
+import { Coordinate } from '../components/special/FloatingCircle';
+import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
 
 type LobbyPageLocation = {
   user: User,
@@ -46,6 +48,7 @@ type LobbyPageLocation = {
 };
 
 const HeaderContainer = styled.div`
+  max-width: 500px;
   text-align: left;
   width: 66%;
   margin: 2rem auto 0;
@@ -58,8 +61,8 @@ const HeaderContainer = styled.div`
   }
 `;
 
-const PrimaryButtonZeroLeftMargin = styled(PrimaryButton)`
-  margin-left: 0;
+const PrimaryButtonNoMargin = styled(PrimaryButton)`
+  margin: 0;
 `;
 
 const FlexBareContainerLeft = styled(FlexBareContainer)`
@@ -67,21 +70,21 @@ const FlexBareContainerLeft = styled(FlexBareContainer)`
 `;
 
 const PlayersContainer = styled.div`
-  flex: 6;
+  flex: 1;
   padding-right: 5px;
 `;
 
 const RoomSettingsContainer = styled.div`
-  flex: 4;
+  flex: 1;
   padding-left: 5px;
 `;
 
-const SmallHeaderTextZeroTopMargin = styled(SmallHeaderText)`
+const LobbyContainerTitle = styled(SmallHeaderText)`
   margin: 0 0 10px 0;
 `;
 
 const BackgroundContainer = styled.div`
-  height: 12rem;
+  height: 16rem;
   background: ${({ theme }) => theme.colors.white};
   padding: 1rem;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
@@ -91,6 +94,35 @@ const BackgroundContainer = styled.div`
 
 const DifficultyContainer = styled.div`
   margin-bottom: 10px;
+`;
+
+const HoverContainerPrimaryButton = styled(HoverContainer)`
+  margin: 1.2rem 1.2rem 1.2rem 0;
+`;
+
+const HoverElementPrimaryButton = styled(HoverElement)`
+  width: 10rem;
+  height: 2.75rem;
+`;
+
+const HoverContainerSmallDifficultyButton = styled(HoverContainer)`
+  margin: 0.5rem 1rem 0 0;
+`;
+
+const HoverElementSmallDifficultyButton = styled(HoverElement)`
+  width: 5rem;
+  height: 2rem;
+`;
+
+const HoverContainerSlider = styled(HoverContainer)`
+  width: 100%;
+  margin: 0.5rem 0;
+`;
+
+const HoverElementSlider = styled(HoverElement)`
+  max-width: 370px;
+  width: 100%;
+  height: 20px;
 `;
 
 function LobbyPage() {
@@ -103,12 +135,15 @@ function LobbyPage() {
 
   // Set all the different variables in the room object
   const [host, setHost] = useState<User | null>(null);
+  const [users, setUsers] = useState<User[] | null>(null);
   const [activeUsers, setActiveUsers] = useState<User[] | null>(null);
   const [inactiveUsers, setInactiveUsers] = useState<User[] | null>(null);
   const [currentRoomId, setRoomId] = useState('');
   const [active, setActive] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [duration, setDuration] = useState<number | undefined>(15);
+  const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
+  const [hoverVisible, setHoverVisible] = useState<boolean>(false);
 
   // Hold error text.
   const [error, setError] = useState('');
@@ -130,6 +165,7 @@ function LobbyPage() {
    */
   const setStateFromRoom = (room: Room) => {
     setHost(room.host);
+    setUsers(room.users);
     setActiveUsers(room.activeUsers);
     setInactiveUsers(room.inactiveUsers);
     setRoomId(room.roomId);
@@ -393,13 +429,22 @@ function LobbyPage() {
         });
         disconnect();
       }
-    }
 
-    // Redirect user regardless of POST request success.
-    history.replace('/game/join', {
-      error: errorHandler('You left the room.'),
-    });
+      // Redirect user regardless of POST request success.
+      history.replace('/game/join', {
+        error: errorHandler('You left the room.'),
+      });
+    }
   };
+
+  // Get current mouse position.
+  const mouseMoveHandler = useCallback((e: MouseEvent) => {
+    setMousePosition({ x: e.clientX, y: e.clientY });
+  }, [setMousePosition]);
+
+  useEffect(() => {
+    window.onmousemove = mouseMoveHandler;
+  }, [mouseMoveHandler]);
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
@@ -448,13 +493,20 @@ function LobbyPage() {
   // Render the lobby.
   return (
     <>
+      <HoverTooltip
+        visible={hoverVisible}
+        x={mousePosition.x}
+        y={mousePosition.y}
+      >
+        Only the host can start the game and update settings
+      </HoverTooltip>
       <CopyIndicatorContainer copied={copiedRoomLink}>
         <CopyIndicator onClick={() => setCopiedRoomLink(false)}>
           Link copied!&nbsp;&nbsp;✕
         </CopyIndicator>
       </CopyIndicatorContainer>
       <HeaderContainer>
-        <MainHeaderText>
+        <SecondaryHeaderText>
           Join with the link
           {' '}
           <InlineBackgroundCopyText
@@ -473,29 +525,45 @@ function LobbyPage() {
           <i>codejoust.co/play</i>
           {' '}
           with Room ID:
-        </MainHeaderText>
+        </SecondaryHeaderText>
         <IdContainer id={currentRoomId} />
-        <PrimaryButtonZeroLeftMargin
-          onClick={handleStartGame}
-          disabled={loading || !isHost(currentUser)}
-          title={!isHost(currentUser) ? 'Only the host can start the game' : undefined}
-        >
-          Start Game
-        </PrimaryButtonZeroLeftMargin>
+        <HoverContainerPrimaryButton>
+          <HoverElementPrimaryButton
+            enabled={isHost(currentUser)}
+            onMouseEnter={() => {
+              if (!isHost(currentUser)) {
+                setHoverVisible(true);
+              }
+            }}
+            onMouseLeave={() => {
+              if (!isHost(currentUser)) {
+                setHoverVisible(false);
+              }
+            }}
+          />
+          <PrimaryButtonNoMargin
+            onClick={handleStartGame}
+            disabled={loading || !isHost(currentUser)}
+          >
+            Start Game
+          </PrimaryButtonNoMargin>
+        </HoverContainerPrimaryButton>
+
         <SecondaryRedButton
           onClick={leaveRoom}
         >
           Leave Room
         </SecondaryRedButton>
+
       </HeaderContainer>
 
       <FlexBareContainerLeft>
         <PlayersContainer>
-          <SmallHeaderTextZeroTopMargin>
+          <LobbyContainerTitle>
             Players
             {
-              (activeUsers && inactiveUsers)
-                ? ` (${activeUsers.length + inactiveUsers.length})`
+              users
+                ? ` (${users.length})`
                 : null
             }
             <InlineRefreshIcon
@@ -503,7 +571,7 @@ function LobbyPage() {
             >
               refresh
             </InlineRefreshIcon>
-          </SmallHeaderTextZeroTopMargin>
+          </LobbyContainerTitle>
           <BackgroundContainer>
             {
               displayUsers(activeUsers, true)
@@ -516,23 +584,37 @@ function LobbyPage() {
           </BackgroundContainer>
         </PlayersContainer>
         <RoomSettingsContainer>
-          <SmallHeaderTextZeroTopMargin>Room Settings</SmallHeaderTextZeroTopMargin>
+          <LobbyContainerTitle>Room Settings</LobbyContainerTitle>
           <BackgroundContainer>
             <NoMarginMediumText>Difficulty</NoMarginMediumText>
             <DifficultyContainer>
               {Object.keys(Difficulty).map((key) => {
                 const difficultyKey: Difficulty = Difficulty[key as keyof typeof Difficulty];
                 return (
-                  <SmallDifficultyButton
-                    difficulty={difficultyKey}
-                    onClick={() => updateDifficultySetting(key)}
-                    active={difficulty === difficultyKey}
-                    enabled={isHost(currentUser)}
-                    disabled={!isHost(currentUser)}
-                    title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
-                  >
-                    {key}
-                  </SmallDifficultyButton>
+                  <HoverContainerSmallDifficultyButton>
+                    <HoverElementSmallDifficultyButton
+                      enabled={isHost(currentUser)}
+                      onMouseEnter={() => {
+                        if (!isHost(currentUser)) {
+                          setHoverVisible(true);
+                        }
+                      }}
+                      onMouseLeave={() => {
+                        if (!isHost(currentUser)) {
+                          setHoverVisible(false);
+                        }
+                      }}
+                    />
+                    <SmallDifficultyButtonNoMargin
+                      difficulty={difficultyKey}
+                      onClick={() => updateDifficultySetting(key)}
+                      active={difficulty === difficultyKey}
+                      enabled={isHost(currentUser)}
+                      disabled={!isHost(currentUser)}
+                    >
+                      {key}
+                    </SmallDifficultyButtonNoMargin>
+                  </HoverContainerSmallDifficultyButton>
                 );
               })}
             </DifficultyContainer>
@@ -540,29 +622,43 @@ function LobbyPage() {
             <NoMarginSubtitleText>
               {`${duration} minutes`}
             </NoMarginSubtitleText>
-            <SliderContainer>
-              <Slider
-                min={1}
-                max={60}
-                value={duration}
-                disabled={!isHost(currentUser)}
-                title={!isHost(currentUser) ? 'Only the host can change these settings' : undefined}
-                onChange={(e) => {
-                  const { value } = e.target;
-
-                  // Set duration to undefined to allow users to clear field
-                  if (!value) {
-                    setDuration(undefined);
-                  } else {
-                    const newDuration = Number(value);
-                    if (newDuration >= 0 && newDuration <= 60) {
-                      setDuration(newDuration);
-                    }
+            <HoverContainerSlider>
+              <HoverElementSlider
+                enabled={isHost(currentUser)}
+                onMouseEnter={() => {
+                  if (!isHost(currentUser)) {
+                    setHoverVisible(true);
                   }
                 }}
-                onMouseUp={updateRoomDuration}
+                onMouseLeave={() => {
+                  if (!isHost(currentUser)) {
+                    setHoverVisible(false);
+                  }
+                }}
               />
-            </SliderContainer>
+              <SliderContainer>
+                <Slider
+                  min={1}
+                  max={60}
+                  value={duration}
+                  disabled={!isHost(currentUser)}
+                  onChange={(e) => {
+                    const { value } = e.target;
+
+                    // Set duration to undefined to allow users to clear field
+                    if (!value) {
+                      setDuration(undefined);
+                    } else {
+                      const newDuration = Number(value);
+                      if (newDuration >= 0 && newDuration <= 60) {
+                        setDuration(newDuration);
+                      }
+                    }
+                  }}
+                  onMouseUp={updateRoomDuration}
+                />
+              </SliderContainer>
+            </HoverContainerSlider>
           </BackgroundContainer>
         </RoomSettingsContainer>
       </FlexBareContainerLeft>

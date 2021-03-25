@@ -10,6 +10,7 @@ export const ThemeConfig: any = {
     background: '#f8f8f8',
     border: '#ccc',
     lightBlue: '#AED2EA',
+    sliderBlue: '#B7D4FF',
     blue: '#3E93CD',
     darkBlue: '#2E7DB2',
     red: 'red',
