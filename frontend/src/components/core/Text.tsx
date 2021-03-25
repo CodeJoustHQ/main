@@ -94,6 +94,7 @@ export const UserNicknameText = styled(Text)<NicknameType>`
 export const ProblemHeaderText = styled.h2`
   font-size: ${({ theme }) => theme.fontSize.large};
   color: ${({ theme }) => theme.colors.darkText};
+  margin-bottom: 5px;
 `;
 
 export const SmallActionHeaderText = styled.p`

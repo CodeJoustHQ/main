@@ -106,6 +106,12 @@ export const SmallDifficultyButton = styled(DefaultButton)<DifficultyProps>`
   }
 `;
 
+export const DifficultyDisplayButton = styled(SmallDifficultyButton)`
+  width: 4.5rem;
+  height: 1.75rem;
+  margin: 8px;
+`;
+
 export const SmallDifficultyButtonNoMargin = styled(SmallDifficultyButton)`
   margin: 0;
 `;
