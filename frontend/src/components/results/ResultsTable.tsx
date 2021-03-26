@@ -35,11 +35,12 @@ type ResultsTableProps = {
   players: Player[],
   currentUser: User | null,
   gameStartTime: string,
+  viewPlayerCode: (index: number) => void,
 };
 
 function ResultsTable(props: ResultsTableProps) {
   const {
-    players, currentUser, gameStartTime,
+    players, currentUser, gameStartTime, viewPlayerCode,
   } = props;
 
   return (
@@ -59,6 +60,7 @@ function ResultsTable(props: ResultsTableProps) {
           isCurrentPlayer={currentUser?.userId === player.user.userId}
           gameStartTime={gameStartTime}
           color={player.color}
+          onViewCode={() => viewPlayerCode(index)}
         />
       ))}
     </Content>

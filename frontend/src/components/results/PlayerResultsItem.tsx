@@ -5,6 +5,7 @@ import { LowMarginText, Text } from '../core/Text';
 import { Color } from '../../api/Color';
 import { useBestSubmission } from '../../util/Hook';
 import Language, { displayNameFromLanguage } from '../../api/Language';
+import { TextButton } from '../core/Button';
 
 const Content = styled.tr`
   border-radius: 5px;
@@ -21,17 +22,33 @@ const PlayerContent = styled.td`
   text-align: left;
 `;
 
-const PlaceContent = styled.td`
+const PlaceColumn = styled.td`
   width: 70px;
 `;
 
-export const CircleIcon = styled.div<CircleParams>`
+const CodeColumn = styled.td`
+  width: 140px;
+`;
+
+const CircleIcon = styled.div<CircleParams>`
   display: inline-block;
   border-radius: 50%;
   background: ${({ theme, color }) => theme.colors.gradients[color]};
   margin: 0 10px 0 0;
   width: 24px;
   height: 24px;
+`;
+
+const PreviewContainer = styled.div`
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+`;
+
+const PreviewIcon = styled.i`
+  font-size: ${({ theme }) => theme.fontSize.default};
+  margin-left: 5px;
 `;
 
 const PlayerText = styled(LowMarginText)`
@@ -55,11 +72,12 @@ type PlayerResultsCardProps = {
   isCurrentPlayer: boolean,
   gameStartTime: string,
   color: Color,
+  onViewCode: () => void,
 };
 
 function PlayerResultsItem(props: PlayerResultsCardProps) {
   const {
-    player, place, isCurrentPlayer, color, gameStartTime,
+    player, place, isCurrentPlayer, color, gameStartTime, onViewCode,
   } = props;
 
   const bestSubmission = useBestSubmission(player);
@@ -93,19 +111,26 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
 
   const getSubmissionCount = () => player.submissions.length || '0';
 
-  const getSubmissionCode = () => {
+  const getSubmissionLanguage = () => {
     if (!bestSubmission) {
       return 'N/A';
     }
 
-    return displayNameFromLanguage(bestSubmission.language as Language);
+    return (
+      <PreviewContainer>
+        <TextButton onClick={onViewCode}>
+          {displayNameFromLanguage(bestSubmission.language as Language)}
+          <PreviewIcon className="material-icons">launch</PreviewIcon>
+        </TextButton>
+      </PreviewContainer>
+    );
   };
 
   return (
     <Content>
-      <PlaceContent>
+      <PlaceColumn>
         <PlayerText bold>{`${place}. `}</PlayerText>
-      </PlaceContent>
+      </PlaceColumn>
 
       <PlayerContent>
         <FlexCenter>
@@ -123,9 +148,7 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
       <td>
         <Text>{getSubmissionCount()}</Text>
       </td>
-      <td>
-        <Text>{getSubmissionCode()}</Text>
-      </td>
+      <CodeColumn>{getSubmissionLanguage()}</CodeColumn>
     </Content>
   );
 }

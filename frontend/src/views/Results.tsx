@@ -266,7 +266,7 @@ function GameResultsPage() {
         <FeedbackPopup />
       </Modal>
 
-      <Modal show onExit={() => setCodeModal(-1)}>
+      <Modal show={codeModal !== -1} onExit={() => setCodeModal(-1)}>
         {getPreviewCodeContent()}
       </Modal>
 
