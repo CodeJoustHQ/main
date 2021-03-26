@@ -12,4 +12,5 @@ public class UpdateSettingsRequest {
     private ProblemDifficulty difficulty;
     private Long duration;
     private Integer numProblems;
+    private Integer size;
 }

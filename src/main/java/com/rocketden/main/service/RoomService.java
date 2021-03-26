@@ -27,6 +27,7 @@ public class RoomService {
 
     public static final int ROOM_ID_LENGTH = 6;
     public static final long MAX_DURATION = 3600; // 1 hour
+    public static final long MAX_SIZE = 30; // 1 hour
     public static final int MAX_NUM_PROBLEMS = 10;
 
     private final RoomRepository repository;
@@ -272,6 +273,16 @@ public class RoomService {
             }
             room.setDuration(request.getDuration());
         }
+
+        // Set new duration if not null
+        Integer size = request.getSize();
+        if (size != null) {
+            if (size <= 0 || size > MAX_SIZE) {
+                throw new ApiException(TimerError.INVALID_DURATION);
+            }
+            room.setMaxSize(request.getSize());
+        }
+
         
         // Set number of problems if not null
         if (request.getNumProblems() != null) {
@@ -280,6 +291,7 @@ public class RoomService {
             }
             room.setNumProblems(request.getNumProblems());
         }
+
 
         repository.save(room);
 
