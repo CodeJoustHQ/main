@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { Player, Submission } from '../../api/Game';
+import { Player } from '../../api/Game';
 import { Text, MediumText } from '../core/Text';
 import Language, { displayNameFromLanguage } from '../../api/Language';
+import { useBestSubmission } from '../../util/Hook';
 
 type PodiumProps = {
   place: number,
@@ -75,22 +76,7 @@ function Podium(props: PodiumProps) {
     place, player, gameStartTime, loading, inviteContent,
   } = props;
 
-  const [bestSubmission, setBestSubmission] = useState<Submission | null>(null);
-
-  useEffect(() => {
-    if (player) {
-      let newBestSubmission: Submission | null = bestSubmission;
-
-      // Find best submission
-      player.submissions.forEach((submission) => {
-        if (!newBestSubmission || submission.numCorrect > newBestSubmission.numCorrect) {
-          newBestSubmission = submission;
-        }
-      });
-
-      setBestSubmission(newBestSubmission);
-    }
-  }, [player, setBestSubmission]);
+  const bestSubmission = useBestSubmission(player);
 
   const getMedalColor = () => {
     switch (place) {

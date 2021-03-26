@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
 import { Color } from '../../api/Color';
+import { useBestSubmission } from '../../util/Hook';
 
 const Content = styled.tr`
   border-radius: 5px;
@@ -53,17 +54,20 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
     player, place, isCurrentPlayer, color,
   } = props;
 
+  const bestSubmission = useBestSubmission(player);
+
   const getDisplayNickname = () => {
     const { nickname } = player.user;
     return `${nickname} ${isCurrentPlayer ? '(you)' : ''}`;
   };
 
   const getScore = () => {
-    const latestSubmission = player.submissions.slice(-1)[0];
-    if (!latestSubmission) {
-      return 'Final Score: 0 correct';
+    if (!bestSubmission) {
+      return '0';
     }
-    return `Final Score: ${latestSubmission.numCorrect} / ${latestSubmission.numTestCases} correct`;
+
+    const percent = Math.round((bestSubmission.numCorrect / bestSubmission.numTestCases) * 100);
+    return `${percent}%`;
   };
 
   const getSubmissionTime = () => {
@@ -82,7 +86,7 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
         <FlexCenter>
           <PlayerText bold>{`${place}. `}</PlayerText>
           <CircleIcon color={color.gradientColor} />
-          <PlayerText>{getDisplayNickname()}</PlayerText>
+          <PlayerText bold={isCurrentPlayer}>{getDisplayNickname()}</PlayerText>
         </FlexCenter>
       </PlayerContent>
 
