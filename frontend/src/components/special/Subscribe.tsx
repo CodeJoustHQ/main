@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Content = styled.div`
+  margin: 40px;
+
   label {
     display: block;
     font-family: ${({ theme }) => theme.font};
@@ -42,6 +44,10 @@ const Content = styled.div`
     &:hover {
       cursor: pointer;
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.24);
+    }
+    
+    &:focus {
+      outline: none;
     }
   }
 `;

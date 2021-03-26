@@ -21,8 +21,8 @@ const Content = styled.div<ContentProps>`
 
 const ModalContent = styled.div`
   position: relative;
-  padding: 10px 30px 30px 30px;
-  margin-top: 30px;
+  padding: 10px 30px;
+  margin: 30px 0;
 `;
 
 const CloseButton = styled(GrayTextButton)`

@@ -38,6 +38,10 @@ export const TextLink = styled(Link)`
   text-decoration: none;
 `;
 
+export const SecondaryHeaderTextLink = styled(TextLink)`
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+`;
+
 export const InlineExternalLink = styled.a`
   color: ${({ theme }) => theme.colors.blueLink};
 `;

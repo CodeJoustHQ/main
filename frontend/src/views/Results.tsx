@@ -39,7 +39,7 @@ type ShowFeedbackPrompt = {
 const FeedbackButton = styled(TextButton)<ShowFeedbackPrompt>`
   position: fixed;
   top: 50%;
-  right: ${({ show }) => (show ? '15px' : '-100px')};
+  right: ${({ show }) => (show ? '20px' : '-100px')};
   transition: right 300ms;
 `;
 
@@ -97,7 +97,7 @@ function GameResultsPage() {
   const [showFeedbackPrompt, setShowFeedbackPrompt] = useState<boolean>(false);
 
   useEffect(() => {
-    setTimeout(() => setShowFeedbackPrompt(true), 3000);
+    setTimeout(() => setShowFeedbackPrompt(true), 2000);
   }, []);
 
   useEffect(() => {
