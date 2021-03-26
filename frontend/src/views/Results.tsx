@@ -26,6 +26,7 @@ import {
 } from '../components/special/CopyIndicator';
 import ResultsTable from '../components/results/ResultsTable';
 import Modal from '../components/core/Modal';
+import FeedbackPopup from '../components/results/FeedbackPopup';
 
 const Content = styled.div`
   padding: 0;
@@ -211,15 +212,12 @@ function GameResultsPage() {
       >
         Only the host can restart the room
       </HoverTooltip>
+
       <FeedbackButton onClick={() => setShowFeedbackModal(true)} show={showFeedbackPrompt}>
         <span role="img" aria-label="wave">Hello! 👋</span>
       </FeedbackButton>
       <Modal show={showFeedbackModal} onExit={() => setShowFeedbackModal(false)}>
-        <p>hello there!</p>
-
-        <div>
-          <h1>please leave feedback</h1>
-        </div>
+        <FeedbackPopup />
       </Modal>
 
       <LargeText>Winners</LargeText>
