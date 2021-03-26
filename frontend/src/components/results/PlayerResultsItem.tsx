@@ -8,8 +8,11 @@ import Language, { displayNameFromLanguage } from '../../api/Language';
 
 const Content = styled.tr`
   border-radius: 5px;
-  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
-  background-color: ${({ theme }) => theme.colors.white};
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  
+  td {
+    background-color: ${({ theme }) => theme.colors.white};
+  }
 `;
 
 const PlayerContent = styled.td`
@@ -77,7 +80,7 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
 
   const getSubmissionTime = () => {
     if (!bestSubmission) {
-      return 'None';
+      return 'N/A';
     }
 
     // Calculate time from start of game till best submission

@@ -109,7 +109,13 @@ function Podium(props: PodiumProps) {
     }
 
     if (!bestSubmission) {
-      return <ScoreText>Scored 0</ScoreText>;
+      return (
+        <ScoreText>
+          Scored
+          {' '}
+          <b>0</b>
+        </ScoreText>
+      );
     }
 
     const percent = Math.round((bestSubmission.numCorrect / bestSubmission.numTestCases) * 100);
