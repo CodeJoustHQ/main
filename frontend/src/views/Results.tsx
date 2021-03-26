@@ -9,7 +9,7 @@ import {
 } from '../api/Game';
 import { checkLocationState, leaveRoom } from '../util/Utility';
 import { errorHandler } from '../api/Error';
-import { PrimaryButton, SecondaryRedButton } from '../components/core/Button';
+import { TextButton, PrimaryButton, SecondaryRedButton } from '../components/core/Button';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import {
@@ -29,6 +29,17 @@ import Modal from '../components/core/Modal';
 
 const Content = styled.div`
   padding: 0;
+`;
+
+type ShowFeedbackPrompt = {
+  show: boolean,
+}
+
+const FeedbackButton = styled(TextButton)<ShowFeedbackPrompt>`
+  position: fixed;
+  top: 50%;
+  right: ${({ show }) => (show ? '10px' : '-100px')};
+  transition: right 300ms;
 `;
 
 const PrimaryButtonHoverElement = styled(HoverElement)`
@@ -82,6 +93,11 @@ function GameResultsPage() {
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
   const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState<boolean>(false);
+  const [showFeedbackPrompt, setShowFeedbackPrompt] = useState<boolean>(false);
+
+  useEffect(() => {
+    setTimeout(() => setShowFeedbackPrompt(true), 3000);
+  }, []);
 
   useEffect(() => {
     if (checkLocationState(location, 'roomId', 'currentUser')) {
@@ -195,6 +211,9 @@ function GameResultsPage() {
       >
         Only the host can restart the room
       </HoverTooltip>
+      <FeedbackButton onClick={() => setShowFeedbackModal(true)} show={showFeedbackPrompt}>
+        <span role="img" aria-label="wave">Hello! 👋</span>
+      </FeedbackButton>
       <Modal show={showFeedbackModal} onExit={() => setShowFeedbackModal(false)}>
         <p>hello there!</p>
 
@@ -257,13 +276,6 @@ function GameResultsPage() {
           Leave Room
         </SecondaryRedButton>
       </div>
-
-      <PrimaryButton
-        onClick={() => setShowFeedbackModal(true)}
-        disabled={false}
-      >
-        Play Again
-      </PrimaryButton>
 
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
