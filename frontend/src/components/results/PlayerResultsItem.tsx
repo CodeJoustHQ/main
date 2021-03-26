@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
-import PlayerIcon from '../card/PlayerIcon';
 import { Color } from '../../api/Color';
 
 const Content = styled.tr`
@@ -12,8 +11,35 @@ const Content = styled.tr`
 `;
 
 const PlayerContent = styled.td`
-  
+  height: 40px;
+  line-height: 40px;
+  text-align: left;
 `;
+
+export const CircleIcon = styled.div<CircleParams>`
+  display: inline-block;
+  border-radius: 50%;
+  background: ${({ theme, color }) => theme.colors.gradients[color]};
+  margin: 0 10px 0 20px;
+  width: 24px;
+  height: 24px;
+`;
+
+const PlayerText = styled(LowMarginText)`
+  display: inline-block;
+`;
+
+const FlexCenter = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  padding: 0 20px;
+`;
+
+type CircleParams = {
+  color: string,
+};
 
 type PlayerResultsCardProps = {
   player: Player,
@@ -53,14 +79,11 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
   return (
     <Content>
       <PlayerContent>
-        <LowMarginText bold>{`${place}. `}</LowMarginText>
-        <PlayerIcon
-          gradientColor={color.gradientColor}
-          nickname={player.user.nickname}
-          active={Boolean(player.user.sessionId)}
-        />
-        <br />
-        <LowMarginText>{getDisplayNickname()}</LowMarginText>
+        <FlexCenter>
+          <PlayerText bold>{`${place}. `}</PlayerText>
+          <CircleIcon color={color.gradientColor} />
+          <PlayerText>{getDisplayNickname()}</PlayerText>
+        </FlexCenter>
       </PlayerContent>
 
       <td>

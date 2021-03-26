@@ -10,6 +10,16 @@ const Content = styled.table`
   
   border-collapse: separate; 
   border-spacing: 0 10px;
+  
+  tr td:first-child {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+  }
+
+  tr td:last-child {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
 `;
 
 type ResultsTableProps = {
