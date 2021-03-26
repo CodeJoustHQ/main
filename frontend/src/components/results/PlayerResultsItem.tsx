@@ -4,6 +4,7 @@ import { Player } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
 import { Color } from '../../api/Color';
 import { useBestSubmission } from '../../util/Hook';
+import Language, { displayNameFromLanguage } from '../../api/Language';
 
 const Content = styled.tr`
   border-radius: 5px;
@@ -17,11 +18,15 @@ const PlayerContent = styled.td`
   text-align: left;
 `;
 
+const PlaceContent = styled.td`
+  width: 70px;
+`;
+
 export const CircleIcon = styled.div<CircleParams>`
   display: inline-block;
   border-radius: 50%;
   background: ${({ theme, color }) => theme.colors.gradients[color]};
-  margin: 0 10px 0 20px;
+  margin: 0 10px 0 0;
   width: 24px;
   height: 24px;
 `;
@@ -35,7 +40,6 @@ const FlexCenter = styled.div`
   display: flex;
   align-items: center;
   justify-content: left;
-  padding: 0 20px;
 `;
 
 type CircleParams = {
@@ -46,12 +50,13 @@ type PlayerResultsCardProps = {
   player: Player,
   place: number,
   isCurrentPlayer: boolean,
+  gameStartTime: string,
   color: Color,
 };
 
 function PlayerResultsItem(props: PlayerResultsCardProps) {
   const {
-    player, place, isCurrentPlayer, color,
+    player, place, isCurrentPlayer, color, gameStartTime,
   } = props;
 
   const bestSubmission = useBestSubmission(player);
@@ -71,20 +76,36 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
   };
 
   const getSubmissionTime = () => {
-    return '0';
+    if (!bestSubmission) {
+      return 'None';
+    }
+
+    // Calculate time from start of game till best submission
+    const startTime = new Date(gameStartTime).getTime();
+    const diffMilliseconds = new Date(bestSubmission.startTime).getTime() - startTime;
+    const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
+
+    return ` ${diffMinutes} min`;
   };
 
-  const getSubmissionCount = () => `Submissions: ${player.submissions.length}`;
+  const getSubmissionCount = () => player.submissions.length || '0';
 
   const getSubmissionCode = () => {
-    return 'Python';
+    if (!bestSubmission) {
+      return 'N/A';
+    }
+
+    return displayNameFromLanguage(bestSubmission.language as Language);
   };
 
   return (
     <Content>
+      <PlaceContent>
+        <PlayerText bold>{`${place}. `}</PlayerText>
+      </PlaceContent>
+
       <PlayerContent>
         <FlexCenter>
-          <PlayerText bold>{`${place}. `}</PlayerText>
           <CircleIcon color={color.gradientColor} />
           <PlayerText bold={isCurrentPlayer}>{getDisplayNickname()}</PlayerText>
         </FlexCenter>

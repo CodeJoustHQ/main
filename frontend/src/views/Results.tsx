@@ -251,7 +251,14 @@ function GameResultsPage() {
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
 
-      {players ? <ResultsTable players={players} currentUser={currentUser} /> : null}
+      <LargeText>Scoreboard</LargeText>
+      {players ? (
+        <ResultsTable
+          players={players}
+          currentUser={currentUser}
+          gameStartTime={startTime}
+        />
+      ) : null}
     </Content>
   );
 }

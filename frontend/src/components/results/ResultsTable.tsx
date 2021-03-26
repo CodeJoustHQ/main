@@ -5,7 +5,8 @@ import PlayerResultsItem from './PlayerResultsItem';
 import { User } from '../../api/User';
 
 const Content = styled.table`
-  width: 80%;
+  width: 65%;
+  min-width: 600px;
   margin: 0 auto;
   
   border-collapse: separate; 
@@ -22,23 +23,33 @@ const Content = styled.table`
   }
 `;
 
+const PrimaryTableHeader = styled.th`
+  text-align: left;
+`;
+
+const SmallColumn = styled.th`
+  width: 100px;
+`;
+
 type ResultsTableProps = {
   players: Player[],
   currentUser: User | null,
+  gameStartTime: string,
 };
 
 function ResultsTable(props: ResultsTableProps) {
   const {
-    players, currentUser,
+    players, currentUser, gameStartTime,
   } = props;
 
   return (
     <Content>
       <tr>
-        <th>Player</th>
+        <th />
+        <PrimaryTableHeader>Player</PrimaryTableHeader>
         <th>Score</th>
         <th>Time</th>
-        <th>Submissions</th>
+        <SmallColumn>Submissions</SmallColumn>
         <th>Code</th>
       </tr>
       {players?.map((player, index) => (
@@ -46,6 +57,7 @@ function ResultsTable(props: ResultsTableProps) {
           player={player}
           place={index + 1}
           isCurrentPlayer={currentUser?.userId === player.user.userId}
+          gameStartTime={gameStartTime}
           color={player.color}
         />
       ))}
