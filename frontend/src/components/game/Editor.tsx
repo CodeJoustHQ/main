@@ -158,7 +158,7 @@ function ResizableMonacoEditor(props: EditorProps) {
       </LanguageContainer>
       <EditorContainer>
         <MonacoEditor
-          options={monacoEditorOptions}
+          options={{ ...monacoEditorOptions, readOnly: !onCodeChange }}
           theme="default-theme"
           height="100%"
           editorDidMount={handleEditorDidMount}

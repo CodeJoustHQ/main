@@ -3,9 +3,9 @@ import styled from 'styled-components';
 import copy from 'copy-to-clipboard';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
-import { LargeText } from '../components/core/Text';
+import { LargeText, SecondaryHeaderText } from '../components/core/Text';
 import {
-  getGame, Game, Player, playAgain,
+  getGame, Game, Player, playAgain, Submission,
 } from '../api/Game';
 import { checkLocationState, leaveRoom } from '../util/Utility';
 import { errorHandler } from '../api/Error';
@@ -48,13 +48,14 @@ const FeedbackButton = styled(TextButton)<ShowFeedbackPrompt>`
 const CodePreview = styled.div`
   position: relative;
   text-align: left;
-  margin-top: 10px;
+  margin: 10px auto;
   
-  height: 350px;
-  padding: 1rem 0;
+  width: 75%;
+  height: 45vh;
+  padding: 8px 0;
   box-sizing: border-box;
   border: 1px solid ${({ theme }) => theme.colors.blue};
-  border-radius: 10px;
+  border-radius: 8px;
 `;
 
 const PrimaryButtonHoverElement = styled(HoverElement)`
@@ -109,7 +110,7 @@ function GameResultsPage() {
   const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState<boolean>(false);
   const [showFeedbackPrompt, setShowFeedbackPrompt] = useState<boolean>(false);
-  const [showCodeModal, setShowCodeModal] = useState(0);
+  const [codeModal, setCodeModal] = useState(-1);
 
   useEffect(() => {
     setTimeout(() => setShowFeedbackPrompt(true), 2000);
@@ -213,6 +214,36 @@ function GameResultsPage() {
     </InviteContainer>
   );
 
+  const getPreviewCodeContent = useCallback(() => {
+    if (!players[codeModal] || !players[codeModal].submissions.length) {
+      return null;
+    }
+
+    let bestSubmission: Submission | undefined;
+    players[codeModal].submissions.forEach((submission) => {
+      if (!bestSubmission || submission.numCorrect > bestSubmission.numCorrect) {
+        bestSubmission = submission;
+      }
+    });
+
+    return (
+      <div>
+        <SecondaryHeaderText bold>
+          {`Previewing code for player "${players[codeModal].user.nickname}"`}
+        </SecondaryHeaderText>
+        <CodePreview>
+          <ResizableMonacoEditor
+            onLanguageChange={null}
+            onCodeChange={null}
+            codeMap={null}
+            defaultLanguage={bestSubmission?.language as Language || Language.Python}
+            defaultCode={bestSubmission?.code || 'Uh oh! An error occurred fetching this player\'s code'}
+          />
+        </CodePreview>
+      </div>
+    );
+  }, [players, codeModal]);
+
   return (
     <Content>
       <CopyIndicatorContainer copied={copiedRoomLink}>
@@ -235,16 +266,8 @@ function GameResultsPage() {
         <FeedbackPopup />
       </Modal>
 
-      <Modal show onExit={() => setShowCodeModal(-1)}>
-        <CodePreview>
-          <ResizableMonacoEditor
-            onLanguageChange={null}
-            onCodeChange={null}
-            codeMap={null}
-            defaultLanguage={players[showCodeModal]?.language as Language || Language.Python}
-            defaultCode="test"
-          />
-        </CodePreview>
+      <Modal show onExit={() => setCodeModal(-1)}>
+        {getPreviewCodeContent()}
       </Modal>
 
       <LargeText>Winners</LargeText>
@@ -311,6 +334,7 @@ function GameResultsPage() {
           players={players}
           currentUser={currentUser}
           gameStartTime={startTime}
+          viewPlayerCode={(index: number) => setCodeModal(index)}
         />
       ) : null}
     </Content>

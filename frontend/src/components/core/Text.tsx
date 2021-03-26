@@ -64,7 +64,7 @@ export const MainHeaderText = styled.h1`
   font-weight: 400;
 `;
 
-export const SecondaryHeaderText = styled.p`
+export const SecondaryHeaderText = styled(Text)`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
 `;
 
