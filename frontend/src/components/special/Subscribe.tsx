@@ -1,8 +1,54 @@
 import React from 'react';
+import styled from 'styled-components';
+
+const Content = styled.div`
+  label {
+    display: block;
+    font-family: ${({ theme }) => theme.font};
+    font-size: ${({ theme }) => theme.fontSize.default};
+    color: ${({ theme }) => theme.colors.text};
+    margin: 2px;
+  }
+  
+  .email {
+    display: inline-block;
+    text-align: left;
+    width: 16rem;
+    height: 3rem;
+    box-sizing: border-box;
+    font-family: ${({ theme }) => theme.font};
+    font-size: ${({ theme }) => theme.fontSize.default};
+    color: ${({ theme }) => theme.colors.text};
+    border: 2px solid ${({ theme }) => theme.colors.blue};
+    border-radius: 5px;
+    padding: 5px;
+    margin: 5px;
+  }
+  
+  .button {
+    font-family: ${({ theme }) => theme.font};
+    font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+    background: ${({ theme }) => theme.colors.gradients.blue};
+    color: ${({ theme }) => theme.colors.white};
+    width: 16rem;
+    height: 3rem;
+    margin: 5px;
+    box-sizing: border-box;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
+    border: none !important;
+    border-radius: 5px;
+    cursor: pointer;
+  
+    &:hover {
+      cursor: pointer;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.24);
+    }
+  }
+`;
 
 function Subscribe() {
   return (
-    <div>
+    <Content>
       {/* Begin Mailchimp Signup Form */}
       <div id="mc_embed_signup">
         <form
@@ -15,17 +61,9 @@ function Subscribe() {
           noValidate
         >
           <div id="mc_embed_signup_scroll">
-            <h2>Subscribe</h2>
-            <div className="indicates-required">
-              <span className="asterisk">*</span>
-              {' '}
-              indicates required
-            </div>
             <div className="mc-field-group">
               <label htmlFor="mce-EMAIL">
                 Email Address
-                {' '}
-                <span className="asterisk">*</span>
               </label>
               <input type="email" defaultValue="" name="EMAIL" className="required email" id="mce-EMAIL" />
             </div>
@@ -43,7 +81,7 @@ function Subscribe() {
         </form>
       </div>
       {/* End mc_embed_signup */}
-    </div>
+    </Content>
   );
 }
 

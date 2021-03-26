@@ -39,7 +39,7 @@ type ShowFeedbackPrompt = {
 const FeedbackButton = styled(TextButton)<ShowFeedbackPrompt>`
   position: fixed;
   top: 50%;
-  right: ${({ show }) => (show ? '10px' : '-100px')};
+  right: ${({ show }) => (show ? '15px' : '-100px')};
   transition: right 300ms;
 `;
 

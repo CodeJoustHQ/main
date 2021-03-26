@@ -10,6 +10,7 @@ const Content = styled.div<ContentProps>`
   right: 20%;
   z-index: ${({ show }) => (show ? 2 : -2)};
   background: ${({ theme }) => theme.colors.white};
+  overflow-y: scroll;
   
   border-radius: 10px;
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
