@@ -27,6 +27,8 @@ import {
 import ResultsTable from '../components/results/ResultsTable';
 import Modal from '../components/core/Modal';
 import FeedbackPopup from '../components/results/FeedbackPopup';
+import ResizableMonacoEditor from '../components/game/Editor';
+import Language from '../api/Language';
 
 const Content = styled.div`
   padding: 0;
@@ -41,6 +43,18 @@ const FeedbackButton = styled(TextButton)<ShowFeedbackPrompt>`
   top: 50%;
   right: ${({ show }) => (show ? '20px' : '-100px')};
   transition: right 300ms;
+`;
+
+const CodePreview = styled.div`
+  position: relative;
+  text-align: left;
+  margin-top: 10px;
+  
+  height: 350px;
+  padding: 1rem 0;
+  box-sizing: border-box;
+  border: 1px solid ${({ theme }) => theme.colors.blue};
+  border-radius: 10px;
 `;
 
 const PrimaryButtonHoverElement = styled(HoverElement)`
@@ -95,6 +109,7 @@ function GameResultsPage() {
   const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState<boolean>(false);
   const [showFeedbackPrompt, setShowFeedbackPrompt] = useState<boolean>(false);
+  const [showCodeModal, setShowCodeModal] = useState(0);
 
   useEffect(() => {
     setTimeout(() => setShowFeedbackPrompt(true), 2000);
@@ -218,6 +233,18 @@ function GameResultsPage() {
       </FeedbackButton>
       <Modal show={showFeedbackModal} onExit={() => setShowFeedbackModal(false)}>
         <FeedbackPopup />
+      </Modal>
+
+      <Modal show onExit={() => setShowCodeModal(-1)}>
+        <CodePreview>
+          <ResizableMonacoEditor
+            onLanguageChange={null}
+            onCodeChange={null}
+            codeMap={null}
+            defaultLanguage={players[showCodeModal]?.language as Language || Language.Python}
+            defaultCode="test"
+          />
+        </CodePreview>
       </Modal>
 
       <LargeText>Winners</LargeText>

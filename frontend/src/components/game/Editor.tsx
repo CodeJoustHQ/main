@@ -6,10 +6,11 @@ import Language, { fromString, languageToEditorLanguage } from '../../api/Langua
 import { DefaultCodeType } from '../../api/Problem';
 
 type EditorProps = {
-  onLanguageChange: (language: Language) => void,
-  onCodeChange: (code: string) => void,
+  onLanguageChange: ((language: Language) => void) | null,
+  onCodeChange: ((code: string) => void) | null,
   codeMap: DefaultCodeType | null,
   defaultLanguage: Language,
+  defaultCode: string | null,
 };
 
 const Content = styled.div`
@@ -87,7 +88,7 @@ const monacoEditorOptions: EditorConstructionOptions = {
 // This function refreshes the width of Monaco editor upon change in container size
 function ResizableMonacoEditor(props: EditorProps) {
   const {
-    onLanguageChange, onCodeChange, codeMap, defaultLanguage,
+    onLanguageChange, onCodeChange, codeMap, defaultLanguage, defaultCode,
   } = props;
 
   const theme = useContext(ThemeContext);
@@ -129,7 +130,9 @@ function ResizableMonacoEditor(props: EditorProps) {
 
     // Change the language and initial code for the editor
     setCurrentLanguage(language);
-    onLanguageChange(language);
+    if (onLanguageChange) {
+      onLanguageChange(language);
+    }
   };
 
   useEffect(() => {
@@ -144,6 +147,7 @@ function ResizableMonacoEditor(props: EditorProps) {
         <LanguageSelect
           onChange={(e) => handleLanguageChange(e.target.value as Language)}
           value={currentLanguage}
+          disabled={!onLanguageChange}
         >
           {
             Object.keys(Language).map((language) => (
@@ -159,9 +163,9 @@ function ResizableMonacoEditor(props: EditorProps) {
           height="100%"
           editorDidMount={handleEditorDidMount}
           editorWillMount={handleEditorWillMount}
-          onChange={() => onCodeChange(codeEditor?.getValue() || 'Loading...')}
+          onChange={() => onCodeChange && onCodeChange(codeEditor?.getValue() || 'Loading...')}
           language={languageToEditorLanguage(currentLanguage)}
-          defaultValue="Loading..."
+          defaultValue={defaultCode || 'Loading...'}
         />
       </EditorContainer>
     </Content>
