@@ -25,6 +25,7 @@ import {
   InlineCopyIcon,
 } from '../components/special/CopyIndicator';
 import ResultsTable from '../components/results/ResultsTable';
+import Modal from '../components/core/Modal';
 
 const Content = styled.div`
   padding: 0;
@@ -80,6 +81,7 @@ function GameResultsPage() {
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
   const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState<boolean>(false);
 
   useEffect(() => {
     if (checkLocationState(location, 'roomId', 'currentUser')) {
@@ -193,6 +195,14 @@ function GameResultsPage() {
       >
         Only the host can restart the room
       </HoverTooltip>
+      <Modal show={showFeedbackModal} onExit={() => setShowFeedbackModal(false)}>
+        <p>hello there!</p>
+
+        <div>
+          <h1>please leave feedback</h1>
+        </div>
+      </Modal>
+
       <LargeText>Winners</LargeText>
       <PodiumContainer>
         <Podium
@@ -247,6 +257,13 @@ function GameResultsPage() {
           Leave Room
         </SecondaryRedButton>
       </div>
+
+      <PrimaryButton
+        onClick={() => setShowFeedbackModal(true)}
+        disabled={false}
+      >
+        Play Again
+      </PrimaryButton>
 
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
