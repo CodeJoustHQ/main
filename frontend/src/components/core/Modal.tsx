@@ -5,10 +5,10 @@ import { GrayTextButton } from './Button';
 const Content = styled.div<ContentProps>`
   position: fixed;
   
-  top: ${({ fullScreen }) => (fullScreen ? 10 : 30)}%;
-  height: ${({ fullScreen }) => (fullScreen ? 80 : 20)}%;
-  left: ${({ fullScreen }) => (fullScreen ? 20 : 30)}%;
-  width: ${({ fullScreen }) => (fullScreen ? 60 : 40)}%;  
+  top: ${({ fullScreen }) => (fullScreen ? '10%' : '40%')};
+  height: ${({ fullScreen }) => (fullScreen ? '80%' : '150px')};
+  left: ${({ fullScreen }) => (fullScreen ? '20%' : '30%')};
+  width: ${({ fullScreen }) => (fullScreen ? '60%' : '40%')};  
   min-height: 150px;
 
   z-index: ${({ show }) => (show ? 2 : -2)};

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import copy from 'copy-to-clipboard';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
-import { LargeText, SecondaryHeaderText } from '../components/core/Text';
+import { LargeText, SecondaryHeaderText, MainHeaderText } from '../components/core/Text';
 import {
   getGame, Game, Player, playAgain, Submission,
 } from '../api/Game';
@@ -214,6 +214,19 @@ function GameResultsPage() {
     });
   }, [players, setPlaceModal]);
 
+  const getPlaceSubfix = () => {
+    switch (placeModal + 1) {
+      case 1:
+        return 'st';
+      case 2:
+        return 'nd';
+      case 3:
+        return 'rd';
+      default:
+        return 'th';
+    }
+  };
+
   // Content to display for inviting players (if not enough players on the podium)
   const inviteContent = () => (
     <InviteContainer>
@@ -288,12 +301,13 @@ function GameResultsPage() {
       <Modal show={placeModal !== -1} onExit={() => setPlaceModal(-1)} fullScreen={false}>
         {placeModal !== -1 ? (
           <PlaceContent>
-            <SecondaryHeaderText>
+            <MainHeaderText>
               You placed:
               <b>
-                {` ${placeModal + 1} / ${players.length} players`}
+                {` ${placeModal + 1}${getPlaceSubfix()}`}
               </b>
-            </SecondaryHeaderText>
+              !
+            </MainHeaderText>
           </PlaceContent>
         ) : null}
       </Modal>
