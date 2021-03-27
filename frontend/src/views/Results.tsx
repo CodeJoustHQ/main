@@ -87,6 +87,12 @@ const InviteText = styled.p`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
 `;
 
+const PlaceContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
 type LocationState = {
   roomId: string,
   currentUser: User,
@@ -111,6 +117,7 @@ function GameResultsPage() {
   const [showFeedbackModal, setShowFeedbackModal] = useState<boolean>(false);
   const [showFeedbackPrompt, setShowFeedbackPrompt] = useState<boolean>(false);
   const [codeModal, setCodeModal] = useState(-1);
+  const [placeModal, setPlaceModal] = useState(-1);
 
   useEffect(() => {
     setTimeout(() => setShowFeedbackPrompt(true), 2000);
@@ -199,6 +206,14 @@ function GameResultsPage() {
     window.onmousemove = mouseMoveHandler;
   }, [mouseMoveHandler]);
 
+  useEffect(() => {
+    players.forEach((player, index) => {
+      if (player.user.userId === currentUser?.userId) {
+        setPlaceModal(index);
+      }
+    });
+  }, [players, setPlaceModal]);
+
   // Content to display for inviting players (if not enough players on the podium)
   const inviteContent = () => (
     <InviteContainer>
@@ -262,12 +277,25 @@ function GameResultsPage() {
       <FeedbackButton onClick={() => setShowFeedbackModal(true)} show={showFeedbackPrompt}>
         <span role="img" aria-label="wave">Hello! 👋</span>
       </FeedbackButton>
-      <Modal show={showFeedbackModal} onExit={() => setShowFeedbackModal(false)}>
+      <Modal show={showFeedbackModal} onExit={() => setShowFeedbackModal(false)} fullScreen>
         <FeedbackPopup />
       </Modal>
 
-      <Modal show={codeModal !== -1} onExit={() => setCodeModal(-1)}>
+      <Modal show={codeModal !== -1} onExit={() => setCodeModal(-1)} fullScreen>
         {getPreviewCodeContent()}
+      </Modal>
+
+      <Modal show={placeModal !== -1} onExit={() => setPlaceModal(-1)} fullScreen={false}>
+        {placeModal !== -1 ? (
+          <PlaceContent>
+            <SecondaryHeaderText>
+              You placed:
+              <b>
+                {` ${placeModal + 1} / ${players.length} players`}
+              </b>
+            </SecondaryHeaderText>
+          </PlaceContent>
+        ) : null}
       </Modal>
 
       <LargeText>Winners</LargeText>

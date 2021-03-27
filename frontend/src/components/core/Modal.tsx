@@ -4,10 +4,13 @@ import { GrayTextButton } from './Button';
 
 const Content = styled.div<ContentProps>`
   position: fixed;
-  top: 10%;
-  bottom: 10%;
-  left: 20%;
-  right: 20%;
+  
+  top: ${({ fullScreen }) => (fullScreen ? 10 : 30)}%;
+  height: ${({ fullScreen }) => (fullScreen ? 80 : 20)}%;
+  left: ${({ fullScreen }) => (fullScreen ? 20 : 30)}%;
+  width: ${({ fullScreen }) => (fullScreen ? 60 : 40)}%;  
+  min-height: 150px;
+
   z-index: ${({ show }) => (show ? 2 : -2)};
   background: ${({ theme }) => theme.colors.white};
   overflow-y: scroll;
@@ -29,20 +32,25 @@ const CloseButton = styled(GrayTextButton)`
   position: absolute;
   top: 8px;
   right: 12px;
+  z-index: 1;
 `;
 
 type ContentProps = {
   show: boolean,
+  fullScreen: boolean,
 };
 
-type ResultsTableProps = {
+type ModalProps = {
   show: boolean,
   children: React.ReactNode,
   onExit: () => void,
+  fullScreen: boolean,
 };
 
-function Modal(props: ResultsTableProps) {
-  const { show, children, onExit } = props;
+function Modal(props: ModalProps) {
+  const {
+    show, children, onExit, fullScreen,
+  } = props;
 
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +67,7 @@ function Modal(props: ResultsTableProps) {
   }, [modalRef]);
 
   return (
-    <Content show={show} ref={modalRef}>
+    <Content show={show} ref={modalRef} fullScreen={fullScreen}>
       <CloseButton onClick={onExit}>Close</CloseButton>
       <ModalContent>
         {children}
