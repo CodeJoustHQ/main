@@ -164,15 +164,20 @@ function GameResultsPage() {
     window.onmousemove = mouseMoveHandler;
   }, [mouseMoveHandler]);
 
+  // Reset hover status on host changes
+  useEffect(() => {
+    setHoverVisible(false);
+  }, [host]);
+
   // Content to display for inviting players (if not enough players on the podium)
   const inviteContent = () => (
-    <InviteContainer>
-      <InviteText
-        onClick={() => {
-          copy(`https://codejoust.co/play?room=${roomId}`);
-          setCopiedRoomLink(true);
-        }}
-      >
+    <InviteContainer
+      onClick={() => {
+        copy(`https://codejoust.co/play?room=${roomId}`);
+        setCopiedRoomLink(true);
+      }}
+    >
+      <InviteText>
         Invite
         <InlineCopyIcon>content_copy</InlineCopyIcon>
       </InviteText>
