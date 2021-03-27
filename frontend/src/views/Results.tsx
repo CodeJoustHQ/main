@@ -71,7 +71,7 @@ const PodiumContainer = styled.div`
 `;
 
 const InviteContainer = styled.div`
-  width: 70%;
+  width: 60%;
   margin: 20px auto 0 auto;
   border-radius: 5px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);
@@ -227,15 +227,20 @@ function GameResultsPage() {
     }
   };
 
+  // Reset hover status on host changes
+  useEffect(() => {
+    setHoverVisible(false);
+  }, [host]);
+
   // Content to display for inviting players (if not enough players on the podium)
   const inviteContent = () => (
-    <InviteContainer>
-      <InviteText
-        onClick={() => {
-          copy(`https://codejoust.co/play?room=${roomId}`);
-          setCopiedRoomLink(true);
-        }}
-      >
+    <InviteContainer
+      onClick={() => {
+        copy(`https://codejoust.co/play?room=${roomId}`);
+        setCopiedRoomLink(true);
+      }}
+    >
+      <InviteText>
         Invite
         <InlineCopyIcon>content_copy</InlineCopyIcon>
       </InviteText>
@@ -343,7 +348,7 @@ function GameResultsPage() {
       <div>
         <HoverContainer>
           <PrimaryButtonHoverElement
-            enabled={isHost(currentUser)}
+            enabled={!loading && isHost(currentUser)}
             onMouseEnter={() => {
               if (!isHost(currentUser)) {
                 setHoverVisible(true);
