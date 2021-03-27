@@ -1,25 +1,62 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import copy from 'copy-to-clipboard';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
-import { LargeText, Text } from '../components/core/Text';
+import { LargeText } from '../components/core/Text';
 import {
   getGame, Game, Player, playAgain,
 } from '../api/Game';
-import { checkLocationState } from '../util/Utility';
+import { checkLocationState, leaveRoom } from '../util/Utility';
 import { errorHandler } from '../api/Error';
 import PlayerResultsCard from '../components/card/PlayerResultsCard';
-import { PrimaryButton } from '../components/core/Button';
+import { PrimaryButton, SecondaryRedButton } from '../components/core/Button';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import {
   connect, disconnect, routes, subscribe,
 } from '../api/Socket';
 import { User } from '../api/User';
-import { ThemeConfig } from '../components/config/Theme';
+import Podium from '../components/special/Podium';
+import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
+import { Coordinate } from '../components/special/FloatingCircle';
+import {
+  CopyIndicator,
+  CopyIndicatorContainer,
+  InlineCopyIcon,
+} from '../components/special/CopyIndicator';
 
 const Content = styled.div`
-  padding: 0 20%;
+  padding: 0;
+`;
+
+const PrimaryButtonHoverElement = styled(HoverElement)`
+  width: 10rem;
+  height: 2.75rem;
+  top: 1.2rem;
+  left: 1.2rem;
+`;
+
+const PodiumContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
+const InviteContainer = styled.div`
+  width: 60%;
+  margin: 20px auto 0 auto;
+  border-radius: 5px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);
+  padding: 5px;
+  
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+const InviteText = styled.p`
+  margin: 0;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
 `;
 
 type LocationState = {
@@ -37,7 +74,12 @@ function GameResultsPage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [host, setHost] = useState<User | null>(null);
+  const [startTime, setStartTime] = useState<string>('');
   const [roomId, setRoomId] = useState('');
+
+  const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
+  const [hoverVisible, setHoverVisible] = useState<boolean>(false);
+  const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
 
   useEffect(() => {
     if (checkLocationState(location, 'roomId', 'currentUser')) {
@@ -58,6 +100,7 @@ function GameResultsPage() {
       const subscribeCallback = (result: Message) => {
         const updatedGame: Game = JSON.parse(result.body);
 
+        setStartTime(updatedGame.gameTimer.startTime);
         // Update leaderboard with last second submissions
         setPlayers(updatedGame.players);
         // Set new host if the previous host refreshes or leaves
@@ -82,6 +125,7 @@ function GameResultsPage() {
               setLoading(false);
               setPlayers(res.players);
               setHost(res.room.host);
+              setStartTime(res.gameTimer.startTime);
 
               // Check if host elected to play again
               if (res.playAgain) {
@@ -109,11 +153,110 @@ function GameResultsPage() {
       });
   };
 
+  const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
+
+  // Get current mouse position.
+  const mouseMoveHandler = useCallback((e: MouseEvent) => {
+    setMousePosition({ x: e.pageX, y: e.pageY });
+  }, [setMousePosition]);
+
+  useEffect(() => {
+    window.onmousemove = mouseMoveHandler;
+  }, [mouseMoveHandler]);
+
+  // Reset hover status on host changes
+  useEffect(() => {
+    setHoverVisible(false);
+  }, [host]);
+
+  // Content to display for inviting players (if not enough players on the podium)
+  const inviteContent = () => (
+    <InviteContainer
+      onClick={() => {
+        copy(`https://codejoust.co/play?room=${roomId}`);
+        setCopiedRoomLink(true);
+      }}
+    >
+      <InviteText>
+        Invite
+        <InlineCopyIcon>content_copy</InlineCopyIcon>
+      </InviteText>
+    </InviteContainer>
+  );
+
   return (
     <Content>
+      <CopyIndicatorContainer copied={copiedRoomLink}>
+        <CopyIndicator onClick={() => setCopiedRoomLink(false)}>
+          Link copied!&nbsp;&nbsp;✕
+        </CopyIndicator>
+      </CopyIndicatorContainer>
+      <HoverTooltip
+        visible={hoverVisible}
+        x={mousePosition.x}
+        y={mousePosition.y}
+      >
+        Only the host can restart the room
+      </HoverTooltip>
+      <LargeText>Winners</LargeText>
+      <PodiumContainer>
+        <Podium
+          place={2}
+          player={players[1]}
+          gameStartTime={startTime}
+          inviteContent={inviteContent()}
+          loading={loading}
+        />
+        <Podium
+          place={1}
+          player={players[0]}
+          gameStartTime={startTime}
+          inviteContent={inviteContent()}
+          loading={loading}
+        />
+        <Podium
+          place={3}
+          player={players[2]}
+          gameStartTime={startTime}
+          inviteContent={inviteContent()}
+          loading={loading}
+        />
+      </PodiumContainer>
+
+      <div>
+        <HoverContainer>
+          <PrimaryButtonHoverElement
+            enabled={!loading && isHost(currentUser)}
+            onMouseEnter={() => {
+              if (!isHost(currentUser)) {
+                setHoverVisible(true);
+              }
+            }}
+            onMouseLeave={() => {
+              if (!isHost(currentUser)) {
+                setHoverVisible(false);
+              }
+            }}
+          />
+          <PrimaryButton
+            onClick={callPlayAgain}
+            disabled={loading || !isHost(currentUser)}
+          >
+            Play Again
+          </PrimaryButton>
+        </HoverContainer>
+
+        <SecondaryRedButton
+          onClick={() => leaveRoom(history, roomId, currentUser)}
+        >
+          Leave Room
+        </SecondaryRedButton>
+      </div>
+
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
-      <LargeText>Winners</LargeText>
+
+      {/* TODO: convert to table */}
       {players?.map((player, index) => (
         <PlayerResultsCard
           player={player}
@@ -122,17 +265,6 @@ function GameResultsPage() {
           color={player.color}
         />
       ))}
-
-      {currentUser && currentUser?.userId === host?.userId
-        ? (
-          <PrimaryButton
-            color={ThemeConfig.colors.gradients.blue}
-            onClick={callPlayAgain}
-          >
-            Play Again
-          </PrimaryButton>
-        )
-        : <Text>{!loading && 'Waiting for the host to choose whether to play again...'}</Text>}
     </Content>
   );
 }

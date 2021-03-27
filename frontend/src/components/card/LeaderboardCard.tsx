@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Player } from '../../api/Game';
+import { Player, Submission } from '../../api/Game';
 import { LowMarginText, SmallText } from '../core/Text';
 import PlayerIcon from './PlayerIcon';
 import { Color } from '../../api/Color';
@@ -74,32 +74,38 @@ function LeaderboardCard(props: LeaderboardCardProps) {
   } = props;
 
   const [showHover, setShowHover] = useState(false);
+  const [bestSubmission, setBestSubmission] = useState<Submission | null>(null);
+
+  useEffect(() => {
+    const latest = player.submissions.slice(-1)[0];
+
+    // Set latest as best submission if it's the first submission or scores higher
+    if (latest && (!bestSubmission || latest.numCorrect > bestSubmission.numCorrect)) {
+      setBestSubmission(latest);
+    }
+  }, [player, bestSubmission, setBestSubmission]);
 
   const getScoreDisplay = () => {
-    const latestSubmission = player.submissions.slice(-1)[0];
-    if (!latestSubmission) {
+    if (!bestSubmission) {
       return '0';
     }
-    return `${latestSubmission.numCorrect}/${latestSubmission.numTestCases}`;
+    return `${bestSubmission.numCorrect}/${bestSubmission.numTestCases}`;
   };
 
   const getScorePercentage = () => {
-    const latestSubmission = player.submissions.slice(-1)[0];
-    if (!latestSubmission) {
+    if (!bestSubmission) {
       return '';
     }
-
-    return ` ${Math.round((latestSubmission.numCorrect / latestSubmission.numTestCases) * 100)}%`;
+    return ` ${Math.round((bestSubmission.numCorrect / bestSubmission.numTestCases) * 100)}%`;
   };
 
   const getSubmissionTime = () => {
-    const latestSubmission = player.submissions.slice(-1)[0];
-    if (!latestSubmission) {
+    if (!bestSubmission) {
       return 'Never';
     }
 
     const currentTime = new Date().getTime();
-    const diffMilliseconds = currentTime - new Date(latestSubmission.startTime).getTime();
+    const diffMilliseconds = currentTime - new Date(bestSubmission.startTime).getTime();
     const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
     return `${diffMinutes}m ago`;
   };

@@ -73,7 +73,7 @@ function JoinGamePage() {
         .then((res) => {
           setLoading(false);
           if (res.active) {
-            setError('Cannot join a game that has already started.');
+            setError('This room has already started; please wait for the host to play again.');
           } else {
             setPageState(2);
           }
