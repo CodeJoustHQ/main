@@ -320,6 +320,7 @@ function GameResultsPage() {
           gameStartTime={startTime}
           inviteContent={inviteContent()}
           loading={loading}
+          isCurrentPlayer={players[1]?.user.userId === currentUser?.userId}
         />
         <Podium
           place={1}
@@ -327,6 +328,7 @@ function GameResultsPage() {
           gameStartTime={startTime}
           inviteContent={inviteContent()}
           loading={loading}
+          isCurrentPlayer={players[0]?.user.userId === currentUser?.userId}
         />
         <Podium
           place={3}
@@ -334,6 +336,7 @@ function GameResultsPage() {
           gameStartTime={startTime}
           inviteContent={inviteContent()}
           loading={loading}
+          isCurrentPlayer={players[2]?.user.userId === currentUser?.userId}
         />
       </PodiumContainer>
 

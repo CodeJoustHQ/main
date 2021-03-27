@@ -11,13 +11,15 @@ type PodiumProps = {
   gameStartTime: string,
   inviteContent: React.ReactNode,
   loading: boolean,
+  isCurrentPlayer: boolean,
 };
 
 type MedalProps = {
   color: string,
 };
 
-type HeightProps = {
+type PodiumContainerProps = {
+  isCurrentPlayer: boolean
   height: number,
 };
 
@@ -27,10 +29,11 @@ const Content = styled.div`
   justify-content: flex-end;
 `;
 
-const PodiumContainer = styled.div<HeightProps>`
+const PodiumContainer = styled.div<PodiumContainerProps>`
   position: relative;
   display: inline-block;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  box-shadow: ${({ isCurrentPlayer }) => (isCurrentPlayer
+    ? '0 2px 12px rgba(255, 199, 0, 0.24)' : '0 1px 4px rgba(0, 0, 0, 0.12)')};
   width: 180px;
   height: ${({ height }) => height}px;
   padding: 10px;
@@ -73,7 +76,7 @@ const Medal = styled.div<MedalProps>`
 
 function Podium(props: PodiumProps) {
   const {
-    place, player, gameStartTime, loading, inviteContent,
+    place, player, gameStartTime, loading, inviteContent, isCurrentPlayer
   } = props;
 
   const bestSubmission = useBestSubmission(player);
@@ -96,7 +99,7 @@ function Podium(props: PodiumProps) {
       case 2:
         return 240;
       default:
-        return 200;
+        return 210;
     }
   };
 
@@ -162,7 +165,7 @@ function Podium(props: PodiumProps) {
     <Content>
       <div>
         <WinnerText>{player?.user.nickname || ''}</WinnerText>
-        <PodiumContainer height={getPodiumHeight()}>
+        <PodiumContainer height={getPodiumHeight()} isCurrentPlayer={isCurrentPlayer}>
           <Medal color={getMedalColor()} />
           {getScoreText()}
           {getTimeText()}

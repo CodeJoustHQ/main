@@ -16,7 +16,7 @@ const Content = styled.div<ContentProps>`
   overflow-y: scroll;
   
   border-radius: 10px;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .24);
   
   opacity: ${({ show }) => (show ? 1 : 0)};
   transition: opacity 300ms;
