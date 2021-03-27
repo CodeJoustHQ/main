@@ -83,7 +83,7 @@ function LeaderboardCard(props: LeaderboardCardProps) {
     if (latest && (!bestSubmission || latest.numCorrect > bestSubmission.numCorrect)) {
       setBestSubmission(latest);
     }
-  }, [player, setBestSubmission]);
+  }, [player, bestSubmission, setBestSubmission]);
 
   const getScoreDisplay = () => {
     if (!bestSubmission) {

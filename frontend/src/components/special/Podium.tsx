@@ -90,7 +90,7 @@ function Podium(props: PodiumProps) {
 
       setBestSubmission(newBestSubmission);
     }
-  }, [player, setBestSubmission]);
+  }, [player, bestSubmission, setBestSubmission]);
 
   const getMedalColor = () => {
     switch (place) {
