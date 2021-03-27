@@ -118,9 +118,10 @@ function GameResultsPage() {
   const [showFeedbackPrompt, setShowFeedbackPrompt] = useState<boolean>(false);
   const [codeModal, setCodeModal] = useState(-1);
   const [placeModal, setPlaceModal] = useState(-1);
+  const [displayPlaceModal, setDisplayPlaceModal] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => setShowFeedbackPrompt(true), 2000);
+    setTimeout(() => setShowFeedbackPrompt(true), 5000);
   }, []);
 
   useEffect(() => {
@@ -303,7 +304,14 @@ function GameResultsPage() {
         {getPreviewCodeContent()}
       </Modal>
 
-      <Modal show={placeModal !== -1} onExit={() => setPlaceModal(-1)} fullScreen={false}>
+      <Modal
+        show={placeModal !== -1 && displayPlaceModal}
+        onExit={() => {
+          setPlaceModal(-1);
+          setDisplayPlaceModal(false);
+        }}
+        fullScreen={false}
+      >
         {placeModal !== -1 ? (
           <PlaceContent>
             <MainHeaderText>
