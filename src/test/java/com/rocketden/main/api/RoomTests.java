@@ -65,6 +65,7 @@ public class RoomTests {
     private static final String USER_ID_2 = "678910";
     private static final String USER_ID_3 = "024681";
     private static final String ROOM_ID = "012345";
+    private static final String PROBLEM_ID = "abcdef-ghijkl";
     private static final long DURATION = 600;
 
     @Test
@@ -354,7 +355,7 @@ public class RoomTests {
         updateRequest.setDifficulty(ProblemDifficulty.EASY);
         updateRequest.setDuration(DURATION);
         updateRequest.setNumProblems(2);
-        // TODO
+        updateRequest.setProblemId(PROBLEM_ID);
 
         MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -378,6 +379,7 @@ public class RoomTests {
         assertEquals(updateRequest.getDifficulty(), actual.getDifficulty());
         assertEquals(updateRequest.getDuration(), actual.getDuration());
         assertEquals(updateRequest.getNumProblems(), actual.getNumProblems());
+        assertEquals(updateRequest.getProblemId(), actual.getProblemId());
     }
 
     @Test

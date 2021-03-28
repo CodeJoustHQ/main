@@ -14,10 +14,12 @@ import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.dto.problem.ProblemInputDto;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
 import com.rocketden.main.dto.room.CreateRoomRequest;
+import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.GameError;
+import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
@@ -48,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -72,6 +75,7 @@ public class GameTests {
     private static final Double RUNTIME = SubmitService.DUMMY_RUNTIME;
 
     private static final String POST_ROOM = "/api/v1/rooms";
+    private static final String UPDATE_ROOM = "/api/v1/rooms/%s/settings";
     private static final String START_GAME = "/api/v1/rooms/%s/start";
     private static final String GET_GAME = "/api/v1/games/%s";
     private static final String POST_RUN_CODE = "/api/v1/games/%s/run-code";
@@ -85,6 +89,7 @@ public class GameTests {
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "098765";
+    private static final String PROBLEM_ID = "abcdef-ghijkl";
     private static final String CODE = "print('hello')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
     private static final String INPUT_NAME = "nums";
@@ -243,7 +248,38 @@ public class GameTests {
 
     @Test
     public void startGameProblemNotFound() throws Exception {
-        // TODO
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
+        createSingleProblemAndTestCases();
+
+        UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
+        updateRequest.setInitiator(host);
+        updateRequest.setProblemId(PROBLEM_ID);
+
+        this.mockMvc.perform(put(String.format(UPDATE_ROOM, ROOM_ID))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        StartGameRequest request = new StartGameRequest();
+        request.setInitiator(host);
+
+        ApiError ERROR = ProblemError.NOT_FOUND;
+
+        MvcResult result = this.mockMvc.perform(post(String.format(START_GAME, ROOM_ID))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
     }
 
     @Test

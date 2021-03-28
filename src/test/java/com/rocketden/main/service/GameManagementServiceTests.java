@@ -13,6 +13,7 @@ import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.GameError;
+import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.CodeLanguage;
@@ -83,6 +84,7 @@ public class GameManagementServiceTests {
     private static final String USER_ID_2 = "345678";
     private static final String USER_ID_3 = "678910";
     private static final String SESSION_ID = "abcdefghijk";
+    private static final String PROBLEM_ID = "zyx-abc";
     private static final String INPUT = "[1, 2, 3]";
     private static final String CODE = "print('hi')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
@@ -195,16 +197,21 @@ public class GameManagementServiceTests {
 
     @Test
     public void startGameProblemIdNotFound() {
-        UserDto user = new UserDto();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
+        User host = new User();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(host);
+        room.setProblemId(PROBLEM_ID);
 
         StartGameRequest request = new StartGameRequest();
-        request.setInitiator(user);
+        request.setInitiator(UserMapper.toDto(host));
 
-        Mockito.doReturn(null).when(repository).findRoomByRoomId(ROOM_ID);
+        Mockito.doReturn(null).when(problemService).getProblemEntity(PROBLEM_ID);
         ApiException exception = assertThrows(ApiException.class, () -> gameService.startGame(ROOM_ID, request));
-        assertEquals(RoomError.NOT_FOUND, exception.getError());
+        assertEquals(ProblemError.NOT_FOUND, exception.getError());
     }
 
     @Test

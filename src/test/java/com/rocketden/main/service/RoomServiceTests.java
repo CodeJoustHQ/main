@@ -68,6 +68,7 @@ public class RoomServiceTests {
     private static final String USER_ID = "678910";
     private static final String USER_ID_2 = "123456";
     private static final String USER_ID_3 = "024681";
+    private static final String PROBLEM_ID = "abcdef-hijklm";
     private static final long DURATION = 600;
 
     @Test
@@ -348,7 +349,7 @@ public class RoomServiceTests {
         request.setDifficulty(ProblemDifficulty.EASY);
         request.setDuration(DURATION);
         request.setNumProblems(3);
-        // TODO
+        request.setProblemId(PROBLEM_ID);
 
         RoomDto response = roomService.updateRoomSettings(room.getRoomId(), request);
 
@@ -356,6 +357,7 @@ public class RoomServiceTests {
         assertEquals(request.getDifficulty(), response.getDifficulty());
         assertEquals(request.getDuration(), response.getDuration());
         assertEquals(request.getNumProblems(), response.getNumProblems());
+        assertEquals(request.getProblemId(), response.getProblemId());
     }
 
     @Test
