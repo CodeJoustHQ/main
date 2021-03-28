@@ -2,6 +2,8 @@ package com.rocketden.main.model;
 
 import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.service.RoomService;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -58,7 +60,7 @@ public class Room {
 
     private Integer numProblems = 1;
 
-    private Integer maxSize = 4;
+    private Integer size = 4;
 
     public void addUser(User user) {
         users.add(user);
@@ -130,6 +132,10 @@ public class Room {
      * than the maximum size of the room
      */
     public boolean isFull() {
-        return users.size() >= maxSize;
+        if (size == RoomService.MAX_SIZE + 1) {
+            return false;
+        }
+
+        return users.size() >= size;
     }
 }
