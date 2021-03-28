@@ -32,6 +32,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -90,6 +91,7 @@ public class RoomServiceTests {
         assertEquals(user.getNickname(), response.getHost().getNickname());
         assertEquals(USER_ID, response.getHost().getUserId());
         assertEquals(ProblemDifficulty.RANDOM, response.getDifficulty());
+        assertNull(response.getProblemId());
     }
 
     @Test
@@ -346,6 +348,7 @@ public class RoomServiceTests {
         request.setDifficulty(ProblemDifficulty.EASY);
         request.setDuration(DURATION);
         request.setNumProblems(3);
+        // TODO
 
         RoomDto response = roomService.updateRoomSettings(room.getRoomId(), request);
 

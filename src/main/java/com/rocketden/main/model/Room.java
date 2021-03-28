@@ -54,6 +54,8 @@ public class Room {
     @Enumerated(EnumType.STRING)
     private ProblemDifficulty difficulty = ProblemDifficulty.RANDOM;
 
+    private String problemId;
+
     private Long duration = GameTimer.DURATION_15;
 
     private Integer numProblems = 1;

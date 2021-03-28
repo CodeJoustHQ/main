@@ -215,6 +215,11 @@ public class GameTests {
     }
 
     @Test
+    public void startGameWithProblemIdGetsCorrectProblem() throws Exception {
+        // TODO
+    }
+
+    @Test
     public void startGameRoomNotFound() throws Exception {
         UserDto user = new UserDto();
         user.setNickname(NICKNAME);
@@ -234,6 +239,11 @@ public class GameTests {
         ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
 
         assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @Test
+    public void startGameProblemNotFound() throws Exception {
+        // TODO
     }
 
     @Test

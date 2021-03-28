@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -141,6 +142,7 @@ public class RoomTests {
         assertEquals(expected.getHost(), actual.getHost());
         assertEquals(expected.getUsers(), actual.getUsers());
         assertEquals(ProblemDifficulty.RANDOM, actual.getDifficulty());
+        assertNull(actual.getProblemId());
 
         // Send GET request to validate that room exists
         String roomId = actual.getRoomId();
@@ -157,6 +159,7 @@ public class RoomTests {
         assertEquals(expected.getHost(), actualGet.getHost());
         assertEquals(expected.getUsers(), actualGet.getUsers());
         assertEquals(ProblemDifficulty.RANDOM, actual.getDifficulty());
+        assertNull(actualGet.getProblemId());
     }
 
     @Test
@@ -351,6 +354,7 @@ public class RoomTests {
         updateRequest.setDifficulty(ProblemDifficulty.EASY);
         updateRequest.setDuration(DURATION);
         updateRequest.setNumProblems(2);
+        // TODO
 
         MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -398,6 +402,7 @@ public class RoomTests {
 
         // Difficulty remains unchanged from default
         assertEquals(ProblemDifficulty.RANDOM, room.getDifficulty());
+        assertNull(room.getProblemId());
         assertEquals(GameTimer.DURATION_15, room.getDuration());
         assertEquals(1, room.getNumProblems());
     }

@@ -175,7 +175,26 @@ public class GameManagementServiceTests {
     }
 
     @Test
+    public void startGameWithProblemIdSuccess() {
+        // TODO
+    }
+
+    @Test
     public void startGameRoomNotFound() {
+        UserDto user = new UserDto();
+        user.setNickname(NICKNAME);
+        user.setUserId(USER_ID);
+
+        StartGameRequest request = new StartGameRequest();
+        request.setInitiator(user);
+
+        Mockito.doReturn(null).when(repository).findRoomByRoomId(ROOM_ID);
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.startGame(ROOM_ID, request));
+        assertEquals(RoomError.NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    public void startGameProblemIdNotFound() {
         UserDto user = new UserDto();
         user.setNickname(NICKNAME);
         user.setUserId(USER_ID);

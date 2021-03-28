@@ -28,6 +28,7 @@ public class RoomMapperTests {
     private static final String USER_ID_2 = "678910";
     private static final String SESSION_ID = "234567";
     private static final String ROOM_ID = "012345";
+    private static final String PROBLEM_ID = "abcdef-ghijkl";
 
     @Test
     public void entityToDto() {
@@ -44,6 +45,7 @@ public class RoomMapperTests {
         room.setDifficulty(ProblemDifficulty.MEDIUM);
         room.setHost(host);
         room.setNumProblems(3);
+        room.setProblemId(PROBLEM_ID);
 
         room.addUser(host);
         room.addUser(user);
@@ -55,6 +57,7 @@ public class RoomMapperTests {
         assertEquals(room.getDifficulty(), response.getDifficulty());
         assertEquals(room.getDuration(), response.getDuration());
         assertEquals(room.getNumProblems(), response.getNumProblems());
+        assertEquals(room.getProblemId(), response.getProblemId());
 
         User actualHost = UserMapper.toEntity(response.getHost());
         assertEquals(room.getHost(), actualHost);
