@@ -212,7 +212,7 @@ public class RoomServiceTests {
     }
 
     @Test
-    public void manyUsersJoiningAnInfinitelySizedRoom() {
+    public void manyUsersJoiningAnInfinitelySizedRoomSuccess() {
         /**
          * Verify join room request fails when the room is already full
          * Define five users, and add to the room

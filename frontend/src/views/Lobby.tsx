@@ -682,7 +682,7 @@ function LobbyPage() {
             </HoverContainerSlider>
             <NoMarginMediumText>Room Size</NoMarginMediumText>
             <NoMarginSubtitleText>
-              {size == 31? 'No Limit' : `${size} People`}
+              {size == 31? 'No limit' : (size == 1? '1 person' : `${size} people`)}
             </NoMarginSubtitleText>
             <HoverContainerSlider>
               <HoverElementSlider
