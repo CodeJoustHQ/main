@@ -216,16 +216,20 @@ function GameResultsPage() {
   }, [players, setPlaceModal]);
 
   const getPlaceSubfix = () => {
-    switch (placeModal + 1) {
-      case 1:
-        return 'st';
-      case 2:
-        return 'nd';
-      case 3:
-        return 'rd';
-      default:
-        return 'th';
+    const ones = (placeModal + 1) % 10;
+    const tenths = (placeModal + 1) % 100;
+
+    if (ones === 1 && tenths !== 11) {
+      return 'st';
     }
+    if (ones === 2 && tenths !== 12) {
+      return 'nd';
+    }
+    if (ones === 3 && tenths !== 13) {
+      return 'rd';
+    }
+
+    return 'th';
   };
 
   // Reset hover status on host changes
