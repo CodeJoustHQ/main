@@ -58,7 +58,7 @@ function Subscribe() {
       {/* Begin Mailchimp Signup Form */}
       <div id="mc_embed_signup">
         <form
-          action="https://alanbi.us20.list-manage.com/subscribe/post?u=561bf2b7e08898f9277f2f7ac&amp;id=2036e534ed"
+          action="https://codejoust.us1.list-manage.com/subscribe/post?u=c19418c0e793a0cdc3bf7cb40&amp;id=09d32a049d"
           method="post"
           id="mc-embedded-subscribe-form"
           name="mc-embedded-subscribe-form"
@@ -78,7 +78,7 @@ function Subscribe() {
               <div className="response" id="mce-success-response" style={{ display: 'none' }} />
             </div>
             <div style={{ position: 'absolute', left: '-5000px' }} aria-hidden="true">
-              <input type="text" name="b_561bf2b7e08898f9277f2f7ac_2036e534ed" tabIndex={-1} value="" />
+              <input type="text" name="b_c19418c0e793a0cdc3bf7cb40_09d32a049d" tabIndex={-1} value="" />
             </div>
             <div className="clear">
               <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" className="button" />
