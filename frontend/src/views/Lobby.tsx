@@ -14,7 +14,7 @@ import {
   connect, routes, subscribe, disconnect,
 } from '../api/Socket';
 import { User } from '../api/User';
-import { checkLocationState, isValidRoomId } from '../util/Utility';
+import { checkLocationState, isValidRoomId, leaveRoom } from '../util/Utility';
 import { Difficulty } from '../api/Difficulty';
 import {
   PrimaryButton,
@@ -51,7 +51,7 @@ const HeaderContainer = styled.div`
   max-width: 500px;
   text-align: left;
   width: 66%;
-  margin: 2rem auto 0;
+  margin: 2rem auto 1rem auto;
 
   @media (max-width: 750px) {
     width: 80%;
@@ -434,33 +434,13 @@ function LobbyPage() {
             connectUserToRoom(res.roomId, currentUser.userId);
           }
         })
-        .catch((err) => setError(err));
-    }
-  };
-
-  const leaveRoom = () => {
-    // eslint-disable-next-line no-alert
-    if (window.confirm('Are you sure you want to leave the room?')) {
-      if (currentUser && currentUser.userId) {
-        setLoading(true);
-        setError('');
-        removeUser(currentRoomId, {
-          initiator: currentUser,
-          userToDelete: currentUser,
-        });
-        disconnect();
-      }
-
-      // Redirect user regardless of POST request success.
-      history.replace('/game/join', {
-        error: errorHandler('You left the room.'),
-      });
+        .catch((err) => setError(err.message));
     }
   };
 
   // Get current mouse position.
   const mouseMoveHandler = useCallback((e: MouseEvent) => {
-    setMousePosition({ x: e.clientX, y: e.clientY });
+    setMousePosition({ x: e.pageX, y: e.pageY });
   }, [setMousePosition]);
 
   useEffect(() => {
@@ -477,7 +457,7 @@ function LobbyPage() {
           setStateFromRoom(res);
           updateCurrentUserDetails(res.users);
         })
-        .catch((err) => setError(err));
+        .catch((err) => setError(err.message));
     } else {
       // Get URL query params to determine if the roomId is provided.
       const urlParams = new URLSearchParams(window.location.search);
@@ -571,7 +551,7 @@ function LobbyPage() {
         </HoverContainerPrimaryButton>
 
         <SecondaryRedButton
-          onClick={leaveRoom}
+          onClick={() => leaveRoom(history, currentRoomId, currentUser)}
         >
           Leave Room
         </SecondaryRedButton>
@@ -641,7 +621,7 @@ function LobbyPage() {
             </DifficultyContainer>
             <NoMarginMediumText>Duration</NoMarginMediumText>
             <NoMarginSubtitleText>
-              {`${duration} minutes`}
+              {`${duration} minute${duration === 1 ? '' : 's'}`}
             </NoMarginSubtitleText>
             <HoverContainerSlider>
               <HoverElementSlider

@@ -14,7 +14,7 @@ public enum RoomError implements ApiError {
     NO_HOST(HttpStatus.BAD_REQUEST, "There is no host provided."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "A room could not be found with the given id."),
     DUPLICATE_USERNAME(HttpStatus.CONFLICT, "A user with the nickname provided has already joined the room."),
-    ALREADY_ACTIVE(HttpStatus.FORBIDDEN, "Cannot join a room that is already active."),
+    ALREADY_ACTIVE(HttpStatus.FORBIDDEN, "This room has already started; please wait for the host to play again."),
     ALREADY_FULL(HttpStatus.FORBIDDEN, "Cannot join a room that is already full.");
 
     private final HttpStatus status;

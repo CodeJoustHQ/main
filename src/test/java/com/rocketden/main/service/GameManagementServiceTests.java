@@ -504,7 +504,59 @@ public class GameManagementServiceTests {
     }
 
     @Test
-    public void playAgainWrongInitiator() throws Exception {
+    public void playAgainSuccessPlayerLeavesRoom() {
+        User host = new User();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+        host.setSessionId(SESSION_ID);
+
+        User user = new User();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(host);
+        room.setActive(true);
+        room.addUser(host);
+        room.addUser(user);
+        room.setDuration(1L);
+
+        StartGameRequest request = new StartGameRequest();
+        request.setInitiator(UserMapper.toDto(host));
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
+        gameService.startGame(ROOM_ID, request);
+
+        // Wait 1 second until the game timeUp socket update is sent
+        Mockito.verify(socketService, Mockito.timeout(1500)).sendSocketUpdate(Mockito.any(GameDto.class));
+
+        Room newRoom = new Room();
+        newRoom.setRoomId(ROOM_ID);
+        newRoom.setHost(host);
+        newRoom.addUser(host);
+
+        Mockito.doReturn(newRoom).when(repository).findRoomByRoomId(ROOM_ID);
+
+        PlayAgainRequest playAgainRequest = new PlayAgainRequest();
+        playAgainRequest.setInitiator(UserMapper.toDto(host));
+
+        RoomDto response = gameService.playAgain(ROOM_ID, playAgainRequest);
+
+        Game game = gameService.getGameFromRoomId(room.getRoomId());
+
+        verify(socketService).sendSocketUpdate(Mockito.eq(GameMapper.toDto(game)));
+
+        assertTrue(game.getPlayAgain());
+        assertEquals(newRoom.getRoomId(), response.getRoomId());
+        assertEquals(host, newRoom.getUsers().get(0));
+        assertEquals(1, newRoom.getUsers().size());
+        assertFalse(newRoom.getActive());
+        assertNull(newRoom.getHost().getSessionId());
+    }
+
+    @Test
+    public void playAgainWrongInitiator() {
         User host = new User();
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
@@ -554,7 +606,36 @@ public class GameManagementServiceTests {
         assertEquals(GameError.GAME_NOT_OVER, exception.getError());
     }
 
-    public void sendNotificationSuccess() throws Exception {
+    @Test
+    public void playAgainRoomNotFound() {
+        User host = new User();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(host);
+        room.setDuration(1L);
+
+        StartGameRequest startRequest = new StartGameRequest();
+        startRequest.setInitiator(UserMapper.toDto(host));
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
+        gameService.startGame(ROOM_ID, startRequest);
+
+        Mockito.verify(socketService, Mockito.timeout(1500)).sendSocketUpdate(Mockito.any(GameDto.class));
+
+        PlayAgainRequest request = new PlayAgainRequest();
+        request.setInitiator(UserMapper.toDto(host));
+
+        Mockito.doReturn(null).when(repository).findRoomByRoomId(ROOM_ID);
+
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.playAgain(ROOM_ID, request));
+        assertEquals(RoomError.NOT_FOUND, exception.getError());
+    }
+
+
+    public void sendNotificationSuccess() {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
 
