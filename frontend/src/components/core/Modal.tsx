@@ -11,7 +11,7 @@ const Content = styled.div<ContentProps>`
   width: ${({ fullScreen }) => (fullScreen ? '60%' : '40%')};  
   min-height: 150px;
 
-  z-index: ${({ show }) => (show ? 2 : -2)};
+  z-index: ${({ show }) => (show ? 4 : -2)};
   background: ${({ theme }) => theme.colors.white};
   overflow-y: scroll;
   

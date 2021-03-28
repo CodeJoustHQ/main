@@ -40,6 +40,7 @@ export const TextLink = styled(Link)`
 
 export const SecondaryHeaderTextLink = styled(TextLink)`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  color: ${({ theme }) => theme.colors.blueLink};
 `;
 
 export const InlineExternalLink = styled.a`
