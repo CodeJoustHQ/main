@@ -85,7 +85,7 @@ const Medal = styled.div<MedalProps>`
 
 function Podium(props: PodiumProps) {
   const {
-    place, player, gameStartTime, loading, inviteContent, isCurrentPlayer
+    place, player, gameStartTime, loading, inviteContent, isCurrentPlayer,
   } = props;
 
   const bestSubmission = useBestSubmission(player);

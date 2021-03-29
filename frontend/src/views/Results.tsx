@@ -59,8 +59,8 @@ const CodePreview = styled.div`
 `;
 
 const PrimaryButtonHoverElement = styled(HoverElement)`
-  width: 10rem;
-  height: 2.75rem;
+  width: 12rem;
+  height: 3rem;
   top: 1.2rem;
   left: 1.2rem;
 `;
