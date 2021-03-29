@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Player, Submission } from '../api/Game';
 
-// eslint-disable-next-line import/prefer-default-export
-export const useBestSubmission = (player?: Player) => {
+const useBestSubmission = (player?: Player) => {
   const [bestSubmission, setBestSubmission] = useState<Submission | null>(null);
 
   useEffect(() => {
@@ -22,3 +21,5 @@ export const useBestSubmission = (player?: Player) => {
 
   return bestSubmission;
 };
+
+export default useBestSubmission;

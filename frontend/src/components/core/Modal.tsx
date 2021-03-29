@@ -2,6 +2,11 @@ import React, { useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { GrayTextButton } from './Button';
 
+type ContentProps = {
+  show: boolean,
+  fullScreen: boolean,
+};
+
 const Content = styled.div<ContentProps>`
   position: fixed;
   
@@ -34,11 +39,6 @@ const CloseButton = styled(GrayTextButton)`
   right: 12px;
   z-index: 1;
 `;
-
-type ContentProps = {
-  show: boolean,
-  fullScreen: boolean,
-};
 
 type ModalProps = {
   show: boolean,
