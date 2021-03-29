@@ -221,7 +221,42 @@ public class GameTests {
 
     @Test
     public void startGameWithProblemIdGetsCorrectProblem() throws Exception {
-        // TODO
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
+
+        createSingleProblemAndTestCases();
+        createSingleProblemAndTestCases();
+        ProblemDto problemDto = createSingleProblemAndTestCases();
+
+        UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
+        updateRequest.setInitiator(host);
+        updateRequest.setProblemId(problemDto.getProblemId());
+
+        MvcResult result = this.mockMvc.perform(put(String.format(UPDATE_ROOM, ROOM_ID))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        RoomDto response = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+
+        assertEquals(problemDto.getProblemId(), response.getProblemId());
+
+        startGameHelper(roomDto, host);
+
+        result = this.mockMvc.perform(get(String.format(GET_GAME, roomDto.getRoomId())))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        GameDto gameDto = UtilityTestMethods.toObjectInstant(jsonResponse, GameDto.class);
+
+        assertEquals(1, gameDto.getProblems().size());
+        assertEquals(problemDto.getProblemId(), gameDto.getProblems().get(0).getProblemId());
     }
 
     @Test

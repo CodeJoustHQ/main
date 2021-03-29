@@ -23,6 +23,7 @@ import com.rocketden.main.game_object.NotificationType;
 import com.rocketden.main.game_object.Player;
 import com.rocketden.main.game_object.Submission;
 import com.rocketden.main.game_object.PlayerCode;
+import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 import com.rocketden.main.model.problem.ProblemDifficulty;
@@ -85,6 +86,8 @@ public class GameManagementServiceTests {
     private static final String USER_ID_3 = "678910";
     private static final String SESSION_ID = "abcdefghijk";
     private static final String PROBLEM_ID = "zyx-abc";
+    private static final String PROBLEM_NAME = "Test";
+    private static final String PROBLEM_DESCRIPTION = "Test description";
     private static final String INPUT = "[1, 2, 3]";
     private static final String CODE = "print('hi')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
@@ -178,7 +181,40 @@ public class GameManagementServiceTests {
 
     @Test
     public void startGameWithProblemIdSuccess() {
-        // TODO
+        User host = new User();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(host);
+        room.setDifficulty(ProblemDifficulty.HARD);
+        room.setProblemId(PROBLEM_ID);
+
+        Problem problem = new Problem();
+        problem.setProblemId(PROBLEM_ID);
+        problem.setName(PROBLEM_NAME);
+        problem.setDescription(PROBLEM_DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.EASY);
+
+        StartGameRequest request = new StartGameRequest();
+        request.setInitiator(UserMapper.toDto(host));
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
+        Mockito.doReturn(problem).when(problemService).getProblemEntity(PROBLEM_ID);
+        RoomDto response = gameService.startGame(ROOM_ID, request);
+
+        verify(problemService, never()).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        verify(socketService).sendSocketUpdate(eq(response));
+
+        assertEquals(ROOM_ID, response.getRoomId());
+        assertTrue(response.isActive());
+
+        Game game = gameService.getGameFromRoomId(ROOM_ID);
+        assertNotNull(game);
+        assertEquals(1, game.getProblems().size());
+        assertEquals(problem.getProblemId(), game.getProblems().get(0).getProblemId());
+        assertEquals(problem.getDifficulty(), game.getProblems().get(0).getDifficulty());
     }
 
     @Test
