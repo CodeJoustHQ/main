@@ -87,6 +87,11 @@ public class ProblemService {
         return ProblemMapper.toDto(problem);
     }
 
+    // Method used by game management service to fetch specific problem
+    public Problem getProblemEntity(String problemId) {
+        return repository.findProblemByProblemId(problemId);
+    }
+
     public ProblemDto editProblem(String problemId, ProblemDto updatedProblem) {
         Problem problem = repository.findProblemByProblemId(problemId);
 

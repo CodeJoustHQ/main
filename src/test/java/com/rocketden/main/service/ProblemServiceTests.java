@@ -29,6 +29,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
@@ -89,6 +90,25 @@ public class ProblemServiceTests {
 
         verify(repository).findProblemByProblemId("ZZZ");
         assertEquals(ProblemError.NOT_FOUND, exception.getError());
+    }
+
+
+    @Test
+    public void getProblemEntitySuccess() {
+        Problem expected = new Problem();
+        expected.setName(NAME);
+        expected.setDescription(DESCRIPTION);
+
+        Mockito.doReturn(expected).when(repository).findProblemByProblemId(expected.getProblemId());
+
+        Problem response = problemService.getProblemEntity(expected.getProblemId());
+        assertEquals(expected, response);
+    }
+
+    @Test
+    public void getProblemEntityNotFound() {
+        Problem response = problemService.getProblemEntity("abc");
+        assertNull(response);
     }
 
     @Test
