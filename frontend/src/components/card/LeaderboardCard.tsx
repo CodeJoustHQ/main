@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Player, Submission } from '../../api/Game';
+import { Player } from '../../api/Game';
 import { LowMarginText, SmallText } from '../core/Text';
 import PlayerIcon from './PlayerIcon';
 import { Color } from '../../api/Color';
+import useBestSubmission from '../../util/Hook';
 
 type ContentStyleType = {
   isCurrentPlayer: boolean,
@@ -74,16 +75,7 @@ function LeaderboardCard(props: LeaderboardCardProps) {
   } = props;
 
   const [showHover, setShowHover] = useState(false);
-  const [bestSubmission, setBestSubmission] = useState<Submission | null>(null);
-
-  useEffect(() => {
-    const latest = player.submissions.slice(-1)[0];
-
-    // Set latest as best submission if it's the first submission or scores higher
-    if (latest && (!bestSubmission || latest.numCorrect > bestSubmission.numCorrect)) {
-      setBestSubmission(latest);
-    }
-  }, [player, bestSubmission, setBestSubmission]);
+  const bestSubmission = useBestSubmission(player);
 
   const getScoreDisplay = () => {
     if (!bestSubmission) {
