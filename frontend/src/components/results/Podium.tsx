@@ -44,7 +44,16 @@ const PodiumContainer = styled.div<PodiumContainerProps>`
 
 const WinnerText = styled(MediumText)`
   font-weight: bold;
-  margin: 0;
+  margin: 0 auto;
+  width: 180px;
+  
+  overflow-x: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const ScoreText = styled(MediumText)`

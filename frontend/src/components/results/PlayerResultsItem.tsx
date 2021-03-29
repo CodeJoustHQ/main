@@ -53,6 +53,14 @@ const PreviewIcon = styled.i`
 
 const PlayerText = styled(LowMarginText)`
   display: inline-block;
+  
+  overflow-x: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const FlexCenter = styled.div`
@@ -60,6 +68,8 @@ const FlexCenter = styled.div`
   display: flex;
   align-items: center;
   justify-content: left;
+  
+  white-space: nowrap;
 `;
 
 type CircleParams = {
