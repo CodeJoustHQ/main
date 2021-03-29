@@ -662,7 +662,7 @@ function LobbyPage() {
             </HoverContainerSlider>
             <NoMarginMediumText>Room Size</NoMarginMediumText>
             <NoMarginSubtitleText>
-              {size == 31? 'No limit' : (size == 1? '1 person' : `${size} people`)}
+              {size === 31? 'No limit' : (size === 1? '1 person' : `${size} people`)}
             </NoMarginSubtitleText>
             <HoverContainerSlider>
               <HoverElementSlider
@@ -693,7 +693,7 @@ function LobbyPage() {
                     } else {
                       const newSize = Number(value);
                       if (newSize >= (inactiveUsers?.length || 0) + (activeUsers?.length || 0) && newSize <= 31) {
-                        if (newSize != size) {
+                        if (newSize !== size) {
                           setError('');
                         }
 
