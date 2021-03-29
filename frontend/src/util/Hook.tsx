@@ -6,7 +6,7 @@ const useBestSubmission = (player?: Player) => {
 
   useEffect(() => {
     if (player) {
-      let newBestSubmission: Submission | null = bestSubmission;
+      let newBestSubmission: Submission | null = null;
 
       // Find best submission
       player.submissions.forEach((submission) => {

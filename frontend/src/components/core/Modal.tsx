@@ -64,7 +64,7 @@ function Modal(props: ModalProps) {
     // Bind the onClick event listener (and remove it on finish)
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [modalRef]);
+  }, [modalRef, onExit]);
 
   return (
     <Content show={show} ref={modalRef} fullScreen={fullScreen}>

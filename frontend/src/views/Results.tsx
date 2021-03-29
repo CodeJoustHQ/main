@@ -213,7 +213,7 @@ function GameResultsPage() {
         setPlaceModal(index);
       }
     });
-  }, [players, setPlaceModal]);
+  }, [players, currentUser, setPlaceModal]);
 
   const getPlaceSubfix = () => {
     const ones = (placeModal + 1) % 10;
