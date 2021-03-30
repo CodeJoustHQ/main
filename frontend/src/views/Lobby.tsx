@@ -333,6 +333,28 @@ function LobbyPage() {
       });
   };
 
+  const onSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+
+      // Set size to undefined to allow users to clear field
+      if (!value) {
+        setSize(undefined);
+      } else {
+        const newSize = Number(value);
+        
+        if (newSize >= (users?.length || 0) && newSize <= 31) {
+          if (newSize !== size) {
+            setError('');
+          }
+
+      setSize(newSize);
+      } else if (newSize < (users?.length || 0)) {
+        setSize((users?.length || 0));
+        setError('The room limit cannot be set below the number of connected players.');
+      }
+    }
+  }
+
   const updateSize = () => {
     setLoading(true);
     const prevSize = size;
@@ -644,19 +666,7 @@ function LobbyPage() {
                   max={60}
                   value={duration}
                   disabled={!isHost(currentUser)}
-                  onChange={(e) => {
-                    const { value } = e.target;
-
-                    // Set duration to undefined to allow users to clear field
-                    if (!value) {
-                      setDuration(undefined);
-                    } else {
-                      const newDuration = Number(value);
-                      if (newDuration >= 0 && newDuration <= 60) {
-                        setDuration(newDuration);
-                      }
-                    }
-                  }}
+                  onChange={onSizeSliderChange}
                   onMouseUp={updateRoomDuration}
                 />
               </SliderContainer>

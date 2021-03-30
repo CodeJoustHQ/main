@@ -132,7 +132,7 @@ public class Room {
      * than the maximum size of the room
      */
     public boolean isFull() {
-        // size being one greater than the MAX_SIZE is interpreted as an infinitely-sized room
+        // size being one greater than the MAX_SIZE is interpreted as an infinitely-sized room.
         if (size == RoomService.MAX_SIZE + 1) {
             return false;
         }
