@@ -60,7 +60,7 @@ public class Room {
 
     private Integer numProblems = 1;
 
-    private Integer size = 4;
+    private Integer size = 10;
 
     public void addUser(User user) {
         users.add(user);
@@ -132,6 +132,7 @@ public class Room {
      * than the maximum size of the room
      */
     public boolean isFull() {
+        // size being one greater than the MAX_SIZE is interpreted as an infinitely-sized room
         if (size == RoomService.MAX_SIZE + 1) {
             return false;
         }

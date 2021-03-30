@@ -142,7 +142,7 @@ function LobbyPage() {
   const [active, setActive] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [duration, setDuration] = useState<number | undefined>(15);
-  const [size, setSize] = useState<number | undefined>(4);
+  const [size, setSize] = useState<number | undefined>(10);
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
 
@@ -344,10 +344,11 @@ function LobbyPage() {
 
     updateRoomSettings(currentRoomId, settings)
       .then(() => setLoading(false))
+      .then(() => setError(''))
       .catch((err) => {
         setLoading(false);
         setError(err.message);
-        // Set duration back to original if REST call failed
+        // Set size back to original if REST call failed
         setSize(prevSize);
       });
   };
@@ -662,7 +663,7 @@ function LobbyPage() {
             </HoverContainerSlider>
             <NoMarginMediumText>Room Size</NoMarginMediumText>
             <NoMarginSubtitleText>
-              {size === 31? 'No limit' : (size === 1? '1 person' : `${size} people`)}
+              {size === 31 ? 'No limit' : (size ===  1? '1 person' : `${size} people`)}
             </NoMarginSubtitleText>
             <HoverContainerSlider>
               <HoverElementSlider
@@ -687,20 +688,20 @@ function LobbyPage() {
                   onChange={(e) => {
                     const { value } = e.target;
 
-                    // Set duration to undefined to allow users to clear field
+                    // Set size to undefined to allow users to clear field
                     if (!value) {
                       setSize(undefined);
                     } else {
                       const newSize = Number(value);
-                      if (newSize >= (inactiveUsers?.length || 0) + (activeUsers?.length || 0) && newSize <= 31) {
+                      if (newSize >= (users?.length || 0) && newSize <= 31) {
                         if (newSize !== size) {
                           setError('');
                         }
 
                         setSize(newSize);
-                      } else if (newSize < (inactiveUsers?.length || 0) + (activeUsers?.length || 0)) {
-                        setSize((inactiveUsers?.length || 0) + (activeUsers?.length || 0));
-                        setError("The room limit cannot be set below the number of connected players. Kick a player to set the limit lower.");
+                      } else if (newSize < (users?.length || 0)) {
+                        setSize((users?.length || 0));
+                        setError('The room limit cannot be set below the number of connected players.');
                       }
                     }
                   }}
