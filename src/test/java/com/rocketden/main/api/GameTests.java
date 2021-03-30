@@ -236,7 +236,7 @@ public class GameTests {
         updateRequest.setNumProblems(10);
         updateRequest.setProblemId(problemDto.getProblemId());
 
-        MvcResult result = this.mockMvc.perform(put(String.format(UPDATE_ROOM, ROOM_ID))
+        MvcResult result = this.mockMvc.perform(put(String.format(UPDATE_ROOM, roomDto.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
                 .andDo(print()).andExpect(status().isOk())
@@ -296,7 +296,7 @@ public class GameTests {
         updateRequest.setInitiator(host);
         updateRequest.setProblemId(PROBLEM_ID);
 
-        this.mockMvc.perform(put(String.format(UPDATE_ROOM, ROOM_ID))
+        this.mockMvc.perform(put(String.format(UPDATE_ROOM, roomDto.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
                 .andDo(print()).andExpect(status().isOk())
@@ -307,7 +307,7 @@ public class GameTests {
 
         ApiError ERROR = ProblemError.NOT_FOUND;
 
-        MvcResult result = this.mockMvc.perform(post(String.format(START_GAME, ROOM_ID))
+        MvcResult result = this.mockMvc.perform(post(String.format(START_GAME, roomDto.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(request)))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))

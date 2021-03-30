@@ -247,6 +247,7 @@ public class GameManagementServiceTests {
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(UserMapper.toDto(host));
 
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
         Mockito.doReturn(null).when(problemService).getProblemEntity(PROBLEM_ID);
         ApiException exception = assertThrows(ApiException.class, () -> gameService.startGame(ROOM_ID, request));
         assertEquals(ProblemError.NOT_FOUND, exception.getError());
