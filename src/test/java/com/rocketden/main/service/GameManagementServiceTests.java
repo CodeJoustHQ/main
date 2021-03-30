@@ -190,6 +190,7 @@ public class GameManagementServiceTests {
         room.setHost(host);
         room.setDifficulty(ProblemDifficulty.HARD);
         room.setProblemId(PROBLEM_ID);
+        room.setNumProblems(10);
 
         Problem problem = new Problem();
         problem.setProblemId(PROBLEM_ID);
@@ -212,6 +213,7 @@ public class GameManagementServiceTests {
 
         Game game = gameService.getGameFromRoomId(ROOM_ID);
         assertNotNull(game);
+        assertEquals(1, game.getRoom().getNumProblems());
         assertEquals(1, game.getProblems().size());
         assertEquals(problem.getProblemId(), game.getProblems().get(0).getProblemId());
         assertEquals(problem.getDifficulty(), game.getProblems().get(0).getDifficulty());

@@ -1,5 +1,6 @@
 package com.rocketden.main.service;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.GameError;
+import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.RoomError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.game_object.Game;
@@ -139,10 +141,22 @@ public class GameManagementService {
         Game game = GameMapper.fromRoom(room);
         Long time = room.getDuration();
 
-        List<Problem> problems = problemService.getProblemsFromDifficulty(room.getDifficulty(), room.getNumProblems());
-        game.setProblems(problems);
-        setStartGameTimer(game, time);
+        // If specific problem specified, use that instead of difficulty setting
+        if (room.getProblemId() != null) {
+            Problem problem = problemService.getProblemEntity(room.getProblemId());
 
+            if (problem == null) {
+                throw new ApiException(ProblemError.NOT_FOUND);
+            }
+
+            game.getRoom().setNumProblems(1);
+            game.setProblems(Collections.singletonList(problem));
+        } else {
+            List<Problem> problems = problemService.getProblemsFromDifficulty(room.getDifficulty(), room.getNumProblems());
+            game.setProblems(problems);
+        }
+
+        setStartGameTimer(game, time);
         currentGameMap.put(room.getRoomId(), game);
         notificationService.scheduleTimeLeftNotifications(game, time);
     }

@@ -281,6 +281,11 @@ public class RoomService {
             room.setNumProblems(request.getNumProblems());
         }
 
+        // Set problemId if not null
+        if (request.getProblemId() != null) {
+            room.setProblemId(request.getProblemId());
+        }
+
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);

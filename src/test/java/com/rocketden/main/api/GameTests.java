@@ -233,6 +233,7 @@ public class GameTests {
 
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(host);
+        updateRequest.setNumProblems(10);
         updateRequest.setProblemId(problemDto.getProblemId());
 
         MvcResult result = this.mockMvc.perform(put(String.format(UPDATE_ROOM, ROOM_ID))
@@ -255,6 +256,7 @@ public class GameTests {
         jsonResponse = result.getResponse().getContentAsString();
         GameDto gameDto = UtilityTestMethods.toObjectInstant(jsonResponse, GameDto.class);
 
+        assertEquals(1, gameDto.getRoom().getNumProblems());
         assertEquals(1, gameDto.getProblems().size());
         assertEquals(problemDto.getProblemId(), gameDto.getProblems().get(0).getProblemId());
     }
