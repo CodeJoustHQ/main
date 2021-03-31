@@ -336,33 +336,32 @@ function LobbyPage() {
   const onSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
-      // Set size to undefined to allow users to clear field
-      if (!value) {
-        setSize(undefined);
-      } else {
-        const newSize = Number(value);
-        
-        if (newSize >= (users?.length || 0) && newSize <= 31) {
-          if (newSize !== size) {
-            setError('');
-          }
+    // Set size to undefined to allow users to clear field
+    if (!value) {
+      setSize(undefined);
+    } else {
+      const newSize = Number(value);
 
-      setSize(newSize);
+      if (newSize >= (users?.length || 0) && newSize <= 31) {
+        if (newSize !== size) {
+          setError('');
+        }
+
+        setSize(newSize);
       } else if (newSize < (users?.length || 0)) {
         setSize((users?.length || 0));
         setError('The room limit cannot be set below the number of connected players.');
       }
     }
-  }
+  };
 
   const updateSize = () => {
     setLoading(true);
     const prevSize = size;
     const settings = {
       initiator: currentUser!,
-      size: size,
+      size,
     };
-
 
     updateRoomSettings(currentRoomId, settings)
       .then(() => setLoading(false))
@@ -673,7 +672,7 @@ function LobbyPage() {
             </HoverContainerSlider>
             <NoMarginMediumText>Room Size</NoMarginMediumText>
             <NoMarginSubtitleText>
-              {size === 31 ? 'No limit' : (size ===  1? '1 person' : `${size} people`)}
+              {size === 31 ? 'No limit' : `${size === 1 ? '1 person' : `${size} people`}`}
             </NoMarginSubtitleText>
             <HoverContainerSlider>
               <HoverElementSlider
