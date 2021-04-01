@@ -207,7 +207,6 @@ public class RoomServiceTests {
         request.setDifficulty(ProblemDifficulty.EASY);
         request.setDuration(DURATION);
         request.setSize(3);
-        request.setNumProblems(3);
 
         ApiException exception = assertThrows(ApiException.class, () -> roomService.updateRoomSettings(ROOM_ID, request));
         assertEquals(RoomError.BAD_ROOM_SIZE, exception.getError());

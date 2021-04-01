@@ -242,7 +242,8 @@ public class RoomTests {
 
     @Test
     public void createAndJoinRoomUserAlreadyExists() throws Exception {
-        // POST request to create room and PUT request to join room should succeed
+        // POST request to create room and PUT request to join room should fail
+        // because the room already has a user with the exact same information
         UserDto host = new UserDto();
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
@@ -350,7 +351,6 @@ public class RoomTests {
         updateRequest.setInitiator(host);
         updateRequest.setSize(1);
 
-
         MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
@@ -364,7 +364,6 @@ public class RoomTests {
 
         // Get id of created room to join
         String roomId = room.getRoomId();
-
 
         // 2. Send PUT request and verify that ALREADY_FULL exception was thrown
         JoinRoomRequest joinRequest = new JoinRoomRequest();
@@ -436,7 +435,6 @@ public class RoomTests {
         user.setUserId(USER_ID_2);
 
         RoomDto room = RoomTestMethods.setUpRoomWithTwoUsers(mockMvc, host, user);
-
 
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(host);
