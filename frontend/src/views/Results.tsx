@@ -3,21 +3,20 @@ import styled from 'styled-components';
 import copy from 'copy-to-clipboard';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
-import { LargeText } from '../components/core/Text';
+import { LargeText, SecondaryHeaderText, MainHeaderText } from '../components/core/Text';
 import {
-  getGame, Game, Player, playAgain,
+  getGame, Game, Player, playAgain, Submission,
 } from '../api/Game';
 import { checkLocationState, leaveRoom } from '../util/Utility';
 import { errorHandler } from '../api/Error';
-import PlayerResultsCard from '../components/card/PlayerResultsCard';
-import { PrimaryButton, SecondaryRedButton } from '../components/core/Button';
+import { TextButton, PrimaryButton, SecondaryRedButton } from '../components/core/Button';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import {
   connect, disconnect, routes, subscribe,
 } from '../api/Socket';
 import { User } from '../api/User';
-import Podium from '../components/special/Podium';
+import Podium from '../components/results/Podium';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
 import { Coordinate } from '../components/special/FloatingCircle';
 import {
@@ -25,14 +24,43 @@ import {
   CopyIndicatorContainer,
   InlineCopyIcon,
 } from '../components/special/CopyIndicator';
+import ResultsTable from '../components/results/ResultsTable';
+import Modal from '../components/core/Modal';
+import FeedbackPopup from '../components/results/FeedbackPopup';
+import ResizableMonacoEditor from '../components/game/Editor';
+import Language from '../api/Language';
 
 const Content = styled.div`
   padding: 0;
 `;
 
+type ShowFeedbackPrompt = {
+  show: boolean,
+}
+
+const FeedbackButton = styled(TextButton)<ShowFeedbackPrompt>`
+  position: fixed;
+  top: 50%;
+  right: ${({ show }) => (show ? '20px' : '-100px')};
+  transition: right 300ms;
+`;
+
+const CodePreview = styled.div`
+  position: relative;
+  text-align: left;
+  margin: 10px auto;
+  
+  width: 75%;
+  height: 45vh;
+  padding: 8px 0;
+  box-sizing: border-box;
+  border: 1px solid ${({ theme }) => theme.colors.blue};
+  border-radius: 8px;
+`;
+
 const PrimaryButtonHoverElement = styled(HoverElement)`
-  width: 10rem;
-  height: 2.75rem;
+  width: 12rem;
+  height: 3rem;
   top: 1.2rem;
   left: 1.2rem;
 `;
@@ -59,6 +87,12 @@ const InviteText = styled.p`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
 `;
 
+const PlaceContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
 type LocationState = {
   roomId: string,
   currentUser: User,
@@ -80,6 +114,15 @@ function GameResultsPage() {
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
   const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState<boolean>(false);
+  const [showFeedbackPrompt, setShowFeedbackPrompt] = useState<boolean>(false);
+  const [codeModal, setCodeModal] = useState(-1);
+  const [placeModal, setPlaceModal] = useState(-1);
+  const [displayPlaceModal, setDisplayPlaceModal] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => setShowFeedbackPrompt(true), 5000);
+  }, []);
 
   useEffect(() => {
     if (checkLocationState(location, 'roomId', 'currentUser')) {
@@ -164,6 +207,31 @@ function GameResultsPage() {
     window.onmousemove = mouseMoveHandler;
   }, [mouseMoveHandler]);
 
+  useEffect(() => {
+    players.forEach((player, index) => {
+      if (player.user.userId === currentUser?.userId) {
+        setPlaceModal(index);
+      }
+    });
+  }, [players, currentUser, setPlaceModal]);
+
+  const getPlaceSubfix = () => {
+    const ones = (placeModal + 1) % 10;
+    const tenths = (placeModal + 1) % 100;
+
+    if (ones === 1 && tenths !== 11) {
+      return 'st';
+    }
+    if (ones === 2 && tenths !== 12) {
+      return 'nd';
+    }
+    if (ones === 3 && tenths !== 13) {
+      return 'rd';
+    }
+
+    return 'th';
+  };
+
   // Reset hover status on host changes
   useEffect(() => {
     setHoverVisible(false);
@@ -184,6 +252,36 @@ function GameResultsPage() {
     </InviteContainer>
   );
 
+  const getPreviewCodeContent = useCallback(() => {
+    if (!players[codeModal] || !players[codeModal].submissions.length) {
+      return null;
+    }
+
+    let bestSubmission: Submission | undefined;
+    players[codeModal].submissions.forEach((submission) => {
+      if (!bestSubmission || submission.numCorrect > bestSubmission.numCorrect) {
+        bestSubmission = submission;
+      }
+    });
+
+    return (
+      <div>
+        <SecondaryHeaderText bold>
+          {`Previewing code for player "${players[codeModal].user.nickname}"`}
+        </SecondaryHeaderText>
+        <CodePreview>
+          <ResizableMonacoEditor
+            onLanguageChange={null}
+            onCodeChange={null}
+            codeMap={null}
+            defaultLanguage={bestSubmission?.language as Language || Language.Python}
+            defaultCode={bestSubmission?.code || 'Uh oh! An error occurred fetching this player\'s code'}
+          />
+        </CodePreview>
+      </div>
+    );
+  }, [players, codeModal]);
+
   return (
     <Content>
       <CopyIndicatorContainer copied={copiedRoomLink}>
@@ -198,6 +296,39 @@ function GameResultsPage() {
       >
         Only the host can restart the room
       </HoverTooltip>
+
+      <FeedbackButton onClick={() => setShowFeedbackModal(true)} show={showFeedbackPrompt}>
+        <span role="img" aria-label="wave">Hello! 👋</span>
+      </FeedbackButton>
+      <Modal show={showFeedbackModal} onExit={() => setShowFeedbackModal(false)} fullScreen>
+        <FeedbackPopup />
+      </Modal>
+
+      <Modal show={codeModal !== -1} onExit={() => setCodeModal(-1)} fullScreen>
+        {getPreviewCodeContent()}
+      </Modal>
+
+      <Modal
+        show={placeModal !== -1 && displayPlaceModal}
+        onExit={() => {
+          setPlaceModal(-1);
+          setDisplayPlaceModal(false);
+        }}
+        fullScreen={false}
+      >
+        {placeModal !== -1 ? (
+          <PlaceContent>
+            <MainHeaderText>
+              You placed:
+              <b>
+                {` ${placeModal + 1}${getPlaceSubfix()}`}
+              </b>
+              !
+            </MainHeaderText>
+          </PlaceContent>
+        ) : null}
+      </Modal>
+
       <LargeText>Winners</LargeText>
       <PodiumContainer>
         <Podium
@@ -206,6 +337,7 @@ function GameResultsPage() {
           gameStartTime={startTime}
           inviteContent={inviteContent()}
           loading={loading}
+          isCurrentPlayer={players[1]?.user.userId === currentUser?.userId}
         />
         <Podium
           place={1}
@@ -213,6 +345,7 @@ function GameResultsPage() {
           gameStartTime={startTime}
           inviteContent={inviteContent()}
           loading={loading}
+          isCurrentPlayer={players[0]?.user.userId === currentUser?.userId}
         />
         <Podium
           place={3}
@@ -220,6 +353,7 @@ function GameResultsPage() {
           gameStartTime={startTime}
           inviteContent={inviteContent()}
           loading={loading}
+          isCurrentPlayer={players[2]?.user.userId === currentUser?.userId}
         />
       </PodiumContainer>
 
@@ -256,15 +390,15 @@ function GameResultsPage() {
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
 
-      {/* TODO: convert to table */}
-      {players?.map((player, index) => (
-        <PlayerResultsCard
-          player={player}
-          place={index + 1}
-          isCurrentPlayer={currentUser?.userId === player.user.userId}
-          color={player.color}
+      <LargeText>Scoreboard</LargeText>
+      {players ? (
+        <ResultsTable
+          players={players}
+          currentUser={currentUser}
+          gameStartTime={startTime}
+          viewPlayerCode={(index: number) => setCodeModal(index)}
         />
-      ))}
+      ) : null}
     </Content>
   );
 }

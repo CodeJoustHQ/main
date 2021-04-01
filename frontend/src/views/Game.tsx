@@ -457,6 +457,7 @@ function GamePage() {
                 onLanguageChange={setCurrentLanguage}
                 codeMap={defaultCodeList[0]}
                 defaultLanguage={currentLanguage}
+                defaultCode={null}
               />
             </NoPaddingPanel>
 

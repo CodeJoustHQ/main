@@ -101,8 +101,8 @@ const HoverContainerPrimaryButton = styled(HoverContainer)`
 `;
 
 const HoverElementPrimaryButton = styled(HoverElement)`
-  width: 10rem;
-  height: 2.75rem;
+  width: 12rem;
+  height: 3rem;
 `;
 
 const HoverContainerSmallDifficultyButton = styled(HoverContainer)`

@@ -25,7 +25,8 @@ function ContactUsPage() {
           Contact Us
         </ContactHeaderTitle>
         <ContactHeaderText>
-          We are two students building the tool we wish we had when learning computer science.
+          We are a group of students building the tool
+          we wish we had when learning computer science.
         </ContactHeaderText>
         <ContactHeaderText>
           You can follow our progress on our

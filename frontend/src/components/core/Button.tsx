@@ -184,7 +184,7 @@ export const GreenSmallButtonBlock = styled(SmallButton)`
 
 export const InvertedSmallButton = styled(SmallButton)`
   color: ${({ theme }) => theme.colors.text};
-  background: ${({ theme }) => theme.colors.background};
+  background: ${({ theme }) => theme.colors.white};
 `;
 
 export const InlineRefreshIcon = styled.i.attrs(() => ({
