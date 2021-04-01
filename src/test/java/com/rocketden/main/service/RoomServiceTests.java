@@ -256,7 +256,7 @@ public class RoomServiceTests {
     public void manyUsersJoiningAnInfinitelySizedRoomSuccess() {
         /**
          * Verify join room request works when the room is infinitely sized
-         * Define a hunderd users, add to the room, then request to add another user
+         * Define a hundred users, add to the room, then request to add another user
          */
         User firstUser = new User();
         firstUser.setNickname(NICKNAME);
