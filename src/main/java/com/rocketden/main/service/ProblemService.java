@@ -312,8 +312,6 @@ public class ProblemService {
     }
 
     public Boolean accessProblems(String password) {
-        logger.info(password);
-        logger.info("" + password.equals("temptestpassword"));
         return password.equals("temptestpassword");
     }
 }

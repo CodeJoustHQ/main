@@ -82,7 +82,7 @@ public class ProblemController extends BaseRestController {
         return new ResponseEntity<>(service.getDefaultCode(problemId), HttpStatus.OK);
     }
 
-    @GetMapping("/access/{password}")
+    @GetMapping("/problems/access/{password}")
     public ResponseEntity<Boolean> accessProblems(@PathVariable String password) {
         return new ResponseEntity<>(service.accessProblems(password), HttpStatus.OK);
     }

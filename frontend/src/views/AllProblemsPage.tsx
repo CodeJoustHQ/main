@@ -7,7 +7,7 @@ import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import ProblemCard from '../components/card/ProblemCard';
 import { TextLink } from '../components/core/Link';
-import { LargeCenterInputText, PrimaryInput } from '../components/core/Input';
+import LockScreen from '../components/core/LockScreen';
 
 const Content = styled.div`
   padding: 0 20%;
@@ -21,19 +21,20 @@ function AllProblemsPage() {
 
   // The problems page is locked until a valid password is supplied.
   const [locked, setLocked] = useState(true);
-  const [password, setPassword] = useState('');
 
   useEffect(() => {
-    getProblems()
-      .then((res) => {
-        setProblems(res);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
+    if (!locked) {
+      getProblems()
+        .then((res) => {
+          setProblems(res);
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError(err.message);
+          setLoading(false);
+        });
+    }
+  }, [locked]);
 
   const sendAccessProblems = (passwordParam: string) => {
     accessProblems(passwordParam)
@@ -45,6 +46,7 @@ function AllProblemsPage() {
         }
       })
       .catch((err) => {
+        setLoading(false);
         setError(err.message);
       });
   };
@@ -55,31 +57,11 @@ function AllProblemsPage() {
 
   return (
     locked ? (
-      <Content>
-        <LargeText>
-          What is the password?
-        </LargeText>
-        <LargeCenterInputText
-          placeholder="Your nickname"
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setPassword(event.target.value);
-          }}
-          onKeyPress={(event: React.KeyboardEvent<HTMLInputElement>) => {
-            setError('');
-            if (event.key === 'Enter') {
-              sendAccessProblems(password);
-            }
-          }}
-        />
-        <PrimaryInput
-          onClick={() => {
-            sendAccessProblems(password);
-          }}
-          value="Enter"
-          disabled={!password}
-        />
-        { error ? <ErrorMessage message={error} /> : null }
-      </Content>
+      <LockScreen
+        loading={loading}
+        error={error}
+        enterPasswordAction={sendAccessProblems}
+      />
     ) : (
       <Content>
         <LargeText>View All Problems</LargeText>
