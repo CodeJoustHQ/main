@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useParams } from 'react-router-dom';
-import { editProblem, getSingleProblem, Problem } from '../api/Problem';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
+import {
+  accessProblems,
+  editProblem,
+  getSingleProblem,
+  Problem,
+} from '../api/Problem';
 import NotFound from './NotFound';
 import { LargeText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import ProblemDisplay from '../components/problem/ProblemDisplay';
-import { generateRandomId } from '../util/Utility';
+import { checkLocationState, generateRandomId } from '../util/Utility';
+import LockScreen from '../components/core/LockScreen';
 
 const Content = styled.div`
   display: flex;
@@ -17,28 +23,67 @@ type ProblemParams = {
   id: string,
 };
 
+type LocationState = {
+  locked: boolean,
+};
+
 function ProblemPage() {
+  const history = useHistory();
+  const location = useLocation<LocationState>();
   const [problem, setProblem] = useState<Problem | null>(null);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const params = useParams<ProblemParams>();
 
+  // The problems page is locked until a valid password is supplied.
+  const [locked, setLocked] = useState(true);
+
   useEffect(() => {
-    getSingleProblem(params.id)
-      .then((res) => {
-        res.testCases.forEach((testCase) => {
-          // eslint-disable-next-line no-param-reassign
-          testCase.id = generateRandomId();
-        });
-        setProblem(res);
+    if (checkLocationState(location, 'locked')) {
+      setLocked(location.state.locked);
+    }
+  }, [location]);
+
+  const sendAccessSpecificProblem = (passwordParam: string) => {
+    setLoading(true);
+    setError('');
+    accessProblems(passwordParam)
+      .then((access: boolean) => {
         setLoading(false);
+        if (access) {
+          // Push to history to give access with location on refresh.
+          history.push(`/problem/all/${params.id}`, {
+            locked: false,
+          });
+        } else {
+          setError('The password was incorrect; please contact support@codejoust.co if you wish to help edit problems.');
+        }
       })
       .catch((err) => {
-        setError(err.message);
         setLoading(false);
+        setError(err.message);
       });
-  }, [params]);
+  };
+
+  useEffect(() => {
+    if (!locked) {
+      setLoading(true);
+      getSingleProblem(params.id)
+        .then((res) => {
+          res.testCases.forEach((testCase) => {
+            // eslint-disable-next-line no-param-reassign
+            testCase.id = generateRandomId();
+          });
+          setProblem(res);
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError(err.message);
+          setLoading(false);
+        });
+    }
+  }, [params, locked]);
 
   if (!problem) {
     if (loading) {
@@ -63,14 +108,22 @@ function ProblemPage() {
   };
 
   return (
-    <>
-      <LargeText>Edit Problem</LargeText>
-      { error ? <ErrorMessage message={error} /> : null }
-      { loading ? <Loading /> : null }
-      <Content>
-        <ProblemDisplay problem={problem!} onClick={handleEdit} actionText="Save" editMode />
-      </Content>
-    </>
+    locked ? (
+      <LockScreen
+        loading={loading}
+        error={error}
+        enterPasswordAction={sendAccessSpecificProblem}
+      />
+    ) : (
+      <>
+        <LargeText>Edit Problem</LargeText>
+        { error ? <ErrorMessage message={error} /> : null }
+        { loading ? <Loading /> : null }
+        <Content>
+          <ProblemDisplay problem={problem!} onClick={handleEdit} actionText="Save" editMode />
+        </Content>
+      </>
+    )
   );
 }
 
