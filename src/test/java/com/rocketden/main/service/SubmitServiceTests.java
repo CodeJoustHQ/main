@@ -20,10 +20,13 @@ import com.rocketden.main.game_object.SubmissionResult;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 import com.rocketden.main.model.problem.Problem;
+import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemTestCase;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.Spy;
@@ -66,6 +69,9 @@ public class SubmitServiceTests {
     @InjectMocks
     private SubmitService submitService;
 
+    @Captor
+    ArgumentCaptor<TesterRequest> captor;
+
     @Test
     public void runCodeSuccess() {
         Room room = new Room();
@@ -80,6 +86,9 @@ public class SubmitServiceTests {
         List<Problem> problems = new ArrayList<>();
         Problem problem = new Problem();
         problem.setName(NAME);
+        problem.setDescription("anything");
+        problem.setProblemId("abcdefg");
+        problem.setDifficulty(ProblemDifficulty.EASY);
 
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(INPUT);
@@ -95,6 +104,16 @@ public class SubmitServiceTests {
         request.setInitiator(UserMapper.toDto(user));
 
         SubmissionDto submissionDto = submitService.runCode(game, request);
+
+        verify(submitService).getSubmission(captor.capture());
+        TesterRequest testerRequest = captor.getValue();
+
+        // Verify TesterRequest has non-required fields set to null
+        assertNull(testerRequest.getProblem().getProblemId());
+        assertNull(testerRequest.getProblem().getName());
+        assertNull(testerRequest.getProblem().getDescription());
+        assertNull(testerRequest.getProblem().getDifficulty());
+
         assertEquals(CODE, submissionDto.getCode());
         assertEquals(LANGUAGE, submissionDto.getLanguage());
         assertEquals(submissionDto.getNumCorrect(), submissionDto.getNumTestCases());
@@ -128,6 +147,9 @@ public class SubmitServiceTests {
         List<Problem> problems = new ArrayList<>();
         Problem problem = new Problem();
         problem.setName(NAME);
+        problem.setDescription("anything");
+        problem.setProblemId("abcdefg");
+        problem.setDifficulty(ProblemDifficulty.EASY);
 
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(INPUT);
@@ -142,6 +164,15 @@ public class SubmitServiceTests {
         request.setInitiator(UserMapper.toDto(user));
 
         submitService.submitSolution(game, request);
+
+        verify(submitService).getSubmission(captor.capture());
+        TesterRequest testerRequest = captor.getValue();
+
+        // Verify TesterRequest has non-required fields set to null
+        assertNull(testerRequest.getProblem().getProblemId());
+        assertNull(testerRequest.getProblem().getName());
+        assertNull(testerRequest.getProblem().getDescription());
+        assertNull(testerRequest.getProblem().getDifficulty());
 
         List<Submission> submissions = game.getPlayers().get(USER_ID).getSubmissions();
         assertEquals(1, submissions.size());
