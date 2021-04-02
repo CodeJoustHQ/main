@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { accessProblems, getProblems, Problem } from '../api/Problem';
 import { LargeText } from '../components/core/Text';
@@ -8,19 +8,31 @@ import Loading from '../components/core/Loading';
 import ProblemCard from '../components/card/ProblemCard';
 import { TextLink } from '../components/core/Link';
 import LockScreen from '../components/core/LockScreen';
+import { checkLocationState } from '../util/Utility';
 
 const Content = styled.div`
   padding: 0 20%;
 `;
 
+type LocationState = {
+  locked: boolean,
+};
+
 function AllProblemsPage() {
   const history = useHistory();
+  const location = useLocation<LocationState>();
   const [problems, setProblems] = useState<Problem[] | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
   // The problems page is locked until a valid password is supplied.
   const [locked, setLocked] = useState(true);
+
+  useEffect(() => {
+    if (checkLocationState(location, 'locked')) {
+      setLocked(location.state.locked);
+    }
+  }, [location]);
 
   useEffect(() => {
     if (!locked) {
@@ -33,8 +45,6 @@ function AllProblemsPage() {
           setError(err.message);
           setLoading(false);
         });
-    } else {
-      setLoading(false);
     }
   }, [locked]);
 
