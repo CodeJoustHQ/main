@@ -53,7 +53,7 @@ function ProblemPage() {
         setLoading(false);
         if (access) {
           // Push to history to give access with location on refresh.
-          history.push(`/problem/all/${params.id}`, {
+          history.push(`/problem/${params.id}`, {
             locked: false,
           });
         } else {
@@ -86,6 +86,15 @@ function ProblemPage() {
   }, [params, locked]);
 
   if (!problem) {
+    if (locked) {
+      return (
+        <LockScreen
+          loading={loading}
+          error={error}
+          enterPasswordAction={sendAccessSpecificProblem}
+        />
+      );
+    }
     if (loading) {
       return <Loading />;
     }
@@ -108,22 +117,14 @@ function ProblemPage() {
   };
 
   return (
-    locked ? (
-      <LockScreen
-        loading={loading}
-        error={error}
-        enterPasswordAction={sendAccessSpecificProblem}
-      />
-    ) : (
-      <>
-        <LargeText>Edit Problem</LargeText>
-        { error ? <ErrorMessage message={error} /> : null }
-        { loading ? <Loading /> : null }
-        <Content>
-          <ProblemDisplay problem={problem!} onClick={handleEdit} actionText="Save" editMode />
-        </Content>
-      </>
-    )
+    <>
+      <LargeText>Edit Problem</LargeText>
+      { error ? <ErrorMessage message={error} /> : null }
+      { loading ? <Loading /> : null }
+      <Content>
+        <ProblemDisplay problem={problem!} onClick={handleEdit} actionText="Save" editMode />
+      </Content>
+    </>
   );
 }
 
