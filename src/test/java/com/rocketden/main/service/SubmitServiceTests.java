@@ -52,7 +52,10 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 public class SubmitServiceTests {
 
+    private static final String PROBLEM_ID = "abcde-fghij";
     private static final String NAME = "Sort an Array";
+    private static final String DESCRIPTION = "Given an array, sort it.";
+    private static final ProblemDifficulty DIFFICULTY = ProblemDifficulty.EASY;
     private static final String INPUT = "[1, 3, 2]";
     private static final String OUTPUT = SubmitService.DUMMY_OUTPUT;
     private static final Double RUNTIME = SubmitService.DUMMY_RUNTIME;
@@ -86,9 +89,9 @@ public class SubmitServiceTests {
         List<Problem> problems = new ArrayList<>();
         Problem problem = new Problem();
         problem.setName(NAME);
-        problem.setDescription("anything");
-        problem.setProblemId("abcdefg");
-        problem.setDifficulty(ProblemDifficulty.EASY);
+        problem.setDescription(DESCRIPTION);
+        problem.setProblemId(PROBLEM_ID);
+        problem.setDifficulty(DIFFICULTY);
 
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(INPUT);
@@ -147,9 +150,9 @@ public class SubmitServiceTests {
         List<Problem> problems = new ArrayList<>();
         Problem problem = new Problem();
         problem.setName(NAME);
-        problem.setDescription("anything");
-        problem.setProblemId("abcdefg");
-        problem.setDifficulty(ProblemDifficulty.EASY);
+        problem.setDescription(DESCRIPTION);
+        problem.setProblemId(PROBLEM_ID);
+        problem.setDifficulty(DIFFICULTY);
 
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(INPUT);
