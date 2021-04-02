@@ -142,8 +142,9 @@ function LobbyPage() {
   const [currentRoomId, setRoomId] = useState('');
   const [active, setActive] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
-  const [selectedProblem, setSelectedProblem] = useState<SelectableProblem | null>(null);
   const [duration, setDuration] = useState<number | undefined>(15);
+  const [selectedProblem, setSelectedProblem] = useState<SelectableProblem | null>(null);
+
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
 
