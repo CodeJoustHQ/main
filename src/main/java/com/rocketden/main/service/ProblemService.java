@@ -281,6 +281,7 @@ public class ProblemService {
             throw new ApiException(ProblemError.INVALID_INPUT);
         }
     }
+    
     public Map<CodeLanguage, String> getDefaultCode(String problemId) {
         // Convert from the Problem object to Problem DTOs.
         Problem problem = repository.findProblemByProblemId(problemId);
@@ -304,5 +305,9 @@ public class ProblemService {
         }
 
         return defaultCodeMap;
-    }   
+    }
+
+    public Boolean accessProblems(String password) {
+        return password.equals("temptestpassword");
+    }
 }
