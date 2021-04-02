@@ -18,6 +18,8 @@ import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.model.problem.ProblemTestCase;
 import com.rocketden.main.service.generators.DefaultCodeGeneratorService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +39,8 @@ public class ProblemService {
     private final List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList;
     private final Random random = new Random();
     private final Gson gson = new Gson();
+
+    private static final Logger logger = LoggerFactory.getLogger(ProblemService.class);
 
     @Autowired
     public ProblemService(ProblemRepository repository, List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList) {
@@ -308,6 +312,8 @@ public class ProblemService {
     }
 
     public Boolean accessProblems(String password) {
+        logger.info(password);
+        logger.info("" + password.equals("temptestpassword"));
         return password.equals("temptestpassword");
     }
 }

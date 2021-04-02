@@ -40,7 +40,12 @@ function AllProblemsPage() {
       .then((access: boolean) => {
         if (access) {
           setLocked(false);
+        } else {
+          setError('The password was incorrect; please contact support@codejoust.co if you wish to help edit problems.');
         }
+      })
+      .catch((err) => {
+        setError(err.message);
       });
   };
 
@@ -73,6 +78,7 @@ function AllProblemsPage() {
           value="Enter"
           disabled={!password}
         />
+        { error ? <ErrorMessage message={error} /> : null }
       </Content>
     ) : (
       <Content>
