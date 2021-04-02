@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import { getProblems, Problem } from '../api/Problem';
+import { accessProblems, getProblems, Problem } from '../api/Problem';
 import { LargeText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import ProblemCard from '../components/card/ProblemCard';
 import { TextLink } from '../components/core/Link';
+import { LargeCenterInputText, PrimaryInput } from '../components/core/Input';
 
 const Content = styled.div`
   padding: 0 20%;
@@ -17,9 +18,6 @@ function AllProblemsPage() {
   const [problems, setProblems] = useState<Problem[] | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
-
-  // Variable to hold whether the user is focused on the text input field.
-  const [focusInput, setFocusInput] = useState(false);
 
   // The problems page is locked until a valid password is supplied.
   const [locked, setLocked] = useState(true);
@@ -37,6 +35,15 @@ function AllProblemsPage() {
       });
   }, []);
 
+  const sendAccessProblems = (passwordParam: string) => {
+    accessProblems(passwordParam)
+      .then((access: boolean) => {
+        if (access) {
+          setLocked(false);
+        }
+      });
+  };
+
   const redirect = (problemId: string) => {
     history.push(`/problem/${problemId}`);
   };
@@ -52,22 +59,16 @@ function AllProblemsPage() {
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             setPassword(event.target.value);
           }}
-          onFocus={() => {
-            setFocusInput(true);
-          }}
-          onBlur={() => {
-            setFocusInput(false);
-          }}
-          onKeyPress={(event: React.ChangeEvent<HTMLInputElement>) => {
+          onKeyPress={(event: React.KeyboardEvent<HTMLInputElement>) => {
             setError('');
             if (event.key === 'Enter') {
-              alert(event.target.value);
+              sendAccessProblems(password);
             }
           }}
         />
         <PrimaryInput
           onClick={() => {
-            alert(password);
+            sendAccessProblems(password);
           }}
           value="Enter"
           disabled={!password}

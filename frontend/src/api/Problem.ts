@@ -79,6 +79,7 @@ const routes = {
   getProblems: `${basePath}/`,
   createProblem: `${basePath}/`,
   getRandomProblem: `${basePath}/random`,
+  accessProblems: (password: string) => `${basePath}/access/${password}`,
   getSingleProblem: (problemId: string) => `${basePath}/${problemId}`,
   editProblem: (problemId: string) => `${basePath}/${problemId}`,
   deleteProblem: (problemId: string) => `${basePath}/${problemId}`,
@@ -123,6 +124,13 @@ export const editProblem = (problemId: string, updatedProblem: Problem): Promise
 
 export const deleteProblem = (problemId: string): Promise<Problem> => axios
   .delete<Problem>(routes.deleteProblem(problemId))
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const accessProblems = (password: string): Promise<boolean> => axios
+  .get<boolean>(routes.accessProblems(password))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
