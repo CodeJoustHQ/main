@@ -23,7 +23,7 @@ function AllProblemsPage() {
   const location = useLocation<LocationState>();
   const [problems, setProblems] = useState<Problem[] | null>(null);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // The problems page is locked until a valid password is supplied.
   const [locked, setLocked] = useState(true);
@@ -36,6 +36,7 @@ function AllProblemsPage() {
 
   useEffect(() => {
     if (!locked) {
+      setLoading(true);
       getProblems()
         .then((res) => {
           setProblems(res);

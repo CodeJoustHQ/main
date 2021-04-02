@@ -1,8 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { ThemeConfig } from '../config/Theme';
 import { NavbarLink } from '../core/Link';
-import { FloatingCircleHeader } from '../special/FloatingCircle';
 
 const Content = styled.div`
   height: 50px;
@@ -26,6 +24,15 @@ const RightHeader = styled(NavbarLink)`
   margin-right: 50px;
 `;
 
+const InlineHeaderTag = styled.span`
+  margin-left: 0.4rem;
+  padding: 0 0.5rem;
+  font-size: ${({ theme }) => theme.fontSize.medium};
+  background: ${({ theme }) => theme.colors.gradients.purple};
+  border-radius: 1rem;
+  color: ${({ theme }) => theme.colors.white};
+`;
+
 // Note: Can also create a center header with simply display: inline-block
 
 export function Header() {
@@ -33,11 +40,8 @@ export function Header() {
     <Content>
       <nav>
         <LeftHeader to="/">
-          <FloatingCircleHeader
-            color={ThemeConfig.colors.gradients.purple}
-            size={0.9}
-          />
           CodeJoust
+          <InlineHeaderTag>Beta</InlineHeaderTag>
         </LeftHeader>
         <RightHeader to="/contact-us">
           Contact Us
@@ -52,11 +56,8 @@ export function MinimalHeader() {
     <MinimalContent>
       <nav>
         <LeftHeader to="/">
-          <FloatingCircleHeader
-            color={ThemeConfig.colors.gradients.purple}
-            size={0.9}
-          />
           CodeJoust
+          <InlineHeaderTag>Beta</InlineHeaderTag>
         </LeftHeader>
         <RightHeader to="/contact-us">
           Contact Us
