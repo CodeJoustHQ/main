@@ -56,9 +56,10 @@ function AllProblemsPage() {
       .then((access: boolean) => {
         setLoading(false);
         if (access) {
-          // Give access, and set loading to true as problems load.
-          setLocked(false);
-          setLoading(true);
+          // Push to history to give access with location on refresh.
+          history.push('/problems/all', {
+            locked: false,
+          });
         } else {
           setError('The password was incorrect; please contact support@codejoust.co if you wish to help edit problems.');
         }
