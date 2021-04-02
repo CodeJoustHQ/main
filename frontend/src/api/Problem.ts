@@ -21,6 +21,12 @@ export type Problem = {
   outputType: ProblemIOType,
 };
 
+export type SelectableProblem = {
+  problemId: string,
+  name: string,
+  difficulty: Difficulty,
+};
+
 export type ProblemInput = {
   name: string,
   type: ProblemIOType,

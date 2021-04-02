@@ -41,6 +41,7 @@ import { FlexBareContainer } from '../components/core/Container';
 import { Slider, SliderContainer } from '../components/core/RangeSlider';
 import { Coordinate } from '../components/special/FloatingCircle';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
+import { SelectableProblem } from '../api/Problem';
 
 type LobbyPageLocation = {
   user: User,
@@ -141,6 +142,7 @@ function LobbyPage() {
   const [currentRoomId, setRoomId] = useState('');
   const [active, setActive] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
+  const [selectedProblem, setSelectedProblem] = useState<SelectableProblem | null>(null);
   const [duration, setDuration] = useState<number | undefined>(15);
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
@@ -172,6 +174,7 @@ function LobbyPage() {
     setActive(room.active);
     setDifficulty(room.difficulty);
     setDuration(room.duration / 60);
+    setSelectedProblem(room.problem);
   };
 
   // Function to determine if the given user is the host or not

@@ -2,6 +2,7 @@ import axios from 'axios';
 import { axiosErrorHandler } from './Error';
 import { User } from './User';
 import { Difficulty } from './Difficulty';
+import { SelectableProblem } from './Problem';
 
 export type Room = {
   roomId: string,
@@ -12,6 +13,7 @@ export type Room = {
   active: boolean,
   difficulty: Difficulty,
   duration: number,
+  problem: SelectableProblem | null,
 };
 
 export type CreateRoomParams = {
@@ -26,6 +28,7 @@ export type UpdateSettingsParams = {
   initiator: User,
   difficulty?: Difficulty,
   duration?: number,
+  problem?: SelectableProblem,
 };
 
 export type ChangeHostParams = {
