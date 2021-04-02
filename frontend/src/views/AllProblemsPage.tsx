@@ -33,14 +33,21 @@ function AllProblemsPage() {
           setError(err.message);
           setLoading(false);
         });
+    } else {
+      setLoading(false);
     }
   }, [locked]);
 
   const sendAccessProblems = (passwordParam: string) => {
+    setLoading(true);
+    setError('');
     accessProblems(passwordParam)
       .then((access: boolean) => {
+        setLoading(false);
         if (access) {
+          // Give access, and set loading to true as problems load.
           setLocked(false);
+          setLoading(true);
         } else {
           setError('The password was incorrect; please contact support@codejoust.co if you wish to help edit problems.');
         }
