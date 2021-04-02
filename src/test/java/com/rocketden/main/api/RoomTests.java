@@ -242,8 +242,10 @@ public class RoomTests {
 
     @Test
     public void createAndJoinRoomUserAlreadyExists() throws Exception {
-        // POST request to create room and PUT request to join room should fail
-        // because the room already has a user with the exact same information
+        /**
+         * POST request to create room and PUT request to join room should fail
+         * because the room already has a user with the exact same information
+         */
         UserDto host = new UserDto();
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
@@ -292,7 +294,7 @@ public class RoomTests {
 
     @Test
     public void createAndJoinRoomNoUser() throws Exception {
-        // POST request to create room and PUT request to join room should succeed
+        // POST request to create room and PUT request to join room, without set user, should fail
         UserDto host = new UserDto();
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
@@ -323,9 +325,8 @@ public class RoomTests {
 
         // 2. Send PUT request and verify room was joined
         JoinRoomRequest joinRequest = new JoinRoomRequest();
-        joinRequest.setUser(host);
 
-        ApiError ERROR = RoomError.DUPLICATE_USERNAME;
+        ApiError ERROR = UserError.INVALID_USER;
 
         result = this.mockMvc.perform(put(String.format(PUT_ROOM_JOIN, roomId))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
