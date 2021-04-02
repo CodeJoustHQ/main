@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum RoomError implements ApiError {
 
     BAD_SETTING(HttpStatus.BAD_REQUEST, "An invalid room setting was provided."),
+    BAD_ROOM_SIZE(HttpStatus.BAD_REQUEST, "An invalid room size was provided."),
     INACTIVE_USER(HttpStatus.BAD_REQUEST, "The specified user is inactive."),
     INVALID_PERMISSIONS(HttpStatus.FORBIDDEN, "You do not have permission to perform this action"),
     NO_HOST(HttpStatus.BAD_REQUEST, "There is no host provided."),

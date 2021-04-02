@@ -12,6 +12,7 @@ export type Room = {
   active: boolean,
   difficulty: Difficulty,
   duration: number,
+  size: number,
 };
 
 export type CreateRoomParams = {
@@ -26,6 +27,7 @@ export type UpdateSettingsParams = {
   initiator: User,
   difficulty?: Difficulty,
   duration?: number,
+  size?: number,
 };
 
 export type ChangeHostParams = {
