@@ -14,6 +14,7 @@ public enum ProblemError implements ApiError {
     INCORRECT_INPUT_COUNT(HttpStatus.BAD_REQUEST, "Please specify the correct number of parameters for this problem."),
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "Please ensure each line of test case input/output is valid and is of the correct type."),
     INVALID_NUMBER_REQUEST(HttpStatus.BAD_REQUEST, "Please request a valid number of problems."),
+    INVALID_VARIABLE_NAME(HttpStatus.BAD_REQUEST, "Please ensure the variable name is valid for Java and Python."),
     EMPTY_FIELD(HttpStatus.BAD_REQUEST, "Please enter a value for each required field."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "A problem could not be found with the given criteria.");
 

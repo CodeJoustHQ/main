@@ -17,6 +17,7 @@ import com.rocketden.main.model.problem.ProblemIOType;
 import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.model.problem.ProblemTestCase;
 import com.rocketden.main.service.generators.DefaultCodeGeneratorService;
+import com.rocketden.main.util.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,10 +66,12 @@ public class ProblemService {
 
         // Add all problem inputs in list.
         for (ProblemInputDto problemInput : request.getProblemInputs()) {
-            if (problemInput != null) {
-                problem.addProblemInput(ProblemMapper.toProblemInputEntity(problemInput));
-            } else {
+            if (problemInput == null) {
                 throw new ApiException(ProblemError.BAD_INPUT);
+            } else if (!Utility.validateIdentifier(problemInput.getName())) {
+                throw new ApiException(ProblemError.INVALID_VARIABLE_NAME);
+            } else {
+                problem.addProblemInput(ProblemMapper.toProblemInputEntity(problemInput));
             }
         }
 
@@ -116,6 +119,10 @@ public class ProblemService {
 
         problem.getProblemInputs().clear();
         for (ProblemInputDto problemInput : updatedProblem.getProblemInputs()) {
+            if (!Utility.validateIdentifier(problemInput.getName())) {
+                throw new ApiException(ProblemError.INVALID_VARIABLE_NAME);
+            }
+
             problem.addProblemInput(ProblemMapper.toProblemInputEntity(problemInput));
         }
 
