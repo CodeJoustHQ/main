@@ -484,6 +484,20 @@ function LobbyPage() {
     }
   }, [history, active, currentUser, currentRoomId, difficulty, subscription]);
 
+  const hoverProps = {
+    enabled: isHost(currentUser),
+    onMouseEnter: () => {
+      if (!isHost(currentUser)) {
+        setHoverVisible(true);
+      }
+    },
+    onMouseLeave: () => {
+      if (!isHost(currentUser)) {
+        setHoverVisible(false);
+      }
+    },
+  };
+
   // Render the lobby.
   return (
     <>
@@ -522,19 +536,7 @@ function LobbyPage() {
         </SecondaryHeaderText>
         <IdContainer id={currentRoomId} />
         <HoverContainerPrimaryButton>
-          <HoverElementPrimaryButton
-            enabled={isHost(currentUser)}
-            onMouseEnter={() => {
-              if (!isHost(currentUser)) {
-                setHoverVisible(true);
-              }
-            }}
-            onMouseLeave={() => {
-              if (!isHost(currentUser)) {
-                setHoverVisible(false);
-              }
-            }}
-          />
+          <HoverElementPrimaryButton {...hoverProps} />
           <PrimaryButtonNoMargin
             onClick={handleStartGame}
             disabled={loading || !isHost(currentUser)}
@@ -586,19 +588,7 @@ function LobbyPage() {
                 const difficultyKey: Difficulty = Difficulty[key as keyof typeof Difficulty];
                 return (
                   <HoverContainerSmallDifficultyButton>
-                    <HoverElementSmallDifficultyButton
-                      enabled={isHost(currentUser)}
-                      onMouseEnter={() => {
-                        if (!isHost(currentUser)) {
-                          setHoverVisible(true);
-                        }
-                      }}
-                      onMouseLeave={() => {
-                        if (!isHost(currentUser)) {
-                          setHoverVisible(false);
-                        }
-                      }}
-                    />
+                    <HoverElementSmallDifficultyButton {...hoverProps} />
                     <SmallDifficultyButtonNoMargin
                       difficulty={difficultyKey}
                       onClick={() => updateDifficultySetting(key)}
@@ -615,19 +605,7 @@ function LobbyPage() {
 
             <NoMarginMediumText>Or Choose Problem:</NoMarginMediumText>
             <HoverContainerSelector>
-              <HoverElementSelector
-                enabled={isHost(currentUser)}
-                onMouseEnter={() => {
-                  if (!isHost(currentUser)) {
-                    setHoverVisible(true);
-                  }
-                }}
-                onMouseLeave={() => {
-                  if (!isHost(currentUser)) {
-                    setHoverVisible(false);
-                  }
-                }}
-              />
+              <HoverElementSelector {...hoverProps} />
 
               <ProblemSelector />
             </HoverContainerSelector>
@@ -637,19 +615,7 @@ function LobbyPage() {
               {`${duration} minute${duration === 1 ? '' : 's'}`}
             </NoMarginSubtitleText>
             <HoverContainerSlider>
-              <HoverElementSlider
-                enabled={isHost(currentUser)}
-                onMouseEnter={() => {
-                  if (!isHost(currentUser)) {
-                    setHoverVisible(true);
-                  }
-                }}
-                onMouseLeave={() => {
-                  if (!isHost(currentUser)) {
-                    setHoverVisible(false);
-                  }
-                }}
-              />
+              <HoverElementSlider {...hoverProps} />
               <SliderContainer>
                 <Slider
                   min={1}
