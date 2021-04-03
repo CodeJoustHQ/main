@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
@@ -39,6 +39,8 @@ import ErrorMessage from '../core/Error';
 import { InvertedSmallButtonLink } from '../core/Link';
 import { FlexBareContainer } from '../core/Container';
 import { generateRandomId, validIdentifier } from '../../util/Utility';
+import { HoverContainer, HoverElement, HoverTooltip } from '../core/HoverTooltip';
+import { Coordinate } from '../special/FloatingCircle';
 
 const MainContent = styled.div`
   text-align: left;
@@ -63,6 +65,23 @@ const SettingsContainer = styled.div`
   border-radius: 10px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   background: ${({ theme }) => theme.colors.white};
+`;
+
+type ShowError = {
+  show: boolean,
+};
+
+const HoverContainerErrorIcon = styled(HoverContainer).attrs((props: ShowError) => ({
+  style: {
+    display: `${props.show ? 'inline-block' : 'none'}`,
+  },
+}))<ShowError>`
+  margin: 0 0.5rem 0 0;
+`;
+
+const HoverElementErrorIcon = styled(HoverElement)`
+  width: 1rem;
+  height: 1rem;
 `;
 
 const SettingsContainerRelative = styled(SettingsContainer)`
@@ -155,6 +174,17 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const [newProblem, setNewProblem] = useState<Problem>(problem);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
+  const [hoverVisible, setHoverVisible] = useState<boolean>(false);
+
+  // Get current mouse position.
+  const mouseMoveHandler = useCallback((e: MouseEvent) => {
+    setMousePosition({ x: e.pageX, y: e.pageY });
+  }, [setMousePosition]);
+
+  useEffect(() => {
+    window.onmousemove = mouseMoveHandler;
+  }, [mouseMoveHandler]);
 
   const onDragEnd = (result: any) => {
     // dropped outside the list
@@ -275,6 +305,13 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
   return (
     <>
+      <HoverTooltip
+        visible={hoverVisible}
+        x={mousePosition.x}
+        y={mousePosition.y}
+      >
+        The provided input is likely invalid
+      </HoverTooltip>
       <MainContent>
         <FlexBareContainer>
           <SmallHeaderText>Problem</SmallHeaderText>
@@ -450,11 +487,18 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                   e.target.value, newProblem.problemInputs[index].type)}
               />
 
-              <InlineErrorIcon
+              <HoverContainerErrorIcon
                 show={!validIdentifier(newProblem.problemInputs[index].name)}
               >
-                error_outline
-              </InlineErrorIcon>
+                <HoverElementErrorIcon
+                  enabled={validIdentifier(newProblem.problemInputs[index].name)}
+                  onMouseEnter={() => setHoverVisible(true)}
+                  onMouseLeave={() => setHoverVisible(false)}
+                />
+                <InlineErrorIcon>
+                  error_outline
+                </InlineErrorIcon>
+              </HoverContainerErrorIcon>
 
               <PrimarySelect
                 onChange={(e) => handleInputChange(
