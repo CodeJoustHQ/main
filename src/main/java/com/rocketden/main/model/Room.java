@@ -1,6 +1,7 @@
 package com.rocketden.main.model;
 
 import com.rocketden.main.game_object.GameTimer;
+import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -54,13 +55,16 @@ public class Room {
     @Enumerated(EnumType.STRING)
     private ProblemDifficulty difficulty = ProblemDifficulty.RANDOM;
 
-    private String problemId;
-
     private Long duration = GameTimer.DURATION_15;
 
     private Integer numProblems = 1;
 
     private Integer maxSize = 4;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "problem_id")
+    private List<Problem> problems = new ArrayList<>();
+
 
     public void addUser(User user) {
         users.add(user);
