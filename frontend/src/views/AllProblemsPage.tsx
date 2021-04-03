@@ -2,16 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { accessProblems, getProblems, Problem } from '../api/Problem';
-import { LargeText } from '../components/core/Text';
+import { Text, LargeText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import ProblemCard from '../components/card/ProblemCard';
-import { TextLink } from '../components/core/Link';
 import LockScreen from '../components/core/LockScreen';
 import { checkLocationState } from '../util/Utility';
 
 const Content = styled.div`
   padding: 0 20%;
+`;
+
+const TextLinkLocation = styled(Text)`
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 type LocationState = {
@@ -71,7 +76,9 @@ function AllProblemsPage() {
   };
 
   const redirect = (problemId: string) => {
-    history.push(`/problem/${problemId}`);
+    history.push(`/problem/${problemId}`, {
+      locked: false,
+    });
   };
 
   return (
@@ -84,7 +91,15 @@ function AllProblemsPage() {
     ) : (
       <Content>
         <LargeText>View All Problems</LargeText>
-        <TextLink to="/problem/create">Create new problem</TextLink>
+        <TextLinkLocation
+          onClick={() => {
+            history.push('/problem/create', {
+              locked: true,
+            });
+          }}
+        >
+          Create new problem
+        </TextLinkLocation>
         { error ? <ErrorMessage message={error} /> : null }
         { loading ? <Loading /> : null }
 
