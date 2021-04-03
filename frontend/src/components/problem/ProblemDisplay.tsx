@@ -25,6 +25,7 @@ import {
   GrayTextButton,
   SmallButton,
   GreenSmallButtonBlock,
+  InlineErrorIcon,
 } from '../core/Button';
 import PrimarySelect from '../core/Select';
 import {
@@ -37,7 +38,7 @@ import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
 import { InvertedSmallButtonLink } from '../core/Link';
 import { FlexBareContainer } from '../core/Container';
-import { generateRandomId } from '../../util/Utility';
+import { generateRandomId, validIdentifier } from '../../util/Utility';
 
 const MainContent = styled.div`
   text-align: left;
@@ -448,6 +449,12 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                 onChange={(e) => handleInputChange(index,
                   e.target.value, newProblem.problemInputs[index].type)}
               />
+
+              <InlineErrorIcon
+                show={validIdentifier(newProblem.problemInputs[index].name)}
+              >
+                error
+              </InlineErrorIcon>
 
               <PrimarySelect
                 onChange={(e) => handleInputChange(

@@ -204,3 +204,15 @@ export const InlineRefreshIcon = styled.i.attrs(() => ({
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.24);
   }
 `;
+
+type ShowError = {
+  show: boolean,
+};
+
+export const InlineErrorIcon = styled(InlineRefreshIcon).attrs((props: ShowError) => ({
+  display: props.show ? 'inline-block' : 'none',
+}))<ShowError>`
+  &:hover {
+    cursor: default;
+  }
+`;
