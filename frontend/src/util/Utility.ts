@@ -3,7 +3,7 @@ import { removeUser } from '../api/Room';
 import { disconnect } from '../api/Socket';
 import { errorHandler } from '../api/Error';
 
-// Determine if string is valid identifier in JavaScript, no types provided.
+// Require validator for identifiers as no types are provided.
 const validateIdentifier = require('valid-identifier');
 
 /**
