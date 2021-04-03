@@ -321,6 +321,8 @@ public class RoomService {
                 newProblems.add(problem);
             }
 
+            // TODO: keep only those under numProblems limit
+
             room.setProblems(newProblems);
         }
 

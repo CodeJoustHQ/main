@@ -71,6 +71,11 @@ public class RoomServiceTests {
     private static final String PROBLEM_ID = "abcdef-hijklm";
     private static final long DURATION = 600;
 
+    // TODO test: multiple problems added
+    // TODO test: select problem, second request doesn't touch database
+    // TODO test: not found
+    // TODO test: only problems under numProblems kept
+
     @Test
     public void createRoomSuccess() {
         UserDto user = new UserDto();

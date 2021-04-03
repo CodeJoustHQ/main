@@ -113,6 +113,11 @@ public class GameManagementServiceTests {
         }
     }
 
+    // TODO test: select multiple problems, rest filled by difficulty (no duplicates)
+    // TODO test: only problems selected, no random found
+    // TODO test: only problems selected, dabatase not touched
+    // TODO test: error when no problems found in either method
+
     @Test
     public void addGetAndRemoveGame() {
         // Initially, room doesn't exist
@@ -203,8 +208,6 @@ public class GameManagementServiceTests {
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(UserMapper.toDto(host));
 
-//        Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
-//        Mockito.doReturn(problem).when(problemService).getProblemEntity(PROBLEM_ID);
         RoomDto response = gameService.startGame(ROOM_ID, request);
 
         verify(problemService, never()).getProblemsFromDifficulty(Mockito.any(), Mockito.any());

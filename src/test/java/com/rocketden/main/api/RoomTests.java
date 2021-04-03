@@ -68,6 +68,9 @@ public class RoomTests {
     private static final String PROBLEM_ID = "abcdef-ghijkl";
     private static final long DURATION = 600;
 
+    // TODO test: problem selected then cleared
+    // TODO test: problem not found
+
     @Test
     public void getNonExistentRoom() throws Exception {
         ApiError ERROR = RoomError.NOT_FOUND;

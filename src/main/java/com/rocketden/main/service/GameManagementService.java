@@ -149,6 +149,10 @@ public class GameManagementService {
         int remaining = room.getNumProblems() - problems.size();
         if (remaining > 0) {
             List<Problem> otherProblems = problemService.getProblemsFromDifficulty(room.getDifficulty(), remaining);
+
+            // TODO: duplicate filtering
+            // TODO: throw no problem found
+
             problems.addAll(otherProblems);
         }
 

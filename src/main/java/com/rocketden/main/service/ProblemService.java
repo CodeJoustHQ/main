@@ -182,6 +182,7 @@ public class ProblemService {
         }
 
         if (problems == null || problems.isEmpty()) {
+            // TODO: move to game management service
             throw new ApiException(ProblemError.NOT_FOUND);
         }
 

@@ -13,6 +13,7 @@ import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
 import com.rocketden.main.dto.problem.ProblemInputDto;
 import com.rocketden.main.dto.problem.ProblemTestCaseDto;
+import com.rocketden.main.dto.problem.SelectableProblemDto;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.user.UserDto;
@@ -56,6 +57,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
@@ -234,7 +236,13 @@ public class GameTests {
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(host);
         updateRequest.setNumProblems(10);
-        updateRequest.setProblemId(problemDto.getProblemId());
+
+        SelectableProblemDto selectableDto = new SelectableProblemDto();
+        selectableDto.setProblemId(problemDto.getProblemId());
+        selectableDto.setName(problemDto.getName());
+        selectableDto.setDifficulty(problemDto.getDifficulty());
+
+        updateRequest.setProblems(Collections.singletonList(selectableDto));
 
         MvcResult result = this.mockMvc.perform(put(String.format(UPDATE_ROOM, roomDto.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -245,7 +253,10 @@ public class GameTests {
         String jsonResponse = result.getResponse().getContentAsString();
         RoomDto response = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
-        assertEquals(problemDto.getProblemId(), response.getProblemId());
+        assertEquals(3, response.getProblems().size());
+        assertEquals(selectableDto.getProblemId(), response.getProblems().get(0).getProblemId());
+        assertEquals(selectableDto.getName(), response.getProblems().get(0).getName());
+        assertEquals(selectableDto.getDifficulty(), response.getProblems().get(0).getDifficulty());
 
         startGameHelper(roomDto, host);
 
@@ -285,6 +296,8 @@ public class GameTests {
 
     @Test
     public void startGameProblemNotFound() throws Exception {
+        // TODO: adapt to have no problems in database
+
         UserDto host = new UserDto();
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
