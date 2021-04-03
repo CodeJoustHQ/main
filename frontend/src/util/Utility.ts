@@ -3,6 +3,9 @@ import { removeUser } from '../api/Room';
 import { disconnect } from '../api/Socket';
 import { errorHandler } from '../api/Error';
 
+// Determine if string is valid identifier in JavaScript, no types provided.
+const validateIdentifier = require('valid-identifier');
+
 /**
  * Check whether all keys in param exist in location.state
  */
@@ -50,3 +53,17 @@ export const leaveRoom = (history: any, roomId: string, user: User | null) => {
     });
   }
 };
+
+// Return true iff the character is a letter.
+const isLetter = (character: string) => {
+  if (character.length !== 0) {
+    return false;
+  }
+
+  // Character is a letter iff the upper case does not equal lower case.
+  return character.toUpperCase() !== character.toLowerCase();
+};
+
+// Return true iff the variable is a valid identifier, and starts with a letter.
+export const validIdentifier = (identifier: string) => validateIdentifier(identifier)
+  && isLetter(identifier.charAt(0));
