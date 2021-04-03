@@ -50,6 +50,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.time.Instant;
+import java.util.Collections;
 
 @ExtendWith(MockitoExtension.class)
 public class GameManagementServiceTests {
@@ -180,7 +181,7 @@ public class GameManagementServiceTests {
     }
 
     @Test
-    public void startGameWithProblemIdSuccess() {
+    public void startGameWithProblemSuccess() {
         User host = new User();
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
@@ -189,8 +190,7 @@ public class GameManagementServiceTests {
         room.setRoomId(ROOM_ID);
         room.setHost(host);
         room.setDifficulty(ProblemDifficulty.HARD);
-        room.setProblemId(PROBLEM_ID);
-        room.setNumProblems(10);
+        room.setNumProblems(1);
 
         Problem problem = new Problem();
         problem.setProblemId(PROBLEM_ID);
@@ -198,11 +198,13 @@ public class GameManagementServiceTests {
         problem.setDescription(PROBLEM_DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.EASY);
 
+        room.setProblems(Collections.singletonList(problem));
+
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(UserMapper.toDto(host));
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
-        Mockito.doReturn(problem).when(problemService).getProblemEntity(PROBLEM_ID);
+//        Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
+//        Mockito.doReturn(problem).when(problemService).getProblemEntity(PROBLEM_ID);
         RoomDto response = gameService.startGame(ROOM_ID, request);
 
         verify(problemService, never()).getProblemsFromDifficulty(Mockito.any(), Mockito.any());

@@ -3,14 +3,17 @@ package com.rocketden.main.mapper;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.user.UserMapper;
+import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
 
+import com.rocketden.main.model.problem.ProblemIOType;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +31,13 @@ public class RoomMapperTests {
     private static final String USER_ID_2 = "678910";
     private static final String SESSION_ID = "234567";
     private static final String ROOM_ID = "012345";
-    private static final String PROBLEM_ID = "abcdef-ghijkl";
+
+    private static final String PROBLEM_ID = "abcdef";
+    private static final String PROBLEM_NAME = "name1";
+    private static final ProblemDifficulty PROBLEM_DIFFICULTY = ProblemDifficulty.EASY;
+    private static final String PROBLEM_ID_2 = "ghijkl";
+    private static final String PROBLEM_NAME_2 = "name2";
+    private static final ProblemDifficulty PROBLEM_DIFFICULTY_2 = ProblemDifficulty.HARD;
 
     @Test
     public void entityToDto() {
@@ -45,7 +54,20 @@ public class RoomMapperTests {
         room.setDifficulty(ProblemDifficulty.MEDIUM);
         room.setHost(host);
         room.setNumProblems(3);
-        room.setProblemId(PROBLEM_ID);
+
+        Problem problem1 = new Problem();
+        problem1.setProblemId(PROBLEM_ID);
+        problem1.setName(PROBLEM_NAME);
+        problem1.setDifficulty(PROBLEM_DIFFICULTY);
+        problem1.setDescription("irrelevant");
+
+        Problem problem2 = new Problem();
+        problem1.setProblemId(PROBLEM_ID_2);
+        problem1.setName(PROBLEM_NAME_2);
+        problem1.setDifficulty(PROBLEM_DIFFICULTY_2);
+        problem1.setOutputType(ProblemIOType.INTEGER);
+
+        room.setProblems(Arrays.asList(problem1, problem2));
 
         room.addUser(host);
         room.addUser(user);
@@ -57,7 +79,12 @@ public class RoomMapperTests {
         assertEquals(room.getDifficulty(), response.getDifficulty());
         assertEquals(room.getDuration(), response.getDuration());
         assertEquals(room.getNumProblems(), response.getNumProblems());
-        assertEquals(room.getProblemId(), response.getProblemId());
+
+        assertEquals(room.getProblems().size(), response.getProblems().size());
+        assertEquals(room.getProblems().get(0).getProblemId(), response.getProblems().get(0).getProblemId());
+        assertEquals(room.getProblems().get(0).getName(), response.getProblems().get(0).getName());
+        assertEquals(room.getProblems().get(1).getDifficulty(), response.getProblems().get(1).getDifficulty());
+
 
         User actualHost = UserMapper.toEntity(response.getHost());
         assertEquals(room.getHost(), actualHost);
