@@ -176,7 +176,6 @@ public class ProblemServiceTests {
         problem.setApproval(true);
         List<Problem> expected = new ArrayList<>();
         expected.add(problem);
-        //do findAllByApproval once it works
         Mockito.doReturn(expected).when(repository).findAll();
 
         List<ProblemDto> response = problemService.getAllProblems();
@@ -186,6 +185,7 @@ public class ProblemServiceTests {
         assertEquals(NAME, response.get(0).getName());
         assertEquals(DESCRIPTION, response.get(0).getDescription());
         assertEquals(problem.getDifficulty(), response.get(0).getDifficulty());
+        assertTrue(problem.getApproval());
     }
 
     @Test
@@ -289,7 +289,6 @@ public class ProblemServiceTests {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
-        //do findAllByApproval once it works
         Mockito.doReturn(problems).when(repository).findAllByApproval(true);
 
         // Return correct problem when selecting random difficulty
@@ -302,7 +301,6 @@ public class ProblemServiceTests {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
-        //do findAllByApproval once it works
         Mockito.doReturn(problems).when(repository).findAllByApproval(true);
 
         // Return correct problem when selecting random difficulty
@@ -332,7 +330,6 @@ public class ProblemServiceTests {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
-        //do findAllByApproval once it works
         //Mockito.doReturn(problems).when(repository).findAllByApproval(true);
 
         ApiException exception = assertThrows(ApiException.class, () ->
@@ -346,7 +343,7 @@ public class ProblemServiceTests {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
-        //do findAllByApproval once it works
+
         //Mockito.doReturn(problems).when(repository).findAll();
 
         ApiException exception = assertThrows(ApiException.class, () ->
@@ -467,7 +464,7 @@ public class ProblemServiceTests {
         ProblemDto updatedProblem = ProblemMapper.toDto(problem);
         updatedProblem.setApproval(true);
 
-        ArrayList<ProblemTestCaseDto> emptyCases = new ArrayList<ProblemTestCaseDto>();
+        List<ProblemTestCaseDto> emptyCases = new ArrayList<ProblemTestCaseDto>();
         updatedProblem.setTestCases(emptyCases);
 
         String problemId = problem.getProblemId();

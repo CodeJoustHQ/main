@@ -179,10 +179,8 @@ public class ProblemService {
 
         List<Problem> problems;
         if (difficulty == ProblemDifficulty.RANDOM) {
-            //Change to findAllByApproval once it works
             problems = repository.findAllByApproval(true);
         } else {
-            //Change to findAllByDifficultyAndApproval once it works
             problems = repository.findAllByDifficultyAndApproval(difficulty, true);
         }
 

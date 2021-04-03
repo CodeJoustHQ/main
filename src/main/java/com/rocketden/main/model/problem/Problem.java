@@ -71,7 +71,4 @@ public class Problem {
         problemInput.setProblem(this);
     }
 
-    public void toggleApprovedStatus() {
-        approval ^= true;
-    }
 }

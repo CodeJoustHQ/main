@@ -145,7 +145,7 @@ public class GameTests {
         assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
         assertEquals(problemInputs, problemActual.getProblemInputs());
         assertEquals(IO_TYPE, problemActual.getOutputType());
-
+        assertTrue(problemActual.getApproval());
         CreateTestCaseRequest createTestCaseRequest = new CreateTestCaseRequest();
         createTestCaseRequest.setInput(INPUT);
         createTestCaseRequest.setOutput(OUTPUT);
@@ -163,7 +163,6 @@ public class GameTests {
         assertEquals(INPUT, testCaseActual.getInput());
         assertEquals(OUTPUT, testCaseActual.getOutput());
         assertFalse(testCaseActual.isHidden());
-
         return problemActual;
     }
 
