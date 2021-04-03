@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { InlineShowIcon } from './Button';
 import ErrorMessage from './Error';
 import { LargeCenterPassword, PrimaryInput } from './Input';
 import Loading from './Loading';
-import { LargeText } from './Text';
+import { LargeText, SmallHoverText } from './Text';
 
 const Content = styled.div`
   padding: 0 20%;
@@ -22,6 +23,11 @@ export default function LockScreen(props: LockScreenProps) {
   } = props;
 
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   return (
     <Content>
@@ -29,7 +35,7 @@ export default function LockScreen(props: LockScreenProps) {
         What is the password?
       </LargeText>
       <LargeCenterPassword
-        show={false}
+        show={showPassword}
         placeholder="Password"
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
           setPassword(event.target.value);
@@ -40,6 +46,14 @@ export default function LockScreen(props: LockScreenProps) {
           }
         }}
       />
+      <SmallHoverText
+        onClick={togglePasswordVisibility}
+      >
+        {showPassword ? 'Hide' : 'Show'}
+        <InlineShowIcon>
+          {showPassword ? 'visibility_off' : 'visibility'}
+        </InlineShowIcon>
+      </SmallHoverText>
       <PrimaryInput
         onClick={() => {
           enterPasswordAction(password);
