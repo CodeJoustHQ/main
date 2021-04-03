@@ -56,7 +56,7 @@ export const leaveRoom = (history: any, roomId: string, user: User | null) => {
 
 // Return true iff the character is a letter.
 const isLetter = (character: string) => {
-  if (character.length !== 0) {
+  if (character.length !== 1) {
     return false;
   }
 

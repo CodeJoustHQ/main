@@ -451,9 +451,9 @@ function ProblemDisplay(props: ProblemDisplayParams) {
               />
 
               <InlineErrorIcon
-                show={validIdentifier(newProblem.problemInputs[index].name)}
+                show={!validIdentifier(newProblem.problemInputs[index].name)}
               >
-                error
+                error_outline
               </InlineErrorIcon>
 
               <PrimarySelect
