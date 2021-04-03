@@ -45,6 +45,14 @@ export const LargeCenterInputText = styled(Input).attrs(() => ({
   padding: 1rem;
 `;
 
+type PasswordParam = {
+  show: boolean,
+}
+
+export const LargeCenterPassword = styled(LargeCenterInputText).attrs((props: PasswordParam) => ({
+  type: props.show ? 'text' : 'password',
+}))<PasswordParam>``;
+
 export const PrimaryInput = styled(Input).attrs(() => ({
   type: 'button',
 }))`

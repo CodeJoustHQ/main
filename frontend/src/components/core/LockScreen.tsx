@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import ErrorMessage from './Error';
-import { LargeCenterInputText, PrimaryInput } from './Input';
+import { LargeCenterPassword, PrimaryInput } from './Input';
 import Loading from './Loading';
 import { LargeText } from './Text';
 
@@ -28,7 +28,8 @@ export default function LockScreen(props: LockScreenProps) {
       <LargeText>
         What is the password?
       </LargeText>
-      <LargeCenterInputText
+      <LargeCenterPassword
+        show={false}
         placeholder="Password"
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
           setPassword(event.target.value);
