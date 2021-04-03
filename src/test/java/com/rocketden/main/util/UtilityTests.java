@@ -8,6 +8,8 @@ import com.rocketden.main.service.UserService;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -17,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -83,5 +86,17 @@ public class UtilityTests {
     @Test
     public void generateUserIdInvalidType() {
         assertThrows(IllegalArgumentException.class, () -> utility.generateUniqueId(UserService.USER_ID_LENGTH, "INVALID_KEY"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "rocket rocket", "12", "$Hello", "jimmy=neutron"})
+    public void validateIdentifierFalse(String inputName) {
+        assertFalse(Utility.validateIdentifier(inputName));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"rocket", "rocketrocket", "hi12", "H$ello", "jimmyNeutron"})
+    public void validateIdentifierTrue(String inputName) {
+        assertTrue(Utility.validateIdentifier(inputName));
     }
 }
