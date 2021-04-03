@@ -294,6 +294,7 @@ class ProblemTests {
         ProblemInputDto problemInput = new ProblemInputDto();
         problemInput.setName(inputName);
         problemInput.setType(ProblemIOType.STRING);
+        problemInputs.add(problemInput);
         problemDto.setProblemInputs(problemInputs);
 
         ApiError ERROR = ProblemError.INVALID_VARIABLE_NAME;
