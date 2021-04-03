@@ -310,7 +310,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
         x={mousePosition.x}
         y={mousePosition.y}
       >
-        The provided input is likely invalid
+        This variable name is likely invalid
       </HoverTooltip>
       <MainContent>
         <FlexBareContainer>
