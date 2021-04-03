@@ -1,6 +1,7 @@
 package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
+import com.rocketden.main.dto.problem.SelectableProblemDto;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.DeleteRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
@@ -17,10 +18,14 @@ import com.rocketden.main.exception.UserError;
 import com.rocketden.main.exception.api.ApiException;
 import com.rocketden.main.model.Room;
 import com.rocketden.main.model.User;
+import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.util.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class RoomService {
@@ -31,12 +36,15 @@ public class RoomService {
 
     private final RoomRepository repository;
     private final SocketService socketService;
+    private final ProblemService problemService;
     private final Utility utility;
 
     @Autowired
-    public RoomService(RoomRepository repository, SocketService socketService, Utility utility) {
+    public RoomService(RoomRepository repository, SocketService socketService,
+                       ProblemService problemService, Utility utility) {
         this.repository = repository;
         this.socketService = socketService;
+        this.problemService = problemService;
         this.utility = utility;
     }
 
@@ -281,9 +289,39 @@ public class RoomService {
             room.setNumProblems(request.getNumProblems());
         }
 
-        // Set problemId if not null
-        if (request.getProblemId() != null) {
-            room.setProblemId(request.getProblemId());
+        // Set selected problems if not null
+        List<SelectableProblemDto> selectedProblems = request.getProblems();
+        boolean problemsHaveChanged = false;
+
+        if (request.getProblems() != null) {
+            // Check if selected problems have changed at all
+            if (selectedProblems.size() != room.getProblems().size()) {
+                problemsHaveChanged = true;
+            } else {
+                // Loop through to check if problemIds match
+                for (int i = 0; i < selectedProblems.size(); i++) {
+                    String problemId = room.getProblems().get(i).getProblemId();
+                    if (!selectedProblems.get(i).getProblemId().equals(problemId)) {
+                        problemsHaveChanged = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (problemsHaveChanged) {
+            List<Problem> newProblems = new ArrayList<>();
+            for (SelectableProblemDto selected : selectedProblems) {
+                Problem problem = problemService.getProblemEntity(selected.getProblemId());
+
+                if (problem == null) {
+                    throw new ApiException(ProblemError.NOT_FOUND);
+                }
+
+                newProblems.add(problem);
+            }
+
+            room.setProblems(newProblems);
         }
 
         repository.save(room);
