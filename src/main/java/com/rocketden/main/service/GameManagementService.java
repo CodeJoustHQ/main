@@ -141,19 +141,15 @@ public class GameManagementService {
         Game game = GameMapper.fromRoom(room);
         Long time = room.getDuration();
 
-        // If specific problem specified, use that instead of difficulty setting
-        if (room.getProblemId() != null) {
-            Problem problem = problemService.getProblemEntity(room.getProblemId());
+        // If specific problems specified, use those instead of difficulty setting
+        List<Problem> problems = game.getProblems();
+        problems.addAll(room.getProblems());
 
-            if (problem == null) {
-                throw new ApiException(ProblemError.NOT_FOUND);
-            }
-
-            game.getRoom().setNumProblems(1);
-            game.setProblems(Collections.singletonList(problem));
-        } else {
-            List<Problem> problems = problemService.getProblemsFromDifficulty(room.getDifficulty(), room.getNumProblems());
-            game.setProblems(problems);
+        // Fill remaining problems with random ones by difficulty
+        int remaining = room.getNumProblems() - problems.size();
+        if (remaining > 0) {
+            List<Problem> otherProblems = problemService.getProblemsFromDifficulty(room.getDifficulty(), remaining);
+            problems.addAll(otherProblems);
         }
 
         setStartGameTimer(game, time);
