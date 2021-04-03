@@ -124,7 +124,7 @@ public class GameTests {
         createProblemRequest.setName(NAME);
         createProblemRequest.setDescription(DESCRIPTION);
         createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
-
+        createProblemRequest.setApproval(true);
         List<ProblemInputDto> problemInputs = new ArrayList<>();
         ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
         problemInputs.add(problemInput);

@@ -62,6 +62,7 @@ public class ProblemService {
         problem.setDescription(request.getDescription());
         problem.setDifficulty(request.getDifficulty());
         problem.setOutputType(request.getOutputType());
+        problem.setApproval(request.getApproval());
 
         // Add all problem inputs in list.
         for (ProblemInputDto problemInput : request.getProblemInputs()) {
@@ -104,7 +105,9 @@ public class ProblemService {
                 || updatedProblem.getOutputType() == null) {
             throw new ApiException(ProblemError.EMPTY_FIELD);
         }
-
+        if (updatedProblem.getApproval() && updatedProblem.getTestCases().size() == 0) {
+            throw new ApiException(ProblemError.BAD_APPROVAL);
+        }
         if (updatedProblem.getDifficulty() == ProblemDifficulty.RANDOM) {
             throw new ApiException(ProblemError.BAD_DIFFICULTY);
         }
@@ -113,6 +116,7 @@ public class ProblemService {
         problem.setDescription(updatedProblem.getDescription());
         problem.setDifficulty(updatedProblem.getDifficulty());
         problem.setOutputType(updatedProblem.getOutputType());
+        problem.setApproval(updatedProblem.getApproval());
 
         problem.getProblemInputs().clear();
         for (ProblemInputDto problemInput : updatedProblem.getProblemInputs()) {
@@ -169,19 +173,21 @@ public class ProblemService {
             throw new ApiException(ProblemError.EMPTY_FIELD);
         }
 
+        if (numProblems <= 0) {
+            throw new ApiException(ProblemError.INVALID_NUMBER_REQUEST);
+        }
+
         List<Problem> problems;
         if (difficulty == ProblemDifficulty.RANDOM) {
-            problems = repository.findAll();
+            //Change to findAllByApproval once it works
+            problems = repository.findAllByApproval(true);
         } else {
-            problems = repository.findAllByDifficulty(difficulty);
+            //Change to findAllByDifficultyAndApproval once it works
+            problems = repository.findAllByDifficultyAndApproval(difficulty, true);
         }
 
         if (problems == null || problems.isEmpty()) {
             throw new ApiException(ProblemError.NOT_FOUND);
-        }
-
-        if (numProblems <= 0) {
-            throw new ApiException(ProblemError.INVALID_NUMBER_REQUEST);
         }
 
         // If the user wants more problems than exists, just return all of them

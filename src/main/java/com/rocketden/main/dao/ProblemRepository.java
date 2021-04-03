@@ -12,8 +12,9 @@ import java.util.List;
 public interface ProblemRepository extends CrudRepository<Problem, Integer> {
 
     Problem findProblemByProblemId(String problemId);
+    List<Problem> findAllByDifficultyAndApproval(ProblemDifficulty difficulty, Boolean approval);
+    List<Problem> findAllByApproval(Boolean approval);
     List<Problem> findAllByDifficulty(ProblemDifficulty difficulty);
-
     @Override
     List<Problem> findAll();
 }

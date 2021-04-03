@@ -15,6 +15,7 @@ public enum ProblemError implements ApiError {
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "Please ensure each line of test case input/output is valid and is of the correct type."),
     INVALID_NUMBER_REQUEST(HttpStatus.BAD_REQUEST, "Please request a valid number of problems."),
     EMPTY_FIELD(HttpStatus.BAD_REQUEST, "Please enter a value for each required field."),
+    BAD_APPROVAL(HttpStatus.BAD_REQUEST, "Cannot approve a problem with no test cases."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "A problem could not be found with the given criteria.");
 
     private final HttpStatus status;
