@@ -94,7 +94,7 @@ function AllProblemsPage() {
         <TextLinkLocation
           onClick={() => {
             history.push('/problem/create', {
-              locked: true,
+              locked: false,
             });
           }}
         >
