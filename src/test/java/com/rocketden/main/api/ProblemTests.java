@@ -285,6 +285,33 @@ class ProblemTests {
         assertEquals(ERROR.getResponse(), response);
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"", "rocket rocket", "12", "$Hello", "jimmy=neutron"})
+    public void editProblemInvalidIdentifier(String inputName) throws Exception {
+        ProblemDto problemDto = createSingleProblem();
+
+        List<ProblemInputDto> problemInputs = new ArrayList<>();
+        ProblemInputDto problemInput = new ProblemInputDto();
+        problemInput.setName(inputName);
+        problemInput.setType(ProblemIOType.STRING);
+        problemDto.setProblemInputs(problemInputs);
+
+        ApiError ERROR = ProblemError.INVALID_VARIABLE_NAME;
+
+        // Edit problem with new values
+        String endpoint = String.format(PUT_PROBLEM_EDIT, problemDto.getProblemId());
+        MvcResult result = this.mockMvc.perform(put(endpoint)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(problemDto)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+    }
+
     @Test
     public void createProblemBadInput() throws Exception {
         CreateProblemRequest request = new CreateProblemRequest();
