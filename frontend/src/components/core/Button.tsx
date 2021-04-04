@@ -204,3 +204,16 @@ export const InlineRefreshIcon = styled.i.attrs(() => ({
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.24);
   }
 `;
+
+export const InlineErrorIcon = styled(InlineRefreshIcon).attrs(() => ({
+}))`
+  color: ${({ theme }) => theme.colors.gray};
+  margin: 0;
+  padding: 0;
+  box-shadow: none;
+
+  &:hover {
+    cursor: default;
+    box-shadow: none;
+  }
+`;
