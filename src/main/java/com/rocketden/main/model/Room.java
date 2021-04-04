@@ -62,7 +62,7 @@ public class Room {
     private Integer maxSize = 4;
 
     @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "problem_id")
+    @JoinColumn(name = "selectable_problem_id")
     private List<Problem> problems = new ArrayList<>();
 
 

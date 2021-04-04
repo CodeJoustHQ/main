@@ -296,24 +296,11 @@ public class GameTests {
 
     @Test
     public void startGameProblemNotFound() throws Exception {
-        // TODO: adapt to have no problems in database
-
         UserDto host = new UserDto();
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
 
         RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
-        createSingleProblemAndTestCases();
-
-        UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
-        updateRequest.setInitiator(host);
-        updateRequest.setProblemId(PROBLEM_ID);
-
-        this.mockMvc.perform(put(String.format(UPDATE_ROOM, roomDto.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
 
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(host);

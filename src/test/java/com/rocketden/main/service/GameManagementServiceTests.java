@@ -239,7 +239,7 @@ public class GameManagementServiceTests {
     }
 
     @Test
-    public void startGameProblemIdNotFound() {
+    public void startGameNoProblemsFound() {
         User host = new User();
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
@@ -247,7 +247,6 @@ public class GameManagementServiceTests {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
         room.setHost(host);
-        room.setProblemId(PROBLEM_ID);
 
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(UserMapper.toDto(host));

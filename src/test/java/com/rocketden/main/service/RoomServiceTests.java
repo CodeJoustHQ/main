@@ -74,7 +74,7 @@ public class RoomServiceTests {
     // TODO test: multiple problems added
     // TODO test: select problem, second request doesn't touch database
     // TODO test: not found
-    // TODO test: only problems under numProblems kept
+    // TODO test: only problems under numProblems kept (or throw error)
 
     @Test
     public void createRoomSuccess() {
@@ -97,7 +97,7 @@ public class RoomServiceTests {
         assertEquals(user.getNickname(), response.getHost().getNickname());
         assertEquals(USER_ID, response.getHost().getUserId());
         assertEquals(ProblemDifficulty.RANDOM, response.getDifficulty());
-        assertNull(response.getProblemId());
+        assertEquals(0, response.getProblems().size());
     }
 
     @Test
@@ -354,7 +354,6 @@ public class RoomServiceTests {
         request.setDifficulty(ProblemDifficulty.EASY);
         request.setDuration(DURATION);
         request.setNumProblems(3);
-        request.setProblemId(PROBLEM_ID);
 
         RoomDto response = roomService.updateRoomSettings(room.getRoomId(), request);
 
@@ -362,7 +361,6 @@ public class RoomServiceTests {
         assertEquals(request.getDifficulty(), response.getDifficulty());
         assertEquals(request.getDuration(), response.getDuration());
         assertEquals(request.getNumProblems(), response.getNumProblems());
-        assertEquals(request.getProblemId(), response.getProblemId());
     }
 
     @Test

@@ -146,7 +146,7 @@ public class RoomTests {
         assertEquals(expected.getHost(), actual.getHost());
         assertEquals(expected.getUsers(), actual.getUsers());
         assertEquals(ProblemDifficulty.RANDOM, actual.getDifficulty());
-        assertNull(actual.getProblemId());
+        assertEquals(0, actual.getProblems().size());
 
         // Send GET request to validate that room exists
         String roomId = actual.getRoomId();
@@ -163,7 +163,7 @@ public class RoomTests {
         assertEquals(expected.getHost(), actualGet.getHost());
         assertEquals(expected.getUsers(), actualGet.getUsers());
         assertEquals(ProblemDifficulty.RANDOM, actual.getDifficulty());
-        assertNull(actualGet.getProblemId());
+        assertEquals(0, actual.getProblems().size());
     }
 
     @Test
@@ -358,7 +358,6 @@ public class RoomTests {
         updateRequest.setDifficulty(ProblemDifficulty.EASY);
         updateRequest.setDuration(DURATION);
         updateRequest.setNumProblems(2);
-        updateRequest.setProblemId(PROBLEM_ID);
 
         MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -382,7 +381,6 @@ public class RoomTests {
         assertEquals(updateRequest.getDifficulty(), actual.getDifficulty());
         assertEquals(updateRequest.getDuration(), actual.getDuration());
         assertEquals(updateRequest.getNumProblems(), actual.getNumProblems());
-        assertEquals(updateRequest.getProblemId(), actual.getProblemId());
     }
 
     @Test
@@ -407,7 +405,7 @@ public class RoomTests {
 
         // Difficulty remains unchanged from default
         assertEquals(ProblemDifficulty.RANDOM, room.getDifficulty());
-        assertNull(room.getProblemId());
+        assertEquals(0, room.getProblems().size());
         assertEquals(GameTimer.DURATION_15, room.getDuration());
         assertEquals(1, room.getNumProblems());
     }
