@@ -25,6 +25,8 @@ const RightHeader = styled(NavbarLink)`
 `;
 
 const InlineHeaderTag = styled.span`
+  position: relative;
+  top: -0.1rem;
   margin-left: 0.4rem;
   padding: 0 0.5rem;
   font-size: ${({ theme }) => theme.fontSize.medium};

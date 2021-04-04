@@ -308,6 +308,16 @@ public class ProblemService {
         return defaultCodeMap;
     }
 
+    /**
+     * This method is used in a GET request to see if users can access the
+     * problem pages on the frontend. The parameter is compared against the
+     * problem access password environment variable; if no environment variable
+     * is set, then it returns false.
+     * 
+     * @param password the password supplied by the user
+     * @return true iff the password supplied by the user matches the set system
+     * password, false otherwise
+     */
     public Boolean accessProblems(String password) {
         return System.getenv(PROBLEM_ACCESS_PASSWORD_KEY) != null
             && password.equals(System.getenv(PROBLEM_ACCESS_PASSWORD_KEY));
