@@ -181,8 +181,7 @@ public class ProblemService {
             problems = repository.findAllByDifficulty(difficulty);
         }
 
-        if (problems == null || problems.isEmpty()) {
-            // TODO: move to game management service
+        if (problems == null) {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
 

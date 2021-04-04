@@ -116,7 +116,6 @@ public class GameManagementServiceTests {
     // TODO test: select multiple problems, rest filled by difficulty (no duplicates)
     // TODO test: only problems selected, no random found
     // TODO test: only problems selected, dabatase not touched
-    // TODO test: error when no problems found in either method
 
     @Test
     public void addGetAndRemoveGame() {
@@ -252,7 +251,6 @@ public class GameManagementServiceTests {
         request.setInitiator(UserMapper.toDto(host));
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
-        Mockito.doReturn(null).when(problemService).getProblemEntity(PROBLEM_ID);
         ApiException exception = assertThrows(ApiException.class, () -> gameService.startGame(ROOM_ID, request));
         assertEquals(ProblemError.NOT_FOUND, exception.getError());
     }

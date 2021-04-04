@@ -149,11 +149,15 @@ public class GameManagementService {
         int remaining = room.getNumProblems() - problems.size();
         if (remaining > 0) {
             List<Problem> otherProblems = problemService.getProblemsFromDifficulty(room.getDifficulty(), remaining);
+            for (Problem problem : otherProblems) {
+                if (!problems.contains(problem)) {
+                    problems.add(problem);
+                }
+            }
+        }
 
-            // TODO: duplicate filtering
-            // TODO: throw no problem found
-
-            problems.addAll(otherProblems);
+        if (problems.isEmpty()) {
+            throw new ApiException(ProblemError.NOT_FOUND);
         }
 
         setStartGameTimer(game, time);

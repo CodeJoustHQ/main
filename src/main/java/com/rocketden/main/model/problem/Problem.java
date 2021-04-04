@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
@@ -24,12 +25,14 @@ import java.util.UUID;
 @Entity // This tells Hibernate to make a table out of this class
 @Getter
 @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Problem {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
     // Auto-generate default business ID for each problem
+    @EqualsAndHashCode.Include
     private String problemId = UUID.randomUUID().toString();
 
     private String name;
