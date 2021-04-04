@@ -120,8 +120,6 @@ public class GameManagementServiceTests {
         }
     }
 
-    // TODO test: only problems selected, dabatase not touched
-
     @Test
     public void addGetAndRemoveGame() {
         // Initially, room doesn't exist
@@ -276,6 +274,37 @@ public class GameManagementServiceTests {
         assertEquals(1, game.getProblems().size());
         assertEquals(problem.getProblemId(), game.getProblems().get(0).getProblemId());
         assertEquals(problem.getOutputType(), game.getProblems().get(0).getOutputType());
+    }
+
+    @Test
+    public void startGameWithSelectedProblemsNoDatabaseTouches() {
+        User host = new User();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(host);
+        room.setDifficulty(ProblemDifficulty.HARD);
+        room.setNumProblems(1);
+
+        Problem problem = new Problem();
+        problem.setProblemId(PROBLEM_ID);
+        problem.setName(PROBLEM_NAME);
+        problem.setDescription(PROBLEM_DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.EASY);
+        room.setProblems(Collections.singletonList(problem));
+
+        StartGameRequest request = new StartGameRequest();
+        request.setInitiator(UserMapper.toDto(host));
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(room.getRoomId());
+
+        gameService.startGame(ROOM_ID, request);
+        gameService.getGameFromRoomId(ROOM_ID);
+
+        verify(problemService, never()).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        verify(problemService, never()).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
     }
 
     @Test
