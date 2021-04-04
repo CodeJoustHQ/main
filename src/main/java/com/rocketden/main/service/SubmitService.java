@@ -27,6 +27,8 @@ import com.rocketden.main.game_object.PlayerCode;
 import com.rocketden.main.game_object.Submission;
 import com.rocketden.main.game_object.SubmissionResult;
 
+import com.rocketden.main.model.problem.Problem;
+import lombok.extern.log4j.Log4j2;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -40,6 +42,7 @@ import org.springframework.stereotype.Service;
 /**
  * Class to handle code updates and miscellaneous requests.
  */
+@Log4j2
 @Service
 public class SubmitService {
 
@@ -104,8 +107,8 @@ public class SubmitService {
         testerRequest.setLanguage(request.getLanguage());
 
         // Set the problem with the single provided test case.
-        ProblemDto problemDto = ProblemMapper.toDto(game.getProblems().get(0));
-        
+        ProblemDto problemDto = getStrippedProblemDto(game.getProblems().get(0));
+
         /**
          * Provide a temporary output to circumvent output parsing error.
          * The problem must have at least one test case to work.
@@ -142,7 +145,10 @@ public class SubmitService {
         TesterRequest testerRequest = new TesterRequest();
         testerRequest.setCode(request.getCode());
         testerRequest.setLanguage(request.getLanguage());
-        testerRequest.setProblem(ProblemMapper.toDto(game.getProblems().get(0)));
+
+        // Invariant: Games have at least one problem (else it will fail to create)
+        ProblemDto problemDto = getStrippedProblemDto(game.getProblems().get(0));
+        testerRequest.setProblem(problemDto);
 
         Submission submission = getSubmission(testerRequest);
         player.getSubmissions().add(submission);
@@ -206,6 +212,8 @@ public class SubmitService {
             throw e;
         } catch (Exception e) {
             // Throw generic 500 error
+            log.info("An error occurred connecting to the tester service:");
+            log.error(e.getMessage());
             throw new ApiException(GameError.TESTER_ERROR);
         }
     }
@@ -247,5 +255,17 @@ public class SubmitService {
     // This method should only be called for testing purposes
     protected void setDebugModeForTesting(boolean debugMode) {
         this.debugMode = debugMode;
+    }
+
+    private ProblemDto getStrippedProblemDto(Problem problem) {
+        ProblemDto problemDto = ProblemMapper.toDto(problem);
+
+        // Clear irrelevant fields before sending request to tester service
+        problemDto.setProblemId(null);
+        problemDto.setName(null);
+        problemDto.setDescription(null);
+        problemDto.setDifficulty(null);
+
+        return problemDto;
     }
 }
