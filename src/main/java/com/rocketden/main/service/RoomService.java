@@ -293,7 +293,11 @@ public class RoomService {
         List<SelectableProblemDto> selectedProblems = request.getProblems();
         boolean problemsHaveChanged = false;
 
-        if (request.getProblems() != null) {
+        if (selectedProblems != null) {
+            if (selectedProblems.size() > request.getNumProblems()) {
+                throw new ApiException(RoomError.TOO_MANY_PROBLEMS);
+            }
+
             // Check if selected problems have changed at all
             if (selectedProblems.size() != room.getProblems().size()) {
                 problemsHaveChanged = true;
@@ -320,9 +324,6 @@ public class RoomService {
 
                 newProblems.add(problem);
             }
-
-            // TODO: keep only those under numProblems limit
-
             room.setProblems(newProblems);
         }
 

@@ -1,6 +1,7 @@
 package com.rocketden.main.service;
 
 import com.rocketden.main.dao.RoomRepository;
+import com.rocketden.main.dto.problem.SelectableProblemDto;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.DeleteRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
@@ -37,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,6 +71,7 @@ public class RoomServiceTests {
     private static final String USER_ID_2 = "123456";
     private static final String USER_ID_3 = "024681";
     private static final String PROBLEM_ID = "abcdef-hijklm";
+    private static final String PROBLEM_ID_2 = "zzzzz-aaaaa";
     private static final long DURATION = 600;
 
     // TODO test: multiple problems added
@@ -491,6 +494,32 @@ public class RoomServiceTests {
         ApiException exception = assertThrows(ApiException.class, () ->
                 roomService.updateRoomSettings(ROOM_ID, request));
         assertEquals(ProblemError.INVALID_NUMBER_REQUEST, exception.getError());
+    }
+
+    @Test
+    public void updateRoomSettingsTooManySelectedProblems() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        User host = new User();
+        host.setNickname(NICKNAME);
+        room.setHost(host);
+        room.addUser(host);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        UpdateSettingsRequest request = new UpdateSettingsRequest();
+        request.setInitiator(UserMapper.toDto(host));
+        request.setNumProblems(1);
+
+        SelectableProblemDto problemDto = new SelectableProblemDto();
+        problemDto.setProblemId(PROBLEM_ID);
+        SelectableProblemDto problemDto2 = new SelectableProblemDto();
+        problemDto.setProblemId(PROBLEM_ID_2);
+        request.setProblems(Arrays.asList(problemDto, problemDto2));
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.updateRoomSettings(ROOM_ID, request));
+        assertEquals(RoomError.TOO_MANY_PROBLEMS, exception.getError());
     }
 
     @Test
