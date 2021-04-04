@@ -25,6 +25,9 @@ import {
   GrayTextButton,
   SmallButton,
   GreenSmallButtonBlock,
+  ToggleButtonLabel,
+  ToggleButtonInput,
+  ToggleButtonSpan,
 } from '../core/Button';
 import PrimarySelect from '../core/Select';
 import {
@@ -152,6 +155,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
   const history = useHistory();
   const [newProblem, setNewProblem] = useState<Problem>(problem);
+  const [approvedProblem, setApprovedProblem] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -204,6 +208,15 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
   // Handle description change
   const handleDescriptionChange = (value: string) => handleChange({ target: { name: 'description', value } });
+
+  // Toggle the problem approved status
+  const toggleApprovedProblem = () => {
+    if (approvedProblem) {
+      setApprovedProblem(false);
+    } else {
+      setApprovedProblem(true);
+    }
+  };
 
   // Handle updating of problem inputs
   const handleInputChange = (index: number, name: string, type: ProblemIOType) => {
@@ -421,6 +434,15 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       <SidebarContent>
         <SmallHeaderText>Options</SmallHeaderText>
         <SettingsContainer>
+          <ToggleButtonLabel>
+            <ToggleButtonInput
+              onChange={() => toggleApprovedProblem()}
+              checked={approvedProblem}
+            />
+            <ToggleButtonSpan
+              checked={approvedProblem}
+            />
+          </ToggleButtonLabel>
           <LowMarginMediumText>Difficulty</LowMarginMediumText>
           {Object.keys(Difficulty).map((key) => {
             const difficulty = Difficulty[key as keyof typeof Difficulty];
