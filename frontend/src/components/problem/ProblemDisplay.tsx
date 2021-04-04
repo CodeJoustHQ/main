@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
@@ -39,7 +39,7 @@ import ErrorMessage from '../core/Error';
 import { InvertedSmallButtonLink } from '../core/Link';
 import { FlexBareContainer } from '../core/Container';
 import { generateRandomId, validIdentifier } from '../../util/Utility';
-import { HoverContainer, HoverElement, HoverTooltip } from '../core/HoverTooltip';
+import { HoverTooltip } from '../core/HoverTooltip';
 import { Coordinate } from '../special/FloatingCircle';
 
 const MainContent = styled.div`
@@ -65,23 +65,6 @@ const SettingsContainer = styled.div`
   border-radius: 10px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   background: ${({ theme }) => theme.colors.white};
-`;
-
-type ShowError = {
-  show: boolean,
-};
-
-const HoverContainerErrorIcon = styled(HoverContainer).attrs((props: ShowError) => ({
-  style: {
-    display: `${props.show ? 'inline-block' : 'none'}`,
-  },
-}))<ShowError>`
-  margin: 0 0.5rem 0 0;
-`;
-
-const HoverElementErrorIcon = styled(HoverElement)`
-  width: 1rem;
-  height: 1rem;
 `;
 
 const SettingsContainerRelative = styled(SettingsContainer)`
@@ -178,13 +161,9 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
 
   // Get current mouse position.
-  const mouseMoveHandler = useCallback((e: MouseEvent) => {
+  const mouseMoveHandler = useCallback((e: any) => {
     setMousePosition({ x: e.pageX, y: e.pageY });
   }, [setMousePosition]);
-
-  useEffect(() => {
-    window.onmousemove = mouseMoveHandler;
-  }, [mouseMoveHandler]);
 
   const onDragEnd = (result: any) => {
     // dropped outside the list
@@ -487,18 +466,14 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                   e.target.value, newProblem.problemInputs[index].type)}
               />
 
-              <HoverContainerErrorIcon
+              <InlineErrorIcon
                 show={!validIdentifier(newProblem.problemInputs[index].name)}
+                onMouseEnter={() => setHoverVisible(true)}
+                onMouseMove={mouseMoveHandler}
+                onMouseLeave={() => setHoverVisible(false)}
               >
-                <HoverElementErrorIcon
-                  enabled={validIdentifier(newProblem.problemInputs[index].name)}
-                  onMouseEnter={() => setHoverVisible(true)}
-                  onMouseLeave={() => setHoverVisible(false)}
-                />
-                <InlineErrorIcon>
-                  error_outline
-                </InlineErrorIcon>
-              </HoverContainerErrorIcon>
+                error_outline
+              </InlineErrorIcon>
 
               <PrimarySelect
                 onChange={(e) => handleInputChange(

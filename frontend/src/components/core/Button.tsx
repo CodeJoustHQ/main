@@ -205,10 +205,17 @@ export const InlineRefreshIcon = styled.i.attrs(() => ({
   }
 `;
 
-export const InlineErrorIcon = styled(InlineRefreshIcon).attrs(() => ({
-}))`
+type ShowError = {
+  show: boolean,
+};
+
+export const InlineErrorIcon = styled(InlineRefreshIcon).attrs((props: ShowError) => ({
+  style: {
+    display: props.show ? 'inline-block' : 'none',
+  },
+}))<ShowError>`
   color: ${({ theme }) => theme.colors.gray};
-  margin: 0;
+  margin: 0 0.5rem 0 0;
   padding: 0;
   box-shadow: none;
 
