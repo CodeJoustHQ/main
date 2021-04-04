@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
@@ -155,7 +155,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
   const history = useHistory();
   const [newProblem, setNewProblem] = useState<Problem>(problem);
-  const [approvedProblem, setApprovedProblem] = useState(false);
+  const [problemApproval, setProblemApproval] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -209,12 +209,12 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   // Handle description change
   const handleDescriptionChange = (value: string) => handleChange({ target: { name: 'description', value } });
 
-  // Toggle the problem approved status
-  const toggleApprovedProblem = () => {
-    if (approvedProblem) {
-      setApprovedProblem(false);
+  // Toggle the problem approval status
+  const toggleProblemApproval = () => {
+    if (problemApproval) {
+      setProblemApproval(false);
     } else {
-      setApprovedProblem(true);
+      setProblemApproval(true);
     }
   };
 
@@ -436,11 +436,11 @@ function ProblemDisplay(props: ProblemDisplayParams) {
         <SettingsContainer>
           <ToggleButtonLabel>
             <ToggleButtonInput
-              onChange={() => toggleApprovedProblem()}
-              checked={approvedProblem}
+              onChange={() => toggleProblemApproval()}
+              checked={problemApproval}
             />
             <ToggleButtonSpan
-              checked={approvedProblem}
+              checked={problemApproval}
             />
           </ToggleButtonLabel>
           <LowMarginMediumText>Difficulty</LowMarginMediumText>

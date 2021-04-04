@@ -15,6 +15,7 @@ export type Problem = {
   problemId: string,
   name: string,
   description: string,
+  approval: boolean,
   difficulty: Difficulty,
   testCases: TestCase[],
   problemInputs: ProblemInput[],
