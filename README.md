@@ -20,16 +20,21 @@ with an explanation if you would like access to this for some reason. Otherwise,
 replace the `spring.datasource` variables in `application.properties` with your
 own database to proceed. 
 
-Run `./mvnw clean install` if it's your first time running the app (or for whatever
+* Run `./mvnw clean install` if it's your first time running the app (or for whatever
 reason you need to re-download Maven dependencies). 
 
-Run `./mvnw test` to run the project's unit tests.
+* Run `./mvnw test` to run the project's unit tests.
 
-Run `./mvnw spring-boot:run` to build and start the server (both frontend and backend).
+* Run `./mvnw spring-boot:run` to build and start the server (both frontend and backend).
 
 Once the server is started, the site should be running at 
 [localhost:8080](http://localhost:8080), and you can send REST requests to the routes
 at `localhost:8080/api/v1/`. 
+
+### Speed Up Build Times
+
+The following two tips can dramatically speed up build times and save you a lot of
+time when developing (a matter of minutes vs. seconds on each code change):
 
 **Tip 1**: the full server startup process can take some time, so if you are looking to test
 some quick frontend changes, you can start `./mvnw spring-boot:run` in one bash window
