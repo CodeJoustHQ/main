@@ -204,3 +204,15 @@ export const InlineRefreshIcon = styled.i.attrs(() => ({
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.24);
   }
 `;
+
+export const InlineShowIcon = styled.i.attrs(() => ({
+  className: 'material-icons',
+}))`
+  display: inline-block;
+  position: relative;
+  top: 0.1rem;
+  margin-left: 0.3rem;
+  border-radius: 1rem;
+  font-size: ${({ theme }) => theme.fontSize.medium};
+  color: ${({ theme }) => theme.colors.font};
+`;
