@@ -20,22 +20,37 @@ with an explanation if you would like access to this for some reason. Otherwise,
 replace the `spring.datasource` variables in `application.properties` with your
 own database to proceed. 
 
-Run `./mvnw clean install` to build.
+* Run `./mvnw clean install` if it's your first time running the app (or for whatever
+reason you need to re-download Maven dependencies). 
 
-Run `./mvnw test` to run tests.
+* Run `./mvnw test` to run the project's unit and API tests.
 
-Run `./mvnw spring-boot:run` to start the server.
+* Run `./mvnw spring-boot:run` to build and start the server (both frontend and backend).
 
 Once the server is started, the site should be running at 
 [localhost:8080](http://localhost:8080), and you can send REST requests to the routes
 at `localhost:8080/api/v1/`. 
 
-Note: the server startup process can take some time, so if you are looking to test
+### Speed Up Build Times
+
+The following two tips can dramatically speed up build times and save you a lot of
+time when developing (a matter of minutes vs. seconds on each code change):
+
+**Tip 1**: The full server startup process can take some time, so if you are looking to test
 some quick frontend changes, you can start `./mvnw spring-boot:run` in one bash window
 and run `cd ./frontend && npm start` in another. You can then use 
 [localhost:3000](http://localhost:3000) instead, and any changes to frontend files will
 immediately be reflected (so you don't need to re-run Maven every time). Be aware that 
 occasional socket connection errors can occur when using this method. 
+
+**Tip 2**: On the other hand, if you're only testing backend changes, you can avoid 
+re-building the entire frontend by running `./mvnw spring-boot:run -Dfrontend.skip`.
+This will reuse the frontend code built from the latest call to `./mvnw spring-boot:run`
+(so if your previous build failed, you may need to rerun the full command before this
+tip will work). 
+
+**Tip 3**: Combine tips 1 and 2 if you're making both frontend and backend changes and
+want a way to quickly build each section separately. 
 
 ## File Structure
 
