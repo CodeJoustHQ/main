@@ -37,6 +37,15 @@ export const NoMarginSubtitleText = styled.p`
   margin: 0;
 `;
 
+export const SmallHoverText = styled(SmallHeaderText)`
+  font-size: ${({ theme }) => theme.fontSize.medium};
+  margin: 0;
+
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
 export const MediumText = styled.h5`
   font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
 `;

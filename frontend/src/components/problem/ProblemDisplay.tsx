@@ -26,6 +26,7 @@ import {
   SmallButton,
   GreenSmallButtonBlock,
   InlineErrorIcon,
+  InvertedSmallButton,
 } from '../core/Button';
 import PrimarySelect from '../core/Select';
 import {
@@ -36,7 +37,6 @@ import {
 } from '../core/Text';
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
-import { InvertedSmallButtonLink } from '../core/Link';
 import { FlexBareContainer } from '../core/Container';
 import { generateRandomId, validIdentifier } from '../../util/Utility';
 import { HoverTooltip } from '../core/HoverTooltip';
@@ -295,12 +295,16 @@ function ProblemDisplay(props: ProblemDisplayParams) {
         <FlexBareContainer>
           <SmallHeaderText>Problem</SmallHeaderText>
           <TopButtonsContainer>
-            <InvertedSmallButtonLink
-              onClick={() => onClick(newProblem)}
-              to="/problems/all"
+            <InvertedSmallButton
+              onClick={() => {
+                onClick(newProblem);
+                history.push('/problems/all', {
+                  locked: false,
+                });
+              }}
             >
               Back
-            </InvertedSmallButtonLink>
+            </InvertedSmallButton>
             <SmallButton
               onClick={() => onClick(newProblem)}
             >

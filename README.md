@@ -10,15 +10,21 @@ and begin coding to see who's the best!
 First, ensure you have the necessary languages and frameworks installed 
 (e.g. Java, Maven, Node) and clone this repo. 
 
-Then, export the following environment variable in your local dev environment:
+Then, export the following two environment variables in your local dev environment:
 
-```export JASYPT_ENCRYPTOR_PASSWORD=XXXXXXXXXXXX```
+1. ```export JASYPT_ENCRYPTOR_PASSWORD=XXXXXXXXXXXX;```
+2. ```export PROBLEM_ACCESS_PASSWORD=XXXXXXXXXXXX;```
 
-This is for the encrypted password to our database (see `application.properties`).
-Please email us at [zpchris@wharton.upenn.edu](zpchris@wharton.upenn.edu) 
-with an explanation if you would like access to this for some reason. Otherwise,
-replace the `spring.datasource` variables in `application.properties` with your
-own database to proceed. 
+The first environment variable is for the encrypted password to our database
+(see `application.properties`). Please email us at
+[zpchris@wharton.upenn.edu](zpchris@wharton.upenn.edu) with an explanation if
+you would like access to this for some reason. Otherwise, replace the `spring.datasource`
+variables in `application.properties` with your own database to proceed.
+
+The second environment variable is for the encrypted password to correctly set
+up the local lock screen on the problem pages. This step is unimportant if you are
+not accessing any of the problem pages, but does set up the site as it is currently
+running in production.
 
 * Run `./mvnw clean install` if it's your first time running the app (or for whatever
 reason you need to re-download Maven dependencies). 
