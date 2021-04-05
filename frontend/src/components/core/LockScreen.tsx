@@ -8,6 +8,7 @@ import { LargeText, SmallHoverText } from './Text';
 
 const Content = styled.div`
   padding: 0 20%;
+  margin-top: 8rem;
 `;
 
 type LockScreenProps = {
