@@ -30,6 +30,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -173,6 +174,46 @@ public class RoomServiceTests {
     }
 
     @Test
+    public void setRoomSizeFailure() {
+        /**
+         * Verify set room size request fails when the size to be set is less
+         * than the the number of users already in the room
+         * Define four users, add to the room, and attempt to set room size to 3
+         */
+        User firstUser = new User();
+        firstUser.setNickname(NICKNAME);
+        User secondUser = new User();
+        secondUser.setNickname(NICKNAME_2);
+        User thirdUser = new User();
+        thirdUser.setNickname(NICKNAME_3);
+        User fourthUser = new User();
+        fourthUser.setNickname(NICKNAME_4);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setSize(4);
+        room.setHost(firstUser);
+        room.addUser(firstUser);
+        
+        room.addUser(secondUser);
+        room.addUser(thirdUser);
+        room.addUser(fourthUser);
+
+        // Mock repository to return room when called
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        UpdateSettingsRequest request = new UpdateSettingsRequest();
+        request.setInitiator(UserMapper.toDto(firstUser));
+        request.setDifficulty(ProblemDifficulty.EASY);
+        request.setDuration(DURATION);
+        request.setSize(3);
+
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.updateRoomSettings(ROOM_ID, request));
+        assertEquals(RoomError.BAD_ROOM_SIZE, exception.getError());
+        verify(repository).findRoomByRoomId(ROOM_ID);
+    }
+
+    @Test
     public void joinFullRoomFailure() {
         /**
          * Verify join room request fails when the room is already full
@@ -194,6 +235,7 @@ public class RoomServiceTests {
 
         Room room = new Room();
         room.setRoomId(ROOM_ID);
+        room.setSize(4);
         room.setHost(firstUser);
         room.addUser(firstUser);
         
@@ -210,6 +252,40 @@ public class RoomServiceTests {
     }
 
 
+    @Test
+    public void manyUsersJoiningAnInfinitelySizedRoomSuccess() {
+        /**
+         * Verify join room request works when the room is infinitely sized
+         * Define a hundred users, add to the room, then request to add another user
+         */
+        User firstUser = new User();
+        firstUser.setNickname(NICKNAME);
+        UserDto secondUser = new UserDto();
+        secondUser.setNickname(NICKNAME_2);
+        JoinRoomRequest request = new JoinRoomRequest();
+        request.setUser(secondUser);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setSize((int) (RoomService.MAX_SIZE + 1));
+        room.setHost(firstUser);
+        room.addUser(firstUser);
+
+        for (int i = 0; i < 100; i++) {
+            User temp = new User();
+            temp.setNickname("Rocket" + i);
+            room.addUser(temp);
+        }
+
+        // Mock repository to return room when called
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        assertDoesNotThrow(() -> roomService.joinRoom(ROOM_ID, request));
+        verify(repository).findRoomByRoomId(ROOM_ID);
+
+        assertEquals(102, room.getUsers().size());
+    }
+
+    
     @Test
     public void getRoomSuccess() {
         Room room = new Room();
@@ -345,6 +421,7 @@ public class RoomServiceTests {
         request.setInitiator(UserMapper.toDto(host));
         request.setDifficulty(ProblemDifficulty.EASY);
         request.setDuration(DURATION);
+        request.setSize(5);
         request.setNumProblems(3);
 
         RoomDto response = roomService.updateRoomSettings(room.getRoomId(), request);
@@ -352,6 +429,7 @@ public class RoomServiceTests {
         verify(socketService).sendSocketUpdate(eq(response));
         assertEquals(request.getDifficulty(), response.getDifficulty());
         assertEquals(request.getDuration(), response.getDuration());
+        assertEquals(request.getSize(), response.getSize());
         assertEquals(request.getNumProblems(), response.getNumProblems());
     }
 

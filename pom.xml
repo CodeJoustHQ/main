@@ -165,6 +165,8 @@
         <configuration>
           <workingDirectory>frontend</workingDirectory>
           <installDirectory>target</installDirectory>
+          <!-- Skip this plugin step if skip property is set to true -->
+          <skip>${frontend.skip}</skip>
         </configuration>
         <executions>
           <execution>
@@ -173,8 +175,8 @@
               <goal>install-node-and-npm</goal>
             </goals>
             <configuration>
-              <nodeVersion>v14.8.0</nodeVersion>
-              <npmVersion>6.14.8</npmVersion>
+              <nodeVersion>v14.16.0</nodeVersion>
+              <npmVersion>7.7.5</npmVersion>
             </configuration>
           </execution>
           <execution>
@@ -214,6 +216,10 @@
             </goals>
           </execution>
         </executions>
+        <!-- Skip this plugin step if skip property is set to true -->
+        <configuration>
+          <skip>${frontend.skip}</skip>
+        </configuration>
       </plugin>
     </plugins>
   </build>

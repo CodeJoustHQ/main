@@ -20,5 +20,6 @@ public class RoomDto {
     private boolean active;
     private ProblemDifficulty difficulty;
     private long duration;
+    private int size;
     private int numProblems;
 }
