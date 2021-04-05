@@ -38,6 +38,7 @@ export const NoMarginSubtitleText = styled.p`
 `;
 
 export const SmallHoverText = styled(SmallHeaderText)`
+  font-size: ${({ theme }) => theme.fontSize.medium};
   margin: 0;
 
   &:hover {

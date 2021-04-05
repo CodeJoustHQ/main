@@ -209,6 +209,8 @@ export const InlineShowIcon = styled.i.attrs(() => ({
   className: 'material-icons',
 }))`
   display: inline-block;
+  position: relative;
+  top: 0.1rem;
   margin-left: 0.3rem;
   border-radius: 1rem;
   font-size: ${({ theme }) => theme.fontSize.medium};

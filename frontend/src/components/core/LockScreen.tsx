@@ -8,7 +8,13 @@ import { LargeText, SmallHoverText } from './Text';
 
 const Content = styled.div`
   padding: 0 20%;
-  margin-top: 8rem;
+  margin-top: 10rem;
+`;
+
+const ShowHideTextContainer = styled.div`
+  width: 16rem;
+  margin: 0 auto;
+  text-align: left;
 `;
 
 type LockScreenProps = {
@@ -47,14 +53,16 @@ export default function LockScreen(props: LockScreenProps) {
           }
         }}
       />
-      <SmallHoverText
-        onClick={togglePasswordVisibility}
-      >
-        {showPassword ? 'Hide' : 'Show'}
-        <InlineShowIcon>
-          {showPassword ? 'visibility_off' : 'visibility'}
-        </InlineShowIcon>
-      </SmallHoverText>
+      <ShowHideTextContainer>
+        <SmallHoverText
+          onClick={togglePasswordVisibility}
+        >
+          {showPassword ? 'Hide' : 'Show'}
+          <InlineShowIcon>
+            {showPassword ? 'visibility_off' : 'visibility'}
+          </InlineShowIcon>
+        </SmallHoverText>
+      </ShowHideTextContainer>
       <PrimaryInput
         onClick={() => {
           enterPasswordAction(password);
