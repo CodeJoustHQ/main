@@ -377,10 +377,8 @@ public class ProblemServiceTests {
 
     @Test
     public void getRandomProblemNotFound() {
-        ApiException exception = assertThrows(ApiException.class, () ->
-                problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 1));
-
-        assertEquals(ProblemError.NOT_FOUND, exception.getError());
+        List<Problem> problems = problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 1);
+        assertTrue(problems.isEmpty());
     }
 
     @Test

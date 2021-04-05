@@ -230,7 +230,6 @@ public class GameTests {
         RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
 
         createSingleProblemAndTestCases();
-        createSingleProblemAndTestCases();
         ProblemDto problemDto = createSingleProblemAndTestCases();
 
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
@@ -253,11 +252,12 @@ public class GameTests {
         String jsonResponse = result.getResponse().getContentAsString();
         RoomDto response = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
-        assertEquals(3, response.getProblems().size());
+        assertEquals(1, response.getProblems().size());
         assertEquals(selectableDto.getProblemId(), response.getProblems().get(0).getProblemId());
         assertEquals(selectableDto.getName(), response.getProblems().get(0).getName());
         assertEquals(selectableDto.getDifficulty(), response.getProblems().get(0).getDifficulty());
 
+        // Note: this also creates a problem (so total number of problems is 3)
         startGameHelper(roomDto, host);
 
         result = this.mockMvc.perform(get(String.format(GET_GAME, roomDto.getRoomId())))
@@ -267,8 +267,8 @@ public class GameTests {
         jsonResponse = result.getResponse().getContentAsString();
         GameDto gameDto = UtilityTestMethods.toObjectInstant(jsonResponse, GameDto.class);
 
-        assertEquals(1, gameDto.getRoom().getNumProblems());
-        assertEquals(1, gameDto.getProblems().size());
+        assertEquals(10, gameDto.getRoom().getNumProblems());
+        assertEquals(3, gameDto.getProblems().size());
         assertEquals(problemDto.getProblemId(), gameDto.getProblems().get(0).getProblemId());
     }
 
