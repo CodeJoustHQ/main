@@ -8,6 +8,7 @@ import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.room.RemoveUserRequest;
+import com.rocketden.main.dto.room.SetSpectatorRequest;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.ProblemError;
@@ -30,6 +31,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -813,5 +815,34 @@ public class RoomServiceTests {
                 roomService.deleteRoom(ROOM_ID, deleteRoomRequest));
         assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
         assertNotNull(roomService.getRoom(ROOM_ID));
+    }
+
+    @Test
+    public void setSpectatorSuccess() {
+        /**
+         * Tests ProblemService.setSpectator(roomId, spectator, SetSpectatorRequest)
+         * SetSpectatorRequest has initiator and receiver user; initiator must be
+         * either same person as receiver or is the host. Create new room, add two users,
+         * set one as host, and test setSpectator between host and non-host.
+         */
+        User firstUser = new User();
+        firstUser.setNickname(NICKNAME);
+        User secondUser = new User();
+        secondUser.setNickname(NICKNAME_2);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(firstUser);
+        room.addUser(firstUser);
+        room.addUser(secondUser);
+
+        // Mock repository to return room when called
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        SetSpectatorRequest request = new SetSpectatorRequest();
+        request.setInitiator(UserMapper.toDto(firstUser));
+        request.setReceiver(UserMapper.toDto(secondUser));
+        RoomDto response = roomService.setSpectator(ROOM_ID, true, request);
+        assertTrue(response.getUsers().get(1).getIsSpectator());
     }
 }
