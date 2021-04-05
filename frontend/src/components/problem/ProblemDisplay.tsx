@@ -73,7 +73,7 @@ type ShowProps = {
 
 const ApprovalContainer = styled.div.attrs((props: ShowProps) => ({
   style: {
-    display: props.show ? 'none' : 'inline-block',
+    display: props.show ? 'inline-block' : 'none',
   },
 }))<ShowProps>`
   text-align: left;

@@ -211,6 +211,7 @@ export const ToggleButtonLabel = styled.label`
   width: 55px;
   height: 20px;
   user-select: none;
+  opacity: 0.7;
 `;
 
 type CheckboxProps = {
