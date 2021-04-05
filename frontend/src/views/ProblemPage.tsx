@@ -36,12 +36,14 @@ function ProblemPage() {
 
   const params = useParams<ProblemParams>();
 
-  // The problems page is locked until a valid password is supplied.
-  const [locked, setLocked] = useState(true);
+  // The problems page is loading or locked until a valid password is supplied.
+  const [locked, setLocked] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (checkLocationState(location, 'locked')) {
       setLocked(location.state.locked);
+    } else {
+      setLocked(true);
     }
   }, [location]);
 
@@ -64,21 +66,27 @@ function ProblemPage() {
     }
   }, [params, locked]);
 
+  // Display loading page while locked value is being calculated.
+  if (locked === null) {
+    return <Loading />;
+  }
+
+  if (locked) {
+    return (
+      <LockScreen
+        loading={loading}
+        error={error}
+        enterPasswordAction={sendAccessProblemPartial(
+          `/problem/${params.id}`,
+          history,
+          setLoading,
+          setError,
+        )}
+      />
+    );
+  }
+
   if (!problem) {
-    if (locked) {
-      return (
-        <LockScreen
-          loading={loading}
-          error={error}
-          enterPasswordAction={sendAccessProblemPartial(
-            `/problem/${params.id}`,
-            history,
-            setLoading,
-            setError,
-          )}
-        />
-      );
-    }
     if (loading) {
       return <Loading />;
     }
