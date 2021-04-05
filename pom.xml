@@ -165,6 +165,8 @@
         <configuration>
           <workingDirectory>frontend</workingDirectory>
           <installDirectory>target</installDirectory>
+          <!-- Skip this plugin step if skip property is set to true -->
+          <skip>${frontend.skip}</skip>
         </configuration>
         <executions>
           <execution>
@@ -214,6 +216,10 @@
             </goals>
           </execution>
         </executions>
+        <!-- Skip this plugin step if skip property is set to true -->
+        <configuration>
+          <skip>${frontend.skip}</skip>
+        </configuration>
       </plugin>
     </plugins>
   </build>
