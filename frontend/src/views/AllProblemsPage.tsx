@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
-import { accessProblems, getProblems, Problem } from '../api/Problem';
+import { getProblems, Problem, sendAccessProblemPartial } from '../api/Problem';
 import { Text, LargeText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
@@ -54,27 +54,6 @@ function AllProblemsPage() {
     }
   }, [locked]);
 
-  const sendAccessProblems = (passwordParam: string) => {
-    setLoading(true);
-    setError('');
-    accessProblems(passwordParam)
-      .then((access: boolean) => {
-        setLoading(false);
-        if (access) {
-          // Push to history to give access with location on refresh.
-          history.push('/problems/all', {
-            locked: false,
-          });
-        } else {
-          setError('The password was incorrect; please contact support@codejoust.co if you wish to help edit problems.');
-        }
-      })
-      .catch((err) => {
-        setLoading(false);
-        setError(err.message);
-      });
-  };
-
   const redirect = (problemId: string) => {
     history.push(`/problem/${problemId}`, {
       locked: false,
@@ -86,7 +65,12 @@ function AllProblemsPage() {
       <LockScreen
         loading={loading}
         error={error}
-        enterPasswordAction={sendAccessProblems}
+        enterPasswordAction={sendAccessProblemPartial(
+          '/problems/all',
+          history,
+          setLoading,
+          setError,
+        )}
       />
     ) : (
       <Content>

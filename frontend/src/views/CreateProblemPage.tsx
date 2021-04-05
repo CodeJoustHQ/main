@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import {
-  accessProblems,
   createProblem,
   Problem,
   ProblemIOType,
+  sendAccessProblemPartial,
 } from '../api/Problem';
 import { LargeText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
@@ -49,27 +49,6 @@ function CreateProblemPage() {
     }
   }, [location]);
 
-  const sendAccessCreateProblem = (passwordParam: string) => {
-    setLoading(true);
-    setError('');
-    accessProblems(passwordParam)
-      .then((access: boolean) => {
-        setLoading(false);
-        if (access) {
-          // Push to history to give access with location on refresh.
-          history.push('/problem/create', {
-            locked: false,
-          });
-        } else {
-          setError('The password was incorrect; please contact support@codejoust.co if you wish to help edit problems.');
-        }
-      })
-      .catch((err) => {
-        setLoading(false);
-        setError(err.message);
-      });
-  };
-
   const handleSubmit = (newProblem: Problem) => {
     setLoading(true);
     setError('');
@@ -92,7 +71,12 @@ function CreateProblemPage() {
       <LockScreen
         loading={loading}
         error={error}
-        enterPasswordAction={sendAccessCreateProblem}
+        enterPasswordAction={sendAccessProblemPartial(
+          '/problem/create',
+          history,
+          setLoading,
+          setError,
+        )}
       />
     ) : (
       <>

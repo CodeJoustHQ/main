@@ -136,6 +136,36 @@ export const accessProblems = (password: string): Promise<boolean> => axios
     throw axiosErrorHandler(err);
   });
 
+// This function helps check if the user can access the problems.
+const sendAccessProblem = (location: string, passwordParam: string,
+  history: any, setLoading: any, setError: any) => {
+  setLoading(true);
+  setError('');
+  accessProblems(passwordParam)
+    .then((access: boolean) => {
+      setLoading(false);
+      if (access) {
+        // Push to history to give access with location on refresh.
+        history.push(location, {
+          locked: false,
+        });
+      } else {
+        setError('The password was incorrect; please contact support@codejoust.co if you wish to help edit problems.');
+      }
+    })
+    .catch((err) => {
+      setLoading(false);
+      setError(err.message);
+    });
+};
+
+// Partially implemented access problem function.
+export const sendAccessProblemPartial = (
+  location: string, history: any, setLoading: any, setError: any,
+) => (passwordParam: string) => sendAccessProblem(
+  location, passwordParam, history, setLoading, setError,
+);
+
 export const getDefaultCodeMap = (problemId: string): Promise<DefaultCodeType> => axios
   .get<DefaultCodeType>(routes.defaultCodeMap(problemId))
   .then((res) => res.data)
