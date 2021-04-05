@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
@@ -65,6 +65,25 @@ const SettingsContainer = styled.div`
   border-radius: 10px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   background: ${({ theme }) => theme.colors.white};
+`;
+
+type ShowProps = {
+  show: boolean,
+};
+
+const ApprovalContainer = styled.div.attrs((props: ShowProps) => ({
+  style: {
+    display: props.show ? 'none' : 'inline-block',
+  },
+}))<ShowProps>`
+  text-align: left;
+  margin-top: 0.5rem;
+`;
+
+const ApprovalText = styled(Text)`
+  display: inline-block;
+  margin: 0 0 0 0.75rem;
+  font-size: ${({ theme }) => theme.fontSize.subtitleXMediumLarge}
 `;
 
 const SettingsContainerRelative = styled(SettingsContainer)`
@@ -434,15 +453,24 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       <SidebarContent>
         <SmallHeaderText>Options</SmallHeaderText>
         <SettingsContainer>
-          <ToggleButtonLabel>
-            <ToggleButtonInput
-              onChange={() => toggleProblemApproval()}
-              checked={problemApproval}
-            />
-            <ToggleButtonSpan
-              checked={problemApproval}
-            />
-          </ToggleButtonLabel>
+          <ApprovalContainer
+            show={editMode}
+          >
+            <ToggleButtonLabel>
+              <ToggleButtonInput
+                onChange={() => toggleProblemApproval()}
+                checked={problemApproval}
+              />
+              <ToggleButtonSpan
+                checked={problemApproval}
+              />
+            </ToggleButtonLabel>
+            <ApprovalText>
+              Approval
+              {' '}
+              {problemApproval ? 'ON' : 'OFF'}
+            </ApprovalText>
+          </ApprovalContainer>
           <LowMarginMediumText>Difficulty</LowMarginMediumText>
           {Object.keys(Difficulty).map((key) => {
             const difficulty = Difficulty[key as keyof typeof Difficulty];

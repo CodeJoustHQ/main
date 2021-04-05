@@ -42,6 +42,7 @@ export const ThemeConfig: any = {
     medium: '0.9rem',
     default: '1rem',
     mediumLarge: '1.2rem',
+    subtitleXMediumLarge: '1.4rem',
     xMediumLarge: '1.5rem',
     large: '1.8rem',
     xLarge: '2rem',
