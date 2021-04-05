@@ -89,7 +89,7 @@ public class UtilityTests {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "rocket rocket", "12", "$Hello", "jimmy=neutron"})
+    @ValueSource(strings = {"await", "7del", "finally", "is", "elif"})
     public void validateIdentifierFalse(String inputName) {
         assertFalse(Utility.validateIdentifier(inputName));
     }

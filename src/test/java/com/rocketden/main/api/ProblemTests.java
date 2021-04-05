@@ -286,7 +286,7 @@ class ProblemTests {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "rocket rocket", "12", "$Hello", "jimmy=neutron"})
+    @ValueSource(strings = {"finally", "void", "throw", "EP<>", "new"})
     public void editProblemInvalidIdentifier(String inputName) throws Exception {
         ProblemDto problemDto = createSingleProblem();
 
@@ -340,7 +340,7 @@ class ProblemTests {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "rocket rocket", "12", "$Hello", "jimmy=neutron"})
+    @ValueSource(strings = {"False", "try", "jeremy ", "-minus", "@annotation"})
     public void createProblemInvalidIdentifier(String inputName) throws Exception {
         CreateProblemRequest request = new CreateProblemRequest();
         request.setName(NAME);

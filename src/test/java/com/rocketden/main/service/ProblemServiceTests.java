@@ -422,7 +422,7 @@ public class ProblemServiceTests {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "rocket rocket", "12", "$Hello", "jimmy=neutron"})
+    @ValueSource(strings = {"class", "true", " ", "()", "\\"})
     public void editProblemInvalidIdentifier(String inputName) {
         Problem problem = new Problem();
         problem.setName(NAME);
