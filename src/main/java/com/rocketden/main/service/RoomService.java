@@ -294,7 +294,7 @@ public class RoomService {
         boolean problemsHaveChanged = false;
 
         if (selectedProblems != null) {
-            if (selectedProblems.size() > request.getNumProblems()) {
+            if (selectedProblems.size() > room.getNumProblems()) {
                 throw new ApiException(RoomError.TOO_MANY_PROBLEMS);
             }
 
