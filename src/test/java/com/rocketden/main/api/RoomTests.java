@@ -44,6 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
@@ -73,9 +74,6 @@ public class RoomTests {
     private static final String ROOM_ID = "012345";
     private static final String PROBLEM_ID = "abcdef-ghijkl";
     private static final long DURATION = 600;
-
-    // TODO test: problem selected then cleared
-    // TODO test: problem not found
 
     @Test
     public void getNonExistentRoom() throws Exception {
@@ -440,6 +438,36 @@ public class RoomTests {
 
         assertEquals(1, room.getNumProblems());
         assertTrue(room.getProblems().isEmpty());
+    }
+
+    @Test
+    public void updateRoomSettingsProblemNotFound() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        RoomDto room = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
+
+        SelectableProblemDto problemDto = new SelectableProblemDto();
+        problemDto.setProblemId("random-string");
+
+        UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
+        updateRequest.setInitiator(host);
+        updateRequest.setNumProblems(2);
+        updateRequest.setProblems(Collections.singletonList(problemDto));
+
+        ApiError ERROR = ProblemError.NOT_FOUND;
+
+        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
     }
 
     @Test
