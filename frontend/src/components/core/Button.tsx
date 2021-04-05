@@ -205,6 +205,26 @@ export const InlineRefreshIcon = styled.i.attrs(() => ({
   }
 `;
 
+type ShowError = {
+  show: boolean,
+};
+
+export const InlineErrorIcon = styled(InlineRefreshIcon).attrs((props: ShowError) => ({
+  style: {
+    display: props.show ? 'inline-block' : 'none',
+  },
+}))<ShowError>`
+  color: ${({ theme }) => theme.colors.gray};
+  margin: 0 0.5rem 0 0;
+  padding: 0;
+  box-shadow: none;
+
+  &:hover {
+    cursor: default;
+    box-shadow: none;
+  }
+`;
+
 export const InlineShowIcon = styled.i.attrs(() => ({
   className: 'material-icons',
 }))`

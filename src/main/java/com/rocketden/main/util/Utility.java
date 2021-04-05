@@ -1,8 +1,14 @@
 package com.rocketden.main.util;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.lang.model.SourceVersion;
 
 import com.rocketden.main.dao.RoomRepository;
 import com.rocketden.main.dao.UserRepository;
@@ -13,6 +19,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Utility {
+
+    // Set of all Python keywords to prevent invalid variable names.
+    private static final Set<String> PYTHON_KEYWORDS =
+        Stream.of("False", "await", "else", "import", "pass", "None", "break",
+        "except", "in", "raise", "True", "class", "finally", "is", "return",
+        "and", "continue", "for", "lambda", "try", "as", "def", "from",
+        "nonlocal", "while", "assert", "del", "global", "not", "with", "async",
+        "elif", "if", "or", "yield")
+        .collect(Collectors.toCollection(HashSet::new));
 
     // List notifications that require an initiator.
     public static final List<NotificationType> initiatorNotifications =
@@ -84,5 +99,36 @@ public class Utility {
             default:
                 throw new IllegalArgumentException(String.format("The provided id type of %s is invalid.", idType));
         }
+    }
+
+    /**
+     * Check if the String is a valid identifier / variable name in Java and
+     * Python, as well as ensuring that is starts with a letter.
+     * 
+     * @param identifier the proposed variable name
+     * @return a boolean verifying whether the identifier is a valid variable
+     * name
+     */
+    public static boolean validateIdentifier(String identifier) {
+        if (identifier == null || identifier.isEmpty()) {
+            return false;
+        }
+
+        return SourceVersion.isIdentifier(identifier)
+            && SourceVersion.isName(identifier)
+            && !SourceVersion.isKeyword(identifier)
+            && isLetter(identifier.charAt(0))
+            && !PYTHON_KEYWORDS.contains(identifier);
+    }
+
+    /**
+     * Check if the character is a letter by determining if the toUpperCase
+     * function does not return the same character as toLowerCase.
+     * 
+     * @param c the character in question
+     * @return a boolean verifying whether c is a letter
+     */
+    private static boolean isLetter(Character c) {
+        return Character.toUpperCase(c) != Character.toLowerCase(c);
     }
 }

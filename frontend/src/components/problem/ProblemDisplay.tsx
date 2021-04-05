@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
@@ -25,6 +25,7 @@ import {
   GrayTextButton,
   SmallButton,
   GreenSmallButtonBlock,
+  InlineErrorIcon,
   InvertedSmallButton,
 } from '../core/Button';
 import PrimarySelect from '../core/Select';
@@ -37,7 +38,9 @@ import {
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
 import { FlexBareContainer } from '../core/Container';
-import { generateRandomId } from '../../util/Utility';
+import { generateRandomId, validIdentifier } from '../../util/Utility';
+import { HoverTooltip } from '../core/HoverTooltip';
+import { Coordinate } from '../special/FloatingCircle';
 
 const MainContent = styled.div`
   text-align: left;
@@ -154,6 +157,13 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const [newProblem, setNewProblem] = useState<Problem>(problem);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
+  const [hoverVisible, setHoverVisible] = useState<boolean>(false);
+
+  // Get current mouse position.
+  const mouseMoveHandler = useCallback((e: any) => {
+    setMousePosition({ x: e.pageX, y: e.pageY });
+  }, [setMousePosition]);
 
   const onDragEnd = (result: any) => {
     // dropped outside the list
@@ -274,6 +284,13 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
   return (
     <>
+      <HoverTooltip
+        visible={hoverVisible}
+        x={mousePosition.x}
+        y={mousePosition.y}
+      >
+        This variable name is likely invalid
+      </HoverTooltip>
       <MainContent>
         <FlexBareContainer>
           <SmallHeaderText>Problem</SmallHeaderText>
@@ -452,6 +469,15 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                 onChange={(e) => handleInputChange(index,
                   e.target.value, newProblem.problemInputs[index].type)}
               />
+
+              <InlineErrorIcon
+                show={!validIdentifier(newProblem.problemInputs[index].name)}
+                onMouseEnter={() => setHoverVisible(true)}
+                onMouseMove={mouseMoveHandler}
+                onMouseLeave={() => setHoverVisible(false)}
+              >
+                error_outline
+              </InlineErrorIcon>
 
               <PrimarySelect
                 onChange={(e) => handleInputChange(
