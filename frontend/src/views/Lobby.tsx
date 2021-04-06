@@ -389,6 +389,7 @@ function LobbyPage() {
   };
 
   const updateNumProblems = () => {
+    setError('')
     setLoading(true);
     const prevNumProblems = numProblems;
     const settings = {
@@ -398,12 +399,11 @@ function LobbyPage() {
 
     updateRoomSettings(currentRoomId, settings)
       .then(() => setLoading(false))
-      .then(() => setError(''))
       .catch((err) => {
         setLoading(false);
         setError(err.message);
         // Set numProblems back to original if REST call failed
-        setSize(prevNumProblems);
+        setNumProblems(prevNumProblems);
       });
   };
 
@@ -753,7 +753,7 @@ function LobbyPage() {
               <SliderContainer>
                 <Slider
                   min={1}
-                  max={8}
+                  max={10}
                   value={numProblems}
                   disabled={!isHost(currentUser)}
                   onChange={(e) => {
@@ -764,7 +764,7 @@ function LobbyPage() {
                       setNumProblems(undefined);
                     } else {
                       const newNumProblems = Number(value);
-                      if (newNumProblems >= 1 && newNumProblems <= 8) {
+                      if (newNumProblems >= 1 && newNumProblems <= 10) {
                         setNumProblems(newNumProblems);
                       }
                     }
