@@ -66,7 +66,6 @@ public class Room {
     @JoinColumn(name = "selectable_problem_id")
     private List<Problem> problems = new ArrayList<>();
 
-
     public void addUser(User user) {
         users.add(user);
         user.setRoom(this);
