@@ -357,6 +357,18 @@ function LobbyPage() {
     }
   };
 
+  const onDurationSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    if (!value) {
+      setDuration(undefined);
+    } else {
+      const newDuration = Number(value);
+      if (newDuration >= 0 && newDuration <= 60) {
+        setDuration(newDuration);
+      }
+    }
+  };
+
   const updateSize = () => {
     setLoading(true);
     const prevSize = size;
@@ -686,7 +698,7 @@ function LobbyPage() {
                   max={60}
                   value={duration}
                   disabled={!isHost(currentUser)}
-                  onChange={onSizeSliderChange}
+                  onChange={onDurationSliderChange}
                   onMouseUp={updateRoomDuration}
                 />
               </SliderContainer>
@@ -715,26 +727,7 @@ function LobbyPage() {
                   max={31}
                   value={size}
                   disabled={!isHost(currentUser)}
-                  onChange={(e) => {
-                    const { value } = e.target;
-
-                    // Set size to undefined to allow users to clear field
-                    if (!value) {
-                      setSize(undefined);
-                    } else {
-                      const newSize = Number(value);
-                      if (newSize >= (users?.length || 0) && newSize <= 31) {
-                        if (newSize !== size) {
-                          setError('');
-                        }
-
-                        setSize(newSize);
-                      } else if (newSize < (users?.length || 0)) {
-                        setSize((users?.length || 0));
-                        setError('The room limit cannot be set below the number of connected players.');
-                      }
-                    }
-                  }}
+                  onChange={onSizeSliderChange}
                   onMouseUp={updateSize}
                 />
               </SliderContainer>

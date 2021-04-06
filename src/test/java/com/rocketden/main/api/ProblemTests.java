@@ -27,6 +27,8 @@ import com.rocketden.main.model.problem.ProblemIOType;
 import com.rocketden.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -283,6 +285,34 @@ class ProblemTests {
         assertEquals(ERROR.getResponse(), response);
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"finally", "void", "throw", "EP<>", "new"})
+    public void editProblemInvalidIdentifier(String inputName) throws Exception {
+        ProblemDto problemDto = createSingleProblem();
+
+        List<ProblemInputDto> problemInputs = new ArrayList<>();
+        ProblemInputDto problemInput = new ProblemInputDto();
+        problemInput.setName(inputName);
+        problemInput.setType(ProblemIOType.STRING);
+        problemInputs.add(problemInput);
+        problemDto.setProblemInputs(problemInputs);
+
+        ApiError ERROR = ProblemError.INVALID_VARIABLE_NAME;
+
+        // Edit problem with new values
+        String endpoint = String.format(PUT_PROBLEM_EDIT, problemDto.getProblemId());
+        MvcResult result = this.mockMvc.perform(put(endpoint)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(problemDto)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+    }
+
     @Test
     public void createProblemBadInput() throws Exception {
         CreateProblemRequest request = new CreateProblemRequest();
@@ -296,6 +326,36 @@ class ProblemTests {
         request.setOutputType(IO_TYPE);
 
         ApiError ERROR = ProblemError.BAD_INPUT;
+
+        MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"False", "try", "jeremy ", "-minus", "@annotation"})
+    public void createProblemInvalidIdentifier(String inputName) throws Exception {
+        CreateProblemRequest request = new CreateProblemRequest();
+        request.setName(NAME);
+        request.setDescription(DESCRIPTION);
+        request.setDifficulty(ProblemDifficulty.HARD);
+
+        List<ProblemInputDto> problemInputs = new ArrayList<>();
+        ProblemInputDto problemInput = new ProblemInputDto();
+        problemInput.setName(inputName);
+        problemInput.setType(ProblemIOType.STRING);
+        problemInputs.add(problemInput);
+        request.setProblemInputs(problemInputs);
+        request.setOutputType(IO_TYPE);
+
+        ApiError ERROR = ProblemError.INVALID_VARIABLE_NAME;
 
         MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

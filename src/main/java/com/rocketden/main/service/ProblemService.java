@@ -17,6 +17,7 @@ import com.rocketden.main.model.problem.ProblemIOType;
 import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.model.problem.ProblemTestCase;
 import com.rocketden.main.service.generators.DefaultCodeGeneratorService;
+import com.rocketden.main.util.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ public class ProblemService {
     private final List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList;
     private final Random random = new Random();
     private final Gson gson = new Gson();
+    private static final String PROBLEM_ACCESS_PASSWORD_KEY = "PROBLEM_ACCESS_PASSWORD";
 
     @Autowired
     public ProblemService(ProblemRepository repository, List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList) {
@@ -65,10 +67,12 @@ public class ProblemService {
 
         // Add all problem inputs in list.
         for (ProblemInputDto problemInput : request.getProblemInputs()) {
-            if (problemInput != null) {
-                problem.addProblemInput(ProblemMapper.toProblemInputEntity(problemInput));
-            } else {
+            if (problemInput == null) {
                 throw new ApiException(ProblemError.BAD_INPUT);
+            } else if (!Utility.validateIdentifier(problemInput.getName())) {
+                throw new ApiException(ProblemError.INVALID_VARIABLE_NAME);
+            } else {
+                problem.addProblemInput(ProblemMapper.toProblemInputEntity(problemInput));
             }
         }
 
@@ -116,6 +120,10 @@ public class ProblemService {
 
         problem.getProblemInputs().clear();
         for (ProblemInputDto problemInput : updatedProblem.getProblemInputs()) {
+            if (!Utility.validateIdentifier(problemInput.getName())) {
+                throw new ApiException(ProblemError.INVALID_VARIABLE_NAME);
+            }
+
             problem.addProblemInput(ProblemMapper.toProblemInputEntity(problemInput));
         }
 
@@ -281,6 +289,7 @@ public class ProblemService {
             throw new ApiException(ProblemError.INVALID_INPUT);
         }
     }
+    
     public Map<CodeLanguage, String> getDefaultCode(String problemId) {
         // Convert from the Problem object to Problem DTOs.
         Problem problem = repository.findProblemByProblemId(problemId);
@@ -304,5 +313,20 @@ public class ProblemService {
         }
 
         return defaultCodeMap;
-    }   
+    }
+
+    /**
+     * This method is used in a GET request to see if users can access the
+     * problem pages on the frontend. The parameter is compared against the
+     * problem access password environment variable; if no environment variable
+     * is set, then it returns false.
+     * 
+     * @param password the password supplied by the user
+     * @return true iff the password supplied by the user matches the set system
+     * password, false otherwise
+     */
+    public Boolean accessProblems(String password) {
+        return System.getenv(PROBLEM_ACCESS_PASSWORD_KEY) != null
+            && password.equals(System.getenv(PROBLEM_ACCESS_PASSWORD_KEY));
+    }
 }
