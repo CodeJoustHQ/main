@@ -276,7 +276,6 @@ public class ProblemServiceTests {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
-        // Should be findAllByDifficultyAndApproval()
         Mockito.doReturn(problems).when(repository).findAllByDifficultyAndApproval(ProblemDifficulty.MEDIUM, true);
 
         List<Problem> response = problemService.getProblemsFromDifficulty(ProblemDifficulty.MEDIUM, 1);
@@ -463,9 +462,6 @@ public class ProblemServiceTests {
 
         ProblemDto updatedProblem = ProblemMapper.toDto(problem);
         updatedProblem.setApproval(true);
-
-        List<ProblemTestCaseDto> emptyCases = new ArrayList<ProblemTestCaseDto>();
-        updatedProblem.setTestCases(emptyCases);
 
         String problemId = problem.getProblemId();
         ApiException exception = assertThrows(ApiException.class, () ->
