@@ -827,8 +827,45 @@ public class RoomServiceTests {
          */
         User firstUser = new User();
         firstUser.setNickname(NICKNAME);
+        firstUser.setUserId(USER_ID);
         User secondUser = new User();
         secondUser.setNickname(NICKNAME_2);
+        secondUser.setUserId(USER_ID_2);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(firstUser);
+        room.addUser(firstUser);
+        room.addUser(secondUser);
+
+        // Mock repository to return room when called
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        SetSpectatorRequest request1 = new SetSpectatorRequest();
+        request1.setInitiator(UserMapper.toDto(firstUser));
+        request1.setReceiver(UserMapper.toDto(secondUser));
+        RoomDto response1 = roomService.setSpectator(ROOM_ID, true, request1);
+        assertTrue(response1.getUsers().get(1).getIsSpectator());
+
+        SetSpectatorRequest request2 = new SetSpectatorRequest();
+        request2.setInitiator(UserMapper.toDto(secondUser));
+        request2.setReceiver(UserMapper.toDto(secondUser));
+        RoomDto response2 = roomService.setSpectator(ROOM_ID, true, request2);
+        assertTrue(response2.getUsers().get(1).getIsSpectator());
+    }
+
+    @Test
+    public void setSpectatorFailure() {
+        /**
+         * secondUser (non-host) will try to set the firstUser (host) as a spectator
+         * expected result: RoomError.INVALID_PERMISSIONS
+         */
+        User firstUser = new User();
+        firstUser.setNickname(NICKNAME);
+        firstUser.setUserId(USER_ID);
+        User secondUser = new User();
+        secondUser.setNickname(NICKNAME_2);
+        secondUser.setUserId(USER_ID_2);
 
         Room room = new Room();
         room.setRoomId(ROOM_ID);
@@ -840,9 +877,12 @@ public class RoomServiceTests {
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
 
         SetSpectatorRequest request = new SetSpectatorRequest();
-        request.setInitiator(UserMapper.toDto(firstUser));
-        request.setReceiver(UserMapper.toDto(secondUser));
-        RoomDto response = roomService.setSpectator(ROOM_ID, true, request);
-        assertTrue(response.getUsers().get(1).getIsSpectator());
+        request.setInitiator(UserMapper.toDto(secondUser));
+        request.setReceiver(UserMapper.toDto(firstUser));
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.setSpectator(ROOM_ID, true, request));
+        assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
+
     }
 }
