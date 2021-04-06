@@ -70,7 +70,6 @@ public class RoomTests {
     private static final String USER_ID_2 = "678910";
     private static final String USER_ID_3 = "024681";
     private static final String ROOM_ID = "012345";
-    private static final String PROBLEM_ID = "abcdef-ghijkl";
     private static final long DURATION = 600;
 
     @Test

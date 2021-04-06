@@ -46,6 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -91,7 +92,6 @@ public class GameTests {
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "098765";
-    private static final String PROBLEM_ID = "abcdef-ghijkl";
     private static final String CODE = "print('hello')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
     private static final String INPUT_NAME = "nums";
@@ -270,6 +270,8 @@ public class GameTests {
         assertEquals(10, gameDto.getRoom().getNumProblems());
         assertEquals(3, gameDto.getProblems().size());
         assertEquals(problemDto.getProblemId(), gameDto.getProblems().get(0).getProblemId());
+        assertNotEquals(gameDto.getProblems().get(0).getProblemId(), gameDto.getProblems().get(1).getProblemId());
+        assertNotEquals(gameDto.getProblems().get(1).getProblemId(), gameDto.getProblems().get(2).getProblemId());
     }
 
     @Test
