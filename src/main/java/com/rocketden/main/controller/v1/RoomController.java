@@ -10,7 +10,6 @@ import com.rocketden.main.dto.room.SetSpectatorRequest;
 import com.rocketden.main.dto.room.RemoveUserRequest;
 import com.rocketden.main.service.RoomService;
 
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -70,8 +69,8 @@ public class RoomController extends BaseRestController {
         return new ResponseEntity<>(service.updateRoomSettings(roomId, request), HttpStatus.OK);
     }
 
-    @PostMapping("/rooms/{roomId}/spectator/{isSpectator}")
-    public ResponseEntity<RoomDto> setSpectator(@PathVariable String roomId, @PathVariable Boolean isSpectator, @RequestBody SetSpectatorRequest request) {
-        return new ResponseEntity<>(service.setSpectator(roomId, isSpectator, request), HttpStatus.OK);
+    @PostMapping("/rooms/{roomId}/spectator/")
+    public ResponseEntity<RoomDto> setSpectator(@PathVariable String roomId, @RequestBody SetSpectatorRequest request) {
+        return new ResponseEntity<>(service.setSpectator(roomId, request), HttpStatus.OK);
     }
 }

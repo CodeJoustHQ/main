@@ -9,4 +9,5 @@ import lombok.Setter;
 public class SetSpectatorRequest {
     private UserDto initiator;
     private UserDto receiver;
+    private Boolean spectator;
 }

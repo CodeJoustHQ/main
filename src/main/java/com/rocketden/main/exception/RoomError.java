@@ -13,6 +13,7 @@ public enum RoomError implements ApiError {
     INACTIVE_USER(HttpStatus.BAD_REQUEST, "The specified user is inactive."),
     INVALID_PERMISSIONS(HttpStatus.FORBIDDEN, "You do not have permission to perform this action"),
     NO_HOST(HttpStatus.BAD_REQUEST, "There is no host provided."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "The specified user could not be found in the room."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "A room could not be found with the given id."),
     DUPLICATE_USERNAME(HttpStatus.CONFLICT, "A user with the nickname provided has already joined the room."),
     ALREADY_ACTIVE(HttpStatus.FORBIDDEN, "This room has already started; please wait for the host to play again."),

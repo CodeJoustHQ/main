@@ -300,7 +300,7 @@ public class RoomService {
         return roomDto;
     }
 
-    public RoomDto setSpectator(String roomId, Boolean isSpectator, SetSpectatorRequest request) {
+    public RoomDto setSpectator(String roomId, SetSpectatorRequest request) {
         Room room = repository.findRoomByRoomId(roomId);
 
         // Return error if room could not be found
@@ -308,6 +308,16 @@ public class RoomService {
             throw new ApiException(RoomError.NOT_FOUND);
         }
 
+        //Return error if the initiator or receiver are null
+        if (request.getInitiator() == null || request.getReceiver() == null) {
+            throw new ApiException(UserError.NOT_FOUND);
+        }
+
+        //Return error if the initiator or receiver are not in the room
+        if (room.getUserByUserId(request.getReceiver().getUserId()) == null
+            || room.getUserByUserId(request.getInitiator().getUserId()) == null) {
+            throw new ApiException(RoomError.USER_NOT_FOUND);
+        }
         // Return error if the initiator is not the host or the same as the receiver
         User initiator = UserMapper.toEntity(request.getInitiator());
         User receiver = UserMapper.toEntity(request.getReceiver());
@@ -316,7 +326,8 @@ public class RoomService {
         }
 
         User modifiedUser = room.getUserByUserId(receiver.getUserId());
-        modifiedUser.setIsSpectator(isSpectator);
+        modifiedUser.setSpectator(request.getSpectator());
+        repository.save(room);
 
         return RoomMapper.toDto(room);
     }
