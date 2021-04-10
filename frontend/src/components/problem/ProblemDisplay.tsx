@@ -466,9 +466,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
               />
             </ToggleButtonLabel>
             <ApprovalText>
-              Approval
-              {' '}
-              {problemApproval ? 'ON' : 'OFF'}
+              {problemApproval ? 'Approved' : 'Approval Pending'}
             </ApprovalText>
           </ApprovalContainer>
           <LowMarginMediumText>Difficulty</LowMarginMediumText>
