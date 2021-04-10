@@ -124,7 +124,6 @@ public class GameTests {
         createProblemRequest.setName(NAME);
         createProblemRequest.setDescription(DESCRIPTION);
         createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
-        createProblemRequest.setApproval(true);
         List<ProblemInputDto> problemInputs = new ArrayList<>();
         ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
         problemInputs.add(problemInput);
@@ -145,7 +144,6 @@ public class GameTests {
         assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
         assertEquals(problemInputs, problemActual.getProblemInputs());
         assertEquals(IO_TYPE, problemActual.getOutputType());
-        assertTrue(problemActual.getApproval());
         CreateTestCaseRequest createTestCaseRequest = new CreateTestCaseRequest();
         createTestCaseRequest.setInput(INPUT);
         createTestCaseRequest.setOutput(OUTPUT);

@@ -62,7 +62,6 @@ public class ProblemService {
         problem.setDescription(request.getDescription());
         problem.setDifficulty(request.getDifficulty());
         problem.setOutputType(request.getOutputType());
-        problem.setApproval(request.getApproval());
 
         // Add all problem inputs in list.
         for (ProblemInputDto problemInput : request.getProblemInputs()) {

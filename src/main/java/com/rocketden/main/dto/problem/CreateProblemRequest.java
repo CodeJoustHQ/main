@@ -13,7 +13,6 @@ import lombok.Setter;
 public class CreateProblemRequest {
     private String name;
     private String description;
-    private Boolean approval;
     private ProblemDifficulty difficulty;
     private List<ProblemInputDto> problemInputs;
     private ProblemIOType outputType;

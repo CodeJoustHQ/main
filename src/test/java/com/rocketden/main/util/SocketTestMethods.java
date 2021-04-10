@@ -70,7 +70,6 @@ public class SocketTestMethods {
         createProblemRequest.setName(NAME);
         createProblemRequest.setDescription(DESCRIPTION);
         createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
-        createProblemRequest.setApproval(true);
 
         List<ProblemInputDto> problemInputs = new ArrayList<>();
         ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
@@ -89,7 +88,6 @@ public class SocketTestMethods {
         assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
         assertEquals(problemInputs, problemActual.getProblemInputs());
         assertEquals(IO_TYPE, problemActual.getOutputType());
-        assertEquals(true, problemActual.getApproval());
         CreateTestCaseRequest createTestCaseRequest = new CreateTestCaseRequest();
         createTestCaseRequest.setInput(INPUT);
         createTestCaseRequest.setOutput(OUTPUT);
