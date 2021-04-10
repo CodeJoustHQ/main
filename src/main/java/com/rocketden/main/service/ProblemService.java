@@ -102,12 +102,15 @@ public class ProblemService {
                 || updatedProblem.getDifficulty() == null
                 || updatedProblem.getProblemInputs() == null
                 || updatedProblem.getTestCases() == null
-                || updatedProblem.getOutputType() == null) {
+                || updatedProblem.getOutputType() == null
+                || updatedProblem.getApproval() == null) {
             throw new ApiException(ProblemError.EMPTY_FIELD);
         }
+
         if (updatedProblem.getApproval() && updatedProblem.getTestCases().size() == 0) {
             throw new ApiException(ProblemError.BAD_APPROVAL);
         }
+
         if (updatedProblem.getDifficulty() == ProblemDifficulty.RANDOM) {
             throw new ApiException(ProblemError.BAD_DIFFICULTY);
         }

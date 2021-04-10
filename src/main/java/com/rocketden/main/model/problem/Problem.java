@@ -70,5 +70,4 @@ public class Problem {
         problemInputs.add(problemInput);
         problemInput.setProblem(this);
     }
-
 }
