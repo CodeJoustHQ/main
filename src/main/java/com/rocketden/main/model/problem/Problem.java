@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -53,6 +54,11 @@ public class Problem {
     @Setter(AccessLevel.PRIVATE)
     @Fetch(value = FetchMode.SUBSELECT)
     private List<ProblemInput> problemInputs = new ArrayList<>();
+
+    //List of problem tags
+    @ManyToMany(mappedBy = "problem", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Setter
+    private List<ProblemTag> problemTags = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private ProblemIOType outputType;

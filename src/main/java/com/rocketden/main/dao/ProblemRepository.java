@@ -1,6 +1,7 @@
 package com.rocketden.main.dao;
 
 import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.model.problem.ProblemTag;
 import org.springframework.data.repository.CrudRepository;
 
 import com.rocketden.main.model.problem.Problem;
