@@ -95,6 +95,7 @@ public class SocketTestMethods {
         String createTestCaseEndpoint = String.format("http://localhost:%s/api/v1/problems/%s/test-case", port, problemActual.getProblemId());
 
         ProblemTestCaseDto testCaseActual = template.exchange(createTestCaseEndpoint, HttpMethod.POST, createTestCaseEntity, ProblemTestCaseDto.class).getBody();
+        problemActual.getTestCases().add(testCaseActual);
 
         assertNotNull(testCaseActual);
         assertEquals(INPUT, testCaseActual.getInput());
@@ -113,11 +114,6 @@ public class SocketTestMethods {
     public static void createSingleApprovedProblemAndTestCases(TestRestTemplate template, int port) throws Exception {
         ProblemDto problem = createSingleProblemAndTestCases(template, port);
         problem.setApproval(true);
-
-        ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
-        testCaseDto.setInput(INPUT);
-        testCaseDto.setOutput("a");
-        problem.setTestCases(Collections.singletonList(testCaseDto));
 
         HttpEntity<ProblemDto> editProblemEntity = new HttpEntity<>(problem);
         String editProblemEndpoint = String.format("http://localhost:%s/api/v1/problems/%s", port, problem.getProblemId());
