@@ -23,12 +23,11 @@ import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SocketTestMethods {
 
@@ -65,12 +64,11 @@ public class SocketTestMethods {
      * create a new problem
      * @throws Exception if anything wrong occurs
      */
-    public static void createSingleProblemAndTestCases(TestRestTemplate template, int port) throws Exception {
+    public static ProblemDto createSingleProblemAndTestCases(TestRestTemplate template, int port) throws Exception {
         CreateProblemRequest createProblemRequest = new CreateProblemRequest();
         createProblemRequest.setName(NAME);
         createProblemRequest.setDescription(DESCRIPTION);
         createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
-        createProblemRequest.setApproval(true);
 
         List<ProblemInputDto> problemInputs = new ArrayList<>();
         ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
@@ -89,7 +87,6 @@ public class SocketTestMethods {
         assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
         assertEquals(problemInputs, problemActual.getProblemInputs());
         assertEquals(IO_TYPE, problemActual.getOutputType());
-        assertEquals(true, problemActual.getApproval());
         CreateTestCaseRequest createTestCaseRequest = new CreateTestCaseRequest();
         createTestCaseRequest.setInput(INPUT);
         createTestCaseRequest.setOutput(OUTPUT);
@@ -103,5 +100,30 @@ public class SocketTestMethods {
         assertEquals(INPUT, testCaseActual.getInput());
         assertEquals(OUTPUT, testCaseActual.getOutput());
         assertFalse(testCaseActual.isHidden());
+
+        return problemActual;
+    }
+
+    /**
+     * Sets the approval for a new problem to true. Necessary for a number of tests
+     *
+     * @return the new problem
+     * @throws Exception if anything wrong occurs
+     */
+    public static void createSingleApprovedProblemAndTestCases(TestRestTemplate template, int port) throws Exception {
+        ProblemDto problem = createSingleProblemAndTestCases(template, port);
+        problem.setApproval(true);
+
+        ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
+        testCaseDto.setInput(INPUT);
+        testCaseDto.setOutput("a");
+        problem.setTestCases(Collections.singletonList(testCaseDto));
+
+        HttpEntity<ProblemDto> editProblemEntity = new HttpEntity<>(problem);
+        String editProblemEndpoint = String.format("http://localhost:%s/api/v1/problems/%s", port, problem.getProblemId());
+
+        ProblemDto problemActual = template.exchange(editProblemEndpoint, HttpMethod.PUT, editProblemEntity, ProblemDto.class).getBody();
+
+        assertTrue(problemActual.getApproval());
     }
 }

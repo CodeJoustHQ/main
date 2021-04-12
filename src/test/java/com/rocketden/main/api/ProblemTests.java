@@ -1,5 +1,6 @@
 package com.rocketden.main.api;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -104,7 +105,6 @@ class ProblemTests {
         createProblemRequest.setName(NAME);
         createProblemRequest.setDescription(DESCRIPTION);
         createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
-        createProblemRequest.setApproval(true);
         List<ProblemInputDto> problemInputs = new ArrayList<>();
         ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
         problemInputs.add(problemInput);
@@ -129,6 +129,38 @@ class ProblemTests {
         return problemActual;
     }
 
+    /**
+     * Helper method that creates a problem with the approved boolean set to true.
+     *
+     * @return the problem with approval set to true
+     * @throws Exception if anything wrong occurs
+     */
+    private ProblemDto createSingleApprovedProblem() throws Exception {
+        ProblemDto problemDto = createSingleProblem();
+        problemDto.setOutputType(ProblemIOType.CHARACTER);
+        problemDto.setName(NAME_2);
+        problemDto.setApproval(true);
+
+        ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
+        testCaseDto.setInput(INPUT);
+        testCaseDto.setOutput("a");
+        problemDto.setTestCases(Collections.singletonList(testCaseDto));
+
+        // Edit problem with new values
+        String endpoint = String.format(PUT_PROBLEM_EDIT, problemDto.getProblemId());
+        MvcResult problemResult = this.mockMvc.perform(put(endpoint)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(problemDto)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String problemJsonResponse = problemResult.getResponse().getContentAsString();
+        ProblemDto problemActual = UtilityTestMethods.toObject(problemJsonResponse, ProblemDto.class);
+
+        assertTrue(problemActual.getApproval());
+
+        return problemActual;
+    }
     @Test
     public void getProblemNonExistent() throws Exception {
         ApiError ERROR = ProblemError.NOT_FOUND;
@@ -510,7 +542,7 @@ class ProblemTests {
 
     @Test
     public void getRandomProblemSuccess() throws Exception {
-        ProblemDto problem = createSingleProblem();
+        ProblemDto problem = createSingleApprovedProblem();
 
         MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_RANDOM)
                 .param(DIFFICULTY_KEY, "EASY")

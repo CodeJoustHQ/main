@@ -25,13 +25,18 @@ import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.game_object.NotificationType;
 import com.rocketden.main.model.User;
+import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.util.RoomTestMethods;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemIOType;
 import com.rocketden.main.service.SubmitService;
 import com.rocketden.main.util.UtilityTestMethods;
+import com.rocketden.main.service.ProblemService;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,13 +51,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
@@ -78,6 +83,7 @@ public class GameTests {
     private static final String POST_SUBMISSION = "/api/v1/games/%s/submission";
     private static final String POST_NOTIFICATION = "/api/v1/games/%s/notification";
     private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
+    private static final String PUT_PROBLEM_EDIT = "/api/v1/problems/%s";
     private static final String POST_TEST_CASE_CREATE = "/api/v1/problems/%s/test-case";
 
     // Predefine user and room attributes.
@@ -93,9 +99,14 @@ public class GameTests {
     // Predefine notification content.
     private static final String CONTENT = "[1, 2, 3]";
 
+    //ProblemService for editing the problem
+    @Spy
+    @InjectMocks
+    private ProblemService problemService;
+
     // Helper method to start the game for a given room
     private void startGameHelper(RoomDto room, UserDto host) throws Exception {
-        createSingleProblemAndTestCases();
+        createSingleApprovedProblemAndTestCases();
 
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(host);
@@ -124,7 +135,6 @@ public class GameTests {
         createProblemRequest.setName(NAME);
         createProblemRequest.setDescription(DESCRIPTION);
         createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
-        createProblemRequest.setApproval(true);
         List<ProblemInputDto> problemInputs = new ArrayList<>();
         ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
         problemInputs.add(problemInput);
@@ -145,7 +155,6 @@ public class GameTests {
         assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
         assertEquals(problemInputs, problemActual.getProblemInputs());
         assertEquals(IO_TYPE, problemActual.getOutputType());
-        assertTrue(problemActual.getApproval());
         CreateTestCaseRequest createTestCaseRequest = new CreateTestCaseRequest();
         createTestCaseRequest.setInput(INPUT);
         createTestCaseRequest.setOutput(OUTPUT);
@@ -164,6 +173,36 @@ public class GameTests {
         assertEquals(OUTPUT, testCaseActual.getOutput());
         assertFalse(testCaseActual.isHidden());
         return problemActual;
+    }
+
+    /**
+     * Helper method that creates a problem with the approved boolean set to true.
+     *
+     * @return the created problem
+     * @throws Exception if anything wrong occurs
+     */
+    private ProblemDto createSingleApprovedProblemAndTestCases() throws Exception {
+        ProblemDto problemDto = createSingleProblemAndTestCases();
+        problemDto.setOutputType(ProblemIOType.CHARACTER);
+        problemDto.setName(NAME);
+        problemDto.setApproval(true);
+
+        ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
+        testCaseDto.setInput(INPUT);
+        testCaseDto.setOutput("a");
+        problemDto.setTestCases(Collections.singletonList(testCaseDto));
+
+        // Edit problem with new values
+        String endpoint = String.format(PUT_PROBLEM_EDIT, problemDto.getProblemId());
+        this.mockMvc.perform(put(endpoint)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(problemDto)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        assertTrue(problemDto.getApproval());
+
+        return problemDto;
     }
 
     @Test
@@ -186,7 +225,7 @@ public class GameTests {
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(roomDto.getHost());
 
-        createSingleProblemAndTestCases();
+        createSingleApprovedProblemAndTestCases();
 
         result = this.mockMvc.perform(post(String.format(START_GAME, roomDto.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
