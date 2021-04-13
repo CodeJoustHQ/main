@@ -308,12 +308,12 @@ public class RoomService {
             throw new ApiException(RoomError.NOT_FOUND);
         }
 
-        //Return error if the initiator or receiver are null
+        // Return error if the initiator or receiver are null
         if (request.getInitiator() == null || request.getReceiver() == null) {
             throw new ApiException(UserError.NOT_FOUND);
         }
 
-        //Return error if the initiator or receiver are not in the room
+        // Return error if the initiator or receiver are not in the room
         if (room.getUserByUserId(request.getReceiver().getUserId()) == null
             || room.getUserByUserId(request.getInitiator().getUserId()) == null) {
             throw new ApiException(RoomError.USER_NOT_FOUND);
@@ -323,6 +323,11 @@ public class RoomService {
         User receiver = UserMapper.toEntity(request.getReceiver());
         if (!room.getHost().equals(initiator) && !initiator.equals(receiver)) {
             throw new ApiException(RoomError.INVALID_PERMISSIONS);
+        }
+
+        // Return error if the requested spectator is null
+        if (request.getSpectator() == null) {
+            throw new ApiException(RoomError.BAD_SETTING);
         }
 
         User modifiedUser = room.getUserByUserId(receiver.getUserId());

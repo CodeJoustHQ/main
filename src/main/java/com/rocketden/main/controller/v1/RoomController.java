@@ -69,7 +69,7 @@ public class RoomController extends BaseRestController {
         return new ResponseEntity<>(service.updateRoomSettings(roomId, request), HttpStatus.OK);
     }
 
-    @PostMapping("/rooms/{roomId}/spectator/")
+    @PostMapping("/rooms/{roomId}/spectator")
     public ResponseEntity<RoomDto> setSpectator(@PathVariable String roomId, @RequestBody SetSpectatorRequest request) {
         return new ResponseEntity<>(service.setSpectator(roomId, request), HttpStatus.OK);
     }
