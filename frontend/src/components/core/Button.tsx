@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { Difficulty, difficultyToColor } from '../../api/Difficulty';
-import { ThemeConfig, ThemeType } from '../config/Theme';
+import { ThemeType } from '../config/Theme';
 
 type Dimensions = {
   width?: string,
@@ -223,18 +223,14 @@ export const ToggleButtonInput = styled.input.attrs((props: CheckboxProps) => ({
   checked: props.checked,
 }))<CheckboxProps>``;
 
-export const ToggleButtonSpan = styled.span.attrs((props: CheckboxProps) => ({
-  style: {
-    backgroundColor: props.checked ? `${ThemeConfig.colors.sliderBlue}` : `${ThemeConfig.colors.white}`,
-  },
-}))<CheckboxProps>`
+export const ToggleButtonSpan = styled.span<CheckboxProps>`
+  background-color: ${({ theme, checked }) => (checked ? theme.colors.sliderBlue : theme.colors.sliderGray)};
   position: absolute;
   cursor: pointer;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: ${({ theme }) => theme.colors.white};
   -webkit-transition: .4s;
   transition: .4s;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);

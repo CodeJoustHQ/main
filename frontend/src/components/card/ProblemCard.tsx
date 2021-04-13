@@ -39,7 +39,7 @@ function ProblemCard(props: ProblemCardProps) {
 
         <FlexRight>
           <CenteredContainer>
-            <Text>{problem.problemId}</Text>
+            <Text>{problem.approval}</Text>
             <br />
             <Text>{problem.difficulty}</Text>
           </CenteredContainer>

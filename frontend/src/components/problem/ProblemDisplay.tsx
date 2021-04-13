@@ -71,11 +71,8 @@ type ShowProps = {
   show: boolean,
 };
 
-const ApprovalContainer = styled.div.attrs((props: ShowProps) => ({
-  style: {
-    display: props.show ? 'inline-block' : 'none',
-  },
-}))<ShowProps>`
+const ApprovalContainer = styled.div<ShowProps>`
+  display: ${({ show }) => (show ? 'inline-block' : 'none')};
   text-align: left;
   margin-top: 0.5rem;
 `;
