@@ -33,6 +33,7 @@ public class Problem {
     private String problemId = UUID.randomUUID().toString();
     private String name;
     private Boolean approval = false;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
