@@ -151,16 +151,16 @@ public class GameManagementService {
             throw new ApiException(RoomError.TOO_MANY_PROBLEMS);
         }
         if (remaining > 0) {
-            List<Problem> otherProblems = problemService.getProblemsFromDifficulty(room.getDifficulty(), remaining);
+            List<Problem> otherProblems = problemService.getProblemsFromDifficulty(room.getDifficulty(), room.getNumProblems());
             for (Problem problem : otherProblems) {
-                if (!problems.contains(problem)) {
+                if (!problems.contains(problem) && problems.size() < room.getNumProblems()) {
                     problems.add(problem);
                 }
             }
         }
 
-        if (problems.isEmpty()) {
-            throw new ApiException(ProblemError.NOT_FOUND);
+        if (problems.size() < room.getNumProblems()) {
+            throw new ApiException(ProblemError.NOT_ENOUGH_FOUND);
         }
 
         setStartGameTimer(game, time);

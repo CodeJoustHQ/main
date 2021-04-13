@@ -198,7 +198,7 @@ public class GameManagementServiceTests {
         room.setRoomId(ROOM_ID);
         room.setHost(host);
         room.setDifficulty(ProblemDifficulty.HARD);
-        room.setNumProblems(10);
+        room.setNumProblems(2);
 
         Problem problem = new Problem();
         problem.setProblemId(PROBLEM_ID);
@@ -219,7 +219,7 @@ public class GameManagementServiceTests {
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(room.getRoomId());
         Mockito.doReturn(Arrays.asList(problem, problem2))
-                .when(problemService).getProblemsFromDifficulty(ProblemDifficulty.HARD, 9);
+                .when(problemService).getProblemsFromDifficulty(ProblemDifficulty.HARD, 2);
 
         RoomDto response = gameService.startGame(ROOM_ID, request);
 
@@ -231,8 +231,7 @@ public class GameManagementServiceTests {
         Game game = gameService.getGameFromRoomId(ROOM_ID);
         assertNotNull(game);
 
-        // Only 2 problems are selected (no duplicate problems are included)
-        assertEquals(10, game.getRoom().getNumProblems());
+        assertEquals(2, game.getRoom().getNumProblems());
         assertEquals(2, game.getProblems().size());
         assertEquals(problem.getProblemId(), game.getProblems().get(0).getProblemId());
         assertEquals(problem.getDifficulty(), game.getProblems().get(0).getDifficulty());
@@ -250,7 +249,7 @@ public class GameManagementServiceTests {
         room.setRoomId(ROOM_ID);
         room.setHost(host);
         room.setDifficulty(ProblemDifficulty.HARD);
-        room.setNumProblems(10);
+        room.setNumProblems(2);
 
         Problem problem = new Problem();
         problem.setProblemId(PROBLEM_ID);
@@ -258,27 +257,31 @@ public class GameManagementServiceTests {
         problem.setDescription(PROBLEM_DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.EASY);
 
-        room.setProblems(Collections.singletonList(problem));
+        Problem problem2 = new Problem();
+        problem2.setProblemId(PROBLEM_ID_2);
+        problem2.setName(PROBLEM_NAME_2);
+        problem2.setDescription(PROBLEM_DESCRIPTION_2);
+        problem2.setDifficulty(ProblemDifficulty.MEDIUM);
+
+        room.setProblems(Arrays.asList(problem, problem2));
 
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(UserMapper.toDto(host));
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(room.getRoomId());
-        Mockito.doReturn(new ArrayList<>())
-                .when(problemService).getProblemsFromDifficulty(ProblemDifficulty.HARD, 9);
 
         gameService.startGame(ROOM_ID, request);
         Game game = gameService.getGameFromRoomId(ROOM_ID);
 
         // Only 2 problems are selected (no duplicate problems are included)
-        assertEquals(10, game.getRoom().getNumProblems());
-        assertEquals(1, game.getProblems().size());
+        assertEquals(2, game.getRoom().getNumProblems());
+        assertEquals(2, game.getProblems().size());
         assertEquals(problem.getProblemId(), game.getProblems().get(0).getProblemId());
         assertEquals(problem.getOutputType(), game.getProblems().get(0).getOutputType());
     }
 
     @Test
-    public void startGameWithSelectedProblemsNoDatabaseTouches() {
+    public void startGameNotEnoughProblems() {
         User host = new User();
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
@@ -286,8 +289,8 @@ public class GameManagementServiceTests {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
         room.setHost(host);
-        room.setDifficulty(ProblemDifficulty.HARD);
-        room.setNumProblems(1);
+        room.setDifficulty(ProblemDifficulty.EASY);
+        room.setNumProblems(2);
 
         Problem problem = new Problem();
         problem.setProblemId(PROBLEM_ID);
@@ -300,12 +303,11 @@ public class GameManagementServiceTests {
         request.setInitiator(UserMapper.toDto(host));
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(room.getRoomId());
+        Mockito.doReturn(Collections.singletonList(problem))
+                .when(problemService).getProblemsFromDifficulty(ProblemDifficulty.EASY, 2);
 
-        gameService.startGame(ROOM_ID, request);
-        gameService.getGameFromRoomId(ROOM_ID);
-
-        verify(problemService, never()).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
-        verify(problemService, never()).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.startGame(ROOM_ID, request));
+        assertEquals(ProblemError.NOT_ENOUGH_FOUND, exception.getError());
     }
 
     @Test
@@ -337,7 +339,7 @@ public class GameManagementServiceTests {
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
         ApiException exception = assertThrows(ApiException.class, () -> gameService.startGame(ROOM_ID, request));
-        assertEquals(ProblemError.NOT_FOUND, exception.getError());
+        assertEquals(ProblemError.NOT_ENOUGH_FOUND, exception.getError());
     }
 
     @Test

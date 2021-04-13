@@ -496,16 +496,18 @@ class ProblemTests {
 
     @Test
     public void getRandomProblemNotFound() throws Exception {
+        ApiError ERROR = ProblemError.NOT_ENOUGH_FOUND;
+
         MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_RANDOM)
                 .param(DIFFICULTY_KEY, "MEDIUM")
                 .param(NUM_PROBLEMS_KEY, "1"))
-                .andDo(print()).andExpect(status().isOk())
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        List<ProblemDto> actual = UtilityTestMethods.toObjectType(jsonResponse, new TypeToken<List<ProblemDto>>(){}.getType());
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
 
-        assertTrue(actual.isEmpty());
+        assertEquals(ERROR.getResponse(), actual);
     }
 
     @Test

@@ -234,7 +234,7 @@ public class GameTests {
 
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(host);
-        updateRequest.setNumProblems(10);
+        updateRequest.setNumProblems(3);
 
         SelectableProblemDto selectableDto = new SelectableProblemDto();
         selectableDto.setProblemId(problemDto.getProblemId());
@@ -267,7 +267,7 @@ public class GameTests {
         jsonResponse = result.getResponse().getContentAsString();
         GameDto gameDto = UtilityTestMethods.toObjectInstant(jsonResponse, GameDto.class);
 
-        assertEquals(10, gameDto.getRoom().getNumProblems());
+        assertEquals(3, gameDto.getRoom().getNumProblems());
         assertEquals(3, gameDto.getProblems().size());
         assertEquals(problemDto.getProblemId(), gameDto.getProblems().get(0).getProblemId());
         assertNotEquals(gameDto.getProblems().get(0).getProblemId(), gameDto.getProblems().get(1).getProblemId());
@@ -307,7 +307,7 @@ public class GameTests {
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(host);
 
-        ApiError ERROR = ProblemError.NOT_FOUND;
+        ApiError ERROR = ProblemError.NOT_ENOUGH_FOUND;
 
         MvcResult result = this.mockMvc.perform(post(String.format(START_GAME, roomDto.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

@@ -325,10 +325,10 @@ public class ProblemServiceTests {
 
         Mockito.doReturn(problems).when(repository).findAll();
 
-        // Return correct problem when selecting random difficulty
-        List<Problem> response = problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 3);
-        assertEquals(1, response.size());
-        assertEquals(problem1.getProblemId(), response.get(0).getProblemId());
+        ApiException exception = assertThrows(ApiException.class, () ->
+                problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 3));
+
+        assertEquals(ProblemError.NOT_ENOUGH_FOUND, exception.getError());
     }
 
     @Test
@@ -377,8 +377,10 @@ public class ProblemServiceTests {
 
     @Test
     public void getRandomProblemNotFound() {
-        List<Problem> problems = problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 1);
-        assertTrue(problems.isEmpty());
+        ApiException exception = assertThrows(ApiException.class, () ->
+                problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 1));
+
+        assertEquals(ProblemError.NOT_ENOUGH_FOUND, exception.getError());
     }
 
     @Test

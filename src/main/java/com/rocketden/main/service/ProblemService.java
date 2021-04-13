@@ -189,9 +189,9 @@ public class ProblemService {
             throw new ApiException(ProblemError.INVALID_NUMBER_REQUEST);
         }
 
-        // If the user wants more problems than exists, just return all of them
+        // If the user wants more problems than exists, throw an error
         if (numProblems > problems.size()) {
-            return problems;
+            throw new ApiException(ProblemError.NOT_ENOUGH_FOUND);
         }
 
         // Get numProblem random integers used to map to problems.
