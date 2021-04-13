@@ -289,8 +289,17 @@ public class RoomService {
             room.setNumProblems(request.getNumProblems());
         }
 
+        room = updateRoomSettingsSelectedProblems(request.getProblems(), room);
+
+        repository.save(room);
+
+        RoomDto roomDto = RoomMapper.toDto(room);
+        socketService.sendSocketUpdate(roomDto);
+        return roomDto;
+    }
+
+    private Room updateRoomSettingsSelectedProblems(List<SelectableProblemDto> selectedProblems, Room room) {
         // Set selected problems if not null
-        List<SelectableProblemDto> selectedProblems = request.getProblems();
         boolean problemsHaveChanged = false;
 
         if (selectedProblems != null) {
@@ -327,10 +336,6 @@ public class RoomService {
             room.setProblems(newProblems);
         }
 
-        repository.save(room);
-
-        RoomDto roomDto = RoomMapper.toDto(room);
-        socketService.sendSocketUpdate(roomDto);
-        return roomDto;
+        return room;
     }
 }
