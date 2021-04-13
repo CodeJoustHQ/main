@@ -174,7 +174,6 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
   const history = useHistory();
   const [newProblem, setNewProblem] = useState<Problem>(problem);
-  const [problemApproval, setProblemApproval] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -228,14 +227,8 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   // Handle description change
   const handleDescriptionChange = (value: string) => handleChange({ target: { name: 'description', value } });
 
-  // Toggle the problem approval status
-  const toggleProblemApproval = () => {
-    if (problemApproval) {
-      setProblemApproval(false);
-    } else {
-      setProblemApproval(true);
-    }
-  };
+  // Handle approval change
+  const handleApprovalChange = (value: boolean) => handleChange({ target: { name: 'approval', value } });
 
   // Handle updating of problem inputs
   const handleInputChange = (index: number, name: string, type: ProblemIOType) => {
@@ -458,15 +451,15 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           >
             <ToggleButtonLabel>
               <ToggleButtonInput
-                onChange={() => toggleProblemApproval()}
-                checked={problemApproval}
+                onChange={() => handleApprovalChange(!newProblem.approval)}
+                checked={newProblem.approval}
               />
               <ToggleButtonSpan
-                checked={problemApproval}
+                checked={newProblem.approval}
               />
             </ToggleButtonLabel>
             <ApprovalText>
-              {problemApproval ? 'Approved' : 'Approval Pending'}
+              {newProblem.approval ? 'Approved' : 'Approval Pending'}
             </ApprovalText>
           </ApprovalContainer>
           <LowMarginMediumText>Difficulty</LowMarginMediumText>
