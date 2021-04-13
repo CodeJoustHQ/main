@@ -50,10 +50,10 @@ const ToggleButtonSpan = styled.span<CheckboxProps>`
   }
 `;
 
-const ToggleButton = (onChange: any, checked: boolean) => (
+const ToggleButton = (onChangeFunction: any, checked: boolean) => (
   <ToggleButtonLabel>
     <ToggleButtonInput
-      onChange={onChange}
+      onChange={onChangeFunction}
       checked={checked}
     />
     <ToggleButtonSpan

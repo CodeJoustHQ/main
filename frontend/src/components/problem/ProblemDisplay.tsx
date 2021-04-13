@@ -445,7 +445,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             show={editMode}
           >
             <ToggleButton
-              onChange={() => handleApprovalChange(!newProblem.approval)}
+              onChangeFunction={() => handleApprovalChange(!newProblem.approval)}
               checked={newProblem.approval}
             />
             <ApprovalText>
@@ -473,7 +473,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
           <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
           {newProblem.problemInputs.map((input, index) => (
-            <InputTypeContainer>
+            <InputTypeContainer key={generateRandomId()}>
               <TextInput
                 value={newProblem.problemInputs[index].name}
                 onChange={(e) => handleInputChange(index,
