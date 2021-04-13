@@ -31,12 +31,8 @@ import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemIOType;
 import com.rocketden.main.service.SubmitService;
 import com.rocketden.main.util.UtilityTestMethods;
-import com.rocketden.main.service.ProblemService;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -98,11 +94,6 @@ public class GameTests {
 
     // Predefine notification content.
     private static final String CONTENT = "[1, 2, 3]";
-
-    //ProblemService for editing the problem
-    @Spy
-    @InjectMocks
-    private ProblemService problemService;
 
     // Helper method to start the game for a given room
     private void startGameHelper(RoomDto room, UserDto host) throws Exception {
