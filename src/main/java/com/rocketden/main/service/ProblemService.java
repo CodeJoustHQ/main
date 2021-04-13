@@ -182,7 +182,7 @@ public class ProblemService {
         }
 
         if (problems == null) {
-            throw new ApiException(ProblemError.NOT_FOUND);
+            throw new ApiException(ProblemError.INTERNAL_ERROR);
         }
 
         if (numProblems <= 0) {

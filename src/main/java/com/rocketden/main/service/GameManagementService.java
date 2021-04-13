@@ -146,6 +146,10 @@ public class GameManagementService {
 
         // Fill remaining problems with random ones by difficulty
         int remaining = room.getNumProblems() - problems.size();
+
+        if (remaining < 0) {
+            throw new ApiException(RoomError.TOO_MANY_PROBLEMS);
+        }
         if (remaining > 0) {
             List<Problem> otherProblems = problemService.getProblemsFromDifficulty(room.getDifficulty(), remaining);
             for (Problem problem : otherProblems) {

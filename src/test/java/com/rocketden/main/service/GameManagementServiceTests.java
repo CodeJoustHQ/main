@@ -136,7 +136,7 @@ public class GameManagementServiceTests {
         room.addUser(user);
 
         // Return a non-empty list so at least one problem exists
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(eq(room.getDifficulty()), eq(1));
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(eq(room.getDifficulty()), eq(1));
 
         // Create a game from a room
         gameService.createAddGameFromRoom(room);
@@ -169,7 +169,7 @@ public class GameManagementServiceTests {
         request.setInitiator(UserMapper.toDto(host));
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         RoomDto response = gameService.startGame(ROOM_ID, request);
 
         // Confirm that the problem service method is called correctly.
@@ -371,7 +371,7 @@ public class GameManagementServiceTests {
         user.setUserId(USER_ID);
         room.addUser(user);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
 
         // Confirm that the problem service method is called correctly.
@@ -402,7 +402,7 @@ public class GameManagementServiceTests {
         user.setUserId(USER_ID);
         room.addUser(user);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
         Game game = gameService.getGameFromRoomId(ROOM_ID);
 
@@ -432,7 +432,7 @@ public class GameManagementServiceTests {
         user.setUserId(USER_ID);
         room.addUser(user);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
 
         SubmissionRequest request = new SubmissionRequest();
@@ -454,7 +454,7 @@ public class GameManagementServiceTests {
         user.setUserId(USER_ID);
         room.addUser(user);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
         Game game = gameService.getGameFromRoomId(ROOM_ID);
 
@@ -505,7 +505,7 @@ public class GameManagementServiceTests {
         user3.setUserId(USER_ID_3);
         room.addUser(user3);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
         Game game = gameService.getGameFromRoomId(ROOM_ID);
 
@@ -555,7 +555,7 @@ public class GameManagementServiceTests {
         user2.setUserId(USER_ID_2);
         room.addUser(user2);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
         Game game = gameService.getGameFromRoomId(ROOM_ID);
 
@@ -588,7 +588,7 @@ public class GameManagementServiceTests {
     public void submitSolutionInvalidPermissions() {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
 
         User user = new User();
@@ -608,7 +608,7 @@ public class GameManagementServiceTests {
     public void submitSolutionEmptyField() {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
 
         User user = new User();
@@ -643,7 +643,7 @@ public class GameManagementServiceTests {
         request.setInitiator(UserMapper.toDto(host));
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.startGame(ROOM_ID, request);
 
         // Wait 1 second until the game timeUp socket update is sent
@@ -687,7 +687,7 @@ public class GameManagementServiceTests {
         request.setInitiator(UserMapper.toDto(host));
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.startGame(ROOM_ID, request);
 
         // Wait 1 second until the game timeUp socket update is sent
@@ -732,7 +732,7 @@ public class GameManagementServiceTests {
         startRequest.setInitiator(UserMapper.toDto(host));
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.startGame(ROOM_ID, startRequest);
 
         Mockito.verify(socketService, Mockito.timeout(1500)).sendSocketUpdate(Mockito.any(GameDto.class));
@@ -760,7 +760,7 @@ public class GameManagementServiceTests {
         startRequest.setInitiator(UserMapper.toDto(host));
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.startGame(ROOM_ID, startRequest);
 
         PlayAgainRequest request = new PlayAgainRequest();
@@ -785,7 +785,7 @@ public class GameManagementServiceTests {
         startRequest.setInitiator(UserMapper.toDto(host));
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.startGame(ROOM_ID, startRequest);
 
         Mockito.verify(socketService, Mockito.timeout(1500)).sendSocketUpdate(Mockito.any(GameDto.class));
@@ -815,7 +815,7 @@ public class GameManagementServiceTests {
         room.addUser(host);
         room.setHost(host);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
 
         GameNotificationDto notificationDto = new GameNotificationDto();
@@ -844,7 +844,7 @@ public class GameManagementServiceTests {
         room.addUser(host);
         room.setHost(host);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
 
         // Change notification type to time left, as no initiator is required.
@@ -875,7 +875,7 @@ public class GameManagementServiceTests {
         room.addUser(host);
         room.setHost(host);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
 
         // Change notification type to time left, as no initiator is required.
@@ -905,7 +905,7 @@ public class GameManagementServiceTests {
         room.addUser(host);
         room.setHost(host);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
 
         // Change notification type to time left, as no initiator is required.
@@ -934,7 +934,7 @@ public class GameManagementServiceTests {
         room.addUser(host);
         room.setHost(host);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
 
         GameNotificationDto notificationDto = new GameNotificationDto();
@@ -962,7 +962,7 @@ public class GameManagementServiceTests {
         room.addUser(host);
         room.setHost(host);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
 
         GameNotificationDto notificationDto = new GameNotificationDto();
@@ -990,7 +990,7 @@ public class GameManagementServiceTests {
         room.addUser(host);
         room.setHost(host);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
 
         GameNotificationDto notificationDto = new GameNotificationDto();
@@ -1013,7 +1013,7 @@ public class GameManagementServiceTests {
         user.setUserId(USER_ID);
         room.addUser(user);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
         Game game = gameService.getGameFromRoomId(ROOM_ID);
         gameService.updateCode(ROOM_ID, USER_ID, PLAYER_CODE);
@@ -1034,7 +1034,7 @@ public class GameManagementServiceTests {
         user.setUserId(USER_ID);
         room.addUser(user);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
         ApiException exception = assertThrows(ApiException.class, () -> gameService.updateCode("999999", USER_ID, PLAYER_CODE));
         assertEquals(GameError.NOT_FOUND, exception.getError());
@@ -1050,7 +1050,7 @@ public class GameManagementServiceTests {
         user.setUserId(USER_ID);
         room.addUser(user);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
         ApiException exception = assertThrows(ApiException.class, () -> gameService.updateCode(ROOM_ID, "999999", PLAYER_CODE));
         assertEquals(GameError.USER_NOT_IN_GAME, exception.getError());
@@ -1066,7 +1066,7 @@ public class GameManagementServiceTests {
         user.setUserId(USER_ID);
         room.addUser(user);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
         ApiException exception = assertThrows(ApiException.class, () -> gameService.updateCode(ROOM_ID, USER_ID, null));
         assertEquals(GameError.EMPTY_FIELD, exception.getError());
@@ -1104,7 +1104,7 @@ public class GameManagementServiceTests {
         user.setUserId(USER_ID);
         room.addUser(user);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
         Game game = gameService.getGameFromRoomId(room.getRoomId());
 
@@ -1127,7 +1127,7 @@ public class GameManagementServiceTests {
         user.setUserId(USER_ID);
         room.addUser(user);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
 
         gameService.createAddGameFromRoom(room);
 
@@ -1166,7 +1166,7 @@ public class GameManagementServiceTests {
         user.setUserId(USER_ID);
         room.addUser(user);
 
-        Mockito.doReturn(Collections.singletonList(null)).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
 
         gameService.createAddGameFromRoom(room);
 
