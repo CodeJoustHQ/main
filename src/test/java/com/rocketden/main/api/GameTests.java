@@ -159,6 +159,7 @@ public class GameTests {
 
         String testCaseJsonResponse = testCaseResult.getResponse().getContentAsString();
         ProblemTestCaseDto testCaseActual = UtilityTestMethods.toObject(testCaseJsonResponse, ProblemTestCaseDto.class);
+        problemActual.setTestCases(Collections.singletonList(testCaseActual));
 
         assertEquals(INPUT, testCaseActual.getInput());
         assertEquals(OUTPUT, testCaseActual.getOutput());
@@ -177,11 +178,6 @@ public class GameTests {
         problemDto.setOutputType(ProblemIOType.CHARACTER);
         problemDto.setName(NAME);
         problemDto.setApproval(true);
-
-        ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
-        testCaseDto.setInput(INPUT);
-        testCaseDto.setOutput("a");
-        problemDto.setTestCases(Collections.singletonList(testCaseDto));
 
         // Edit problem with new values
         String endpoint = String.format(PUT_PROBLEM_EDIT, problemDto.getProblemId());
