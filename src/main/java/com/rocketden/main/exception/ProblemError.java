@@ -16,6 +16,7 @@ public enum ProblemError implements ApiError {
     INVALID_NUMBER_REQUEST(HttpStatus.BAD_REQUEST, "Please request a valid number of problems."),
     INVALID_VARIABLE_NAME(HttpStatus.BAD_REQUEST, "Please ensure all variable names are valid for Java and Python."),
     EMPTY_FIELD(HttpStatus.BAD_REQUEST, "Please enter a value for each required field."),
+    BAD_APPROVAL(HttpStatus.BAD_REQUEST, "Cannot approve a problem with no test cases."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "A problem could not be found with the given criteria.");
 
     private final HttpStatus status;

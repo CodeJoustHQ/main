@@ -105,8 +105,13 @@ public class ProblemService {
                 || updatedProblem.getDifficulty() == null
                 || updatedProblem.getProblemInputs() == null
                 || updatedProblem.getTestCases() == null
-                || updatedProblem.getOutputType() == null) {
+                || updatedProblem.getOutputType() == null
+                || updatedProblem.getApproval() == null) {
             throw new ApiException(ProblemError.EMPTY_FIELD);
+        }
+
+        if (updatedProblem.getApproval() && updatedProblem.getTestCases().size() == 0) {
+            throw new ApiException(ProblemError.BAD_APPROVAL);
         }
 
         if (updatedProblem.getDifficulty() == ProblemDifficulty.RANDOM) {
@@ -117,6 +122,7 @@ public class ProblemService {
         problem.setDescription(updatedProblem.getDescription());
         problem.setDifficulty(updatedProblem.getDifficulty());
         problem.setOutputType(updatedProblem.getOutputType());
+        problem.setApproval(updatedProblem.getApproval());
 
         problem.getProblemInputs().clear();
         for (ProblemInputDto problemInput : updatedProblem.getProblemInputs()) {
@@ -177,19 +183,19 @@ public class ProblemService {
             throw new ApiException(ProblemError.EMPTY_FIELD);
         }
 
+        if (numProblems <= 0) {
+            throw new ApiException(ProblemError.INVALID_NUMBER_REQUEST);
+        }
+
         List<Problem> problems;
         if (difficulty == ProblemDifficulty.RANDOM) {
-            problems = repository.findAll();
+            problems = repository.findAllByApproval(true);
         } else {
-            problems = repository.findAllByDifficulty(difficulty);
+            problems = repository.findAllByDifficultyAndApproval(difficulty, true);
         }
 
         if (problems == null || problems.isEmpty()) {
             throw new ApiException(ProblemError.NOT_FOUND);
-        }
-
-        if (numProblems <= 0) {
-            throw new ApiException(ProblemError.INVALID_NUMBER_REQUEST);
         }
 
         // If the user wants more problems than exists, just return all of them
