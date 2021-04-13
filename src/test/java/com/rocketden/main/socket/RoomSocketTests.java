@@ -353,7 +353,7 @@ public class RoomSocketTests {
         String joinRoomEndpoint = String.format("%s/%s/users", baseRestEndpoint, room.getRoomId());
         template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
 
-        RoomDto actual = blockingQueue.pogitll(5, SECONDS);
+        RoomDto actual = blockingQueue.poll(5, SECONDS);
         assertNotNull(actual);
 
         // Check that the room contains the user
