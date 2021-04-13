@@ -175,6 +175,39 @@ public class GameManagementServiceTests {
     }
 
     @Test
+    public void startGameWithMultipleQuestionsSuccess() {
+        User host = new User();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(host);
+        room.setDifficulty(ProblemDifficulty.RANDOM);
+        room.setDuration(DURATION);
+        room.setNumProblems(6);
+
+        StartGameRequest request = new StartGameRequest();
+        request.setInitiator(UserMapper.toDto(host));
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(ROOM_ID);
+        RoomDto response = gameService.startGame(ROOM_ID, request);
+
+        verify(socketService).sendSocketUpdate(eq(response));
+
+        assertEquals(ROOM_ID, response.getRoomId());
+        assertTrue(response.isActive());
+
+        // Game object is created when the room chooses to start
+        Game game = gameService.getGameFromRoomId(ROOM_ID);
+        assertNotNull(game);
+
+        assertNotNull(game.getGameTimer());
+        assertEquals(room.getDuration(), game.getGameTimer().getDuration());
+        assertEquals(room.getNumProblems(), response.getNumProblems());
+    }
+
+    @Test
     public void startGameRoomNotFound() {
         UserDto user = new UserDto();
         user.setNickname(NICKNAME);

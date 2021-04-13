@@ -13,6 +13,7 @@ export type Room = {
   difficulty: Difficulty,
   duration: number,
   size: number,
+  numProblems: number,
 };
 
 export type CreateRoomParams = {
@@ -28,6 +29,7 @@ export type UpdateSettingsParams = {
   difficulty?: Difficulty,
   duration?: number,
   size?: number,
+  numProblems?: number,
 };
 
 export type ChangeHostParams = {
