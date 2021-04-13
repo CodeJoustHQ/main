@@ -175,7 +175,6 @@ public class GameTests {
      */
     private ProblemDto createSingleApprovedProblemAndTestCases() throws Exception {
         ProblemDto problemDto = createSingleProblemAndTestCases();
-        problemDto.setOutputType(ProblemIOType.CHARACTER);
         problemDto.setName(NAME);
         problemDto.setApproval(true);
 
