@@ -25,10 +25,8 @@ import {
   GrayTextButton,
   SmallButton,
   GreenSmallButtonBlock,
-  ToggleButtonLabel,
-  ToggleButtonInput,
-  ToggleButtonSpan,
 } from '../core/Button';
+import ToggleButton from '../core/ToggleButton';
 import PrimarySelect from '../core/Select';
 import {
   SmallHeaderText,
@@ -446,15 +444,10 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           <ApprovalContainer
             show={editMode}
           >
-            <ToggleButtonLabel>
-              <ToggleButtonInput
-                onChange={() => handleApprovalChange(!newProblem.approval)}
-                checked={newProblem.approval}
-              />
-              <ToggleButtonSpan
-                checked={newProblem.approval}
-              />
-            </ToggleButtonLabel>
+            <ToggleButton
+              onChange={() => handleApprovalChange(!newProblem.approval)}
+              checked={newProblem.approval}
+            />
             <ApprovalText>
               {newProblem.approval ? 'Approved' : 'Approval Pending'}
             </ApprovalText>
