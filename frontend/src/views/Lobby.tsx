@@ -389,7 +389,7 @@ function LobbyPage() {
   };
 
   const updateNumProblems = () => {
-    setError('')
+    setError('');
     setLoading(true);
     const prevNumProblems = numProblems;
     const settings = {
