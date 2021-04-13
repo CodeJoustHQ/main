@@ -9,6 +9,7 @@ import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.room.RemoveUserRequest;
+import com.rocketden.main.dto.room.SetSpectatorRequest;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.RoomError;
@@ -297,5 +298,42 @@ public class RoomService {
         RoomDto roomDto = RoomMapper.toDto(room);
         socketService.sendSocketUpdate(roomDto);
         return roomDto;
+    }
+
+    public RoomDto setSpectator(String roomId, SetSpectatorRequest request) {
+        Room room = repository.findRoomByRoomId(roomId);
+
+        // Return error if room could not be found
+        if (room == null) {
+            throw new ApiException(RoomError.NOT_FOUND);
+        }
+
+        // Return error if the initiator or receiver are null
+        if (request.getInitiator() == null || request.getReceiver() == null) {
+            throw new ApiException(UserError.NOT_FOUND);
+        }
+
+        // Return error if the initiator or receiver are not in the room
+        if (room.getUserByUserId(request.getReceiver().getUserId()) == null
+            || room.getUserByUserId(request.getInitiator().getUserId()) == null) {
+            throw new ApiException(RoomError.USER_NOT_FOUND);
+        }
+        // Return error if the initiator is not the host or the same as the receiver
+        User initiator = UserMapper.toEntity(request.getInitiator());
+        User receiver = UserMapper.toEntity(request.getReceiver());
+        if (!room.getHost().equals(initiator) && !initiator.equals(receiver)) {
+            throw new ApiException(RoomError.INVALID_PERMISSIONS);
+        }
+
+        // Return error if the requested spectator is null
+        if (request.getSpectator() == null) {
+            throw new ApiException(RoomError.BAD_SETTING);
+        }
+
+        User modifiedUser = room.getUserByUserId(receiver.getUserId());
+        modifiedUser.setSpectator(request.getSpectator());
+        repository.save(room);
+
+        return RoomMapper.toDto(room);
     }
 }

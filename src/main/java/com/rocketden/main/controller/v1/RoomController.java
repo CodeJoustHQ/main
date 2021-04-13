@@ -6,6 +6,7 @@ import com.rocketden.main.dto.room.JoinRoomRequest;
 import com.rocketden.main.dto.room.RoomDto;
 import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
+import com.rocketden.main.dto.room.SetSpectatorRequest;
 import com.rocketden.main.dto.room.RemoveUserRequest;
 import com.rocketden.main.service.RoomService;
 
@@ -66,5 +67,10 @@ public class RoomController extends BaseRestController {
     public ResponseEntity<RoomDto> updateRoomSettings(@PathVariable String roomId,
                                                       @RequestBody UpdateSettingsRequest request) {
         return new ResponseEntity<>(service.updateRoomSettings(roomId, request), HttpStatus.OK);
+    }
+
+    @PostMapping("/rooms/{roomId}/spectator")
+    public ResponseEntity<RoomDto> setSpectator(@PathVariable String roomId, @RequestBody SetSpectatorRequest request) {
+        return new ResponseEntity<>(service.setSpectator(roomId, request), HttpStatus.OK);
     }
 }
