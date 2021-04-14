@@ -149,12 +149,12 @@ public class GameManagementService {
 
         if (remaining < 0) {
             throw new ApiException(RoomError.TOO_MANY_PROBLEMS);
-        }
-        if (remaining > 0) {
+        } else if (remaining > 0) {
             List<Problem> otherProblems = problemService.getProblemsFromDifficulty(room.getDifficulty(), room.getNumProblems());
             for (Problem problem : otherProblems) {
                 if (!problems.contains(problem) && problems.size() < room.getNumProblems()) {
                     problems.add(problem);
+                    break;
                 }
             }
         }
