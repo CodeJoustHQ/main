@@ -143,6 +143,7 @@ function LobbyPage() {
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [duration, setDuration] = useState<number | undefined>(15);
   const [size, setSize] = useState<number | undefined>(10);
+  const [numProblems, setNumProblems] = useState<number>(1);
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
 
@@ -174,6 +175,7 @@ function LobbyPage() {
     setDifficulty(room.difficulty);
     setDuration(room.duration / 60);
     setSize(room.size);
+    setNumProblems(room.numProblems);
   };
 
   // Function to determine if the given user is the host or not
@@ -383,6 +385,25 @@ function LobbyPage() {
         setError(err.message);
         // Set size back to original if REST call failed
         setSize(prevSize);
+      });
+  };
+
+  const updateNumProblems = () => {
+    setError('');
+    setLoading(true);
+    const prevNumProblems = numProblems;
+    const settings = {
+      initiator: currentUser!,
+      numProblems,
+    };
+
+    updateRoomSettings(currentRoomId, settings)
+      .then(() => setLoading(false))
+      .catch((err) => {
+        setLoading(false);
+        setError(err.message);
+        // Set numProblems back to original if REST call failed
+        setNumProblems(prevNumProblems);
       });
   };
 
@@ -708,6 +729,40 @@ function LobbyPage() {
                   disabled={!isHost(currentUser)}
                   onChange={onSizeSliderChange}
                   onMouseUp={updateSize}
+                />
+              </SliderContainer>
+            </HoverContainerSlider>
+            <NoMarginMediumText>Number of Problems</NoMarginMediumText>
+            <NoMarginSubtitleText>
+              {`${numProblems} problem${numProblems === 1 ? '' : 's'}`}
+            </NoMarginSubtitleText>
+            <HoverContainerSlider>
+              <HoverElementSlider
+                enabled={isHost(currentUser)}
+                onMouseEnter={() => {
+                  if (!isHost(currentUser)) {
+                    setHoverVisible(true);
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (!isHost(currentUser)) {
+                    setHoverVisible(false);
+                  }
+                }}
+              />
+              <SliderContainer>
+                <Slider
+                  min={1}
+                  max={10}
+                  value={numProblems}
+                  disabled={!isHost(currentUser)}
+                  onChange={(e) => {
+                    const newNumProblems = Number(e.target);
+                    if (newNumProblems >= 1 && newNumProblems <= 10) {
+                      setNumProblems(newNumProblems);
+                    }
+                  }}
+                  onMouseUp={updateNumProblems}
                 />
               </SliderContainer>
             </HoverContainerSlider>
