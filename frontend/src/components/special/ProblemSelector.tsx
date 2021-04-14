@@ -8,10 +8,13 @@ import { DifficultyDisplayButton } from '../core/Button';
 const InlineProblem = styled.div`
   width: 300px;
   height: 50px;
+  display: flex;
+  flex: auto;
+  justify-content: space-between;
 `;
 
-const ProblemName = styled.div`
-  background: blue;
+const ProblemName = styled.p`
+  font-weight: bold;
 `;
 
 function ProblemSelector() {
@@ -31,7 +34,7 @@ function ProblemSelector() {
   return (
     <div>
       {problems.map((problem) => (
-        <InlineProblem>
+        <InlineProblem key={problem.name}>
           <ProblemName>
             {problem.name}
           </ProblemName>

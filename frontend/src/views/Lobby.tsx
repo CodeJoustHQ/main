@@ -411,6 +411,7 @@ function LobbyPage() {
           me={currentUser !== null && (user.nickname === currentUser.nickname)}
           isHost={isHost(user)}
           isActive={isActive}
+          key={user.userId}
         >
           {isHost(currentUser) && (user.userId !== currentUser?.userId) ? (
             // If currentUser is host, pass in an on-click action card for all other users
@@ -641,7 +642,7 @@ function LobbyPage() {
               {Object.keys(Difficulty).map((key) => {
                 const difficultyKey: Difficulty = Difficulty[key as keyof typeof Difficulty];
                 return (
-                  <HoverContainerSmallDifficultyButton>
+                  <HoverContainerSmallDifficultyButton key={key}>
                     <HoverElementSmallDifficultyButton {...hoverProps} />
                     <SmallDifficultyButtonNoMargin
                       difficulty={difficultyKey}

@@ -33,6 +33,12 @@ const PlayerCardActiveIcon = styled.div<PlayerIconType>`
   width: 1.3rem;
 `;
 
+const InlineHostIcon = styled.i.attrs(() => ({
+  className: 'material-icons',
+}))`
+  margin-left: 5px;
+`;
+
 type PlayerCardProps = {
   user: User,
   me: boolean,
@@ -47,12 +53,6 @@ function PlayerCard(props: PlayerCardProps) {
   } = props;
 
   const [showActionCard, setShowActionCard] = useState(false);
-
-  const InlineHostIcon = styled.i.attrs(() => ({
-    className: 'material-icons',
-  }))`
-    margin-left: 5px;
-  `;
 
   return (
     <TransparentHoverContainer

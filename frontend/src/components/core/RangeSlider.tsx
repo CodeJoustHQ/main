@@ -11,7 +11,7 @@ type SliderRange = {
 
 export const Slider = styled.input.attrs((props: SliderRange) => ({
   type: 'range',
-  class: 'slider',
+  className: 'slider',
   value: props.value,
 }))<SliderRange>`
   -webkit-appearance: none;
