@@ -1,6 +1,5 @@
 package com.rocketden.main.service;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,19 +140,27 @@ public class GameManagementService {
         Game game = GameMapper.fromRoom(room);
         Long time = room.getDuration();
 
-        // If specific problem specified, use that instead of difficulty setting
-        if (room.getProblemId() != null) {
-            Problem problem = problemService.getProblemEntity(room.getProblemId());
+        // If specific problems specified, use those instead of difficulty setting
+        List<Problem> problems = game.getProblems();
+        problems.addAll(room.getProblems());
 
-            if (problem == null) {
-                throw new ApiException(ProblemError.NOT_FOUND);
+        // Fill remaining problems with random ones by difficulty
+        int remaining = room.getNumProblems() - problems.size();
+
+        if (remaining < 0) {
+            throw new ApiException(RoomError.TOO_MANY_PROBLEMS);
+        } else if (remaining > 0) {
+            List<Problem> otherProblems = problemService.getProblemsFromDifficulty(room.getDifficulty(), room.getNumProblems());
+            for (Problem problem : otherProblems) {
+                if (!problems.contains(problem) && problems.size() < room.getNumProblems()) {
+                    problems.add(problem);
+                    break;
+                }
             }
+        }
 
-            game.getRoom().setNumProblems(1);
-            game.setProblems(Collections.singletonList(problem));
-        } else {
-            List<Problem> problems = problemService.getProblemsFromDifficulty(room.getDifficulty(), room.getNumProblems());
-            game.setProblems(problems);
+        if (problems.size() < room.getNumProblems()) {
+            throw new ApiException(ProblemError.NOT_ENOUGH_FOUND);
         }
 
         setStartGameTimer(game, time);

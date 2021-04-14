@@ -17,6 +17,7 @@ public class ProblemDto {
     private String problemId;
     private String name;
     private String description;
+    private Boolean approval;
     private ProblemDifficulty difficulty;
     private List<ProblemTestCaseDto> testCases = new ArrayList<>();
     private List<ProblemInputDto> problemInputs;

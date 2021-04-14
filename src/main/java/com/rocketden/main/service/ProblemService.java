@@ -17,6 +17,7 @@ import com.rocketden.main.model.problem.ProblemIOType;
 import com.rocketden.main.model.problem.ProblemInput;
 import com.rocketden.main.model.problem.ProblemTestCase;
 import com.rocketden.main.service.generators.DefaultCodeGeneratorService;
+import com.rocketden.main.util.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ public class ProblemService {
     private final List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList;
     private final Random random = new Random();
     private final Gson gson = new Gson();
+    private static final String PROBLEM_ACCESS_PASSWORD_KEY = "PROBLEM_ACCESS_PASSWORD";
 
     @Autowired
     public ProblemService(ProblemRepository repository, List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList) {
@@ -65,10 +67,12 @@ public class ProblemService {
 
         // Add all problem inputs in list.
         for (ProblemInputDto problemInput : request.getProblemInputs()) {
-            if (problemInput != null) {
-                problem.addProblemInput(ProblemMapper.toProblemInputEntity(problemInput));
-            } else {
+            if (problemInput == null) {
                 throw new ApiException(ProblemError.BAD_INPUT);
+            } else if (!Utility.validateIdentifier(problemInput.getName())) {
+                throw new ApiException(ProblemError.INVALID_VARIABLE_NAME);
+            } else {
+                problem.addProblemInput(ProblemMapper.toProblemInputEntity(problemInput));
             }
         }
 
@@ -106,8 +110,13 @@ public class ProblemService {
                 || updatedProblem.getDifficulty() == null
                 || updatedProblem.getProblemInputs() == null
                 || updatedProblem.getTestCases() == null
-                || updatedProblem.getOutputType() == null) {
+                || updatedProblem.getOutputType() == null
+                || updatedProblem.getApproval() == null) {
             throw new ApiException(ProblemError.EMPTY_FIELD);
+        }
+
+        if (updatedProblem.getApproval() && updatedProblem.getTestCases().size() == 0) {
+            throw new ApiException(ProblemError.BAD_APPROVAL);
         }
 
         if (updatedProblem.getDifficulty() == ProblemDifficulty.RANDOM) {
@@ -118,9 +127,14 @@ public class ProblemService {
         problem.setDescription(updatedProblem.getDescription());
         problem.setDifficulty(updatedProblem.getDifficulty());
         problem.setOutputType(updatedProblem.getOutputType());
+        problem.setApproval(updatedProblem.getApproval());
 
         problem.getProblemInputs().clear();
         for (ProblemInputDto problemInput : updatedProblem.getProblemInputs()) {
+            if (!Utility.validateIdentifier(problemInput.getName())) {
+                throw new ApiException(ProblemError.INVALID_VARIABLE_NAME);
+            }
+
             problem.addProblemInput(ProblemMapper.toProblemInputEntity(problemInput));
         }
 
@@ -174,24 +188,24 @@ public class ProblemService {
             throw new ApiException(ProblemError.EMPTY_FIELD);
         }
 
-        List<Problem> problems;
-        if (difficulty == ProblemDifficulty.RANDOM) {
-            problems = repository.findAll();
-        } else {
-            problems = repository.findAllByDifficulty(difficulty);
-        }
-
-        if (problems == null || problems.isEmpty()) {
-            throw new ApiException(ProblemError.NOT_FOUND);
-        }
-
         if (numProblems <= 0) {
             throw new ApiException(ProblemError.INVALID_NUMBER_REQUEST);
         }
 
-        // If the user wants more problems than exists, just return all of them
+        List<Problem> problems;
+        if (difficulty == ProblemDifficulty.RANDOM) {
+            problems = repository.findAllByApproval(true);
+        } else {
+            problems = repository.findAllByDifficultyAndApproval(difficulty, true);
+        }
+
+        if (problems == null) {
+            throw new ApiException(ProblemError.INTERNAL_ERROR);
+        }
+
+        // If the user wants more problems than exists, throw an error
         if (numProblems > problems.size()) {
-            return problems;
+            throw new ApiException(ProblemError.NOT_ENOUGH_FOUND);
         }
 
         // Get numProblem random integers used to map to problems.
@@ -210,7 +224,6 @@ public class ProblemService {
     }
 
     public ProblemTestCaseDto createTestCase(String problemId, CreateTestCaseRequest request) {
-
         Problem problem = repository.findProblemByProblemId(problemId);
         if (problem == null) {
             throw new ApiException(ProblemError.NOT_FOUND);
@@ -286,6 +299,7 @@ public class ProblemService {
             throw new ApiException(ProblemError.INVALID_INPUT);
         }
     }
+    
     public Map<CodeLanguage, String> getDefaultCode(String problemId) {
         // Convert from the Problem object to Problem DTOs.
         Problem problem = repository.findProblemByProblemId(problemId);
@@ -309,5 +323,20 @@ public class ProblemService {
         }
 
         return defaultCodeMap;
-    }   
+    }
+
+    /**
+     * This method is used in a GET request to see if users can access the
+     * problem pages on the frontend. The parameter is compared against the
+     * problem access password environment variable; if no environment variable
+     * is set, then it returns false.
+     * 
+     * @param password the password supplied by the user
+     * @return true iff the password supplied by the user matches the set system
+     * password, false otherwise
+     */
+    public Boolean accessProblems(String password) {
+        return System.getenv(PROBLEM_ACCESS_PASSWORD_KEY) != null
+            && password.equals(System.getenv(PROBLEM_ACCESS_PASSWORD_KEY));
+    }
 }

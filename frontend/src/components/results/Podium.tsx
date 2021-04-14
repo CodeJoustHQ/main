@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { Player, Submission } from '../../api/Game';
+import { Player } from '../../api/Game';
 import { Text, MediumText } from '../core/Text';
 import Language, { displayNameFromLanguage } from '../../api/Language';
+import useBestSubmission from '../../util/Hook';
 
 type PodiumProps = {
   place: number,
@@ -10,13 +11,15 @@ type PodiumProps = {
   gameStartTime: string,
   inviteContent: React.ReactNode,
   loading: boolean,
+  isCurrentPlayer: boolean,
 };
 
 type MedalProps = {
   color: string,
 };
 
-type HeightProps = {
+type PodiumContainerProps = {
+  isCurrentPlayer: boolean
   height: number,
 };
 
@@ -26,10 +29,11 @@ const Content = styled.div`
   justify-content: flex-end;
 `;
 
-const PodiumContainer = styled.div<HeightProps>`
+const PodiumContainer = styled.div<PodiumContainerProps>`
   position: relative;
   display: inline-block;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  box-shadow: ${({ isCurrentPlayer }) => (isCurrentPlayer
+    ? '0 2px 12px rgba(255, 199, 0, 0.24)' : '0 1px 4px rgba(0, 0, 0, 0.12)')};
   width: 180px;
   height: ${({ height }) => height}px;
   padding: 10px;
@@ -40,7 +44,16 @@ const PodiumContainer = styled.div<HeightProps>`
 
 const WinnerText = styled(MediumText)`
   font-weight: bold;
-  margin: 0;
+  margin: 0 auto;
+  width: 180px;
+  
+  overflow-x: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const ScoreText = styled(MediumText)`
@@ -72,25 +85,10 @@ const Medal = styled.div<MedalProps>`
 
 function Podium(props: PodiumProps) {
   const {
-    place, player, gameStartTime, loading, inviteContent,
+    place, player, gameStartTime, loading, inviteContent, isCurrentPlayer,
   } = props;
 
-  const [bestSubmission, setBestSubmission] = useState<Submission | null>(null);
-
-  useEffect(() => {
-    if (player) {
-      let newBestSubmission: Submission | null = bestSubmission;
-
-      // Find best submission
-      player.submissions.forEach((submission) => {
-        if (!newBestSubmission || submission.numCorrect > newBestSubmission.numCorrect) {
-          newBestSubmission = submission;
-        }
-      });
-
-      setBestSubmission(newBestSubmission);
-    }
-  }, [player, bestSubmission, setBestSubmission]);
+  const bestSubmission = useBestSubmission(player);
 
   const getMedalColor = () => {
     switch (place) {
@@ -110,7 +108,7 @@ function Podium(props: PodiumProps) {
       case 2:
         return 240;
       default:
-        return 200;
+        return 210;
     }
   };
 
@@ -123,7 +121,13 @@ function Podium(props: PodiumProps) {
     }
 
     if (!bestSubmission) {
-      return <ScoreText>Scored 0</ScoreText>;
+      return (
+        <ScoreText>
+          Scored
+          {' '}
+          <b>0</b>
+        </ScoreText>
+      );
     }
 
     const percent = Math.round((bestSubmission.numCorrect / bestSubmission.numTestCases) * 100);
@@ -170,7 +174,7 @@ function Podium(props: PodiumProps) {
     <Content>
       <div>
         <WinnerText>{player?.user.nickname || ''}</WinnerText>
-        <PodiumContainer height={getPodiumHeight()}>
+        <PodiumContainer height={getPodiumHeight()} isCurrentPlayer={isCurrentPlayer}>
           <Medal color={getMedalColor()} />
           {getScoreText()}
           {getTimeText()}

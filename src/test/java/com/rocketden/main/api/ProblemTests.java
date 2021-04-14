@@ -24,9 +24,12 @@ import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemIOType;
+import com.rocketden.main.util.ProblemTestMethods;
 import com.rocketden.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -93,41 +96,6 @@ class ProblemTests {
         "\tdef solve(nums):",
         "\t\t"
     ).replaceAll("\t", "    ");
-
-    /**
-     * Helper method that sends a POST request to create a new problem
-     * @return the created problem
-     * @throws Exception if anything wrong occurs
-     */
-    private ProblemDto createSingleProblem() throws Exception {
-        CreateProblemRequest createProblemRequest = new CreateProblemRequest();
-        createProblemRequest.setName(NAME);
-        createProblemRequest.setDescription(DESCRIPTION);
-        createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
-
-        List<ProblemInputDto> problemInputs = new ArrayList<>();
-        ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
-        problemInputs.add(problemInput);
-        createProblemRequest.setProblemInputs(problemInputs);
-        createProblemRequest.setOutputType(IO_TYPE);
-
-        MvcResult problemResult = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(createProblemRequest)))
-                .andDo(print()).andExpect(status().isCreated())
-                .andReturn();
-
-        String problemJsonResponse = problemResult.getResponse().getContentAsString();
-        ProblemDto problemActual = UtilityTestMethods.toObject(problemJsonResponse, ProblemDto.class);
-
-        assertEquals(NAME, problemActual.getName());
-        assertEquals(DESCRIPTION, problemActual.getDescription());
-        assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
-        assertEquals(problemInputs, problemActual.getProblemInputs());
-        assertEquals(IO_TYPE, problemActual.getOutputType());
-
-        return problemActual;
-    }
 
     @Test
     public void getProblemNonExistent() throws Exception {
@@ -235,7 +203,7 @@ class ProblemTests {
 
     @Test
     public void createEditDeleteProblemSuccess() throws Exception {
-        ProblemDto problemDto = createSingleProblem();
+        ProblemDto problemDto = ProblemTestMethods.createSingleProblem(this.mockMvc);
         problemDto.setOutputType(ProblemIOType.CHARACTER);
         problemDto.setName(NAME_2);
 
@@ -283,6 +251,34 @@ class ProblemTests {
         assertEquals(ERROR.getResponse(), response);
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"finally", "void", "throw", "EP<>", "new"})
+    public void editProblemInvalidIdentifier(String inputName) throws Exception {
+        ProblemDto problemDto = ProblemTestMethods.createSingleProblem(this.mockMvc);
+
+        List<ProblemInputDto> problemInputs = new ArrayList<>();
+        ProblemInputDto problemInput = new ProblemInputDto();
+        problemInput.setName(inputName);
+        problemInput.setType(ProblemIOType.STRING);
+        problemInputs.add(problemInput);
+        problemDto.setProblemInputs(problemInputs);
+
+        ApiError ERROR = ProblemError.INVALID_VARIABLE_NAME;
+
+        // Edit problem with new values
+        String endpoint = String.format(PUT_PROBLEM_EDIT, problemDto.getProblemId());
+        MvcResult result = this.mockMvc.perform(put(endpoint)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(problemDto)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+    }
+
     @Test
     public void createProblemBadInput() throws Exception {
         CreateProblemRequest request = new CreateProblemRequest();
@@ -296,6 +292,36 @@ class ProblemTests {
         request.setOutputType(IO_TYPE);
 
         ApiError ERROR = ProblemError.BAD_INPUT;
+
+        MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(request)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"False", "try", "jeremy ", "-minus", "@annotation"})
+    public void createProblemInvalidIdentifier(String inputName) throws Exception {
+        CreateProblemRequest request = new CreateProblemRequest();
+        request.setName(NAME);
+        request.setDescription(DESCRIPTION);
+        request.setDifficulty(ProblemDifficulty.HARD);
+
+        List<ProblemInputDto> problemInputs = new ArrayList<>();
+        ProblemInputDto problemInput = new ProblemInputDto();
+        problemInput.setName(inputName);
+        problemInput.setType(ProblemIOType.STRING);
+        problemInputs.add(problemInput);
+        request.setProblemInputs(problemInputs);
+        request.setOutputType(IO_TYPE);
+
+        ApiError ERROR = ProblemError.INVALID_VARIABLE_NAME;
 
         MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -362,7 +388,7 @@ class ProblemTests {
 
     @Test
     public void createTestCaseSuccess() throws Exception {
-        ProblemDto problem = createSingleProblem();
+        ProblemDto problem = ProblemTestMethods.createSingleProblem(this.mockMvc);
 
         CreateTestCaseRequest request = new CreateTestCaseRequest();
         request.setInput(INPUT);
@@ -387,7 +413,7 @@ class ProblemTests {
 
     @Test
     public void createTestCaseNoExplanationSuccess() throws Exception {
-        ProblemDto problem = createSingleProblem();
+        ProblemDto problem = ProblemTestMethods.createSingleProblem(this.mockMvc);
 
         CreateTestCaseRequest request = new CreateTestCaseRequest();
         request.setInput(INPUT);
@@ -411,7 +437,7 @@ class ProblemTests {
 
     @Test
     public void createTestCaseEmptyField() throws Exception {
-        ProblemDto problem = createSingleProblem();
+        ProblemDto problem = ProblemTestMethods.createSingleProblem(this.mockMvc);
 
         CreateTestCaseRequest request = new CreateTestCaseRequest();
         request.setInput(INPUT);
@@ -455,7 +481,7 @@ class ProblemTests {
 
     @Test
     public void createProblemWithTestCasesSuccess() throws Exception {
-        ProblemDto problem = createSingleProblem();
+        ProblemDto problem = ProblemTestMethods.createSingleProblem(this.mockMvc);
 
         // Create first test case
         CreateTestCaseRequest request = new CreateTestCaseRequest();
@@ -510,7 +536,7 @@ class ProblemTests {
 
     @Test
     public void getRandomProblemSuccess() throws Exception {
-        ProblemDto problem = createSingleProblem();
+        ProblemDto problem = ProblemTestMethods.createSingleApprovedProblemAndTestCases(this.mockMvc);
 
         MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_RANDOM)
                 .param(DIFFICULTY_KEY, "EASY")
@@ -530,9 +556,7 @@ class ProblemTests {
 
     @Test
     public void getRandomProblemNotFound() throws Exception {
-        createSingleProblem();
-
-        ApiError ERROR = ProblemError.NOT_FOUND;
+        ApiError ERROR = ProblemError.NOT_ENOUGH_FOUND;
 
         MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_RANDOM)
                 .param(DIFFICULTY_KEY, "MEDIUM")
@@ -548,7 +572,7 @@ class ProblemTests {
 
     @Test
     public void getDefaultCodeSuccess() throws Exception {
-        ProblemDto problem = createSingleProblem();
+        ProblemDto problem = ProblemTestMethods.createSingleProblem(this.mockMvc);
 
         MvcResult result = this.mockMvc.perform(get(String.format(GET_DEFAULT_CODE, problem.getProblemId())))
                 .andDo(print()).andExpect(status().isOk())

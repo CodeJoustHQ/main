@@ -1,5 +1,6 @@
 package com.rocketden.main.dto.room;
 
+import com.rocketden.main.dto.problem.SelectableProblemDto;
 import com.rocketden.main.dto.user.UserDto;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import lombok.EqualsAndHashCode;
@@ -19,7 +20,8 @@ public class RoomDto {
     private List<UserDto> inactiveUsers;
     private boolean active;
     private ProblemDifficulty difficulty;
-    private String problemId;
+    private List<SelectableProblemDto> problems;
     private long duration;
+    private int size;
     private int numProblems;
 }

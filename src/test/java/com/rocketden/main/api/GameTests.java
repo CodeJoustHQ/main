@@ -8,11 +8,8 @@ import com.rocketden.main.dto.game.StartGameRequest;
 import com.rocketden.main.dto.game.SubmissionDto;
 import com.rocketden.main.dto.game.SubmissionRequest;
 import com.rocketden.main.dto.game.SubmissionResultDto;
-import com.rocketden.main.dto.problem.CreateProblemRequest;
-import com.rocketden.main.dto.problem.CreateTestCaseRequest;
 import com.rocketden.main.dto.problem.ProblemDto;
-import com.rocketden.main.dto.problem.ProblemInputDto;
-import com.rocketden.main.dto.problem.ProblemTestCaseDto;
+import com.rocketden.main.dto.problem.SelectableProblemDto;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.user.UserDto;
@@ -27,8 +24,8 @@ import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.game_object.NotificationType;
 import com.rocketden.main.model.User;
+import com.rocketden.main.util.ProblemTestMethods;
 import com.rocketden.main.util.RoomTestMethods;
-import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemIOType;
 import com.rocketden.main.service.SubmitService;
 import com.rocketden.main.util.UtilityTestMethods;
@@ -45,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -55,8 +53,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
 @AutoConfigureMockMvc
@@ -82,6 +79,7 @@ public class GameTests {
     private static final String POST_SUBMISSION = "/api/v1/games/%s/submission";
     private static final String POST_NOTIFICATION = "/api/v1/games/%s/notification";
     private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
+    private static final String PUT_PROBLEM_EDIT = "/api/v1/problems/%s";
     private static final String POST_TEST_CASE_CREATE = "/api/v1/problems/%s/test-case";
 
     // Predefine user and room attributes.
@@ -89,18 +87,15 @@ public class GameTests {
     private static final String NICKNAME_2 = "rocketrocket";
     private static final String ROOM_ID = "012345";
     private static final String USER_ID = "098765";
-    private static final String PROBLEM_ID = "abcdef-ghijkl";
     private static final String CODE = "print('hello')";
     private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
-    private static final String INPUT_NAME = "nums";
-    private static final ProblemIOType IO_TYPE = ProblemIOType.ARRAY_INTEGER;
 
     // Predefine notification content.
     private static final String CONTENT = "[1, 2, 3]";
 
     // Helper method to start the game for a given room
     private void startGameHelper(RoomDto room, UserDto host) throws Exception {
-        createSingleProblemAndTestCases();
+        ProblemTestMethods.createSingleApprovedProblemAndTestCases(this.mockMvc);
 
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(host);
@@ -116,60 +111,6 @@ public class GameTests {
 
         assertEquals(room.getRoomId(), roomDto.getRoomId());
         assertTrue(roomDto.isActive());
-    }
-
-    /**
-     * Helper method that sends a POST request to create a new problem
-     *
-     * @return the created problem
-     * @throws Exception if anything wrong occurs
-     */
-    private ProblemDto createSingleProblemAndTestCases() throws Exception {
-        CreateProblemRequest createProblemRequest = new CreateProblemRequest();
-        createProblemRequest.setName(NAME);
-        createProblemRequest.setDescription(DESCRIPTION);
-        createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
-
-        List<ProblemInputDto> problemInputs = new ArrayList<>();
-        ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
-        problemInputs.add(problemInput);
-        createProblemRequest.setProblemInputs(problemInputs);
-        createProblemRequest.setOutputType(IO_TYPE);
-
-        MvcResult problemResult = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(createProblemRequest)))
-                .andDo(print()).andExpect(status().isCreated())
-                .andReturn();
-
-        String problemJsonResponse = problemResult.getResponse().getContentAsString();
-        ProblemDto problemActual = UtilityTestMethods.toObject(problemJsonResponse, ProblemDto.class);
-
-        assertEquals(NAME, problemActual.getName());
-        assertEquals(DESCRIPTION, problemActual.getDescription());
-        assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
-        assertEquals(problemInputs, problemActual.getProblemInputs());
-        assertEquals(IO_TYPE, problemActual.getOutputType());
-
-        CreateTestCaseRequest createTestCaseRequest = new CreateTestCaseRequest();
-        createTestCaseRequest.setInput(INPUT);
-        createTestCaseRequest.setOutput(OUTPUT);
-
-        String endpoint = String.format(POST_TEST_CASE_CREATE, problemActual.getProblemId());
-        MvcResult testCaseResult = this.mockMvc.perform(post(endpoint)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(createTestCaseRequest)))
-                .andDo(print()).andExpect(status().isCreated())
-                .andReturn();
-
-        String testCaseJsonResponse = testCaseResult.getResponse().getContentAsString();
-        ProblemTestCaseDto testCaseActual = UtilityTestMethods.toObject(testCaseJsonResponse, ProblemTestCaseDto.class);
-
-        assertEquals(INPUT, testCaseActual.getInput());
-        assertEquals(OUTPUT, testCaseActual.getOutput());
-        assertFalse(testCaseActual.isHidden());
-
-        return problemActual;
     }
 
     @Test
@@ -192,7 +133,7 @@ public class GameTests {
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(roomDto.getHost());
 
-        createSingleProblemAndTestCases();
+        ProblemTestMethods.createSingleApprovedProblemAndTestCases(this.mockMvc);
 
         result = this.mockMvc.perform(post(String.format(START_GAME, roomDto.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -227,14 +168,19 @@ public class GameTests {
 
         RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
 
-        createSingleProblemAndTestCases();
-        createSingleProblemAndTestCases();
-        ProblemDto problemDto = createSingleProblemAndTestCases();
+        ProblemTestMethods.createSingleApprovedProblemAndTestCases(this.mockMvc);
+        ProblemDto problemDto = ProblemTestMethods.createSingleApprovedProblemAndTestCases(this.mockMvc);
 
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(host);
-        updateRequest.setNumProblems(10);
-        updateRequest.setProblemId(problemDto.getProblemId());
+        updateRequest.setNumProblems(3);
+
+        SelectableProblemDto selectableDto = new SelectableProblemDto();
+        selectableDto.setProblemId(problemDto.getProblemId());
+        selectableDto.setName(problemDto.getName());
+        selectableDto.setDifficulty(problemDto.getDifficulty());
+
+        updateRequest.setProblems(Collections.singletonList(selectableDto));
 
         MvcResult result = this.mockMvc.perform(put(String.format(UPDATE_ROOM, roomDto.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -245,8 +191,12 @@ public class GameTests {
         String jsonResponse = result.getResponse().getContentAsString();
         RoomDto response = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
 
-        assertEquals(problemDto.getProblemId(), response.getProblemId());
+        assertEquals(1, response.getProblems().size());
+        assertEquals(selectableDto.getProblemId(), response.getProblems().get(0).getProblemId());
+        assertEquals(selectableDto.getName(), response.getProblems().get(0).getName());
+        assertEquals(selectableDto.getDifficulty(), response.getProblems().get(0).getDifficulty());
 
+        // Note: this also creates a problem (so total number of problems is 3)
         startGameHelper(roomDto, host);
 
         result = this.mockMvc.perform(get(String.format(GET_GAME, roomDto.getRoomId())))
@@ -256,9 +206,11 @@ public class GameTests {
         jsonResponse = result.getResponse().getContentAsString();
         GameDto gameDto = UtilityTestMethods.toObjectInstant(jsonResponse, GameDto.class);
 
-        assertEquals(1, gameDto.getRoom().getNumProblems());
-        assertEquals(1, gameDto.getProblems().size());
+        assertEquals(3, gameDto.getRoom().getNumProblems());
+        assertEquals(3, gameDto.getProblems().size());
         assertEquals(problemDto.getProblemId(), gameDto.getProblems().get(0).getProblemId());
+        assertNotEquals(gameDto.getProblems().get(0).getProblemId(), gameDto.getProblems().get(1).getProblemId());
+        assertNotEquals(gameDto.getProblems().get(1).getProblemId(), gameDto.getProblems().get(2).getProblemId());
     }
 
     @Test
@@ -284,28 +236,17 @@ public class GameTests {
     }
 
     @Test
-    public void startGameProblemNotFound() throws Exception {
+    public void startGameProblemNotEnoughFound() throws Exception {
         UserDto host = new UserDto();
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
 
         RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
-        createSingleProblemAndTestCases();
-
-        UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
-        updateRequest.setInitiator(host);
-        updateRequest.setProblemId(PROBLEM_ID);
-
-        this.mockMvc.perform(put(String.format(UPDATE_ROOM, roomDto.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
 
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(host);
 
-        ApiError ERROR = ProblemError.NOT_FOUND;
+        ApiError ERROR = ProblemError.NOT_ENOUGH_FOUND;
 
         MvcResult result = this.mockMvc.perform(post(String.format(START_GAME, roomDto.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

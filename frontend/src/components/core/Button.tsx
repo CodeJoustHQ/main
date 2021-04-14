@@ -184,7 +184,7 @@ export const GreenSmallButtonBlock = styled(SmallButton)`
 
 export const InvertedSmallButton = styled(SmallButton)`
   color: ${({ theme }) => theme.colors.text};
-  background: ${({ theme }) => theme.colors.background};
+  background: ${({ theme }) => theme.colors.white};
 `;
 
 export const InlineRefreshIcon = styled.i.attrs(() => ({
@@ -203,4 +203,36 @@ export const InlineRefreshIcon = styled.i.attrs(() => ({
     cursor: pointer;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.24);
   }
+`;
+
+type ShowError = {
+  show: boolean,
+};
+
+export const InlineErrorIcon = styled(InlineRefreshIcon).attrs((props: ShowError) => ({
+  style: {
+    display: props.show ? 'inline-block' : 'none',
+  },
+}))<ShowError>`
+  color: ${({ theme }) => theme.colors.gray};
+  margin: 0 0.5rem 0 0;
+  padding: 0;
+  box-shadow: none;
+
+  &:hover {
+    cursor: default;
+    box-shadow: none;
+  }
+`;
+
+export const InlineShowIcon = styled.i.attrs(() => ({
+  className: 'material-icons',
+}))`
+  display: inline-block;
+  position: relative;
+  top: 0.1rem;
+  margin-left: 0.3rem;
+  border-radius: 1rem;
+  font-size: ${({ theme }) => theme.fontSize.medium};
+  color: ${({ theme }) => theme.colors.font};
 `;

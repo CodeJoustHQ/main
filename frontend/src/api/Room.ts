@@ -14,6 +14,7 @@ export type Room = {
   difficulty: Difficulty,
   duration: number,
   problem: SelectableProblem | null,
+  size: number,
 };
 
 export type CreateRoomParams = {
@@ -29,6 +30,7 @@ export type UpdateSettingsParams = {
   difficulty?: Difficulty,
   duration?: number,
   problem?: SelectableProblem,
+  size?: number,
 };
 
 export type ChangeHostParams = {

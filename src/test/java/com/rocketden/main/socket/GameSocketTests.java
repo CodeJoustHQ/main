@@ -115,7 +115,7 @@ public class GameSocketTests {
         assertNotNull(room);
 
         // Create problems
-        SocketTestMethods.createSingleProblemAndTestCases(template, port);
+        SocketTestMethods.createSingleApprovedProblemAndTestCases(template, port);
 
         // Start game
         StartGameRequest startRequest = new StartGameRequest();
