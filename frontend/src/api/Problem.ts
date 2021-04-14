@@ -26,6 +26,7 @@ export type SelectableProblem = {
   problemId: string,
   name: string,
   difficulty: Difficulty,
+  selected?: boolean,
 };
 
 export type ProblemInput = {

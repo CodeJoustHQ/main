@@ -9,20 +9,28 @@ type ContentProps = {
   show: boolean,
 };
 
+type InlineProblemProps = {
+  selected: boolean,
+};
+
 const InnerContent = styled.div<ContentProps>`
   display: ${({ show }) => (show ? 'block' : 'none')};
   border-radius: 5px;
 `;
 
-const InlineProblem = styled.div`
+const InlineProblem = styled.div<InlineProblemProps>`
   width: 300px;
   height: 50px;
   display: flex;
   flex: auto;
   justify-content: space-between;
-  background-color: ${({ theme }) => theme.colors.white};
   
+  background-color: ${({ theme, selected }) => (selected ? theme.colors.gray : theme.colors.white)};
   border: solid 1px ${({ theme }) => theme.colors.gray};
+  
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const ProblemName = styled.p`
@@ -30,7 +38,7 @@ const ProblemName = styled.p`
 `;
 
 function ProblemSelector() {
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState('');
   const [problems, setProblems] = useState<SelectableProblem[]>([]);
   const [showProblems, setShowProblems] = useState(false);
 
@@ -44,12 +52,25 @@ function ProblemSelector() {
       });
   }, []);
 
+  const toggleSelectedStatus = (index: number) => {
+    setProblems(problems.map((problem, i) => {
+      if (index === i) {
+        return { ...problem, selected: !problem.selected };
+      }
+      return problem;
+    }));
+  };
+
   return (
     <div>
       <button onClick={() => setShowProblems(!showProblems)}>Select a problem...</button>
       <InnerContent show={showProblems}>
-        {problems.map((problem) => (
-          <InlineProblem key={problem.name}>
+        {problems.map((problem, index) => (
+          <InlineProblem
+            key={problem.name}
+            selected={Boolean(problem.selected)}
+            onClick={() => toggleSelectedStatus(index)}
+          >
             <ProblemName>
               {problem.name}
             </ProblemName>
