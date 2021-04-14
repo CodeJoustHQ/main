@@ -321,7 +321,7 @@ public class GameTests {
     }
 
     @Test
-    public void startGameProblemNotFound() throws Exception {
+    public void startGameProblemNotEnoughFound() throws Exception {
         UserDto host = new UserDto();
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
