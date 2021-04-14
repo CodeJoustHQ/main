@@ -13,8 +13,9 @@ export type Room = {
   active: boolean,
   difficulty: Difficulty,
   duration: number,
-  problem: SelectableProblem | null,
+  problems: SelectableProblem[],
   size: number,
+  numProblems: number,
 };
 
 export type CreateRoomParams = {

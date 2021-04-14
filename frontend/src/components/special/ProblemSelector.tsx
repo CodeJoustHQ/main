@@ -1,6 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { getProblems, SelectableProblem } from '../../api/Problem';
 import ErrorMessage from '../core/Error';
+import { displayNameFromDifficulty } from '../../api/Difficulty';
+import { DifficultyDisplayButton } from '../core/Button';
+
+const InlineProblem = styled.div`
+  width: 300px;
+  height: 50px;
+`;
+
+const ProblemName = styled.div`
+  background: blue;
+`;
 
 function ProblemSelector() {
   const [error, setError] = useState<string>('');
@@ -18,7 +30,20 @@ function ProblemSelector() {
 
   return (
     <div>
-      Here goes the problem selector
+      {problems.map((problem) => (
+        <InlineProblem>
+          <ProblemName>
+            {problem.name}
+          </ProblemName>
+          <DifficultyDisplayButton
+            difficulty={problem.difficulty}
+            enabled={false}
+            active
+          >
+            {displayNameFromDifficulty(problem.difficulty)}
+          </DifficultyDisplayButton>
+        </InlineProblem>
+      ))}
 
       { error ? <ErrorMessage message={error} /> : null }
     </div>

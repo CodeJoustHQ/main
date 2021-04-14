@@ -153,7 +153,7 @@ function LobbyPage() {
   const [active, setActive] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [duration, setDuration] = useState<number | undefined>(15);
-  const [selectedProblem, setSelectedProblem] = useState<SelectableProblem | null>(null);
+  const [selectedProblems, setSelectedProblems] = useState<SelectableProblem[]>([]);
   const [size, setSize] = useState<number | undefined>(10);
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
@@ -185,7 +185,7 @@ function LobbyPage() {
     setActive(room.active);
     setDifficulty(room.difficulty);
     setDuration(room.duration / 60);
-    setSelectedProblem(room.problem);
+    setSelectedProblems(room.problems);
     setSize(room.size);
   };
 
