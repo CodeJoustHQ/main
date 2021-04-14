@@ -26,9 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SocketTestMethods {
 
@@ -65,7 +63,7 @@ public class SocketTestMethods {
      * create a new problem
      * @throws Exception if anything wrong occurs
      */
-    public static void createSingleProblemAndTestCases(TestRestTemplate template, int port) throws Exception {
+    public static ProblemDto createSingleProblemAndTestCases(TestRestTemplate template, int port) throws Exception {
         CreateProblemRequest createProblemRequest = new CreateProblemRequest();
         createProblemRequest.setName(NAME);
         createProblemRequest.setDescription(DESCRIPTION);
@@ -88,7 +86,6 @@ public class SocketTestMethods {
         assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
         assertEquals(problemInputs, problemActual.getProblemInputs());
         assertEquals(IO_TYPE, problemActual.getOutputType());
-
         CreateTestCaseRequest createTestCaseRequest = new CreateTestCaseRequest();
         createTestCaseRequest.setInput(INPUT);
         createTestCaseRequest.setOutput(OUTPUT);
@@ -97,10 +94,31 @@ public class SocketTestMethods {
         String createTestCaseEndpoint = String.format("http://localhost:%s/api/v1/problems/%s/test-case", port, problemActual.getProblemId());
 
         ProblemTestCaseDto testCaseActual = template.exchange(createTestCaseEndpoint, HttpMethod.POST, createTestCaseEntity, ProblemTestCaseDto.class).getBody();
+        problemActual.getTestCases().add(testCaseActual);
 
         assertNotNull(testCaseActual);
         assertEquals(INPUT, testCaseActual.getInput());
         assertEquals(OUTPUT, testCaseActual.getOutput());
         assertFalse(testCaseActual.isHidden());
+
+        return problemActual;
+    }
+
+    /**
+     * Sets the approval for a new problem to true. Necessary for a number of tests
+     *
+     * @return the new problem
+     * @throws Exception if anything wrong occurs
+     */
+    public static void createSingleApprovedProblemAndTestCases(TestRestTemplate template, int port) throws Exception {
+        ProblemDto problem = createSingleProblemAndTestCases(template, port);
+        problem.setApproval(true);
+
+        HttpEntity<ProblemDto> editProblemEntity = new HttpEntity<>(problem);
+        String editProblemEndpoint = String.format("http://localhost:%s/api/v1/problems/%s", port, problem.getProblemId());
+
+        ProblemDto problemActual = template.exchange(editProblemEndpoint, HttpMethod.PUT, editProblemEntity, ProblemDto.class).getBody();
+
+        assertTrue(problemActual.getApproval());
     }
 }

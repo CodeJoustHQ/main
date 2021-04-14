@@ -101,8 +101,8 @@ const HoverContainerPrimaryButton = styled(HoverContainer)`
 `;
 
 const HoverElementPrimaryButton = styled(HoverElement)`
-  width: 10rem;
-  height: 2.75rem;
+  width: 12rem;
+  height: 3rem;
 `;
 
 const HoverContainerSmallDifficultyButton = styled(HoverContainer)`
@@ -142,6 +142,7 @@ function LobbyPage() {
   const [active, setActive] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [duration, setDuration] = useState<number | undefined>(15);
+  const [size, setSize] = useState<number | undefined>(10);
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
 
@@ -172,6 +173,7 @@ function LobbyPage() {
     setActive(room.active);
     setDifficulty(room.difficulty);
     setDuration(room.duration / 60);
+    setSize(room.size);
   };
 
   // Function to determine if the given user is the host or not
@@ -328,6 +330,59 @@ function LobbyPage() {
         setError(err.message);
         // Set duration back to original if REST call failed
         setDuration(prevDuration);
+      });
+  };
+
+  const onSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+
+    // Set size to undefined to allow users to clear field
+    if (!value) {
+      setSize(undefined);
+    } else {
+      const newSize = Number(value);
+
+      if (newSize >= (users?.length || 0) && newSize <= 31) {
+        if (newSize !== size) {
+          setError('');
+        }
+
+        setSize(newSize);
+      } else if (newSize < (users?.length || 0)) {
+        setSize((users?.length || 0));
+        setError('The room limit cannot be set below the number of connected players.');
+      }
+    }
+  };
+
+  const onDurationSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    if (!value) {
+      setDuration(undefined);
+    } else {
+      const newDuration = Number(value);
+      if (newDuration >= 0 && newDuration <= 60) {
+        setDuration(newDuration);
+      }
+    }
+  };
+
+  const updateSize = () => {
+    setLoading(true);
+    const prevSize = size;
+    const settings = {
+      initiator: currentUser!,
+      size,
+    };
+
+    updateRoomSettings(currentRoomId, settings)
+      .then(() => setLoading(false))
+      .then(() => setError(''))
+      .catch((err) => {
+        setLoading(false);
+        setError(err.message);
+        // Set size back to original if REST call failed
+        setSize(prevSize);
       });
   };
 
@@ -622,20 +677,37 @@ function LobbyPage() {
                   max={60}
                   value={duration}
                   disabled={!isHost(currentUser)}
-                  onChange={(e) => {
-                    const { value } = e.target;
-
-                    // Set duration to undefined to allow users to clear field
-                    if (!value) {
-                      setDuration(undefined);
-                    } else {
-                      const newDuration = Number(value);
-                      if (newDuration >= 0 && newDuration <= 60) {
-                        setDuration(newDuration);
-                      }
-                    }
-                  }}
+                  onChange={onDurationSliderChange}
                   onMouseUp={updateRoomDuration}
+                />
+              </SliderContainer>
+            </HoverContainerSlider>
+            <NoMarginMediumText>Room Size</NoMarginMediumText>
+            <NoMarginSubtitleText>
+              {size === 31 ? 'No limit' : `${size === 1 ? '1 person' : `${size} people`}`}
+            </NoMarginSubtitleText>
+            <HoverContainerSlider>
+              <HoverElementSlider
+                enabled={isHost(currentUser)}
+                onMouseEnter={() => {
+                  if (!isHost(currentUser)) {
+                    setHoverVisible(true);
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (!isHost(currentUser)) {
+                    setHoverVisible(false);
+                  }
+                }}
+              />
+              <SliderContainer>
+                <Slider
+                  min={1}
+                  max={31}
+                  value={size}
+                  disabled={!isHost(currentUser)}
+                  onChange={onSizeSliderChange}
+                  onMouseUp={updateSize}
                 />
               </SliderContainer>
             </HoverContainerSlider>

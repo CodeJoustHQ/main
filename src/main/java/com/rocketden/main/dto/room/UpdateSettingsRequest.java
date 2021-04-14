@@ -14,6 +14,7 @@ public class UpdateSettingsRequest {
     private UserDto initiator;
     private ProblemDifficulty difficulty;
     private Long duration;
+    private Integer size;
     private Integer numProblems;
     private List<SelectableProblemDto> problems;
 }

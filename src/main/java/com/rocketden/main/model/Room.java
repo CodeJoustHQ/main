@@ -3,6 +3,8 @@ package com.rocketden.main.model;
 import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.service.RoomService;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -60,7 +62,7 @@ public class Room {
 
     private Integer numProblems = 1;
 
-    private Integer maxSize = 4;
+    private Integer size = 10;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "selectable_problem_id")
@@ -136,6 +138,11 @@ public class Room {
      * than the maximum size of the room
      */
     public boolean isFull() {
-        return users.size() >= maxSize;
+        // size being one greater than the MAX_SIZE is interpreted as an infinitely-sized room.
+        if (size == RoomService.MAX_SIZE + 1) {
+            return false;
+        }
+
+        return users.size() >= size;
     }
 }

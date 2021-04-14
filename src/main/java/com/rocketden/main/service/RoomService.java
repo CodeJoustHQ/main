@@ -10,6 +10,7 @@ import com.rocketden.main.dto.room.RoomMapper;
 import com.rocketden.main.dto.room.UpdateHostRequest;
 import com.rocketden.main.dto.room.UpdateSettingsRequest;
 import com.rocketden.main.dto.room.RemoveUserRequest;
+import com.rocketden.main.dto.room.SetSpectatorRequest;
 import com.rocketden.main.dto.user.UserMapper;
 import com.rocketden.main.exception.ProblemError;
 import com.rocketden.main.exception.RoomError;
@@ -32,6 +33,7 @@ public class RoomService {
 
     public static final int ROOM_ID_LENGTH = 6;
     public static final long MAX_DURATION = 3600; // 1 hour
+    public static final int MAX_SIZE = 30;
     public static final int MAX_NUM_PROBLEMS = 10;
 
     private final RoomRepository repository;
@@ -280,6 +282,16 @@ public class RoomService {
             }
             room.setDuration(request.getDuration());
         }
+
+        // Set new size if not null
+        Integer size = request.getSize();
+        if (size != null) {
+            if (size <= 0 || size > MAX_SIZE + 1 || size < room.getUsers().size()) {
+                throw new ApiException(RoomError.BAD_ROOM_SIZE);
+            }
+
+            room.setSize(size);
+        }
         
         // Set number of problems if not null
         if (request.getNumProblems() != null) {
@@ -337,5 +349,42 @@ public class RoomService {
         }
 
         return room;
+    }
+
+    public RoomDto setSpectator(String roomId, SetSpectatorRequest request) {
+        Room room = repository.findRoomByRoomId(roomId);
+
+        // Return error if room could not be found
+        if (room == null) {
+            throw new ApiException(RoomError.NOT_FOUND);
+        }
+
+        // Return error if the initiator or receiver are null
+        if (request.getInitiator() == null || request.getReceiver() == null) {
+            throw new ApiException(UserError.NOT_FOUND);
+        }
+
+        // Return error if the initiator or receiver are not in the room
+        if (room.getUserByUserId(request.getReceiver().getUserId()) == null
+            || room.getUserByUserId(request.getInitiator().getUserId()) == null) {
+            throw new ApiException(RoomError.USER_NOT_FOUND);
+        }
+        // Return error if the initiator is not the host or the same as the receiver
+        User initiator = UserMapper.toEntity(request.getInitiator());
+        User receiver = UserMapper.toEntity(request.getReceiver());
+        if (!room.getHost().equals(initiator) && !initiator.equals(receiver)) {
+            throw new ApiException(RoomError.INVALID_PERMISSIONS);
+        }
+
+        // Return error if the requested spectator is null
+        if (request.getSpectator() == null) {
+            throw new ApiException(RoomError.BAD_SETTING);
+        }
+
+        User modifiedUser = room.getUserByUserId(receiver.getUserId());
+        modifiedUser.setSpectator(request.getSpectator());
+        repository.save(room);
+
+        return RoomMapper.toDto(room);
     }
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
@@ -25,7 +25,10 @@ import {
   GrayTextButton,
   SmallButton,
   GreenSmallButtonBlock,
+  InlineErrorIcon,
+  InvertedSmallButton,
 } from '../core/Button';
+import ToggleButton from '../core/ToggleButton';
 import PrimarySelect from '../core/Select';
 import {
   SmallHeaderText,
@@ -35,9 +38,10 @@ import {
 } from '../core/Text';
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
-import { InvertedSmallButtonLink } from '../core/Link';
 import { FlexBareContainer } from '../core/Container';
-import { generateRandomId } from '../../util/Utility';
+import { generateRandomId, validIdentifier } from '../../util/Utility';
+import { HoverTooltip } from '../core/HoverTooltip';
+import { Coordinate } from '../special/FloatingCircle';
 
 const MainContent = styled.div`
   text-align: left;
@@ -62,6 +66,22 @@ const SettingsContainer = styled.div`
   border-radius: 10px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   background: ${({ theme }) => theme.colors.white};
+`;
+
+type ShowProps = {
+  show: boolean,
+};
+
+const ApprovalContainer = styled.div<ShowProps>`
+  display: ${({ show }) => (show ? 'inline-block' : 'none')};
+  text-align: left;
+  margin-top: 0.5rem;
+`;
+
+const ApprovalText = styled(Text)`
+  display: inline-block;
+  margin: 0 0 0 0.75rem;
+  font-size: ${({ theme }) => theme.fontSize.subtitleXMediumLarge}
 `;
 
 const SettingsContainerRelative = styled(SettingsContainer)`
@@ -154,6 +174,13 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const [newProblem, setNewProblem] = useState<Problem>(problem);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
+  const [hoverVisible, setHoverVisible] = useState<boolean>(false);
+
+  // Get current mouse position.
+  const mouseMoveHandler = useCallback((e: any) => {
+    setMousePosition({ x: e.pageX, y: e.pageY });
+  }, [setMousePosition]);
 
   const onDragEnd = (result: any) => {
     // dropped outside the list
@@ -204,6 +231,9 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
   // Handle description change
   const handleDescriptionChange = (value: string) => handleChange({ target: { name: 'description', value } });
+
+  // Handle approval change
+  const handleApprovalChange = (value: boolean) => handleChange({ target: { name: 'approval', value } });
 
   // Handle updating of problem inputs
   const handleInputChange = (index: number, name: string, type: ProblemIOType) => {
@@ -274,16 +304,27 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
   return (
     <>
+      <HoverTooltip
+        visible={hoverVisible}
+        x={mousePosition.x}
+        y={mousePosition.y}
+      >
+        This variable name is likely invalid
+      </HoverTooltip>
       <MainContent>
         <FlexBareContainer>
           <SmallHeaderText>Problem</SmallHeaderText>
           <TopButtonsContainer>
-            <InvertedSmallButtonLink
-              onClick={() => onClick(newProblem)}
-              to="/problems/all"
+            <InvertedSmallButton
+              onClick={() => {
+                onClick(newProblem);
+                history.push('/problems/all', {
+                  locked: false,
+                });
+              }}
             >
               Back
-            </InvertedSmallButtonLink>
+            </InvertedSmallButton>
             <SmallButton
               onClick={() => onClick(newProblem)}
             >
@@ -421,6 +462,17 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       <SidebarContent>
         <SmallHeaderText>Options</SmallHeaderText>
         <SettingsContainer>
+          <ApprovalContainer
+            show={editMode}
+          >
+            <ToggleButton
+              onChangeFunction={() => handleApprovalChange(!newProblem.approval)}
+              checked={newProblem.approval}
+            />
+            <ApprovalText>
+              {newProblem.approval ? 'Approved' : 'Approval Pending'}
+            </ApprovalText>
+          </ApprovalContainer>
           <LowMarginMediumText>Difficulty</LowMarginMediumText>
           {Object.keys(Difficulty).map((key) => {
             const difficulty = Difficulty[key as keyof typeof Difficulty];
@@ -442,12 +494,21 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
           <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
           {newProblem.problemInputs.map((input, index) => (
-            <InputTypeContainer>
+            <InputTypeContainer key={generateRandomId()}>
               <TextInput
                 value={newProblem.problemInputs[index].name}
                 onChange={(e) => handleInputChange(index,
                   e.target.value, newProblem.problemInputs[index].type)}
               />
+
+              <InlineErrorIcon
+                show={!validIdentifier(newProblem.problemInputs[index].name)}
+                onMouseEnter={() => setHoverVisible(true)}
+                onMouseMove={mouseMoveHandler}
+                onMouseLeave={() => setHoverVisible(false)}
+              >
+                error_outline
+              </InlineErrorIcon>
 
               <PrimarySelect
                 onChange={(e) => handleInputChange(

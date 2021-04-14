@@ -250,7 +250,10 @@ public class RoomTests {
 
     @Test
     public void createAndJoinRoomUserAlreadyExists() throws Exception {
-        // POST request to create room and PUT request to join room should succeed
+        /**
+         * POST request to create room and PUT request to join room should fail
+         * because the room already has a user with the exact same information
+         */
         UserDto host = new UserDto();
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
@@ -299,7 +302,7 @@ public class RoomTests {
 
     @Test
     public void createAndJoinRoomNoUser() throws Exception {
-        // POST request to create room and PUT request to join room should succeed
+        // POST request to create room and PUT request to join room, without set user, should fail
         UserDto host = new UserDto();
         host.setNickname(NICKNAME);
         host.setUserId(USER_ID);
@@ -346,6 +349,49 @@ public class RoomTests {
     }
 
     @Test
+    public void createAndJoinFullRoom() throws Exception {
+        // 1. Create room with one user and PUT request to set size to 1
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+        RoomDto room = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
+
+        UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
+        updateRequest.setInitiator(host);
+        updateRequest.setSize(1);
+
+        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        room = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+
+        assertEquals(updateRequest.getSize(), room.getSize());
+
+        // Get id of created room to join
+        String roomId = room.getRoomId();
+
+        // 2. Send PUT request and verify that ALREADY_FULL exception was thrown
+        JoinRoomRequest joinRequest = new JoinRoomRequest();
+
+        ApiError ERROR = RoomError.ALREADY_FULL;
+
+        result = this.mockMvc.perform(put(String.format(PUT_ROOM_JOIN, roomId))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(joinRequest)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @Test
     public void updateRoomSettingsSuccess() throws Exception {
         UserDto host = new UserDto();
         host.setNickname(NICKNAME);
@@ -359,6 +405,7 @@ public class RoomTests {
         updateRequest.setDifficulty(ProblemDifficulty.EASY);
         updateRequest.setDuration(DURATION);
         updateRequest.setNumProblems(2);
+        updateRequest.setSize(6);
 
         MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -382,6 +429,38 @@ public class RoomTests {
         assertEquals(updateRequest.getDifficulty(), actual.getDifficulty());
         assertEquals(updateRequest.getDuration(), actual.getDuration());
         assertEquals(updateRequest.getNumProblems(), actual.getNumProblems());
+        assertEquals(updateRequest.getSize(), actual.getSize());
+    }
+
+    @Test
+    public void updateRoomSettingInvalidSize() throws Exception {
+        // 1. Create room with two users and PUT request to set size to 1
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        UserDto user = new UserDto();
+        user.setNickname(NICKNAME_2);
+        user.setUserId(USER_ID_2);
+
+        RoomDto room = RoomTestMethods.setUpRoomWithTwoUsers(mockMvc, host, user);
+
+        UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
+        updateRequest.setInitiator(host);
+        updateRequest.setSize(1);
+
+        ApiError ERROR = RoomError.BAD_ROOM_SIZE;
+
+        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual, actual.getType());
     }
 
     @Test

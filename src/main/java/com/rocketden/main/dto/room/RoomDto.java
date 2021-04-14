@@ -22,5 +22,6 @@ public class RoomDto {
     private ProblemDifficulty difficulty;
     private List<SelectableProblemDto> problems;
     private long duration;
+    private int size;
     private int numProblems;
 }

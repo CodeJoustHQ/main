@@ -34,8 +34,9 @@ public class Problem {
     // Auto-generate default business ID for each problem
     @EqualsAndHashCode.Include
     private String problemId = UUID.randomUUID().toString();
-
     private String name;
+    private Boolean approval = false;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 

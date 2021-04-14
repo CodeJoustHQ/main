@@ -9,10 +9,12 @@ import org.springframework.http.HttpStatus;
 public enum RoomError implements ApiError {
 
     BAD_SETTING(HttpStatus.BAD_REQUEST, "An invalid room setting was provided."),
+    BAD_ROOM_SIZE(HttpStatus.BAD_REQUEST, "An invalid room size was provided."),
     INACTIVE_USER(HttpStatus.BAD_REQUEST, "The specified user is inactive."),
     TOO_MANY_PROBLEMS(HttpStatus.BAD_REQUEST, "Please select fewer problems or increase the room's problem limit."),
     INVALID_PERMISSIONS(HttpStatus.FORBIDDEN, "You do not have permission to perform this action"),
     NO_HOST(HttpStatus.BAD_REQUEST, "There is no host provided."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "The specified user could not be found in the room."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "A room could not be found with the given id."),
     DUPLICATE_USERNAME(HttpStatus.CONFLICT, "A user with the nickname provided has already joined the room."),
     ALREADY_ACTIVE(HttpStatus.FORBIDDEN, "This room has already started; please wait for the host to play again."),

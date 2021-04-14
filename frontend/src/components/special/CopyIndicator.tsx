@@ -11,10 +11,11 @@ export const CopyIndicatorContainer = styled.div.attrs((props: CopyIndicator) =>
     transform: (!props.copied) ? 'translateY(-60px)' : null,
   },
 }))<CopyIndicator>`
-  position: absolute;
+  position: fixed;
   top: 20px;
   left: 50%;
   transition: transform 0.25s;
+  z-index: 5;
 `;
 
 export const BottomCopyIndicatorContainer = styled.div.attrs((props: CopyIndicator) => ({

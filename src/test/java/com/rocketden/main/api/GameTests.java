@@ -28,6 +28,7 @@ import com.rocketden.main.game_object.CodeLanguage;
 import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.game_object.NotificationType;
 import com.rocketden.main.model.User;
+import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.util.RoomTestMethods;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.model.problem.ProblemIOType;
@@ -85,6 +86,7 @@ public class GameTests {
     private static final String POST_SUBMISSION = "/api/v1/games/%s/submission";
     private static final String POST_NOTIFICATION = "/api/v1/games/%s/notification";
     private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
+    private static final String PUT_PROBLEM_EDIT = "/api/v1/problems/%s";
     private static final String POST_TEST_CASE_CREATE = "/api/v1/problems/%s/test-case";
 
     // Predefine user and room attributes.
@@ -102,7 +104,7 @@ public class GameTests {
 
     // Helper method to start the game for a given room
     private void startGameHelper(RoomDto room, UserDto host) throws Exception {
-        createSingleProblemAndTestCases();
+        createSingleApprovedProblemAndTestCases();
 
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(host);
@@ -131,7 +133,6 @@ public class GameTests {
         createProblemRequest.setName(NAME);
         createProblemRequest.setDescription(DESCRIPTION);
         createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
-
         List<ProblemInputDto> problemInputs = new ArrayList<>();
         ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
         problemInputs.add(problemInput);
@@ -152,7 +153,6 @@ public class GameTests {
         assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
         assertEquals(problemInputs, problemActual.getProblemInputs());
         assertEquals(IO_TYPE, problemActual.getOutputType());
-
         CreateTestCaseRequest createTestCaseRequest = new CreateTestCaseRequest();
         createTestCaseRequest.setInput(INPUT);
         createTestCaseRequest.setOutput(OUTPUT);
@@ -166,12 +166,36 @@ public class GameTests {
 
         String testCaseJsonResponse = testCaseResult.getResponse().getContentAsString();
         ProblemTestCaseDto testCaseActual = UtilityTestMethods.toObject(testCaseJsonResponse, ProblemTestCaseDto.class);
+        problemActual.setTestCases(Collections.singletonList(testCaseActual));
 
         assertEquals(INPUT, testCaseActual.getInput());
         assertEquals(OUTPUT, testCaseActual.getOutput());
         assertFalse(testCaseActual.isHidden());
-
         return problemActual;
+    }
+
+    /**
+     * Helper method that creates a problem with the approved boolean set to true.
+     *
+     * @return the created problem
+     * @throws Exception if anything wrong occurs
+     */
+    private ProblemDto createSingleApprovedProblemAndTestCases() throws Exception {
+        ProblemDto problemDto = createSingleProblemAndTestCases();
+        problemDto.setName(NAME);
+        problemDto.setApproval(true);
+
+        // Edit problem with new values
+        String endpoint = String.format(PUT_PROBLEM_EDIT, problemDto.getProblemId());
+        this.mockMvc.perform(put(endpoint)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(problemDto)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        assertTrue(problemDto.getApproval());
+
+        return problemDto;
     }
 
     @Test
@@ -194,7 +218,7 @@ public class GameTests {
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(roomDto.getHost());
 
-        createSingleProblemAndTestCases();
+        createSingleApprovedProblemAndTestCases();
 
         result = this.mockMvc.perform(post(String.format(START_GAME, roomDto.getRoomId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
