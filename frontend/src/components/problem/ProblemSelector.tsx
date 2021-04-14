@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { getProblems, SelectableProblem } from '../../api/Problem';
 import ErrorMessage from '../core/Error';
 import { displayNameFromDifficulty } from '../../api/Difficulty';
 import { DifficultyDisplayButton } from '../core/Button';
 import SelectedProblemsDisplay from './SelectedProblemsDisplay';
+
+type ProblemSelectorProps = {
+  onSelect: (problems: SelectableProblem[]) => void,
+};
 
 type ContentProps = {
   show: boolean,
@@ -38,7 +42,9 @@ const ProblemName = styled.p`
   font-weight: bold;
 `;
 
-function ProblemSelector() {
+function ProblemSelector(props: ProblemSelectorProps) {
+  const { onSelect } = props;
+
   const [error, setError] = useState('');
   const [problems, setProblems] = useState<SelectableProblem[]>([]);
   const [showProblems, setShowProblems] = useState(false);
@@ -54,15 +60,17 @@ function ProblemSelector() {
   }, []);
 
   const toggleSelectedStatus = (index: number) => {
-    setProblems(problems.map((problem, i) => {
+    const newProblems = problems.map((problem, i) => {
       if (index === i) {
         return { ...problem, selected: !problem.selected };
       }
       return problem;
-    }));
-  };
+    });
 
-  const getSelectedProblems = () => problems.filter((problem) => Boolean(problem.selected));
+    setProblems(newProblems);
+
+    onSelect(newProblems.filter((problem) => problem.selected));
+  };
 
   return (
     <div>
@@ -87,7 +95,7 @@ function ProblemSelector() {
           </InlineProblem>
         ))}
       </InnerContent>
-      <SelectedProblemsDisplay problems={getSelectedProblems()} />
+      <SelectedProblemsDisplay problems={problems.filter((problem) => problem.selected)} />
 
       { error ? <ErrorMessage message={error} /> : null }
     </div>

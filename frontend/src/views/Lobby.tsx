@@ -338,6 +338,32 @@ function LobbyPage() {
       });
   };
 
+  /**
+   * Update the list of selected problems
+   */
+  const updateSelectedProblems = (newProblems: SelectableProblem[]) => {
+    setError('');
+    setLoading(true);
+
+    const prevProblems = selectedProblems;
+    setSelectedProblems(newProblems);
+
+    const settings = {
+      initiator: currentUser!,
+      problems: newProblems,
+    };
+
+    console.log(newProblems);
+
+    updateRoomSettings(currentRoomId, settings)
+      .then(() => setLoading(false))
+      .catch((err) => {
+        setLoading(false);
+        setError(err.message);
+        setSelectedProblems(prevProblems);
+      });
+  };
+
   const onSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
@@ -653,7 +679,7 @@ function LobbyPage() {
             <NoMarginMediumText>Or Choose Problem:</NoMarginMediumText>
 
             {isHost(currentUser)
-              ? <ProblemSelector />
+              ? <ProblemSelector onSelect={updateSelectedProblems} />
               : <SelectedProblemsDisplay problems={selectedProblems} />}
 
             <NoMarginMediumText>Duration</NoMarginMediumText>
