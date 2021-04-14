@@ -143,7 +143,7 @@ function LobbyPage() {
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [duration, setDuration] = useState<number | undefined>(15);
   const [size, setSize] = useState<number | undefined>(10);
-  const [numProblems, setNumProblems] = useState<number | undefined>(1);
+  const [numProblems, setNumProblems] = useState<number>(1);
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
 
@@ -389,7 +389,7 @@ function LobbyPage() {
   };
 
   const updateNumProblems = () => {
-    setError('')
+    setError('');
     setLoading(true);
     const prevNumProblems = numProblems;
     const settings = {
@@ -757,16 +757,9 @@ function LobbyPage() {
                   value={numProblems}
                   disabled={!isHost(currentUser)}
                   onChange={(e) => {
-                    const { value } = e.target;
-
-                    // Set numProblems to undefined to allow users to clear field
-                    if (!value) {
-                      setNumProblems(undefined);
-                    } else {
-                      const newNumProblems = Number(value);
-                      if (newNumProblems >= 1 && newNumProblems <= 10) {
-                        setNumProblems(newNumProblems);
-                      }
+                    const newNumProblems = Number(e.target);
+                    if (newNumProblems >= 1 && newNumProblems <= 10) {
+                      setNumProblems(newNumProblems);
                     }
                   }}
                   onMouseUp={updateNumProblems}
