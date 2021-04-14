@@ -154,7 +154,6 @@ public class GameManagementService {
             for (Problem problem : otherProblems) {
                 if (!problems.contains(problem) && problems.size() < room.getNumProblems()) {
                     problems.add(problem);
-                    break;
                 }
             }
         }
