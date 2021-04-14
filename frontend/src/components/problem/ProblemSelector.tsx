@@ -4,6 +4,7 @@ import { getProblems, SelectableProblem } from '../../api/Problem';
 import ErrorMessage from '../core/Error';
 import { displayNameFromDifficulty } from '../../api/Difficulty';
 import { DifficultyDisplayButton } from '../core/Button';
+import SelectedProblemsDisplay from './SelectedProblemsDisplay';
 
 type ContentProps = {
   show: boolean,
@@ -61,6 +62,8 @@ function ProblemSelector() {
     }));
   };
 
+  const getSelectedProblems = () => problems.filter((problem) => Boolean(problem.selected));
+
   return (
     <div>
       <button onClick={() => setShowProblems(!showProblems)}>Select a problem...</button>
@@ -84,6 +87,7 @@ function ProblemSelector() {
           </InlineProblem>
         ))}
       </InnerContent>
+      <SelectedProblemsDisplay problems={getSelectedProblems()} />
 
       { error ? <ErrorMessage message={error} /> : null }
     </div>

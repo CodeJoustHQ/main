@@ -42,7 +42,8 @@ import { Slider, SliderContainer } from '../components/core/RangeSlider';
 import { Coordinate } from '../components/special/FloatingCircle';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
 import { SelectableProblem } from '../api/Problem';
-import ProblemSelector from '../components/special/ProblemSelector';
+import ProblemSelector from '../components/problem/ProblemSelector';
+import SelectedProblemsDisplay from '../components/problem/SelectedProblemsDisplay';
 
 type LobbyPageLocation = {
   user: User,
@@ -109,15 +110,6 @@ const HoverElementPrimaryButton = styled(HoverElement)`
 
 const HoverContainerSmallDifficultyButton = styled(HoverContainer)`
   margin: 0.5rem 1rem 0 0;
-`;
-
-const HoverContainerSelector = styled(HoverContainer)`
-  margin: 0.5rem 1rem 0 0;
-`;
-
-const HoverElementSelector = styled(HoverElement)`
-  width: 5rem;
-  height: 2rem;
 `;
 
 const HoverElementSmallDifficultyButton = styled(HoverElement)`
@@ -659,11 +651,10 @@ function LobbyPage() {
             </DifficultyContainer>
 
             <NoMarginMediumText>Or Choose Problem:</NoMarginMediumText>
-            <HoverContainerSelector>
-              <HoverElementSelector {...hoverProps} />
 
-              <ProblemSelector />
-            </HoverContainerSelector>
+            {isHost(currentUser)
+              ? <ProblemSelector />
+              : <SelectedProblemsDisplay problems={selectedProblems} />}
 
             <NoMarginMediumText>Duration</NoMarginMediumText>
             <NoMarginSubtitleText>
