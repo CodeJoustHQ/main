@@ -31,6 +31,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
@@ -91,6 +92,25 @@ public class ProblemServiceTests {
 
         verify(repository).findProblemByProblemId("ZZZ");
         assertEquals(ProblemError.NOT_FOUND, exception.getError());
+    }
+
+
+    @Test
+    public void getProblemEntitySuccess() {
+        Problem expected = new Problem();
+        expected.setName(NAME);
+        expected.setDescription(DESCRIPTION);
+
+        Mockito.doReturn(expected).when(repository).findProblemByProblemId(expected.getProblemId());
+
+        Problem response = problemService.getProblemEntity(expected.getProblemId());
+        assertEquals(expected, response);
+    }
+
+    @Test
+    public void getProblemEntityNotFound() {
+        Problem response = problemService.getProblemEntity("abc");
+        assertNull(response);
     }
 
     @Test
@@ -324,10 +344,10 @@ public class ProblemServiceTests {
         List<Problem> problems = Collections.singletonList(problem1);
         Mockito.doReturn(problems).when(repository).findAllByApproval(true);
 
-        // Return correct problem when selecting random difficulty
-        List<Problem> response = problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 3);
-        assertEquals(1, response.size());
-        assertEquals(problem1.getProblemId(), response.get(0).getProblemId());
+        ApiException exception = assertThrows(ApiException.class, () ->
+                problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 3));
+
+        assertEquals(ProblemError.NOT_ENOUGH_FOUND, exception.getError());
     }
 
     @Test
@@ -375,7 +395,7 @@ public class ProblemServiceTests {
         ApiException exception = assertThrows(ApiException.class, () ->
                 problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 1));
 
-        assertEquals(ProblemError.NOT_FOUND, exception.getError());
+        assertEquals(ProblemError.NOT_ENOUGH_FOUND, exception.getError());
     }
 
     @Test

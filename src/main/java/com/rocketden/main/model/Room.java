@@ -1,6 +1,7 @@
 package com.rocketden.main.model;
 
 import com.rocketden.main.game_object.GameTimer;
+import com.rocketden.main.model.problem.Problem;
 import com.rocketden.main.model.problem.ProblemDifficulty;
 import com.rocketden.main.service.RoomService;
 
@@ -17,6 +18,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -61,6 +63,10 @@ public class Room {
     private Integer numProblems = 1;
 
     private Integer size = 10;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "selectable_problem_id")
+    private List<Problem> problems = new ArrayList<>();
 
     public void addUser(User user) {
         users.add(user);

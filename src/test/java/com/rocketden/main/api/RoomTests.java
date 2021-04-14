@@ -1,5 +1,6 @@
 package com.rocketden.main.api;
 
+import com.rocketden.main.dto.problem.SelectableProblemDto;
 import com.rocketden.main.dto.room.CreateRoomRequest;
 import com.rocketden.main.dto.room.DeleteRoomRequest;
 import com.rocketden.main.dto.room.JoinRoomRequest;
@@ -14,6 +15,7 @@ import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.util.ProblemTestMethods;
 import com.rocketden.main.util.RoomTestMethods;
 import com.rocketden.main.util.UtilityTestMethods;
 
@@ -29,6 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -37,6 +41,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
@@ -141,6 +147,7 @@ public class RoomTests {
         assertEquals(expected.getHost(), actual.getHost());
         assertEquals(expected.getUsers(), actual.getUsers());
         assertEquals(ProblemDifficulty.RANDOM, actual.getDifficulty());
+        assertEquals(0, actual.getProblems().size());
 
         // Send GET request to validate that room exists
         String roomId = actual.getRoomId();
@@ -157,6 +164,7 @@ public class RoomTests {
         assertEquals(expected.getHost(), actualGet.getHost());
         assertEquals(expected.getUsers(), actualGet.getUsers());
         assertEquals(ProblemDifficulty.RANDOM, actual.getDifficulty());
+        assertEquals(0, actual.getProblems().size());
     }
 
     @Test
@@ -456,6 +464,89 @@ public class RoomTests {
     }
 
     @Test
+    public void updateRoomSettingsProblems() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        RoomDto room = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
+        String problemId1 = ProblemTestMethods.createSingleProblem(this.mockMvc).getProblemId();
+        String problemId2 = ProblemTestMethods.createSingleProblem(this.mockMvc).getProblemId();
+
+        SelectableProblemDto problemDto1 = new SelectableProblemDto();
+        problemDto1.setProblemId(problemId1);
+        SelectableProblemDto problemDto2 = new SelectableProblemDto();
+        problemDto2.setProblemId(problemId2);
+
+        UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
+        updateRequest.setInitiator(host);
+        updateRequest.setNumProblems(2);
+        updateRequest.setProblems(Arrays.asList(problemDto1, problemDto2));
+
+        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        room = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+
+        assertEquals(2, room.getNumProblems());
+        assertEquals(2, room.getProblems().size());
+        assertEquals(problemDto1.getProblemId(), room.getProblems().get(0).getProblemId());
+        assertEquals(problemDto1.getProblemId(), room.getProblems().get(0).getProblemId());
+        assertNotNull(room.getProblems().get(0).getName());
+        assertNotNull(room.getProblems().get(0).getDifficulty());
+
+        // Clear problems list
+        updateRequest.setNumProblems(1);
+        updateRequest.setProblems(new ArrayList<>());
+
+        result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+
+        jsonResponse = result.getResponse().getContentAsString();
+        room = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+
+        assertEquals(1, room.getNumProblems());
+        assertTrue(room.getProblems().isEmpty());
+    }
+
+    @Test
+    public void updateRoomSettingsProblemNotFound() throws Exception {
+        UserDto host = new UserDto();
+        host.setNickname(NICKNAME);
+        host.setUserId(USER_ID);
+
+        RoomDto room = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
+
+        SelectableProblemDto problemDto = new SelectableProblemDto();
+        problemDto.setProblemId("random-string");
+
+        UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
+        updateRequest.setInitiator(host);
+        updateRequest.setNumProblems(2);
+        updateRequest.setProblems(Collections.singletonList(problemDto));
+
+        ApiError ERROR = ProblemError.NOT_FOUND;
+
+        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
+                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+
+        assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @Test
     public void updateRoomSettingsNullValue() throws Exception {
         UserDto host = new UserDto();
         host.setNickname(NICKNAME);
@@ -477,6 +568,7 @@ public class RoomTests {
 
         // Difficulty remains unchanged from default
         assertEquals(ProblemDifficulty.RANDOM, room.getDifficulty());
+        assertEquals(0, room.getProblems().size());
         assertEquals(GameTimer.DURATION_15, room.getDuration());
         assertEquals(1, room.getNumProblems());
     }

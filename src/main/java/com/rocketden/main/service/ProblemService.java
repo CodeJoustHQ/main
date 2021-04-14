@@ -91,6 +91,11 @@ public class ProblemService {
         return ProblemMapper.toDto(problem);
     }
 
+    // Method used by game management service to fetch specific problem
+    public Problem getProblemEntity(String problemId) {
+        return repository.findProblemByProblemId(problemId);
+    }
+
     public ProblemDto editProblem(String problemId, ProblemDto updatedProblem) {
         Problem problem = repository.findProblemByProblemId(problemId);
 
@@ -194,13 +199,13 @@ public class ProblemService {
             problems = repository.findAllByDifficultyAndApproval(difficulty, true);
         }
 
-        if (problems == null || problems.isEmpty()) {
-            throw new ApiException(ProblemError.NOT_FOUND);
+        if (problems == null) {
+            throw new ApiException(ProblemError.INTERNAL_ERROR);
         }
 
-        // If the user wants more problems than exists, just return all of them
+        // If the user wants more problems than exists, throw an error
         if (numProblems > problems.size()) {
-            return problems;
+            throw new ApiException(ProblemError.NOT_ENOUGH_FOUND);
         }
 
         // Get numProblem random integers used to map to problems.
@@ -219,7 +224,6 @@ public class ProblemService {
     }
 
     public ProblemTestCaseDto createTestCase(String problemId, CreateTestCaseRequest request) {
-
         Problem problem = repository.findProblemByProblemId(problemId);
         if (problem == null) {
             throw new ApiException(ProblemError.NOT_FOUND);
