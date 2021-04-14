@@ -1,6 +1,5 @@
 package com.rocketden.main.api;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -97,73 +96,6 @@ class ProblemTests {
         "\tdef solve(nums):",
         "\t\t"
     ).replaceAll("\t", "    ");
-
-    /**
-     * Helper method that sends a POST request to create a new problem
-     * @return the created problem
-     * @throws Exception if anything wrong occurs
-     */
-    private ProblemDto createSingleProblem() throws Exception {
-        CreateProblemRequest createProblemRequest = new CreateProblemRequest();
-        createProblemRequest.setName(NAME);
-        createProblemRequest.setDescription(DESCRIPTION);
-        createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
-        List<ProblemInputDto> problemInputs = new ArrayList<>();
-        ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
-        problemInputs.add(problemInput);
-        createProblemRequest.setProblemInputs(problemInputs);
-        createProblemRequest.setOutputType(IO_TYPE);
-
-        MvcResult problemResult = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(createProblemRequest)))
-                .andDo(print()).andExpect(status().isCreated())
-                .andReturn();
-
-        String problemJsonResponse = problemResult.getResponse().getContentAsString();
-        ProblemDto problemActual = UtilityTestMethods.toObject(problemJsonResponse, ProblemDto.class);
-
-        assertEquals(NAME, problemActual.getName());
-        assertEquals(DESCRIPTION, problemActual.getDescription());
-        assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
-        assertEquals(problemInputs, problemActual.getProblemInputs());
-        assertEquals(IO_TYPE, problemActual.getOutputType());
-
-        return problemActual;
-    }
-
-    /**
-     * Helper method that creates a problem with the approved boolean set to true.
-     *
-     * @return the problem with approval set to true
-     * @throws Exception if anything wrong occurs
-     */
-    private ProblemDto createSingleApprovedProblem() throws Exception {
-        ProblemDto problemDto = createSingleProblem();
-        problemDto.setOutputType(ProblemIOType.CHARACTER);
-        problemDto.setName(NAME_2);
-        problemDto.setApproval(true);
-
-        ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
-        testCaseDto.setInput(INPUT);
-        testCaseDto.setOutput("a");
-        problemDto.setTestCases(Collections.singletonList(testCaseDto));
-
-        // Edit problem with new values
-        String endpoint = String.format(PUT_PROBLEM_EDIT, problemDto.getProblemId());
-        MvcResult problemResult = this.mockMvc.perform(put(endpoint)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(problemDto)))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
-
-        String problemJsonResponse = problemResult.getResponse().getContentAsString();
-        ProblemDto problemActual = UtilityTestMethods.toObject(problemJsonResponse, ProblemDto.class);
-
-        assertTrue(problemActual.getApproval());
-
-        return problemActual;
-    }
 
     @Test
     public void getProblemNonExistent() throws Exception {
@@ -322,7 +254,7 @@ class ProblemTests {
     @ParameterizedTest
     @ValueSource(strings = {"finally", "void", "throw", "EP<>", "new"})
     public void editProblemInvalidIdentifier(String inputName) throws Exception {
-        ProblemDto problemDto = createSingleProblem();
+        ProblemDto problemDto = ProblemTestMethods.createSingleProblem(this.mockMvc);
 
         List<ProblemInputDto> problemInputs = new ArrayList<>();
         ProblemInputDto problemInput = new ProblemInputDto();
@@ -604,7 +536,7 @@ class ProblemTests {
 
     @Test
     public void getRandomProblemSuccess() throws Exception {
-        ProblemDto problem = createSingleApprovedProblem();
+        ProblemDto problem = ProblemTestMethods.createSingleApprovedProblemAndTestCases(this.mockMvc);
 
         MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_RANDOM)
                 .param(DIFFICULTY_KEY, "EASY")
