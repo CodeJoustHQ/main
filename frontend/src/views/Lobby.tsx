@@ -341,19 +341,18 @@ function LobbyPage() {
   /**
    * Update the list of selected problems
    */
-  const updateSelectedProblems = (newProblems: SelectableProblem[]) => {
+  const updateSelectedProblems = (newProblem: SelectableProblem) => {
     setError('');
     setLoading(true);
 
     const prevProblems = selectedProblems;
+    const newProblems = [...prevProblems, newProblem];
     setSelectedProblems(newProblems);
 
     const settings = {
       initiator: currentUser!,
       problems: newProblems,
     };
-
-    console.log(newProblems);
 
     updateRoomSettings(currentRoomId, settings)
       .then(() => setLoading(false))
@@ -676,11 +675,18 @@ function LobbyPage() {
               })}
             </DifficultyContainer>
 
-            <NoMarginMediumText>Or Choose Problem:</NoMarginMediumText>
+            <NoMarginMediumText>Or Choose Problems:</NoMarginMediumText>
+            {isHost(currentUser) ? (
+              <ProblemSelector
+                selectedProblems={selectedProblems}
+                onSelect={updateSelectedProblems}
+              />
+            ) : null}
 
-            {isHost(currentUser)
-              ? <ProblemSelector onSelect={updateSelectedProblems} />
-              : <SelectedProblemsDisplay problems={selectedProblems} />}
+            <SelectedProblemsDisplay
+              problems={selectedProblems}
+              onRemove={isHost(currentUser) ? () => null : null}
+            />
 
             <NoMarginMediumText>Duration</NoMarginMediumText>
             <NoMarginSubtitleText>
