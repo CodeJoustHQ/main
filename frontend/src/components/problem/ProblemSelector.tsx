@@ -76,7 +76,7 @@ function ProblemSelector(props: ProblemSelectorProps) {
   }, [ref]);
 
   useEffect(() => {
-    getProblems()
+    getProblems(true)
       .then((res) => {
         setProblems(res);
       })
@@ -99,7 +99,7 @@ function ProblemSelector(props: ProblemSelectorProps) {
       <ProblemSearch
         onClick={() => setShowProblems(!showProblems)}
         onChange={setSearchStatus}
-        placeholder="Select problems..."
+        placeholder={problems.length ? 'Select problems (optional)' : 'Loading...'}
       />
 
       <InnerContent show={showProblems} ref={ref}>

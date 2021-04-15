@@ -13,24 +13,27 @@ const Content = styled.div`
   margin: 5px 0;
 `;
 
-const ProblemName = styled.p`
-  font-weight: bold;
-  display: inline;
-  margin: 0 10px;
-`;
-
 const ProblemDisplay = styled.div`
   display: inline-block;
-  padding: 5px 10px;
+  padding: 5px;
   margin: 5px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);
   background-color: ${({ theme }) => theme.colors.white};
   border-radius: 5px;
 `;
 
+const ProblemName = styled.p`
+  font-weight: bold;
+  display: inline;
+  margin: 0 10px;
+`;
+
 const RemoveText = styled.p`
   display: inline;
-  margin: 5px 10px;
+  padding: 5px;
+  margin: 0 5px;
+  color: ${({ theme }) => theme.colors.gray};
+  line-height: 100%;
 
   &:hover {
     cursor: pointer;
@@ -54,7 +57,7 @@ function SelectedProblemsDisplay(props: SelectedProblemsDisplayProps) {
           >
             {displayNameFromDifficulty(problem.difficulty)}
           </InlineDifficultyDisplayButton>
-          {onRemove ? <RemoveText onClick={() => onRemove(index)}>X</RemoveText> : null}
+          {onRemove ? <RemoveText onClick={() => onRemove(index)}>✕</RemoveText> : null}
         </ProblemDisplay>
       ))}
     </Content>

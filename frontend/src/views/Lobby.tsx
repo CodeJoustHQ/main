@@ -680,7 +680,7 @@ function LobbyPage() {
               })}
             </DifficultyContainer>
 
-            <NoMarginMediumText>Or Choose Problems:</NoMarginMediumText>
+            <NoMarginMediumText>Select Problems</NoMarginMediumText>
             <SelectedProblemsDisplay
               problems={selectedProblems}
               onRemove={isHost(currentUser) ? removeProblem : null}

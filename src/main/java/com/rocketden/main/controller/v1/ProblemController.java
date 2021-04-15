@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -62,8 +63,8 @@ public class ProblemController extends BaseRestController {
     }
 
     @GetMapping("/problems")
-    public ResponseEntity<List<ProblemDto>> getAllProblems() {
-        return new ResponseEntity<>(service.getAllProblems(), HttpStatus.OK);
+    public ResponseEntity<List<ProblemDto>> getAllProblems(@RequestParam(required = false) Boolean approved) {
+        return new ResponseEntity<>(service.getAllProblems(approved), HttpStatus.OK);
     }
 
     // Note: Since this GET request takes query parameters, the difficulty to enum
