@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { SelectableProblem } from '../../api/Problem';
-import { DifficultyDisplayButton } from '../core/Button';
+import { InlineDifficultyDisplayButton } from '../core/Button';
 import { displayNameFromDifficulty } from '../../api/Difficulty';
 
 type SelectedProblemsDisplayProps = {
@@ -10,7 +10,7 @@ type SelectedProblemsDisplayProps = {
 }
 
 const Content = styled.div`
-
+  margin: 5px 0;
 `;
 
 const ProblemName = styled.p`
@@ -22,6 +22,7 @@ const ProblemName = styled.p`
 const ProblemDisplay = styled.div`
   display: inline-block;
   padding: 5px 10px;
+  margin: 5px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);
   background-color: ${({ theme }) => theme.colors.white};
   border-radius: 5px;
@@ -46,13 +47,13 @@ function SelectedProblemsDisplay(props: SelectedProblemsDisplayProps) {
           <ProblemName>
             {problem.name}
           </ProblemName>
-          <DifficultyDisplayButton
+          <InlineDifficultyDisplayButton
             difficulty={problem.difficulty}
             enabled={false}
             active
           >
             {displayNameFromDifficulty(problem.difficulty)}
-          </DifficultyDisplayButton>
+          </InlineDifficultyDisplayButton>
           {onRemove ? <RemoveText onClick={() => onRemove(index)}>X</RemoveText> : null}
         </ProblemDisplay>
       ))}

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { getProblems, SelectableProblem } from '../../api/Problem';
 import ErrorMessage from '../core/Error';
 import { displayNameFromDifficulty } from '../../api/Difficulty';
-import { DifficultyDisplayButton } from '../core/Button';
+import { InlineDifficultyDisplayButton } from '../core/Button';
 import { TextInput } from '../core/Input';
 
 type ProblemSelectorProps = {
@@ -15,32 +15,42 @@ type ContentProps = {
   show: boolean,
 };
 
+const Content = styled.div`
+  width: 50%;
+  min-width: 250px;
+  margin: 10px 0;
+`;
+
 const InnerContent = styled.div<ContentProps>`
+  width: 100%;
   display: ${({ show }) => (show ? 'block' : 'none')};
   border-radius: 5px;
+  border: solid 1px ${({ theme }) => theme.colors.border};
 `;
 
 const InlineProblem = styled.div`
-  width: 300px;
-  height: 50px;
+  width: 100%;
+  padding: 5px;
   display: flex;
   flex: auto;
   justify-content: space-between;
-  
-  border: solid 1px ${({ theme }) => theme.colors.gray};
-  
+  box-sizing: border-box;
+  border-bottom: solid 1px ${({ theme }) => theme.colors.background};
+
   &:hover {
     cursor: pointer;
-    background-color: ${({ theme }) => theme.colors.gray};
+    background-color: ${({ theme }) => theme.colors.background};
   }
 `;
 
 const ProblemSearch = styled(TextInput)`
-  ;
+  width: 100%;
+  margin: 0;
 `;
 
 const ProblemName = styled.p`
   font-weight: bold;
+  margin: 0;
 `;
 
 function ProblemSelector(props: ProblemSelectorProps) {
@@ -85,8 +95,13 @@ function ProblemSelector(props: ProblemSelectorProps) {
   };
 
   return (
-    <div>
-      <ProblemSearch onClick={() => setShowProblems(!showProblems)} onChange={setSearchStatus} />
+    <Content>
+      <ProblemSearch
+        onClick={() => setShowProblems(!showProblems)}
+        onChange={setSearchStatus}
+        placeholder="Select problems..."
+      />
+
       <InnerContent show={showProblems} ref={ref}>
         {problems.map((problem, index) => {
           // Only show problems that haven't been selected yet
@@ -106,20 +121,20 @@ function ProblemSelector(props: ProblemSelectorProps) {
               <ProblemName>
                 {problem.name}
               </ProblemName>
-              <DifficultyDisplayButton
+              <InlineDifficultyDisplayButton
                 difficulty={problem.difficulty}
                 enabled={false}
                 active
               >
                 {displayNameFromDifficulty(problem.difficulty)}
-              </DifficultyDisplayButton>
+              </InlineDifficultyDisplayButton>
             </InlineProblem>
           );
         })}
       </InnerContent>
 
       { error ? <ErrorMessage message={error} /> : null }
-    </div>
+    </Content>
   );
 }
 

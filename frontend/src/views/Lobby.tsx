@@ -681,17 +681,16 @@ function LobbyPage() {
             </DifficultyContainer>
 
             <NoMarginMediumText>Or Choose Problems:</NoMarginMediumText>
+            <SelectedProblemsDisplay
+              problems={selectedProblems}
+              onRemove={isHost(currentUser) ? removeProblem : null}
+            />
             {isHost(currentUser) ? (
               <ProblemSelector
                 selectedProblems={selectedProblems}
                 onSelect={updateSelectedProblems}
               />
             ) : null}
-
-            <SelectedProblemsDisplay
-              problems={selectedProblems}
-              onRemove={isHost(currentUser) ? removeProblem : null}
-            />
 
             <NoMarginMediumText>Duration</NoMarginMediumText>
             <NoMarginSubtitleText>

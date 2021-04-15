@@ -44,6 +44,7 @@ import {
 } from '../components/special/CopyIndicator';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
+  margin-top: 15px;
   padding: 0;
   
   p {

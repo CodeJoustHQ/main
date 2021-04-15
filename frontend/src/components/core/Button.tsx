@@ -117,12 +117,17 @@ export const DifficultyDisplayButton = styled(SmallDifficultyButton)`
   width: unset;
   padding: 2px 15px;
   height: 1.75rem;
-  margin: 0 0 15px 0;
+  margin: 0;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);
   
   &:hover {
     box-shadow: 0 1px 6px rgba(0, 0, 0, 0.24);
   }
+`;
+
+export const InlineDifficultyDisplayButton = styled(DifficultyDisplayButton)`
+  padding: 1px 10px;
+  height: 1.6rem;
 `;
 
 export const SmallDifficultyButtonNoMargin = styled(SmallDifficultyButton)`
