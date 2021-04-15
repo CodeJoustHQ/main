@@ -27,12 +27,21 @@ const ProblemDisplay = styled.div`
   border-radius: 5px;
 `;
 
+const RemoveText = styled.p`
+  display: inline;
+  margin: 5px 10px;
+
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
 function SelectedProblemsDisplay(props: SelectedProblemsDisplayProps) {
   const { problems, onRemove } = props;
 
   return (
     <Content>
-      {problems.map((problem) => (
+      {problems.map((problem, index) => (
         <ProblemDisplay key={problem.problemId}>
           <ProblemName>
             {problem.name}
@@ -44,6 +53,7 @@ function SelectedProblemsDisplay(props: SelectedProblemsDisplayProps) {
           >
             {displayNameFromDifficulty(problem.difficulty)}
           </DifficultyDisplayButton>
+          {onRemove ? <RemoveText onClick={() => onRemove(index)}>X</RemoveText> : null}
         </ProblemDisplay>
       ))}
     </Content>

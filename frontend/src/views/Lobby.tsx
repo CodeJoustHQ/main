@@ -363,6 +363,11 @@ function LobbyPage() {
       });
   };
 
+  const removeProblem = (index: number) => {
+    const newProblems = selectedProblems.filter((_, i) => i !== index);
+    setSelectedProblems(newProblems);
+  };
+
   const onSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
@@ -685,7 +690,7 @@ function LobbyPage() {
 
             <SelectedProblemsDisplay
               problems={selectedProblems}
-              onRemove={isHost(currentUser) ? () => null : null}
+              onRemove={isHost(currentUser) ? removeProblem : null}
             />
 
             <NoMarginMediumText>Duration</NoMarginMediumText>
