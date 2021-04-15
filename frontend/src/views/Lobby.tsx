@@ -341,12 +341,11 @@ function LobbyPage() {
   /**
    * Update the list of selected problems
    */
-  const updateSelectedProblems = (newProblem: SelectableProblem) => {
+  const updateSelectedProblems = (newProblems: SelectableProblem[]) => {
     setError('');
     setLoading(true);
 
     const prevProblems = selectedProblems;
-    const newProblems = [...prevProblems, newProblem];
     setSelectedProblems(newProblems);
 
     const settings = {
@@ -363,9 +362,14 @@ function LobbyPage() {
       });
   };
 
+  const addProblem = (newProblem: SelectableProblem) => {
+    const newProblems = [...selectedProblems, newProblem];
+    updateSelectedProblems(newProblems);
+  };
+
   const removeProblem = (index: number) => {
     const newProblems = selectedProblems.filter((_, i) => i !== index);
-    setSelectedProblems(newProblems);
+    updateSelectedProblems(newProblems);
   };
 
   const onSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -680,7 +684,7 @@ function LobbyPage() {
               })}
             </DifficultyContainer>
 
-            <NoMarginMediumText>Select Problems</NoMarginMediumText>
+            <NoMarginMediumText>Selected Problems</NoMarginMediumText>
             <SelectedProblemsDisplay
               problems={selectedProblems}
               onRemove={isHost(currentUser) ? removeProblem : null}
@@ -688,7 +692,7 @@ function LobbyPage() {
             {isHost(currentUser) ? (
               <ProblemSelector
                 selectedProblems={selectedProblems}
-                onSelect={updateSelectedProblems}
+                onSelect={addProblem}
               />
             ) : null}
 

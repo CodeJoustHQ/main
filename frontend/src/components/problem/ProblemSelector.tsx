@@ -16,21 +16,24 @@ type ContentProps = {
 };
 
 const Content = styled.div`
-  width: 50%;
+  width: 65%;
   min-width: 250px;
   margin: 10px 0;
 `;
 
 const InnerContent = styled.div<ContentProps>`
   width: 100%;
+  max-height: 200px;
+  overflow-y: scroll;
   display: ${({ show }) => (show ? 'block' : 'none')};
   border-radius: 5px;
-  border: solid 1px ${({ theme }) => theme.colors.border};
+  //border: solid 1px ${({ theme }) => theme.colors.border};
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);
 `;
 
 const InlineProblem = styled.div`
   width: 100%;
-  padding: 5px;
+  padding: 8px 15px;
   display: flex;
   flex: auto;
   justify-content: space-between;

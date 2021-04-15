@@ -60,6 +60,8 @@ function SelectedProblemsDisplay(props: SelectedProblemsDisplayProps) {
           {onRemove ? <RemoveText onClick={() => onRemove(index)}>✕</RemoveText> : null}
         </ProblemDisplay>
       ))}
+
+      { !problems.length ? <p>Selected problems will show here.</p> : null }
     </Content>
   );
 }
