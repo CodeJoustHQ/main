@@ -35,7 +35,7 @@ function ContactUsPage() {
           {' '}
           or our
           {' '}
-          <InlineExternalLink href="https://trello.com/b/jb0SgY1b/sprint-board" target="_blank">public roadmap on Trello</InlineExternalLink>
+          <InlineExternalLink href="https://trello.com/b/jb0SgY1b/engineering-sprint-board" target="_blank">public roadmap on Trello</InlineExternalLink>
           .
         </ContactHeaderText>
         <ContactHeaderText>
