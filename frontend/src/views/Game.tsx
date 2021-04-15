@@ -180,7 +180,6 @@ function GamePage() {
 
       setDefaultCodeList(result);
     }).catch((err) => {
-      console.log('This error is thrown');
       setError(err.message);
     });
   }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage]);
