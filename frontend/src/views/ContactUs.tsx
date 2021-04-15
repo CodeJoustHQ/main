@@ -31,7 +31,7 @@ function ContactUsPage() {
         <ContactHeaderText>
           You can follow our progress on our
           {' '}
-          <InlineExternalLink href="https://github.com/rocketden" target="_blank">GitHub</InlineExternalLink>
+          <InlineExternalLink href="https://github.com/codejousthq" target="_blank">GitHub</InlineExternalLink>
           {' '}
           or our
           {' '}
