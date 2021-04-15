@@ -15,7 +15,6 @@ import com.codejoust.main.game_object.Player;
 import com.codejoust.main.game_object.PlayerCode;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
-import com.codejoust.main.service.LiveGameService;
 
 @ExtendWith(MockitoExtension.class)
 public class LiveGameServiceTests {

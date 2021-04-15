@@ -91,6 +91,11 @@ public class ProblemService {
         return ProblemMapper.toDto(problem);
     }
 
+    // Method used by game management service to fetch specific problem
+    public Problem getProblemEntity(String problemId) {
+        return repository.findProblemByProblemId(problemId);
+    }
+
     public ProblemDto editProblem(String problemId, ProblemDto updatedProblem) {
         Problem problem = repository.findProblemByProblemId(problemId);
 
@@ -105,8 +110,13 @@ public class ProblemService {
                 || updatedProblem.getDifficulty() == null
                 || updatedProblem.getProblemInputs() == null
                 || updatedProblem.getTestCases() == null
-                || updatedProblem.getOutputType() == null) {
+                || updatedProblem.getOutputType() == null
+                || updatedProblem.getApproval() == null) {
             throw new ApiException(ProblemError.EMPTY_FIELD);
+        }
+
+        if (updatedProblem.getApproval() && updatedProblem.getTestCases().size() == 0) {
+            throw new ApiException(ProblemError.BAD_APPROVAL);
         }
 
         if (updatedProblem.getDifficulty() == ProblemDifficulty.RANDOM) {
@@ -117,6 +127,7 @@ public class ProblemService {
         problem.setDescription(updatedProblem.getDescription());
         problem.setDifficulty(updatedProblem.getDifficulty());
         problem.setOutputType(updatedProblem.getOutputType());
+        problem.setApproval(updatedProblem.getApproval());
 
         problem.getProblemInputs().clear();
         for (ProblemInputDto problemInput : updatedProblem.getProblemInputs()) {
@@ -177,24 +188,24 @@ public class ProblemService {
             throw new ApiException(ProblemError.EMPTY_FIELD);
         }
 
-        List<Problem> problems;
-        if (difficulty == ProblemDifficulty.RANDOM) {
-            problems = repository.findAll();
-        } else {
-            problems = repository.findAllByDifficulty(difficulty);
-        }
-
-        if (problems == null || problems.isEmpty()) {
-            throw new ApiException(ProblemError.NOT_FOUND);
-        }
-
         if (numProblems <= 0) {
             throw new ApiException(ProblemError.INVALID_NUMBER_REQUEST);
         }
 
-        // If the user wants more problems than exists, just return all of them
+        List<Problem> problems;
+        if (difficulty == ProblemDifficulty.RANDOM) {
+            problems = repository.findAllByApproval(true);
+        } else {
+            problems = repository.findAllByDifficultyAndApproval(difficulty, true);
+        }
+
+        if (problems == null) {
+            throw new ApiException(ProblemError.INTERNAL_ERROR);
+        }
+
+        // If the user wants more problems than exists, throw an error
         if (numProblems > problems.size()) {
-            return problems;
+            throw new ApiException(ProblemError.NOT_ENOUGH_FOUND);
         }
 
         // Get numProblem random integers used to map to problems.
@@ -213,7 +224,6 @@ public class ProblemService {
     }
 
     public ProblemTestCaseDto createTestCase(String problemId, CreateTestCaseRequest request) {
-
         Problem problem = repository.findProblemByProblemId(problemId);
         if (problem == null) {
             throw new ApiException(ProblemError.NOT_FOUND);

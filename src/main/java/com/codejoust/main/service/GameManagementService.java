@@ -17,6 +17,7 @@ import com.codejoust.main.dto.room.RoomDto;
 import com.codejoust.main.dto.room.RoomMapper;
 import com.codejoust.main.dto.user.UserMapper;
 import com.codejoust.main.exception.GameError;
+import com.codejoust.main.exception.ProblemError;
 import com.codejoust.main.exception.RoomError;
 import com.codejoust.main.exception.api.ApiException;
 import com.codejoust.main.game_object.Game;
@@ -139,10 +140,29 @@ public class GameManagementService {
         Game game = GameMapper.fromRoom(room);
         Long time = room.getDuration();
 
-        List<Problem> problems = problemService.getProblemsFromDifficulty(room.getDifficulty(), room.getNumProblems());
-        game.setProblems(problems);
-        setStartGameTimer(game, time);
+        // If specific problems specified, use those instead of difficulty setting
+        List<Problem> problems = game.getProblems();
+        problems.addAll(room.getProblems());
 
+        // Fill remaining problems with random ones by difficulty
+        int remaining = room.getNumProblems() - problems.size();
+
+        if (remaining < 0) {
+            throw new ApiException(RoomError.TOO_MANY_PROBLEMS);
+        } else if (remaining > 0) {
+            List<Problem> otherProblems = problemService.getProblemsFromDifficulty(room.getDifficulty(), room.getNumProblems());
+            for (Problem problem : otherProblems) {
+                if (!problems.contains(problem) && problems.size() < room.getNumProblems()) {
+                    problems.add(problem);
+                }
+            }
+        }
+
+        if (problems.size() < room.getNumProblems()) {
+            throw new ApiException(ProblemError.NOT_ENOUGH_FOUND);
+        }
+
+        setStartGameTimer(game, time);
         currentGameMap.put(room.getRoomId(), game);
         notificationService.scheduleTimeLeftNotifications(game, time);
     }

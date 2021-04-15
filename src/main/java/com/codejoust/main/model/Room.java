@@ -13,10 +13,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import com.codejoust.main.game_object.GameTimer;
+import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.service.RoomService;
 
@@ -61,6 +63,10 @@ public class Room {
     private Integer numProblems = 1;
 
     private Integer size = 10;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "selectable_problem_id")
+    private List<Problem> problems = new ArrayList<>();
 
     public void addUser(User user) {
         users.add(user);

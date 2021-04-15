@@ -9,22 +9,27 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.codejoust.main.dao.RoomRepository;
+import com.codejoust.main.dto.problem.SelectableProblemDto;
 import com.codejoust.main.dto.room.CreateRoomRequest;
 import com.codejoust.main.dto.room.DeleteRoomRequest;
 import com.codejoust.main.dto.room.JoinRoomRequest;
 import com.codejoust.main.dto.room.RemoveUserRequest;
 import com.codejoust.main.dto.room.RoomDto;
+import com.codejoust.main.dto.room.SetSpectatorRequest;
 import com.codejoust.main.dto.room.UpdateHostRequest;
 import com.codejoust.main.dto.room.UpdateSettingsRequest;
 import com.codejoust.main.dto.user.UserDto;
@@ -37,9 +42,6 @@ import com.codejoust.main.exception.api.ApiException;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.ProblemDifficulty;
-import com.codejoust.main.service.RoomService;
-import com.codejoust.main.service.SocketService;
-import com.codejoust.main.service.UserService;
 import com.codejoust.main.util.Utility;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,6 +72,8 @@ public class RoomServiceTests {
     private static final String USER_ID = "678910";
     private static final String USER_ID_2 = "123456";
     private static final String USER_ID_3 = "024681";
+    private static final String PROBLEM_ID = "abcdef-hijklm";
+    private static final String PROBLEM_ID_2 = "zzzzz-aaaaa";
     private static final long DURATION = 600;
 
     @Test
@@ -93,6 +97,7 @@ public class RoomServiceTests {
         assertEquals(user.getNickname(), response.getHost().getNickname());
         assertEquals(USER_ID, response.getHost().getUserId());
         assertEquals(ProblemDifficulty.RANDOM, response.getDifficulty());
+        assertEquals(0, response.getProblems().size());
     }
 
     @Test
@@ -566,6 +571,32 @@ public class RoomServiceTests {
     }
 
     @Test
+    public void updateRoomSettingsTooManySelectedProblems() {
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        User host = new User();
+        host.setNickname(NICKNAME);
+        room.setHost(host);
+        room.addUser(host);
+
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        UpdateSettingsRequest request = new UpdateSettingsRequest();
+        request.setInitiator(UserMapper.toDto(host));
+        request.setNumProblems(1);
+
+        SelectableProblemDto problemDto = new SelectableProblemDto();
+        problemDto.setProblemId(PROBLEM_ID);
+        SelectableProblemDto problemDto2 = new SelectableProblemDto();
+        problemDto.setProblemId(PROBLEM_ID_2);
+        request.setProblems(Arrays.asList(problemDto, problemDto2));
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.updateRoomSettings(ROOM_ID, request));
+        assertEquals(RoomError.TOO_MANY_PROBLEMS, exception.getError());
+    }
+
+    @Test
     public void removeUserSuccessHostInitiator() {
         Room room = new Room();
         room.setRoomId(ROOM_ID);
@@ -815,5 +846,108 @@ public class RoomServiceTests {
                 roomService.deleteRoom(ROOM_ID, deleteRoomRequest));
         assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
         assertNotNull(roomService.getRoom(ROOM_ID));
+    }
+
+    @Test
+    public void setSpectatorSuccess() {
+        /**
+         * Tests ProblemService.setSpectator(roomId, spectator, SetSpectatorRequest)
+         * SetSpectatorRequest has initiator and receiver user; initiator must be
+         * either same person as receiver or is the host. Create new room, add two users,
+         * set one as host, and test setSpectator between host and non-host.
+         */
+        User firstUser = new User();
+        firstUser.setNickname(NICKNAME);
+        firstUser.setUserId(USER_ID);
+        User secondUser = new User();
+        secondUser.setNickname(NICKNAME_2);
+        secondUser.setUserId(USER_ID_2);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(firstUser);
+        room.addUser(firstUser);
+        room.addUser(secondUser);
+
+        // Mock repository to return room when called
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        SetSpectatorRequest request1 = new SetSpectatorRequest();
+        request1.setInitiator(UserMapper.toDto(firstUser));
+        request1.setReceiver(UserMapper.toDto(secondUser));
+        request1.setSpectator(true);
+        RoomDto response1 = roomService.setSpectator(ROOM_ID, request1);
+        assertTrue(response1.getUsers().get(1).getSpectator());
+
+        SetSpectatorRequest request2 = new SetSpectatorRequest();
+        request2.setInitiator(UserMapper.toDto(secondUser));
+        request2.setReceiver(UserMapper.toDto(secondUser));
+        request2.setSpectator(true);
+        RoomDto response2 = roomService.setSpectator(ROOM_ID, request2);
+        assertTrue(response2.getUsers().get(1).getSpectator());
+        verify(repository, times(2)).save(room);
+    }
+
+    @Test
+    public void setSpectatorFailureInvalidPermissions() {
+        /**
+         * secondUser (non-host) will try to set the firstUser (host) as a spectator
+         * expected result: RoomError.INVALID_PERMISSIONS
+         */
+        User firstUser = new User();
+        firstUser.setNickname(NICKNAME);
+        firstUser.setUserId(USER_ID);
+        User secondUser = new User();
+        secondUser.setNickname(NICKNAME_2);
+        secondUser.setUserId(USER_ID_2);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(firstUser);
+        room.addUser(firstUser);
+        room.addUser(secondUser);
+
+        // Mock repository to return room when called
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        SetSpectatorRequest request = new SetSpectatorRequest();
+        request.setInitiator(UserMapper.toDto(secondUser));
+        request.setReceiver(UserMapper.toDto(firstUser));
+        request.setSpectator(true);
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.setSpectator(ROOM_ID, request));
+        assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
+    }
+
+    @Test
+    public void setSpectatorFailureUserNotFound() {
+        /**
+         * secondUser will not be added to the room at all, but will still be a user.
+         * expected result: RoomError.USER_NOT_FOUND
+         */
+        User firstUser = new User();
+        firstUser.setNickname(NICKNAME);
+        firstUser.setUserId(USER_ID);
+        User secondUser = new User();
+        secondUser.setNickname(NICKNAME_2);
+        secondUser.setUserId(USER_ID_2);
+
+        Room room = new Room();
+        room.setRoomId(ROOM_ID);
+        room.setHost(firstUser);
+        room.addUser(firstUser);
+
+        // Mock repository to return room when called
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+
+        SetSpectatorRequest request = new SetSpectatorRequest();
+        request.setInitiator(UserMapper.toDto(firstUser));
+        request.setReceiver(UserMapper.toDto(secondUser));
+        request.setSpectator(true);
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                roomService.setSpectator(ROOM_ID, request));
+        assertEquals(RoomError.USER_NOT_FOUND, exception.getError());
     }
 }

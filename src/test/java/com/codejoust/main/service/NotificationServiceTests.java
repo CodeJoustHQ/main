@@ -14,9 +14,6 @@ import com.codejoust.main.exception.api.ApiException;
 import com.codejoust.main.game_object.NotificationType;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
-import com.codejoust.main.service.GameManagementService;
-import com.codejoust.main.service.NotificationService;
-import com.codejoust.main.service.SocketService;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

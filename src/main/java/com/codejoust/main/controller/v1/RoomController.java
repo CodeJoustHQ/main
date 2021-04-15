@@ -5,6 +5,7 @@ import com.codejoust.main.dto.room.DeleteRoomRequest;
 import com.codejoust.main.dto.room.JoinRoomRequest;
 import com.codejoust.main.dto.room.RemoveUserRequest;
 import com.codejoust.main.dto.room.RoomDto;
+import com.codejoust.main.dto.room.SetSpectatorRequest;
 import com.codejoust.main.dto.room.UpdateHostRequest;
 import com.codejoust.main.dto.room.UpdateSettingsRequest;
 import com.codejoust.main.service.RoomService;
@@ -66,5 +67,10 @@ public class RoomController extends BaseRestController {
     public ResponseEntity<RoomDto> updateRoomSettings(@PathVariable String roomId,
                                                       @RequestBody UpdateSettingsRequest request) {
         return new ResponseEntity<>(service.updateRoomSettings(roomId, request), HttpStatus.OK);
+    }
+
+    @PostMapping("/rooms/{roomId}/spectator")
+    public ResponseEntity<RoomDto> setSpectator(@PathVariable String roomId, @RequestBody SetSpectatorRequest request) {
+        return new ResponseEntity<>(service.setSpectator(roomId, request), HttpStatus.OK);
     }
 }

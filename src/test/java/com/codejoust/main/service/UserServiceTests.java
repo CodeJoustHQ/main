@@ -23,7 +23,6 @@ import com.codejoust.main.exception.UserError;
 import com.codejoust.main.exception.api.ApiException;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
-import com.codejoust.main.service.UserService;
 import com.codejoust.main.util.Utility;
 
 @ExtendWith(MockitoExtension.class)

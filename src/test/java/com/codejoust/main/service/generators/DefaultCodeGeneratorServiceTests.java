@@ -7,9 +7,6 @@ import java.util.List;
 
 import com.codejoust.main.model.problem.ProblemIOType;
 import com.codejoust.main.model.problem.ProblemInput;
-import com.codejoust.main.service.generators.DefaultCodeGeneratorService;
-import com.codejoust.main.service.generators.JavaDefaultCodeGeneratorService;
-import com.codejoust.main.service.generators.PythonDefaultCodeGeneratorService;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

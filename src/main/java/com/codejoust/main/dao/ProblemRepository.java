@@ -12,8 +12,8 @@ import com.codejoust.main.model.problem.ProblemDifficulty;
 public interface ProblemRepository extends CrudRepository<Problem, Integer> {
 
     Problem findProblemByProblemId(String problemId);
-    List<Problem> findAllByDifficulty(ProblemDifficulty difficulty);
-
+    List<Problem> findAllByDifficultyAndApproval(ProblemDifficulty difficulty, Boolean approval);
+    List<Problem> findAllByApproval(Boolean approval);
     @Override
     List<Problem> findAll();
 }

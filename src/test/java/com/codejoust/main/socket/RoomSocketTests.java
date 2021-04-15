@@ -329,7 +329,7 @@ public class RoomSocketTests {
         String startGameEndpoint = String.format("%s/%s/start", baseRestEndpoint, room.getRoomId());
 
         // Create a problem that the game can find and attach to the room.
-        SocketTestMethods.createSingleProblemAndTestCases(template, port);
+        SocketTestMethods.createSingleApprovedProblemAndTestCases(template, port);
 
         RoomDto expected = template.exchange(startGameEndpoint, HttpMethod.POST, startGameEntity, RoomDto.class).getBody();
 

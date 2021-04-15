@@ -39,7 +39,6 @@ import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemTestCase;
-import com.codejoust.main.service.SubmitService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

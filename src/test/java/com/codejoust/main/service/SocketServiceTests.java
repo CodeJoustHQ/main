@@ -6,7 +6,6 @@ import static org.mockito.Mockito.verify;
 import com.codejoust.main.config.WebSocketConfig;
 import com.codejoust.main.dto.room.RoomDto;
 import com.codejoust.main.dto.user.UserDto;
-import com.codejoust.main.service.SocketService;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

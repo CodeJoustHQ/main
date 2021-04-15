@@ -1,12 +1,14 @@
 package com.codejoust.main.service;
 
 import com.codejoust.main.dao.RoomRepository;
+import com.codejoust.main.dto.problem.SelectableProblemDto;
 import com.codejoust.main.dto.room.CreateRoomRequest;
 import com.codejoust.main.dto.room.DeleteRoomRequest;
 import com.codejoust.main.dto.room.JoinRoomRequest;
 import com.codejoust.main.dto.room.RemoveUserRequest;
 import com.codejoust.main.dto.room.RoomDto;
 import com.codejoust.main.dto.room.RoomMapper;
+import com.codejoust.main.dto.room.SetSpectatorRequest;
 import com.codejoust.main.dto.room.UpdateHostRequest;
 import com.codejoust.main.dto.room.UpdateSettingsRequest;
 import com.codejoust.main.dto.user.UserMapper;
@@ -17,10 +19,14 @@ import com.codejoust.main.exception.UserError;
 import com.codejoust.main.exception.api.ApiException;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
+import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.util.Utility;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class RoomService {
@@ -32,12 +38,15 @@ public class RoomService {
 
     private final RoomRepository repository;
     private final SocketService socketService;
+    private final ProblemService problemService;
     private final Utility utility;
 
     @Autowired
-    public RoomService(RoomRepository repository, SocketService socketService, Utility utility) {
+    public RoomService(RoomRepository repository, SocketService socketService,
+                       ProblemService problemService, Utility utility) {
         this.repository = repository;
         this.socketService = socketService;
+        this.problemService = problemService;
         this.utility = utility;
     }
 
@@ -292,10 +301,94 @@ public class RoomService {
             room.setNumProblems(request.getNumProblems());
         }
 
+        updateRoomSettingsSelectedProblems(request.getProblems(), room);
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
         socketService.sendSocketUpdate(roomDto);
         return roomDto;
+    }
+
+    private Room updateRoomSettingsSelectedProblems(List<SelectableProblemDto> selectedProblems, Room room) {
+        // Set selected problems if not null
+        boolean problemsHaveChanged = false;
+
+        if (selectedProblems != null) {
+            if (selectedProblems.size() > room.getNumProblems()) {
+                throw new ApiException(RoomError.TOO_MANY_PROBLEMS);
+            }
+
+            problemsHaveChanged = checkSelectedProblemChanges(selectedProblems, room);
+        }
+
+        if (problemsHaveChanged) {
+            List<Problem> newProblems = new ArrayList<>();
+            for (SelectableProblemDto selected : selectedProblems) {
+                Problem problem = problemService.getProblemEntity(selected.getProblemId());
+
+                if (problem == null) {
+                    throw new ApiException(ProblemError.NOT_FOUND);
+                }
+
+                newProblems.add(problem);
+            }
+            room.setProblems(newProblems);
+        }
+
+        return room;
+    }
+
+    private boolean checkSelectedProblemChanges(List<SelectableProblemDto> selectedProblems, Room room) {
+        // Check if selected problems have changed at all
+        if (selectedProblems.size() != room.getProblems().size()) {
+            return true;
+        } else {
+            // Loop through to check if problemIds match
+            for (int i = 0; i < selectedProblems.size(); i++) {
+                String problemId = room.getProblems().get(i).getProblemId();
+                if (!selectedProblems.get(i).getProblemId().equals(problemId)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public RoomDto setSpectator(String roomId, SetSpectatorRequest request) {
+        Room room = repository.findRoomByRoomId(roomId);
+
+        // Return error if room could not be found
+        if (room == null) {
+            throw new ApiException(RoomError.NOT_FOUND);
+        }
+
+        // Return error if the initiator or receiver are null
+        if (request.getInitiator() == null || request.getReceiver() == null) {
+            throw new ApiException(UserError.NOT_FOUND);
+        }
+
+        // Return error if the initiator or receiver are not in the room
+        if (room.getUserByUserId(request.getReceiver().getUserId()) == null
+            || room.getUserByUserId(request.getInitiator().getUserId()) == null) {
+            throw new ApiException(RoomError.USER_NOT_FOUND);
+        }
+        // Return error if the initiator is not the host or the same as the receiver
+        User initiator = UserMapper.toEntity(request.getInitiator());
+        User receiver = UserMapper.toEntity(request.getReceiver());
+        if (!room.getHost().equals(initiator) && !initiator.equals(receiver)) {
+            throw new ApiException(RoomError.INVALID_PERMISSIONS);
+        }
+
+        // Return error if the requested spectator is null
+        if (request.getSpectator() == null) {
+            throw new ApiException(RoomError.BAD_SETTING);
+        }
+
+        User modifiedUser = room.getUserByUserId(receiver.getUserId());
+        modifiedUser.setSpectator(request.getSpectator());
+        repository.save(room);
+
+        return RoomMapper.toDto(room);
     }
 }

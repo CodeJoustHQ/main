@@ -22,7 +22,6 @@ import com.codejoust.main.dao.UserRepository;
 import com.codejoust.main.model.User;
 import com.codejoust.main.service.RoomService;
 import com.codejoust.main.service.UserService;
-import com.codejoust.main.util.Utility;
 
 @ExtendWith(MockitoExtension.class)
 public class UtilityTests {

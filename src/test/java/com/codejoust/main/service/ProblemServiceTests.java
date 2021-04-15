@@ -28,10 +28,10 @@ import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
 import com.codejoust.main.model.problem.ProblemInput;
 import com.codejoust.main.model.problem.ProblemTestCase;
-import com.codejoust.main.service.ProblemService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
@@ -92,6 +92,25 @@ public class ProblemServiceTests {
 
         verify(repository).findProblemByProblemId("ZZZ");
         assertEquals(ProblemError.NOT_FOUND, exception.getError());
+    }
+
+
+    @Test
+    public void getProblemEntitySuccess() {
+        Problem expected = new Problem();
+        expected.setName(NAME);
+        expected.setDescription(DESCRIPTION);
+
+        Mockito.doReturn(expected).when(repository).findProblemByProblemId(expected.getProblemId());
+
+        Problem response = problemService.getProblemEntity(expected.getProblemId());
+        assertEquals(expected, response);
+    }
+
+    @Test
+    public void getProblemEntityNotFound() {
+        Problem response = problemService.getProblemEntity("abc");
+        assertNull(response);
     }
 
     @Test
@@ -196,10 +215,9 @@ public class ProblemServiceTests {
         problem.setName(NAME);
         problem.setDescription(DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.EASY);
-
+        problem.setApproval(true);
         List<Problem> expected = new ArrayList<>();
         expected.add(problem);
-
         Mockito.doReturn(expected).when(repository).findAll();
 
         List<ProblemDto> response = problemService.getAllProblems();
@@ -209,6 +227,7 @@ public class ProblemServiceTests {
         assertEquals(NAME, response.get(0).getName());
         assertEquals(DESCRIPTION, response.get(0).getDescription());
         assertEquals(problem.getDifficulty(), response.get(0).getDifficulty());
+        assertTrue(problem.getApproval());
     }
 
     @Test
@@ -299,8 +318,7 @@ public class ProblemServiceTests {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
-
-        Mockito.doReturn(problems).when(repository).findAllByDifficulty(ProblemDifficulty.MEDIUM);
+        Mockito.doReturn(problems).when(repository).findAllByDifficultyAndApproval(ProblemDifficulty.MEDIUM, true);
 
         List<Problem> response = problemService.getProblemsFromDifficulty(ProblemDifficulty.MEDIUM, 1);
 
@@ -312,8 +330,7 @@ public class ProblemServiceTests {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
-
-        Mockito.doReturn(problems).when(repository).findAll();
+        Mockito.doReturn(problems).when(repository).findAllByApproval(true);
 
         // Return correct problem when selecting random difficulty
         List<Problem> response = problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 1);
@@ -325,13 +342,12 @@ public class ProblemServiceTests {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
+        Mockito.doReturn(problems).when(repository).findAllByApproval(true);
 
-        Mockito.doReturn(problems).when(repository).findAll();
+        ApiException exception = assertThrows(ApiException.class, () ->
+                problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 3));
 
-        // Return correct problem when selecting random difficulty
-        List<Problem> response = problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 3);
-        assertEquals(1, response.size());
-        assertEquals(problem1.getProblemId(), response.get(0).getProblemId());
+        assertEquals(ProblemError.NOT_ENOUGH_FOUND, exception.getError());
     }
 
     @Test
@@ -354,9 +370,7 @@ public class ProblemServiceTests {
     public void getRandomProblemZeroNumProblems() {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
-        List<Problem> problems = Collections.singletonList(problem1);
-
-        Mockito.doReturn(problems).when(repository).findAll();
+        Collections.singletonList(problem1);
 
         ApiException exception = assertThrows(ApiException.class, () ->
                 problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 0));
@@ -368,9 +382,7 @@ public class ProblemServiceTests {
     public void getRandomProblemNegativeNumProblems() {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
-        List<Problem> problems = Collections.singletonList(problem1);
-
-        Mockito.doReturn(problems).when(repository).findAll();
+        Collections.singletonList(problem1);
 
         ApiException exception = assertThrows(ApiException.class, () ->
                 problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, -3));
@@ -383,7 +395,7 @@ public class ProblemServiceTests {
         ApiException exception = assertThrows(ApiException.class, () ->
                 problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 1));
 
-        assertEquals(ProblemError.NOT_FOUND, exception.getError());
+        assertEquals(ProblemError.NOT_ENOUGH_FOUND, exception.getError());
     }
 
     @Test
@@ -504,6 +516,27 @@ public class ProblemServiceTests {
                 problemService.editProblem(problemId, updatedProblem));
 
         assertEquals(ProblemError.INVALID_INPUT, exception.getError());
+    }
+    @Test
+    public void editProblemBadApproval() {
+        Problem problem = new Problem();
+        problem.setName(NAME);
+        problem.setDescription(DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.MEDIUM);
+        problem.setOutputType(ProblemIOType.STRING);
+        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        problem.addProblemInput(problemInput);
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
+
+        ProblemDto updatedProblem = ProblemMapper.toDto(problem);
+        updatedProblem.setApproval(true);
+
+        String problemId = problem.getProblemId();
+        ApiException exception = assertThrows(ApiException.class, () ->
+                problemService.editProblem(problemId, updatedProblem));
+
+        assertEquals(ProblemError.BAD_APPROVAL, exception.getError());
     }
 
     @Test
