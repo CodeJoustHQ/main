@@ -10,8 +10,8 @@
   <groupId>com.rocketden</groupId>
   <artifactId>main</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>main</name>
-  <description>Code game by Rocket Den</description>
+  <name>CodeJoust</name>
+  <description>A live coding platform for all learners.</description>
 
   <properties>
     <java.version>11</java.version>
@@ -40,7 +40,7 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap</artifactId>
-      <version>3.3.7</version>
+      <version>5.0.0-beta2</version>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
@@ -148,7 +148,7 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <version>4.5.12</version>
+      <version>4.5.13</version>
     </dependency>
   </dependencies>
   
