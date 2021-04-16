@@ -2,9 +2,7 @@ name: Java CI/CD
 
 on:
   push:
-    branches:
-      [ main ]
-      [ changeFrontEndtoTakeMultipleProblems ]
+    branches: [ main, changeFrontEndtoTakeMultipleProblems ]
   pull_request:
     branches: [ main ]
 
