@@ -45,6 +45,12 @@ const InlineProblem = styled.div`
   }
 `;
 
+const ClickableInlineDifficultyDisplayButton = styled(InlineDifficultyDisplayButton)`
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
 const ProblemSearch = styled(TextInput)`
   width: 100%;
   margin: 0;
@@ -117,19 +123,19 @@ function ProblemSelector(props: ProblemSelectorProps) {
 
           return (
             <InlineProblem
-              key={problem.name}
+              key={problem.problemId}
               onClick={() => setSelectedStatus(index)}
             >
               <ProblemName>
                 {problem.name}
               </ProblemName>
-              <InlineDifficultyDisplayButton
+              <ClickableInlineDifficultyDisplayButton
                 difficulty={problem.difficulty}
                 enabled={false}
                 active
               >
                 {displayNameFromDifficulty(problem.difficulty)}
-              </InlineDifficultyDisplayButton>
+              </ClickableInlineDifficultyDisplayButton>
             </InlineProblem>
           );
         })}
