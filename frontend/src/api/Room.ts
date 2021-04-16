@@ -30,7 +30,7 @@ export type UpdateSettingsParams = {
   initiator: User,
   difficulty?: Difficulty,
   duration?: number,
-  problem?: SelectableProblem,
+  problems?: SelectableProblem[],
   size?: number,
 };
 

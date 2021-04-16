@@ -27,7 +27,6 @@ const InnerContent = styled.div<ContentProps>`
   overflow-y: scroll;
   display: ${({ show }) => (show ? 'block' : 'none')};
   border-radius: 5px;
-  //border: solid 1px ${({ theme }) => theme.colors.border};
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);
 `;
 

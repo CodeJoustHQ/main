@@ -84,7 +84,7 @@ export type DefaultCodeType = {
 
 const basePath = '/api/v1/problems';
 const routes = {
-  getProblems: `${basePath}`,
+  getProblems: `${basePath}/`,
   createProblem: `${basePath}/`,
   getRandomProblem: `${basePath}/random`,
   accessProblems: (password: string) => `${basePath}/access/${password}`,
