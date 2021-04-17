@@ -41,6 +41,9 @@ import { FlexBareContainer } from '../components/core/Container';
 import { Slider, SliderContainer } from '../components/core/RangeSlider';
 import { Coordinate } from '../components/special/FloatingCircle';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
+import { SelectableProblem } from '../api/Problem';
+import ProblemSelector from '../components/problem/ProblemSelector';
+import SelectedProblemsDisplay from '../components/problem/SelectedProblemsDisplay';
 
 type LobbyPageLocation = {
   user: User,
@@ -142,6 +145,7 @@ function LobbyPage() {
   const [active, setActive] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [duration, setDuration] = useState<number | undefined>(15);
+  const [selectedProblems, setSelectedProblems] = useState<SelectableProblem[]>([]);
   const [size, setSize] = useState<number | undefined>(10);
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
@@ -173,6 +177,7 @@ function LobbyPage() {
     setActive(room.active);
     setDifficulty(room.difficulty);
     setDuration(room.duration / 60);
+    setSelectedProblems(room.problems);
     setSize(room.size);
   };
 
@@ -333,6 +338,40 @@ function LobbyPage() {
       });
   };
 
+  /**
+   * Update the list of selected problems
+   */
+  const updateSelectedProblems = (newProblems: SelectableProblem[]) => {
+    setError('');
+    setLoading(true);
+
+    const prevProblems = selectedProblems;
+    setSelectedProblems(newProblems);
+
+    const settings = {
+      initiator: currentUser!,
+      problems: newProblems,
+    };
+
+    updateRoomSettings(currentRoomId, settings)
+      .then(() => setLoading(false))
+      .catch((err) => {
+        setLoading(false);
+        setError(err.message);
+        setSelectedProblems(prevProblems);
+      });
+  };
+
+  const addProblem = (newProblem: SelectableProblem) => {
+    const newProblems = [...selectedProblems, newProblem];
+    updateSelectedProblems(newProblems);
+  };
+
+  const removeProblem = (index: number) => {
+    const newProblems = selectedProblems.filter((_, i) => i !== index);
+    updateSelectedProblems(newProblems);
+  };
+
   const onSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
@@ -398,6 +437,7 @@ function LobbyPage() {
           me={currentUser !== null && (user.nickname === currentUser.nickname)}
           isHost={isHost(user)}
           isActive={isActive}
+          key={user.userId}
         >
           {isHost(currentUser) && (user.userId !== currentUser?.userId) ? (
             // If currentUser is host, pass in an on-click action card for all other users
@@ -525,6 +565,20 @@ function LobbyPage() {
     }
   }, [history, active, currentUser, currentRoomId, difficulty, subscription]);
 
+  const hoverProps = {
+    enabled: isHost(currentUser),
+    onMouseEnter: () => {
+      if (!isHost(currentUser)) {
+        setHoverVisible(true);
+      }
+    },
+    onMouseLeave: () => {
+      if (!isHost(currentUser)) {
+        setHoverVisible(false);
+      }
+    },
+  };
+
   // Render the lobby.
   return (
     <>
@@ -563,19 +617,7 @@ function LobbyPage() {
         </SecondaryHeaderText>
         <IdContainer id={currentRoomId} />
         <HoverContainerPrimaryButton>
-          <HoverElementPrimaryButton
-            enabled={isHost(currentUser)}
-            onMouseEnter={() => {
-              if (!isHost(currentUser)) {
-                setHoverVisible(true);
-              }
-            }}
-            onMouseLeave={() => {
-              if (!isHost(currentUser)) {
-                setHoverVisible(false);
-              }
-            }}
-          />
+          <HoverElementPrimaryButton {...hoverProps} />
           <PrimaryButtonNoMargin
             onClick={handleStartGame}
             disabled={loading || !isHost(currentUser)}
@@ -626,20 +668,8 @@ function LobbyPage() {
               {Object.keys(Difficulty).map((key) => {
                 const difficultyKey: Difficulty = Difficulty[key as keyof typeof Difficulty];
                 return (
-                  <HoverContainerSmallDifficultyButton>
-                    <HoverElementSmallDifficultyButton
-                      enabled={isHost(currentUser)}
-                      onMouseEnter={() => {
-                        if (!isHost(currentUser)) {
-                          setHoverVisible(true);
-                        }
-                      }}
-                      onMouseLeave={() => {
-                        if (!isHost(currentUser)) {
-                          setHoverVisible(false);
-                        }
-                      }}
-                    />
+                  <HoverContainerSmallDifficultyButton key={key}>
+                    <HoverElementSmallDifficultyButton {...hoverProps} />
                     <SmallDifficultyButtonNoMargin
                       difficulty={difficultyKey}
                       onClick={() => updateDifficultySetting(key)}
@@ -653,24 +683,25 @@ function LobbyPage() {
                 );
               })}
             </DifficultyContainer>
+
+            <NoMarginMediumText>Selected Problems</NoMarginMediumText>
+            <SelectedProblemsDisplay
+              problems={selectedProblems}
+              onRemove={isHost(currentUser) ? removeProblem : null}
+            />
+            {isHost(currentUser) ? (
+              <ProblemSelector
+                selectedProblems={selectedProblems}
+                onSelect={addProblem}
+              />
+            ) : null}
+
             <NoMarginMediumText>Duration</NoMarginMediumText>
             <NoMarginSubtitleText>
               {`${duration} minute${duration === 1 ? '' : 's'}`}
             </NoMarginSubtitleText>
             <HoverContainerSlider>
-              <HoverElementSlider
-                enabled={isHost(currentUser)}
-                onMouseEnter={() => {
-                  if (!isHost(currentUser)) {
-                    setHoverVisible(true);
-                  }
-                }}
-                onMouseLeave={() => {
-                  if (!isHost(currentUser)) {
-                    setHoverVisible(false);
-                  }
-                }}
-              />
+              <HoverElementSlider {...hoverProps} />
               <SliderContainer>
                 <Slider
                   min={1}

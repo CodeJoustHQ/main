@@ -22,6 +22,13 @@ export type Problem = {
   outputType: ProblemIOType,
 };
 
+export type SelectableProblem = {
+  problemId: string,
+  name: string,
+  difficulty: Difficulty,
+  selected?: boolean,
+};
+
 export type ProblemInput = {
   name: string,
   type: ProblemIOType,
@@ -88,8 +95,8 @@ const routes = {
   defaultCodeMap: (problemId: string) => `${basePath}/${problemId}/default-code`,
 };
 
-export const getProblems = (): Promise<Problem[]> => axios
-  .get<Problem[]>(routes.getProblems)
+export const getProblems = (approved?: boolean): Promise<Problem[]> => axios
+  .get<Problem[]>(approved ? `${routes.getProblems}?approved=true` : routes.getProblems)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

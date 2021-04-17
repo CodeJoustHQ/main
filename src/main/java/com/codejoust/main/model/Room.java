@@ -3,6 +3,8 @@ package com.codejoust.main.model;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -66,6 +68,7 @@ public class Room {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "selectable_problem_id")
+    @Fetch(FetchMode.SUBSELECT)
     private List<Problem> problems = new ArrayList<>();
 
     public void addUser(User user) {

@@ -215,18 +215,34 @@ public class ProblemServiceTests {
         problem.setName(NAME);
         problem.setDescription(DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.EASY);
-        problem.setApproval(true);
         List<Problem> expected = new ArrayList<>();
         expected.add(problem);
         Mockito.doReturn(expected).when(repository).findAll();
 
-        List<ProblemDto> response = problemService.getAllProblems();
+        List<ProblemDto> response = problemService.getAllProblems(null);
 
         assertEquals(1, response.size());
         assertNotNull(response.get(0).getProblemId());
         assertEquals(NAME, response.get(0).getName());
         assertEquals(DESCRIPTION, response.get(0).getDescription());
         assertEquals(problem.getDifficulty(), response.get(0).getDifficulty());
+    }
+
+    @Test
+    public void getAllProblemsOnlyApproved() {
+        Problem problem = new Problem();
+        problem.setName(NAME);
+        problem.setDescription(DESCRIPTION);
+        problem.setApproval(true);
+
+        List<Problem> expected = new ArrayList<>();
+        expected.add(problem);
+        Mockito.doReturn(expected).when(repository).findAllByApproval(true);
+
+        List<ProblemDto> response = problemService.getAllProblems(true);
+
+        assertEquals(1, response.size());
+        assertEquals(NAME, response.get(0).getName());
         assertTrue(problem.getApproval());
     }
 
