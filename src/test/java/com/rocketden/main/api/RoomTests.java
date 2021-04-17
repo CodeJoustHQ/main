@@ -15,6 +15,7 @@ import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.util.MockHelper;
 import com.rocketden.main.util.ProblemTestMethods;
 import com.rocketden.main.util.RoomTestMethods;
 import com.rocketden.main.util.UtilityTestMethods;
@@ -77,23 +78,11 @@ public class RoomTests {
         ApiError ERROR = RoomError.NOT_FOUND;
 
         // Passing in nonexistent roomId should return 404
-        MvcResult result = this.mockMvc.perform(get(String.format(GET_ROOM, ROOM_ID)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.getRequest(this.mockMvc, String.format(GET_ROOM, ROOM_ID), ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
 
         // Passing in no roomId should result in same 404 error
-        result = this.mockMvc.perform(get(String.format(GET_ROOM, " ")))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        jsonResponse = result.getResponse().getContentAsString();
-        actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        actual = MockHelper.getRequest(this.mockMvc, String.format(GET_ROOM, " "), ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
