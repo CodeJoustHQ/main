@@ -170,9 +170,13 @@ public class ProblemService {
         return ProblemMapper.toDto(problem);
     }
 
-    public List<ProblemDto> getAllProblems() {
+    public List<ProblemDto> getAllProblems(Boolean approved) {
         List<ProblemDto> problems = new ArrayList<>();
-        repository.findAll().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
+        if (approved != null && approved) {
+            repository.findAllByApproval(true).forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
+        } else {
+            repository.findAll().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
+        }
 
         return problems;
     }
