@@ -15,6 +15,8 @@ import com.rocketden.main.exception.api.ApiError;
 import com.rocketden.main.exception.api.ApiErrorResponse;
 import com.rocketden.main.game_object.GameTimer;
 import com.rocketden.main.model.problem.ProblemDifficulty;
+import com.rocketden.main.util.TestConstants;
+import com.rocketden.main.util.TestUrls;
 import com.rocketden.main.util.MockHelper;
 import com.rocketden.main.util.ProblemTestMethods;
 import com.rocketden.main.util.RoomTestMethods;
@@ -78,7 +80,7 @@ public class RoomTests {
         ApiError ERROR = RoomError.NOT_FOUND;
 
         // Passing in nonexistent roomId should return 404
-        ApiErrorResponse actual = MockHelper.getRequest(this.mockMvc, String.format(GET_ROOM, ROOM_ID), ApiErrorResponse.class, ERROR.getStatus());
+        ApiErrorResponse actual = MockHelper.getRequest(this.mockMvc, TestUrls.getRoom(TestConstants.ROOM_ID), ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
 
         // Passing in no roomId should result in same 404 error
