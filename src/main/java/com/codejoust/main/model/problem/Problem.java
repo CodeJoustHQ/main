@@ -59,9 +59,10 @@ public class Problem {
     @Fetch(value = FetchMode.SUBSELECT)
     private List<ProblemInput> problemInputs = new ArrayList<>();
 
-    //List of problem tags
+    // List of tags associated with this problem
     @ManyToMany(mappedBy = "problem", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Setter
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<ProblemTag> problemTags = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
@@ -78,10 +79,11 @@ public class Problem {
 
     public void addProblemTag(ProblemTag problemTag) {
         problemTags.add(problemTag);
-        problemTag.setProblem(this);
+        problemTag.addProblem(this);
     }
 
     public boolean removeProblemTag(ProblemTag problemTag) {
+        problemTag.removeProblem(this);
         return problemTags.remove(problemTag);
     }
 
