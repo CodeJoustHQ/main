@@ -12,6 +12,7 @@ public interface ProblemTagRepository extends CrudRepository<ProblemTag, Integer
 
     List<ProblemTag> findAllByProblemId(String problemId);
     ProblemTag findProblemTagByName(String name);
+    ProblemTag findTagByTagId(String tagId);
     @Override
     List<ProblemTag> findAll();
 }

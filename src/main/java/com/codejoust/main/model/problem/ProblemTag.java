@@ -27,6 +27,9 @@ public class ProblemTag {
     private Integer id;
 
     @EqualsAndHashCode.Include
+    private String tagId;
+
+    @EqualsAndHashCode.Include
     private String name;
 
     @ManyToMany(mappedBy = "problem", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

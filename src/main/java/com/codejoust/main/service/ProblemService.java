@@ -399,6 +399,20 @@ public class ProblemService {
         return ProblemMapper.toProblemTagDto(problemTag);
     }
 
+    public ProblemTagDto deleteProblemTag(String tagId) {
+        ProblemTag problemTag = problemTagRepository.findTagByTagId(tagId);
+
+        // Do not create the new problem tag if one with this name exists.
+        if (problemTag == null) {
+            throw new ApiException(ProblemError.TAG_NAME_NOT_FOUND);
+        }
+
+        // Remove the problem tag from the database.
+        ProblemTagDto problemTagDto = ProblemMapper.toProblemTagDto(problemTag);
+        problemTagRepository.delete(problemTag);
+        return problemTagDto;
+    }
+
     private boolean validProblemTagName(String name) {
         return name != null && name.length() > 0 && name.length() < 20;
     }
