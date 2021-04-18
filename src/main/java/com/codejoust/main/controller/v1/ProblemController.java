@@ -101,8 +101,8 @@ public class ProblemController extends BaseRestController {
         return new ResponseEntity<>(service.createProblemTag(request), HttpStatus.OK);
     }
 
-    @DeleteMapping("/problems/tags/${tagId}")
-    public ResponseEntity<ProblemTagDto> createProblemTag(@PathVariable String tagId) {
+    @DeleteMapping("/problems/tags/{tagId}")
+    public ResponseEntity<ProblemTagDto> deleteProblemTag(@PathVariable String tagId) {
         return new ResponseEntity<>(service.deleteProblemTag(tagId), HttpStatus.OK);
     }
 

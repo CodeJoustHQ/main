@@ -10,7 +10,6 @@ import com.codejoust.main.model.problem.ProblemTag;
 // CRUD refers Create, Read, Update, Delete
 public interface ProblemTagRepository extends CrudRepository<ProblemTag, Integer> {
 
-    List<ProblemTag> findAllByProblemId(String problemId);
     ProblemTag findProblemTagByName(String name);
     ProblemTag findTagByTagId(String tagId);
     @Override
