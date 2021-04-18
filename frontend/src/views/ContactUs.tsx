@@ -31,11 +31,11 @@ function ContactUsPage() {
         <ContactHeaderText>
           You can follow our progress on our
           {' '}
-          <InlineExternalLink href="https://github.com/rocketden" target="_blank">GitHub</InlineExternalLink>
+          <InlineExternalLink href="https://github.com/CodeJoustHQ" target="_blank">GitHub</InlineExternalLink>
           {' '}
           or our
           {' '}
-          <InlineExternalLink href="https://trello.com/b/jb0SgY1b/sprint-board" target="_blank">public roadmap on Trello</InlineExternalLink>
+          <InlineExternalLink href="https://trello.com/b/jb0SgY1b/engineering-sprint-board" target="_blank">public roadmap on Trello</InlineExternalLink>
           .
         </ContactHeaderText>
         <ContactHeaderText>

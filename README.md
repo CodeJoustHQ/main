@@ -73,7 +73,7 @@ The frontend files are mostly located in `frontend/src`:
 | `views`                    | Different pages of the application |
 
 
-The backend files are located under `src/main/java/com/rocketden/main`:
+The backend files are located under `src/main/java/com/codejoust/main`:
 
 
 | `src/.../main/*`           | Description                |
@@ -92,6 +92,6 @@ The backend files are located under `src/main/java/com/rocketden/main`:
 
 Various configuration properties are set in 
 `src/main/resources/application.properties`, and unit/integration tests are
-located under `src/test/java/com/rocketden/main`. 
+located under `src/test/java/com/codejoust/main`. 
 
 
