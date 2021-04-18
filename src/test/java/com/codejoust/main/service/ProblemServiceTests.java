@@ -20,6 +20,7 @@ import com.codejoust.main.dto.problem.CreateTestCaseRequest;
 import com.codejoust.main.dto.problem.ProblemDto;
 import com.codejoust.main.dto.problem.ProblemInputDto;
 import com.codejoust.main.dto.problem.ProblemMapper;
+import com.codejoust.main.dto.problem.ProblemTagDto;
 import com.codejoust.main.dto.problem.ProblemTestCaseDto;
 import com.codejoust.main.exception.ProblemError;
 import com.codejoust.main.exception.api.ApiException;
@@ -58,6 +59,8 @@ public class ProblemServiceTests {
     private static final String INPUT_NAME = "nums";
     private static final ProblemIOType IO_TYPE = ProblemIOType.ARRAY_INTEGER;
     private static final ProblemIOType IO_TYPE_2 = ProblemIOType.INTEGER;
+
+    private static final String PROBLEM_TAG = "Binary String";
 
     @Test
     public void getProblemSuccess() {
@@ -436,13 +439,18 @@ public class ProblemServiceTests {
         testCaseDto.setInput(INPUT);
         testCaseDto.setOutput(OUTPUT_2);
 
+        ProblemTagDto problemTagDto = new ProblemTagDto();
+        problemTagDto.setName(PROBLEM_TAG);
+
         ProblemDto updatedProblem = ProblemMapper.toDto(problem);
         updatedProblem.setTestCases(Collections.singletonList(testCaseDto));
+        updatedProblem.setProblemTags(Collections.singletonList(problemTagDto));
 
         problemService.editProblem(problem.getProblemId(), updatedProblem);
 
         verify(repository).save(problem);
         assertEquals(1, problem.getTestCases().size());
+        assertEquals(1, problem.getProblemTags().size());
         assertEquals(1, problem.getProblemInputs().size());
 
         ProblemTestCase testCase = problem.getTestCases().get(0);
