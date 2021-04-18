@@ -21,6 +21,7 @@ import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
 import com.codejoust.main.util.MockHelper;
 import com.codejoust.main.util.ProblemTestMethods;
+import com.codejoust.main.util.TestFields;
 import com.codejoust.main.util.TestUrls;
 import com.codejoust.main.util.UtilityTestMethods;
 import com.google.gson.Gson;
@@ -56,20 +57,6 @@ class ProblemTests {
     private static final String DIFFICULTY_KEY = "difficulty";
     private static final String NUM_PROBLEMS_KEY = "numProblems";
 
-    private static final String NAME = "Sort an Array";
-    private static final String DESCRIPTION = "Sort an array from lowest to highest value.";
-    private static final String NAME_2 = "Find Maximum";
-    private static final String DESCRIPTION_2 = "Find the maximum value in an array.";
-
-    private static final String INPUT = "[1, 8, 2]";
-    private static final String OUTPUT = "[1, 2, 8]";
-    private static final String EXPLANATION = "2 < 8, so those are swapped.";
-    private static final String INPUT_2 = "[-1, 5, 0, 3]";
-    private static final String OUTPUT_2 = "[-1, 0, 3, 5]";
-    private static final String EXPLANATION_2 = "5 is the largest, so it should be at the end.";
-    private static final String INPUT_NAME = "nums";
-    private static final ProblemIOType IO_TYPE = ProblemIOType.ARRAY_INTEGER;
-
     private static final String javaDefaultCode = String.join("\n",
         "import java.util.*;",
         "",
@@ -98,29 +85,29 @@ class ProblemTests {
     @Test
     public void createAndGetProblemSuccess() throws Exception {
         CreateProblemRequest request = new CreateProblemRequest();
-        request.setName(NAME);
-        request.setDescription(DESCRIPTION);
+        request.setName(TestFields.PROBLEM_NAME);
+        request.setDescription(TestFields.PROBLEM_DESCRIPTION);
         request.setDifficulty(ProblemDifficulty.MEDIUM);
 
         List<ProblemInputDto> problemInputs = new ArrayList<>();
-        ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
+        ProblemInputDto problemInput = new ProblemInputDto(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problemInputs.add(problemInput);
         request.setProblemInputs(problemInputs);
-        request.setOutputType(IO_TYPE);
+        request.setOutputType(TestFields.IO_TYPE);
 
         ProblemDto actual = MockHelper.postRequest(this.mockMvc, TestUrls.createProblem(), request, ProblemDto.class, HttpStatus.CREATED);
 
-        assertEquals(NAME, actual.getName());
-        assertEquals(DESCRIPTION, actual.getDescription());
+        assertEquals(TestFields.PROBLEM_NAME, actual.getName());
+        assertEquals(TestFields.PROBLEM_DESCRIPTION, actual.getDescription());
         assertEquals(0, actual.getTestCases().size());
         assertEquals(problemInputs, actual.getProblemInputs());
-        assertEquals(IO_TYPE, actual.getOutputType());
+        assertEquals(TestFields.IO_TYPE, actual.getOutputType());
 
         // Get the newly created problem from the database
         actual = MockHelper.getRequest(this.mockMvc, TestUrls.getProblem(actual.getProblemId()), ProblemDto.class, HttpStatus.OK);
 
-        assertEquals(NAME, actual.getName());
-        assertEquals(DESCRIPTION, actual.getDescription());
+        assertEquals(TestFields.PROBLEM_NAME, actual.getName());
+        assertEquals(TestFields.PROBLEM_DESCRIPTION, actual.getDescription());
         assertEquals(request.getDifficulty(), actual.getDifficulty());
         assertEquals(0, actual.getTestCases().size());
     }
@@ -128,20 +115,20 @@ class ProblemTests {
     @Test
     public void createProblemsAndGetProblems() throws Exception {
         CreateProblemRequest request = new CreateProblemRequest();
-        request.setName(NAME);
-        request.setDescription(DESCRIPTION);
+        request.setName(TestFields.PROBLEM_NAME);
+        request.setDescription(TestFields.PROBLEM_DESCRIPTION);
         request.setDifficulty(ProblemDifficulty.HARD);
 
         List<ProblemInputDto> problemInputs = new ArrayList<>();
-        ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
+        ProblemInputDto problemInput = new ProblemInputDto(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problemInputs.add(problemInput);
         request.setProblemInputs(problemInputs);
-        request.setOutputType(IO_TYPE);
+        request.setOutputType(TestFields.IO_TYPE);
 
         MockHelper.postRequest(this.mockMvc, TestUrls.createProblem(), request, ProblemDto.class, HttpStatus.CREATED);
 
-        request.setName(NAME_2);
-        request.setDescription(DESCRIPTION_2);
+        request.setName(TestFields.PROBLEM_NAME_2);
+        request.setDescription(TestFields.PROBLEM_DESCRIPTION_2);
         MockHelper.postRequest(this.mockMvc, TestUrls.createProblem(), request, ProblemDto.class, HttpStatus.CREATED);
 
         // After creating two problems, check that the GET request finds them all
@@ -155,25 +142,25 @@ class ProblemTests {
         List<ProblemDto> actual = new Gson().fromJson(jsonResponse, listType);
 
         assertEquals(2, actual.size());
-        assertEquals(NAME, actual.get(0).getName());
-        assertEquals(DESCRIPTION, actual.get(0).getDescription());
+        assertEquals(TestFields.PROBLEM_NAME, actual.get(0).getName());
+        assertEquals(TestFields.PROBLEM_DESCRIPTION, actual.get(0).getDescription());
         assertEquals(problemInputs, actual.get(0).getProblemInputs());
-        assertEquals(IO_TYPE, actual.get(0).getOutputType());
+        assertEquals(TestFields.IO_TYPE, actual.get(0).getOutputType());
 
-        assertEquals(NAME_2, actual.get(1).getName());
-        assertEquals(DESCRIPTION_2, actual.get(1).getDescription());
+        assertEquals(TestFields.PROBLEM_NAME_2, actual.get(1).getName());
+        assertEquals(TestFields.PROBLEM_DESCRIPTION_2, actual.get(1).getDescription());
         assertEquals(problemInputs, actual.get(1).getProblemInputs());
-        assertEquals(IO_TYPE, actual.get(1).getOutputType());
+        assertEquals(TestFields.IO_TYPE, actual.get(1).getOutputType());
     }
 
     @Test
     public void createEditDeleteProblemSuccess() throws Exception {
         ProblemDto problemDto = ProblemTestMethods.createSingleProblem(this.mockMvc);
         problemDto.setOutputType(ProblemIOType.CHARACTER);
-        problemDto.setName(NAME_2);
+        problemDto.setName(TestFields.PROBLEM_NAME_2);
 
         ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
-        testCaseDto.setInput(INPUT);
+        testCaseDto.setInput(TestFields.INPUT);
         testCaseDto.setOutput("a");
         problemDto.setTestCases(Collections.singletonList(testCaseDto));
 
@@ -220,14 +207,14 @@ class ProblemTests {
     @Test
     public void createProblemBadInput() throws Exception {
         CreateProblemRequest request = new CreateProblemRequest();
-        request.setName(NAME);
-        request.setDescription(DESCRIPTION);
+        request.setName(TestFields.PROBLEM_NAME);
+        request.setDescription(TestFields.PROBLEM_DESCRIPTION);
         request.setDifficulty(ProblemDifficulty.HARD);
 
         List<ProblemInputDto> problemInputs = new ArrayList<>();
         problemInputs.add(null);
         request.setProblemInputs(problemInputs);
-        request.setOutputType(IO_TYPE);
+        request.setOutputType(TestFields.IO_TYPE);
 
         ApiError ERROR = ProblemError.BAD_INPUT;
 
@@ -239,8 +226,8 @@ class ProblemTests {
     @ValueSource(strings = {"False", "try", "jeremy ", "-minus", "@annotation"})
     public void createProblemInvalidIdentifier(String inputName) throws Exception {
         CreateProblemRequest request = new CreateProblemRequest();
-        request.setName(NAME);
-        request.setDescription(DESCRIPTION);
+        request.setName(TestFields.PROBLEM_NAME);
+        request.setDescription(TestFields.PROBLEM_DESCRIPTION);
         request.setDifficulty(ProblemDifficulty.HARD);
 
         List<ProblemInputDto> problemInputs = new ArrayList<>();
@@ -249,7 +236,7 @@ class ProblemTests {
         problemInput.setType(ProblemIOType.STRING);
         problemInputs.add(problemInput);
         request.setProblemInputs(problemInputs);
-        request.setOutputType(IO_TYPE);
+        request.setOutputType(TestFields.IO_TYPE);
 
         ApiError ERROR = ProblemError.INVALID_VARIABLE_NAME;
 
@@ -260,7 +247,7 @@ class ProblemTests {
     @Test
     public void createProblemEmptyFields() throws Exception {
         CreateProblemRequest request = new CreateProblemRequest();
-        request.setName(NAME);
+        request.setName(TestFields.PROBLEM_NAME);
         request.setDifficulty(ProblemDifficulty.HARD);
 
         ApiError ERROR = ProblemError.EMPTY_FIELD;
@@ -297,15 +284,15 @@ class ProblemTests {
         ProblemDto problem = ProblemTestMethods.createSingleProblem(this.mockMvc);
 
         CreateTestCaseRequest request = new CreateTestCaseRequest();
-        request.setInput(INPUT);
-        request.setOutput(OUTPUT);
-        request.setExplanation(EXPLANATION);
+        request.setInput(TestFields.INPUT);
+        request.setOutput(TestFields.OUTPUT);
+        request.setExplanation(TestFields.EXPLANATION);
 
         ProblemTestCaseDto actual = MockHelper.postRequest(this.mockMvc, TestUrls.createTestcase(problem.getProblemId()), request, ProblemTestCaseDto.class, HttpStatus.CREATED);
 
-        assertEquals(INPUT, actual.getInput());
-        assertEquals(OUTPUT, actual.getOutput());
-        assertEquals(EXPLANATION, actual.getExplanation());
+        assertEquals(TestFields.INPUT, actual.getInput());
+        assertEquals(TestFields.OUTPUT, actual.getOutput());
+        assertEquals(TestFields.EXPLANATION, actual.getExplanation());
         assertFalse(actual.isHidden());
     }
 
@@ -314,13 +301,13 @@ class ProblemTests {
         ProblemDto problem = ProblemTestMethods.createSingleProblem(this.mockMvc);
 
         CreateTestCaseRequest request = new CreateTestCaseRequest();
-        request.setInput(INPUT);
-        request.setOutput(OUTPUT);
+        request.setInput(TestFields.INPUT);
+        request.setOutput(TestFields.OUTPUT);
 
         ProblemTestCaseDto actual = MockHelper.postRequest(this.mockMvc, TestUrls.createTestcase(problem.getProblemId()), request, ProblemTestCaseDto.class, HttpStatus.CREATED);
 
-        assertEquals(INPUT, actual.getInput());
-        assertEquals(OUTPUT, actual.getOutput());
+        assertEquals(TestFields.INPUT, actual.getInput());
+        assertEquals(TestFields.OUTPUT, actual.getOutput());
         assertNull(actual.getExplanation());
         assertFalse(actual.isHidden());
     }
@@ -330,7 +317,7 @@ class ProblemTests {
         ProblemDto problem = ProblemTestMethods.createSingleProblem(this.mockMvc);
 
         CreateTestCaseRequest request = new CreateTestCaseRequest();
-        request.setInput(INPUT);
+        request.setInput(TestFields.INPUT);
 
         ApiError ERROR = ProblemError.EMPTY_FIELD;
 
@@ -341,9 +328,9 @@ class ProblemTests {
     @Test
     public void createTestCaseProblemNotFound() throws Exception {
         CreateTestCaseRequest request = new CreateTestCaseRequest();
-        request.setInput(INPUT);
-        request.setOutput(OUTPUT);
-        request.setExplanation(EXPLANATION);
+        request.setInput(TestFields.INPUT);
+        request.setOutput(TestFields.OUTPUT);
+        request.setExplanation(TestFields.EXPLANATION);
 
         ApiError ERROR = ProblemError.NOT_FOUND;
 
@@ -357,17 +344,17 @@ class ProblemTests {
 
         // Create first test case
         CreateTestCaseRequest request = new CreateTestCaseRequest();
-        request.setInput(INPUT);
-        request.setOutput(OUTPUT);
-        request.setExplanation(EXPLANATION);
+        request.setInput(TestFields.INPUT);
+        request.setOutput(TestFields.OUTPUT);
+        request.setExplanation(TestFields.EXPLANATION);
         request.setHidden(true);
 
         MockHelper.postRequest(this.mockMvc, TestUrls.createTestcase(problem.getProblemId()), request, ProblemTestCaseDto.class, HttpStatus.CREATED);
 
         // Create second test case
-        request.setInput(INPUT_2);
-        request.setOutput(OUTPUT_2);
-        request.setExplanation(EXPLANATION_2);
+        request.setInput(TestFields.INPUT_2);
+        request.setOutput(TestFields.OUTPUT_2);
+        request.setExplanation(TestFields.EXPLANATION_2);
         request.setHidden(false);
 
         MockHelper.postRequest(this.mockMvc, TestUrls.createTestcase(problem.getProblemId()), request, ProblemTestCaseDto.class, HttpStatus.CREATED);
@@ -381,14 +368,14 @@ class ProblemTests {
         ProblemTestCaseDto case1 = testCases.get(0);
         ProblemTestCaseDto case2 = testCases.get(1);
 
-        assertEquals(INPUT, case1.getInput());
-        assertEquals(OUTPUT, case1.getOutput());
-        assertEquals(EXPLANATION, case1.getExplanation());
+        assertEquals(TestFields.INPUT, case1.getInput());
+        assertEquals(TestFields.OUTPUT, case1.getOutput());
+        assertEquals(TestFields.EXPLANATION, case1.getExplanation());
         assertTrue(case1.isHidden());
 
-        assertEquals(INPUT_2, case2.getInput());
-        assertEquals(OUTPUT_2, case2.getOutput());
-        assertEquals(EXPLANATION_2, case2.getExplanation());
+        assertEquals(TestFields.INPUT_2, case2.getInput());
+        assertEquals(TestFields.OUTPUT_2, case2.getOutput());
+        assertEquals(TestFields.EXPLANATION_2, case2.getExplanation());
         assertFalse(case2.isHidden());
     }
 

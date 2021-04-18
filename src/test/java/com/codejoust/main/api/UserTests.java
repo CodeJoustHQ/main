@@ -7,6 +7,7 @@ import com.codejoust.main.exception.UserError;
 import com.codejoust.main.exception.api.ApiError;
 import com.codejoust.main.exception.api.ApiErrorResponse;
 import com.codejoust.main.util.MockHelper;
+import com.codejoust.main.util.TestFields;
 import com.codejoust.main.util.TestUrls;
 
 import org.junit.jupiter.api.Test;
@@ -31,19 +32,13 @@ public class UserTests {
     @Autowired
     private MockMvc mockMvc;
 
-    // Predefine user attributes.
-    private static final String NICKNAME = "rocket";
-    private static final String USER_ID = "012345";
-
     @Test
     public void createNewUser() throws Exception {
         CreateUserRequest request = new CreateUserRequest();
-        request.setNickname(NICKNAME);
-        request.setUserId(USER_ID);
+        request.setNickname(TestFields.NICKNAME);
+        request.setUserId(TestFields.USER_ID);
 
-        UserDto expected = new UserDto();
-        expected.setNickname(NICKNAME);
-        expected.setUserId(USER_ID);
+        UserDto expected = TestFields.userDto1();
 
         UserDto actual = MockHelper.postRequest(this.mockMvc, TestUrls.user(), request, UserDto.class, HttpStatus.CREATED);
 
@@ -54,11 +49,9 @@ public class UserTests {
     @Test
     public void createNewUserNoUserIdSuccess() throws Exception {
         CreateUserRequest request = new CreateUserRequest();
-        request.setNickname(NICKNAME);
+        request.setNickname(TestFields.NICKNAME);
 
-        UserDto expected = new UserDto();
-        expected.setNickname(NICKNAME);
-        expected.setUserId(USER_ID);
+        UserDto expected = TestFields.userDto1();
 
         UserDto actual = MockHelper.postRequest(this.mockMvc, TestUrls.user(), request, UserDto.class, HttpStatus.CREATED);
         assertEquals(expected.getNickname(), actual.getNickname());
@@ -89,8 +82,8 @@ public class UserTests {
     @Test
     public void deleteExistingUser() throws Exception {
         CreateUserRequest createUserRequest = new CreateUserRequest();
-        createUserRequest.setNickname(NICKNAME);
-        createUserRequest.setUserId(USER_ID);
+        createUserRequest.setNickname(TestFields.NICKNAME);
+        createUserRequest.setUserId(TestFields.USER_ID);
 
         UserDto expected = MockHelper.postRequest(this.mockMvc, TestUrls.user(), createUserRequest, UserDto.class, HttpStatus.CREATED);
 
@@ -103,8 +96,7 @@ public class UserTests {
 
     @Test
     public void deleteNonExistentUser() throws Exception {
-        UserDto user = new UserDto();
-        user.setUserId(USER_ID);
+        UserDto user = TestFields.userDto1();
 
         DeleteUserRequest request = new DeleteUserRequest();
         request.setUserToDelete(user);
