@@ -1,4 +1,4 @@
-package com.rocketden.main.model.problem;
+package com.codejoust.main.model.problem;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
