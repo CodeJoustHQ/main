@@ -1,5 +1,6 @@
 package com.codejoust.main.entity;
 
+import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -14,11 +15,6 @@ import com.codejoust.main.model.problem.ProblemTestCase;
 
 @SpringBootTest
 public class ProblemEntityTests {
-
-    private static final int ID = 10;
-    private static final String INPUT = "[1, 8, 2]";
-    private static final String OUTPUT = "[1, 2, 8]";
-    private static final String EXPLANATION = "2 < 8, so those are swapped.";
 
     @Test
     public void problemInitialization() {
@@ -47,22 +43,22 @@ public class ProblemEntityTests {
         Problem problem = new Problem();
 
         ProblemTestCase testCase = new ProblemTestCase();
-        testCase.setId(ID);
-        testCase.setInput(INPUT);
-        testCase.setOutput(OUTPUT);
-        testCase.setExplanation(EXPLANATION);
+        testCase.setId(TestFields.ID);
+        testCase.setInput(TestFields.INPUT);
+        testCase.setOutput(TestFields.OUTPUT);
+        testCase.setExplanation(TestFields.EXPLANATION);
 
         problem.addTestCase(testCase);
 
         ProblemTestCase caseToRemove = new ProblemTestCase();
-        caseToRemove.setInput(INPUT);
-        caseToRemove.setOutput(OUTPUT);
-        caseToRemove.setExplanation(EXPLANATION);
+        caseToRemove.setInput(TestFields.INPUT);
+        caseToRemove.setOutput(TestFields.OUTPUT);
+        caseToRemove.setExplanation(TestFields.EXPLANATION);
         caseToRemove.setHidden(true);
 
         assertFalse(problem.removeTestCase(caseToRemove));
 
-        caseToRemove.setId(ID);
+        caseToRemove.setId(TestFields.ID);
         caseToRemove.setHidden(false);
 
         // Function returns true to remove test case, then false once deleted.

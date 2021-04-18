@@ -13,6 +13,10 @@ public class TestFields {
     public static final String USER_ID = "012345";
     public static final String USER_ID_2 = "678910";
     public static final String USER_ID_3 = "024681";
+    public static final String SESSION_ID = "abcde";
+    public static final String SESSION_ID_2 = "fghij";
+    public static final Integer ID = 1;
+    public static final Integer ID_2 = 2;
 
     // Room constants
     public static final String ROOM_ID = "012345";
@@ -21,6 +25,7 @@ public class TestFields {
     // Problem constants
     public static final String PROBLEM_NAME = "Sort an Array";
     public static final String PROBLEM_DESCRIPTION = "Sort an array from lowest to highest value.";
+    public static final String PROBLEM_ID = "abcxyz";
     public static final String INPUT_NAME = "nums";
     public static final ProblemIOType IO_TYPE = ProblemIOType.ARRAY_INTEGER;
 
@@ -34,6 +39,7 @@ public class TestFields {
 
     public static final String PROBLEM_NAME_2 = "Find Maximum";
     public static final String PROBLEM_DESCRIPTION_2 = "Find the maximum value in an array.";
+    public static final String PROBLEM_ID_2 = "zyx-cba";
 
     public static final String PYTHON_CODE = "print('hello')";
     public static final CodeLanguage PYTHON_LANGUAGE = CodeLanguage.PYTHON;

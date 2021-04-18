@@ -1,5 +1,6 @@
 package com.codejoust.main.mapper;
 
+import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -21,30 +22,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 public class ProblemMapperTests {
 
-    private static final String NAME = "Sort a List";
-    private static final String DESCRIPTION = "Sort the given list in O(n log n) time.";
-
-    private static final String INPUT = "[1, 8, 2]";
-    private static final String OUTPUT = "[1, 2, 8]";
-    private static final String EXPLANATION = "2 < 8, so those are swapped.";
-
-    private static final String INPUT_NAME = "nums";
-
     @Test
     public void entityToDto() {
         Problem expected = new Problem();
-        expected.setName(NAME);
-        expected.setDescription(DESCRIPTION);
+        expected.setName(TestFields.PROBLEM_NAME);
+        expected.setDescription(TestFields.PROBLEM_DESCRIPTION);
         expected.setDifficulty(ProblemDifficulty.HARD);
 
         ProblemTestCase testCase = new ProblemTestCase();
-        testCase.setInput(INPUT);
-        testCase.setOutput(OUTPUT);
-        testCase.setExplanation(EXPLANATION);
+        testCase.setInput(TestFields.INPUT);
+        testCase.setOutput(TestFields.OUTPUT);
+        testCase.setExplanation(TestFields.EXPLANATION);
         testCase.setHidden(true);
         expected.addTestCase(testCase);
 
-        ProblemInput problemInput = new ProblemInput(INPUT_NAME, ProblemIOType.ARRAY_INTEGER);
+        ProblemInput problemInput = new ProblemInput(TestFields.INPUT_NAME, ProblemIOType.ARRAY_INTEGER);
         expected.addProblemInput(problemInput);
         expected.setOutputType(ProblemIOType.ARRAY_INTEGER);
 
@@ -75,10 +67,10 @@ public class ProblemMapperTests {
     @Test
     public void entityToTestCaseDto() {
         ProblemTestCase expected = new ProblemTestCase();
-        expected.setInput(INPUT);
-        expected.setOutput(OUTPUT);
+        expected.setInput(TestFields.INPUT);
+        expected.setOutput(TestFields.OUTPUT);
         expected.setHidden(false);
-        expected.setExplanation(EXPLANATION);
+        expected.setExplanation(TestFields.EXPLANATION);
 
         ProblemTestCaseDto actual = ProblemMapper.toTestCaseDto(expected);
 
@@ -90,7 +82,7 @@ public class ProblemMapperTests {
 
     @Test
     public void entityToProblemInputDto() {
-        ProblemInput expected = new ProblemInput(INPUT, ProblemIOType.ARRAY_INTEGER);
+        ProblemInput expected = new ProblemInput(TestFields.INPUT_NAME, ProblemIOType.ARRAY_INTEGER);
 
         ProblemInputDto actual = ProblemMapper.toProblemInputDto(expected);
 
