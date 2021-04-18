@@ -41,21 +41,15 @@ public class ProblemService {
     private final ProblemRepository problemRepository;
     private final ProblemTagRepository problemTagRepository;
     private final List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList;
-    private final Utility utility;
     private final Random random = new Random();
     private final Gson gson = new Gson();
     private static final String PROBLEM_ACCESS_PASSWORD_KEY = "PROBLEM_ACCESS_PASSWORD";
 
-    // The length of the problem ID.
-    public static final int PROBLEM_ID_LENGTH = 10;
-
     @Autowired
-    public ProblemService(ProblemRepository problemRepository, ProblemTagRepository problemTagRepository, List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList,
-    Utility utility) {
+    public ProblemService(ProblemRepository problemRepository, ProblemTagRepository problemTagRepository, List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList) {
         this.problemRepository = problemRepository;
         this.problemTagRepository = problemTagRepository;
         this.defaultCodeGeneratorServiceList = defaultCodeGeneratorServiceList;
-        this.utility = utility;
     }
 
     public ProblemDto createProblem(CreateProblemRequest request) {
@@ -393,7 +387,6 @@ public class ProblemService {
         // Add the problem tag to the database.
         ProblemTag problemTag = new ProblemTag();
         problemTag.setName(request.getName());
-        problemTag.setTagId(utility.generateUniqueId(ProblemService.PROBLEM_ID_LENGTH, Utility.USER_ID_KEY));
         problemTagRepository.save(problemTag);
         return ProblemMapper.toProblemTagDto(problemTag);
     }

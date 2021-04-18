@@ -2,6 +2,7 @@ package com.codejoust.main.model.problem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -25,7 +26,7 @@ public class ProblemTag {
     private Integer id;
 
     @EqualsAndHashCode.Include
-    private String tagId;
+    private String tagId =  UUID.randomUUID().toString();
 
     @EqualsAndHashCode.Include
     private String name;
