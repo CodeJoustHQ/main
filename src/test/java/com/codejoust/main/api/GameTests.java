@@ -19,14 +19,12 @@ import com.codejoust.main.exception.ProblemError;
 import com.codejoust.main.exception.RoomError;
 import com.codejoust.main.exception.api.ApiError;
 import com.codejoust.main.exception.api.ApiErrorResponse;
-import com.codejoust.main.game_object.CodeLanguage;
 import com.codejoust.main.game_object.GameTimer;
 import com.codejoust.main.game_object.NotificationType;
-import com.codejoust.main.service.SubmitService;
 import com.codejoust.main.util.MockHelper;
 import com.codejoust.main.util.ProblemTestMethods;
 import com.codejoust.main.util.RoomTestMethods;
-import com.codejoust.main.util.TestConstants;
+import com.codejoust.main.util.TestFields;
 import com.codejoust.main.util.TestUrls;
 
 import org.junit.jupiter.api.Test;
@@ -57,19 +55,6 @@ public class GameTests {
     @Autowired
     private MockMvc mockMvc;
 
-    // Predefine problem attributes.
-    private static final String INPUT = "[1, 3, 2]";
-    private static final String OUTPUT = SubmitService.DUMMY_OUTPUT;
-    private static final Double RUNTIME = SubmitService.DUMMY_RUNTIME;
-
-    // Predefine user and room attributes.
-    private static final String NICKNAME = "rocket";
-    private static final String NICKNAME_2 = "rocketrocket";
-    private static final String ROOM_ID = "012345";
-    private static final String USER_ID = "098765";
-    private static final String CODE = "print('hello')";
-    private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
-
     // Predefine notification content.
     private static final String CONTENT = "[1, 2, 3]";
 
@@ -88,8 +73,7 @@ public class GameTests {
 
     @Test
     public void startAndGetGameSuccess() throws Exception {
-        UserDto host = new UserDto();
-        host.setNickname(NICKNAME);
+        UserDto host = TestFields.userDto1();
 
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
@@ -116,9 +100,7 @@ public class GameTests {
 
     @Test
     public void startGameWithProblemIdGetsCorrectProblem() throws Exception {
-        UserDto host = new UserDto();
-        host.setNickname(NICKNAME);
-        host.setUserId(USER_ID);
+        UserDto host = TestFields.userDto1();
 
         RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
 
@@ -157,23 +139,20 @@ public class GameTests {
 
     @Test
     public void startGameRoomNotFound() throws Exception {
-        UserDto user = new UserDto();
-        user.setNickname(NICKNAME);
+        UserDto user = TestFields.userDto1();
 
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(user);
 
         ApiError ERROR = RoomError.NOT_FOUND;
 
-        ApiErrorResponse actual = MockHelper.postRequest(this.mockMvc, TestUrls.startGame(TestConstants.ROOM_ID), request, ApiErrorResponse.class, ERROR.getStatus());
+        ApiErrorResponse actual = MockHelper.postRequest(this.mockMvc, TestUrls.startGame(TestFields.ROOM_ID), request, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
     @Test
     public void startGameProblemNotEnoughFound() throws Exception {
-        UserDto host = new UserDto();
-        host.setNickname(NICKNAME);
-        host.setUserId(USER_ID);
+        UserDto host = TestFields.userDto1();
 
         RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
 
@@ -188,16 +167,14 @@ public class GameTests {
 
     @Test
     public void startGameWrongInitiator() throws Exception {
-        UserDto host = new UserDto();
-        host.setNickname(NICKNAME);
+        UserDto host = TestFields.userDto1();
 
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
         RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
 
-        UserDto user = new UserDto();
-        user.setNickname(NICKNAME_2);
+        UserDto user = TestFields.userDto2();
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(user);
 
@@ -209,34 +186,32 @@ public class GameTests {
 
     @Test
     public void runCodeSuccess() throws Exception {
-        UserDto host = new UserDto();
-        host.setNickname(NICKNAME);
-        host.setUserId(USER_ID);
+        UserDto host = TestFields.userDto1();
 
         RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
         startGameHelper(roomDto, host);
 
         SubmissionRequest request = new SubmissionRequest();
         request.setInitiator(host);
-        request.setCode(CODE);
-        request.setLanguage(LANGUAGE);
-        request.setInput(INPUT);
+        request.setCode(TestFields.PYTHON_CODE);
+        request.setLanguage(TestFields.PYTHON_LANGUAGE);
+        request.setInput(TestFields.INPUT);
 
         SubmissionDto submissionDto = MockHelper.postRequest(this.mockMvc, TestUrls.runCode(roomDto.getRoomId()), request, SubmissionDto.class, HttpStatus.OK);
 
-        assertEquals(CODE, submissionDto.getCode());
-        assertEquals(LANGUAGE, submissionDto.getLanguage());
+        assertEquals(TestFields.PYTHON_CODE, submissionDto.getCode());
+        assertEquals(TestFields.PYTHON_LANGUAGE, submissionDto.getLanguage());
         assertEquals(submissionDto.getNumCorrect(), submissionDto.getNumTestCases());
         assertNull(submissionDto.getCompilationError());
-        assertEquals(RUNTIME, submissionDto.getRuntime());
+        assertEquals(TestFields.RUNTIME, submissionDto.getRuntime());
         assertTrue(Instant.now().isAfter(submissionDto.getStartTime())
             || Instant.now().minusSeconds((long) 1).isBefore(submissionDto.getStartTime()));
 
         SubmissionResultDto resultDto = submissionDto.getResults().get(0);
-        assertEquals(OUTPUT, resultDto.getUserOutput());
+        assertEquals(TestFields.OUTPUT, resultDto.getUserOutput());
         assertNull(resultDto.getError());
-        assertEquals(INPUT, resultDto.getInput());
-        assertEquals(OUTPUT, resultDto.getCorrectOutput());
+        assertEquals(TestFields.INPUT, resultDto.getInput());
+        assertEquals(TestFields.OUTPUT, resultDto.getCorrectOutput());
         assertFalse(resultDto.isHidden());
         assertTrue(resultDto.isCorrect());
 
@@ -252,23 +227,21 @@ public class GameTests {
     
     @Test
     public void submitSolutionSuccess() throws Exception {
-        UserDto host = new UserDto();
-        host.setNickname(NICKNAME);
-        host.setUserId(USER_ID);
+        UserDto host = TestFields.userDto1();
 
         RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
         startGameHelper(roomDto, host);
 
         SubmissionRequest request = new SubmissionRequest();
         request.setInitiator(host);
-        request.setCode(CODE);
-        request.setLanguage(LANGUAGE);
+        request.setCode(TestFields.PYTHON_CODE);
+        request.setLanguage(TestFields.PYTHON_LANGUAGE);
 
         SubmissionDto submissionDto = MockHelper.postRequest(this.mockMvc, TestUrls.submitCode(roomDto.getRoomId()), request, SubmissionDto.class, HttpStatus.OK);
 
         assertNotNull(submissionDto);
-        assertEquals(CODE, submissionDto.getCode());
-        assertEquals(LANGUAGE, submissionDto.getLanguage());
+        assertEquals(TestFields.PYTHON_CODE, submissionDto.getCode());
+        assertEquals(TestFields.PYTHON_LANGUAGE, submissionDto.getLanguage());
         // For now, just assert that all test cases were passed
         assertEquals(submissionDto.getNumCorrect(), submissionDto.getNumTestCases());
 
@@ -278,19 +251,19 @@ public class GameTests {
         assertEquals(1, gameDto.getPlayers().size());
         PlayerDto player = gameDto.getPlayers().get(0);
         submissionDto = player.getSubmissions().get(0);
-        assertEquals(CODE, submissionDto.getCode());
-        assertEquals(LANGUAGE, submissionDto.getLanguage());
+        assertEquals(TestFields.PYTHON_CODE, submissionDto.getCode());
+        assertEquals(TestFields.PYTHON_LANGUAGE, submissionDto.getLanguage());
         assertEquals(submissionDto.getNumCorrect(), submissionDto.getNumTestCases());
         assertNull(submissionDto.getCompilationError());
-        assertEquals(RUNTIME, submissionDto.getRuntime());
+        assertEquals(TestFields.RUNTIME, submissionDto.getRuntime());
         assertTrue(Instant.now().isAfter(submissionDto.getStartTime())
             || Instant.now().minusSeconds(1).isBefore(submissionDto.getStartTime()));
 
         SubmissionResultDto resultDto = submissionDto.getResults().get(0);
-        assertEquals(OUTPUT, resultDto.getUserOutput());
+        assertEquals(TestFields.OUTPUT, resultDto.getUserOutput());
         assertNull(resultDto.getError());
-        assertEquals(INPUT, resultDto.getInput());
-        assertEquals(OUTPUT, resultDto.getCorrectOutput());
+        assertEquals(TestFields.INPUT, resultDto.getInput());
+        assertEquals(TestFields.OUTPUT, resultDto.getCorrectOutput());
         assertFalse(resultDto.isHidden());
         assertTrue(resultDto.isCorrect());
         
@@ -299,9 +272,7 @@ public class GameTests {
 
     @Test
     public void sendNotificationSuccess() throws Exception {
-        UserDto host = new UserDto();
-        host.setNickname(NICKNAME);
-        host.setUserId(USER_ID);
+        UserDto host = TestFields.userDto1();
 
         RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
         startGameHelper(roomDto, host);
@@ -324,9 +295,7 @@ public class GameTests {
 
     @Test
     public void submitSolutionBadLanguage() throws Exception {
-        UserDto host = new UserDto();
-        host.setNickname(NICKNAME);
-        host.setUserId(USER_ID);
+        UserDto host = TestFields.userDto1();
 
         RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
         startGameHelper(roomDto, host);

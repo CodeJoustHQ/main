@@ -18,7 +18,7 @@ import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.util.MockHelper;
 import com.codejoust.main.util.ProblemTestMethods;
 import com.codejoust.main.util.RoomTestMethods;
-import com.codejoust.main.util.TestConstants;
+import com.codejoust.main.util.TestFields;
 import com.codejoust.main.util.TestUrls;
 
 import org.junit.jupiter.api.Test;
@@ -64,7 +64,7 @@ public class RoomTests {
         ApiError ERROR = RoomError.NOT_FOUND;
 
         // Passing in nonexistent roomId should return 404
-        ApiErrorResponse actual = MockHelper.getRequest(this.mockMvc, TestUrls.getRoom(TestConstants.ROOM_ID), ApiErrorResponse.class, ERROR.getStatus());
+        ApiErrorResponse actual = MockHelper.getRequest(this.mockMvc, TestUrls.getRoom(TestFields.ROOM_ID), ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
 
         // Passing in no roomId should result in same 404 error
@@ -83,7 +83,7 @@ public class RoomTests {
 
         ApiError ERROR = RoomError.NOT_FOUND;
 
-        ApiErrorResponse actual = MockHelper.putRequest(this.mockMvc, TestUrls.updateHost(TestConstants.ROOM_ID), request, ApiErrorResponse.class, ERROR.getStatus());
+        ApiErrorResponse actual = MockHelper.putRequest(this.mockMvc, TestUrls.updateHost(TestFields.ROOM_ID), request, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
