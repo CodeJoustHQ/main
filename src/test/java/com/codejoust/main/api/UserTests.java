@@ -31,8 +31,6 @@ public class UserTests {
     @Autowired
     private MockMvc mockMvc;
 
-    private static final String USER_URI = "/api/v1/user";
-
     // Predefine user attributes.
     private static final String NICKNAME = "rocket";
     private static final String USER_ID = "012345";

@@ -26,6 +26,8 @@ public class TestUrls {
     private static final String DELETE_PROBLEM = "/api/v1/problems/%s";
 
     private static final String USER = "/api/v1/user";
+    private static final String GET_INSTANT = "/api/v1/get-instant";
+
 
     public static String getRoom(String roomId) {
         return String.format(GET_ROOM, roomId);
@@ -109,5 +111,9 @@ public class TestUrls {
 
     public static String user() {
         return USER;
+    }
+
+    public static String getInstant() {
+        return GET_INSTANT;
     }
 }

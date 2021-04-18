@@ -1,10 +1,14 @@
 package com.codejoust.main.api;
 
 
+import com.codejoust.main.dto.user.UserDto;
+import com.codejoust.main.util.MockHelper;
+import com.codejoust.main.util.TestUrls;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -29,18 +33,9 @@ public class UtilityTests {
     @Autowired
     private MockMvc mockMvc;
 
-    private static final String GET_INSTANT = "/api/v1/get-instant";
-
     @Test
     public void getInstantSuccess() throws Exception {
-        MvcResult result = this.mockMvc.perform(get(String.format(GET_INSTANT))
-                .contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        Instant instant = UtilityTestMethods.toObjectInstant(jsonResponse, Instant.class);
-
+        Instant instant = MockHelper.getRequest(this.mockMvc, TestUrls.getInstant(), Instant.class, HttpStatus.OK);
         assertTrue(Instant.now().isAfter(instant)
             || Instant.now().minusSeconds((long) 1).isBefore(instant));
     }

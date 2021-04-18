@@ -20,26 +20,20 @@ import com.codejoust.main.util.ProblemTestMethods;
 import com.codejoust.main.util.RoomTestMethods;
 import com.codejoust.main.util.TestConstants;
 import com.codejoust.main.util.TestUrls;
-import com.codejoust.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,14 +48,6 @@ public class RoomTests {
 
     @Autowired
     private MockMvc mockMvc;
-
-    private static final String GET_ROOM = "/api/v1/rooms/%s";
-    private static final String PUT_ROOM_JOIN = "/api/v1/rooms/%s/users";
-    private static final String POST_ROOM_CREATE = "/api/v1/rooms";
-    private static final String PUT_ROOM_HOST = "/api/v1/rooms/%s/host";
-    private static final String PUT_ROOM_SETTINGS = "/api/v1/rooms/%s/settings";
-    private static final String REMOVE_USER = "/api/v1/rooms/%s/users";
-    private static final String DELETE_ROOM = "/api/v1/rooms/%s";
 
     // Predefine user and room attributes.
     private static final String NICKNAME = "rocket";
@@ -340,15 +326,7 @@ public class RoomTests {
 
         ApiError ERROR = RoomError.BAD_ROOM_SIZE;
 
-        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.putRequest(this.mockMvc, TestUrls.updateSettings(room.getRoomId()), updateRequest, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual, actual.getType());
     }
 

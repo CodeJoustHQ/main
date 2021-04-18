@@ -53,15 +53,6 @@ class ProblemTests {
     @Autowired
     private MockMvc mockMvc;
 
-    private static final String DELETE_PROBLEM = "/api/v1/problems/%s";
-    private static final String GET_DEFAULT_CODE = "/api/v1/problems/%s/default-code";
-    private static final String GET_PROBLEM = "/api/v1/problems/%s";
-    private static final String GET_PROBLEM_RANDOM = "/api/v1/problems/random";
-    private static final String GET_PROBLEM_ALL = "/api/v1/problems";
-    private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
-    private static final String POST_TEST_CASE_CREATE = "/api/v1/problems/%s/test-case";
-    private static final String PUT_PROBLEM_EDIT = "/api/v1/problems/%s";
-
     private static final String DIFFICULTY_KEY = "difficulty";
     private static final String NUM_PROBLEMS_KEY = "numProblems";
 
@@ -154,7 +145,7 @@ class ProblemTests {
         MockHelper.postRequest(this.mockMvc, TestUrls.createProblem(), request, ProblemDto.class, HttpStatus.CREATED);
 
         // After creating two problems, check that the GET request finds them all
-        MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_ALL))
+        MvcResult result = this.mockMvc.perform(get(TestUrls.getAllProblems()))
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
@@ -290,7 +281,7 @@ class ProblemTests {
 
     @Test
     public void getProblemsEmptyList() throws Exception {
-        MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_ALL))
+        MvcResult result = this.mockMvc.perform(get(TestUrls.getAllProblems()))
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
@@ -405,7 +396,7 @@ class ProblemTests {
     public void getRandomProblemSuccess() throws Exception {
         ProblemDto problem = ProblemTestMethods.createSingleApprovedProblemAndTestCases(this.mockMvc);
 
-        MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_RANDOM)
+        MvcResult result = this.mockMvc.perform(get(TestUrls.getRandomProblem())
                 .param(DIFFICULTY_KEY, "EASY")
                 .param(NUM_PROBLEMS_KEY, "1"))
                 .andDo(print()).andExpect(status().isOk())
@@ -425,7 +416,7 @@ class ProblemTests {
     public void getRandomProblemNotFound() throws Exception {
         ApiError ERROR = ProblemError.NOT_ENOUGH_FOUND;
 
-        MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_RANDOM)
+        MvcResult result = this.mockMvc.perform(get(TestUrls.getRandomProblem())
                 .param(DIFFICULTY_KEY, "MEDIUM")
                 .param(NUM_PROBLEMS_KEY, "1"))
                 .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
@@ -441,7 +432,7 @@ class ProblemTests {
     public void getDefaultCodeSuccess() throws Exception {
         ProblemDto problem = ProblemTestMethods.createSingleProblem(this.mockMvc);
 
-        MvcResult result = this.mockMvc.perform(get(String.format(GET_DEFAULT_CODE, problem.getProblemId())))
+        MvcResult result = this.mockMvc.perform(get(TestUrls.getDefaultCode(problem.getProblemId())))
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 

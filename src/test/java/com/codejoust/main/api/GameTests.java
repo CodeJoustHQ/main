@@ -14,7 +14,6 @@ import com.codejoust.main.dto.room.CreateRoomRequest;
 import com.codejoust.main.dto.room.RoomDto;
 import com.codejoust.main.dto.room.UpdateSettingsRequest;
 import com.codejoust.main.dto.user.UserDto;
-import com.codejoust.main.dto.user.UserMapper;
 import com.codejoust.main.exception.GameError;
 import com.codejoust.main.exception.ProblemError;
 import com.codejoust.main.exception.RoomError;
@@ -23,25 +22,20 @@ import com.codejoust.main.exception.api.ApiErrorResponse;
 import com.codejoust.main.game_object.CodeLanguage;
 import com.codejoust.main.game_object.GameTimer;
 import com.codejoust.main.game_object.NotificationType;
-import com.codejoust.main.game_object.Submission;
-import com.codejoust.main.model.User;
 import com.codejoust.main.service.SubmitService;
 import com.codejoust.main.util.MockHelper;
 import com.codejoust.main.util.ProblemTestMethods;
 import com.codejoust.main.util.RoomTestMethods;
 import com.codejoust.main.util.TestConstants;
 import com.codejoust.main.util.TestUrls;
-import com.codejoust.main.util.UtilityTestMethods;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,11 +44,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -72,14 +61,6 @@ public class GameTests {
     private static final String INPUT = "[1, 3, 2]";
     private static final String OUTPUT = SubmitService.DUMMY_OUTPUT;
     private static final Double RUNTIME = SubmitService.DUMMY_RUNTIME;
-
-    private static final String POST_ROOM = "/api/v1/rooms";
-    private static final String UPDATE_ROOM = "/api/v1/rooms/%s/settings";
-    private static final String START_GAME = "/api/v1/rooms/%s/start";
-    private static final String GET_GAME = "/api/v1/games/%s";
-    private static final String POST_RUN_CODE = "/api/v1/games/%s/run-code";
-    private static final String POST_SUBMISSION = "/api/v1/games/%s/submission";
-    private static final String POST_NOTIFICATION = "/api/v1/games/%s/notification";
 
     // Predefine user and room attributes.
     private static final String NICKNAME = "rocket";

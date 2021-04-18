@@ -30,16 +30,4 @@ public class UtilityTestMethods {
         Gson gson = new Gson();
         return gson.fromJson(json, type);
     }
-
-    // Include type adapter to appropriately convert Instant.
-    public static <T> T toObjectInstant(String json, Class<T> c) {
-        Gson gson = new GsonBuilder().registerTypeAdapter(Instant.class,
-            new JsonDeserializer<Instant>() { 
-            @Override 
-            public Instant deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-                    return Instant.parse(json.getAsString());
-                } 
-            }).create();
-        return gson.fromJson(json, c);
-    }
 }
