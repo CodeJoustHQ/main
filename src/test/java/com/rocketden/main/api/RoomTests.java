@@ -37,9 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -231,7 +228,6 @@ public class RoomTests {
         ApiError ERROR = RoomError.DUPLICATE_USERNAME;
 
         ApiErrorResponse actual = MockHelper.putRequest(this.mockMvc, TestUrls.joinRoom(roomId), joinRequest, ApiErrorResponse.class, ERROR.getStatus());
-
         assertEquals(ERROR.getResponse(), actual);
     }
 
@@ -251,14 +247,7 @@ public class RoomTests {
         users.add(host);
         createExpected.setUsers(users);
 
-        MvcResult result = this.mockMvc.perform(post(POST_ROOM_CREATE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(createRequest)))
-                .andDo(print()).andExpect(status().isCreated())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        RoomDto createActual = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+        RoomDto createActual = MockHelper.postRequest(this.mockMvc, TestUrls.createRoom(), createRequest, RoomDto.class, HttpStatus.CREATED);
 
         assertEquals(createExpected.getHost(), createActual.getHost());
         assertEquals(createExpected.getUsers(), createActual.getUsers());
@@ -271,15 +260,7 @@ public class RoomTests {
 
         ApiError ERROR = UserError.INVALID_USER;
 
-        result = this.mockMvc.perform(put(String.format(PUT_ROOM_JOIN, roomId))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(joinRequest)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.putRequest(this.mockMvc, TestUrls.joinRoom(roomId), joinRequest, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
@@ -295,14 +276,7 @@ public class RoomTests {
         updateRequest.setInitiator(host);
         updateRequest.setSize(1);
 
-        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        room = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+        room = MockHelper.putRequest(this.mockMvc, TestUrls.updateSettings(room.getRoomId()), updateRequest, RoomDto.class, HttpStatus.OK);
 
         assertEquals(updateRequest.getSize(), room.getSize());
 
@@ -314,15 +288,7 @@ public class RoomTests {
 
         ApiError ERROR = RoomError.ALREADY_FULL;
 
-        result = this.mockMvc.perform(put(String.format(PUT_ROOM_JOIN, roomId))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(joinRequest)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.putRequest(this.mockMvc, TestUrls.joinRoom(roomId), joinRequest, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
@@ -342,24 +308,12 @@ public class RoomTests {
         updateRequest.setNumProblems(2);
         updateRequest.setSize(6);
 
-        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        room = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+        room = MockHelper.putRequest(this.mockMvc, TestUrls.updateSettings(room.getRoomId()), updateRequest, RoomDto.class, HttpStatus.OK);
 
         assertEquals(updateRequest.getDifficulty(), room.getDifficulty());
 
         // Confirm with a GET that the room has actually been updated in the database
-        result = this.mockMvc.perform(get(String.format(GET_ROOM, room.getRoomId())))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
-
-        jsonResponse = result.getResponse().getContentAsString();
-        RoomDto actual = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+        RoomDto actual = MockHelper.getRequest(this.mockMvc, TestUrls.getRoom(room.getRoomId()), RoomDto.class, HttpStatus.OK);
 
         assertEquals(updateRequest.getDifficulty(), actual.getDifficulty());
         assertEquals(updateRequest.getDuration(), actual.getDuration());
@@ -418,14 +372,7 @@ public class RoomTests {
         updateRequest.setNumProblems(2);
         updateRequest.setProblems(Arrays.asList(problemDto1, problemDto2));
 
-        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        room = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+        room = MockHelper.putRequest(this.mockMvc, TestUrls.updateSettings(room.getRoomId()), updateRequest, RoomDto.class, HttpStatus.OK);
 
         assertEquals(2, room.getNumProblems());
         assertEquals(2, room.getProblems().size());
@@ -438,14 +385,7 @@ public class RoomTests {
         updateRequest.setNumProblems(1);
         updateRequest.setProblems(new ArrayList<>());
 
-        result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
-
-        jsonResponse = result.getResponse().getContentAsString();
-        room = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+        room = MockHelper.putRequest(this.mockMvc, TestUrls.updateSettings(room.getRoomId()), updateRequest, RoomDto.class, HttpStatus.OK);
 
         assertEquals(1, room.getNumProblems());
         assertTrue(room.getProblems().isEmpty());
@@ -469,15 +409,7 @@ public class RoomTests {
 
         ApiError ERROR = ProblemError.NOT_FOUND;
 
-        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.putRequest(this.mockMvc, TestUrls.updateSettings(room.getRoomId()), updateRequest, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
@@ -492,14 +424,7 @@ public class RoomTests {
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(host);
 
-        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        room = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+        room = MockHelper.putRequest(this.mockMvc, TestUrls.updateSettings(room.getRoomId()), updateRequest, RoomDto.class, HttpStatus.OK);
 
         // Difficulty remains unchanged from default
         assertEquals(ProblemDifficulty.RANDOM, room.getDifficulty());
@@ -519,15 +444,7 @@ public class RoomTests {
 
         ApiError ERROR = RoomError.NOT_FOUND;
 
-        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, "999999"))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.putRequest(this.mockMvc, TestUrls.joinRoom("999999"), updateRequest, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
@@ -549,15 +466,7 @@ public class RoomTests {
 
         ApiError ERROR = RoomError.INVALID_PERMISSIONS;
 
-        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(updateRequest)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.putRequest(this.mockMvc, TestUrls.updateSettings(room.getRoomId()), updateRequest, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
@@ -572,15 +481,7 @@ public class RoomTests {
 
         ApiError ERROR = ProblemError.BAD_DIFFICULTY;
 
-        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(jsonRequest))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.putRequest(this.mockMvc, TestUrls.updateSettings(room.getRoomId()), jsonRequest, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
@@ -594,14 +495,7 @@ public class RoomTests {
 
         String jsonRequest = String.format("{\"initiator\": {\"nickname\": \"%s\",\"userId\":\"%s\"}, \"difficulty\": \"medIUM\"}", NICKNAME, USER_ID);
 
-        MvcResult result = this.mockMvc.perform(put(String.format(PUT_ROOM_SETTINGS, room.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(jsonRequest))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        room = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+        room = MockHelper.putRequest(this.mockMvc, TestUrls.updateSettings(room.getRoomId()), jsonRequest, RoomDto.class, HttpStatus.OK);
 
         assertEquals(ProblemDifficulty.MEDIUM, room.getDifficulty());
     }
@@ -622,14 +516,7 @@ public class RoomTests {
         request.setInitiator(host);
         request.setUserToDelete(user);
 
-        MvcResult result = this.mockMvc.perform(delete(String.format(REMOVE_USER, room.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        room = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+        room = MockHelper.deleteRequest(this.mockMvc, TestUrls.removeUser(room.getRoomId()), request, RoomDto.class, HttpStatus.OK);
 
         assertEquals(1, room.getUsers().size());
         assertFalse(room.getUsers().contains(user));
@@ -651,14 +538,7 @@ public class RoomTests {
         request.setInitiator(user);
         request.setUserToDelete(user);
 
-        MvcResult result = this.mockMvc.perform(delete(String.format(REMOVE_USER, room.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        room = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+        room = MockHelper.deleteRequest(this.mockMvc, TestUrls.removeUser(room.getRoomId()), request, RoomDto.class, HttpStatus.OK);
 
         assertEquals(1, room.getUsers().size());
         assertFalse(room.getUsers().contains(user));
@@ -681,15 +561,7 @@ public class RoomTests {
 
         ApiError ERROR = UserError.NOT_FOUND;
 
-        MvcResult result = this.mockMvc.perform(delete(String.format(REMOVE_USER, room.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse errorResponse = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse errorResponse = MockHelper.deleteRequest(this.mockMvc, TestUrls.removeUser(room.getRoomId()), request, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), errorResponse);
     }
 
@@ -715,15 +587,7 @@ public class RoomTests {
 
         ApiError ERROR = RoomError.INVALID_PERMISSIONS;
 
-        MvcResult result = this.mockMvc.perform(delete(String.format(REMOVE_USER, room.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse errorResponse = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse errorResponse = MockHelper.deleteRequest(this.mockMvc, TestUrls.removeUser(room.getRoomId()), request, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), errorResponse);
     }
 
@@ -742,25 +606,12 @@ public class RoomTests {
         DeleteRoomRequest request = new DeleteRoomRequest();
         request.setHost(host);
 
-        MvcResult result = this.mockMvc.perform(delete(String.format(DELETE_ROOM, room.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        RoomDto returnedRoom = UtilityTestMethods.toObject(jsonResponse, RoomDto.class);
+        RoomDto returnedRoom = MockHelper.deleteRequest(this.mockMvc, TestUrls.deleteRoom(room.getRoomId()), request, RoomDto.class, HttpStatus.OK);
         assertEquals(room, returnedRoom);
 
         // The room should not exist any more.
         ApiError ERROR = RoomError.NOT_FOUND;
-        MvcResult getResult = this.mockMvc.perform(get(String.format(GET_ROOM, room.getRoomId())))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String getJsonResponse = getResult.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(getJsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.getRequest(this.mockMvc, TestUrls.getRoom(room.getRoomId()), ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
@@ -781,15 +632,7 @@ public class RoomTests {
 
         ApiError ERROR = RoomError.INVALID_PERMISSIONS;
 
-        MvcResult result = this.mockMvc.perform(delete(String.format(DELETE_ROOM, room.getRoomId()))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse errorResponse = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse errorResponse = MockHelper.deleteRequest(this.mockMvc, TestUrls.deleteRoom(room.getRoomId()), request, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), errorResponse);
     }
 }

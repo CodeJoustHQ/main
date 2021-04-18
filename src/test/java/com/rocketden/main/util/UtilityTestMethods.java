@@ -13,6 +13,9 @@ import com.google.gson.JsonParseException;
 public class UtilityTestMethods {
 
     public static String convertObjectToJsonString(Object o) {
+        if (o instanceof String) {
+            return (String) o;
+        }
         Gson gson = new Gson();
         return gson.toJson(o);
     }
