@@ -51,4 +51,11 @@ public class TestFields {
         user.setUserId(USER_ID_2);
         return user;
     }
+
+    public static UserDto userDto3() {
+        UserDto user = new UserDto();
+        user.setNickname(NICKNAME_3);
+        user.setUserId(USER_ID_3);
+        return user;
+    }
 }
