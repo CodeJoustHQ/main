@@ -21,7 +21,8 @@ public class UtilityTestMethods {
     }
 
     public static <T> T toObject(String json, Class<T> c) {
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().registerTypeAdapter(Instant.class,
+                (JsonDeserializer<Instant>) (json1, typeOfT, context) -> Instant.parse(json1.getAsString())).create();
         return gson.fromJson(json, c);
     }
 

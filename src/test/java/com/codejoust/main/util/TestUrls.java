@@ -10,6 +10,12 @@ public class TestUrls {
     private static final String REMOVE_USER = "/api/v1/rooms/%s/users";
     private static final String DELETE_ROOM = "/api/v1/rooms/%s";
 
+    private static final String START_GAME = "/api/v1/rooms/%s/start";
+    private static final String GET_GAME = "/api/v1/games/%s";
+    private static final String POST_RUN_CODE = "/api/v1/games/%s/run-code";
+    private static final String POST_SUBMISSION = "/api/v1/games/%s/submission";
+    private static final String POST_NOTIFICATION = "/api/v1/games/%s/notification";
+
     public static String getRoom(String roomId) {
         return String.format(GET_ROOM, roomId);
     }
@@ -36,5 +42,25 @@ public class TestUrls {
 
     public static String deleteRoom(String roomId) {
         return String.format(DELETE_ROOM, roomId);
+    }
+
+    public static String startGame(String roomId) {
+        return String.format(START_GAME, roomId);
+    }
+
+    public static String getGame(String roomId) {
+        return String.format(GET_GAME, roomId);
+    }
+
+    public static String runCode(String roomId) {
+        return String.format(POST_RUN_CODE, roomId);
+    }
+
+    public static String submitCode(String roomId) {
+        return String.format(POST_SUBMISSION, roomId);
+    }
+
+    public static String sendNotification(String roomId) {
+        return String.format(POST_NOTIFICATION, roomId);
     }
 }
