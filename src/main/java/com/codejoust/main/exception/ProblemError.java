@@ -12,7 +12,7 @@ public enum ProblemError implements ApiError {
 
     BAD_DIFFICULTY(HttpStatus.BAD_REQUEST, "Please choose either Easy, Medium, or Hard (or Random if choosing a room difficulty)"),
     BAD_INPUT(HttpStatus.BAD_REQUEST, "None of the problem inputs provided can be null."),
-    BAD_IOTYPE(HttpStatus.BAD_REQUEST, "Please choose a value Problem IO Type."),
+    BAD_IOTYPE(HttpStatus.BAD_REQUEST, "Please choose a valid Problem IO Type."),
     INCORRECT_INPUT_COUNT(HttpStatus.BAD_REQUEST, "Please specify the correct number of parameters for this problem."),
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "Please ensure each line of test case input/output is valid and is of the correct type."),
     INVALID_NUMBER_REQUEST(HttpStatus.BAD_REQUEST, "Please request a valid number of problems."),
@@ -21,7 +21,9 @@ public enum ProblemError implements ApiError {
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "An internal error occurred when attempting to find a problem."),
     NOT_ENOUGH_FOUND(HttpStatus.NOT_FOUND, "Not enough problems could be found with the given criteria."),
     BAD_APPROVAL(HttpStatus.BAD_REQUEST, "Cannot approve a problem with no test cases."),
-    NOT_FOUND(HttpStatus.NOT_FOUND, "A problem could not be found with the given criteria.");
+    NOT_FOUND(HttpStatus.NOT_FOUND, "A problem could not be found with the given criteria."),
+    TAG_NAME_ALREADY_EXISTS(HttpStatus.FORBIDDEN, "A problem tag with this name already exists."),
+    BAD_PROBLEM_TAG(HttpStatus.FORBIDDEN, "Please choose a valid name for the problem tag.");
 
     private final HttpStatus status;
     private final ApiErrorResponse response;

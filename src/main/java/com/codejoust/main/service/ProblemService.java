@@ -336,6 +336,7 @@ public class ProblemService {
     }
 
     public List<ProblemTagDto> getProblemTags(String problemId) {
+        // TODO: There's a chance this method isn't necessary.
         Problem problem = problemRepository.findProblemByProblemId(problemId);
 
         if (problem == null) {
@@ -356,14 +357,37 @@ public class ProblemService {
     }
 
     public List<ProblemTagDto> getAllProblemTags() {
-        List<ProblemTagDto> problemTags = new ArrayList<>();
+        List<ProblemTag> problemTags = problemTagRepository.findAll();
 
-        return problemTags;
+        // If the problem does not have any ProblemTags, return empty list.
+        if (problemTags == null) {
+            // TODO: Is the result null if the problem doesn't have tags?
+            return new ArrayList<ProblemTagDto>();
+        }
+
+        List<ProblemTagDto> problemTagDtos = new ArrayList<>();
+        problemTags.forEach(problemTag -> problemTagDtos.add(ProblemMapper.toProblemTagDto(problemTag)));
+        return problemTagDtos;
     }
 
     public ProblemTagDto createProblemTag(CreateProblemTagRequest request) {
-        ProblemTagDto problemTag = new ProblemTagDto();
-        return problemTag;
+        ProblemTag existingProblemTag = problemTagRepository.findProblemTagByName(request.getName());
+
+        // Handle invalid request, with restraints on the length of the name.
+        if (request.getName() == null || request.getName().length() == 0 || request.getName().length() > 20) {
+            throw new ApiException(ProblemError.BAD_PROBLEM_TAG);
+        }
+
+        // Do not create the new problem tag if one with this name exists.
+        if (existingProblemTag != null) {
+            throw new ApiException(ProblemError.TAG_NAME_ALREADY_EXISTS);
+        }
+
+        // Add the problem tag to the database.
+        ProblemTag problemTag = new ProblemTag();
+        problemTag.setName(request.getName());
+        problemTagRepository.save(problemTag);
+        return ProblemMapper.toProblemTagDto(problemTag);
     }
 
     /**

@@ -11,6 +11,7 @@ import com.codejoust.main.model.problem.ProblemTag;
 public interface ProblemTagRepository extends CrudRepository<ProblemTag, Integer> {
 
     List<ProblemTag> findAllByProblemId(String problemId);
+    ProblemTag findProblemTagByName(String name);
     @Override
     List<ProblemTag> findAll();
 }

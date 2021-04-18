@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode
 public class ProblemTagDto {
-    private String tag;
+    private String name;
 }

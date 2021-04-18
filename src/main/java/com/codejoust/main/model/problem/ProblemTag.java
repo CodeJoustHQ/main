@@ -19,5 +19,5 @@ public class ProblemTag {
     private Integer id;
 
     @EqualsAndHashCode.Include
-    private String tag;
+    private String name;
 }
