@@ -8,6 +8,7 @@ import java.util.List;
 import com.codejoust.main.model.problem.ProblemIOType;
 import com.codejoust.main.model.problem.ProblemInput;
 
+import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,9 +25,6 @@ public class DefaultCodeGeneratorServiceTests {
     @Spy
     @InjectMocks
     private PythonDefaultCodeGeneratorService pythonDefaultCodeGeneratorService;
-
-    private static final String INPUT_NAME = "nums";
-    private static final ProblemIOType IO_TYPE = ProblemIOType.ARRAY_INTEGER;
 
     private static final String javaDefaultCode = String.join("\n",
         "import java.util.*;",
@@ -53,8 +51,8 @@ public class DefaultCodeGeneratorServiceTests {
      */
     public void getDefaultCodeSetupMethod(DefaultCodeGeneratorService defaultCodeGeneratorService, String defaultCode) {
         List<ProblemInput> problemInputs = new ArrayList<>();
-        problemInputs.add(new ProblemInput(INPUT_NAME, IO_TYPE));
-        String response = defaultCodeGeneratorService.getDefaultCode(problemInputs, IO_TYPE);
+        problemInputs.add(new ProblemInput(TestFields.INPUT_NAME, TestFields.IO_TYPE));
+        String response = defaultCodeGeneratorService.getDefaultCode(problemInputs, TestFields.IO_TYPE);
         assertEquals(defaultCode, response);
     }
 
