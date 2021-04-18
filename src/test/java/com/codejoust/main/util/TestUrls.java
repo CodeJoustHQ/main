@@ -25,6 +25,8 @@ public class TestUrls {
     private static final String PUT_PROBLEM_EDIT = "/api/v1/problems/%s";
     private static final String DELETE_PROBLEM = "/api/v1/problems/%s";
 
+    private static final String USER = "/api/v1/user";
+
     public static String getRoom(String roomId) {
         return String.format(GET_ROOM, roomId);
     }
@@ -103,5 +105,9 @@ public class TestUrls {
 
     public static String deleteProblem(String problemId) {
         return String.format(DELETE_PROBLEM, problemId);
+    }
+
+    public static String user() {
+        return USER;
     }
 }

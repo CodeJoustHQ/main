@@ -6,7 +6,8 @@ import com.codejoust.main.dto.user.UserDto;
 import com.codejoust.main.exception.UserError;
 import com.codejoust.main.exception.api.ApiError;
 import com.codejoust.main.exception.api.ApiErrorResponse;
-import com.codejoust.main.util.UtilityTestMethods;
+import com.codejoust.main.util.MockHelper;
+import com.codejoust.main.util.TestUrls;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,17 +15,12 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
 @AutoConfigureMockMvc
@@ -51,14 +47,7 @@ public class UserTests {
         expected.setNickname(NICKNAME);
         expected.setUserId(USER_ID);
 
-        MvcResult result = this.mockMvc.perform(post(USER_URI)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().isCreated())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        UserDto actual = UtilityTestMethods.toObject(jsonResponse, UserDto.class);
+        UserDto actual = MockHelper.postRequest(this.mockMvc, TestUrls.user(), request, UserDto.class, HttpStatus.CREATED);
 
         assertEquals(expected.getNickname(), actual.getNickname());
         assertEquals(expected.getUserId(), actual.getUserId());
@@ -73,15 +62,7 @@ public class UserTests {
         expected.setNickname(NICKNAME);
         expected.setUserId(USER_ID);
 
-        MvcResult result = this.mockMvc.perform(post(USER_URI)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().isCreated())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        UserDto actual = UtilityTestMethods.toObject(jsonResponse, UserDto.class);
-
+        UserDto actual = MockHelper.postRequest(this.mockMvc, TestUrls.user(), request, UserDto.class, HttpStatus.CREATED);
         assertEquals(expected.getNickname(), actual.getNickname());
     }
 
@@ -91,15 +72,7 @@ public class UserTests {
 
         ApiError ERROR = UserError.INVALID_USER;
 
-        MvcResult result = this.mockMvc.perform(post(USER_URI)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.postRequest(this.mockMvc, TestUrls.user(), request, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
@@ -111,15 +84,7 @@ public class UserTests {
 
         ApiError ERROR = UserError.INVALID_USER;
 
-        MvcResult result = this.mockMvc.perform(post(USER_URI)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.postRequest(this.mockMvc, TestUrls.user(), request, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
@@ -129,27 +94,12 @@ public class UserTests {
         createUserRequest.setNickname(NICKNAME);
         createUserRequest.setUserId(USER_ID);
 
-        MvcResult result = this.mockMvc.perform(post(USER_URI)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(createUserRequest)))
-                .andDo(print()).andExpect(status().isCreated())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        UserDto expected = UtilityTestMethods.toObject(jsonResponse, UserDto.class);
+        UserDto expected = MockHelper.postRequest(this.mockMvc, TestUrls.user(), createUserRequest, UserDto.class, HttpStatus.CREATED);
 
         DeleteUserRequest deleteUserRequest = new DeleteUserRequest();
         deleteUserRequest.setUserToDelete(expected);
 
-        result = this.mockMvc.perform(delete(USER_URI)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(deleteUserRequest)))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        jsonResponse = result.getResponse().getContentAsString();
-        UserDto actual = UtilityTestMethods.toObject(jsonResponse, UserDto.class);
-
+        UserDto actual = MockHelper.deleteRequest(this.mockMvc, TestUrls.user(), deleteUserRequest, UserDto.class, HttpStatus.OK);
         assertEquals(expected.getUserId(), actual.getUserId());
     }
 
@@ -163,15 +113,7 @@ public class UserTests {
 
         ApiError ERROR = UserError.NOT_FOUND;
 
-        MvcResult result = this.mockMvc.perform(delete(USER_URI)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.deleteRequest(this.mockMvc, TestUrls.user(), request, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 }
