@@ -4,10 +4,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -22,7 +19,9 @@ import com.codejoust.main.exception.api.ApiErrorResponse;
 import com.codejoust.main.game_object.CodeLanguage;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
+import com.codejoust.main.util.MockHelper;
 import com.codejoust.main.util.ProblemTestMethods;
+import com.codejoust.main.util.TestUrls;
 import com.codejoust.main.util.UtilityTestMethods;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -33,7 +32,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -101,13 +100,7 @@ class ProblemTests {
     public void getProblemNonExistent() throws Exception {
         ApiError ERROR = ProblemError.NOT_FOUND;
 
-        MvcResult result = this.mockMvc.perform(get(String.format(GET_PROBLEM, 99)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.getRequest(this.mockMvc, TestUrls.getProblem("999"), ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
@@ -124,14 +117,7 @@ class ProblemTests {
         request.setProblemInputs(problemInputs);
         request.setOutputType(IO_TYPE);
 
-        MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().isCreated())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ProblemDto actual = UtilityTestMethods.toObject(jsonResponse, ProblemDto.class);
+        ProblemDto actual = MockHelper.postRequest(this.mockMvc, TestUrls.createProblem(), request, ProblemDto.class, HttpStatus.CREATED);
 
         assertEquals(NAME, actual.getName());
         assertEquals(DESCRIPTION, actual.getDescription());
@@ -140,12 +126,7 @@ class ProblemTests {
         assertEquals(IO_TYPE, actual.getOutputType());
 
         // Get the newly created problem from the database
-        result = this.mockMvc.perform(get(String.format(GET_PROBLEM, actual.getProblemId())))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
-
-        jsonResponse = result.getResponse().getContentAsString();
-        actual = UtilityTestMethods.toObject(jsonResponse, ProblemDto.class);
+        actual = MockHelper.getRequest(this.mockMvc, TestUrls.getProblem(actual.getProblemId()), ProblemDto.class, HttpStatus.OK);
 
         assertEquals(NAME, actual.getName());
         assertEquals(DESCRIPTION, actual.getDescription());
@@ -166,18 +147,11 @@ class ProblemTests {
         request.setProblemInputs(problemInputs);
         request.setOutputType(IO_TYPE);
 
-        this.mockMvc.perform(post(POST_PROBLEM_CREATE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().isCreated());
+        MockHelper.postRequest(this.mockMvc, TestUrls.createProblem(), request, ProblemDto.class, HttpStatus.CREATED);
 
         request.setName(NAME_2);
         request.setDescription(DESCRIPTION_2);
-
-        this.mockMvc.perform(post(POST_PROBLEM_CREATE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().isCreated());
+        MockHelper.postRequest(this.mockMvc, TestUrls.createProblem(), request, ProblemDto.class, HttpStatus.CREATED);
 
         // After creating two problems, check that the GET request finds them all
         MvcResult result = this.mockMvc.perform(get(GET_PROBLEM_ALL))
@@ -213,40 +187,22 @@ class ProblemTests {
         problemDto.setTestCases(Collections.singletonList(testCaseDto));
 
         // Edit problem with new values
-        String endpoint = String.format(PUT_PROBLEM_EDIT, problemDto.getProblemId());
-        this.mockMvc.perform(put(endpoint)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(problemDto)))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
+        MockHelper.putRequest(this.mockMvc, TestUrls.editProblem(problemDto.getProblemId()), problemDto, ProblemDto.class, HttpStatus.OK);
 
         // Perform GET request to ensure updated problem is saved
-        MvcResult result = this.mockMvc.perform(get(String.format(GET_PROBLEM, problemDto.getProblemId())))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ProblemDto actual = UtilityTestMethods.toObject(jsonResponse, ProblemDto.class);
+        ProblemDto actual = MockHelper.getRequest(this.mockMvc, TestUrls.getProblem(problemDto.getProblemId()), ProblemDto.class, HttpStatus.OK);
 
         assertEquals(problemDto.getOutputType(), actual.getOutputType());
         assertEquals(problemDto.getName(), actual.getName());
         assertEquals(problemDto.getTestCases().get(0).getOutput(), actual.getTestCases().get(0).getOutput());
 
         // Delete problem from the database
-        endpoint = String.format(DELETE_PROBLEM, problemDto.getProblemId());
-        result = this.mockMvc.perform(delete(endpoint))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
+        MockHelper.deleteRequest(this.mockMvc, TestUrls.deleteProblem(problemDto.getProblemId()), null, ProblemDto.class, HttpStatus.OK);
 
         ApiError ERROR = ProblemError.NOT_FOUND;
 
         // Ensure that the GET request throws a not found error
-        result = this.mockMvc.perform(get(String.format(GET_PROBLEM, problemDto.getProblemId())))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse response = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
+        ApiErrorResponse response = MockHelper.getRequest(this.mockMvc, TestUrls.getProblem(problemDto.getProblemId()), ApiErrorResponse.class, ERROR.getStatus());
 
         assertEquals(ERROR.getResponse(), response);
     }
@@ -266,16 +222,7 @@ class ProblemTests {
         ApiError ERROR = ProblemError.INVALID_VARIABLE_NAME;
 
         // Edit problem with new values
-        String endpoint = String.format(PUT_PROBLEM_EDIT, problemDto.getProblemId());
-        MvcResult result = this.mockMvc.perform(put(endpoint)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(problemDto)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.putRequest(this.mockMvc, TestUrls.editProblem(problemDto.getProblemId()), problemDto, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
@@ -293,15 +240,7 @@ class ProblemTests {
 
         ApiError ERROR = ProblemError.BAD_INPUT;
 
-        MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.postRequest(this.mockMvc, TestUrls.createProblem(), request, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
@@ -323,15 +262,7 @@ class ProblemTests {
 
         ApiError ERROR = ProblemError.INVALID_VARIABLE_NAME;
 
-        MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.postRequest(this.mockMvc, TestUrls.createProblem(), request, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
@@ -343,15 +274,7 @@ class ProblemTests {
 
         ApiError ERROR = ProblemError.EMPTY_FIELD;
 
-        MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.postRequest(this.mockMvc, TestUrls.createProblem(), request, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
@@ -361,15 +284,7 @@ class ProblemTests {
 
         ApiError ERROR = ProblemError.BAD_DIFFICULTY;
 
-        MvcResult result = this.mockMvc.perform(post(POST_PROBLEM_CREATE)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(jsonRequest))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.postRequest(this.mockMvc, TestUrls.createProblem(), jsonRequest, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
@@ -395,15 +310,7 @@ class ProblemTests {
         request.setOutput(OUTPUT);
         request.setExplanation(EXPLANATION);
 
-        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getProblemId());
-        MvcResult result = this.mockMvc.perform(post(endpoint)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().isCreated())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ProblemTestCaseDto actual = UtilityTestMethods.toObject(jsonResponse, ProblemTestCaseDto.class);
+        ProblemTestCaseDto actual = MockHelper.postRequest(this.mockMvc, TestUrls.createTestcase(problem.getProblemId()), request, ProblemTestCaseDto.class, HttpStatus.CREATED);
 
         assertEquals(INPUT, actual.getInput());
         assertEquals(OUTPUT, actual.getOutput());
@@ -419,15 +326,7 @@ class ProblemTests {
         request.setInput(INPUT);
         request.setOutput(OUTPUT);
 
-        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getProblemId());
-        MvcResult result = this.mockMvc.perform(post(endpoint)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().isCreated())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ProblemTestCaseDto actual = UtilityTestMethods.toObject(jsonResponse, ProblemTestCaseDto.class);
+        ProblemTestCaseDto actual = MockHelper.postRequest(this.mockMvc, TestUrls.createTestcase(problem.getProblemId()), request, ProblemTestCaseDto.class, HttpStatus.CREATED);
 
         assertEquals(INPUT, actual.getInput());
         assertEquals(OUTPUT, actual.getOutput());
@@ -444,16 +343,7 @@ class ProblemTests {
 
         ApiError ERROR = ProblemError.EMPTY_FIELD;
 
-        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getProblemId());
-        MvcResult result = this.mockMvc.perform(post(endpoint)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.postRequest(this.mockMvc, TestUrls.createTestcase(problem.getProblemId()), request, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
@@ -466,16 +356,7 @@ class ProblemTests {
 
         ApiError ERROR = ProblemError.NOT_FOUND;
 
-        String endpoint = String.format(POST_TEST_CASE_CREATE, 99);
-        MvcResult result = this.mockMvc.perform(post(endpoint)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.postRequest(this.mockMvc, TestUrls.createTestcase("99"), request, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 
@@ -490,12 +371,7 @@ class ProblemTests {
         request.setExplanation(EXPLANATION);
         request.setHidden(true);
 
-        String endpoint = String.format(POST_TEST_CASE_CREATE, problem.getProblemId());
-        this.mockMvc.perform(post(endpoint)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().isCreated())
-                .andReturn();
+        MockHelper.postRequest(this.mockMvc, TestUrls.createTestcase(problem.getProblemId()), request, ProblemTestCaseDto.class, HttpStatus.CREATED);
 
         // Create second test case
         request.setInput(INPUT_2);
@@ -503,19 +379,10 @@ class ProblemTests {
         request.setExplanation(EXPLANATION_2);
         request.setHidden(false);
 
-        this.mockMvc.perform(post(endpoint)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(request)))
-                .andDo(print()).andExpect(status().isCreated())
-                .andReturn();
+        MockHelper.postRequest(this.mockMvc, TestUrls.createTestcase(problem.getProblemId()), request, ProblemTestCaseDto.class, HttpStatus.CREATED);
 
         // Get problem from database
-        MvcResult result = this.mockMvc.perform(get(String.format(GET_PROBLEM, problem.getProblemId())))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ProblemDto actual = UtilityTestMethods.toObject(jsonResponse, ProblemDto.class);
+        ProblemDto actual = MockHelper.getRequest(this.mockMvc, TestUrls.getProblem(problem.getProblemId()), ProblemDto.class, HttpStatus.OK);
 
         List<ProblemTestCaseDto> testCases = actual.getTestCases();
         assertEquals(2, testCases.size());
@@ -579,7 +446,6 @@ class ProblemTests {
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-
         Map<CodeLanguage, String> actual = UtilityTestMethods.toObjectType(jsonResponse, new TypeToken<Map<CodeLanguage, String>>(){}.getType());
 
         assertEquals(javaDefaultCode, actual.get(CodeLanguage.JAVA));
@@ -591,13 +457,7 @@ class ProblemTests {
     public void getDefaultCodeProblemNotFound() throws Exception {
         ApiError ERROR = ProblemError.NOT_FOUND;
 
-        MvcResult result = this.mockMvc.perform(get(String.format(GET_DEFAULT_CODE, 999999)))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
+        ApiErrorResponse actual = MockHelper.getRequest(this.mockMvc, TestUrls.getDefaultCode("999999"), ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
     }
 }
