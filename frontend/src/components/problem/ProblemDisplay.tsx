@@ -28,6 +28,7 @@ import {
   InlineErrorIcon,
   InvertedSmallButton,
 } from '../core/Button';
+import ToggleButton from '../core/ToggleButton';
 import PrimarySelect from '../core/Select';
 import {
   SmallHeaderText,
@@ -65,6 +66,22 @@ const SettingsContainer = styled.div`
   border-radius: 10px;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   background: ${({ theme }) => theme.colors.white};
+`;
+
+type ShowProps = {
+  show: boolean,
+};
+
+const ApprovalContainer = styled.div<ShowProps>`
+  display: ${({ show }) => (show ? 'inline-block' : 'none')};
+  text-align: left;
+  margin-top: 0.5rem;
+`;
+
+const ApprovalText = styled(Text)`
+  display: inline-block;
+  margin: 0 0 0 0.75rem;
+  font-size: ${({ theme }) => theme.fontSize.subtitleXMediumLarge}
 `;
 
 const SettingsContainerRelative = styled(SettingsContainer)`
@@ -214,6 +231,9 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
   // Handle description change
   const handleDescriptionChange = (value: string) => handleChange({ target: { name: 'description', value } });
+
+  // Handle approval change
+  const handleApprovalChange = (value: boolean) => handleChange({ target: { name: 'approval', value } });
 
   // Handle updating of problem inputs
   const handleInputChange = (index: number, name: string, type: ProblemIOType) => {
@@ -442,6 +462,17 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       <SidebarContent>
         <SmallHeaderText>Options</SmallHeaderText>
         <SettingsContainer>
+          <ApprovalContainer
+            show={editMode}
+          >
+            <ToggleButton
+              onChangeFunction={() => handleApprovalChange(!newProblem.approval)}
+              checked={newProblem.approval}
+            />
+            <ApprovalText>
+              {newProblem.approval ? 'Approved' : 'Approval Pending'}
+            </ApprovalText>
+          </ApprovalContainer>
           <LowMarginMediumText>Difficulty</LowMarginMediumText>
           {Object.keys(Difficulty).map((key) => {
             const difficulty = Difficulty[key as keyof typeof Difficulty];
@@ -463,7 +494,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
           <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
           {newProblem.problemInputs.map((input, index) => (
-            <InputTypeContainer>
+            <InputTypeContainer key={generateRandomId()}>
               <TextInput
                 value={newProblem.problemInputs[index].name}
                 onChange={(e) => handleInputChange(index,

@@ -24,9 +24,11 @@ function IdContainer(props: IdProps) {
       {
         id.split('').map((c, index) => {
           if (id.length - 1 === index) {
-            return <NumberContainer style={{ margin: 0 }}>{c}</NumberContainer>;
+            // eslint-disable-next-line react/no-array-index-key
+            return <NumberContainer key={index} style={{ margin: 0 }}>{c}</NumberContainer>;
           }
-          return <NumberContainer>{c}</NumberContainer>;
+          // eslint-disable-next-line react/no-array-index-key
+          return <NumberContainer key={index}>{c}</NumberContainer>;
         })
       }
     </div>
