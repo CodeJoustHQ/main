@@ -357,6 +357,19 @@ public class ProblemService {
         return problemTagDtos;
     }
 
+    public List<ProblemDto> getProblemsWithTag(String tagId) {
+        ProblemTag problemTag = problemTagRepository.findTagByTagId(tagId);
+
+        // Throw an exception if no tag with the provided id exists.
+        if (problemTag == null) {
+            throw new ApiException(ProblemError.TAG_NOT_FOUND);
+        }
+
+        List<ProblemDto> problemDtos = new ArrayList<>();
+        problemTag.getProblems().forEach(problem -> problemDtos.add(ProblemMapper.toDto(problem)));
+        return problemDtos;
+    }
+
     public List<ProblemTagDto> getAllProblemTags() {
         List<ProblemTag> problemTags = problemTagRepository.findAll();
 
@@ -396,7 +409,7 @@ public class ProblemService {
 
         // Do not create the new problem tag if one with this name exists.
         if (problemTag == null) {
-            throw new ApiException(ProblemError.TAG_NAME_NOT_FOUND);
+            throw new ApiException(ProblemError.TAG_NOT_FOUND);
         }
 
         // Remove the problem tag from the database.

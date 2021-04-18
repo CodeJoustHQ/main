@@ -22,7 +22,7 @@ public enum ProblemError implements ApiError {
     NOT_ENOUGH_FOUND(HttpStatus.NOT_FOUND, "Not enough problems could be found with the given criteria."),
     BAD_APPROVAL(HttpStatus.BAD_REQUEST, "Cannot approve a problem with no test cases."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "A problem could not be found with the given criteria."),
-    TAG_NAME_NOT_FOUND(HttpStatus.NOT_FOUND, "A problem tag with these attributes could not be found."),
+    TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "A problem tag with these attributes could not be found."),
     TAG_NAME_ALREADY_EXISTS(HttpStatus.FORBIDDEN, "A problem tag with this name already exists."),
     BAD_PROBLEM_TAG(HttpStatus.FORBIDDEN, "Please choose a valid name for the problem tag.");
 
