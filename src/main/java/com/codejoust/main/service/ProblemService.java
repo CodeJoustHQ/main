@@ -1,11 +1,14 @@
 package com.codejoust.main.service;
 
 import com.codejoust.main.dao.ProblemRepository;
+import com.codejoust.main.dao.ProblemTagRepository;
 import com.codejoust.main.dto.problem.CreateProblemRequest;
+import com.codejoust.main.dto.problem.CreateProblemTagRequest;
 import com.codejoust.main.dto.problem.CreateTestCaseRequest;
 import com.codejoust.main.dto.problem.ProblemDto;
 import com.codejoust.main.dto.problem.ProblemInputDto;
 import com.codejoust.main.dto.problem.ProblemMapper;
+import com.codejoust.main.dto.problem.ProblemTagDto;
 import com.codejoust.main.dto.problem.ProblemTestCaseDto;
 import com.codejoust.main.exception.ProblemError;
 import com.codejoust.main.exception.api.ApiException;
@@ -14,6 +17,7 @@ import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
 import com.codejoust.main.model.problem.ProblemInput;
+import com.codejoust.main.model.problem.ProblemTag;
 import com.codejoust.main.model.problem.ProblemTestCase;
 import com.codejoust.main.service.generators.DefaultCodeGeneratorService;
 import com.codejoust.main.util.Utility;
@@ -34,15 +38,17 @@ import java.util.stream.Collectors;
 @Service
 public class ProblemService {
 
-    private final ProblemRepository repository;
+    private final ProblemRepository problemRepository;
+    private final ProblemTagRepository problemTagRepository;
     private final List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList;
     private final Random random = new Random();
     private final Gson gson = new Gson();
     private static final String PROBLEM_ACCESS_PASSWORD_KEY = "PROBLEM_ACCESS_PASSWORD";
 
     @Autowired
-    public ProblemService(ProblemRepository repository, List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList) {
-        this.repository = repository;
+    public ProblemService(ProblemRepository problemRepository, ProblemTagRepository problemTagRepository, List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList) {
+        this.problemRepository = problemRepository;
+        this.problemTagRepository = problemTagRepository;
         this.defaultCodeGeneratorServiceList = defaultCodeGeneratorServiceList;
     }
 
@@ -76,13 +82,13 @@ public class ProblemService {
             }
         }
 
-        repository.save(problem);
+        problemRepository.save(problem);
 
         return ProblemMapper.toDto(problem);
     }
 
     public ProblemDto getProblem(String problemId) {
-        Problem problem = repository.findProblemByProblemId(problemId);
+        Problem problem = problemRepository.findProblemByProblemId(problemId);
 
         if (problem == null) {
             throw new ApiException(ProblemError.NOT_FOUND);
@@ -93,11 +99,11 @@ public class ProblemService {
 
     // Method used by game management service to fetch specific problem
     public Problem getProblemEntity(String problemId) {
-        return repository.findProblemByProblemId(problemId);
+        return problemRepository.findProblemByProblemId(problemId);
     }
 
     public ProblemDto editProblem(String problemId, ProblemDto updatedProblem) {
-        Problem problem = repository.findProblemByProblemId(problemId);
+        Problem problem = problemRepository.findProblemByProblemId(problemId);
 
         if (problem == null) {
             throw new ApiException(ProblemError.NOT_FOUND);
@@ -153,19 +159,19 @@ public class ProblemService {
             problem.addTestCase(testCase);
         }
 
-        repository.save(problem);
+        problemRepository.save(problem);
 
         return ProblemMapper.toDto(problem);
     }
 
     public ProblemDto deleteProblem(String problemId) {
-        Problem problem = repository.findProblemByProblemId(problemId);
+        Problem problem = problemRepository.findProblemByProblemId(problemId);
 
         if (problem == null) {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
 
-        repository.delete(problem);
+        problemRepository.delete(problem);
 
         return ProblemMapper.toDto(problem);
     }
@@ -173,9 +179,9 @@ public class ProblemService {
     public List<ProblemDto> getAllProblems(Boolean approved) {
         List<ProblemDto> problems = new ArrayList<>();
         if (approved != null && approved) {
-            repository.findAllByApproval(true).forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
+            problemRepository.findAllByApproval(true).forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
         } else {
-            repository.findAll().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
+            problemRepository.findAll().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
         }
 
         return problems;
@@ -198,9 +204,9 @@ public class ProblemService {
 
         List<Problem> problems;
         if (difficulty == ProblemDifficulty.RANDOM) {
-            problems = repository.findAllByApproval(true);
+            problems = problemRepository.findAllByApproval(true);
         } else {
-            problems = repository.findAllByDifficultyAndApproval(difficulty, true);
+            problems = problemRepository.findAllByDifficultyAndApproval(difficulty, true);
         }
 
         if (problems == null) {
@@ -228,7 +234,7 @@ public class ProblemService {
     }
 
     public ProblemTestCaseDto createTestCase(String problemId, CreateTestCaseRequest request) {
-        Problem problem = repository.findProblemByProblemId(problemId);
+        Problem problem = problemRepository.findProblemByProblemId(problemId);
         if (problem == null) {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
@@ -259,7 +265,7 @@ public class ProblemService {
         testCase.setExplanation(request.getExplanation());
 
         problem.addTestCase(testCase);
-        repository.save(problem);
+        problemRepository.save(problem);
 
         return ProblemMapper.toTestCaseDto(testCase);
     }
@@ -306,7 +312,7 @@ public class ProblemService {
     
     public Map<CodeLanguage, String> getDefaultCode(String problemId) {
         // Convert from the Problem object to Problem DTOs.
-        Problem problem = repository.findProblemByProblemId(problemId);
+        Problem problem = problemRepository.findProblemByProblemId(problemId);
 
         if (problem == null) {
             throw new ApiException(ProblemError.NOT_FOUND);
@@ -327,6 +333,37 @@ public class ProblemService {
         }
 
         return defaultCodeMap;
+    }
+
+    public List<ProblemTagDto> getProblemTags(String problemId) {
+        Problem problem = problemRepository.findProblemByProblemId(problemId);
+
+        if (problem == null) {
+            throw new ApiException(ProblemError.NOT_FOUND);
+        }
+
+        List<ProblemTag> problemTags = problemTagRepository.findAllByProblemId(problemId);
+
+        // If the problem does not have any ProblemTags, return empty list.
+        if (problemTags == null) {
+            // TODO: Is the result null if the problem doesn't have tags?
+            return new ArrayList<ProblemTagDto>();
+        }
+
+        List<ProblemTagDto> problemTagDtos = new ArrayList<>();
+        problemTags.forEach(problemTag -> problemTagDtos.add(ProblemMapper.toProblemTagDto(problemTag)));
+        return problemTagDtos;
+    }
+
+    public List<ProblemTagDto> getAllProblemTags() {
+        List<ProblemTagDto> problemTags = new ArrayList<>();
+
+        return problemTags;
+    }
+
+    public ProblemTagDto createProblemTag(CreateProblemTagRequest request) {
+        ProblemTagDto problemTag = new ProblemTagDto();
+        return problemTag;
     }
 
     /**
