@@ -20,6 +20,7 @@ public class ProblemDto {
     private Boolean approval;
     private ProblemDifficulty difficulty;
     private List<ProblemTestCaseDto> testCases = new ArrayList<>();
+    private List<ProblemTagDto> problemTags = new ArrayList<>();
     private List<ProblemInputDto> problemInputs;
     private ProblemIOType outputType;
 }

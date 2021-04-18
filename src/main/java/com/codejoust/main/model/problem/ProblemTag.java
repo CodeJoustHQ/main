@@ -1,9 +1,12 @@
 package com.codejoust.main.model.problem;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -20,4 +23,8 @@ public class ProblemTag {
 
     @EqualsAndHashCode.Include
     private String name;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "problem_table_id")
+    private Problem problem;
 }

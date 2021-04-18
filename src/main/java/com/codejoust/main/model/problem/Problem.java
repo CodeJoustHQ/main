@@ -76,6 +76,15 @@ public class Problem {
         return testCases.remove(testCase);
     }
 
+    public void addProblemTag(ProblemTag problemTag) {
+        problemTags.add(problemTag);
+        problemTag.setProblem(this);
+    }
+
+    public boolean removeProblemTag(ProblemTag problemTag) {
+        return problemTags.remove(problemTag);
+    }
+
     public void addProblemInput(ProblemInput problemInput) {
         problemInputs.add(problemInput);
         problemInput.setProblem(this);

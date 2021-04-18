@@ -159,6 +159,15 @@ public class ProblemService {
             problem.addTestCase(testCase);
         }
 
+        problem.getProblemTags().clear();
+        for (ProblemTagDto problemTagDto : updatedProblem.getProblemTags()) {
+            if (validProblemTagName(problemTagDto.getName())) {
+                ProblemTag problemTag = new ProblemTag();
+                problemTag.setName(problemTagDto.getName());
+                problem.addProblemTag(problemTag);
+            }
+        }
+
         problemRepository.save(problem);
 
         return ProblemMapper.toDto(problem);
@@ -374,7 +383,7 @@ public class ProblemService {
         ProblemTag existingProblemTag = problemTagRepository.findProblemTagByName(request.getName());
 
         // Handle invalid request, with restraints on the length of the name.
-        if (request.getName() == null || request.getName().length() == 0 || request.getName().length() > 20) {
+        if (!validProblemTagName(request.getName())) {
             throw new ApiException(ProblemError.BAD_PROBLEM_TAG);
         }
 
@@ -388,6 +397,10 @@ public class ProblemService {
         problemTag.setName(request.getName());
         problemTagRepository.save(problemTag);
         return ProblemMapper.toProblemTagDto(problemTag);
+    }
+
+    private boolean validProblemTagName(String name) {
+        return name != null && name.length() > 0 && name.length() < 20;
     }
 
     /**
