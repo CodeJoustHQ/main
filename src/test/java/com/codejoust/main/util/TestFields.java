@@ -2,7 +2,10 @@ package com.codejoust.main.util;
 
 import com.codejoust.main.dto.user.UserDto;
 import com.codejoust.main.game_object.CodeLanguage;
+import com.codejoust.main.game_object.PlayerCode;
+import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
+import com.codejoust.main.service.SubmitService;
 
 public class TestFields {
 
@@ -10,6 +13,8 @@ public class TestFields {
     public static final String NICKNAME = "rocket";
     public static final String NICKNAME_2 = "rocketrocket";
     public static final String NICKNAME_3 = "rocketandrocket";
+    public static final String NICKNAME_4 = "rocketrocketrocket";
+    public static final String NICKNAME_5 = "rocketandrocketrocket";
     public static final String USER_ID = "012345";
     public static final String USER_ID_2 = "678910";
     public static final String USER_ID_3 = "024681";
@@ -40,9 +45,21 @@ public class TestFields {
     public static final String PROBLEM_NAME_2 = "Find Maximum";
     public static final String PROBLEM_DESCRIPTION_2 = "Find the maximum value in an array.";
     public static final String PROBLEM_ID_2 = "zyx-cba";
+    public static final ProblemIOType IO_TYPE_2 = ProblemIOType.INTEGER;
+    public static final String INPUT_3 = "[1, 2, 8]";
+    public static final String OUTPUT_3 = "8";
 
     public static final String PYTHON_CODE = "print('hello')";
     public static final CodeLanguage PYTHON_LANGUAGE = CodeLanguage.PYTHON;
+    public static final PlayerCode PLAYER_CODE = new PlayerCode(PYTHON_CODE, PYTHON_LANGUAGE);
+
+    public static final Integer NUM_PROBLEMS = 10;
+
+    // Notification constants
+    public static final String CONTENT = "[1, 2, 3]";
+    public static final String TIME_CONTENT = "are thirty minutes";
+    public static final String NAME = "Sort a List";
+    public static final String DESCRIPTION = "Sort the given list in O(n log n) time.";
 
     public static UserDto userDto1() {
         UserDto user = new UserDto();

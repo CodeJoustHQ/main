@@ -58,7 +58,7 @@ public class RoomEntityTests {
         assertTrue(room.getUsers().contains(user));
 
         // Update userToRemove to match user in attributes, but not ID.
-        userToRemove.setNickname(TestFields.NICKNAME_2);
+        userToRemove.setNickname(TestFields.NICKNAME);
         userToRemove.setUserId(TestFields.USER_ID);
         assertTrue(room.removeUser(userToRemove));
         assertFalse(room.getUsers().contains(userToRemove));

@@ -7,6 +7,7 @@ import com.codejoust.main.config.WebSocketConfig;
 import com.codejoust.main.dto.room.RoomDto;
 import com.codejoust.main.dto.user.UserDto;
 
+import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,16 +26,12 @@ public class SocketServiceTests {
     @InjectMocks
     private SocketService socketService;
 
-    // Predefine user and room attributes.
-    private static final String NICKNAME = "rocket";
-    private static final String ROOM_ID = "012345";
-
     @Test
     public void sendSocketUpdate() {
         RoomDto roomDto = new RoomDto();
-        roomDto.setRoomId(ROOM_ID);
+        roomDto.setRoomId(TestFields.ROOM_ID);
         UserDto userDto = new UserDto();
-        userDto.setNickname(NICKNAME);
+        userDto.setNickname(TestFields.NICKNAME);
         roomDto.setHost(userDto);
 
         socketService.sendSocketUpdate(roomDto);

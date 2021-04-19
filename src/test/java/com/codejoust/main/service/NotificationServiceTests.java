@@ -15,6 +15,7 @@ import com.codejoust.main.game_object.NotificationType;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 
+import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,29 +36,19 @@ public class NotificationServiceTests {
     @InjectMocks
     private NotificationService notificationService;
 
-    // Predefine user and room attributes.
-    private static final String NICKNAME = "rocket";
-    private static final String NICKNAME_2 = "rocketrocket";
-    private static final String ROOM_ID = "012345";
-    private static final String USER_ID = "098765";
-    private static final String USER_ID_2 = "345678";
-
-    // Predefine notification content.
-    private static final String CONTENT = "[1, 2, 3]";
-
     @Test
     public void sendNotificationSuccess() throws Exception {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
 
         User user = new User();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
+        user.setNickname(TestFields.NICKNAME);
+        user.setUserId(TestFields.USER_ID);
         room.addUser(user);
 
         User host = new User();
-        user.setNickname(NICKNAME_2);
-        user.setUserId(USER_ID_2);
+        user.setNickname(TestFields.NICKNAME_2);
+        user.setUserId(TestFields.USER_ID_2);
         room.addUser(host);
         room.setHost(host);
 
@@ -66,12 +57,12 @@ public class NotificationServiceTests {
         GameNotificationDto notificationDto = new GameNotificationDto();
         notificationDto.setInitiator(UserMapper.toDto(user));
         notificationDto.setTime(Instant.now());
-        notificationDto.setContent(CONTENT);
+        notificationDto.setContent(TestFields.CONTENT);
         notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
 
-        GameNotificationDto result = notificationService.sendNotification(ROOM_ID, notificationDto);
+        GameNotificationDto result = notificationService.sendNotification(TestFields.ROOM_ID, notificationDto);
 
-        verify(socketService).sendSocketUpdate(eq(ROOM_ID), eq(notificationDto));
+        verify(socketService).sendSocketUpdate(eq(TestFields.ROOM_ID), eq(notificationDto));
         assertEquals(notificationDto, result);
     }
 
