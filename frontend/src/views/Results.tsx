@@ -314,7 +314,7 @@ function GameResultsPage() {
           setPlaceModal(-1);
           setDisplayPlaceModal(false);
         }}
-        fullScreen={false}
+        fullScreen
       >
         {placeModal !== -1 ? (
           <PlaceContent>
@@ -325,6 +325,15 @@ function GameResultsPage() {
               </b>
               !
             </MainHeaderText>
+            <iframe
+              title="Airtable feedback form"
+              className="airtable-embed"
+              src="https://airtable.com/embed/shrGkEhC6RhAxRCxG?backgroundColor=blue"
+              frameBorder="0"
+              width="80%"
+              height="900"
+              style={{ background: 'transparent' }}
+            />
           </PlaceContent>
         ) : null}
       </Modal>

@@ -9,6 +9,7 @@ import {
   InlineCopyIcon,
   InlineCopyText,
 } from '../components/special/CopyIndicator';
+import Subscribe from '../components/special/Subscribe';
 
 function ContactUsPage() {
   const [copiedEmail, setCopiedEmail] = useState<boolean>(false);
@@ -52,6 +53,11 @@ function ContactUsPage() {
           </InlineCopyText>
           . Say hello!
         </ContactHeaderText>
+        <br />
+        <ContactHeaderText>
+          If you would like to keep up with future updates, fill out the form below:
+        </ContactHeaderText>
+        <Subscribe />
       </DynamicWidthContainer>
     </>
   );

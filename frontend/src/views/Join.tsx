@@ -10,6 +10,7 @@ import Loading from '../components/core/Loading';
 import ErrorMessage from '../components/core/Error';
 import { ErrorResponse } from '../api/Error';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
+import { TextLink } from '../components/core/Link';
 
 const Content = styled.div`
   padding-top: 20px;
@@ -155,6 +156,9 @@ function JoinGamePage() {
             // Input is disabled if loading or if no nickname exists, has a space, or is too long.
             disabled={!validRoomId || loading}
           />
+          <TextLink to="/game/create">
+            Or create a room &#8594;
+          </TextLink>
           { focusInput && !validRoomId ? (
             <Text>
               The room ID must have exactly six digits (numbers 0 through 9).
