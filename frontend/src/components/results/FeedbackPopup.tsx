@@ -13,7 +13,7 @@ function FeedbackPopup() {
         Makers of CodeJoust here - if you like (or dislike) the platform,
         we would love to
         {' '}
-        <a target="_blank" rel="noreferrer" href="https://airtable.com/shrGkEhC6RhAxRCxG">hear your feedback!</a>
+        <a target="_blank" rel="noopener noreferrer" href="https://airtable.com/shrGkEhC6RhAxRCxG">hear your feedback!</a>
         {' '}
         Feel free to
         {' '}

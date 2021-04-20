@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import copy from 'copy-to-clipboard';
 import { DynamicWidthContainer } from '../components/core/Container';
 import { InlineExternalLink } from '../components/core/Link';
-import { ContactHeaderTitle, ContactHeaderText, SecondaryHeaderText } from '../components/core/Text';
+import { ContactHeaderTitle, ContactHeaderText } from '../components/core/Text';
 import {
   CopyIndicator,
   CopyIndicatorContainer,
