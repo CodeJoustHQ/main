@@ -194,7 +194,7 @@ function GamePage() {
     }).catch((err) => {
       setError(err.message);
     });
-  }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage, currentProblem]);
+  }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage]);
 
   /**
    * Display the notification as a callback from the notification
