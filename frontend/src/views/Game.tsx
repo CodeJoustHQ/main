@@ -116,8 +116,9 @@ function GamePage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.Python);
-  const [currentCode, setCurrentCode] = useState('');
+  const [currentLanguage, setCurrentLanguage] = useState<Language[]>([Language.Python]);
+  const [currentCode, setCurrentCode] = useState<string[]>(['']);
+  const currentProblem = 0;
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
   const [defaultCodeList, setDefaultCodeList] = useState<DefaultCodeType[]>([]);
@@ -148,8 +149,16 @@ function GamePage() {
     setTimeUp(newGame.gameTimer.timeUp);
   };
 
+  const setCurrentOneLanguage = (newLanguage: Language) => {
+    currentLanguage[currentProblem] = newLanguage;
+  };
+
+  const setCurrentOneCode = (newCode: string) => {
+    currentCode[currentProblem] = newCode;
+  };
+
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
-    code: string, language: Language) => {
+    code: string, language: Language[]) => {
     const promises: Promise<DefaultCodeType>[] = [];
     problemsParam.forEach((problem) => {
       if (problem && problem.problemId) {
@@ -159,22 +168,22 @@ function GamePage() {
 
     // Get the result of promises and set the default code list.
     Promise.all(promises).then((result) => {
-      const codeMap = result[0];
+      const codeMap = result[currentProblem];
 
       // If previous code and language specified, save those as defaults
       if (code) {
-        codeMap[language] = code;
+        codeMap[language[currentProblem]] = code;
       }
 
       // Set this user's current code and language
-      setCurrentCode(codeMap[language]);
+      setCurrentCode([codeMap[language[currentProblem]]]);
       setCurrentLanguage(language);
 
       setDefaultCodeList(result);
     }).catch((err) => {
       setError(err.message);
     });
-  }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage]);
+  }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage, currentProblem]);
 
   /**
    * Display the notification as a callback from the notification
@@ -251,14 +260,14 @@ function GamePage() {
           // If this user refreshed and has already submitted code, load and save their latest code
           res.players.forEach((player) => {
             if (player.user.userId === location.state.currentUser.userId && player.code) {
-              setDefaultCodeFromProblems(res.problems, player.code, player.language as Language);
+              setDefaultCodeFromProblems(res.problems, player.code, [player.language as Language]);
               matchFound = true;
             }
           });
 
           // If no previous code, proceed as normal with the default Python language
           if (!matchFound) {
-            setDefaultCodeFromProblems(res.problems, '', Language.Python);
+            setDefaultCodeFromProblems(res.problems, '', [Language.Python]);
           }
         })
         .catch((err) => {
@@ -312,8 +321,8 @@ function GamePage() {
     const request = {
       initiator: currentUser!,
       input,
-      code: currentCode,
-      language: currentLanguage,
+      code: currentCode[currentProblem],
+      language: currentLanguage[currentProblem],
     };
 
     runSolution(roomId, request)
@@ -337,8 +346,8 @@ function GamePage() {
     setError('');
     const request = {
       initiator: currentUser!,
-      code: currentCode,
-      language: currentLanguage,
+      code: currentCode[currentProblem],
+      language: currentLanguage[currentProblem],
     };
 
     submitSolution(roomId, request)
@@ -416,18 +425,18 @@ function GamePage() {
         >
           {/* Problem title/description panel */}
           <OverflowPanel className="display-box-shadow">
-            <ProblemHeaderText>{problems[0]?.name}</ProblemHeaderText>
-            {problems[0] ? (
+            <ProblemHeaderText>{problems[currentProblem]?.name}</ProblemHeaderText>
+            {problems[currentProblem] ? (
               <DifficultyDisplayButton
-                difficulty={problems[0].difficulty!}
+                difficulty={problems[currentProblem].difficulty!}
                 enabled={false}
                 active
               >
-                {displayNameFromDifficulty(problems[0].difficulty!)}
+                {displayNameFromDifficulty(problems[currentProblem].difficulty!)}
               </DifficultyDisplayButton>
             ) : null}
             <StyledMarkdownEditor
-              defaultValue={problems[0]?.description}
+              defaultValue={problems[currentProblem]?.description}
               onChange={() => ''}
               readOnly
             />
@@ -454,17 +463,17 @@ function GamePage() {
           >
             <NoPaddingPanel>
               <Editor
-                onCodeChange={setCurrentCode}
-                onLanguageChange={setCurrentLanguage}
+                onCodeChange={setCurrentOneCode}
+                onLanguageChange={setCurrentOneLanguage}
                 codeMap={defaultCodeList[0]}
-                defaultLanguage={currentLanguage}
+                defaultLanguage={currentLanguage[currentProblem]}
                 defaultCode={null}
               />
             </NoPaddingPanel>
 
             <Panel>
               <Console
-                testCases={problems[0]?.testCases}
+                testCases={problems[currentProblem]?.testCases}
                 submission={submission}
                 onRun={runCode}
                 onSubmit={submitCode}
