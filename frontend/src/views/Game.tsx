@@ -179,22 +179,26 @@ function GamePage() {
 
     // Get the result of promises and set the default code list.
     Promise.all(promises).then((result) => {
-      const codeMap = result[0];
+      const codeList = [];
+
+      for (let i = 0; i < result.length; i += 1) {
+        codeList.push(result[i][language[i]]);
+      }
 
       // If previous code and language specified, save those as defaults
       if (code) {
-        codeMap[language[0]] = code;
+        codeList[currentProblem.valueOf()] = code;
       }
 
       // Set this user's current code and language
-      setCurrentCode([codeMap[language[0]]]);
+      setCurrentCode(codeList);
       setCurrentLanguage(language);
 
       setDefaultCodeList(result);
     }).catch((err) => {
       setError(err.message);
     });
-  }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage]);
+  }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage, currentProblem]);
 
   /**
    * Display the notification as a callback from the notification
@@ -491,7 +495,8 @@ function GamePage() {
               <Editor
                 onCodeChange={setOneCurrentCode}
                 onLanguageChange={setOneCurrentLanguage}
-                codeMap={defaultCodeList[0]}
+                codeMap={defaultCodeList}
+                currentProblem={currentProblem.valueOf()}
                 defaultLanguage={currentLanguage[currentProblem.valueOf()]}
                 defaultCode={null}
               />
