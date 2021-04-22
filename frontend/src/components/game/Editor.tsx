@@ -8,10 +8,11 @@ import { DefaultCodeType } from '../../api/Problem';
 type EditorProps = {
   onLanguageChange: ((language: Language) => void) | null,
   onCodeChange: ((code: string) => void) | null,
-  codeMap: DefaultCodeType[] | null,
+  defaultCodeMap: DefaultCodeType[] | null,
   defaultLanguage: Language,
   defaultCode: string | null,
-  currentProblem: number
+  currentProblem: number,
+  newLanguage: Language
 };
 
 const Content = styled.div`
@@ -89,16 +90,22 @@ const monacoEditorOptions: EditorConstructionOptions = {
 // This function refreshes the width of Monaco editor upon change in container size
 function ResizableMonacoEditor(props: EditorProps) {
   const {
-    onLanguageChange, onCodeChange, codeMap, defaultLanguage, defaultCode, currentProblem,
+    onLanguageChange, onCodeChange, defaultCodeMap, defaultLanguage, defaultCode, currentProblem,
+    newLanguage,
   } = props;
 
   const theme = useContext(ThemeContext);
   const [currentLanguage, setCurrentLanguage] = useState<Language>(defaultLanguage);
   const [codeEditor, setCodeEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const [codeMap, setCodeMap] = useState<DefaultCodeType[] | null>(defaultCodeMap);
 
   useEffect(() => {
     setCurrentLanguage(defaultLanguage);
   }, [defaultLanguage]);
+
+  useEffect(() => {
+    setCodeMap(defaultCodeMap);
+  }, [defaultCodeMap]);
 
   const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor) => {
     setCodeEditor(editor);
@@ -125,7 +132,9 @@ function ResizableMonacoEditor(props: EditorProps) {
   const handleLanguageChange = (language: Language) => {
     // Save the code for this language
     if (codeMap != null && codeEditor != null) {
+      console.log(codeMap[currentProblem][currentLanguage]);
       codeMap[currentProblem][currentLanguage] = codeEditor.getValue();
+      console.log(codeMap[currentProblem][currentLanguage]);
       codeEditor.setValue(codeMap[currentProblem][language]);
     }
 
@@ -137,10 +146,6 @@ function ResizableMonacoEditor(props: EditorProps) {
   };
 
   useEffect(() => {
-    console.log(codeMap);
-    console.log(currentProblem);
-    console.log(currentLanguage);
-
     if (codeMap != null && codeEditor != null) {
       if (codeMap[currentProblem] != null) {
         codeEditor.setValue(codeMap[currentProblem][currentLanguage]);

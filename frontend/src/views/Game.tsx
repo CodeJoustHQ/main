@@ -331,6 +331,8 @@ function GamePage() {
 
   // Callback when user runs code against custom test case
   const runCode = (input: string) => {
+    console.log(problems[currentProblem.valueOf()].name);
+
     setLoading(true);
     setError('');
     const request = {
@@ -495,9 +497,10 @@ function GamePage() {
               <Editor
                 onCodeChange={setOneCurrentCode}
                 onLanguageChange={setOneCurrentLanguage}
-                codeMap={defaultCodeList}
+                defaultCodeMap={defaultCodeList}
                 currentProblem={currentProblem.valueOf()}
-                defaultLanguage={currentLanguage[currentProblem.valueOf()]}
+                defaultLanguage={Language.Python}
+                newLanguage={currentLanguage[currentProblem.valueOf()]}
                 defaultCode={null}
               />
             </NoPaddingPanel>
