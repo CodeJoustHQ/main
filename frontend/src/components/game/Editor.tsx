@@ -11,8 +11,7 @@ type EditorProps = {
   defaultCodeMap: DefaultCodeType[] | null,
   defaultLanguage: Language,
   defaultCode: string | null,
-  currentProblem: number,
-  newLanguage: Language
+  currentProblem: number
 };
 
 const Content = styled.div`
@@ -91,7 +90,6 @@ const monacoEditorOptions: EditorConstructionOptions = {
 function ResizableMonacoEditor(props: EditorProps) {
   const {
     onLanguageChange, onCodeChange, defaultCodeMap, defaultLanguage, defaultCode, currentProblem,
-    newLanguage,
   } = props;
 
   const theme = useContext(ThemeContext);

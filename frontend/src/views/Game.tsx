@@ -500,7 +500,6 @@ function GamePage() {
                 defaultCodeMap={defaultCodeList}
                 currentProblem={currentProblem.valueOf()}
                 defaultLanguage={Language.Python}
-                newLanguage={currentLanguage[currentProblem.valueOf()]}
                 defaultCode={null}
               />
             </NoPaddingPanel>

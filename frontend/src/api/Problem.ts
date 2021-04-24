@@ -170,6 +170,5 @@ export const getDefaultCodeMap = (problemId: string): Promise<DefaultCodeType> =
   .get<DefaultCodeType>(routes.defaultCodeMap(problemId))
   .then((res) => res.data)
   .catch((err) => {
-    console.log("this is where it's all coming from");
     throw axiosErrorHandler(err);
   });
