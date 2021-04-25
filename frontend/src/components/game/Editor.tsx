@@ -131,7 +131,9 @@ function ResizableMonacoEditor(props: EditorProps) {
     // Save the code for this language
     if (codeMap != null && codeEditor != null) {
       console.log(codeMap[currentProblem][currentLanguage]);
-      codeMap[currentProblem][currentLanguage] = codeEditor.getValue();
+      let codeMapTemp = codeMap;
+      codeMapTemp[currentProblem][currentLanguage] = codeEditor.getValue();
+      setCodeMap(codeMapTemp);
       console.log(codeMap[currentProblem][currentLanguage]);
       codeEditor.setValue(codeMap[currentProblem][language]);
     }
