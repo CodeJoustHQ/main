@@ -35,6 +35,12 @@ const InlineHeaderTag = styled.span`
   color: ${({ theme }) => theme.colors.white};
 `;
 
+const LogoIcon = styled.img`
+  vertical-align: bottom;
+  width: 27px;
+  margin-right: 5px;
+`;
+
 // Note: Can also create a center header with simply display: inline-block
 
 export function Header() {
@@ -42,6 +48,7 @@ export function Header() {
     <Content>
       <nav>
         <LeftHeader to="/">
+          <LogoIcon src="/logo512.png" alt="Logo Icon" />
           CodeJoust
           <InlineHeaderTag>Beta</InlineHeaderTag>
         </LeftHeader>
@@ -58,6 +65,7 @@ export function MinimalHeader() {
     <MinimalContent>
       <nav>
         <LeftHeader to="/">
+          <LogoIcon src="/logo512.png" alt="Logo Icon" />
           CodeJoust
           <InlineHeaderTag>Beta</InlineHeaderTag>
         </LeftHeader>

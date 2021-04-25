@@ -28,6 +28,7 @@ function CreateProblemPage() {
     problemId: '',
     name: '',
     description: '',
+    approval: false,
     difficulty: Difficulty.Easy,
     testCases: [],
     problemInputs: [],
