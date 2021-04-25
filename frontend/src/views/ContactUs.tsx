@@ -9,6 +9,7 @@ import {
   InlineCopyIcon,
   InlineCopyText,
 } from '../components/special/CopyIndicator';
+import Subscribe from '../components/special/Subscribe';
 
 function ContactUsPage() {
   const [copiedEmail, setCopiedEmail] = useState<boolean>(false);
@@ -31,11 +32,11 @@ function ContactUsPage() {
         <ContactHeaderText>
           You can follow our progress on our
           {' '}
-          <InlineExternalLink href="https://github.com/rocketden" target="_blank">GitHub</InlineExternalLink>
+          <InlineExternalLink href="https://github.com/CodeJoustHQ" target="_blank">GitHub</InlineExternalLink>
           {' '}
           or our
           {' '}
-          <InlineExternalLink href="https://trello.com/b/jb0SgY1b/sprint-board" target="_blank">public roadmap on Trello</InlineExternalLink>
+          <InlineExternalLink href="https://trello.com/b/jb0SgY1b/engineering-sprint-board" target="_blank">public roadmap on Trello</InlineExternalLink>
           .
         </ContactHeaderText>
         <ContactHeaderText>
@@ -52,6 +53,11 @@ function ContactUsPage() {
           </InlineCopyText>
           . Say hello!
         </ContactHeaderText>
+        <br />
+        <ContactHeaderText>
+          If you would like to keep up with future updates, fill out the form below:
+        </ContactHeaderText>
+        <Subscribe />
       </DynamicWidthContainer>
     </>
   );
