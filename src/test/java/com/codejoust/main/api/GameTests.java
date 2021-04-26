@@ -55,9 +55,6 @@ public class GameTests {
     @Autowired
     private MockMvc mockMvc;
 
-    // Predefine notification content.
-    private static final String CONTENT = "[1, 2, 3]";
-
     // Helper method to start the game for a given room
     private void startGameHelper(RoomDto room, UserDto host) throws Exception {
         ProblemTestMethods.createSingleApprovedProblemAndTestCases(this.mockMvc);
@@ -279,7 +276,7 @@ public class GameTests {
 
         GameNotificationRequest request = new GameNotificationRequest();
         request.setInitiator(host);
-        request.setContent(CONTENT);
+        request.setContent(TestFields.CONTENT);
         request.setNotificationType(NotificationType.TEST_CORRECT);
 
         GameNotificationDto notificationDtoResult = MockHelper.postRequest(this.mockMvc,

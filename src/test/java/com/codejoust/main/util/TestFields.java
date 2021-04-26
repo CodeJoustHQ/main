@@ -3,9 +3,7 @@ package com.codejoust.main.util;
 import com.codejoust.main.dto.user.UserDto;
 import com.codejoust.main.game_object.CodeLanguage;
 import com.codejoust.main.game_object.PlayerCode;
-import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
-import com.codejoust.main.service.SubmitService;
 
 public class TestFields {
 

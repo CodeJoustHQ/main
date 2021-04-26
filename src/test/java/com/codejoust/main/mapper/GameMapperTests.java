@@ -18,7 +18,6 @@ import com.codejoust.main.dto.game.SubmissionDto;
 import com.codejoust.main.dto.problem.ProblemMapper;
 import com.codejoust.main.dto.room.RoomMapper;
 import com.codejoust.main.dto.user.UserMapper;
-import com.codejoust.main.game_object.CodeLanguage;
 import com.codejoust.main.game_object.Game;
 import com.codejoust.main.game_object.Player;
 import com.codejoust.main.game_object.PlayerCode;

@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.codejoust.main.model.problem.ProblemIOType;
 import com.codejoust.main.model.problem.ProblemInput;
 
 import com.codejoust.main.util.TestFields;

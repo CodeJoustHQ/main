@@ -10,10 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.codejoust.main.dto.game.GameMapper;
-import com.codejoust.main.game_object.CodeLanguage;
 import com.codejoust.main.game_object.Game;
 import com.codejoust.main.game_object.Player;
-import com.codejoust.main.game_object.PlayerCode;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 
