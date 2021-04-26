@@ -1,5 +1,6 @@
 package com.codejoust.main.service;
 
+import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -47,29 +48,17 @@ public class ProblemServiceTests {
     @InjectMocks
     private ProblemService problemService;
 
-    private static final String NAME = "Sort a List";
-    private static final String DESCRIPTION = "Sort the given list in O(n log n) time.";
-
-    private static final String INPUT = "[1, 8, 2]";
-    private static final String OUTPUT = "[1, 2, 8]";
-    private static final String OUTPUT_2 = "8";
-    private static final String EXPLANATION = "2 < 8, so those are swapped.";
-
-    private static final String INPUT_NAME = "nums";
-    private static final ProblemIOType IO_TYPE = ProblemIOType.ARRAY_INTEGER;
-    private static final ProblemIOType IO_TYPE_2 = ProblemIOType.INTEGER;
-
     @Test
     public void getProblemSuccess() {
         Problem expected = new Problem();
-        expected.setName(NAME);
-        expected.setDescription(DESCRIPTION);
+        expected.setName(TestFields.NAME);
+        expected.setDescription(TestFields.DESCRIPTION);
         expected.setDifficulty(ProblemDifficulty.EASY);
 
         ProblemTestCase testCase = new ProblemTestCase();
-        testCase.setInput(INPUT);
-        testCase.setOutput(OUTPUT);
-        testCase.setExplanation(EXPLANATION);
+        testCase.setInput(TestFields.INPUT);
+        testCase.setOutput(TestFields.OUTPUT);
+        testCase.setExplanation(TestFields.EXPLANATION);
         expected.addTestCase(testCase);
 
         Mockito.doReturn(expected).when(repository).findProblemByProblemId(expected.getProblemId());
@@ -98,8 +87,8 @@ public class ProblemServiceTests {
     @Test
     public void getProblemEntitySuccess() {
         Problem expected = new Problem();
-        expected.setName(NAME);
-        expected.setDescription(DESCRIPTION);
+        expected.setName(TestFields.NAME);
+        expected.setDescription(TestFields.DESCRIPTION);
 
         Mockito.doReturn(expected).when(repository).findProblemByProblemId(expected.getProblemId());
 
@@ -116,40 +105,40 @@ public class ProblemServiceTests {
     @Test
     public void createProblemSuccess() {
         CreateProblemRequest request = new CreateProblemRequest();
-        request.setName(NAME);
-        request.setDescription(DESCRIPTION);
+        request.setName(TestFields.NAME);
+        request.setDescription(TestFields.DESCRIPTION);
         request.setDifficulty(ProblemDifficulty.MEDIUM);
 
         List<ProblemInputDto> problemInputs = new ArrayList<>();
-        ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
+        ProblemInputDto problemInput = new ProblemInputDto(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problemInputs.add(problemInput);
         request.setProblemInputs(problemInputs);
-        request.setOutputType(IO_TYPE);
+        request.setOutputType(TestFields.IO_TYPE);
 
         ProblemDto response = problemService.createProblem(request);
 
         verify(repository).save(Mockito.any(Problem.class));
 
         assertNotNull(response.getProblemId());
-        assertEquals(NAME, response.getName());
-        assertEquals(DESCRIPTION, response.getDescription());
+        assertEquals(TestFields.NAME, response.getName());
+        assertEquals(TestFields.DESCRIPTION, response.getDescription());
         assertEquals(request.getDifficulty(), response.getDifficulty());
         assertEquals(0, response.getTestCases().size());
         assertEquals(problemInputs, response.getProblemInputs());
-        assertEquals(IO_TYPE, response.getOutputType());
+        assertEquals(TestFields.IO_TYPE, response.getOutputType());
     }
 
     @Test
     public void createProblemFailureEmptyField() {
         CreateProblemRequest request = new CreateProblemRequest();
-        request.setDescription(DESCRIPTION);
+        request.setDescription(TestFields.DESCRIPTION);
         request.setDifficulty(ProblemDifficulty.HARD);
 
         List<ProblemInputDto> problemInputs = new ArrayList<>();
-        ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
+        ProblemInputDto problemInput = new ProblemInputDto(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problemInputs.add(problemInput);
         request.setProblemInputs(problemInputs);
-        request.setOutputType(IO_TYPE);
+        request.setOutputType(TestFields.IO_TYPE);
 
         ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblem(request));
 
@@ -161,15 +150,15 @@ public class ProblemServiceTests {
     @ValueSource(strings = {"", "rocket rocket", "12", "$Hello", "jimmy=neutron"})
     public void createProblemInvalidIdentifier(String inputName) {
         CreateProblemRequest request = new CreateProblemRequest();
-        request.setName(NAME);
-        request.setDescription(DESCRIPTION);
+        request.setName(TestFields.NAME);
+        request.setDescription(TestFields.DESCRIPTION);
         request.setDifficulty(ProblemDifficulty.HARD);
 
         List<ProblemInputDto> problemInputs = new ArrayList<>();
-        ProblemInputDto problemInput = new ProblemInputDto(inputName, IO_TYPE);
+        ProblemInputDto problemInput = new ProblemInputDto(inputName, TestFields.IO_TYPE);
         problemInputs.add(problemInput);
         request.setProblemInputs(problemInputs);
-        request.setOutputType(IO_TYPE);
+        request.setOutputType(TestFields.IO_TYPE);
 
         ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblem(request));
 
@@ -181,14 +170,14 @@ public class ProblemServiceTests {
     public void createProblemFailureBadDifficulty() {
         // Must provide a difficulty setting
         CreateProblemRequest missingRequest = new CreateProblemRequest();
-        missingRequest.setName(NAME);
-        missingRequest.setDescription(DESCRIPTION);
+        missingRequest.setName(TestFields.NAME);
+        missingRequest.setDescription(TestFields.DESCRIPTION);
 
         List<ProblemInputDto> problemInputs = new ArrayList<>();
-        ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
+        ProblemInputDto problemInput = new ProblemInputDto(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problemInputs.add(problemInput);
         missingRequest.setProblemInputs(problemInputs);
-        missingRequest.setOutputType(IO_TYPE);
+        missingRequest.setOutputType(TestFields.IO_TYPE);
 
         ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblem(missingRequest));
 
@@ -197,11 +186,11 @@ public class ProblemServiceTests {
 
         // Difficulty setting cannot be random
         CreateProblemRequest badRequest = new CreateProblemRequest();
-        badRequest.setName(NAME);
-        badRequest.setDescription(DESCRIPTION);
+        badRequest.setName(TestFields.NAME);
+        badRequest.setDescription(TestFields.DESCRIPTION);
         badRequest.setDifficulty(ProblemDifficulty.RANDOM);
         badRequest.setProblemInputs(problemInputs);
-        badRequest.setOutputType(IO_TYPE);
+        badRequest.setOutputType(TestFields.IO_TYPE);
 
         exception = assertThrows(ApiException.class, () -> problemService.createProblem(badRequest));
 
@@ -212,8 +201,8 @@ public class ProblemServiceTests {
     @Test
     public void getProblemsSuccess() {
         Problem problem = new Problem();
-        problem.setName(NAME);
-        problem.setDescription(DESCRIPTION);
+        problem.setName(TestFields.NAME);
+        problem.setDescription(TestFields.DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.EASY);
         List<Problem> expected = new ArrayList<>();
         expected.add(problem);
@@ -223,16 +212,16 @@ public class ProblemServiceTests {
 
         assertEquals(1, response.size());
         assertNotNull(response.get(0).getProblemId());
-        assertEquals(NAME, response.get(0).getName());
-        assertEquals(DESCRIPTION, response.get(0).getDescription());
+        assertEquals(TestFields.NAME, response.get(0).getName());
+        assertEquals(TestFields.DESCRIPTION, response.get(0).getDescription());
         assertEquals(problem.getDifficulty(), response.get(0).getDifficulty());
     }
 
     @Test
     public void getAllProblemsOnlyApproved() {
         Problem problem = new Problem();
-        problem.setName(NAME);
-        problem.setDescription(DESCRIPTION);
+        problem.setName(TestFields.NAME);
+        problem.setDescription(TestFields.DESCRIPTION);
         problem.setApproval(true);
 
         List<Problem> expected = new ArrayList<>();
@@ -242,35 +231,35 @@ public class ProblemServiceTests {
         List<ProblemDto> response = problemService.getAllProblems(true);
 
         assertEquals(1, response.size());
-        assertEquals(NAME, response.get(0).getName());
+        assertEquals(TestFields.NAME, response.get(0).getName());
         assertTrue(problem.getApproval());
     }
 
     @Test
     public void createTestCaseSuccess() {
         Problem expected = new Problem();
-        expected.setName(NAME);
-        expected.setDescription(DESCRIPTION);
+        expected.setName(TestFields.NAME);
+        expected.setDescription(TestFields.DESCRIPTION);
         expected.setDifficulty(ProblemDifficulty.HARD);
         expected.addProblemInput(new ProblemInput("name", ProblemIOType.ARRAY_INTEGER));
-        expected.setOutputType(IO_TYPE);
+        expected.setOutputType(TestFields.IO_TYPE);
 
         Mockito.doReturn(expected).when(repository).findProblemByProblemId(expected.getProblemId());
 
         CreateTestCaseRequest request = new CreateTestCaseRequest();
-        request.setInput(INPUT);
-        request.setOutput(OUTPUT);
+        request.setInput(TestFields.INPUT);
+        request.setOutput(TestFields.OUTPUT);
         request.setHidden(true);
-        request.setExplanation(EXPLANATION);
+        request.setExplanation(TestFields.EXPLANATION);
 
         ProblemTestCaseDto response = problemService.createTestCase(expected.getProblemId(), request);
 
         verify(repository).save(Mockito.any(Problem.class));
 
-        assertEquals(INPUT, response.getInput());
-        assertEquals(OUTPUT, response.getOutput());
+        assertEquals(TestFields.INPUT, response.getInput());
+        assertEquals(TestFields.OUTPUT, response.getOutput());
         assertTrue(response.isHidden());
-        assertEquals(EXPLANATION, response.getExplanation());
+        assertEquals(TestFields.EXPLANATION, response.getExplanation());
 
         // The created test case should be added to this problem
         assertEquals(1, expected.getTestCases().size());
@@ -280,8 +269,8 @@ public class ProblemServiceTests {
     public void createTestCaseFailure() {
         // A problem with the given ID could not be found
         CreateTestCaseRequest noProblemRequest = new CreateTestCaseRequest();
-        noProblemRequest.setInput(INPUT);
-        noProblemRequest.setOutput(OUTPUT);
+        noProblemRequest.setInput(TestFields.INPUT);
+        noProblemRequest.setOutput(TestFields.OUTPUT);
 
         ApiException exception = assertThrows(ApiException.class, () ->
                 problemService.createTestCase("Z", noProblemRequest));
@@ -291,7 +280,7 @@ public class ProblemServiceTests {
 
         // The test case has empty fields
         CreateTestCaseRequest emptyFieldRequest = new CreateTestCaseRequest();
-        emptyFieldRequest.setOutput(OUTPUT);
+        emptyFieldRequest.setOutput(TestFields.OUTPUT);
         emptyFieldRequest.setHidden(false);
 
         Problem problem = new Problem();
@@ -309,15 +298,15 @@ public class ProblemServiceTests {
     @Test
     public void createTestCaseInvalidParsing() {
         Problem expected = new Problem();
-        expected.setName(NAME);
-        expected.setDescription(DESCRIPTION);
+        expected.setName(TestFields.NAME);
+        expected.setDescription(TestFields.DESCRIPTION);
         expected.setDifficulty(ProblemDifficulty.HARD);
-        expected.addProblemInput(new ProblemInput("name", IO_TYPE));
-        expected.setOutputType(IO_TYPE_2);
+        expected.addProblemInput(new ProblemInput("name", TestFields.IO_TYPE));
+        expected.setOutputType(TestFields.IO_TYPE_2);
 
         CreateTestCaseRequest request = new CreateTestCaseRequest();
-        request.setInput(INPUT);
-        request.setOutput(OUTPUT);
+        request.setInput(TestFields.INPUT);
+        request.setOutput(TestFields.OUTPUT);
 
         Mockito.doReturn(expected).when(repository).findProblemByProblemId(expected.getProblemId());
 
@@ -417,24 +406,24 @@ public class ProblemServiceTests {
     @Test
     public void editProblemSuccess() {
         Problem problem = new Problem();
-        problem.setName(NAME);
-        problem.setDescription(DESCRIPTION);
+        problem.setName(TestFields.NAME);
+        problem.setDescription(TestFields.DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.MEDIUM);
 
-        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        ProblemInput problemInput = new ProblemInput(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problem.addProblemInput(problemInput);
-        problem.setOutputType(IO_TYPE_2);
+        problem.setOutputType(TestFields.IO_TYPE_2);
 
         ProblemTestCase originalTestCase = new ProblemTestCase();
-        originalTestCase.setInput(INPUT);
-        originalTestCase.setOutput(OUTPUT_2);
+        originalTestCase.setInput(TestFields.INPUT_3);
+        originalTestCase.setOutput(TestFields.OUTPUT_3);
         problem.addTestCase(originalTestCase);
 
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
 
         ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
-        testCaseDto.setInput(INPUT);
-        testCaseDto.setOutput(OUTPUT_2);
+        testCaseDto.setInput(TestFields.INPUT_3);
+        testCaseDto.setOutput(TestFields.OUTPUT_3);
 
         ProblemDto updatedProblem = ProblemMapper.toDto(problem);
         updatedProblem.setTestCases(Collections.singletonList(testCaseDto));
@@ -454,17 +443,17 @@ public class ProblemServiceTests {
     @ValueSource(strings = {"class", "true", " ", "()", "\\"})
     public void editProblemInvalidIdentifier(String inputName) {
         Problem problem = new Problem();
-        problem.setName(NAME);
-        problem.setDescription(DESCRIPTION);
+        problem.setName(TestFields.NAME);
+        problem.setDescription(TestFields.DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.MEDIUM);
 
-        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        ProblemInput problemInput = new ProblemInput(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problem.addProblemInput(problemInput);
-        problem.setOutputType(IO_TYPE_2);
+        problem.setOutputType(TestFields.IO_TYPE_2);
 
         ProblemTestCase originalTestCase = new ProblemTestCase();
-        originalTestCase.setInput(INPUT);
-        originalTestCase.setOutput(OUTPUT_2);
+        originalTestCase.setInput(TestFields.INPUT_3);
+        originalTestCase.setOutput(TestFields.OUTPUT_3);
         problem.addTestCase(originalTestCase);
 
         String problemId = problem.getProblemId();
@@ -483,19 +472,19 @@ public class ProblemServiceTests {
     @Test
     public void editProblemBadTestCase() {
         Problem problem = new Problem();
-        problem.setName(NAME);
-        problem.setDescription(DESCRIPTION);
+        problem.setName(TestFields.NAME);
+        problem.setDescription(TestFields.DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.MEDIUM);
 
-        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        ProblemInput problemInput = new ProblemInput(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problem.addProblemInput(problemInput);
-        problem.setOutputType(IO_TYPE);
+        problem.setOutputType(TestFields.IO_TYPE);
 
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
 
         ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
         testCaseDto.setInput("[1, 2, 3");
-        testCaseDto.setOutput(OUTPUT);
+        testCaseDto.setOutput(TestFields.OUTPUT);
 
         ProblemDto updatedProblem = ProblemMapper.toDto(problem);
         updatedProblem.setTestCases(Collections.singletonList(testCaseDto));
@@ -510,19 +499,19 @@ public class ProblemServiceTests {
     @Test
     public void editProblemBadTestCaseOutput() {
         Problem problem = new Problem();
-        problem.setName(NAME);
-        problem.setDescription(DESCRIPTION);
+        problem.setName(TestFields.NAME);
+        problem.setDescription(TestFields.DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.MEDIUM);
 
-        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        ProblemInput problemInput = new ProblemInput(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problem.addProblemInput(problemInput);
-        problem.setOutputType(IO_TYPE_2);
+        problem.setOutputType(TestFields.IO_TYPE_2);
 
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
 
         ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
-        testCaseDto.setInput(INPUT);
-        testCaseDto.setOutput(OUTPUT);
+        testCaseDto.setInput(TestFields.INPUT);
+        testCaseDto.setOutput(TestFields.OUTPUT);
 
         ProblemDto updatedProblem = ProblemMapper.toDto(problem);
         updatedProblem.setTestCases(Collections.singletonList(testCaseDto));
@@ -536,11 +525,11 @@ public class ProblemServiceTests {
     @Test
     public void editProblemBadApproval() {
         Problem problem = new Problem();
-        problem.setName(NAME);
-        problem.setDescription(DESCRIPTION);
+        problem.setName(TestFields.NAME);
+        problem.setDescription(TestFields.DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.MEDIUM);
         problem.setOutputType(ProblemIOType.STRING);
-        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        ProblemInput problemInput = new ProblemInput(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problem.addProblemInput(problemInput);
 
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
@@ -558,19 +547,19 @@ public class ProblemServiceTests {
     @Test
     public void editProblemEmptyFields() {
         Problem problem = new Problem();
-        problem.setName(NAME);
-        problem.setDescription(DESCRIPTION);
+        problem.setName(TestFields.NAME);
+        problem.setDescription(TestFields.DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.MEDIUM);
 
-        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        ProblemInput problemInput = new ProblemInput(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problem.addProblemInput(problemInput);
-        problem.setOutputType(IO_TYPE);
+        problem.setOutputType(TestFields.IO_TYPE);
 
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
 
         ProblemTestCaseDto testCaseDto = new ProblemTestCaseDto();
-        testCaseDto.setInput(INPUT);
-        testCaseDto.setOutput(OUTPUT);
+        testCaseDto.setInput(TestFields.INPUT);
+        testCaseDto.setOutput(TestFields.OUTPUT);
 
         ProblemDto updatedProblem = ProblemMapper.toDto(problem);
         updatedProblem.setTestCases(Collections.singletonList(testCaseDto));
@@ -586,23 +575,23 @@ public class ProblemServiceTests {
     @Test
     public void editProblemNewProblemInputInvalidatesTestCases() {
         Problem problem = new Problem();
-        problem.setName(NAME);
-        problem.setDescription(DESCRIPTION);
+        problem.setName(TestFields.NAME);
+        problem.setDescription(TestFields.DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.MEDIUM);
 
-        ProblemInput problemInput = new ProblemInput(INPUT_NAME, IO_TYPE);
+        ProblemInput problemInput = new ProblemInput(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problem.addProblemInput(problemInput);
-        problem.setOutputType(IO_TYPE);
+        problem.setOutputType(TestFields.IO_TYPE);
 
         ProblemTestCase testCase = new ProblemTestCase();
-        testCase.setInput(INPUT);
-        testCase.setOutput(OUTPUT);
+        testCase.setInput(TestFields.INPUT);
+        testCase.setOutput(TestFields.OUTPUT);
         problem.addTestCase(testCase);
 
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
 
         ProblemDto updatedProblem = ProblemMapper.toDto(problem);
-        updatedProblem.getProblemInputs().get(0).setType(IO_TYPE_2);
+        updatedProblem.getProblemInputs().get(0).setType(TestFields.IO_TYPE_2);
 
         String problemId = problem.getProblemId();
         ApiException exception = assertThrows(ApiException.class, () ->
@@ -614,8 +603,8 @@ public class ProblemServiceTests {
     @Test
     public void deleteProblemSuccess() {
         Problem problem = new Problem();
-        problem.setName(NAME);
-        problem.setDescription(DESCRIPTION);
+        problem.setName(TestFields.NAME);
+        problem.setDescription(TestFields.DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.MEDIUM);
 
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());

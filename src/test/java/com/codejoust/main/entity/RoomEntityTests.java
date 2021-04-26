@@ -1,5 +1,6 @@
 package com.codejoust.main.entity;
 
+import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -15,14 +16,6 @@ import com.codejoust.main.model.User;
 @SpringBootTest
 public class RoomEntityTests {
 
-    // Predefine user and room attributes.
-    private static final String NICKNAME = "rocket";
-    private static final String USER_ID = "012345";
-    private static final Integer ID = 1;
-    private static final String NICKNAME_2 = "rocketrocket";
-    private static final String USER_ID_2 = "678910";
-    private static final Integer ID_2 = 2;
-
     @Test
     public void roomInitialization() {
         Room room = new Room();
@@ -37,8 +30,8 @@ public class RoomEntityTests {
         Room room = new Room();
 
         User user = new User();
-        user.setNickname(NICKNAME);
-        user.setId(ID);
+        user.setNickname(TestFields.NICKNAME);
+        user.setId(TestFields.ID);
 
         room.addUser(user);
 
@@ -51,22 +44,22 @@ public class RoomEntityTests {
         Room room = new Room();
 
         User user = new User();
-        user.setNickname(NICKNAME);
-        user.setId(ID);
-        user.setUserId(USER_ID);
+        user.setNickname(TestFields.NICKNAME);
+        user.setId(TestFields.ID);
+        user.setUserId(TestFields.USER_ID);
         room.addUser(user);
         
         User userToRemove = new User();
-        userToRemove.setNickname(NICKNAME_2);
-        userToRemove.setId(ID_2);
-        userToRemove.setUserId(USER_ID_2);
+        userToRemove.setNickname(TestFields.NICKNAME_2);
+        userToRemove.setId(TestFields.ID_2);
+        userToRemove.setUserId(TestFields.USER_ID_2);
 
         assertFalse(room.removeUser(userToRemove));
         assertTrue(room.getUsers().contains(user));
 
         // Update userToRemove to match user in attributes, but not ID.
-        userToRemove.setNickname(NICKNAME);
-        userToRemove.setUserId(USER_ID);
+        userToRemove.setNickname(TestFields.NICKNAME);
+        userToRemove.setUserId(TestFields.USER_ID);
         assertTrue(room.removeUser(userToRemove));
         assertFalse(room.getUsers().contains(userToRemove));
         assertFalse(room.getUsers().contains(user));
@@ -77,21 +70,21 @@ public class RoomEntityTests {
         Room room = new Room();
 
         User user = new User();
-        user.setNickname(NICKNAME);
-        user.setId(ID);
-        user.setUserId(USER_ID);
+        user.setNickname(TestFields.NICKNAME);
+        user.setId(TestFields.ID);
+        user.setUserId(TestFields.USER_ID);
         room.addUser(user);
 
         User userToGet = new User();
-        userToGet.setNickname(NICKNAME_2);
-        userToGet.setId(ID_2);
-        userToGet.setUserId(USER_ID_2);
+        userToGet.setNickname(TestFields.NICKNAME_2);
+        userToGet.setId(TestFields.ID_2);
+        userToGet.setUserId(TestFields.USER_ID_2);
 
         assertNull(room.getEquivalentUser(userToGet));
 
         // Update userToGet to confirm that user is same despite different ID.
-        userToGet.setNickname(NICKNAME);
-        userToGet.setUserId(USER_ID);
+        userToGet.setNickname(TestFields.NICKNAME);
+        userToGet.setUserId(TestFields.USER_ID);
         User actual = room.getEquivalentUser(userToGet);
 
         assertEquals(user.getNickname(), actual.getNickname());

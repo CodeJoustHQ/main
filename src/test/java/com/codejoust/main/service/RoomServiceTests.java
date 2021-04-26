@@ -1,5 +1,6 @@
 package com.codejoust.main.service;
 
+import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -60,42 +61,26 @@ public class RoomServiceTests {
     @InjectMocks
     private RoomService roomService;
 
-    // Predefine user and room attributes.
-    private static final String NICKNAME = "rocket";
-    private static final String NICKNAME_2 = "rocketrocket";
-    private static final String NICKNAME_3 = "rocketandrocket";
-    private static final String NICKNAME_4 = "rocketrocketrocket";
-    private static final String NICKNAME_5 = "rocketandrocketrocket";
-    private static final String SESSION_ID = "abcdef";
-    private static final String SESSION_ID_2 = "ghijkl";
-    private static final String ROOM_ID = "012345";
-    private static final String USER_ID = "678910";
-    private static final String USER_ID_2 = "123456";
-    private static final String USER_ID_3 = "024681";
-    private static final String PROBLEM_ID = "abcdef-hijklm";
-    private static final String PROBLEM_ID_2 = "zzzzz-aaaaa";
-    private static final long DURATION = 600;
-
     @Test
     public void createRoomSuccess() {
         UserDto user = new UserDto();
-        user.setNickname(NICKNAME);
+        user.setNickname(TestFields.NICKNAME);
         CreateRoomRequest request = new CreateRoomRequest();
         request.setHost(user);
         
         // Mock generateUniqueId to return a custom room id
-        Mockito.doReturn(ROOM_ID).when(utility).generateUniqueId(eq(RoomService.ROOM_ID_LENGTH), eq(Utility.ROOM_ID_KEY));
+        Mockito.doReturn(TestFields.ROOM_ID).when(utility).generateUniqueId(eq(RoomService.ROOM_ID_LENGTH), eq(Utility.ROOM_ID_KEY));
 
         // Mock generateUniqueId to return a custom user id
-        Mockito.doReturn(USER_ID).when(utility).generateUniqueId(eq(UserService.USER_ID_LENGTH), eq(Utility.USER_ID_KEY));
+        Mockito.doReturn(TestFields.USER_ID).when(utility).generateUniqueId(eq(UserService.USER_ID_LENGTH), eq(Utility.USER_ID_KEY));
 
         // Verify create room request succeeds and returns correct response
         RoomDto response = roomService.createRoom(request);
 
         verify(repository).save(Mockito.any(Room.class));
-        assertEquals(ROOM_ID, response.getRoomId());
+        assertEquals(TestFields.ROOM_ID, response.getRoomId());
         assertEquals(user.getNickname(), response.getHost().getNickname());
-        assertEquals(USER_ID, response.getHost().getUserId());
+        assertEquals(TestFields.USER_ID, response.getHost().getUserId());
         assertEquals(ProblemDifficulty.RANDOM, response.getDifficulty());
         assertEquals(0, response.getProblems().size());
     }
@@ -104,32 +89,32 @@ public class RoomServiceTests {
     public void joinRoomSuccess() {
         // Verify join room request succeeds and returns correct response
         User user = new User();
-        user.setNickname(NICKNAME);
+        user.setNickname(TestFields.NICKNAME);
         JoinRoomRequest request = new JoinRoomRequest();
         request.setUser(UserMapper.toDto(user));
 
         // Mock generateUniqueId to return a custom user id
-        Mockito.doReturn(USER_ID).when(utility).generateUniqueId(eq(UserService.USER_ID_LENGTH), eq(Utility.USER_ID_KEY));
+        Mockito.doReturn(TestFields.USER_ID).when(utility).generateUniqueId(eq(UserService.USER_ID_LENGTH), eq(Utility.USER_ID_KEY));
 
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
 
         // Create host
         User host = new User();
-        host.setNickname(NICKNAME_2);
+        host.setNickname(TestFields.NICKNAME_2);
         room.addUser(host);
         room.setHost(host);
 
         // Mock repository to return room when called
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
-        RoomDto response = roomService.joinRoom(ROOM_ID, request);
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
+        RoomDto response = roomService.joinRoom(TestFields.ROOM_ID, request);
 
         verify(socketService).sendSocketUpdate(eq(response));
-        assertEquals(ROOM_ID, response.getRoomId());
+        assertEquals(TestFields.ROOM_ID, response.getRoomId());
         assertEquals(2, response.getUsers().size());
         assertEquals(host.getNickname(), response.getUsers().get(0).getNickname());
         assertEquals(user.getNickname(), response.getUsers().get(1).getNickname());
-        assertEquals(USER_ID, response.getUsers().get(1).getUserId());
+        assertEquals(TestFields.USER_ID, response.getUsers().get(1).getUserId());
         assertEquals(ProblemDifficulty.RANDOM, response.getDifficulty());
     }
 
@@ -137,17 +122,17 @@ public class RoomServiceTests {
     public void joinRoomNonexistentFailure() {
         // Verify join room request fails when room does not exist
         User user = new User();
-        user.setNickname(NICKNAME);
+        user.setNickname(TestFields.NICKNAME);
         JoinRoomRequest request = new JoinRoomRequest();
         request.setUser(UserMapper.toDto(user));
 
         // Mock repository to return room when called
-        Mockito.doReturn(null).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(null).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         // Assert that service.joinRoom(request) throws the correct exception
-        ApiException exception = assertThrows(ApiException.class, () -> roomService.joinRoom(ROOM_ID, request));
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.joinRoom(TestFields.ROOM_ID, request));
 
-        verify(repository).findRoomByRoomId(ROOM_ID);
+        verify(repository).findRoomByRoomId(TestFields.ROOM_ID);
         assertEquals(RoomError.NOT_FOUND, exception.getError());
     }
 
@@ -160,23 +145,23 @@ public class RoomServiceTests {
          * second one the joiner
          */
         User firstUser = new User();
-        firstUser.setNickname(NICKNAME);
+        firstUser.setNickname(TestFields.NICKNAME);
         UserDto newUser = new UserDto();
-        newUser.setNickname(NICKNAME);
+        newUser.setNickname(TestFields.NICKNAME);
 
         JoinRoomRequest request = new JoinRoomRequest();
         request.setUser(newUser);
 
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         room.setHost(firstUser);
         room.addUser(firstUser);
 
         // Mock repository to return room when called
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
-        ApiException exception = assertThrows(ApiException.class, () -> roomService.joinRoom(ROOM_ID, request));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.joinRoom(TestFields.ROOM_ID, request));
 
-        verify(repository).findRoomByRoomId(ROOM_ID);
+        verify(repository).findRoomByRoomId(TestFields.ROOM_ID);
         assertEquals(RoomError.DUPLICATE_USERNAME, exception.getError());
     }
 
@@ -188,16 +173,16 @@ public class RoomServiceTests {
          * Define four users, add to the room, and attempt to set room size to 3
          */
         User firstUser = new User();
-        firstUser.setNickname(NICKNAME);
+        firstUser.setNickname(TestFields.NICKNAME);
         User secondUser = new User();
-        secondUser.setNickname(NICKNAME_2);
+        secondUser.setNickname(TestFields.NICKNAME_2);
         User thirdUser = new User();
-        thirdUser.setNickname(NICKNAME_3);
+        thirdUser.setNickname(TestFields.NICKNAME_3);
         User fourthUser = new User();
-        fourthUser.setNickname(NICKNAME_4);
+        fourthUser.setNickname(TestFields.NICKNAME_4);
 
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         room.setSize(4);
         room.setHost(firstUser);
         room.addUser(firstUser);
@@ -207,17 +192,17 @@ public class RoomServiceTests {
         room.addUser(fourthUser);
 
         // Mock repository to return room when called
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(firstUser));
         request.setDifficulty(ProblemDifficulty.EASY);
-        request.setDuration(DURATION);
+        request.setDuration(TestFields.DURATION);
         request.setSize(3);
 
-        ApiException exception = assertThrows(ApiException.class, () -> roomService.updateRoomSettings(ROOM_ID, request));
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.updateRoomSettings(TestFields.ROOM_ID, request));
         assertEquals(RoomError.BAD_ROOM_SIZE, exception.getError());
-        verify(repository).findRoomByRoomId(ROOM_ID);
+        verify(repository).findRoomByRoomId(TestFields.ROOM_ID);
     }
 
     @Test
@@ -227,21 +212,21 @@ public class RoomServiceTests {
          * Define five users, and add to the room
          */
         User firstUser = new User();
-        firstUser.setNickname(NICKNAME);
+        firstUser.setNickname(TestFields.NICKNAME);
         User secondUser = new User();
-        secondUser.setNickname(NICKNAME_2);
+        secondUser.setNickname(TestFields.NICKNAME_2);
         User thirdUser = new User();
-        thirdUser.setNickname(NICKNAME_3);
+        thirdUser.setNickname(TestFields.NICKNAME_3);
         User fourthUser = new User();
-        fourthUser.setNickname(NICKNAME_4);
+        fourthUser.setNickname(TestFields.NICKNAME_4);
         UserDto fifthUser = new UserDto();
-        fifthUser.setNickname(NICKNAME_5);
+        fifthUser.setNickname(TestFields.NICKNAME_5);
 
         JoinRoomRequest request = new JoinRoomRequest();
         request.setUser(fifthUser);
 
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         room.setSize(4);
         room.setHost(firstUser);
         room.addUser(firstUser);
@@ -251,10 +236,10 @@ public class RoomServiceTests {
         room.addUser(fourthUser);
 
         // Mock repository to return room when called
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
-        ApiException exception = assertThrows(ApiException.class, () -> roomService.joinRoom(ROOM_ID, request));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.joinRoom(TestFields.ROOM_ID, request));
 
-        verify(repository).findRoomByRoomId(ROOM_ID);
+        verify(repository).findRoomByRoomId(TestFields.ROOM_ID);
         assertEquals(RoomError.ALREADY_FULL, exception.getError());
     }
 
@@ -266,14 +251,14 @@ public class RoomServiceTests {
          * Define a hundred users, add to the room, then request to add another user
          */
         User firstUser = new User();
-        firstUser.setNickname(NICKNAME);
+        firstUser.setNickname(TestFields.NICKNAME);
         UserDto secondUser = new UserDto();
-        secondUser.setNickname(NICKNAME_2);
+        secondUser.setNickname(TestFields.NICKNAME_2);
         JoinRoomRequest request = new JoinRoomRequest();
         request.setUser(secondUser);
 
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         room.setSize((int) (RoomService.MAX_SIZE + 1));
         room.setHost(firstUser);
         room.addUser(firstUser);
@@ -285,9 +270,9 @@ public class RoomServiceTests {
         }
 
         // Mock repository to return room when called
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
-        assertDoesNotThrow(() -> roomService.joinRoom(ROOM_ID, request));
-        verify(repository).findRoomByRoomId(ROOM_ID);
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
+        assertDoesNotThrow(() -> roomService.joinRoom(TestFields.ROOM_ID, request));
+        verify(repository).findRoomByRoomId(TestFields.ROOM_ID);
 
         assertEquals(102, room.getUsers().size());
     }
@@ -296,18 +281,18 @@ public class RoomServiceTests {
     @Test
     public void getRoomSuccess() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
 
         User host = new User();
-        host.setNickname(NICKNAME);
+        host.setNickname(TestFields.NICKNAME);
 
         room.setHost(host);
         room.addUser(host);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
-        RoomDto response = roomService.getRoom(ROOM_ID);
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
+        RoomDto response = roomService.getRoom(TestFields.ROOM_ID);
 
-        assertEquals(ROOM_ID, response.getRoomId());
+        assertEquals(TestFields.ROOM_ID, response.getRoomId());
         assertEquals(room.getHost(), UserMapper.toEntity(response.getHost()));
 
         List<User> actual = response.getUsers().stream()
@@ -317,7 +302,7 @@ public class RoomServiceTests {
 
     @Test
     public void getRoomFailure() {
-        ApiException exception = assertThrows(ApiException.class, () -> roomService.getRoom(ROOM_ID));
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.getRoom(TestFields.ROOM_ID));
 
         assertEquals(RoomError.NOT_FOUND, exception.getError());
     }
@@ -325,21 +310,21 @@ public class RoomServiceTests {
     @Test
     public void changeRoomHostSuccess() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
 
         User host = new User();
-        host.setNickname(NICKNAME);
-        host.setSessionId(SESSION_ID);
+        host.setNickname(TestFields.NICKNAME);
+        host.setSessionId(TestFields.SESSION_ID);
 
         User user =  new User();
-        user.setNickname(NICKNAME_2);
-        user.setSessionId(SESSION_ID_2);
+        user.setNickname(TestFields.NICKNAME_2);
+        user.setSessionId(TestFields.SESSION_ID_2);
 
         room.setHost(host);
         room.addUser(host);
         room.addUser(user);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         UpdateHostRequest request = new UpdateHostRequest();
         request.setInitiator(UserMapper.toDto(host));
@@ -354,21 +339,21 @@ public class RoomServiceTests {
     @Test
     public void changeRoomHostFailure() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
 
         User host = new User();
-        host.setNickname(NICKNAME);
-        host.setSessionId(SESSION_ID);
+        host.setNickname(TestFields.NICKNAME);
+        host.setSessionId(TestFields.SESSION_ID);
 
         User user =  new User();
-        user.setNickname(NICKNAME_2);
-        user.setSessionId(SESSION_ID_2);
+        user.setNickname(TestFields.NICKNAME_2);
+        user.setSessionId(TestFields.SESSION_ID_2);
 
         room.setHost(host);
         room.addUser(host);
         room.addUser(user);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         // Invalid permissions
         UpdateHostRequest invalidPermRequest = new UpdateHostRequest();
@@ -376,7 +361,7 @@ public class RoomServiceTests {
         invalidPermRequest.setNewHost(UserMapper.toDto(host));
 
         ApiException exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomHost(ROOM_ID, invalidPermRequest, false));
+                roomService.updateRoomHost(TestFields.ROOM_ID, invalidPermRequest, false));
         assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
 
         // Nonexistent room
@@ -393,11 +378,11 @@ public class RoomServiceTests {
         noUserRequest.setInitiator(UserMapper.toDto(host));
 
         UserDto nonExistentUser = new UserDto();
-        nonExistentUser.setNickname(NICKNAME_3);
+        nonExistentUser.setNickname(TestFields.NICKNAME_3);
         noUserRequest.setNewHost(nonExistentUser);
 
         exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomHost(ROOM_ID, noUserRequest, false));
+                roomService.updateRoomHost(TestFields.ROOM_ID, noUserRequest, false));
         assertEquals(UserError.NOT_FOUND, exception.getError());
 
         // New host inactive
@@ -407,27 +392,27 @@ public class RoomServiceTests {
         inactiveUserRequest.setNewHost(UserMapper.toDto(user));
 
         exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomHost(ROOM_ID, inactiveUserRequest, false));
+                roomService.updateRoomHost(TestFields.ROOM_ID, inactiveUserRequest, false));
         assertEquals(RoomError.INACTIVE_USER, exception.getError());
     }
 
     @Test
     public void updateRoomSettingsSuccess() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
 
         User host = new User();
-        host.setNickname(NICKNAME);
+        host.setNickname(TestFields.NICKNAME);
 
         room.setHost(host);
         room.addUser(host);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(host));
         request.setDifficulty(ProblemDifficulty.EASY);
-        request.setDuration(DURATION);
+        request.setDuration(TestFields.DURATION);
         request.setSize(5);
         request.setNumProblems(3);
 
@@ -443,18 +428,18 @@ public class RoomServiceTests {
     @Test
     public void updateRoomSettingsInvalidPermissions() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
 
         User host = new User();
-        host.setNickname(NICKNAME);
+        host.setNickname(TestFields.NICKNAME);
         User user =  new User();
-        user.setNickname(NICKNAME_2);
+        user.setNickname(TestFields.NICKNAME_2);
 
         room.setHost(host);
         room.addUser(host);
         room.addUser(user);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         // Invalid permissions
         UpdateSettingsRequest invalidPermRequest = new UpdateSettingsRequest();
@@ -462,14 +447,14 @@ public class RoomServiceTests {
         invalidPermRequest.setDifficulty(ProblemDifficulty.MEDIUM);
 
         ApiException exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomSettings(ROOM_ID, invalidPermRequest));
+                roomService.updateRoomSettings(TestFields.ROOM_ID, invalidPermRequest));
         assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
     }
 
     @Test
     public void updateRoomSettingsNoRoomFound() {
         UserDto userDto = new UserDto();
-        userDto.setNickname(NICKNAME);
+        userDto.setNickname(TestFields.NICKNAME);
 
         // Non-existent room
         UpdateSettingsRequest noRoomRequest = new UpdateSettingsRequest();
@@ -484,37 +469,37 @@ public class RoomServiceTests {
     @Test
     public void updateRoomSettingsInvalidDuration() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
 
         User host = new User();
-        host.setNickname(NICKNAME);
+        host.setNickname(TestFields.NICKNAME);
 
         room.setHost(host);
         room.addUser(host);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(host));
         request.setDifficulty(ProblemDifficulty.EASY);
         request.setDuration(-1L);
 
-        ApiException exception = assertThrows(ApiException.class, () -> roomService.updateRoomSettings(ROOM_ID, request));
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.updateRoomSettings(TestFields.ROOM_ID, request));
         assertEquals(TimerError.INVALID_DURATION, exception.getError());
     }
 
     @Test
     public void updateRoomSettingsDurationTooLong() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
 
         User host = new User();
-        host.setNickname(NICKNAME);
+        host.setNickname(TestFields.NICKNAME);
 
         room.setHost(host);
         room.addUser(host);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(host));
@@ -522,103 +507,103 @@ public class RoomServiceTests {
         request.setDifficulty(ProblemDifficulty.EASY);
         request.setDuration(RoomService.MAX_DURATION + 1);
 
-        ApiException exception = assertThrows(ApiException.class, () -> roomService.updateRoomSettings(ROOM_ID, request));
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.updateRoomSettings(TestFields.ROOM_ID, request));
         assertEquals(TimerError.INVALID_DURATION, exception.getError());
     }
 
     @Test
     public void updateRoomSettingsBadNumProblems() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
 
         User host = new User();
-        host.setNickname(NICKNAME);
+        host.setNickname(TestFields.NICKNAME);
 
         room.setHost(host);
         room.addUser(host);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(host));
         request.setNumProblems(-1);
 
         ApiException exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomSettings(ROOM_ID, request));
+                roomService.updateRoomSettings(TestFields.ROOM_ID, request));
         assertEquals(ProblemError.INVALID_NUMBER_REQUEST, exception.getError());
     }
 
     @Test
     public void updateRoomSettingsExceedsMaxProblems() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
 
         User host = new User();
-        host.setNickname(NICKNAME);
+        host.setNickname(TestFields.NICKNAME);
 
         room.setHost(host);
         room.addUser(host);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(host));
         request.setNumProblems(RoomService.MAX_NUM_PROBLEMS + 1);
 
         ApiException exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomSettings(ROOM_ID, request));
+                roomService.updateRoomSettings(TestFields.ROOM_ID, request));
         assertEquals(ProblemError.INVALID_NUMBER_REQUEST, exception.getError());
     }
 
     @Test
     public void updateRoomSettingsTooManySelectedProblems() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         User host = new User();
-        host.setNickname(NICKNAME);
+        host.setNickname(TestFields.NICKNAME);
         room.setHost(host);
         room.addUser(host);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(host));
         request.setNumProblems(1);
 
         SelectableProblemDto problemDto = new SelectableProblemDto();
-        problemDto.setProblemId(PROBLEM_ID);
+        problemDto.setProblemId(TestFields.PROBLEM_ID);
         SelectableProblemDto problemDto2 = new SelectableProblemDto();
-        problemDto.setProblemId(PROBLEM_ID_2);
+        problemDto.setProblemId(TestFields.PROBLEM_ID_2);
         request.setProblems(Arrays.asList(problemDto, problemDto2));
 
         ApiException exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomSettings(ROOM_ID, request));
+                roomService.updateRoomSettings(TestFields.ROOM_ID, request));
         assertEquals(RoomError.TOO_MANY_PROBLEMS, exception.getError());
     }
 
     @Test
     public void removeUserSuccessHostInitiator() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
 
         User host = new User();
-        host.setNickname(NICKNAME);
-        host.setUserId(USER_ID);
+        host.setNickname(TestFields.NICKNAME);
+        host.setUserId(TestFields.USER_ID);
 
         room.setHost(host);
         room.addUser(host);
 
         User user = new User();
-        user.setNickname(NICKNAME_2);
-        user.setUserId(USER_ID_2);
+        user.setNickname(TestFields.NICKNAME_2);
+        user.setUserId(TestFields.USER_ID_2);
         room.addUser(user);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         RemoveUserRequest request = new RemoveUserRequest();
         request.setInitiator(UserMapper.toDto(host));
         request.setUserToDelete(UserMapper.toDto(user));
-        RoomDto response = roomService.removeUser(ROOM_ID, request);
+        RoomDto response = roomService.removeUser(TestFields.ROOM_ID, request);
 
         verify(socketService).sendSocketUpdate(eq(response));
         assertEquals(1, response.getUsers().size());
@@ -628,26 +613,26 @@ public class RoomServiceTests {
     @Test
     public void removeUserSuccessSelfInitiator() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
 
         User host = new User();
-        host.setNickname(NICKNAME);
-        host.setUserId(USER_ID);
+        host.setNickname(TestFields.NICKNAME);
+        host.setUserId(TestFields.USER_ID);
 
         room.setHost(host);
         room.addUser(host);
 
         User user = new User();
-        user.setNickname(NICKNAME_2);
-        user.setUserId(USER_ID_2);
+        user.setNickname(TestFields.NICKNAME_2);
+        user.setUserId(TestFields.USER_ID_2);
         room.addUser(user);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         RemoveUserRequest request = new RemoveUserRequest();
         request.setInitiator(UserMapper.toDto(user));
         request.setUserToDelete(UserMapper.toDto(user));
-        RoomDto response = roomService.removeUser(ROOM_ID, request);
+        RoomDto response = roomService.removeUser(TestFields.ROOM_ID, request);
 
         verify(socketService).sendSocketUpdate(eq(response));
         assertEquals(1, response.getUsers().size());
@@ -657,28 +642,28 @@ public class RoomServiceTests {
     @Test
     public void removeHost() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
 
         User host = new User();
-        host.setNickname(NICKNAME);
-        host.setUserId(USER_ID);
-        host.setSessionId(SESSION_ID);
+        host.setNickname(TestFields.NICKNAME);
+        host.setUserId(TestFields.USER_ID);
+        host.setSessionId(TestFields.SESSION_ID);
 
         room.setHost(host);
         room.addUser(host);
 
         User user = new User();
-        user.setNickname(NICKNAME_2);
-        user.setUserId(USER_ID_2);
-        user.setSessionId(SESSION_ID_2);
+        user.setNickname(TestFields.NICKNAME_2);
+        user.setUserId(TestFields.USER_ID_2);
+        user.setSessionId(TestFields.SESSION_ID_2);
         room.addUser(user);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         RemoveUserRequest request = new RemoveUserRequest();
         request.setInitiator(UserMapper.toDto(host));
         request.setUserToDelete(UserMapper.toDto(host));
-        RoomDto response = roomService.removeUser(ROOM_ID, request);
+        RoomDto response = roomService.removeUser(TestFields.ROOM_ID, request);
 
         verify(socketService).sendSocketUpdate(eq(response));
         assertEquals(1, response.getUsers().size());
@@ -689,96 +674,96 @@ public class RoomServiceTests {
     @Test
     public void removeNonExistentUser() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
 
         User host = new User();
-        host.setNickname(NICKNAME);
-        host.setUserId(USER_ID);
+        host.setNickname(TestFields.NICKNAME);
+        host.setUserId(TestFields.USER_ID);
 
         room.setHost(host);
         room.addUser(host);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         User user = new User();
-        user.setUserId(USER_ID_2);
+        user.setUserId(TestFields.USER_ID_2);
 
         RemoveUserRequest request = new RemoveUserRequest();
         request.setInitiator(UserMapper.toDto(host));
         request.setUserToDelete(UserMapper.toDto(user));
 
         ApiException exception = assertThrows(ApiException.class, () ->
-                roomService.removeUser(ROOM_ID, request));
+                roomService.removeUser(TestFields.ROOM_ID, request));
         assertEquals(UserError.NOT_FOUND, exception.getError());
     }
 
     @Test
     public void removeUserBadHost() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
 
         User host = new User();
-        host.setNickname(NICKNAME);
-        host.setUserId(USER_ID);
+        host.setNickname(TestFields.NICKNAME);
+        host.setUserId(TestFields.USER_ID);
 
         room.setHost(host);
         room.addUser(host);
 
         User user = new User();
-        user.setNickname(NICKNAME_2);
-        user.setUserId(USER_ID_2);
+        user.setNickname(TestFields.NICKNAME_2);
+        user.setUserId(TestFields.USER_ID_2);
         room.addUser(user);
 
         User user2 = new User();
-        user2.setNickname(NICKNAME_2);
-        user2.setUserId(USER_ID_3);
+        user2.setNickname(TestFields.NICKNAME_2);
+        user2.setUserId(TestFields.USER_ID_3);
         room.addUser(user2);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         RemoveUserRequest request = new RemoveUserRequest();
         request.setInitiator(UserMapper.toDto(user));
         request.setUserToDelete(UserMapper.toDto(user2));
 
         ApiException exception = assertThrows(ApiException.class, () ->
-                roomService.removeUser(ROOM_ID, request));
+                roomService.removeUser(TestFields.ROOM_ID, request));
         assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
     }
 
     @Test
     public void removeUserRoomNotFound() {
         User host = new User();
-        host.setUserId(USER_ID);
+        host.setUserId(TestFields.USER_ID);
 
         User user = new User();
-        user.setUserId(USER_ID_2);
+        user.setUserId(TestFields.USER_ID_2);
 
-        Mockito.doReturn(null).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(null).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         RemoveUserRequest request = new RemoveUserRequest();
         request.setInitiator(UserMapper.toDto(host));
         request.setUserToDelete(UserMapper.toDto(user));
 
         ApiException exception = assertThrows(ApiException.class, () ->
-                roomService.removeUser(ROOM_ID, request));
+                roomService.removeUser(TestFields.ROOM_ID, request));
         assertEquals(RoomError.NOT_FOUND, exception.getError());
     }
 
     @Test
     public void conditionallyUpdateRoomHostSuccess() {
         User user1 = new User();
-        user1.setUserId(USER_ID);
-        user1.setSessionId(SESSION_ID);
+        user1.setUserId(TestFields.USER_ID);
+        user1.setSessionId(TestFields.SESSION_ID);
 
         User user2 = new User();
-        user2.setUserId(USER_ID_2);
+        user2.setUserId(TestFields.USER_ID_2);
 
         User user3 = new User();
-        user3.setSessionId(USER_ID_3);
-        user3.setSessionId(SESSION_ID_2);
+        user3.setSessionId(TestFields.USER_ID_3);
+        user3.setSessionId(TestFields.SESSION_ID_2);
 
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         room.setHost(user1);
         room.addUser(user1);
         room.addUser(user2);
@@ -800,52 +785,52 @@ public class RoomServiceTests {
     @Test
     public void deleteRoomSuccess() {
         User host = new User();
-        host.setUserId(USER_ID);
-        host.setSessionId(SESSION_ID);
+        host.setUserId(TestFields.USER_ID);
+        host.setSessionId(TestFields.SESSION_ID);
 
         User user = new User();
-        user.setUserId(USER_ID_2);
-        user.setSessionId(SESSION_ID_2);
+        user.setUserId(TestFields.USER_ID_2);
+        user.setSessionId(TestFields.SESSION_ID_2);
 
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         room.setHost(host);
         room.addUser(host);
         room.addUser(user);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         DeleteRoomRequest deleteRoomRequest = new DeleteRoomRequest();
         deleteRoomRequest.setHost(UserMapper.toDto(host));
-        roomService.deleteRoom(ROOM_ID, deleteRoomRequest);
+        roomService.deleteRoom(TestFields.ROOM_ID, deleteRoomRequest);
         verify(repository).delete(eq(room));
     }
 
     @Test
     public void deleteRoomBadHost() {
         User host = new User();
-        host.setUserId(USER_ID);
-        host.setSessionId(SESSION_ID);
+        host.setUserId(TestFields.USER_ID);
+        host.setSessionId(TestFields.SESSION_ID);
 
         User user = new User();
-        user.setUserId(USER_ID_2);
-        user.setSessionId(SESSION_ID_2);
+        user.setUserId(TestFields.USER_ID_2);
+        user.setSessionId(TestFields.SESSION_ID_2);
 
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         room.setHost(host);
         room.addUser(host);
         room.addUser(user);
 
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         DeleteRoomRequest deleteRoomRequest = new DeleteRoomRequest();
         deleteRoomRequest.setHost(UserMapper.toDto(user));
 
         ApiException exception = assertThrows(ApiException.class, () ->
-                roomService.deleteRoom(ROOM_ID, deleteRoomRequest));
+                roomService.deleteRoom(TestFields.ROOM_ID, deleteRoomRequest));
         assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
-        assertNotNull(roomService.getRoom(ROOM_ID));
+        assertNotNull(roomService.getRoom(TestFields.ROOM_ID));
     }
 
     @Test
@@ -857,33 +842,33 @@ public class RoomServiceTests {
          * set one as host, and test setSpectator between host and non-host.
          */
         User firstUser = new User();
-        firstUser.setNickname(NICKNAME);
-        firstUser.setUserId(USER_ID);
+        firstUser.setNickname(TestFields.NICKNAME);
+        firstUser.setUserId(TestFields.USER_ID);
         User secondUser = new User();
-        secondUser.setNickname(NICKNAME_2);
-        secondUser.setUserId(USER_ID_2);
+        secondUser.setNickname(TestFields.NICKNAME_2);
+        secondUser.setUserId(TestFields.USER_ID_2);
 
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         room.setHost(firstUser);
         room.addUser(firstUser);
         room.addUser(secondUser);
 
         // Mock repository to return room when called
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         SetSpectatorRequest request1 = new SetSpectatorRequest();
         request1.setInitiator(UserMapper.toDto(firstUser));
         request1.setReceiver(UserMapper.toDto(secondUser));
         request1.setSpectator(true);
-        RoomDto response1 = roomService.setSpectator(ROOM_ID, request1);
+        RoomDto response1 = roomService.setSpectator(TestFields.ROOM_ID, request1);
         assertTrue(response1.getUsers().get(1).getSpectator());
 
         SetSpectatorRequest request2 = new SetSpectatorRequest();
         request2.setInitiator(UserMapper.toDto(secondUser));
         request2.setReceiver(UserMapper.toDto(secondUser));
         request2.setSpectator(true);
-        RoomDto response2 = roomService.setSpectator(ROOM_ID, request2);
+        RoomDto response2 = roomService.setSpectator(TestFields.ROOM_ID, request2);
         assertTrue(response2.getUsers().get(1).getSpectator());
         verify(repository, times(2)).save(room);
     }
@@ -895,20 +880,20 @@ public class RoomServiceTests {
          * expected result: RoomError.INVALID_PERMISSIONS
          */
         User firstUser = new User();
-        firstUser.setNickname(NICKNAME);
-        firstUser.setUserId(USER_ID);
+        firstUser.setNickname(TestFields.NICKNAME);
+        firstUser.setUserId(TestFields.USER_ID);
         User secondUser = new User();
-        secondUser.setNickname(NICKNAME_2);
-        secondUser.setUserId(USER_ID_2);
+        secondUser.setNickname(TestFields.NICKNAME_2);
+        secondUser.setUserId(TestFields.USER_ID_2);
 
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         room.setHost(firstUser);
         room.addUser(firstUser);
         room.addUser(secondUser);
 
         // Mock repository to return room when called
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         SetSpectatorRequest request = new SetSpectatorRequest();
         request.setInitiator(UserMapper.toDto(secondUser));
@@ -916,7 +901,7 @@ public class RoomServiceTests {
         request.setSpectator(true);
 
         ApiException exception = assertThrows(ApiException.class, () ->
-                roomService.setSpectator(ROOM_ID, request));
+                roomService.setSpectator(TestFields.ROOM_ID, request));
         assertEquals(RoomError.INVALID_PERMISSIONS, exception.getError());
     }
 
@@ -927,19 +912,19 @@ public class RoomServiceTests {
          * expected result: RoomError.USER_NOT_FOUND
          */
         User firstUser = new User();
-        firstUser.setNickname(NICKNAME);
-        firstUser.setUserId(USER_ID);
+        firstUser.setNickname(TestFields.NICKNAME);
+        firstUser.setUserId(TestFields.USER_ID);
         User secondUser = new User();
-        secondUser.setNickname(NICKNAME_2);
-        secondUser.setUserId(USER_ID_2);
+        secondUser.setNickname(TestFields.NICKNAME_2);
+        secondUser.setUserId(TestFields.USER_ID_2);
 
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         room.setHost(firstUser);
         room.addUser(firstUser);
 
         // Mock repository to return room when called
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         SetSpectatorRequest request = new SetSpectatorRequest();
         request.setInitiator(UserMapper.toDto(firstUser));
@@ -947,7 +932,7 @@ public class RoomServiceTests {
         request.setSpectator(true);
 
         ApiException exception = assertThrows(ApiException.class, () ->
-                roomService.setSpectator(ROOM_ID, request));
+                roomService.setSpectator(TestFields.ROOM_ID, request));
         assertEquals(RoomError.USER_NOT_FOUND, exception.getError());
     }
 }
