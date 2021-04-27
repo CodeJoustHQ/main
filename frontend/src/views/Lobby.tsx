@@ -44,6 +44,7 @@ import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/H
 import { SelectableProblem } from '../api/Problem';
 import ProblemSelector from '../components/problem/ProblemSelector';
 import SelectedProblemsDisplay from '../components/problem/SelectedProblemsDisplay';
+import { useAppDispatch, useAppSelector } from '../util/Hook';
 
 type LobbyPageLocation = {
   user: User,
@@ -149,6 +150,10 @@ function LobbyPage() {
   const [size, setSize] = useState<number | undefined>(10);
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
+
+  // React Redux
+  const { room } = useAppSelector((state) => state);
+  const dispatch = useAppDispatch();
 
   // Hold error text.
   const [error, setError] = useState('');

@@ -1,8 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import roomReducer from './Room';
 
-export default configureStore({
+const rootReducer = configureStore({
   reducer: {
     room: roomReducer,
   },
 });
+
+export type RootState = ReturnType<typeof rootReducer.getState>;
+export type AppDispatch = ReturnType<typeof rootReducer.dispatch>;
+
+export default rootReducer;
