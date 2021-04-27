@@ -199,7 +199,7 @@ function GamePage() {
     }).catch((err) => {
       setError(err.message);
     });
-  }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage, currentProblem]);
+  }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage]);
 
   /**
    * Display the notification as a callback from the notification
@@ -498,6 +498,7 @@ function GamePage() {
               <Editor
                 onCodeChange={setOneCurrentCode}
                 onLanguageChange={setOneCurrentLanguage}
+                getCurrentLanguage={() => currentLanguage[currentProblem.valueOf()]}
                 defaultCodeMap={defaultCodeList}
                 currentProblem={currentProblem.valueOf()}
                 defaultLanguage={Language.Python}

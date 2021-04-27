@@ -273,6 +273,7 @@ function GameResultsPage() {
           <ResizableMonacoEditor
             onLanguageChange={null}
             onCodeChange={null}
+            getCurrentLanguage={null}
             defaultCodeMap={null}
             currentProblem={0}
             defaultLanguage={bestSubmission?.language as Language || Language.Python}
