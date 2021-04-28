@@ -341,6 +341,7 @@ function GamePage() {
       input,
       code: currentCode[currentProblem.valueOf()],
       language: currentLanguage[currentProblem.valueOf()],
+      problem: currentProblem,
     };
 
     runSolution(roomId, request)
@@ -366,6 +367,7 @@ function GamePage() {
       initiator: currentUser!,
       code: currentCode[currentProblem.valueOf()],
       language: currentLanguage[currentProblem.valueOf()],
+      problem: currentProblem,
     };
 
     submitSolution(roomId, request)
@@ -385,6 +387,7 @@ function GamePage() {
 
   const nextProblem = () => {
     setCurrentProblem((currentProblem.valueOf() + 1) % problems?.length);
+    setSubmission(null);
   };
 
   const previousProblem = () => {
@@ -395,6 +398,7 @@ function GamePage() {
     }
 
     setCurrentProblem(temp);
+    setSubmission(null);
   };
 
   const displayPlayerLeaderboard = useCallback(() => players.map((player, index) => (
