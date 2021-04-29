@@ -188,7 +188,7 @@ function GamePage() {
 
       // If previous code and language specified, save those as defaults
       if (code) {
-        codeList[currentProblem.valueOf()] = code;
+        codeList[0] = code;
       }
 
       // Set this user's current code and language
@@ -332,8 +332,6 @@ function GamePage() {
 
   // Callback when user runs code against custom test case
   const runCode = (input: string) => {
-    console.log(problems[currentProblem.valueOf()].name);
-
     setLoading(true);
     setError('');
     const request = {

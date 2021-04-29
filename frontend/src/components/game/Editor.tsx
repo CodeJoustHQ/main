@@ -146,8 +146,6 @@ function ResizableMonacoEditor(props: EditorProps) {
   };
 
   useEffect(() => {
-    console.log('again');
-
     if (codeMap != null && codeEditor != null) {
       if (codeMap[currentProblem] != null) {
         const codeMapTemp = codeMap;
