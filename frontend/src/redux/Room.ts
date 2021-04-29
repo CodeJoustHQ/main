@@ -1,13 +1,25 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getRoom, Room } from '../api/Room';
+import { setLoading, setError } from './Status';
 
 const initialState = null as Room | null;
 
-const fetchRoom = createAsyncThunk(
-  'users/fetchByIdStatus',
-  async (roomId, thunkAPI) => {
-    const response = await getRoom(roomId);
-    return response.data;
+// Create an async action that fetches the room from the backend
+const fetchRoom = createAsyncThunk<Room | null, string>(
+  'rooms/fetch',
+  async (roomId, thunkApi) => {
+    thunkApi.dispatch(setLoading(true));
+
+    return getRoom(roomId)
+      .then((res) => {
+        thunkApi.dispatch(setLoading(false));
+        return res;
+      })
+      .catch((err) => {
+        thunkApi.dispatch(setLoading(false));
+        thunkApi.dispatch(setError(err.message));
+        return null;
+      });
   },
 );
 
@@ -26,12 +38,12 @@ const roomSlice = createSlice({
       return action.payload;
     },
   },
-  extraReducers: {
-    [fetchRoom.fulfilled]: (state, action) => {
-      // Set state to be the payload
+  extraReducers: (builder) => {
+    builder.addCase(fetchRoom.fulfilled, (_, action) => {
+      // When the async fetchRoom action is fulfilled, set room state to its return object
       return action.payload;
-    },
-  };
+    });
+  },
 });
 
 export const { exampleAction, exampleActionWithPayload } = roomSlice.actions;
