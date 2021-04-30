@@ -153,7 +153,11 @@ function LobbyPage() {
 
   // React Redux
   const { room } = useAppSelector((state) => state);
+  const currentUserTemp = useAppSelector((state) => state.currentUser);
   const dispatch = useAppDispatch();
+
+  console.log(room);
+  console.log(currentUserTemp);
 
   // Hold error text.
   const [error, setError] = useState('');

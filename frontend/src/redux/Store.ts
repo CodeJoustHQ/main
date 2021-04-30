@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import roomReducer from './Room';
 import statusReducer from './Status';
+import userReducer from './User';
 
 const store = configureStore({
   reducer: {
     room: roomReducer,
     status: statusReducer,
+    currentUser: userReducer,
   },
 });
 

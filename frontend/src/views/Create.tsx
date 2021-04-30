@@ -3,10 +3,14 @@ import { useHistory } from 'react-router-dom';
 import EnterNicknamePage from '../components/core/EnterNickname';
 import { createRoom, Room, CreateRoomParams } from '../api/Room';
 import { User } from '../api/User';
+import { useAppDispatch } from '../util/Hook';
+import { setRoom } from '../redux/Room';
+import { setCurrentUser } from '../redux/User';
 
 function CreateGamePage() {
   // Get history object to be able to move between different pages
   const history = useHistory();
+  const dispatch = useAppDispatch();
 
   // Creates a room with the user as the host, and joins that same lobby.
   const createJoinLobby = (nickname: string) => new Promise<void>((resolve, reject) => {
@@ -21,6 +25,9 @@ function CreateGamePage() {
     };
     createRoom(roomHost)
       .then((res) => {
+        dispatch(setRoom(res));
+        dispatch(setCurrentUser(res.host));
+
         redirectToLobby(res, roomHost.host);
         resolve();
       }).catch((err) => reject(err));
