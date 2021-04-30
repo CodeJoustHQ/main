@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { Player, Submission } from '../api/Game';
-import { AppDispatch, RootState } from '../redux/Store';
+import { RootState } from '../redux/Store';
 
 export const useBestSubmission = (player?: Player) => {
   const [bestSubmission, setBestSubmission] = useState<Submission | null>(null);
@@ -25,5 +25,7 @@ export const useBestSubmission = (player?: Player) => {
 };
 
 // Custom Redux Hooks with our store's types
-export const useAppDispatch = () => useDispatch<AppDispatch>();
+// This should be the correct one, but for some reason it doesn't work
+// export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppDispatch = () => useDispatch();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

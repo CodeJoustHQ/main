@@ -2,14 +2,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import roomReducer from './Room';
 import statusReducer from './Status';
 
-const rootReducer = configureStore({
+const store = configureStore({
   reducer: {
     room: roomReducer,
     status: statusReducer,
   },
 });
 
-export type RootState = ReturnType<typeof rootReducer.getState>;
-export type AppDispatch = ReturnType<typeof rootReducer.dispatch>;
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = ReturnType<typeof store.dispatch>;
 
-export default rootReducer;
+export default store;

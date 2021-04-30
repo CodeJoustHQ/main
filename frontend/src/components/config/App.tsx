@@ -17,16 +17,20 @@ import CreateProblemPage from '../../views/CreateProblemPage';
 import CircleBackgroundLayout from '../layout/CircleBackground';
 import ContactUsPage from '../../views/ContactUs';
 import MinimalLayout from '../layout/MinimalLayout';
+import { useAppDispatch } from '../../util/Hook';
+import { setError } from '../../redux/Status';
 
 // Set up Google Analytics
 ReactGA.initialize('UA-192641172-2');
 
 function App() {
   const location = useLocation();
+  const dispatch = useAppDispatch();
 
-  // Track page view on every change in location
+  // Track page view on every change in location and clear errors when switching pages
   useEffect(() => {
     ReactGA.pageview(location.pathname);
+    dispatch(setError(''));
   }, [location]);
 
   return (

@@ -5,10 +5,11 @@ import { setLoading, setError } from './Status';
 const initialState = null as Room | null;
 
 // Create an async action that fetches the room from the backend
-const fetchRoom = createAsyncThunk<Room | null, string>(
+export const fetchRoom = createAsyncThunk<Room | null, string>(
   'rooms/fetch',
   async (roomId, thunkApi) => {
     thunkApi.dispatch(setLoading(true));
+    thunkApi.dispatch(setError(''));
 
     return getRoom(roomId)
       .then((res) => {
@@ -39,7 +40,7 @@ const roomSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchRoom.fulfilled, (_, action) => {
+    builder.addCase(fetchRoom.fulfilled, (state, action) => {
       // When the async fetchRoom action is fulfilled, set room state to its return object
       return action.payload;
     });
