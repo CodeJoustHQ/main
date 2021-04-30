@@ -93,7 +93,7 @@ function JoinGamePage() {
    * Join the room and redirect the user to the lobby.
    */
   const redirectToLobby = (nickname: string) => new Promise<undefined>((_, reject) => {
-    const currentUser: User = { nickname };
+    let currentUser: User = { nickname };
     const roomParams = { user: currentUser };
 
     joinRoom(roomId, roomParams)
@@ -104,6 +104,7 @@ function JoinGamePage() {
         res.users.forEach((user: User) => {
           if (user.nickname === currentUser.nickname) {
             dispatch(setCurrentUser(user));
+            currentUser = user;
           }
         });
 

@@ -14,7 +14,7 @@ import {
   connect, routes, subscribe, disconnect,
 } from '../api/Socket';
 import { User } from '../api/User';
-import { isValidRoomId, leaveRoom } from '../util/Utility';
+import { isValidRoomId, leaveRoom, checkLocationState } from '../util/Utility';
 import { Difficulty } from '../api/Difficulty';
 import {
   PrimaryButton,
@@ -45,8 +45,9 @@ import { SelectableProblem } from '../api/Problem';
 import ProblemSelector from '../components/problem/ProblemSelector';
 import SelectedProblemsDisplay from '../components/problem/SelectedProblemsDisplay';
 import { useAppDispatch, useAppSelector } from '../util/Hook';
-import { setRoom } from '../redux/Room';
+import { fetchRoom, setRoom } from '../redux/Room';
 import { setCurrentUser } from '../redux/User';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 type LobbyPageLocation = {
   user: User,
@@ -186,6 +187,12 @@ function LobbyPage() {
     setSize(room.size);
   };
 
+  useEffect(() => {
+    if (room) {
+      setStateFromRoom(room);
+    }
+  }, [room]);
+
   // Function to determine if the given user is the host or not
   const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
 
@@ -213,10 +220,10 @@ function LobbyPage() {
    * @param currentUser The updated room to check for kicked user.
    */
   useEffect(() => {
-    if (room?.users) {
+    if (room?.users && currentUser) {
       let userIncluded: boolean = false;
       room!.users.forEach((user) => {
-        if (currentUser!.userId === user.userId) {
+        if (currentUser?.userId === user.userId) {
           userIncluded = true;
         }
       });
@@ -466,7 +473,6 @@ function LobbyPage() {
     // Callback to update the Redux state to hold the latest Room info
     const subscribeCallback = (result: Message) => {
       const newRoom: Room = JSON.parse(result.body);
-      setStateFromRoom(newRoom);
       dispatch(setRoom(newRoom));
     };
 
@@ -476,34 +482,30 @@ function LobbyPage() {
       subscribe(routes(roomId).subscribe_lobby, subscribeCallback).then((subscriptionParam) => {
         setSubscription(subscriptionParam);
         setError('');
-        setLoading(false);
       }).catch((err) => {
         setError(err.message);
-        setLoading(false);
       });
     }).catch((err) => {
       setError(err.message);
-      setLoading(false);
-    });
+    }).finally(() => setLoading(false));
   }, []);
 
   const refreshRoomDetails = () => {
     // Call GET endpoint to get latest room info
     if (!loading) {
       setLoading(true);
-      getRoom(location.state.roomId)
-        .then((res) => {
-          setStateFromRoom(res);
 
-          // Boot the user from the room, if they are not present.
-          updateCurrentUserDetails(res.users);
+      dispatch(fetchRoom(location.state.roomId))
+        .then(() => {
+          setLoading(false);
+          // if (room) {
+          //   updateCurrentUserDetails(room?.users);
+          // }
 
-          // Attempt to connect the user to the socket.
-          if (currentUser && currentUser.userId) {
-            connectUserToRoom(res.roomId, currentUser.userId);
+          if (!subscription && room && currentUser) {
+            connectUserToRoom(room!.roomId, currentUser!.userId!);
           }
-        })
-        .catch((err) => setError(err.message));
+        });
     }
   };
 
@@ -518,8 +520,20 @@ function LobbyPage() {
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
-    // Redirect to the join page if room and currentUser not set
-    if (!room || !currentUser || !currentUser.userId) {
+    /// Grab the user and room information; otherwise, redirect to the join page
+    if (checkLocationState(location, 'user', 'roomId')) {
+      // Set room if it doesn't exist in Redux state
+      if (!room) {
+        dispatch(fetchRoom(location.state.roomId))
+      }
+      if (!currentUser) {
+        dispatch(setCurrentUser(location.state.user));
+      }
+      // Connect to socket if not already
+      if (!subscription && room && currentUser) {
+        connectUserToRoom(room!.roomId, currentUser!.userId!);
+      }
+    } else {
       // Get URL query params to determine if the roomId is provided.
       const urlParams = new URLSearchParams(window.location.search);
       const roomIdQueryParam: string | null = urlParams.get('room');
@@ -529,13 +543,6 @@ function LobbyPage() {
       } else {
         history.replace('/game/join');
       }
-      return;
-    }
-
-    // If this is the first time loading, connect to the socket
-    if (!subscription) {
-      setStateFromRoom(room);
-      connectUserToRoom(room!.roomId, currentUser!.userId!);
     }
   }, [room, currentUser, subscription, history, connectUserToRoom]);
 
