@@ -27,8 +27,12 @@ public class PythonDefaultCodeGeneratorService implements DefaultCodeGeneratorSe
         }
         methodLineBuilder.append("):");
 
+        // Add a method header comment to describe the return type.
+        String returnComment = String.format("\t# The solve method should return the type %s", outputType.getClassType().getSimpleName());
+
         return String.join("\n",
             "class Solution(object):",
+            returnComment,
             methodLineBuilder.toString(),
             "\t\t"
         );
