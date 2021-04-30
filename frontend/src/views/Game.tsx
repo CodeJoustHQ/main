@@ -116,7 +116,7 @@ function GamePage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.Python);
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.Java);
   const [currentCode, setCurrentCode] = useState('');
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
@@ -256,9 +256,9 @@ function GamePage() {
             }
           });
 
-          // If no previous code, proceed as normal with the default Python language
+          // If no previous code, proceed as normal with the default Java language
           if (!matchFound) {
-            setDefaultCodeFromProblems(res.problems, '', Language.Python);
+            setDefaultCodeFromProblems(res.problems, '', Language.Java);
           }
         })
         .catch((err) => {
