@@ -37,9 +37,8 @@ public class DefaultCodeGeneratorServiceTests {
     );
 
     public static final String pythonDefaultCode = String.join("\n",
-        "class Solution(object):",
-        "\t# The solve method should return the type Integer[]",
-        "\tdef solve(nums):",
+        "class Solution:",
+        "\tdef solve(self, nums: List[int]):",
         "\t\t"
     );
 
