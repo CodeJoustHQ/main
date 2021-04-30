@@ -33,8 +33,10 @@ public class PythonDefaultCodeGeneratorService implements DefaultCodeGeneratorSe
         // Add output type hinting.
         methodLineBuilder.append(String.format(") -> %s:", typeInstantiationToString(outputType)));
 
+        // Return the name with extra line to prevent frontend overlap.
         return String.join("\n",
             "class Solution:",
+            "",
             methodLineBuilder.toString(),
             "\t\t"
         );

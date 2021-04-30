@@ -70,6 +70,7 @@ class ProblemTests {
 
     public static final String pythonDefaultCode = String.join("\n",
         "class Solution:",
+        "",
         "\tdef solve(self, nums: List[int]) -> List[int]:",
         "\t\t"
     ).replaceAll("\t", "    ");
