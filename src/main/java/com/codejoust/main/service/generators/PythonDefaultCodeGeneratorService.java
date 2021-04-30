@@ -25,11 +25,13 @@ public class PythonDefaultCodeGeneratorService implements DefaultCodeGeneratorSe
             methodLineBuilder.append(
                 String.format(", %s: %s", 
                     problemInput.getName(),
-                    typeInstantiationToString(outputType)
+                    typeInstantiationToString(problemInput.getType())
                 )
             );
         }
-        methodLineBuilder.append("):");
+
+        // Add output type hinting.
+        methodLineBuilder.append(String.format(") -> %s:", typeInstantiationToString(outputType)));
 
         return String.join("\n",
             "class Solution:",
