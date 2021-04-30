@@ -274,6 +274,7 @@ function GameResultsPage() {
             onLanguageChange={null}
             onCodeChange={null}
             codeMap={null}
+            currentProblem={0}
             defaultLanguage={bestSubmission?.language as Language || Language.Python}
             defaultCode={bestSubmission?.code || 'Uh oh! An error occurred fetching this player\'s code'}
           />
