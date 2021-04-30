@@ -61,15 +61,15 @@ public class PythonDefaultCodeGeneratorService implements DefaultCodeGeneratorSe
             case BOOLEAN:
                 return "bool";
             case ARRAY_STRING:
-                return "List[str]";
+                return "list[str]";
             case ARRAY_INTEGER:
-                return "List[int]";
+                return "list[int]";
             case ARRAY_DOUBLE:
-                return "List[float]";
+                return "list[float]";
             case ARRAY_CHARACTER:
-                return "List[str]";
+                return "list[str]";
             case ARRAY_BOOLEAN:
-                return "List[bool]";
+                return "list[bool]";
             default:
                 throw new ApiException(ProblemError.BAD_IOTYPE);
         }
