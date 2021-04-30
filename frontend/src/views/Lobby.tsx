@@ -14,7 +14,7 @@ import {
   connect, routes, subscribe, disconnect,
 } from '../api/Socket';
 import { User } from '../api/User';
-import { checkLocationState, isValidRoomId, leaveRoom } from '../util/Utility';
+import { isValidRoomId, leaveRoom } from '../util/Utility';
 import { Difficulty } from '../api/Difficulty';
 import {
   PrimaryButton,
@@ -45,6 +45,8 @@ import { SelectableProblem } from '../api/Problem';
 import ProblemSelector from '../components/problem/ProblemSelector';
 import SelectedProblemsDisplay from '../components/problem/SelectedProblemsDisplay';
 import { useAppDispatch, useAppSelector } from '../util/Hook';
+import { setRoom } from '../redux/Room';
+import { setCurrentUser } from '../redux/User';
 
 type LobbyPageLocation = {
   user: User,
@@ -135,7 +137,7 @@ function LobbyPage() {
   const location = useLocation<LobbyPageLocation>();
 
   // Set the current user
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  // const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   // Set all the different variables in the room object
   const [host, setHost] = useState<User | null>(null);
@@ -152,12 +154,9 @@ function LobbyPage() {
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
 
   // React Redux
-  const { room } = useAppSelector((state) => state);
-  const currentUserTemp = useAppSelector((state) => state.currentUser);
   const dispatch = useAppDispatch();
-
-  console.log(room);
-  console.log(currentUserTemp);
+  const { room } = useAppSelector((state) => state);
+  const { currentUser } = useAppSelector((state) => state);
 
   // Hold error text.
   const [error, setError] = useState('');
@@ -165,10 +164,7 @@ function LobbyPage() {
   // Hold loading boolean.
   const [loading, setLoading] = useState(false);
 
-  // Variable to hold whether the user is connected to the socket.
-  const [socketConnected, setSocketConnected] = useState(false);
-
-  // Variable to hold the subscription return, which can be unsubscribed.
+  // Variable to hold the socket subscription, or null if not connected
   const [subscription, setSubscription] = useState<Subscription | null>(null);
 
   // Variable to hold whether the room link was copied.
@@ -216,12 +212,11 @@ function LobbyPage() {
    * @param roomParam The updated room to check for kicked user.
    * @param currentUser The updated room to check for kicked user.
    */
-  const conditionallyBootKickedUser = useCallback((roomParam: Room,
-    currentUserParam: User | null) => {
-    if (currentUserParam) {
+  useEffect(() => {
+    if (room?.users) {
       let userIncluded: boolean = false;
-      roomParam.users.forEach((user) => {
-        if (currentUserParam.userId === user.userId) {
+      room!.users.forEach((user) => {
+        if (currentUser!.userId === user.userId) {
           userIncluded = true;
         }
       });
@@ -229,18 +224,14 @@ function LobbyPage() {
       // If user is no longer present in room, boot the user.
       if (!userIncluded) {
         disconnect().then(() => {
+          dispatch(setCurrentUser(null));
           history.replace('/game/join', {
             error: errorHandler('You have been kicked from the room.'),
           });
-          setSocketConnected(false);
-          setLoading(false);
-        }).catch((err) => {
-          setError(err.message);
-          setLoading(false);
         });
       }
     }
-  }, [history]);
+  }, [currentUser, room?.users, history]);
 
   /**
    * Reset the user to hold the ID (location currently has
@@ -472,15 +463,11 @@ function LobbyPage() {
    * the useEffect function.
    */
   const connectUserToRoom = useCallback((roomId: string, userId: string) => {
-    /**
-     * Subscribe callback that will be triggered on every message.
-     * Update the users list and other room info.
-     * Boot any kicked users that are no longer present in the room.
-     */
+    // Callback to update the Redux state to hold the latest Room info
     const subscribeCallback = (result: Message) => {
-      const room: Room = JSON.parse(result.body);
-      setStateFromRoom(room);
-      conditionallyBootKickedUser(room, currentUser);
+      const newRoom: Room = JSON.parse(result.body);
+      setStateFromRoom(newRoom);
+      dispatch(setRoom(newRoom));
     };
 
     setLoading(true);
@@ -488,7 +475,6 @@ function LobbyPage() {
       // Body encrypt through JSON.
       subscribe(routes(roomId).subscribe_lobby, subscribeCallback).then((subscriptionParam) => {
         setSubscription(subscriptionParam);
-        setSocketConnected(true);
         setError('');
         setLoading(false);
       }).catch((err) => {
@@ -499,7 +485,7 @@ function LobbyPage() {
       setError(err.message);
       setLoading(false);
     });
-  }, [currentUser, conditionallyBootKickedUser]);
+  }, []);
 
   const refreshRoomDetails = () => {
     // Call GET endpoint to get latest room info
@@ -532,16 +518,8 @@ function LobbyPage() {
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
-    // Grab the user and room information; otherwise, redirect to the join page
-    if (checkLocationState(location, 'user', 'roomId')) {
-      // Call GET endpoint to get latest room info
-      getRoom(location.state.roomId)
-        .then((res) => {
-          setStateFromRoom(res);
-          updateCurrentUserDetails(res.users);
-        })
-        .catch((err) => setError(err.message));
-    } else {
+    // Redirect to the join page if room and currentUser not set
+    if (!room || !currentUser || !currentUser.userId) {
       // Get URL query params to determine if the roomId is provided.
       const urlParams = new URLSearchParams(window.location.search);
       const roomIdQueryParam: string | null = urlParams.get('room');
@@ -551,15 +529,15 @@ function LobbyPage() {
       } else {
         history.replace('/game/join');
       }
+      return;
     }
-  }, [location, socketConnected, history, updateCurrentUserDetails]);
 
-  // Connect the user to the room.
-  useEffect(() => {
-    if (!socketConnected && currentRoomId && currentUser && currentUser.userId) {
-      connectUserToRoom(currentRoomId, currentUser.userId);
+    // If this is the first time loading, connect to the socket
+    if (!subscription) {
+      setStateFromRoom(room);
+      connectUserToRoom(room!.roomId, currentUser!.userId!);
     }
-  }, [socketConnected, connectUserToRoom, currentRoomId, currentUser]);
+  }, [room, currentUser, subscription, history, connectUserToRoom]);
 
   // Redirect user to game page if room is active.
   useEffect(() => {
