@@ -215,26 +215,30 @@ function LobbyPage() {
    * If the user is not present in the room after a refresh, then
    * disconnect them and boot them off the page, as they were kicked.
    */
-  const conditionallyBootKickedUser = useCallback(() => {
-    if (room?.users && currentUser) {
-      let userIncluded: boolean = false;
-      room!.users.forEach((user) => {
-        if (currentUser?.userId === user.userId) {
-          userIncluded = true;
-        }
-      });
-
-      // If user is no longer present in room, boot the user.
-      if (!userIncluded) {
-        disconnect().then(() => {
-          dispatch(setCurrentUser(null));
-          history.replace('/game/join', {
-            error: errorHandler('You have been kicked from the room.'),
-          });
-        });
+  const conditionallyBootKickedUser = useCallback((roomParam: Room, userId) => {
+    let userIncluded: boolean = false;
+    roomParam.users.forEach((user) => {
+      if (userId === user.userId) {
+        userIncluded = true;
       }
+    });
+
+    // If user is no longer present in room, boot the user.
+    if (!userIncluded) {
+      disconnect().then(() => {
+        dispatch(setCurrentUser(null));
+        history.replace('/game/join', {
+          error: errorHandler('You have been kicked from the room.'),
+        });
+      });
     }
-  }, [currentUser, room?.users, history]);
+  }, [history, dispatch]);
+
+  useEffect(() => {
+    if (room && currentUser?.userId) {
+      conditionallyBootKickedUser(room, currentUser?.userId);
+    }
+  }, [room, currentUser?.userId, conditionallyBootKickedUser]);
 
   const changeHosts = (newHost: User) => {
     setError('');
@@ -452,7 +456,6 @@ function LobbyPage() {
     const subscribeCallback = (result: Message) => {
       const newRoom: Room = JSON.parse(result.body);
       dispatch(setRoom(newRoom));
-      conditionallyBootKickedUser();
     };
 
     setLoading(true);
@@ -468,7 +471,7 @@ function LobbyPage() {
     }).catch((err) => {
       setError(err.message);
     }).finally(() => setLoading(false));
-  }, []);
+  }, [dispatch]);
 
   // Get current mouse position.
   const mouseMoveHandler = useCallback((e: MouseEvent) => {
@@ -489,7 +492,6 @@ function LobbyPage() {
       }
       if (!currentUser) {
         dispatch(setCurrentUser(location.state.user));
-        conditionallyBootKickedUser();
       }
     } else {
       // Get URL query params to determine if the roomId is provided.
@@ -502,14 +504,14 @@ function LobbyPage() {
         history.replace('/game/join');
       }
     }
-  }, [room, currentUser, subscription, history, connectUserToRoom]);
+  }, [room, currentUser, subscription, history, dispatch]);
 
   useEffect(() => {
     // Connect to socket if not already
     if (!subscription && room?.roomId && currentUser?.userId) {
       connectUserToRoom(room!.roomId, currentUser!.userId!);
     }
-  }, [subscription, room?.roomId, currentUser?.userId]);
+  }, [subscription, room?.roomId, currentUser?.userId, connectUserToRoom]);
 
   // Redirect user to game page if room is active.
   useEffect(() => {
