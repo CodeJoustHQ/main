@@ -47,7 +47,6 @@ import SelectedProblemsDisplay from '../components/problem/SelectedProblemsDispl
 import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { fetchRoom, setRoom } from '../redux/Room';
 import { setCurrentUser } from '../redux/User';
-import { unwrapResult } from '@reduxjs/toolkit';
 
 type LobbyPageLocation = {
   user: User,
@@ -215,11 +214,8 @@ function LobbyPage() {
   /**
    * If the user is not present in the room after a refresh, then
    * disconnect them and boot them off the page, as they were kicked.
-   *
-   * @param roomParam The updated room to check for kicked user.
-   * @param currentUser The updated room to check for kicked user.
    */
-  useEffect(() => {
+  const conditionallyBootKickedUser = useCallback(() => {
     if (room?.users && currentUser) {
       let userIncluded: boolean = false;
       room!.users.forEach((user) => {
@@ -239,30 +235,6 @@ function LobbyPage() {
       }
     }
   }, [currentUser, room?.users, history]);
-
-  /**
-   * Reset the user to hold the ID (location currently has
-   * only nickname). Boot user if not present in list.
-   * Only go through process if current user is not yet set.
-   */
-  const updateCurrentUserDetails = useCallback((usersParam: User[]) => {
-    if (!currentUser) {
-      let userFound: boolean = false;
-      usersParam.forEach((user: User) => {
-        if (user.nickname === location.state.user.nickname) {
-          setCurrentUser(user);
-          userFound = true;
-        }
-      });
-
-      // If user is not found in list, redirect them to join page with error.
-      if (!userFound) {
-        history.replace('/game/join', {
-          error: errorHandler('You could not be found in the room\'s list of users.'),
-        });
-      }
-    }
-  }, [currentUser, history, location]);
 
   const changeHosts = (newHost: User) => {
     setError('');
@@ -461,11 +433,17 @@ function LobbyPage() {
     return null;
   };
 
+  const refreshRoomDetails = () => {
+    // Call GET endpoint to get latest room info
+    if (!loading) {
+      setLoading(true);
+      dispatch(fetchRoom(location.state.roomId))
+        .then(() => setLoading(false));
+    }
+  };
+
   /**
-   * Add the user to the lobby through the following steps.
-   * 1. Connect the user to the socket.
-   * 2. Subscribe the user to future messages.
-   * 3. Send the user nickname to the room.
+   * Connect the user to the socket and subscribe to room updates.
    * This method uses useCallback so it is not re-built in
    * the useEffect function.
    */
@@ -474,6 +452,7 @@ function LobbyPage() {
     const subscribeCallback = (result: Message) => {
       const newRoom: Room = JSON.parse(result.body);
       dispatch(setRoom(newRoom));
+      conditionallyBootKickedUser();
     };
 
     setLoading(true);
@@ -481,6 +460,7 @@ function LobbyPage() {
       // Body encrypt through JSON.
       subscribe(routes(roomId).subscribe_lobby, subscribeCallback).then((subscriptionParam) => {
         setSubscription(subscriptionParam);
+        refreshRoomDetails();
         setError('');
       }).catch((err) => {
         setError(err.message);
@@ -489,25 +469,6 @@ function LobbyPage() {
       setError(err.message);
     }).finally(() => setLoading(false));
   }, []);
-
-  const refreshRoomDetails = () => {
-    // Call GET endpoint to get latest room info
-    if (!loading) {
-      setLoading(true);
-
-      dispatch(fetchRoom(location.state.roomId))
-        .then(() => {
-          setLoading(false);
-          // if (room) {
-          //   updateCurrentUserDetails(room?.users);
-          // }
-
-          if (!subscription && room && currentUser) {
-            connectUserToRoom(room!.roomId, currentUser!.userId!);
-          }
-        });
-    }
-  };
 
   // Get current mouse position.
   const mouseMoveHandler = useCallback((e: MouseEvent) => {
@@ -520,18 +481,15 @@ function LobbyPage() {
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
-    /// Grab the user and room information; otherwise, redirect to the join page
+    // Grab the user and room information; otherwise, redirect to the join page
     if (checkLocationState(location, 'user', 'roomId')) {
       // Set room if it doesn't exist in Redux state
       if (!room) {
-        dispatch(fetchRoom(location.state.roomId))
+        dispatch(fetchRoom(location.state.roomId));
       }
       if (!currentUser) {
         dispatch(setCurrentUser(location.state.user));
-      }
-      // Connect to socket if not already
-      if (!subscription && room && currentUser) {
-        connectUserToRoom(room!.roomId, currentUser!.userId!);
+        conditionallyBootKickedUser();
       }
     } else {
       // Get URL query params to determine if the roomId is provided.
@@ -545,6 +503,13 @@ function LobbyPage() {
       }
     }
   }, [room, currentUser, subscription, history, connectUserToRoom]);
+
+  useEffect(() => {
+    // Connect to socket if not already
+    if (!subscription && room?.roomId && currentUser?.userId) {
+      connectUserToRoom(room!.roomId, currentUser!.userId!);
+    }
+  }, [subscription, room?.roomId, currentUser?.userId]);
 
   // Redirect user to game page if room is active.
   useEffect(() => {

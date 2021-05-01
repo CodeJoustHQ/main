@@ -27,7 +27,6 @@ function CreateGamePage() {
       .then((res) => {
         dispatch(setRoom(res));
         dispatch(setCurrentUser(res.host));
-
         redirectToLobby(res, res.host);
         resolve();
       }).catch((err) => reject(err));
