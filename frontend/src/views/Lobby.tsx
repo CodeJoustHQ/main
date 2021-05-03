@@ -27,7 +27,7 @@ import PlayerCard from '../components/card/PlayerCard';
 import HostActionCard from '../components/card/HostActionCard';
 import { startGame } from '../api/Game';
 import {
-  getRoom, Room, changeRoomHost, updateRoomSettings, removeUser,
+  Room, changeRoomHost, updateRoomSettings, removeUser,
 } from '../api/Room';
 import { errorHandler } from '../api/Error';
 import {
@@ -173,17 +173,17 @@ function LobbyPage() {
   /**
    * Set state variables from an updated room object
    */
-  const setStateFromRoom = (room: Room) => {
-    setHost(room.host);
-    setUsers(room.users);
-    setActiveUsers(room.activeUsers);
-    setInactiveUsers(room.inactiveUsers);
-    setRoomId(room.roomId);
-    setActive(room.active);
-    setDifficulty(room.difficulty);
-    setDuration(room.duration / 60);
-    setSelectedProblems(room.problems);
-    setSize(room.size);
+  const setStateFromRoom = (newRoom: Room) => {
+    setHost(newRoom.host);
+    setUsers(newRoom.users);
+    setActiveUsers(newRoom.activeUsers);
+    setInactiveUsers(newRoom.inactiveUsers);
+    setRoomId(newRoom.roomId);
+    setActive(newRoom.active);
+    setDifficulty(newRoom.difficulty);
+    setDuration(newRoom.duration / 60);
+    setSelectedProblems(newRoom.problems);
+    setSize(newRoom.size);
   };
 
   useEffect(() => {
@@ -463,7 +463,7 @@ function LobbyPage() {
       // Body encrypt through JSON.
       subscribe(routes(roomId).subscribe_lobby, subscribeCallback).then((subscriptionParam) => {
         setSubscription(subscriptionParam);
-        refreshRoomDetails();
+        dispatch(fetchRoom(roomId));
         setError('');
       }).catch((err) => {
         setError(err.message);
@@ -504,7 +504,7 @@ function LobbyPage() {
         history.replace('/game/join');
       }
     }
-  }, [room, currentUser, subscription, history, dispatch]);
+  }, [room, currentUser, subscription, location, history, dispatch]);
 
   useEffect(() => {
     // Connect to socket if not already
@@ -521,10 +521,9 @@ function LobbyPage() {
       history.replace('/game', {
         roomId: currentRoomId,
         currentUser,
-        difficulty,
       });
     }
-  }, [history, active, currentUser, currentRoomId, difficulty, subscription]);
+  }, [history, active, currentUser, currentRoomId, subscription]);
 
   const hoverProps = {
     enabled: isHost(currentUser),

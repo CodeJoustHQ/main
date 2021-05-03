@@ -203,6 +203,8 @@ function GamePage() {
     }
   }, [timeUp, allSolved, game, history, currentUser, gameSocket, notificationSocket, roomId]);
 
+  // ------------------------------- TODO below
+
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string, userId: string) => {
     const subscribeUserCallback = (result: Message) => {
@@ -271,6 +273,8 @@ function GamePage() {
       });
     }
   }, [location, history, setDefaultCodeFromProblems]);
+
+  // ----------------------------- TODO above
 
   // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {
