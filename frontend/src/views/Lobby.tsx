@@ -186,6 +186,7 @@ function LobbyPage() {
     setSize(newRoom.size);
   };
 
+  // Map the room in Redux to the state variables used in this file
   useEffect(() => {
     if (room) {
       setStateFromRoom(room);
@@ -487,7 +488,7 @@ function LobbyPage() {
     // Grab the user and room information; otherwise, redirect to the join page
     if (checkLocationState(location, 'user', 'roomId')) {
       // Set room if it doesn't exist in Redux state
-      if (!room) {
+      if (!room || room?.roomId !== location.state.roomId) {
         dispatch(fetchRoom(location.state.roomId));
       }
       if (!currentUser) {

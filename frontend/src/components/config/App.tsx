@@ -31,7 +31,7 @@ function App() {
   useEffect(() => {
     ReactGA.pageview(location.pathname);
     dispatch(setError(''));
-  }, [location]);
+  }, [location, dispatch]);
 
   return (
     <Switch>
