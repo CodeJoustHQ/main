@@ -390,7 +390,7 @@ function GameResultsPage() {
         </HoverContainer>
 
         <SecondaryRedButton
-          onClick={() => leaveRoom(history, roomId, currentUser)}
+          onClick={() => leaveRoom(dispatch, history, roomId, currentUser)}
         >
           Leave Room
         </SecondaryRedButton>

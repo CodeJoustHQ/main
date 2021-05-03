@@ -28,13 +28,7 @@ const roomSlice = createSlice({
   name: 'room',
   initialState,
   reducers: {
-    exampleAction(state) {
-      if (state) {
-        // Update state's roomId parameter
-        state!.roomId = '012345';
-      }
-    },
-    setRoom(state, action: PayloadAction<Room>) {
+    setRoom(state, action: PayloadAction<Room | null>) {
       // State is set to the returned value
       return action.payload;
     },
@@ -47,5 +41,5 @@ const roomSlice = createSlice({
   },
 });
 
-export const { exampleAction, setRoom } = roomSlice.actions;
+export const { setRoom } = roomSlice.actions;
 export default roomSlice.reducer;

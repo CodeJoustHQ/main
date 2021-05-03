@@ -190,12 +190,12 @@ function GamePage() {
       setFullPageLoading(false);
       setStateFromGame(game);
 
-      if (!defaultCodeList) {
+      if (!defaultCodeList.length && currentUser) {
         let matchFound = false;
 
         // If this user refreshed and has already submitted code, load and save their latest code
         game.players.forEach((player) => {
-          if (player.user.userId === location.state.currentUser.userId && player.code) {
+          if (player.user.userId === currentUser?.userId && player.code) {
             setDefaultCodeFromProblems(game.problems, player.code, player.language as Language);
             matchFound = true;
           }
@@ -207,7 +207,7 @@ function GamePage() {
         }
       }
     }
-  }, [game, defaultCodeList, location, setDefaultCodeFromProblems, setFullPageLoading]);
+  }, [game, currentUser, defaultCodeList, setDefaultCodeFromProblems, setFullPageLoading]);
 
   /**
    * Display the notification as a callback from the notification
@@ -236,8 +236,6 @@ function GamePage() {
     }
   }, [timeUp, allSolved, history, currentUser, gameSocket, notificationSocket, roomId]);
 
-  // ------------------------------- TODO below
-
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string, userId: string) => {
     const subscribeUserCallback = (result: Message) => {
@@ -252,6 +250,7 @@ function GamePage() {
         subscribe(routes(roomIdParam).subscribe_game, subscribeUserCallback)
           .then((subscription) => {
             setGameSocket(subscription);
+            dispatch(fetchGame(roomIdParam));
           }).catch((err) => {
             setError(err.message);
           });
@@ -410,7 +409,7 @@ function GamePage() {
           <GameTimerContainer gameTimer={gameTimer || null} />
         </FlexCenter>
         <FlexRight>
-          <TextButton onClick={() => leaveRoom(history, roomId, currentUser)}>Exit Game</TextButton>
+          <TextButton onClick={() => leaveRoom(dispatch, history, roomId, currentUser)}>Exit Game</TextButton>
         </FlexRight>
       </FlexInfoBar>
       <LeaderboardContent>

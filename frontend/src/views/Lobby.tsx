@@ -239,7 +239,7 @@ function LobbyPage() {
     if (room && currentUser?.userId) {
       conditionallyBootKickedUser(room, currentUser?.userId);
     }
-  }, [room, currentUser?.userId, conditionallyBootKickedUser]);
+  }, [room, currentUser, conditionallyBootKickedUser]);
 
   const changeHosts = (newHost: User) => {
     setError('');
@@ -499,7 +499,6 @@ function LobbyPage() {
       const urlParams = new URLSearchParams(window.location.search);
       const roomIdQueryParam: string | null = urlParams.get('room');
       if (roomIdQueryParam && isValidRoomId(roomIdQueryParam)) {
-        setRoomId(roomIdQueryParam);
         history.replace(`/game/join?room=${roomIdQueryParam}`);
       } else {
         history.replace('/game/join');
@@ -509,10 +508,10 @@ function LobbyPage() {
 
   useEffect(() => {
     // Connect to socket if not already
-    if (!subscription && room?.roomId && currentUser?.userId) {
-      connectUserToRoom(room!.roomId, currentUser!.userId!);
+    if (!subscription && currentRoomId && currentUser?.userId) {
+      connectUserToRoom(currentRoomId, currentUser!.userId!);
     }
-  }, [subscription, room?.roomId, currentUser?.userId, connectUserToRoom]);
+  }, [subscription, currentRoomId, currentUser, connectUserToRoom]);
 
   // Redirect user to game page if room is active.
   useEffect(() => {
@@ -588,7 +587,7 @@ function LobbyPage() {
         </HoverContainerPrimaryButton>
 
         <SecondaryRedButton
-          onClick={() => leaveRoom(history, currentRoomId, currentUser)}
+          onClick={() => leaveRoom(dispatch, history, currentRoomId, currentUser)}
         >
           Leave Room
         </SecondaryRedButton>

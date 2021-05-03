@@ -2,6 +2,9 @@ import { User } from '../api/User';
 import { removeUser } from '../api/Room';
 import { disconnect } from '../api/Socket';
 import { errorHandler } from '../api/Error';
+import { setRoom } from '../redux/Room';
+import { setCurrentUser } from '../redux/User';
+import { setGame } from '../redux/Game';
 
 // Require validator for identifiers as no types are provided.
 const validateIdentifier = require('valid-identifier');
@@ -37,7 +40,7 @@ export const generateRandomId = (): string => Math.random().toString(36);
 /**
  * Remove a user or player from the given lobby or game
  */
-export const leaveRoom = (history: any, roomId: string, user: User | null) => {
+export const leaveRoom = (dispatch: any, history: any, roomId: string, user: User | null) => {
   // eslint-disable-next-line no-alert
   if (window.confirm('Are you sure you want to leave the room?')) {
     if (user && user.userId) {
@@ -47,6 +50,11 @@ export const leaveRoom = (history: any, roomId: string, user: User | null) => {
       });
       disconnect();
     }
+
+    // Clear redux states
+    dispatch(setRoom(null));
+    dispatch(setGame(null));
+    dispatch(setCurrentUser(null));
 
     history.replace('/game/join', {
       error: errorHandler('You left the room.'),

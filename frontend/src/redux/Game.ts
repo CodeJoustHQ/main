@@ -27,7 +27,7 @@ const gameSlice = createSlice({
   name: 'game',
   initialState,
   reducers: {
-    setGame(state, action: PayloadAction<Game>) {
+    setGame(state, action: PayloadAction<Game | null>) {
       // State is set to the returned value
       return action.payload;
     },
