@@ -5,7 +5,7 @@ import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
 import { LargeText, SecondaryHeaderText, MainHeaderText } from '../components/core/Text';
 import {
-  getGame, Game, Player, playAgain, Submission,
+  Game, Player, playAgain, Submission,
 } from '../api/Game';
 import { checkLocationState, leaveRoom } from '../util/Utility';
 import { errorHandler } from '../api/Error';
@@ -29,6 +29,10 @@ import Modal from '../components/core/Modal';
 import FeedbackPopup from '../components/results/FeedbackPopup';
 import ResizableMonacoEditor from '../components/game/Editor';
 import Language from '../api/Language';
+import { useAppDispatch, useAppSelector } from '../util/Hook';
+import { fetchGame, setGame } from '../redux/Game';
+import { setCurrentUser } from '../redux/User';
+import { setRoom } from '../redux/Room';
 
 const Content = styled.div`
   padding: 0;
@@ -106,11 +110,11 @@ function GameResultsPage() {
   const [loading, setLoading] = useState(true);
 
   const [players, setPlayers] = useState<Player[]>([]);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [host, setHost] = useState<User | null>(null);
   const [startTime, setStartTime] = useState<string>('');
   const [roomId, setRoomId] = useState('');
 
+  const [connected, setConnected] = useState(false);
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
   const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
@@ -120,70 +124,68 @@ function GameResultsPage() {
   const [placeModal, setPlaceModal] = useState(-1);
   const [displayPlaceModal, setDisplayPlaceModal] = useState(true);
 
+  const dispatch = useAppDispatch();
+  const { game } = useAppSelector((state) => state);
+  const { currentUser } = useAppSelector((state) => state);
+
+  useEffect(() => {
+    if (game) {
+      setRoomId(game.room.roomId);
+      setHost(game.room.host);
+      setStartTime(game.gameTimer.startTime);
+      setPlayers(game.players);
+
+      if (game.playAgain && currentUser) {
+        disconnect()
+          .then(() => {
+            dispatch(setRoom(null));
+            dispatch(setGame(null));
+            history.replace(`/game/lobby?room=${game.room.roomId}`, {
+              user: currentUser,
+              roomId: game.room.roomId,
+            });
+          });
+      }
+    }
+  }, [game, currentUser, dispatch, history]);
+
   useEffect(() => {
     setTimeout(() => setShowFeedbackPrompt(true), 5000);
   }, []);
 
   useEffect(() => {
     if (checkLocationState(location, 'roomId', 'currentUser')) {
-      setRoomId(location.state.roomId);
-      setCurrentUser(location.state.currentUser);
-
-      // Function that's called when playAgain is triggered
-      const playAgainAction = (game: Game) => {
-        disconnect()
-          .then(() => {
-            history.replace(`/game/lobby?room=${game.room.roomId}`, {
-              user: location.state.currentUser,
-              roomId: game.room.roomId,
-            });
-          });
-      };
-
-      const subscribeCallback = (result: Message) => {
-        const updatedGame: Game = JSON.parse(result.body);
-
-        setStartTime(updatedGame.gameTimer.startTime);
-        // Update leaderboard with last second submissions
-        setPlayers(updatedGame.players);
-        // Set new host if the previous host refreshes or leaves
-        setHost(updatedGame.room.host);
-
-        // Disconnect users from socket and then redirect them to the lobby page
-        if (updatedGame.playAgain) {
-          playAgainAction(updatedGame);
-        }
-      };
-
-      /**
-       * Connect, subscribe, and then finally get the game details. Doing so in this order ensures
-       * that any late submissions are properly received (either through the socket update or
-       * through the get game request) and reflected on the leaderboard.
-       */
-      connect(location.state.roomId, location.state.currentUser.userId!).then(() => {
-        subscribe(routes(location.state.roomId).subscribe_game, subscribeCallback)
-          .then(() => {
-            // Get latest game information
-            getGame(location.state.roomId).then((res) => {
-              setLoading(false);
-              setPlayers(res.players);
-              setHost(res.room.host);
-              setStartTime(res.gameTimer.startTime);
-
-              // Check if host elected to play again
-              if (res.playAgain) {
-                playAgainAction(res);
-              }
-            }).catch((err) => setError(err.message));
-          })
-          .catch((err) => setError(err.message));
-      }).catch((err) => setError(err.message));
+      if (!game || game?.room.roomId !== location.state.roomId) {
+        dispatch(fetchGame(location.state.roomId));
+      }
+      if (!currentUser) {
+        dispatch(setCurrentUser(location.state.currentUser));
+      }
     } else {
       history.replace('/game/join', {
         error: errorHandler('Please join and play a game before viewing the results page.'),
       });
     }
-  }, [location, history]);
+  }, [game, currentUser, dispatch, location, history]);
+
+  useEffect(() => {
+    if (!connected && roomId && currentUser?.userId) {
+      const subscribeCallback = (result: Message) => {
+        const updatedGame: Game = JSON.parse(result.body);
+        dispatch(setGame(updatedGame));
+      };
+
+      connect(roomId, currentUser!.userId!).then(() => {
+        subscribe(routes(roomId).subscribe_game, subscribeCallback)
+          .then(() => {
+            setLoading(false);
+            setConnected(true);
+            dispatch(fetchGame(roomId));
+          })
+          .catch((err) => setError(err.message));
+      }).catch((err) => setError(err.message));
+    }
+  }, [connected, roomId, currentUser, dispatch]);
 
   const callPlayAgain = () => {
     setError('');

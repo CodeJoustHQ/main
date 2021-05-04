@@ -136,9 +136,6 @@ function LobbyPage() {
   const history = useHistory();
   const location = useLocation<LobbyPageLocation>();
 
-  // Set the current user
-  // const [currentUser, setCurrentUser] = useState<User | null>(null);
-
   // Set all the different variables in the room object
   const [host, setHost] = useState<User | null>(null);
   const [users, setUsers] = useState<User[] | null>(null);
