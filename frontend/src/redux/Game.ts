@@ -1,26 +1,13 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { setLoading, setError } from './Status';
 import { Game, getGame } from '../api/Game';
 
 const initialState = null as Game | null;
 
-export const fetchGame = createAsyncThunk<Game | null, string>(
+export const fetchGame = createAsyncThunk<Game, string>(
   'games/fetch',
-  async (roomId, thunkApi) => {
-    thunkApi.dispatch(setLoading(true));
-    thunkApi.dispatch(setError(''));
-
-    return getGame(roomId)
-      .then((res) => {
-        thunkApi.dispatch(setLoading(false));
-        return res;
-      })
-      .catch((err) => {
-        thunkApi.dispatch(setLoading(false));
-        thunkApi.dispatch(setError(err.message));
-        return null;
-      });
-  },
+  async (roomId, thunkApi) => getGame(roomId)
+    .then((res) => res)
+    .catch((err) => thunkApi.rejectWithValue(err)),
 );
 
 const gameSlice = createSlice({

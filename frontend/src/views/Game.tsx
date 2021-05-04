@@ -45,6 +45,7 @@ import {
 import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { fetchGame, setGame } from '../redux/Game';
 import { setCurrentUser } from '../redux/User';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
   margin-top: 15px;
@@ -248,7 +249,9 @@ function GamePage() {
         subscribe(routes(roomIdParam).subscribe_game, subscribeUserCallback)
           .then((subscription) => {
             setGameSocket(subscription);
-            dispatch(fetchGame(roomIdParam));
+            dispatch(fetchGame(roomIdParam))
+              .then(unwrapResult)
+              .catch((err) => setError(err.message));
           }).catch((err) => {
             setError(err.message);
           });
@@ -270,7 +273,9 @@ function GamePage() {
   useEffect(() => {
     if (checkLocationState(location, 'roomId', 'currentUser')) {
       if (!game || game?.room.roomId !== location.state.roomId) {
-        dispatch(fetchGame(location.state.roomId));
+        dispatch(fetchGame(location.state.roomId))
+          .then(unwrapResult)
+          .catch((err) => setError(err.message));
       }
       if (!currentUser) {
         dispatch(setCurrentUser(location.state.currentUser));

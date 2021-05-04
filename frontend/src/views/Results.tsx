@@ -33,6 +33,7 @@ import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { fetchGame, setGame } from '../redux/Game';
 import { setCurrentUser } from '../redux/User';
 import { setRoom } from '../redux/Room';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 const Content = styled.div`
   padding: 0;
@@ -156,7 +157,9 @@ function GameResultsPage() {
   useEffect(() => {
     if (checkLocationState(location, 'roomId', 'currentUser')) {
       if (!game || game?.room.roomId !== location.state.roomId) {
-        dispatch(fetchGame(location.state.roomId));
+        dispatch(fetchGame(location.state.roomId))
+          .then(unwrapResult)
+          .catch((err) => setError(err.message));
       }
       if (!currentUser) {
         dispatch(setCurrentUser(location.state.currentUser));
@@ -180,7 +183,9 @@ function GameResultsPage() {
           .then(() => {
             setLoading(false);
             setConnected(true);
-            dispatch(fetchGame(roomId));
+            dispatch(fetchGame(roomId))
+              .then(unwrapResult)
+              .catch((err) => setError(err.message));
           })
           .catch((err) => setError(err.message));
       }).catch((err) => setError(err.message));

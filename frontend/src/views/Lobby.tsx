@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { Message, Subscription } from 'stompjs';
 import styled from 'styled-components';
 import copy from 'copy-to-clipboard';
@@ -440,7 +441,9 @@ function LobbyPage() {
     if (!loading) {
       setLoading(true);
       dispatch(fetchRoom(location.state.roomId))
-        .then(() => setLoading(false));
+        .then(unwrapResult)
+        .then(() => setLoading(false))
+        .catch((err) => setError(err.message));
     }
   };
 
@@ -461,8 +464,10 @@ function LobbyPage() {
       // Body encrypt through JSON.
       subscribe(routes(roomId).subscribe_lobby, subscribeCallback).then((subscriptionParam) => {
         setSubscription(subscriptionParam);
-        dispatch(fetchRoom(roomId));
-        setError('');
+        dispatch(fetchRoom(roomId))
+          .then(unwrapResult)
+          .then(() => setError(''))
+          .catch((err) => setError(err.message));
       }).catch((err) => {
         setError(err.message);
       });
@@ -486,7 +491,9 @@ function LobbyPage() {
     if (checkLocationState(location, 'user', 'roomId')) {
       // Set room if it doesn't exist in Redux state
       if (!room || room?.roomId !== location.state.roomId) {
-        dispatch(fetchRoom(location.state.roomId));
+        dispatch(fetchRoom(location.state.roomId))
+          .then(unwrapResult)
+          .catch((err) => setError(err.message));
       }
       if (!currentUser) {
         dispatch(setCurrentUser(location.state.user));
