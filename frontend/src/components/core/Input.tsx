@@ -148,8 +148,8 @@ export const NumberInput = styled(Input).attrs(() => ({
   }
 `;
 
-export const TextInput = styled(Input).attrs(() => ({
-  type: 'text',
+export const TextInput = styled(Input).attrs((props) => ({
+  type: (props?.type ? props.type : 'text'),
 }))`
   display: inline-block;
   margin: 0 0.5rem 0 0;

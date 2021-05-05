@@ -4,7 +4,7 @@ import { Switch, useLocation } from 'react-router-dom';
 import MainLayout from '../layout/Main';
 import LandingPage from '../../views/Landing';
 import NotFound from '../../views/NotFound';
-import { CustomRoute, CustomRedirect } from './Route';
+import { CustomRoute, CustomRedirect, PrivateRoute } from './Route';
 import GamePage from '../../views/Game';
 import GameLayout from '../layout/Game';
 import JoinGamePage from '../../views/Join';
@@ -15,6 +15,7 @@ import AllProblemsPage from '../../views/AllProblemsPage';
 import ProblemPage from '../../views/ProblemPage';
 import CreateProblemPage from '../../views/CreateProblemPage';
 import CircleBackgroundLayout from '../layout/CircleBackground';
+import LoginPage from '../../views/account/Login';
 import ContactUsPage from '../../views/ContactUs';
 import MinimalLayout from '../layout/MinimalLayout';
 import { useAppDispatch } from '../../util/Hook';
@@ -46,9 +47,11 @@ function App() {
       <CustomRoute path="/game/create" component={CreateGamePage} layout={CircleBackgroundLayout} exact />
       <CustomRoute path="/game/lobby" component={LobbyPage} layout={MinimalLayout} exact />
       <CustomRoute path="/game/results" component={GameResultsPage} layout={MinimalLayout} exact />
-      <CustomRoute path="/problems/all" component={AllProblemsPage} layout={MinimalLayout} exact />
-      <CustomRoute path="/problem/create" component={CreateProblemPage} layout={MinimalLayout} exact />
-      <CustomRoute path="/problem/:id" component={ProblemPage} layout={MinimalLayout} exact />
+      <PrivateRoute path="/problems/all" component={AllProblemsPage} layout={MinimalLayout} exact />
+      <PrivateRoute path="/problem/create" component={CreateProblemPage} layout={MinimalLayout} exact />
+      <PrivateRoute path="/problem/:id" component={ProblemPage} layout={MinimalLayout} exact />
+      <CustomRoute path="/login" component={LoginPage} layout={MainLayout} exact />
+      <CustomRoute path="/register" component={LoginPage} layout={MainLayout} exact />
       <CustomRoute path="/contact-us" component={ContactUsPage} layout={MainLayout} exact />
       <CustomRedirect from="/play" to="/game/join" />
       <CustomRoute path="*" component={NotFound} layout={MainLayout} />
