@@ -3,22 +3,23 @@ import styled from 'styled-components';
 import { Redirect } from 'react-router-dom';
 import { useAppSelector } from '../../util/Hook';
 import { TextInput } from '../../components/core/Input';
-import { LandingHeaderTitle } from '../../components/core/Text';
-import ErrorMessage from '../../components/core/Error';
 import { PrimaryButton } from '../../components/core/Button';
+import ErrorMessage from '../../components/core/Error';
+import { LandingHeaderTitle } from '../../components/core/Text';
 import { TextLink } from '../../components/core/Link';
 
-const LoginInput = styled(TextInput)`
+const RegisterInput = styled(TextInput)`
   display: block;
   margin: 15px auto;
   width: 20rem;
 `;
 
-function LoginPage() {
+function RegisterPage() {
   const { account } = useAppSelector((state) => state);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
   if (account) {
@@ -31,34 +32,45 @@ function LoginPage() {
   };
 
   const onSubmit = () => {
-    if (!email || !password) {
+    if (!email || !password || !confirmPassword) {
       setError('Please enter a value for each field.');
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
     }
   };
 
   return (
     <div>
       <LandingHeaderTitle>
-        Login
+        Register an Account
       </LandingHeaderTitle>
       <div>
-        <LoginInput
+        <RegisterInput
           placeholder="Email"
           name="email"
           value={email}
           onChange={(e) => handleChange(setEmail, e.target.value)}
         />
-        <LoginInput
+        <RegisterInput
           placeholder="Password"
           name="password"
           type="password"
           value={password}
           onChange={(e) => handleChange(setPassword, e.target.value)}
         />
-        <TextLink to="/register">Or register an account &#8594;</TextLink>
+        <RegisterInput
+          placeholder="Confirm Password"
+          name="confirm-password"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => handleChange(setConfirmPassword, e.target.value)}
+        />
+        <TextLink to="/login">Or login to an existing account &#8594;</TextLink>
       </div>
       <PrimaryButton onClick={onSubmit}>
-        Login
+        Register
       </PrimaryButton>
 
       {error ? <ErrorMessage message={error} /> : null}
@@ -66,4 +78,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default RegisterPage;
