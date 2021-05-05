@@ -32,7 +32,7 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   if (account) {
-    history.replace(location.state?.from || '/');
+    history.replace(location.state?.from || '/dashboard');
   }
 
   const handleChange = (func: (val: string) => void, val: string) => {
@@ -48,7 +48,7 @@ function LoginPage() {
 
     setLoading(true);
     app.auth().signInWithEmailAndPassword(email, password)
-      .then(() => history.replace(location.state?.from || '/'))
+      .then(() => history.replace(location.state?.from || '/dashboard'))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   };

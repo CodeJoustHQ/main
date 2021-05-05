@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { NavbarLink } from '../core/Link';
 import app from '../../api/Firebase';
 import { TextButton } from '../core/Button';
+import { useAppSelector } from '../../util/Hook';
 
 const Content = styled.div`
   height: 50px;
@@ -54,7 +55,44 @@ const LogoIcon = styled.img`
 
 // Note: Can also create a center header with simply display: inline-block
 
+function LoggedInContent() {
+  return (
+    <RightContainer>
+      <RightHeader to="/problems/all">
+        Problems
+      </RightHeader>
+      <RightHeader to="/dashboard">
+        Dashboard
+      </RightHeader>
+      <NavButton onClick={() => app.auth().signOut()}>
+        Logout
+      </NavButton>
+      <RightHeader to="/contact-us">
+        Contact Us
+      </RightHeader>
+    </RightContainer>
+  );
+}
+
+function LoggedOutContent() {
+  return (
+    <RightContainer>
+      <RightHeader to="/register">
+        Register
+      </RightHeader>
+      <RightHeader to="/login">
+        Login
+      </RightHeader>
+      <RightHeader to="/contact-us">
+        Contact Us
+      </RightHeader>
+    </RightContainer>
+  );
+}
+
 function HeaderContent() {
+  const { account } = useAppSelector((state) => state);
+
   return (
     <nav>
       <LeftHeader to="/">
@@ -62,14 +100,7 @@ function HeaderContent() {
         CodeJoust
         <InlineHeaderTag>Beta</InlineHeaderTag>
       </LeftHeader>
-      <RightContainer>
-        <RightHeader to="/contact-us">
-          Contact Us
-        </RightHeader>
-        <NavButton onClick={() => app.auth().signOut()}>
-          Log Out
-        </NavButton>
-      </RightContainer>
+      {account ? <LoggedInContent /> : <LoggedOutContent />}
     </nav>
   );
 }

@@ -15,13 +15,14 @@ import AllProblemsPage from '../../views/AllProblemsPage';
 import ProblemPage from '../../views/ProblemPage';
 import CreateProblemPage from '../../views/CreateProblemPage';
 import CircleBackgroundLayout from '../layout/CircleBackground';
+import DashboardPage from '../../views/account/Dashboard';
 import LoginPage from '../../views/account/Login';
 import RegisterPage from '../../views/account/Register';
 import ContactUsPage from '../../views/ContactUs';
 import MinimalLayout from '../layout/MinimalLayout';
 import { useAppDispatch } from '../../util/Hook';
 import app from '../../api/Firebase';
-import { setAccount } from '../../redux/Account';
+import { setAccount, AccountType } from '../../redux/Account';
 
 // Set up Google Analytics
 ReactGA.initialize('UA-192641172-2');
@@ -39,7 +40,7 @@ function App() {
   // Set authentication status when Firebase auth status changes
   useEffect(() => {
     app.auth().onAuthStateChanged((account) => {
-      dispatch(setAccount(account?.toJSON() || null));
+      dispatch(setAccount(account?.toJSON() as AccountType || null));
       setLoading(false);
     });
   }, [dispatch, setLoading]);
@@ -60,6 +61,7 @@ function App() {
       <PrivateRoute path="/problems/all" component={AllProblemsPage} layout={MinimalLayout} exact />
       <PrivateRoute path="/problem/create" component={CreateProblemPage} layout={MinimalLayout} exact />
       <PrivateRoute path="/problem/:id" component={ProblemPage} layout={MinimalLayout} exact />
+      <PrivateRoute path="/dashboard" component={DashboardPage} layout={MinimalLayout} exact />
       <CustomRoute path="/login" component={LoginPage} layout={MainLayout} exact />
       <CustomRoute path="/register" component={RegisterPage} layout={MainLayout} exact />
       <CustomRoute path="/contact-us" component={ContactUsPage} layout={MainLayout} exact />
