@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Redirect } from 'react-router-dom';
+import { Redirect, useHistory } from 'react-router-dom';
+import app from '../../api/Firebase';
 import { useAppSelector } from '../../util/Hook';
 import { TextInput } from '../../components/core/Input';
 import { PrimaryButton } from '../../components/core/Button';
 import ErrorMessage from '../../components/core/Error';
 import { LandingHeaderTitle } from '../../components/core/Text';
 import { TextLink } from '../../components/core/Link';
+import Loading from '../../components/core/Loading';
 
 const RegisterInput = styled(TextInput)`
   display: block;
@@ -15,12 +17,15 @@ const RegisterInput = styled(TextInput)`
 `;
 
 function RegisterPage() {
+  const history = useHistory();
   const { account } = useAppSelector((state) => state);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   if (account) {
     return <Redirect to="/" />;
@@ -34,11 +39,24 @@ function RegisterPage() {
   const onSubmit = () => {
     if (!email || !password || !confirmPassword) {
       setError('Please enter a value for each field.');
+      return;
     }
 
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
+      return;
     }
+
+    setLoading(true);
+    app.auth().createUserWithEmailAndPassword(email, password)
+      .then((res) => {
+        if (res.user) {
+          res.user!.sendEmailVerification();
+        }
+        history.replace('/');
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -73,6 +91,7 @@ function RegisterPage() {
         Register
       </PrimaryButton>
 
+      {loading ? <Loading /> : null}
       {error ? <ErrorMessage message={error} /> : null}
     </div>
   );

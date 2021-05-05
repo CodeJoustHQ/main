@@ -1,5 +1,7 @@
 import React from 'react';
-import { Redirect, Route } from 'react-router-dom';
+import {
+  Redirect, Route, useHistory, useLocation,
+} from 'react-router-dom';
 import { useAppSelector } from '../../util/Hook';
 
 export function CustomRoute(props: any) {
@@ -26,22 +28,14 @@ export function CustomRedirect(props: any) {
 }
 
 export function PrivateRoute(props: any) {
-  const { component: Component, layout: Layout, ...rest } = props;
+  const history = useHistory();
+  const location = useLocation();
 
   const { account } = useAppSelector((state) => state);
 
-  return (
-    <Route
-      {...rest}
-      render={(renderProps) => (
-        !account ? (
-          <Redirect to="/login" />
-        ) : (
-          <Layout {...renderProps}>
-            <Component {...renderProps} />
-          </Layout>
-        )
-      )}
-    />
-  );
+  if (!account) {
+    history.replace('/login', { from: location.pathname + location.search });
+  }
+
+  return <CustomRoute {...props} />;
 }

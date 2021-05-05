@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactGA from 'react-ga';
 import { Switch, useLocation } from 'react-router-dom';
 import MainLayout from '../layout/Main';
@@ -29,6 +29,7 @@ ReactGA.initialize('UA-192641172-2');
 function App() {
   const location = useLocation();
   const dispatch = useAppDispatch();
+  const [loading, setLoading] = useState(true);
 
   // Track page view on every change in location and clear errors when switching pages
   useEffect(() => {
@@ -37,8 +38,16 @@ function App() {
 
   // Set authentication status when Firebase auth status changes
   useEffect(() => {
-    app.auth().onAuthStateChanged((account) => dispatch(setAccount(account)));
-  }, []);
+    app.auth().onAuthStateChanged((account) => {
+      dispatch(setAccount(account?.toJSON() || null));
+      setLoading(false);
+    });
+  }, [dispatch, setLoading]);
+
+  // While the initial Firebase auth is still loading, show blank loading screen
+  if (loading) {
+    return null;
+  }
 
   return (
     <Switch>

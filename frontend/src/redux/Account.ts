@@ -1,13 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import firebase from 'firebase';
 
-const initialState = null as firebase.User | null;
+const initialState = null as Object | null;
 
 const accountSlice = createSlice({
-  name: 'user',
+  name: 'account',
   initialState,
   reducers: {
-    setAccount(state, action: PayloadAction<firebase.User | null>) {
+    setAccount(state, action: PayloadAction<Object | null>) {
       return action.payload;
     },
   },
