@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import firebase from 'firebase';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useAppSelector } from '../../util/Hook';
@@ -9,6 +10,7 @@ import { PrimaryButton } from '../../components/core/Button';
 import { TextLink } from '../../components/core/Link';
 import app from '../../api/Firebase';
 import Loading from '../../components/core/Loading';
+import GoogleLogin from '../../components/config/GoogleLogin';
 
 const LoginInput = styled(TextInput)`
   display: block;
@@ -31,8 +33,10 @@ function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const redirectAction = () => history.replace(location.state?.from || '/dashboard');
+
   if (account) {
-    history.replace(location.state?.from || '/dashboard');
+    redirectAction();
   }
 
   const handleChange = (func: (val: string) => void, val: string) => {
@@ -48,7 +52,7 @@ function LoginPage() {
 
     setLoading(true);
     app.auth().signInWithEmailAndPassword(email, password)
-      .then(() => history.replace(location.state?.from || '/dashboard'))
+      .then(redirectAction)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   };
@@ -74,9 +78,12 @@ function LoginPage() {
         />
         <TextLink to="/register">Or register an account &#8594;</TextLink>
       </div>
-      <PrimaryButton onClick={onSubmit}>
-        Login
-      </PrimaryButton>
+      <div>
+        <PrimaryButton onClick={onSubmit}>
+          Login
+        </PrimaryButton>
+        <GoogleLogin successAction={redirectAction} errorAction={setError} />
+      </div>
 
       {loading ? <Loading /> : null}
       {error ? <ErrorMessage message={error} /> : null}

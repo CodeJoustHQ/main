@@ -9,6 +9,7 @@ import ErrorMessage from '../../components/core/Error';
 import { LandingHeaderTitle } from '../../components/core/Text';
 import { TextLink } from '../../components/core/Link';
 import Loading from '../../components/core/Loading';
+import GoogleLogin from '../../components/config/GoogleLogin';
 
 const RegisterInput = styled(TextInput)`
   display: block;
@@ -27,8 +28,10 @@ function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const redirectAction = () => history.replace('/dashboard');
+
   if (account) {
-    return <Redirect to="/" />;
+    redirectAction();
   }
 
   const handleChange = (func: (val: string) => void, val: string) => {
@@ -53,7 +56,7 @@ function RegisterPage() {
         if (res.user) {
           res.user!.sendEmailVerification();
         }
-        history.replace('/');
+        redirectAction();
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -87,9 +90,12 @@ function RegisterPage() {
         />
         <TextLink to="/login">Or login to an existing account &#8594;</TextLink>
       </div>
-      <PrimaryButton onClick={onSubmit}>
-        Register
-      </PrimaryButton>
+      <div>
+        <PrimaryButton onClick={onSubmit}>
+          Register
+        </PrimaryButton>
+        <GoogleLogin successAction={redirectAction} errorAction={setError} />
+      </div>
 
       {loading ? <Loading /> : null}
       {error ? <ErrorMessage message={error} /> : null}
