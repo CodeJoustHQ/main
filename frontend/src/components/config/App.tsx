@@ -23,6 +23,8 @@ import MinimalLayout from '../layout/MinimalLayout';
 import { useAppDispatch } from '../../util/Hook';
 import app from '../../api/Firebase';
 import { setAccount, AccountType } from '../../redux/Account';
+import { CenteredContainer } from '../core/Container';
+import Loading from '../core/Loading';
 
 // Set up Google Analytics
 ReactGA.initialize('UA-192641172-2');
@@ -47,7 +49,11 @@ function App() {
 
   // While the initial Firebase auth is still loading, show blank loading screen
   if (loading) {
-    return null;
+    return (
+      <CenteredContainer>
+        <Loading />
+      </CenteredContainer>
+    );
   }
 
   return (

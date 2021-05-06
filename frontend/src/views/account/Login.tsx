@@ -11,6 +11,7 @@ import { TextLink } from '../../components/core/Link';
 import app from '../../api/Firebase';
 import Loading from '../../components/core/Loading';
 import GoogleLogin from '../../components/config/GoogleLogin';
+import { onEnterAction } from '../../util/Utility';
 
 const LoginInput = styled(TextInput)`
   display: block;
@@ -68,6 +69,7 @@ function LoginPage() {
           name="email"
           value={email}
           onChange={(e) => handleChange(setEmail, e.target.value)}
+          onKeyPress={(e) => onEnterAction(onSubmit, e)}
         />
         <LoginInput
           placeholder="Password"
@@ -75,6 +77,7 @@ function LoginPage() {
           type="password"
           value={password}
           onChange={(e) => handleChange(setPassword, e.target.value)}
+          onKeyPress={(e) => onEnterAction(onSubmit, e)}
         />
         <TextLink to="/register">Or register an account &#8594;</TextLink>
       </div>

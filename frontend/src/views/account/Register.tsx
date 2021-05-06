@@ -10,6 +10,7 @@ import { LandingHeaderTitle } from '../../components/core/Text';
 import { TextLink } from '../../components/core/Link';
 import Loading from '../../components/core/Loading';
 import GoogleLogin from '../../components/config/GoogleLogin';
+import { onEnterAction } from '../../util/Utility';
 
 const RegisterInput = styled(TextInput)`
   display: block;
@@ -73,6 +74,7 @@ function RegisterPage() {
           name="email"
           value={email}
           onChange={(e) => handleChange(setEmail, e.target.value)}
+          onKeyPress={(e) => onEnterAction(onSubmit, e)}
         />
         <RegisterInput
           placeholder="Password"
@@ -80,6 +82,7 @@ function RegisterPage() {
           type="password"
           value={password}
           onChange={(e) => handleChange(setPassword, e.target.value)}
+          onKeyPress={(e) => onEnterAction(onSubmit, e)}
         />
         <RegisterInput
           placeholder="Confirm Password"
@@ -87,6 +90,7 @@ function RegisterPage() {
           type="password"
           value={confirmPassword}
           onChange={(e) => handleChange(setConfirmPassword, e.target.value)}
+          onKeyPress={(e) => onEnterAction(onSubmit, e)}
         />
         <TextLink to="/login">Or login to an existing account &#8594;</TextLink>
       </div>

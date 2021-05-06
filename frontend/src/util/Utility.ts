@@ -5,6 +5,7 @@ import { errorHandler } from '../api/Error';
 import { setRoom } from '../redux/Room';
 import { setCurrentUser } from '../redux/User';
 import { setGame } from '../redux/Game';
+import React from 'react';
 
 // Require validator for identifiers as no types are provided.
 const validateIdentifier = require('valid-identifier');
@@ -75,3 +76,9 @@ const isLetter = (character: string) => {
 // Return true iff the variable is a valid identifier, and starts with a letter.
 export const validIdentifier = (identifier: string) => validateIdentifier(identifier)
   && isLetter(identifier.charAt(0));
+
+export const onEnterAction = (action: () => void, event: React.KeyboardEvent<HTMLInputElement>) => {
+  if (event.key === 'Enter') {
+    action();
+  }
+};
