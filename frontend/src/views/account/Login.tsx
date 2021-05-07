@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import firebase from 'firebase';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useAppSelector } from '../../util/Hook';

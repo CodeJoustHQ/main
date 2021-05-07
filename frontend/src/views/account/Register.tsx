@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Redirect, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import app from '../../api/Firebase';
 import { useAppSelector } from '../../util/Hook';
 import { TextInput } from '../../components/core/Input';
