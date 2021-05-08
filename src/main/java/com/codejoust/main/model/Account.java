@@ -30,7 +30,7 @@ public class Account {
     @EqualsAndHashCode.Include
     private String uid;
 
-    @OneToMany(mappedBy = "problem", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
     @Setter(AccessLevel.PRIVATE)
     private List<Problem> problems = new ArrayList<>();
 }

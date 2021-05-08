@@ -31,8 +31,8 @@ const accountSlice = createSlice({
     setFirebaseUser(state, action: PayloadAction<FirebaseUserType | null>) {
       state.firebaseUser = action.payload;
     },
-    setAccount(state, action: PayloadAction<FirebaseUserType | null>) {
-      state.firebaseUser = action.payload;
+    setAccount(state, action: PayloadAction<Account | null>) {
+      state.account = action.payload;
     },
     setToken(state, action: PayloadAction<string | null>) {
       state.token = action.payload;

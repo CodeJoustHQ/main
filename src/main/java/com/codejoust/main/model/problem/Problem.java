@@ -39,8 +39,7 @@ public class Problem {
     private String problemId = UUID.randomUUID().toString();
 
     // The person who created the problem and has permissions to edit it
-    @Column(nullable = false)
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "account_id")
     private Account owner;
 
