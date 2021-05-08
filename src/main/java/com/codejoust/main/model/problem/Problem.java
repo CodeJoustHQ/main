@@ -9,8 +9,11 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.codejoust.main.model.Account;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -34,6 +37,12 @@ public class Problem {
     // Auto-generate default business ID for each problem
     @EqualsAndHashCode.Include
     private String problemId = UUID.randomUUID().toString();
+
+    @Column(nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "account_id")
+    private Account account;
+
     private String name;
     private Boolean approval = false;
 

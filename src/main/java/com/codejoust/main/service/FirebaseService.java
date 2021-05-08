@@ -1,5 +1,7 @@
 package com.codejoust.main.service;
 
+import com.codejoust.main.exception.AccountError;
+import com.codejoust.main.exception.api.ApiException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
@@ -16,7 +18,7 @@ public class FirebaseService {
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
             String uid = decodedToken.getUid();
             if (uid == null) {
-                System.out.println("uh oh");
+                throw new ApiException(AccountError.INVALID_CREDENTIALS);
             }
 
             return uid;
