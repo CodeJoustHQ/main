@@ -3,6 +3,7 @@ import { axiosErrorHandler } from './Error';
 import { Difficulty } from './Difficulty';
 import Language from './Language';
 import { AccountUid } from './Account';
+import { getAuthHttpHeader } from '../util/Utility';
 
 export type TestCase = {
   id: string,
@@ -118,22 +119,22 @@ export const getSingleProblem = (problemId: string): Promise<Problem> => axios
     throw axiosErrorHandler(err);
   });
 
-export const createProblem = (problem: Problem): Promise<Problem> => axios
-  .post<Problem>(routes.createProblem, problem)
+export const createProblem = (problem: Problem, token: string): Promise<Problem> => axios
+  .post<Problem>(routes.createProblem, problem, getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
 
-export const editProblem = (problemId: string, updatedProblem: Problem): Promise<Problem> => axios
-  .put<Problem>(routes.editProblem(problemId), updatedProblem)
+export const editProblem = (problemId: string, updatedProblem: Problem, token: string): Promise<Problem> => axios
+  .put<Problem>(routes.editProblem(problemId), updatedProblem, getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
 
-export const deleteProblem = (problemId: string): Promise<Problem> => axios
-  .delete<Problem>(routes.deleteProblem(problemId))
+export const deleteProblem = (problemId: string, token: string): Promise<Problem> => axios
+  .delete<Problem>(routes.deleteProblem(problemId), getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

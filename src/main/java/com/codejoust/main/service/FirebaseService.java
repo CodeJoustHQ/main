@@ -41,6 +41,13 @@ public class FirebaseService {
         return uid;
     }
 
+    public void verifyTokenMatchesUid(String token, String uid) {
+        String decodedUid = verifyToken(token);
+        if (!decodedUid.equals(uid)) {
+            throw new ApiException(AccountError.INVALID_CREDENTIALS);
+        }
+    }
+
     // Make sure an account exists in our database to match Firebase
     private void createAccountIfNoneExists(String uid) {
         Account account = repository.findAccountByUid(uid);

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,8 +39,8 @@ public class ProblemController extends BaseRestController {
     }
 
     @PostMapping("/problems")
-    public ResponseEntity<ProblemDto> createProblem(@RequestBody CreateProblemRequest request) {
-        return new ResponseEntity<>(service.createProblem(request), HttpStatus.CREATED);
+    public ResponseEntity<ProblemDto> createProblem(@RequestBody CreateProblemRequest request, @RequestHeader(name="Authorization") String token) {
+        return new ResponseEntity<>(service.createProblem(request, token), HttpStatus.CREATED);
 
     }
 
@@ -49,19 +50,21 @@ public class ProblemController extends BaseRestController {
     }
 
     @PutMapping("/problems/{problemId}")
-    public ResponseEntity<ProblemDto> editProblem(@PathVariable String problemId, @RequestBody ProblemDto updatedProblem) {
-        return new ResponseEntity<>(service.editProblem(problemId, updatedProblem), HttpStatus.OK);
+    public ResponseEntity<ProblemDto> editProblem(@PathVariable String problemId, @RequestBody ProblemDto updatedProblem,
+                                                  @RequestHeader (name="Authorization") String token) {
+        return new ResponseEntity<>(service.editProblem(problemId, updatedProblem, token), HttpStatus.OK);
     }
 
     @DeleteMapping("/problems/{problemId}")
-    public ResponseEntity<ProblemDto> deleteProblem(@PathVariable String problemId) {
-        return new ResponseEntity<>(service.deleteProblem(problemId), HttpStatus.OK);
+    public ResponseEntity<ProblemDto> deleteProblem(@PathVariable String problemId, @RequestHeader (name="Authorization") String token) {
+        return new ResponseEntity<>(service.deleteProblem(problemId, token), HttpStatus.OK);
     }
 
 
     @PostMapping("/problems/{problemId}/test-case")
-    public ResponseEntity<ProblemTestCaseDto> createTestCase(@PathVariable String problemId, @RequestBody CreateTestCaseRequest request) {
-        return new ResponseEntity<>(service.createTestCase(problemId, request), HttpStatus.CREATED);
+    public ResponseEntity<ProblemTestCaseDto> createTestCase(@PathVariable String problemId, @RequestBody CreateTestCaseRequest request,
+                                                             @RequestHeader (name="Authorization") String token) {
+        return new ResponseEntity<>(service.createTestCase(problemId, request, token), HttpStatus.CREATED);
     }
 
     @GetMapping("/problems")

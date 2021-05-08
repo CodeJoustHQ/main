@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -21,7 +21,7 @@ public class AccountController extends BaseRestController {
     }
 
     @GetMapping("/accounts/{uid}")
-    public ResponseEntity<AccountDto> getAccount(@PathVariable String uid, @RequestParam(required = false) String token) {
+    public ResponseEntity<AccountDto> getAccount(@PathVariable String uid, @RequestHeader(name="Authorization") String token) {
         return new ResponseEntity<>(service.getAccount(uid, token), HttpStatus.OK);
     }
 
