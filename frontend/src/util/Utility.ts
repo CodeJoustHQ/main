@@ -1,3 +1,4 @@
+import React from 'react';
 import { User } from '../api/User';
 import { removeUser } from '../api/Room';
 import { disconnect } from '../api/Socket';
@@ -5,7 +6,6 @@ import { errorHandler } from '../api/Error';
 import { setRoom } from '../redux/Room';
 import { setCurrentUser } from '../redux/User';
 import { setGame } from '../redux/Game';
-import React from 'react';
 
 // Require validator for identifiers as no types are provided.
 const validateIdentifier = require('valid-identifier');
@@ -85,6 +85,6 @@ export const onEnterAction = (action: () => void, event: React.KeyboardEvent<HTM
 
 export const getAuthHttpHeader = (token: string) => ({
   headers: {
-    Authorization: `Bearer ${token}`,
+    Authorization: token,
   },
 });

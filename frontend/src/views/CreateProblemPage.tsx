@@ -14,6 +14,7 @@ import ProblemDisplay from '../components/problem/ProblemDisplay';
 import { Difficulty } from '../api/Difficulty';
 import { checkLocationState } from '../util/Utility';
 import LockScreen from '../components/core/LockScreen';
+import { useAppSelector } from '../util/Hook';
 
 type LocationState = {
   locked: boolean,
@@ -38,6 +39,8 @@ function CreateProblemPage() {
 
   const history = useHistory();
   const location = useLocation<LocationState>();
+  const { token } = useAppSelector((state) => state.account);
+
   const [problem, setProblem] = useState<Problem>(firstProblem);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -57,7 +60,7 @@ function CreateProblemPage() {
     setLoading(true);
     setError('');
 
-    createProblem(newProblem)
+    createProblem(newProblem, token || '')
       .then((res) => {
         setProblem(res);
         setLoading(false);

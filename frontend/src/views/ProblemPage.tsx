@@ -14,6 +14,7 @@ import Loading from '../components/core/Loading';
 import ProblemDisplay from '../components/problem/ProblemDisplay';
 import { checkLocationState, generateRandomId } from '../util/Utility';
 import LockScreen from '../components/core/LockScreen';
+import { useAppSelector } from '../util/Hook';
 
 const Content = styled.div`
   display: flex;
@@ -30,6 +31,8 @@ type LocationState = {
 function ProblemPage() {
   const history = useHistory();
   const location = useLocation<LocationState>();
+  const { token } = useAppSelector((state) => state.account);
+
   const [problem, setProblem] = useState<Problem | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -97,7 +100,7 @@ function ProblemPage() {
     setLoading(true);
     setError('');
 
-    editProblem(newProblem.problemId, newProblem)
+    editProblem(newProblem.problemId, newProblem, token || '')
       .then((res) => {
         setProblem(res);
         setLoading(false);

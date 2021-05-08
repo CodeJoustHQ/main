@@ -18,14 +18,14 @@ function DashboardPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!account && firebaseUser && token) {
+    if (firebaseUser && token) {
       setLoading(true);
       getAccount(firebaseUser.uid, token)
         .then((res) => dispatch(setAccount(res)))
         .catch((err) => setError(err.message))
         .finally(() => setLoading(false));
     }
-  }, [firebaseUser, account, token]);
+  }, [firebaseUser, token]);
 
   return (
     <div>

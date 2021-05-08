@@ -42,6 +42,7 @@ import { FlexBareContainer } from '../core/Container';
 import { generateRandomId, validIdentifier } from '../../util/Utility';
 import { HoverTooltip } from '../core/HoverTooltip';
 import { Coordinate } from '../special/FloatingCircle';
+import { useAppSelector } from '../../util/Hook';
 
 const MainContent = styled.div`
   text-align: left;
@@ -171,6 +172,8 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   } = props;
 
   const history = useHistory();
+  const { token } = useAppSelector((state) => state.account);
+
   const [newProblem, setNewProblem] = useState<Problem>(problem);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -206,7 +209,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
     setLoading(true);
     setError('');
 
-    deleteProblem(newProblem.problemId)
+    deleteProblem(newProblem.problemId, token || '')
       .then(() => {
         setLoading(false);
         history.replace('/problems/all');
