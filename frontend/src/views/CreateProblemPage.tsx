@@ -27,6 +27,7 @@ function CreateProblemPage() {
   const firstProblem = {
     problemId: '',
     name: '',
+    owner: { uid: '' }, // todo
     description: '',
     approval: false,
     difficulty: Difficulty.Easy,

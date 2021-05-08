@@ -3,7 +3,7 @@ import { useAppSelector } from '../../util/Hook';
 import { LandingHeaderTitle } from '../../components/core/Text';
 
 function DashboardPage() {
-  const { account } = useAppSelector((state) => state.account);
+  const { firebaseUser } = useAppSelector((state) => state.account);
 
   return (
     <div>
@@ -15,7 +15,7 @@ function DashboardPage() {
         <p>
           Email:
           {' '}
-          {account?.email}
+          {firebaseUser?.email}
         </p>
       </div>
     </div>

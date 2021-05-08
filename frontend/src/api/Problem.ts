@@ -2,6 +2,7 @@ import axios from 'axios';
 import { axiosErrorHandler } from './Error';
 import { Difficulty } from './Difficulty';
 import Language from './Language';
+import { AccountUid } from './Account';
 
 export type TestCase = {
   id: string,
@@ -14,6 +15,7 @@ export type TestCase = {
 export type Problem = {
   problemId: string,
   name: string,
+  owner: AccountUid,
   description: string,
   approval: boolean,
   difficulty: Difficulty,

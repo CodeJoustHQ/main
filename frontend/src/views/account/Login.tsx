@@ -26,7 +26,7 @@ function LoginPage() {
   const history = useHistory();
   const location = useLocation<RedirectProps>();
 
-  const { account } = useAppSelector((state) => state.account);
+  const { firebaseUser } = useAppSelector((state) => state.account);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,7 +35,7 @@ function LoginPage() {
 
   const redirectAction = () => history.replace(location.state?.from || '/dashboard');
 
-  if (account) {
+  if (firebaseUser) {
     redirectAction();
   }
 

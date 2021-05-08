@@ -89,10 +89,4 @@ public class ProblemController extends BaseRestController {
     public ResponseEntity<Boolean> accessProblems(@PathVariable String password) {
         return new ResponseEntity<>(service.accessProblems(password), HttpStatus.OK);
     }
-
-    // todo: delete after testing
-    @GetMapping("/problems/test/{test}")
-    public ResponseEntity<String> test(@PathVariable String test) {
-        return new ResponseEntity<>(new FirebaseService().verifyToken(test), HttpStatus.OK);
-    }
 }

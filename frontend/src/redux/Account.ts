@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Account } from '../api/Account';
 
 /**
  * Due to serialization issues, we can't directly store the
@@ -7,7 +8,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
  * the type and copy any relevant fields from the docs below:
  * https://firebase.google.com/docs/reference/js/firebase.User
  */
-export type UserType = {
+export type FirebaseUserType = {
   displayName: string,
   email: string,
   emailVerified: boolean,
@@ -16,18 +17,22 @@ export type UserType = {
 }
 
 export type AccountType = {
-  account: UserType | null,
+  firebaseUser: FirebaseUserType | null,
+  account: Account | null,
   token: string | null,
 };
 
-const initialState = { account: null, token: null } as AccountType;
+const initialState = { firebaseUser: null, token: null } as AccountType;
 
 const accountSlice = createSlice({
   name: 'account',
   initialState,
   reducers: {
-    setAccount(state, action: PayloadAction<UserType | null>) {
-      state.account = action.payload;
+    setFirebaseUser(state, action: PayloadAction<FirebaseUserType | null>) {
+      state.firebaseUser = action.payload;
+    },
+    setAccount(state, action: PayloadAction<FirebaseUserType | null>) {
+      state.firebaseUser = action.payload;
     },
     setToken(state, action: PayloadAction<string | null>) {
       state.token = action.payload;
@@ -35,5 +40,5 @@ const accountSlice = createSlice({
   },
 });
 
-export const { setAccount, setToken } = accountSlice.actions;
+export const { setAccount, setFirebaseUser, setToken } = accountSlice.actions;
 export default accountSlice.reducer;

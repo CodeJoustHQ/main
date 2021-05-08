@@ -91,7 +91,7 @@ function LoggedOutContent() {
 }
 
 function HeaderContent() {
-  const { account } = useAppSelector((state) => state.account);
+  const { firebaseUser } = useAppSelector((state) => state.account);
 
   return (
     <nav>
@@ -100,7 +100,7 @@ function HeaderContent() {
         CodeJoust
         <InlineHeaderTag>Beta</InlineHeaderTag>
       </LeftHeader>
-      {account ? <LoggedInContent /> : <LoggedOutContent />}
+      {firebaseUser ? <LoggedInContent /> : <LoggedOutContent />}
     </nav>
   );
 }

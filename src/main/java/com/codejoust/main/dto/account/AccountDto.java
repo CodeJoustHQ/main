@@ -11,7 +11,6 @@ import java.util.List;
 @Setter
 @EqualsAndHashCode
 public class AccountDto {
-
     private String uid;
     private List<ProblemDto> problems;
 }

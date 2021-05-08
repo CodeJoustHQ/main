@@ -7,6 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode
-public class AccountOwnerDto {
+public class AccountUidDto {
     private String uid;
 }

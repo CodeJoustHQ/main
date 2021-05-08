@@ -20,7 +20,7 @@ const RegisterInput = styled(TextInput)`
 
 function RegisterPage() {
   const history = useHistory();
-  const { account } = useAppSelector((state) => state.account);
+  const { firebaseUser } = useAppSelector((state) => state.account);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,7 +31,7 @@ function RegisterPage() {
 
   const redirectAction = () => history.replace('/dashboard');
 
-  if (account) {
+  if (firebaseUser) {
     redirectAction();
   }
 
