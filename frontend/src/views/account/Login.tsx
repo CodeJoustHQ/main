@@ -26,7 +26,7 @@ function LoginPage() {
   const history = useHistory();
   const location = useLocation<RedirectProps>();
 
-  const { account } = useAppSelector((state) => state);
+  const { account } = useAppSelector((state) => state.account);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

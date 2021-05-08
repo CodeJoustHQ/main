@@ -31,7 +31,7 @@ export function PrivateRoute(props: any) {
   const history = useHistory();
   const location = useLocation();
 
-  const { account } = useAppSelector((state) => state);
+  const { account } = useAppSelector((state) => state.account);
 
   if (!account) {
     history.replace('/login', { from: location.pathname + location.search });

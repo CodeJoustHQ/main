@@ -7,7 +7,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
  * the type and copy any relevant fields from the docs below:
  * https://firebase.google.com/docs/reference/js/firebase.User
  */
-export type AccountType = {
+export type UserType = {
   displayName: string,
   email: string,
   emailVerified: boolean,
@@ -15,17 +15,25 @@ export type AccountType = {
   uid: string,
 }
 
-const initialState = null as AccountType | null;
+export type AccountType = {
+  account: UserType | null,
+  token: string | null,
+};
+
+const initialState = { account: null, token: null } as AccountType;
 
 const accountSlice = createSlice({
   name: 'account',
   initialState,
   reducers: {
-    setAccount(state, action: PayloadAction<AccountType | null>) {
-      return action.payload;
+    setAccount(state, action: PayloadAction<UserType | null>) {
+      state.account = action.payload;
+    },
+    setToken(state, action: PayloadAction<string | null>) {
+      state.token = action.payload;
     },
   },
 });
 
-export const { setAccount } = accountSlice.actions;
+export const { setAccount, setToken } = accountSlice.actions;
 export default accountSlice.reducer;

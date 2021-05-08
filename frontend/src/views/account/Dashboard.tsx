@@ -3,7 +3,7 @@ import { useAppSelector } from '../../util/Hook';
 import { LandingHeaderTitle } from '../../components/core/Text';
 
 function DashboardPage() {
-  const { account } = useAppSelector((state) => state);
+  const { account } = useAppSelector((state) => state.account);
 
   return (
     <div>

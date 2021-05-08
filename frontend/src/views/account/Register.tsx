@@ -20,7 +20,7 @@ const RegisterInput = styled(TextInput)`
 
 function RegisterPage() {
   const history = useHistory();
-  const { account } = useAppSelector((state) => state);
+  const { account } = useAppSelector((state) => state.account);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

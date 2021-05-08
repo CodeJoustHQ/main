@@ -1,5 +1,6 @@
 package com.codejoust.main.controller.v1;
 
+import com.codejoust.main.service.FirebaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -87,5 +88,11 @@ public class ProblemController extends BaseRestController {
     @GetMapping("/problems/access/{password}")
     public ResponseEntity<Boolean> accessProblems(@PathVariable String password) {
         return new ResponseEntity<>(service.accessProblems(password), HttpStatus.OK);
+    }
+
+    // todo: delete after testing
+    @GetMapping("/problems/test/{test}")
+    public ResponseEntity<String> test(@PathVariable String test) {
+        return new ResponseEntity<>(new FirebaseService().verifyToken(test), HttpStatus.OK);
     }
 }

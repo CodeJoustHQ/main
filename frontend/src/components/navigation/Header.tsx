@@ -91,7 +91,7 @@ function LoggedOutContent() {
 }
 
 function HeaderContent() {
-  const { account } = useAppSelector((state) => state);
+  const { account } = useAppSelector((state) => state.account);
 
   return (
     <nav>

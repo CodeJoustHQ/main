@@ -22,7 +22,7 @@ import ContactUsPage from '../../views/ContactUs';
 import MinimalLayout from '../layout/MinimalLayout';
 import { useAppDispatch } from '../../util/Hook';
 import app from '../../api/Firebase';
-import { setAccount, AccountType } from '../../redux/Account';
+import { setAccount, UserType, setToken } from '../../redux/Account';
 import { CenteredContainer } from '../core/Container';
 import Loading from '../core/Loading';
 
@@ -42,8 +42,14 @@ function App() {
   // Set authentication status when Firebase auth status changes
   useEffect(() => {
     app.auth().onAuthStateChanged((account) => {
-      dispatch(setAccount(account?.toJSON() as AccountType || null));
+      dispatch(setAccount(account?.toJSON() as UserType || null));
       setLoading(false);
+
+      // Save Token in Redux state if authenticated
+      if (account) {
+        account.getIdToken(true)
+          .then((token) => dispatch(setToken(token)));
+      }
     });
   }, [dispatch, setLoading]);
 
