@@ -38,10 +38,11 @@ public class Problem {
     @EqualsAndHashCode.Include
     private String problemId = UUID.randomUUID().toString();
 
+    // The person who created the problem and has permissions to edit it
     @Column(nullable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "account_id")
-    private Account account;
+    private Account owner;
 
     private String name;
     private Boolean approval = false;
