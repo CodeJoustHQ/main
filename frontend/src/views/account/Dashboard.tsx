@@ -49,7 +49,7 @@ function DashboardPage() {
         <ProblemCard
           key={index}
           problem={problem}
-          onClick={() => history.push(`/problem/${problem.problemId}`, { locked: false })}
+          onClick={() => history.push(`/problem/${problem.problemId}`)}
         />
       ))}
     </div>
