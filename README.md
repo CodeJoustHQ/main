@@ -14,6 +14,7 @@ Then, export the following two environment variables in your local dev environme
 
 1. ```export JASYPT_ENCRYPTOR_PASSWORD=XXXXXXXXXXXX;```
 2. ```export PROBLEM_ACCESS_PASSWORD=XXXXXXXXXXXX;```
+3. ```export FIREBASE_KEYFILE=XXXXXXXXXXXX;```
 
 The first environment variable is for the encrypted password to our database
 (see `application.properties`). Please email us at
@@ -25,6 +26,10 @@ The second environment variable is for the encrypted password to correctly set
 up the local lock screen on the problem pages. This step is unimportant if you are
 not accessing any of the problem pages, but does set up the site as it is currently
 running in production.
+
+The third environment variable is a generated JSON keyfile for a service account for
+Firebase. This is needed to allow communication with Firebase for user authentication
+logic. The JSON contents of the keyfile are stored directly in the environment variable. 
 
 * Run `./mvnw clean install` if it's your first time running the app (or for whatever
 reason you need to re-download Maven dependencies). 
