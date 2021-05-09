@@ -18,10 +18,13 @@ const Content = styled.div`
 `;
 
 function CreateProblemPage() {
+  const history = useHistory();
+  const { firebaseUser, token } = useAppSelector((state) => state.account);
+
   const firstProblem = {
     problemId: '',
     name: '',
-    owner: { uid: 'n/a' }, // todo
+    owner: { uid: firebaseUser?.uid || 'n/a' },
     description: '',
     approval: false,
     difficulty: Difficulty.Easy,
@@ -29,9 +32,6 @@ function CreateProblemPage() {
     problemInputs: [],
     outputType: ProblemIOType.Integer,
   };
-
-  const history = useHistory();
-  const { token } = useAppSelector((state) => state.account);
 
   const [problem, setProblem] = useState<Problem>(firstProblem);
   const [error, setError] = useState('');
