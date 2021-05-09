@@ -26,16 +26,16 @@ export const useBestSubmission = (player?: Player) => {
   return bestSubmission;
 };
 
-export const useProblemEditable = (firebaseUser: FirebaseUserType | null, problem: Problem) => {
+export const useProblemEditable = (user: FirebaseUserType | null, problem: Problem | null) => {
   const [editable, setEditable] = useState(false);
 
   useEffect(() => {
-    if (!firebaseUser || firebaseUser.uid !== problem.owner.uid) {
+    if (!user || !problem || user.uid !== problem.owner.uid) {
       setEditable(false);
     } else {
       setEditable(true);
     }
-  }, [firebaseUser, problem]);
+  }, [user, problem]);
 
   return editable;
 }

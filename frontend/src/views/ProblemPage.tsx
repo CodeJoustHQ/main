@@ -12,7 +12,7 @@ import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import ProblemDisplay from '../components/problem/ProblemDisplay';
 import { generateRandomId } from '../util/Utility';
-import { useAppSelector } from '../util/Hook';
+import { useAppSelector, useProblemEditable } from '../util/Hook';
 
 const Content = styled.div`
   display: flex;
@@ -23,12 +23,13 @@ type ProblemParams = {
 };
 
 function ProblemPage() {
-  const { token } = useAppSelector((state) => state.account);
+  const { firebaseUser, token } = useAppSelector((state) => state.account);
 
   const [problem, setProblem] = useState<Problem | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const problemEditable = useProblemEditable(firebaseUser, problem);
   const params = useParams<ProblemParams>();
 
   useEffect(() => {
@@ -72,7 +73,7 @@ function ProblemPage() {
 
   return (
     <>
-      <LargeText>Edit Problem</LargeText>
+      <LargeText>{problemEditable ? 'Edit Problem' : 'Preview Problem'}</LargeText>
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
       <Content>

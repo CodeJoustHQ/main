@@ -1,6 +1,5 @@
 package com.codejoust.main.controller.v1;
 
-import com.codejoust.main.service.FirebaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
