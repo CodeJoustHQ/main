@@ -185,7 +185,7 @@ public class GameManagementService {
             throw new ApiException(GameError.EMPTY_FIELD);
         }
 
-        if (request.getProblem() >= game.getProblems().size() || request.getProblem() < 0) {
+        if (request.getProblemIndex() >= game.getProblems().size() || request.getProblemIndex() < 0) {
             throw new ApiException(GameError.BAD_SETTING);
         }
 
@@ -205,7 +205,7 @@ public class GameManagementService {
             throw new ApiException(GameError.EMPTY_FIELD);
         }
 
-        if (request.getProblem() >= game.getProblems().size() || request.getProblem() < 0) {
+        if (request.getProblemIndex() >= game.getProblems().size() || request.getProblemIndex() < 0) {
             throw new ApiException(GameError.BAD_SETTING);
         }
 

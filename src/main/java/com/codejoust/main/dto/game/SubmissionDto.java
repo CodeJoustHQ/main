@@ -19,6 +19,7 @@ import java.util.List;
 public class SubmissionDto {
     private CodeLanguage language;
     private String code;
+    private int problemIndex;
     private List<SubmissionResultDto> results;
     private Integer numCorrect;
     private Integer numTestCases;

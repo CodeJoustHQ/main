@@ -8,8 +8,6 @@ import { Color } from './Color';
 
 export type Player = {
   user: User,
-  code: string,
-  language: string,
   submissions: Submission[],
   solved: boolean,
   color: Color,
@@ -36,12 +34,14 @@ export type RunSolutionParams = {
   initiator: User,
   input: string,
   code: string,
+  problemIndex: number,
   language: string,
 };
 
 export type SubmitSolutionParams = {
   initiator: User,
   code: string,
+  problemIndex: number,
   language: string,
 };
 
@@ -63,6 +63,7 @@ export enum SubmissionType {
 
 export type Submission = {
   code: string,
+  problemIndex: number,
   language: string,
   results: SubmissionResult[],
   numCorrect: number,

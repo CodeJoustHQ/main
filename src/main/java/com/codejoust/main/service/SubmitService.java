@@ -98,15 +98,13 @@ public class SubmitService {
         playerCode.setCode(request.getCode());
         playerCode.setLanguage(request.getLanguage());
 
-        player.setPlayerCode(playerCode);
-
         // Make a call to the tester service
         TesterRequest testerRequest = new TesterRequest();
         testerRequest.setCode(request.getCode());
         testerRequest.setLanguage(request.getLanguage());
 
         // Set the problem with the single provided test case.
-        ProblemDto problemDto = getStrippedProblemDto(game.getProblems().get(request.getProblem()));
+        ProblemDto problemDto = getStrippedProblemDto(game.getProblems().get(request.getProblemIndex()));
 
         /**
          * Provide a temporary output to circumvent output parsing error.
@@ -126,6 +124,8 @@ public class SubmitService {
 
         // Return submission, and no further records necessary for running code.
         Submission submission = getSubmission(testerRequest);
+        submission.setProblemIndex(request.getProblemIndex());
+        player.getSubmissions().add(submission);
         return GameMapper.submissionToDto(submission);
     }
 
@@ -138,18 +138,17 @@ public class SubmitService {
         playerCode.setCode(request.getCode());
         playerCode.setLanguage(request.getLanguage());
 
-        player.setPlayerCode(playerCode);
-
         // Make a call to the tester service
         TesterRequest testerRequest = new TesterRequest();
         testerRequest.setCode(request.getCode());
         testerRequest.setLanguage(request.getLanguage());
 
         // Invariant: Games have at least one problem (else it will fail to create)
-        ProblemDto problemDto = getStrippedProblemDto(game.getProblems().get(request.getProblem()));
+        ProblemDto problemDto = getStrippedProblemDto(game.getProblems().get(request.getProblemIndex()));
         testerRequest.setProblem(problemDto);
 
         Submission submission = getSubmission(testerRequest);
+        submission.setProblemIndex(request.getProblemIndex());
         player.getSubmissions().add(submission);
 
         if (submission.getNumCorrect().equals(submission.getNumTestCases())) {

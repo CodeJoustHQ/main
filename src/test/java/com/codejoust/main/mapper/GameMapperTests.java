@@ -123,8 +123,6 @@ public class GameMapperTests {
         PlayerDto playerDto = gameDto.getPlayers().get(0);
         assertEquals(UserMapper.toDto(user), playerDto.getUser());
         assertEquals(player.getSolved(), playerDto.getSolved());
-        assertEquals(playerCode.getCode(), playerDto.getCode());
-        assertEquals(playerCode.getLanguage(), playerDto.getLanguage());
         assertEquals(1, playerDto.getSubmissions().size());
         assertEquals(player.getColor(), playerDto.getColor());
 

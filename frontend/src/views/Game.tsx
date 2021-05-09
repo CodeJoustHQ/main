@@ -103,7 +103,7 @@ function GamePage() {
   const location = useLocation<LocationState>();
 
   const [copiedEmail, setCopiedEmail] = useState(false);
-  const [submission, setSubmission] = useState<Submission | null>(null);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [roomId, setRoomId] = useState<string>('');
@@ -116,9 +116,10 @@ function GamePage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [currentLanguage, setCurrentLanguage] = useState<Language[]>([Language.Python]);
-  const [currentCode, setCurrentCode] = useState<string[]>(['']);
-  const [currentProblem, setCurrentProblem] = useState<Number>(0);
+  const [languageList] = useState<Language[]>([Language.Python]);
+  const [codeList, setCodeList] = useState<string[]>(['']);
+  const [currentSubmission, setCurrentSubmission] = useState<Submission | null>(null);
+  const [currentProblem, setCurrentProblem] = useState<number>(0);
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
   const [defaultCodeList, setDefaultCodeList] = useState<DefaultCodeType[]>([]);
@@ -150,27 +151,38 @@ function GamePage() {
   };
 
   const createCodeLanguageArray = () => {
-    while (currentLanguage.length < problems.length) {
-      currentLanguage.push(Language.Python);
+    while (languageList.length < problems.length) {
+      languageList.push(Language.Python);
     }
 
-    while (currentCode.length < problems.length) {
-      currentCode.push('');
+    while (codeList.length < problems.length) {
+      codeList.push('');
     }
   };
 
   createCodeLanguageArray();
 
   const setOneCurrentLanguage = (newLanguage: Language) => {
-    currentLanguage[currentProblem.valueOf()] = newLanguage;
+    languageList[currentProblem] = newLanguage;
   };
 
   const setOneCurrentCode = (newCode: string) => {
-    currentCode[currentProblem.valueOf()] = newCode;
+    codeList[currentProblem] = newCode;
+  };
+
+  const getSubmission = (curr: number, playerSubmissions: Submission[]) => {
+    for (let i = playerSubmissions.length - 1; i >= 0; i -= 1) {
+      if (playerSubmissions[i].problemIndex === curr) {
+        return playerSubmissions[i];
+      }
+    }
+
+    return null;
   };
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
-    code: string, language: Language[]) => {
+    playerSubmissions: Submission[]) => {
+    setSubmissions(playerSubmissions);
     const promises: Promise<DefaultCodeType>[] = [];
     problemsParam.forEach((problem) => {
       if (problem && problem.problemId) {
@@ -180,26 +192,32 @@ function GamePage() {
 
     // Get the result of promises and set the default code list.
     Promise.all(promises).then((result) => {
-      const codeList = [];
+      const newCodeList = [];
+      const codeMap = result;
 
       for (let i = 0; i < result.length; i += 1) {
-        codeList.push(result[i][language[i]]);
+        newCodeList.push(result[i][Language.Python]);
       }
 
       // If previous code and language specified, save those as defaults
-      if (code) {
-        codeList[0] = code;
+      for (let i = 0; i < result.length; i += 1) {
+        const temp = getSubmission(i, playerSubmissions);
+
+        if (temp != null) {
+          newCodeList[i] = temp.code;
+          codeMap[i][temp.language as Language] = temp.code;
+          languageList[i] = temp.language as Language;
+          setCurrentProblem(i);
+        }
       }
 
-      // Set this user's current code and language
-      setCurrentCode(codeList);
-      setCurrentLanguage(language);
-
-      setDefaultCodeList(result);
+      // Set this user's current code
+      setCodeList(newCodeList);
+      setDefaultCodeList(codeMap);
     }).catch((err) => {
       setError(err.message);
     });
-  }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage]);
+  }, [setDefaultCodeList, setCodeList, languageList]);
 
   /**
    * Display the notification as a callback from the notification
@@ -275,15 +293,15 @@ function GamePage() {
 
           // If this user refreshed and has already submitted code, load and save their latest code
           res.players.forEach((player) => {
-            if (player.user.userId === location.state.currentUser.userId && player.code) {
-              setDefaultCodeFromProblems(res.problems, player.code, [player.language as Language]);
+            if (player.user.userId === location.state.currentUser.userId) {
+              setDefaultCodeFromProblems(res.problems, player.submissions);
               matchFound = true;
             }
           });
 
           // If no previous code, proceed as normal with the default Python language
           if (!matchFound) {
-            setDefaultCodeFromProblems(res.problems, '', [Language.Python]);
+            setDefaultCodeFromProblems(res.problems, []);
           }
         })
         .catch((err) => {
@@ -337,9 +355,9 @@ function GamePage() {
     const request = {
       initiator: currentUser!,
       input,
-      code: currentCode[currentProblem.valueOf()],
-      language: currentLanguage[currentProblem.valueOf()],
-      problem: currentProblem,
+      code: codeList[currentProblem],
+      language: languageList[currentProblem],
+      problemIndex: currentProblem,
     };
 
     runSolution(roomId, request)
@@ -348,7 +366,8 @@ function GamePage() {
 
         // Set the 'test' submission type to correctly display result.
         res.submissionType = SubmissionType.Test;
-        setSubmission(res);
+        submissions.push(res);
+        setCurrentSubmission(getSubmission(currentProblem, submissions));
         checkSendTestCorrectNotification(res);
       })
       .catch((err) => {
@@ -363,9 +382,9 @@ function GamePage() {
     setError('');
     const request = {
       initiator: currentUser!,
-      code: currentCode[currentProblem.valueOf()],
-      language: currentLanguage[currentProblem.valueOf()],
-      problem: currentProblem,
+      code: codeList[currentProblem],
+      language: languageList[currentProblem],
+      problemIndex: currentProblem,
     };
 
     submitSolution(roomId, request)
@@ -374,7 +393,8 @@ function GamePage() {
 
         // Set the 'submit' submission type to correctly display result.
         res.submissionType = SubmissionType.Submit;
-        setSubmission(res);
+        submissions.push(res);
+        setCurrentSubmission(getSubmission(currentProblem, submissions));
         checkSendSolutionCorrectNotification(res);
       })
       .catch((err) => {
@@ -384,19 +404,19 @@ function GamePage() {
   };
 
   const nextProblem = () => {
-    setCurrentProblem((currentProblem.valueOf() + 1) % problems?.length);
-    setSubmission(null);
+    setCurrentProblem((currentProblem + 1) % problems?.length);
+    setCurrentSubmission(getSubmission(currentProblem, submissions));
   };
 
   const previousProblem = () => {
-    let temp = currentProblem.valueOf() - 1;
+    let temp = currentProblem - 1;
 
     if (temp < 0) {
       temp += problems?.length;
     }
 
     setCurrentProblem(temp);
-    setSubmission(null);
+    setCurrentSubmission(getSubmission(currentProblem, submissions));
   };
 
   const displayPlayerLeaderboard = useCallback(() => players.map((player, index) => (
@@ -459,19 +479,19 @@ function GamePage() {
         >
           {/* Problem title/description panel */}
           <OverflowPanel className="display-box-shadow">
-            <ProblemHeaderText>{problems[currentProblem.valueOf()]?.name}</ProblemHeaderText>
-            {problems[currentProblem.valueOf()] ? (
+            <ProblemHeaderText>{problems[currentProblem]?.name}</ProblemHeaderText>
+            {problems[currentProblem] ? (
               <DifficultyDisplayButton
-                difficulty={problems[currentProblem.valueOf()].difficulty!}
+                difficulty={problems[currentProblem].difficulty!}
                 enabled={false}
                 active
               >
-                {displayNameFromDifficulty(problems[currentProblem.valueOf()].difficulty!)}
+                {displayNameFromDifficulty(problems[currentProblem].difficulty!)}
               </DifficultyDisplayButton>
             ) : null}
             <StyledMarkdownEditor
               defaultValue={problems[0]?.description}
-              value={problems[currentProblem.valueOf()]?.description}
+              value={problems[currentProblem]?.description}
               onChange={() => ''}
               readOnly
             />
@@ -500,9 +520,9 @@ function GamePage() {
               <Editor
                 onCodeChange={setOneCurrentCode}
                 onLanguageChange={setOneCurrentLanguage}
-                getCurrentLanguage={() => currentLanguage[currentProblem.valueOf()]}
+                getCurrentLanguage={() => languageList[currentProblem]}
                 defaultCodeMap={defaultCodeList}
-                currentProblem={currentProblem.valueOf()}
+                currentProblem={currentProblem}
                 defaultLanguage={Language.Python}
                 defaultCode={null}
               />
@@ -510,8 +530,8 @@ function GamePage() {
 
             <Panel>
               <Console
-                testCases={problems[currentProblem.valueOf()]?.testCases}
-                submission={submission}
+                testCases={problems[currentProblem]?.testCases}
+                submission={currentSubmission}
                 onRun={runCode}
                 onSubmit={submitCode}
               />
