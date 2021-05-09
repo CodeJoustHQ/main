@@ -9,7 +9,7 @@ type EditorProps = {
   onLanguageChange: ((language: Language) => void) | null,
   onCodeChange: ((code: string) => void) | null,
   getCurrentLanguage: (() => Language) | null,
-  defaultCodeMap: DefaultCodeType[] | null,
+  defaultCodeMap: DefaultCodeType[] | null
   defaultLanguage: Language,
   defaultCode: string | null,
   currentProblem: number
@@ -146,6 +146,10 @@ function ResizableMonacoEditor(props: EditorProps) {
   };
 
   useEffect(() => {
+    console.log(codeMap);
+    console.log(currentProblem);
+    console.log(currentLanguage);
+
     if (codeMap != null && codeEditor != null) {
       if (codeMap[currentProblem] != null) {
         const codeMapTemp = codeMap;
