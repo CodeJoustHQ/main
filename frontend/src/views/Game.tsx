@@ -188,7 +188,7 @@ function GamePage() {
 
       // If previous code and language specified, save those as defaults
       if (code) {
-        codeList[currentProblem.valueOf()] = code;
+        codeList[0] = code;
       }
 
       // Set this user's current code and language
@@ -339,6 +339,7 @@ function GamePage() {
       input,
       code: currentCode[currentProblem.valueOf()],
       language: currentLanguage[currentProblem.valueOf()],
+      problem: currentProblem,
     };
 
     runSolution(roomId, request)
@@ -364,6 +365,7 @@ function GamePage() {
       initiator: currentUser!,
       code: currentCode[currentProblem.valueOf()],
       language: currentLanguage[currentProblem.valueOf()],
+      problem: currentProblem,
     };
 
     submitSolution(roomId, request)
@@ -383,6 +385,7 @@ function GamePage() {
 
   const nextProblem = () => {
     setCurrentProblem((currentProblem.valueOf() + 1) % problems?.length);
+    setSubmission(null);
   };
 
   const previousProblem = () => {
@@ -393,6 +396,7 @@ function GamePage() {
     }
 
     setCurrentProblem(temp);
+    setSubmission(null);
   };
 
   const displayPlayerLeaderboard = useCallback(() => players.map((player, index) => (
@@ -496,9 +500,10 @@ function GamePage() {
               <Editor
                 onCodeChange={setOneCurrentCode}
                 onLanguageChange={setOneCurrentLanguage}
-                codeMap={defaultCodeList}
+                getCurrentLanguage={() => currentLanguage[currentProblem.valueOf()]}
+                defaultCodeMap={defaultCodeList}
                 currentProblem={currentProblem.valueOf()}
-                defaultLanguage={currentLanguage[currentProblem.valueOf()]}
+                defaultLanguage={Language.Python}
                 defaultCode={null}
               />
             </NoPaddingPanel>

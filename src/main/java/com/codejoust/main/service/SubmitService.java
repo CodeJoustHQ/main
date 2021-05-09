@@ -106,7 +106,7 @@ public class SubmitService {
         testerRequest.setLanguage(request.getLanguage());
 
         // Set the problem with the single provided test case.
-        ProblemDto problemDto = getStrippedProblemDto(game.getProblems().get(0));
+        ProblemDto problemDto = getStrippedProblemDto(game.getProblems().get(request.getProblem()));
 
         /**
          * Provide a temporary output to circumvent output parsing error.
@@ -146,7 +146,7 @@ public class SubmitService {
         testerRequest.setLanguage(request.getLanguage());
 
         // Invariant: Games have at least one problem (else it will fail to create)
-        ProblemDto problemDto = getStrippedProblemDto(game.getProblems().get(0));
+        ProblemDto problemDto = getStrippedProblemDto(game.getProblems().get(request.getProblem()));
         testerRequest.setProblem(problemDto);
 
         Submission submission = getSubmission(testerRequest);

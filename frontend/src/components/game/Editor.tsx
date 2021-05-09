@@ -8,7 +8,8 @@ import { DefaultCodeType } from '../../api/Problem';
 type EditorProps = {
   onLanguageChange: ((language: Language) => void) | null,
   onCodeChange: ((code: string) => void) | null,
-  codeMap: DefaultCodeType[] | null,
+  getCurrentLanguage: (() => Language) | null,
+  defaultCodeMap: DefaultCodeType[] | null
   defaultLanguage: Language,
   defaultCode: string | null,
   currentProblem: number
@@ -89,16 +90,22 @@ const monacoEditorOptions: EditorConstructionOptions = {
 // This function refreshes the width of Monaco editor upon change in container size
 function ResizableMonacoEditor(props: EditorProps) {
   const {
-    onLanguageChange, onCodeChange, codeMap, defaultLanguage, defaultCode, currentProblem,
+    onLanguageChange, onCodeChange, getCurrentLanguage, defaultCodeMap, defaultLanguage, defaultCode, currentProblem,
   } = props;
 
   const theme = useContext(ThemeContext);
   const [currentLanguage, setCurrentLanguage] = useState<Language>(defaultLanguage);
   const [codeEditor, setCodeEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const [codeMap, setCodeMap] = useState<DefaultCodeType[] | null>(defaultCodeMap);
+  const [previousProblem, setPreviousProblem] = useState<number>(0);
 
   useEffect(() => {
     setCurrentLanguage(defaultLanguage);
   }, [defaultLanguage]);
+
+  useEffect(() => {
+    setCodeMap(defaultCodeMap);
+  }, [defaultCodeMap]);
 
   const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor) => {
     setCodeEditor(editor);
@@ -125,7 +132,9 @@ function ResizableMonacoEditor(props: EditorProps) {
   const handleLanguageChange = (language: Language) => {
     // Save the code for this language
     if (codeMap != null && codeEditor != null) {
-      codeMap[currentProblem][currentLanguage] = codeEditor.getValue();
+      const codeMapTemp = codeMap;
+      codeMapTemp[currentProblem][currentLanguage] = codeEditor.getValue();
+      setCodeMap(codeMapTemp);
       codeEditor.setValue(codeMap[currentProblem][language]);
     }
 
@@ -143,10 +152,29 @@ function ResizableMonacoEditor(props: EditorProps) {
 
     if (codeMap != null && codeEditor != null) {
       if (codeMap[currentProblem] != null) {
-        codeEditor.setValue(codeMap[currentProblem][currentLanguage]);
+        const codeMapTemp = codeMap;
+
+        if (codeEditor.getValue() !== 'Loading...') {
+          codeMapTemp[previousProblem][currentLanguage] = codeEditor.getValue();
+        }
+
+        setCodeMap(codeMapTemp);
+        setPreviousProblem(currentProblem);
+
+        let newLanguage = currentLanguage;
+
+        if (getCurrentLanguage !== null) {
+          newLanguage = getCurrentLanguage();
+
+          if (newLanguage !== currentLanguage) {
+            setCurrentLanguage(newLanguage);
+          }
+        }
+
+        codeEditor.setValue(codeMap[currentProblem][newLanguage]);
       }
     }
-  }, [currentLanguage, codeMap, codeEditor, setCodeEditor, currentProblem]);
+  }, [currentLanguage, codeMap, codeEditor, setCodeEditor, currentProblem, previousProblem, getCurrentLanguage]);
 
   return (
     <Content>

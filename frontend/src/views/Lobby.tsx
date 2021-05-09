@@ -788,7 +788,7 @@ function LobbyPage() {
                   value={numProblems}
                   disabled={!isHost(currentUser)}
                   onChange={(e) => {
-                    const newNumProblems = Number(e.target);
+                    const newNumProblems = Number(e.target.value);
                     if (newNumProblems >= 1 && newNumProblems <= 10) {
                       setNumProblems(newNumProblems);
                     }
