@@ -3,6 +3,7 @@ package com.codejoust.main.util;
 import com.codejoust.main.dto.user.UserDto;
 import com.codejoust.main.game_object.CodeLanguage;
 import com.codejoust.main.game_object.PlayerCode;
+import com.codejoust.main.model.Account;
 import com.codejoust.main.model.problem.ProblemIOType;
 
 public class TestFields {
@@ -59,6 +60,10 @@ public class TestFields {
     public static final String NAME = "Sort a List";
     public static final String DESCRIPTION = "Sort the given list in O(n log n) time.";
 
+    // Account constants
+    public static final String TOKEN = "aWbXcYdZ123";
+    public static final String UID = "asdfghjkl";
+
     public static UserDto userDto1() {
         UserDto user = new UserDto();
         user.setNickname(NICKNAME);
@@ -78,5 +83,11 @@ public class TestFields {
         user.setNickname(NICKNAME_3);
         user.setUserId(USER_ID_3);
         return user;
+    }
+
+    public static Account account1() {
+        Account account = new Account();
+        account.setUid(UID);
+        return account;
     }
 }

@@ -1,5 +1,6 @@
 package com.codejoust.main.service;
 
+import com.codejoust.main.dao.AccountRepository;
 import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,6 +44,12 @@ public class ProblemServiceTests {
 
     @Mock
     private ProblemRepository repository;
+
+    @Mock
+    private AccountRepository accountRepository;
+
+    @Mock
+    private FirebaseService firebaseService;
 
     @Spy
     @InjectMocks
@@ -115,7 +122,8 @@ public class ProblemServiceTests {
         request.setProblemInputs(problemInputs);
         request.setOutputType(TestFields.IO_TYPE);
 
-        ProblemDto response = problemService.createProblem(request);
+        Mockito.doReturn(TestFields.UID).when(firebaseService).verifyToken(TestFields.TOKEN);
+        ProblemDto response = problemService.createProblem(request, TestFields.TOKEN);
 
         verify(repository).save(Mockito.any(Problem.class));
 
@@ -140,7 +148,8 @@ public class ProblemServiceTests {
         request.setProblemInputs(problemInputs);
         request.setOutputType(TestFields.IO_TYPE);
 
-        ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblem(request));
+        Mockito.doReturn(TestFields.UID).when(firebaseService).verifyToken(TestFields.TOKEN);
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblem(request, TestFields.TOKEN));
 
         verify(repository, never()).save(Mockito.any());
         assertEquals(ProblemError.EMPTY_FIELD, exception.getError());
@@ -160,7 +169,8 @@ public class ProblemServiceTests {
         request.setProblemInputs(problemInputs);
         request.setOutputType(TestFields.IO_TYPE);
 
-        ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblem(request));
+        Mockito.doReturn(TestFields.UID).when(firebaseService).verifyToken(TestFields.TOKEN);
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblem(request, TestFields.TOKEN));
 
         verify(repository, never()).save(Mockito.any());
         assertEquals(ProblemError.INVALID_VARIABLE_NAME, exception.getError());
@@ -179,7 +189,8 @@ public class ProblemServiceTests {
         missingRequest.setProblemInputs(problemInputs);
         missingRequest.setOutputType(TestFields.IO_TYPE);
 
-        ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblem(missingRequest));
+        Mockito.doReturn(TestFields.UID).when(firebaseService).verifyToken(TestFields.TOKEN);
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblem(missingRequest, TestFields.TOKEN));
 
         verify(repository, never()).save(Mockito.any());
         assertEquals(ProblemError.EMPTY_FIELD, exception.getError());
@@ -192,7 +203,8 @@ public class ProblemServiceTests {
         badRequest.setProblemInputs(problemInputs);
         badRequest.setOutputType(TestFields.IO_TYPE);
 
-        exception = assertThrows(ApiException.class, () -> problemService.createProblem(badRequest));
+        Mockito.doReturn(TestFields.UID).when(firebaseService).verifyToken(TestFields.TOKEN);
+        exception = assertThrows(ApiException.class, () -> problemService.createProblem(badRequest, TestFields.TOKEN));
 
         verify(repository, never()).save(Mockito.any());
         assertEquals(ProblemError.BAD_DIFFICULTY, exception.getError());
@@ -243,6 +255,7 @@ public class ProblemServiceTests {
         expected.setDifficulty(ProblemDifficulty.HARD);
         expected.addProblemInput(new ProblemInput("name", ProblemIOType.ARRAY_INTEGER));
         expected.setOutputType(TestFields.IO_TYPE);
+        expected.setOwner(TestFields.account1());
 
         Mockito.doReturn(expected).when(repository).findProblemByProblemId(expected.getProblemId());
 
@@ -252,7 +265,7 @@ public class ProblemServiceTests {
         request.setHidden(true);
         request.setExplanation(TestFields.EXPLANATION);
 
-        ProblemTestCaseDto response = problemService.createTestCase(expected.getProblemId(), request);
+        ProblemTestCaseDto response = problemService.createTestCase(expected.getProblemId(), request, TestFields.TOKEN);
 
         verify(repository).save(Mockito.any(Problem.class));
 
@@ -273,7 +286,7 @@ public class ProblemServiceTests {
         noProblemRequest.setOutput(TestFields.OUTPUT);
 
         ApiException exception = assertThrows(ApiException.class, () ->
-                problemService.createTestCase("Z", noProblemRequest));
+                problemService.createTestCase("Z", noProblemRequest, TestFields.TOKEN));
 
         verify(repository, never()).save(Mockito.any());
         assertEquals(ProblemError.NOT_FOUND, exception.getError());
@@ -284,12 +297,13 @@ public class ProblemServiceTests {
         emptyFieldRequest.setHidden(false);
 
         Problem problem = new Problem();
+        problem.setOwner(TestFields.account1());
         String problemId = problem.getProblemId();
 
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(problemId);
 
         exception = assertThrows(ApiException.class, () ->
-                problemService.createTestCase(problemId, emptyFieldRequest));
+                problemService.createTestCase(problemId, emptyFieldRequest, TestFields.TOKEN));
 
         verify(repository, never()).save(Mockito.any());
         assertEquals(ProblemError.EMPTY_FIELD, exception.getError());
@@ -303,6 +317,7 @@ public class ProblemServiceTests {
         expected.setDifficulty(ProblemDifficulty.HARD);
         expected.addProblemInput(new ProblemInput("name", TestFields.IO_TYPE));
         expected.setOutputType(TestFields.IO_TYPE_2);
+        expected.setOwner(TestFields.account1());
 
         CreateTestCaseRequest request = new CreateTestCaseRequest();
         request.setInput(TestFields.INPUT);
@@ -312,7 +327,7 @@ public class ProblemServiceTests {
 
         String problemId = expected.getProblemId();
         ApiException exception = assertThrows(ApiException.class, () ->
-                problemService.createTestCase(problemId, request));
+                problemService.createTestCase(problemId, request, TestFields.TOKEN));
 
         verify(repository, never()).save(Mockito.any());
         assertEquals(ProblemError.INVALID_INPUT, exception.getError());
@@ -409,6 +424,7 @@ public class ProblemServiceTests {
         problem.setName(TestFields.NAME);
         problem.setDescription(TestFields.DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.MEDIUM);
+        problem.setOwner(TestFields.account1());
 
         ProblemInput problemInput = new ProblemInput(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problem.addProblemInput(problemInput);
@@ -428,7 +444,7 @@ public class ProblemServiceTests {
         ProblemDto updatedProblem = ProblemMapper.toDto(problem);
         updatedProblem.setTestCases(Collections.singletonList(testCaseDto));
 
-        problemService.editProblem(problem.getProblemId(), updatedProblem);
+        problemService.editProblem(problem.getProblemId(), updatedProblem, TestFields.TOKEN);
 
         verify(repository).save(problem);
         assertEquals(1, problem.getTestCases().size());
@@ -446,6 +462,7 @@ public class ProblemServiceTests {
         problem.setName(TestFields.NAME);
         problem.setDescription(TestFields.DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.MEDIUM);
+        problem.setOwner(TestFields.account1());
 
         ProblemInput problemInput = new ProblemInput(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problem.addProblemInput(problemInput);
@@ -463,7 +480,7 @@ public class ProblemServiceTests {
         ProblemDto updatedProblem = ProblemMapper.toDto(problem);
         updatedProblem.getProblemInputs().get(0).setName(inputName);
 
-        ApiException exception = assertThrows(ApiException.class, () -> problemService.editProblem(problemId, updatedProblem));
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.editProblem(problemId, updatedProblem, TestFields.TOKEN));
         
         verify(repository, never()).save(Mockito.any());
         assertEquals(ProblemError.INVALID_VARIABLE_NAME, exception.getError());
@@ -475,6 +492,7 @@ public class ProblemServiceTests {
         problem.setName(TestFields.NAME);
         problem.setDescription(TestFields.DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.MEDIUM);
+        problem.setOwner(TestFields.account1());
 
         ProblemInput problemInput = new ProblemInput(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problem.addProblemInput(problemInput);
@@ -491,7 +509,7 @@ public class ProblemServiceTests {
 
         String problemId = problem.getProblemId();
         ApiException exception = assertThrows(ApiException.class, () ->
-                problemService.editProblem(problemId, updatedProblem));
+                problemService.editProblem(problemId, updatedProblem, TestFields.TOKEN));
 
         assertEquals(ProblemError.INVALID_INPUT, exception.getError());
     }
@@ -502,6 +520,7 @@ public class ProblemServiceTests {
         problem.setName(TestFields.NAME);
         problem.setDescription(TestFields.DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.MEDIUM);
+        problem.setOwner(TestFields.account1());
 
         ProblemInput problemInput = new ProblemInput(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problem.addProblemInput(problemInput);
@@ -518,7 +537,7 @@ public class ProblemServiceTests {
 
         String problemId = problem.getProblemId();
         ApiException exception = assertThrows(ApiException.class, () ->
-                problemService.editProblem(problemId, updatedProblem));
+                problemService.editProblem(problemId, updatedProblem, TestFields.TOKEN));
 
         assertEquals(ProblemError.INVALID_INPUT, exception.getError());
     }
@@ -531,6 +550,7 @@ public class ProblemServiceTests {
         problem.setOutputType(ProblemIOType.STRING);
         ProblemInput problemInput = new ProblemInput(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problem.addProblemInput(problemInput);
+        problem.setOwner(TestFields.account1());
 
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
 
@@ -539,7 +559,7 @@ public class ProblemServiceTests {
 
         String problemId = problem.getProblemId();
         ApiException exception = assertThrows(ApiException.class, () ->
-                problemService.editProblem(problemId, updatedProblem));
+                problemService.editProblem(problemId, updatedProblem, TestFields.TOKEN));
 
         assertEquals(ProblemError.BAD_APPROVAL, exception.getError());
     }
@@ -550,6 +570,7 @@ public class ProblemServiceTests {
         problem.setName(TestFields.NAME);
         problem.setDescription(TestFields.DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.MEDIUM);
+        problem.setOwner(TestFields.account1());
 
         ProblemInput problemInput = new ProblemInput(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problem.addProblemInput(problemInput);
@@ -567,7 +588,7 @@ public class ProblemServiceTests {
 
         String problemId = problem.getProblemId();
         ApiException exception = assertThrows(ApiException.class, () ->
-                problemService.editProblem(problemId, updatedProblem));
+                problemService.editProblem(problemId, updatedProblem, TestFields.TOKEN));
 
         assertEquals(ProblemError.EMPTY_FIELD, exception.getError());
     }
@@ -578,6 +599,7 @@ public class ProblemServiceTests {
         problem.setName(TestFields.NAME);
         problem.setDescription(TestFields.DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.MEDIUM);
+        problem.setOwner(TestFields.account1());
 
         ProblemInput problemInput = new ProblemInput(TestFields.INPUT_NAME, TestFields.IO_TYPE);
         problem.addProblemInput(problemInput);
@@ -595,7 +617,7 @@ public class ProblemServiceTests {
 
         String problemId = problem.getProblemId();
         ApiException exception = assertThrows(ApiException.class, () ->
-                problemService.editProblem(problemId, updatedProblem));
+                problemService.editProblem(problemId, updatedProblem, TestFields.TOKEN));
 
         assertEquals(ProblemError.INVALID_INPUT, exception.getError());
     }
@@ -606,10 +628,11 @@ public class ProblemServiceTests {
         problem.setName(TestFields.NAME);
         problem.setDescription(TestFields.DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.MEDIUM);
+        problem.setOwner(TestFields.account1());
 
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
 
-        ProblemDto response = problemService.deleteProblem(problem.getProblemId());
+        ProblemDto response = problemService.deleteProblem(problem.getProblemId(), TestFields.TOKEN);
 
         verify(repository).delete(problem);
 
@@ -620,7 +643,7 @@ public class ProblemServiceTests {
 
     @Test
     public void deleteProblemFailure() {
-        ApiException exception = assertThrows(ApiException.class, () -> problemService.deleteProblem("ZZZ"));
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.deleteProblem("ZZZ", TestFields.TOKEN));
 
         verify(repository).findProblemByProblemId("ZZZ");
         assertEquals(ProblemError.NOT_FOUND, exception.getError());
