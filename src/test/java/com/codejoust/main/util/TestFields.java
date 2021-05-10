@@ -1,11 +1,20 @@
 package com.codejoust.main.util;
 
+import com.codejoust.main.dto.problem.CreateProblemRequest;
+import com.codejoust.main.dto.problem.ProblemInputDto;
 import com.codejoust.main.dto.user.UserDto;
 import com.codejoust.main.game_object.CodeLanguage;
 import com.codejoust.main.game_object.PlayerCode;
 import com.codejoust.main.model.Account;
+import com.codejoust.main.model.problem.Problem;
+import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
+import com.codejoust.main.model.problem.ProblemInput;
+import com.codejoust.main.model.problem.ProblemTestCase;
 import com.codejoust.main.service.FirebaseService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestFields {
 
@@ -84,6 +93,40 @@ public class TestFields {
         user.setNickname(NICKNAME_3);
         user.setUserId(USER_ID_3);
         return user;
+    }
+
+    public static Problem problem1() {
+        Problem problem = new Problem();
+        problem.setName(TestFields.NAME);
+        problem.setDescription(TestFields.DESCRIPTION);
+        problem.setDifficulty(ProblemDifficulty.MEDIUM);
+        problem.setOwner(account1());
+
+        ProblemInput problemInput = new ProblemInput(TestFields.INPUT_NAME, TestFields.IO_TYPE);
+        problem.addProblemInput(problemInput);
+        problem.setOutputType(TestFields.IO_TYPE_2);
+
+        ProblemTestCase originalTestCase = new ProblemTestCase();
+        originalTestCase.setInput(TestFields.INPUT_3);
+        originalTestCase.setOutput(TestFields.OUTPUT_3);
+        problem.addTestCase(originalTestCase);
+
+        return problem;
+    }
+
+    public static CreateProblemRequest createProblemRequest1() {
+        CreateProblemRequest request = new CreateProblemRequest();
+        request.setName(TestFields.NAME);
+        request.setDescription(TestFields.DESCRIPTION);
+        request.setDifficulty(ProblemDifficulty.MEDIUM);
+
+        List<ProblemInputDto> problemInputs = new ArrayList<>();
+        ProblemInputDto problemInput = new ProblemInputDto(TestFields.INPUT_NAME, TestFields.IO_TYPE);
+        problemInputs.add(problemInput);
+        request.setProblemInputs(problemInputs);
+        request.setOutputType(TestFields.IO_TYPE);
+
+        return request;
     }
 
     public static Account account1() {

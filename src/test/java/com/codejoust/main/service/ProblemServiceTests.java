@@ -1,6 +1,8 @@
 package com.codejoust.main.service;
 
 import com.codejoust.main.dao.AccountRepository;
+import com.codejoust.main.exception.AccountError;
+import com.codejoust.main.exception.api.ApiError;
 import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -111,16 +113,7 @@ public class ProblemServiceTests {
 
     @Test
     public void createProblemSuccess() {
-        CreateProblemRequest request = new CreateProblemRequest();
-        request.setName(TestFields.NAME);
-        request.setDescription(TestFields.DESCRIPTION);
-        request.setDifficulty(ProblemDifficulty.MEDIUM);
-
-        List<ProblemInputDto> problemInputs = new ArrayList<>();
-        ProblemInputDto problemInput = new ProblemInputDto(TestFields.INPUT_NAME, TestFields.IO_TYPE);
-        problemInputs.add(problemInput);
-        request.setProblemInputs(problemInputs);
-        request.setOutputType(TestFields.IO_TYPE);
+        CreateProblemRequest request = TestFields.createProblemRequest1();
 
         Mockito.doReturn(TestFields.UID).when(firebaseService).verifyToken(TestFields.TOKEN);
         ProblemDto response = problemService.createProblem(request, TestFields.TOKEN);
@@ -132,7 +125,7 @@ public class ProblemServiceTests {
         assertEquals(TestFields.DESCRIPTION, response.getDescription());
         assertEquals(request.getDifficulty(), response.getDifficulty());
         assertEquals(0, response.getTestCases().size());
-        assertEquals(problemInputs, response.getProblemInputs());
+        assertEquals(request.getProblemInputs(), response.getProblemInputs());
         assertEquals(TestFields.IO_TYPE, response.getOutputType());
     }
 
@@ -390,7 +383,6 @@ public class ProblemServiceTests {
     public void getRandomProblemZeroNumProblems() {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
-        Collections.singletonList(problem1);
 
         ApiException exception = assertThrows(ApiException.class, () ->
                 problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 0));
@@ -402,7 +394,6 @@ public class ProblemServiceTests {
     public void getRandomProblemNegativeNumProblems() {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
-        Collections.singletonList(problem1);
 
         ApiException exception = assertThrows(ApiException.class, () ->
                 problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, -3));
@@ -420,20 +411,7 @@ public class ProblemServiceTests {
 
     @Test
     public void editProblemSuccess() {
-        Problem problem = new Problem();
-        problem.setName(TestFields.NAME);
-        problem.setDescription(TestFields.DESCRIPTION);
-        problem.setDifficulty(ProblemDifficulty.MEDIUM);
-        problem.setOwner(TestFields.account1());
-
-        ProblemInput problemInput = new ProblemInput(TestFields.INPUT_NAME, TestFields.IO_TYPE);
-        problem.addProblemInput(problemInput);
-        problem.setOutputType(TestFields.IO_TYPE_2);
-
-        ProblemTestCase originalTestCase = new ProblemTestCase();
-        originalTestCase.setInput(TestFields.INPUT_3);
-        originalTestCase.setOutput(TestFields.OUTPUT_3);
-        problem.addTestCase(originalTestCase);
+        Problem problem = TestFields.problem1();
 
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
 
@@ -695,5 +673,34 @@ public class ProblemServiceTests {
                 problemService.validateInputsGsonParseable("true\n[a]\n3.0\n[]", inputs));
 
         assertEquals(ProblemError.BAD_INPUT, exception.getError());
+    }
+
+    @Test
+    public void createProblemNotLoggedIn() {
+        CreateProblemRequest request = TestFields.createProblemRequest1();
+
+        ApiError ERROR = AccountError.INVALID_CREDENTIALS;
+        Mockito.doThrow(new ApiException(ERROR)).when(firebaseService).verifyToken("bad-token");
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                problemService.createProblem(request, "bad-token"));
+
+        assertEquals(AccountError.INVALID_CREDENTIALS, exception.getError());
+    }
+
+    @Test
+    public void editProblemNotAuthorized() {
+        Problem problem = TestFields.problem1();
+        ProblemDto problemDto = ProblemMapper.toDto(problem);
+
+        ApiError ERROR = AccountError.INVALID_CREDENTIALS;
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
+        Mockito.doThrow(new ApiException(ERROR)).when(firebaseService).verifyTokenMatchesUid("random", problem.getOwner().getUid());
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                problemService.editProblem(problem.getProblemId(), problemDto, "random"));
+
+        assertEquals(AccountError.INVALID_CREDENTIALS, exception.getError());
     }
 }
