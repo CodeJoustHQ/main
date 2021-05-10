@@ -5,6 +5,7 @@ import com.codejoust.main.game_object.CodeLanguage;
 import com.codejoust.main.game_object.PlayerCode;
 import com.codejoust.main.model.Account;
 import com.codejoust.main.model.problem.ProblemIOType;
+import com.codejoust.main.service.FirebaseService;
 
 public class TestFields {
 
@@ -62,7 +63,7 @@ public class TestFields {
 
     // Account constants
     public static final String TOKEN = "aWbXcYdZ123";
-    public static final String UID = "asdfghjkl";
+    public static final String UID = FirebaseService.TEST_UID;
 
     public static UserDto userDto1() {
         UserDto user = new UserDto();

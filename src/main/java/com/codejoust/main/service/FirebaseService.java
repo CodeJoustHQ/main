@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Log4j2
@@ -17,6 +18,11 @@ public class FirebaseService {
 
     private final AccountRepository repository;
 
+    public static final String TEST_UID = "asdfghjkl";
+
+    @Value("${firebase.debugMode}")
+    private Boolean debugMode;
+
     @Autowired
     public FirebaseService(AccountRepository repository) {
         this.repository = repository;
@@ -24,6 +30,12 @@ public class FirebaseService {
 
     // Takes a Firebase ID token and returns the UserID if valid or an error otherwise
     public String verifyToken(String token) {
+        // For MockMvc testing, return a test UID since it won't connect to Firebase
+        if (debugMode != null && debugMode) {
+            createAccountIfNoneExists(TEST_UID);
+            return TEST_UID;
+        }
+
         String uid = null;
         try {
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
