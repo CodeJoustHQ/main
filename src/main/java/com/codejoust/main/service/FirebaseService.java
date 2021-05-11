@@ -30,16 +30,9 @@ public class FirebaseService {
 
     // Takes a Firebase ID token and returns the UserID if valid or an error otherwise
     public String verifyToken(String token) {
-        // For MockMvc testing, return a test UID since it won't connect to Firebase
-        if (debugMode != null && debugMode) {
-            createAccountIfNoneExists(TEST_UID);
-            return TEST_UID;
-        }
-
         String uid = null;
         try {
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
-            uid = decodedToken.getUid();
+            uid = decodeToken(token);
         } catch (FirebaseAuthException e) {
             log.error("An error occurred contacting Firebase to verify an ID token:");
             log.error(e.getMessage());
@@ -60,8 +53,18 @@ public class FirebaseService {
         }
     }
 
+    protected String decodeToken(String token) throws FirebaseAuthException {
+        // For MockMvc testing, return a test UID since it won't connect to Firebase
+        if (debugMode != null && debugMode) {
+            return TEST_UID;
+        }
+
+        FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
+        return decodedToken.getUid();
+    }
+
     // Make sure an account exists in our database to match Firebase
-    private void createAccountIfNoneExists(String uid) {
+    protected void createAccountIfNoneExists(String uid) {
         Account account = repository.findAccountByUid(uid);
         if (account == null) {
             account = new Account();
