@@ -116,7 +116,7 @@ function GamePage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [languageList] = useState<Language[]>([Language.Python]);
+  const [languageList, setLanguageList] = useState<Language[]>([Language.Python]);
   const [codeList, setCodeList] = useState<string[]>(['']);
   const [currentSubmission, setCurrentSubmission] = useState<Submission | null>(null);
   const [currentProblem, setCurrentProblem] = useState<number>(0);
@@ -193,10 +193,12 @@ function GamePage() {
     // Get the result of promises and set the default code list.
     Promise.all(promises).then((result) => {
       const newCodeList = [];
+      const newLanguageList = [];
       const codeMap = result;
 
       for (let i = 0; i < result.length; i += 1) {
         newCodeList.push(result[i][Language.Python]);
+        newLanguageList.push(Language.Python);
       }
 
       // If previous code and language specified, save those as defaults
@@ -206,18 +208,19 @@ function GamePage() {
         if (temp != null) {
           newCodeList[i] = temp.code;
           codeMap[i][temp.language as Language] = temp.code;
-          languageList[i] = temp.language as Language;
+          newLanguageList[i] = temp.language as Language;
           setCurrentProblem(i);
         }
       }
 
       // Set this user's current code
       setCodeList(newCodeList);
+      setLanguageList(newLanguageList);
       setDefaultCodeList(codeMap);
     }).catch((err) => {
       setError(err.message);
     });
-  }, [setDefaultCodeList, setCodeList, languageList]);
+  }, [setDefaultCodeList, setCodeList, setLanguageList]);
 
   /**
    * Display the notification as a callback from the notification
