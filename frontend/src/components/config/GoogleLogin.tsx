@@ -13,11 +13,9 @@ const GoogleButton = styled(PrimaryButton)`
 `;
 
 const GoogleImage = styled.img`
-  display: inline;
   position: absolute;
   left: 15px;
   width: 30px;
-  vertical-align: middle;
 `;
 
 const GoogleText = styled.span`
