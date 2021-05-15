@@ -440,10 +440,11 @@ function LobbyPage() {
     // Call GET endpoint to get latest room info
     if (!loading) {
       setLoading(true);
+      setError('');
       dispatch(fetchRoom(location.state.roomId))
         .then(unwrapResult)
-        .then(() => setLoading(false))
-        .catch((err) => setError(err.message));
+        .catch((err) => setError(err.message))
+        .finally(() => setLoading(false));
     }
   };
 

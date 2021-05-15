@@ -21,10 +21,7 @@ const roomSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchRoom.fulfilled, (state, action) => {
-      // When the async fetchRoom action is fulfilled, set room state to its return object
-      return action.payload;
-    });
+    builder.addCase(fetchRoom.fulfilled, (state, action) => action.payload);
   },
 });
 
