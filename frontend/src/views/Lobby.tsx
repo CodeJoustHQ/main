@@ -440,6 +440,7 @@ function LobbyPage() {
     // Call GET endpoint to get latest room info
     if (!loading) {
       setLoading(true);
+      setError('');
       dispatch(fetchRoom(location.state.roomId))
         .then(unwrapResult)
         .catch((err) => setError(err.message))

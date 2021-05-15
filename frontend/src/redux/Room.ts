@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getRoom, Room } from '../api/Room';
-import { axiosErrorHandler } from '../api/Error';
 
 const initialState = null as Room | null;
 
@@ -9,7 +8,7 @@ export const fetchRoom = createAsyncThunk<Room, string>(
   'rooms/fetch',
   async (roomId, thunkApi) => getRoom(roomId)
     .then((res) => res)
-    .catch((err) => thunkApi.rejectWithValue(axiosErrorHandler(err))),
+    .catch((err) => thunkApi.rejectWithValue(err)),
 );
 
 const roomSlice = createSlice({
