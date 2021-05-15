@@ -142,7 +142,6 @@ function GamePage() {
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
   const setStateFromGame = (newGame: Game) => {
-    setGame(newGame);
     setRoomId(newGame.room.roomId);
     setPlayers(newGame.players);
     setGameTimer(newGame.gameTimer);
