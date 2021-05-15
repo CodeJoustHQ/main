@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useAppSelector } from '../../util/Hook';
-import { TextInput } from '../../components/core/Input';
+import { AuthInput, AuthPasswordInput } from '../../components/core/Input';
 import { LandingHeaderTitle } from '../../components/core/Text';
 import ErrorMessage from '../../components/core/Error';
 import { PrimaryButton } from '../../components/core/Button';
@@ -11,12 +10,6 @@ import app from '../../api/Firebase';
 import Loading from '../../components/core/Loading';
 import GoogleLogin from '../../components/config/GoogleLogin';
 import { onEnterAction } from '../../util/Utility';
-
-const LoginInput = styled(TextInput)`
-  display: block;
-  margin: 15px auto;
-  width: 20rem;
-`;
 
 type RedirectProps = {
   from?: string,
@@ -58,22 +51,21 @@ function LoginPage() {
   };
 
   return (
-    <div>
+    <>
       <LandingHeaderTitle>
         Login
       </LandingHeaderTitle>
       <div>
-        <LoginInput
+        <AuthInput
           placeholder="Email"
           name="email"
           value={email}
           onChange={(e) => handleChange(setEmail, e.target.value)}
           onKeyPress={(e) => onEnterAction(onSubmit, e)}
         />
-        <LoginInput
+        <AuthPasswordInput
           placeholder="Password"
           name="password"
-          type="password"
           value={password}
           onChange={(e) => handleChange(setPassword, e.target.value)}
           onKeyPress={(e) => onEnterAction(onSubmit, e)}
@@ -89,7 +81,7 @@ function LoginPage() {
 
       {loading ? <Loading /> : null}
       {error ? <ErrorMessage message={error} /> : null}
-    </div>
+    </>
   );
 }
 

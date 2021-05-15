@@ -148,8 +148,8 @@ export const NumberInput = styled(Input).attrs(() => ({
   }
 `;
 
-export const TextInput = styled(Input).attrs((props) => ({
-  type: (props?.type ? props.type : 'text'),
+export const TextInput = styled(Input).attrs(() => ({
+  type: 'text',
 }))`
   display: inline-block;
   margin: 0 0.5rem 0 0;
@@ -164,6 +164,16 @@ export const TextInput = styled(Input).attrs((props) => ({
     border: 2px solid ${({ theme }) => theme.colors.darkBlue};
   }
 `;
+
+export const AuthInput = styled(TextInput)`
+  display: block;
+  margin: 15px auto;
+  width: 20rem;
+`;
+
+export const AuthPasswordInput = styled(AuthInput).attrs(() => ({
+  type: 'password',
+}))``;
 
 export const CheckboxInput = styled(Input).attrs(() => ({
   type: 'checkbox',

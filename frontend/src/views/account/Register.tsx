@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import app from '../../api/Firebase';
 import { useAppSelector } from '../../util/Hook';
-import { TextInput } from '../../components/core/Input';
+import { AuthInput, AuthPasswordInput } from '../../components/core/Input';
 import { PrimaryButton } from '../../components/core/Button';
 import ErrorMessage from '../../components/core/Error';
 import { LandingHeaderTitle } from '../../components/core/Text';
@@ -11,12 +10,6 @@ import { TextLink } from '../../components/core/Link';
 import Loading from '../../components/core/Loading';
 import GoogleLogin from '../../components/config/GoogleLogin';
 import { onEnterAction } from '../../util/Utility';
-
-const RegisterInput = styled(TextInput)`
-  display: block;
-  margin: 15px auto;
-  width: 20rem;
-`;
 
 function RegisterPage() {
   const history = useHistory();
@@ -69,25 +62,23 @@ function RegisterPage() {
         Register an Account
       </LandingHeaderTitle>
       <div>
-        <RegisterInput
+        <AuthInput
           placeholder="Email"
           name="email"
           value={email}
           onChange={(e) => handleChange(setEmail, e.target.value)}
           onKeyPress={(e) => onEnterAction(onSubmit, e)}
         />
-        <RegisterInput
+        <AuthPasswordInput
           placeholder="Password"
           name="password"
-          type="password"
           value={password}
           onChange={(e) => handleChange(setPassword, e.target.value)}
           onKeyPress={(e) => onEnterAction(onSubmit, e)}
         />
-        <RegisterInput
+        <AuthPasswordInput
           placeholder="Confirm Password"
           name="confirm-password"
-          type="password"
           value={confirmPassword}
           onChange={(e) => handleChange(setConfirmPassword, e.target.value)}
           onKeyPress={(e) => onEnterAction(onSubmit, e)}
