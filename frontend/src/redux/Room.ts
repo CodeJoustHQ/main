@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getRoom, Room } from '../api/Room';
+import { axiosErrorHandler } from '../api/Error';
 
 const initialState = null as Room | null;
 
@@ -8,7 +9,7 @@ export const fetchRoom = createAsyncThunk<Room, string>(
   'rooms/fetch',
   async (roomId, thunkApi) => getRoom(roomId)
     .then((res) => res)
-    .catch((err) => thunkApi.rejectWithValue(err)),
+    .catch((err) => thunkApi.rejectWithValue(axiosErrorHandler(err))),
 );
 
 const roomSlice = createSlice({
@@ -21,10 +22,7 @@ const roomSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchRoom.fulfilled, (state, action) => {
-      // When the async fetchRoom action is fulfilled, set room state to its return object
-      return action.payload;
-    });
+    builder.addCase(fetchRoom.fulfilled, (state, action) => action.payload);
   },
 });
 
