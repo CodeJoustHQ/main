@@ -151,8 +151,7 @@ function GamePage() {
   };
 
   const dispatch = useAppDispatch();
-  const { game } = useAppSelector((state) => state);
-  const { currentUser } = useAppSelector((state) => state);
+  const { currentUser, game } = useAppSelector((state) => state);
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
     code: string, language: Language) => {
