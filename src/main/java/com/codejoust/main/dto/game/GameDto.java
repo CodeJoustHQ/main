@@ -20,4 +20,5 @@ public class GameDto {
     private List<PlayerDto> players = new ArrayList<>();
     private Boolean playAgain = false;
     private Boolean allSolved;
+    private Boolean gameEnded;
 }

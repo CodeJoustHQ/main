@@ -274,7 +274,13 @@ public class GameManagementService {
             throw new ApiException(GameError.INVALID_PERMISSIONS);
         }
 
-        // todo: end game
+        game.setGameEnded(true);
+        handleEndGame(game);
+
+        GameDto gameDto = GameMapper.toDto(game);
+        socketService.sendSocketUpdate(gameDto);
+
+        return gameDto;
     }
 
     protected void handleEndGame(Game game) {
@@ -288,7 +294,7 @@ public class GameManagementService {
     }
 
     protected boolean isGameOver(Game game) {
-        return game.getAllSolved() || (game.getGameTimer() != null && game.getGameTimer().isTimeUp());
+        return game.getGameEnded() || game.getAllSolved() || (game.getGameTimer() != null && game.getGameTimer().isTimeUp());
     }
 
     // Update people's socket active status

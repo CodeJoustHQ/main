@@ -25,7 +25,7 @@ import { GameNotification, NotificationType } from '../api/GameNotification';
 import { Difficulty, displayNameFromDifficulty } from '../api/Difficulty';
 import {
   Game, getGame, Player, runSolution,
-  Submission, SubmissionType, submitSolution,
+  Submission, SubmissionType, submitSolution, manuallyEndGame,
 } from '../api/Game';
 import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
@@ -120,6 +120,7 @@ function GamePage() {
   const [currentCode, setCurrentCode] = useState('');
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
+  const [gameEnded, setGameEnded] = useState(false);
   const [defaultCodeList, setDefaultCodeList] = useState<DefaultCodeType[]>([]);
 
   // When variable null, show nothing; otherwise, show notification.
@@ -146,6 +147,7 @@ function GamePage() {
     setProblems(newGame.problems);
     setAllSolved(newGame.allSolved);
     setTimeUp(newGame.gameTimer.timeUp);
+    setGameEnded(newGame.gameEnded);
   };
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
@@ -190,7 +192,7 @@ function GamePage() {
 
   // Check if game is over or not and redirect to results page if so
   useEffect(() => {
-    if (timeUp || allSolved) {
+    if (gameEnded || timeUp || allSolved) {
       // eslint-disable-next-line no-unused-expressions
       gameSocket?.unsubscribe();
       // eslint-disable-next-line no-unused-expressions
@@ -201,7 +203,8 @@ function GamePage() {
         currentUser,
       });
     }
-  }, [timeUp, allSolved, game, history, currentUser, gameSocket, notificationSocket, roomId]);
+  }, [gameEnded, timeUp, allSolved, game, history,
+    currentUser, gameSocket, notificationSocket, roomId]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string, userId: string) => {
@@ -397,6 +400,11 @@ function GamePage() {
           <GameTimerContainer gameTimer={gameTimer || null} />
         </FlexCenter>
         <FlexRight>
+          {currentUser?.userId === game?.room.host.userId ? (
+            <TextButton onClick={() => manuallyEndGame(roomId, { initiator: currentUser! })}>
+              End Game
+            </TextButton>
+          ) : null}
           <TextButton onClick={() => leaveRoom(history, roomId, currentUser)}>Exit Game</TextButton>
         </FlexRight>
       </FlexInfoBar>
