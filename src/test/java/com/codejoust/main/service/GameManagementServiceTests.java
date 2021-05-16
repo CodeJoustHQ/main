@@ -505,7 +505,7 @@ public class GameManagementServiceTests {
         gameService.submitSolution(TestFields.ROOM_ID, request);
 
         verify(submitService).submitSolution(eq(game), eq(request));
-        verify(gameService).endGame(eq(game));
+        verify(gameService).handleEndGame(eq(game));
 
         // Confirm that socket sent updated GameDto object.
         verify(socketService).sendSocketUpdate(eq(GameMapper.toDto(game)));
@@ -1083,7 +1083,7 @@ public class GameManagementServiceTests {
         // Manually schedule notification tasks due to service being mocked
         new NotificationService(socketService).scheduleTimeLeftNotifications(game, 12L);
 
-        gameService.endGame(game);
+        gameService.handleEndGame(game);
 
         // Neither the end game nor time left notifications are sent
         verify(socketService, after(13000).never()).sendSocketUpdate(Mockito.any(String.class), Mockito.any(GameNotificationDto.class));
