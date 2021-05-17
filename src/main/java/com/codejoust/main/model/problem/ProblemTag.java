@@ -10,7 +10,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 
 import lombok.EqualsAndHashCode;
@@ -34,7 +33,6 @@ public class ProblemTag {
     private String name;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "problem_list_table_id")
     private List<Problem> problems = new ArrayList<>();
 
     public void addProblem(Problem problem) {
