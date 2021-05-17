@@ -1,4 +1,4 @@
-package com.codejoust.main.util;
+package com.codejoust.main.task;
 
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -16,6 +16,8 @@ import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.service.SocketService;
 
+import com.codejoust.main.util.EndGameTimerTask;
+import com.codejoust.main.util.TestFields;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,12 +27,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class EndGameTimerTaskTests {
-
-    // Predefine user and room attributes.
-    private static final String NICKNAME = "rocket";
-    private static final String USER_ID = "012345";
-    private static final String SESSION_ID = "234567";
-    private static final String ROOM_ID = "012345";
 
     @Mock
     private SocketService socketService;
@@ -48,12 +44,12 @@ public class EndGameTimerTaskTests {
     @Test
     public void endGameTimerTaskSocketMessageNullSocketService() {
         User user = new User();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
-        user.setSessionId(SESSION_ID);
+        user.setNickname(TestFields.NICKNAME);
+        user.setUserId(TestFields.USER_ID);
+        user.setSessionId(TestFields.SESSION_ID);
 
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         room.setDifficulty(ProblemDifficulty.MEDIUM);
         room.setHost(user);
         room.addUser(user);
@@ -68,12 +64,12 @@ public class EndGameTimerTaskTests {
     @Test
     public void endGameTimerTaskSocketMessageNullGameTimer() {
         User user = new User();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
-        user.setSessionId(SESSION_ID);
+        user.setNickname(TestFields.NICKNAME);
+        user.setUserId(TestFields.USER_ID);
+        user.setSessionId(TestFields.SESSION_ID);
 
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         room.setDifficulty(ProblemDifficulty.MEDIUM);
         room.setHost(user);
         room.addUser(user);
@@ -95,9 +91,9 @@ public class EndGameTimerTaskTests {
     @Test
     public void endGameTimerTaskSocketMessageNullRoomId() {
         User user = new User();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
-        user.setSessionId(SESSION_ID);
+        user.setNickname(TestFields.NICKNAME);
+        user.setUserId(TestFields.USER_ID);
+        user.setSessionId(TestFields.SESSION_ID);
 
         Room room = new Room();
         room.setDifficulty(ProblemDifficulty.MEDIUM);
@@ -114,12 +110,12 @@ public class EndGameTimerTaskTests {
     @Test
     public void endGameTimerTaskSocketMessage() {
         User user = new User();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
-        user.setSessionId(SESSION_ID);
+        user.setNickname(TestFields.NICKNAME);
+        user.setUserId(TestFields.USER_ID);
+        user.setSessionId(TestFields.SESSION_ID);
 
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         room.setDifficulty(ProblemDifficulty.MEDIUM);
         room.setHost(user);
         room.addUser(user);
@@ -144,6 +140,6 @@ public class EndGameTimerTaskTests {
 
         verify(socketService, never()).sendSocketUpdate(eq(gameDto));
 
-        verify(socketService, timeout(1000)).sendSocketUpdate(eq(gameDto));
+        verify(socketService, timeout(1200)).sendSocketUpdate(eq(gameDto));
     }
 }

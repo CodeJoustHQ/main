@@ -12,6 +12,7 @@ import com.codejoust.main.dto.user.UserDto;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.util.SocketTestMethods;
 
+import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,20 +60,12 @@ public class RoomSocketTests {
     private RoomDto room;
     private StompSession hostSession;
 
-    // Predefine user and room attributes.
-    private static final String NICKNAME = "rocket";
-    private static final String USER_ID = "012345";
-    private static final String NICKNAME_2 = "rocketrocket";
-    private static final String USER_ID_2 = "098765";
-
     @BeforeEach
     public void setup() throws Exception {
         // Set up a room with a single user (the host)
         baseRestEndpoint = "http://localhost:" + port + "/api/v1/rooms";
 
-        UserDto host = new UserDto();
-        host.setNickname(NICKNAME);
-        host.setUserId(USER_ID);
+        UserDto host = TestFields.userDto1();
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
@@ -88,7 +81,7 @@ public class RoomSocketTests {
         blockingQueue = new ArrayBlockingQueue<>(2);
 
         // Connect to the socket endpoint
-        hostSession = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, USER_ID, this.port);
+        hostSession = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, TestFields.USER_ID, this.port);
 
         // Add socket messages to BlockingQueue so we can verify expected behavior
         hostSession.subscribe(String.format(SUBSCRIBE_ENDPOINT, response.getRoomId()), new StompFrameHandler() {
@@ -107,8 +100,7 @@ public class RoomSocketTests {
     @Test
     public void socketReceivesMessageOnJoin() throws Exception {
         // Join the room, which should trigger a socket message to be sent
-        UserDto newUser = new UserDto();
-        newUser.setNickname(NICKNAME_2);
+        UserDto newUser = TestFields.userDto2();
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(newUser);
 
@@ -128,9 +120,7 @@ public class RoomSocketTests {
     @Test
     public void socketReceivesMessageOnHostChange() throws Exception {
         // A second user joins the room
-        UserDto newUser = new UserDto();
-        newUser.setNickname(NICKNAME_2);
-        newUser.setUserId(USER_ID_2);
+        UserDto newUser = TestFields.userDto2();
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(newUser);
 
@@ -202,8 +192,7 @@ public class RoomSocketTests {
         assertNotNull(actual.getHost().getSessionId());
 
         // Have someone else join the room
-        UserDto user = new UserDto();
-        user.setNickname(NICKNAME_2);
+        UserDto user = TestFields.userDto2();
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(user);
 
@@ -230,8 +219,7 @@ public class RoomSocketTests {
     @Test
     public void socketReceivesMessageOnDisconnection() throws Exception {
         // Have someone join the room
-        UserDto user = new UserDto();
-        user.setNickname(NICKNAME_2);
+        UserDto user = TestFields.userDto2();
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(user);
 
@@ -265,8 +253,7 @@ public class RoomSocketTests {
     @Test
     public void socketChangesHostOnDisconnection() throws Exception {
         // Have someone join the room
-        UserDto user = new UserDto();
-        user.setNickname(NICKNAME_2);
+        UserDto user = TestFields.userDto2();
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(user);
 
@@ -343,9 +330,7 @@ public class RoomSocketTests {
 
     @Test
     public void socketReceivesMessageOnUserKicked() throws Exception {
-        UserDto newUser = new UserDto();
-        newUser.setNickname(NICKNAME_2);
-        newUser.setUserId(USER_ID_2);
+        UserDto newUser = TestFields.userDto2();
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(newUser);
 

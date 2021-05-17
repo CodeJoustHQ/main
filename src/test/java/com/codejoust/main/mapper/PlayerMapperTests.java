@@ -1,5 +1,6 @@
 package com.codejoust.main.mapper;
 
+import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -14,14 +15,11 @@ import com.codejoust.main.model.User;
 @SpringBootTest
 public class PlayerMapperTests {
 
-    private static final String USER_ID = "098765";
-    private static final String NICKNAME = "test";
-
     @Test
     public void playerFromUser() {
         User user = new User();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
+        user.setNickname(TestFields.NICKNAME);
+        user.setUserId(TestFields.USER_ID);
 
         Player player = PlayerMapper.playerFromUser(user);
 

@@ -1,5 +1,6 @@
 package com.codejoust.main.mapper;
 
+import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -12,11 +13,9 @@ import com.codejoust.main.game_object.GameTimer;
 @SpringBootTest
 public class GameTimerMapperTests {
 
-    private static final long DURATION = 15;
-
     @Test
     public void toDto() {
-        GameTimer gameTimer = new GameTimer(DURATION);
+        GameTimer gameTimer = new GameTimer(TestFields.DURATION);
         GameTimerDto gameTimerDto = GameTimerMapper.toDto(gameTimer);
 
         assertEquals(gameTimer.getDuration(), gameTimerDto.getDuration());
