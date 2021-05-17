@@ -710,4 +710,24 @@ public class ProblemServiceTests {
         assertEquals(1, problems.size());
         assertEquals(problem.getName(), problems.get(0).getName());
     }
+
+    @Test
+    public void getAllProblemTagsSuccess() {
+        /**
+         * 1. Create a problem tag.
+         * 2. Mock repository return and verify that tag
+         * is returned with "getAllProblemTags."
+         */
+
+        ProblemTag problemTag = new ProblemTag();
+        problemTag.setName(TestFields.PROBLEM_TAG);
+        problemTag.setTagId(TestFields.TAG_ID);
+
+        Mockito.doReturn(Collections.singletonList(problemTag)).when(tagRepository).findAll();
+        
+        List<ProblemTagDto> problemTags = problemService.getAllProblemTags();
+
+        assertEquals(1, problemTags.size());
+        assertEquals(problemTag.getName(), problemTags.get(0).getName());
+    }
 }
