@@ -24,6 +24,7 @@ public enum ProblemError implements ApiError {
     NOT_FOUND(HttpStatus.NOT_FOUND, "A problem could not be found with the given criteria."),
     TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "A problem tag with these attributes could not be found."),
     TAG_NAME_ALREADY_EXISTS(HttpStatus.FORBIDDEN, "A problem tag with this name already exists."),
+    DUPLICATE_TAG_NAME(HttpStatus.BAD_REQUEST, "The same problem tag name was supplied multiple times for the same problem."),
     BAD_PROBLEM_TAG(HttpStatus.FORBIDDEN, "Please choose a valid name for the problem tag.");
 
     private final HttpStatus status;

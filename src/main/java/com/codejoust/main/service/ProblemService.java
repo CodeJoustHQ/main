@@ -159,18 +159,49 @@ public class ProblemService {
             problem.addTestCase(testCase);
         }
 
+        // If the same tag name is added multiple times, throw error.
+        List<ProblemTagDto> updatedProblemTags = updatedProblem.getProblemTags();
+        if (!problemTagNamesUnique(updatedProblemTags)) {
+            throw new ApiException(ProblemError.DUPLICATE_TAG_NAME);
+        }
+
         problem.getProblemTags().clear();
-        for (ProblemTagDto problemTagDto : updatedProblem.getProblemTags()) {
-            if (validProblemTagName(problemTagDto.getName())) {
+        for (ProblemTagDto problemTagDto : updatedProblemTags) {
+            // Add the tag if the name already exists, or create a new one.
+            ProblemTag existingProblemTag = problemTagRepository.findTagByName(problemTagDto.getName());
+            if (existingProblemTag != null) {
+                problem.addProblemTag(existingProblemTag);
+            } else if (validProblemTagName(problemTagDto.getName())) {
                 ProblemTag problemTag = new ProblemTag();
                 problemTag.setName(problemTagDto.getName());
                 problem.addProblemTag(problemTag);
+            } else {
+                throw new ApiException(ProblemError.BAD_PROBLEM_TAG);
             }
         }
 
         problemRepository.save(problem);
 
         return ProblemMapper.toDto(problem);
+    }
+
+    /**
+     * Helper method that returns true iff all problem tag names provided are
+     * unique within the list, false otherwise.
+     * 
+     * @param problemTags The problem tag DTOs in question.
+     * @return true if all names are unique, false otherwise.
+     */
+    private boolean problemTagNamesUnique(List<ProblemTagDto> problemTags) {
+        Set<String> problemTagNames = new HashSet<>();
+        for (ProblemTagDto problemTag : problemTags) {
+            // If problem tag name is already recorded, return false.
+            if (problemTagNames.contains(problemTag.getName())) {
+                return false;
+            }
+            problemTagNames.add(problemTag.getName());
+        }
+        return true;
     }
 
     public ProblemDto deleteProblem(String problemId) {
@@ -345,7 +376,6 @@ public class ProblemService {
     }
 
     public List<ProblemTagDto> getProblemTags(String problemId) {
-        // TODO: There's a chance this method isn't necessary.
         Problem problem = problemRepository.findProblemByProblemId(problemId);
 
         if (problem == null) {
@@ -371,21 +401,14 @@ public class ProblemService {
     }
 
     public List<ProblemTagDto> getAllProblemTags() {
-        List<ProblemTag> problemTags = problemTagRepository.findAll();
-
-        // If the problem does not have any ProblemTags, return empty list.
-        if (problemTags == null) {
-            // TODO: Is the result null if the problem doesn't have tags?
-            return new ArrayList<ProblemTagDto>();
-        }
-
+        // Get all problem tags and convert them to DTOs.
         List<ProblemTagDto> problemTagDtos = new ArrayList<>();
-        problemTags.forEach(problemTag -> problemTagDtos.add(ProblemMapper.toProblemTagDto(problemTag)));
+        problemTagRepository.findAll().forEach(problemTag -> problemTagDtos.add(ProblemMapper.toProblemTagDto(problemTag)));
         return problemTagDtos;
     }
 
     public ProblemTagDto createProblemTag(CreateProblemTagRequest request) {
-        ProblemTag existingProblemTag = problemTagRepository.findProblemTagByName(request.getName());
+        ProblemTag existingProblemTag = problemTagRepository.findTagByName(request.getName());
 
         // Handle invalid request, with restraints on the length of the name.
         if (!validProblemTagName(request.getName())) {
