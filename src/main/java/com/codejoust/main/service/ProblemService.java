@@ -26,8 +26,6 @@ import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import lombok.extern.log4j.Log4j2;
-
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -37,7 +35,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Log4j2
 @Service
 public class ProblemService {
 
@@ -170,43 +167,40 @@ public class ProblemService {
 
         // The old problem tags associated with the problem.
         List<ProblemTag> oldProblemTags = new ArrayList<>(problem.getProblemTags());
-        log.info("" + oldProblemTags);
         for (ProblemTagDto problemTagDto : updatedProblemTags) {
             // Add the tag if the name already exists, or create a new one.
             ProblemTag existingProblemTag = problemTagRepository.findTagByName(problemTagDto.getName());
             if (existingProblemTag != null) {
-                log.info("" + oldProblemTags.contains(existingProblemTag));
                 // Add the problem tag or remove from old list to be removed.
                 if (oldProblemTags.contains(existingProblemTag)) {
-                    log.info("1");
-                    log.info(existingProblemTag.getName());
                     oldProblemTags.remove(existingProblemTag);
                 } else {
-                    log.info("2");
-                    log.info(existingProblemTag.getName());
                     problem.addProblemTag(existingProblemTag);
                 }
             } else if (validProblemTagName(problemTagDto.getName())) {
                 ProblemTag problemTag = new ProblemTag();
                 problemTag.setName(problemTagDto.getName());
-
-                log.info("3");
-                log.info(problemTag.getName());
                 problem.addProblemTag(problemTag);
             } else {
                 throw new ApiException(ProblemError.BAD_PROBLEM_TAG);
             }
         }
 
-        // Remove all the old problem tags.
+        /**
+         * Remove all the old problem tags.
+         * The tags own the removal side of the relationship, and are
+         * updated here whereas the problem is updated below.
+         */
         for (ProblemTag oldProblemTag : oldProblemTags) {
-            log.info("4");
-            log.info(oldProblemTag.getName());
             oldProblemTag.removeProblem(problem);
-        //     // problem.removeProblemTag(oldProblemTag);
         }
 
         problemRepository.save(problem);
+
+        // Remove the old problem tags from the problem to update the DTO.
+        for (ProblemTag oldProblemTag : oldProblemTags) {
+            problem.removeProblemTag(oldProblemTag);
+        }
 
         return ProblemMapper.toDto(problem);
     }
