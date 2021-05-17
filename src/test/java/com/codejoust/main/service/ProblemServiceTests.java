@@ -704,9 +704,9 @@ public class ProblemServiceTests {
         problemTag.setProblems(Collections.singletonList(problem));
         problem.setProblemTags(Collections.singletonList(problemTag));
 
-        Mockito.doReturn(problemTag).when(tagRepository).findTagByTagId(TestFields.TAG_ID);
+        Mockito.doReturn(problemTag).when(tagRepository).findTagByTagId(problemTag.getTagId());
         
-        List<ProblemDto> problems = problemService.getProblemsWithTag(TestFields.TAG_ID);
+        List<ProblemDto> problems = problemService.getProblemsWithTag(problemTag.getTagId());
 
         assertEquals(1, problems.size());
         assertEquals(problem.getName(), problems.get(0).getName());
@@ -751,5 +751,23 @@ public class ProblemServiceTests {
 
         ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblemTag(request));
         assertEquals(ProblemError.BAD_PROBLEM_TAG, exception.getError());
+    }
+
+    @Test
+    public void deleteProblemTagSuccess() {
+        /**
+         * 1. Create a problem tag.
+         * 2. Mock repository return and verify that tag
+         * is returned with "getAllProblemTags."
+         */
+
+        ProblemTag problemTag = new ProblemTag();
+        problemTag.setName(TestFields.TAG_NAME);
+        problemTag.setTagId(TestFields.TAG_ID);
+
+        Mockito.doReturn(problemTag).when(tagRepository).findTagByTagId(problemTag.getTagId());
+
+        ProblemTagDto problemTagDto = problemService.deleteProblemTag(problemTag.getTagId());
+        assertEquals(problemTag.getName(), problemTagDto.getName());
     }
 }
