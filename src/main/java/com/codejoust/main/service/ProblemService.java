@@ -395,18 +395,6 @@ public class ProblemService {
         return defaultCodeMap;
     }
 
-    public List<ProblemTagDto> getProblemTags(String problemId) {
-        Problem problem = problemRepository.findProblemByProblemId(problemId);
-
-        if (problem == null) {
-            throw new ApiException(ProblemError.NOT_FOUND);
-        }
-
-        List<ProblemTagDto> problemTagDtos = new ArrayList<>();
-        problem.getProblemTags().forEach(problemTag -> problemTagDtos.add(ProblemMapper.toProblemTagDto(problemTag)));
-        return problemTagDtos;
-    }
-
     public List<ProblemDto> getProblemsWithTag(String tagId) {
         ProblemTag problemTag = problemTagRepository.findTagByTagId(tagId);
 

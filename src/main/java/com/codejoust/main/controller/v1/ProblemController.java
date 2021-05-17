@@ -86,11 +86,6 @@ public class ProblemController extends BaseRestController {
         return new ResponseEntity<>(service.getDefaultCode(problemId), HttpStatus.OK);
     }
 
-    @GetMapping("/problems/{problemId}/tags")
-    public ResponseEntity<List<ProblemTagDto>> getProblemTags(@PathVariable String problemId) {
-        return new ResponseEntity<>(service.getProblemTags(problemId), HttpStatus.OK);
-    }
-
     @GetMapping("/problems/tags/{tagId}")
     public ResponseEntity<List<ProblemDto>> getProblemsWithTag(@PathVariable String tagId) {
         return new ResponseEntity<>(service.getProblemsWithTag(tagId), HttpStatus.OK);
