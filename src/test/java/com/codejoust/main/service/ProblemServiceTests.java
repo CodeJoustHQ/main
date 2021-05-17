@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.codejoust.main.dao.ProblemRepository;
+import com.codejoust.main.dao.ProblemTagRepository;
 import com.codejoust.main.dto.problem.CreateProblemRequest;
 import com.codejoust.main.dto.problem.CreateTestCaseRequest;
 import com.codejoust.main.dto.problem.ProblemDto;
@@ -29,6 +30,7 @@ import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
 import com.codejoust.main.model.problem.ProblemInput;
+import com.codejoust.main.model.problem.ProblemTag;
 import com.codejoust.main.model.problem.ProblemTestCase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,6 +46,9 @@ public class ProblemServiceTests {
 
     @Mock
     private ProblemRepository repository;
+
+    @Mock
+    private ProblemTagRepository tagRepository;
 
     @Spy
     @InjectMocks
@@ -678,5 +683,31 @@ public class ProblemServiceTests {
                 problemService.validateInputsGsonParseable("true\n[a]\n3.0\n[]", inputs));
 
         assertEquals(ProblemError.BAD_INPUT, exception.getError());
+    }
+
+    @Test
+    public void getProblemsWithTagSuccess() {
+        /**
+         * 1. Create a problem and problem tag.
+         * 2. Add the problem to the problem tag, and vice versa.
+         * 3. Mock repository return and verify that the correct problem
+         * is returned with "getProblemsWithTag."
+         */
+
+        Problem problem = new Problem();
+        problem.setName(TestFields.NAME);
+
+        ProblemTag problemTag = new ProblemTag();
+        problemTag.setName(TestFields.PROBLEM_TAG);
+        problemTag.setTagId(TestFields.TAG_ID);
+        problemTag.setProblems(Collections.singletonList(problem));
+        problem.setProblemTags(Collections.singletonList(problemTag));
+
+        Mockito.doReturn(problemTag).when(tagRepository).findTagByTagId(TestFields.TAG_ID);
+        
+        List<ProblemDto> problems = problemService.getProblemsWithTag(TestFields.TAG_ID);
+
+        assertEquals(1, problems.size());
+        assertEquals(problem.getName(), problems.get(0).getName());
     }
 }

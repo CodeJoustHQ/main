@@ -20,6 +20,7 @@ public class TestFields {
     public static final String SESSION_ID_2 = "fghij";
     public static final Integer ID = 1;
     public static final Integer ID_2 = 2;
+    public static final String TAG_ID = "klmno";
 
     // Room constants
     public static final String ROOM_ID = "012345";
