@@ -19,6 +19,7 @@ export type Problem = {
   difficulty: Difficulty,
   testCases: TestCase[],
   problemInputs: ProblemInput[],
+  problemTags: ProblemTag[],
   outputType: ProblemIOType,
 };
 

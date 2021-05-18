@@ -373,38 +373,14 @@ function LobbyPage() {
     updateSelectedProblems(newProblems);
   };
 
-  /**
-   * Update the list of selected tags
-   */
-  const updateSelectedTags = (newTags: ProblemTag[]) => {
-    setError('');
-    setLoading(true);
-
-    const prevTags = selectedTags;
-    setSelectedTags(newTags);
-
-    const settings = {
-      initiator: currentUser!,
-      tags: newTags,
-    };
-
-    updateRoomSettings(currentRoomId, settings)
-      .then(() => setLoading(false))
-      .catch((err) => {
-        setLoading(false);
-        setError(err.message);
-        setSelectedTags(prevTags);
-      });
-  };
-
   const addTag = (newTag: ProblemTag) => {
     const newTags = [...selectedTags, newTag];
-    updateSelectedTags(newTags);
+    setSelectedTags(newTags);
   };
 
   const removeTag = (index: number) => {
     const newTags = selectedTags.filter((_, i) => i !== index);
-    updateSelectedTags(newTags);
+    setSelectedTags(newTags);
   };
 
   const onSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {

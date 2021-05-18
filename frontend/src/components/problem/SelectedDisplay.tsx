@@ -85,7 +85,7 @@ export function SelectedTagsDisplay(props: SelectedTagsDisplayProps) {
         </ProblemDisplay>
       ))}
 
-      { !tags.length ? <p>Selected problems will show here.</p> : null }
+      { !tags.length ? <p>Selected tags will show here.</p> : null }
     </Content>
   );
 }
