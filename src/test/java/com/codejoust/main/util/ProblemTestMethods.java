@@ -4,9 +4,11 @@ import com.codejoust.main.dto.problem.CreateProblemRequest;
 import com.codejoust.main.dto.problem.CreateTestCaseRequest;
 import com.codejoust.main.dto.problem.ProblemDto;
 import com.codejoust.main.dto.problem.ProblemInputDto;
+import com.codejoust.main.dto.problem.ProblemTagDto;
 import com.codejoust.main.dto.problem.ProblemTestCaseDto;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
+import com.codejoust.main.model.problem.ProblemTag;
 import com.codejoust.main.service.SubmitService;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -29,6 +31,7 @@ public class ProblemTestMethods {
     private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
     private static final String POST_TEST_CASE_CREATE = "/api/v1/problems/%s/test-case";
     private static final String PUT_PROBLEM_EDIT = "/api/v1/problems/%s";
+    private static final String POST_PROBLEM_TAG_CREATE = "/api/v1/problems/tags";
 
     private static final String NAME = "Sort an Array";
     private static final String DESCRIPTION = "Sort an array from lowest to highest value.";
@@ -124,5 +127,80 @@ public class ProblemTestMethods {
         assertTrue(problemDto.getApproval());
 
         return problemDto;
+    }
+
+    /**
+     * Helper method that sends a POST request to create a new problem,
+     * then edits the problem to add a tag
+     * @return the problem with tags
+     * @throws Exception if anything wrong occurs
+     */
+    public static ProblemDto createSingleProblemAndTags(MockMvc mockMvc) throws Exception {
+        CreateProblemRequest createProblemRequest = new CreateProblemRequest();
+        createProblemRequest.setName(NAME);
+        createProblemRequest.setDescription(DESCRIPTION);
+        createProblemRequest.setDifficulty(ProblemDifficulty.EASY);
+
+        List<ProblemInputDto> problemInputs = new ArrayList<>();
+        ProblemInputDto problemInput = new ProblemInputDto(INPUT_NAME, IO_TYPE);
+        problemInputs.add(problemInput);
+        createProblemRequest.setProblemInputs(problemInputs);
+        createProblemRequest.setOutputType(IO_TYPE);
+
+        MvcResult problemResult = mockMvc.perform(post(POST_PROBLEM_CREATE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(createProblemRequest)))
+                .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        String problemJsonResponse = problemResult.getResponse().getContentAsString();
+        ProblemDto problemActual = UtilityTestMethods.toObject(problemJsonResponse, ProblemDto.class);
+
+        assertEquals(NAME, problemActual.getName());
+        assertEquals(DESCRIPTION, problemActual.getDescription());
+        assertEquals(createProblemRequest.getDifficulty(), problemActual.getDifficulty());
+        assertEquals(problemInputs, problemActual.getProblemInputs());
+        assertEquals(IO_TYPE, problemActual.getOutputType());
+
+        ProblemTagDto problemTag = new ProblemTagDto();
+        problemTag.setName(TestFields.TAG_NAME);
+        problemTag.setTagId(TestFields.TAG_ID);
+        problemActual.setProblemTags(Collections.singletonList(problemTag));
+
+        MvcResult problemResult2 = mockMvc.perform(post(PUT_PROBLEM_EDIT)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(problemActual)))
+                .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        String problemJsonResponse2 = problemResult2.getResponse().getContentAsString();
+        ProblemDto problemActual2 = UtilityTestMethods.toObject(problemJsonResponse2, ProblemDto.class);
+
+        return problemActual2;
+    }
+
+    /**
+     * Helper method that sends a POST request to create a new problem tag
+     * @return the problem tag
+     * @throws Exception if anything wrong occurs
+     */
+    public static ProblemTagDto createSingleProblemTag(MockMvc mockMvc) throws Exception {
+        ProblemTag problemTag = new ProblemTag();
+        problemTag.setName(TestFields.TAG_NAME);
+        problemTag.setTagId(TestFields.TAG_ID);
+
+        MvcResult problemTagResult = mockMvc.perform(post(POST_PROBLEM_TAG_CREATE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(problemTag)))
+                .andDo(print()).andExpect(status().isCreated())
+                .andReturn();
+
+        String problemTagJsonResponse = problemTagResult.getResponse().getContentAsString();
+        ProblemTagDto problemTagActual = UtilityTestMethods.toObject(problemTagJsonResponse, ProblemTagDto.class);
+
+        assertEquals(problemTag.getName(), problemTagActual.getName());
+        assertEquals(problemTag.getTagId(), problemTagActual.getTagId());
+
+        return problemTagActual;
     }
 }

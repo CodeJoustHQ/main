@@ -98,7 +98,7 @@ public class ProblemController extends BaseRestController {
 
     @PostMapping("/problems/tags")
     public ResponseEntity<ProblemTagDto> createProblemTag(@RequestBody CreateProblemTagRequest request) {
-        return new ResponseEntity<>(service.createProblemTag(request), HttpStatus.OK);
+        return new ResponseEntity<>(service.createProblemTag(request), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/problems/tags/{tagId}")

@@ -757,8 +757,9 @@ public class ProblemServiceTests {
     public void deleteProblemTagSuccess() {
         /**
          * 1. Create a problem tag.
-         * 2. Mock repository return and verify that tag
-         * is returned with "getAllProblemTags."
+         * 2. Mock repository return to return problem tag.
+         * 3. Delete problem tag and verify delete is called and method
+         * returns properly.
          */
 
         ProblemTag problemTag = new ProblemTag();
@@ -768,6 +769,7 @@ public class ProblemServiceTests {
         Mockito.doReturn(problemTag).when(tagRepository).findTagByTagId(problemTag.getTagId());
 
         ProblemTagDto problemTagDto = problemService.deleteProblemTag(problemTag.getTagId());
+        verify(tagRepository).delete(Mockito.any(ProblemTag.class));
         assertEquals(problemTag.getName(), problemTagDto.getName());
     }
 }

@@ -24,6 +24,10 @@ public class TestUrls {
     private static final String POST_TEST_CASE_CREATE = "/api/v1/problems/%s/test-case";
     private static final String PUT_PROBLEM_EDIT = "/api/v1/problems/%s";
     private static final String DELETE_PROBLEM = "/api/v1/problems/%s";
+    private static final String GET_PROBLEMS_WITH_TAG = "/api/v1/problems/tags/%s";
+    private static final String GET_PROBLEM_TAG_ALL = "/api/v1/problems/tags";
+    private static final String POST_PROBLEM_TAG = "/api/v1/problems/tags";
+    private static final String DELETE_PROBLEM_TAG = "/api/v1/problems/tags/%s";
 
     private static final String USER = "/api/v1/user";
     private static final String GET_INSTANT = "/api/v1/get-instant";
@@ -107,6 +111,22 @@ public class TestUrls {
 
     public static String deleteProblem(String problemId) {
         return String.format(DELETE_PROBLEM, problemId);
+    }
+
+    public static String getProblemsWithTag(String tagId) {
+        return String.format(GET_PROBLEMS_WITH_TAG, tagId);
+    }
+
+    public static String getAllProblemTags() {
+        return GET_PROBLEM_TAG_ALL;
+    }
+
+    public static String createProblemTag() {
+        return POST_PROBLEM_TAG;
+    }
+
+    public static String deleteProblemTag(String tagId) {
+        return String.format(DELETE_PROBLEM_TAG, tagId);
     }
 
     public static String user() {

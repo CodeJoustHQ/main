@@ -12,6 +12,7 @@ import com.codejoust.main.dto.problem.CreateProblemRequest;
 import com.codejoust.main.dto.problem.CreateTestCaseRequest;
 import com.codejoust.main.dto.problem.ProblemDto;
 import com.codejoust.main.dto.problem.ProblemInputDto;
+import com.codejoust.main.dto.problem.ProblemTagDto;
 import com.codejoust.main.dto.problem.ProblemTestCaseDto;
 import com.codejoust.main.exception.ProblemError;
 import com.codejoust.main.exception.api.ApiError;
@@ -437,5 +438,51 @@ class ProblemTests {
 
         ApiErrorResponse actual = MockHelper.getRequest(this.mockMvc, TestUrls.getDefaultCode("999999"), ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void getProblemsWithTagSuccess() throws Exception {
+        /**
+         * 1. Create a problem with tags.
+         * 2. Perform the GET request and verify the result is correct.
+         */
+
+        ProblemDto problemDto = ProblemTestMethods.createSingleProblemAndTags(this.mockMvc);
+
+        List<ProblemDto> problems = MockHelper.getRequest(this.mockMvc, TestUrls.getProblemsWithTag(TestFields.TAG_ID), List.class, HttpStatus.OK);
+
+        assertEquals(1, problems.size());
+        assertEquals(problemDto.getName(), problems.get(0).getName());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void getAllProblemTagsSuccess() throws Exception {
+        /**
+         * 1. Create a problem tag.
+         * 2. Perform the GET request and verify the result is correct.
+         */
+
+        ProblemTagDto problemTag = ProblemTestMethods.createSingleProblemTag(this.mockMvc);
+
+        List<ProblemTagDto> problemTags = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblemTags(), List.class, HttpStatus.OK);
+
+        assertEquals(1, problemTags.size());
+        assertEquals(problemTag.getName(), problemTags.get(0).getName());
+    }
+
+    @Test
+    public void deleteProblemTagSuccess() throws Exception {
+        /**
+         * 1. Create a problem tag.
+         * 2. Perform the DELETE request and verify the result is correct.
+         */
+
+        ProblemTagDto problemTag = ProblemTestMethods.createSingleProblemTag(this.mockMvc);
+
+        ProblemTagDto problemTagReturn = MockHelper.getRequest(this.mockMvc, TestUrls.deleteProblemTag(problemTag.getTagId()), ProblemTagDto.class, HttpStatus.OK);
+
+        assertEquals(problemTag.getName(), problemTagReturn.getName());
     }
 }
