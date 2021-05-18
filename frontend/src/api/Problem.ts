@@ -82,6 +82,11 @@ export type DefaultCodeType = {
   [language in Language]: string
 };
 
+export type ProblemTag = {
+  name: string,
+  tagId?: string,
+};
+
 const basePath = '/api/v1/problems';
 const routes = {
   getProblems: `${basePath}/`,
@@ -93,6 +98,10 @@ const routes = {
   deleteProblem: (problemId: string) => `${basePath}/${problemId}`,
   createTestCase: (problemId: string) => `${basePath}/${problemId}/test-case`,
   defaultCodeMap: (problemId: string) => `${basePath}/${problemId}/default-code`,
+  getProblemsWithTag: (tagId: string) => `${basePath}/tags/${tagId}`,
+  getAllProblemTags: `${basePath}/tags`,
+  createProblemTag: `${basePath}/tags`,
+  deleteProblemTag: (tagId: string) => `${basePath}/tags/${tagId}`,
 };
 
 export const getProblems = (approved?: boolean): Promise<Problem[]> => axios
@@ -176,6 +185,34 @@ export const sendAccessProblemPartial = (
 
 export const getDefaultCodeMap = (problemId: string): Promise<DefaultCodeType> => axios
   .get<DefaultCodeType>(routes.defaultCodeMap(problemId))
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const getProblemsWithTag = (tagId: string): Promise<Problem[]> => axios
+  .get<Problem[]>(routes.getProblemsWithTag(tagId))
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const getAllProblemTags = (): Promise<ProblemTag[]> => axios
+  .get<ProblemTag[]>(routes.getAllProblemTags)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const createProblemTag = (problemTag: ProblemTag): Promise<ProblemTag> => axios
+  .post<ProblemTag>(routes.createProblemTag, problemTag)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const deleteProblemTag = (tagId: string): Promise<ProblemTag> => axios
+  .post<ProblemTag>(routes.deleteProblemTag(tagId))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

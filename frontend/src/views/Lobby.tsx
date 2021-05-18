@@ -42,8 +42,8 @@ import { Slider, SliderContainer } from '../components/core/RangeSlider';
 import { Coordinate } from '../components/special/FloatingCircle';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
 import { SelectableProblem } from '../api/Problem';
-import ProblemSelector from '../components/problem/ProblemSelector';
-import SelectedProblemsDisplay from '../components/problem/SelectedProblemsDisplay';
+import { ProblemSelector } from '../components/problem/Selector';
+import SelectedProblemsDisplay from '../components/problem/SelectedDisplay';
 
 type LobbyPageLocation = {
   user: User,
