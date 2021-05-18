@@ -12,6 +12,7 @@ const ToggleButtonLabel = styled.label`
 
 type CheckboxProps = {
   checked: boolean,
+  editable: boolean,
 };
 
 const ToggleButtonInput = styled.input.attrs((props: CheckboxProps) => ({
@@ -22,7 +23,7 @@ const ToggleButtonInput = styled.input.attrs((props: CheckboxProps) => ({
 const ToggleButtonSpan = styled.span<CheckboxProps>`
   background-color: ${({ theme, checked }) => (checked ? theme.colors.sliderBlue : theme.colors.sliderGray)};
   position: absolute;
-  cursor: pointer;
+  cursor: ${({ editable }) => (editable ? 'pointer' : 'default')};;
   top: 0;
   left: 0;
   right: 0;
@@ -53,16 +54,19 @@ const ToggleButtonSpan = styled.span<CheckboxProps>`
 type ToggleButtonParams = {
   onChangeFunction: () => void,
   checked: boolean,
+  editable: boolean,
 };
 
 const ToggleButton = (params: ToggleButtonParams) => (
   <ToggleButtonLabel>
     <ToggleButtonInput
-      onChange={() => params.onChangeFunction()}
+      onChange={() => (params.editable ? params.onChangeFunction() : '')}
       checked={params.checked}
+      editable={params.editable}
     />
     <ToggleButtonSpan
       checked={params.checked}
+      editable={params.editable}
     />
   </ToggleButtonLabel>
 );

@@ -35,8 +35,8 @@ public class Main {
 		InputStream stream = new ByteArrayInputStream(keyfile.getBytes(StandardCharsets.UTF_8));
 		try {
 			FirebaseOptions options = FirebaseOptions.builder()
-					.setCredentials(GoogleCredentials.fromStream(stream))
-					.build();
+				.setCredentials(GoogleCredentials.fromStream(stream))
+				.build();
 
 			FirebaseApp.initializeApp(options);
 		} catch (IOException e) {

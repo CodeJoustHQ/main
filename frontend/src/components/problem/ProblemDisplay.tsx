@@ -472,7 +472,8 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             show={editMode}
           >
             <ToggleButton
-              onChangeFunction={() => (problemEditable ? handleApprovalChange(!newProblem.approval) : '')}
+              onChangeFunction={() => handleApprovalChange(!newProblem.approval)}
+              editable={problemEditable}
               checked={newProblem.approval}
             />
             <ApprovalText>
