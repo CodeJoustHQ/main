@@ -125,7 +125,8 @@ export const createProblem = (problem: Problem, token: string): Promise<Problem>
     throw axiosErrorHandler(err);
   });
 
-export const editProblem = (problemId: string, updatedProblem: Problem, token: string): Promise<Problem> => axios
+export const editProblem = (problemId: string,
+  updatedProblem: Problem, token: string): Promise<Problem> => axios
   .put<Problem>(routes.editProblem(problemId), updatedProblem, getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {

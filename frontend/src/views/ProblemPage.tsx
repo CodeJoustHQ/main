@@ -41,12 +41,9 @@ function ProblemPage() {
           testCase.id = generateRandomId();
         });
         setProblem(res);
-        setLoading(false);
       })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
   }, [params]);
 
   if (!problem) {
@@ -57,10 +54,15 @@ function ProblemPage() {
   }
 
   const handleEdit = (newProblem: Problem) => {
+    if (!token) {
+      setError('An error occurred fetching your credentials; '
+        + 'please try again in a few seconds or refresh the page.');
+      return;
+    }
+
     setLoading(true);
     setError('');
-
-    editProblem(newProblem.problemId, newProblem, token || '')
+    editProblem(newProblem.problemId, newProblem, token!)
       .then((res) => {
         setProblem(res);
         setLoading(false);

@@ -26,14 +26,9 @@ function AllProblemsPage() {
   useEffect(() => {
     setLoading(true);
     getProblems()
-      .then((res) => {
-        setProblems(res);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+      .then((res) => setProblems(res))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
   }, []);
 
   const redirect = (problemId: string) => {
