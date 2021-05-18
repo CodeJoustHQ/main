@@ -41,7 +41,7 @@ import { FlexBareContainer } from '../components/core/Container';
 import { Slider, SliderContainer } from '../components/core/RangeSlider';
 import { Coordinate } from '../components/special/FloatingCircle';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
-import { ProblemTag, SelectableProblem } from '../api/Problem';
+import { getAllProblemTags, ProblemTag, SelectableProblem } from '../api/Problem';
 import { ProblemSelector, TagSelector } from '../components/problem/Selector';
 import { SelectedProblemsDisplay, SelectedTagsDisplay } from '../components/problem/SelectedDisplay';
 
@@ -147,6 +147,7 @@ function LobbyPage() {
   const [duration, setDuration] = useState<number | undefined>(15);
   const [selectedProblems, setSelectedProblems] = useState<SelectableProblem[]>([]);
   const [selectedTags, setSelectedTags] = useState<ProblemTag[]>([]);
+  const [allTags, setAllTags] = useState<ProblemTag[]>([]);
   const [size, setSize] = useState<number | undefined>(10);
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
@@ -529,6 +530,16 @@ function LobbyPage() {
   }, [setMousePosition]);
 
   useEffect(() => {
+    getAllProblemTags()
+      .then((res) => {
+        setAllTags(res);
+      })
+      .catch((err) => {
+        setError(err.message);
+      });
+  }, []);
+
+  useEffect(() => {
     window.onmousemove = mouseMoveHandler;
   }, [mouseMoveHandler]);
 
@@ -702,6 +713,7 @@ function LobbyPage() {
             />
             {isHost(currentUser) ? (
               <TagSelector
+                tags={allTags}
                 selectedTags={selectedTags}
                 onSelect={addTag}
               />

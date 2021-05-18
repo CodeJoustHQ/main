@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { getAllProblemTags, ProblemTag, SelectableProblem } from '../../api/Problem';
+import { ProblemTag, SelectableProblem } from '../../api/Problem';
 import { InlineDifficultyDisplayButton } from '../core/Button';
 import { displayNameFromDifficulty } from '../../api/Difficulty';
 import { TextInput } from '../core/Input';
-import ErrorMessage from '../core/Error';
 
 type SelectedProblemsDisplayProps = {
   problems: SelectableProblem[],
@@ -98,20 +97,14 @@ export function SelectedTagsDisplay(props: SelectedTagsDisplayProps) {
   );
 }
 
-export function FilterAllTagsDisplay() {
-  const [searchText, setSearchText] = useState('');
-  const [tags, setTags] = useState<ProblemTag[]>([]);
-  const [error, setError] = useState('');
+type TagProps = {
+  tags: ProblemTag[],
+};
 
-  useEffect(() => {
-    getAllProblemTags()
-      .then((res) => {
-        setTags(res);
-      })
-      .catch((err) => {
-        setError(err.message);
-      });
-  }, []);
+export function FilterAllTagsDisplay(props: TagProps) {
+  const { tags } = props;
+
+  const [searchText, setSearchText] = useState('');
 
   const setSearchStatus = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);
@@ -137,8 +130,6 @@ export function FilterAllTagsDisplay() {
           </ProblemDisplay>
         );
       })}
-
-      { error ? <ErrorMessage message={error} /> : null }
     </Content>
   );
 }

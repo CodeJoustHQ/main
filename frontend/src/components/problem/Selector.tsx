@@ -1,11 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import {
-  getAllProblemTags,
-  getProblems,
-  ProblemTag,
-  SelectableProblem,
-} from '../../api/Problem';
+import { getProblems, ProblemTag, SelectableProblem } from '../../api/Problem';
 import ErrorMessage from '../core/Error';
 import { displayNameFromDifficulty } from '../../api/Difficulty';
 import { InlineDifficultyDisplayButton } from '../core/Button';
@@ -17,6 +12,7 @@ type ProblemSelectorProps = {
 };
 
 type TagSelectorProps = {
+  tags: ProblemTag[],
   selectedTags: ProblemTag[],
   onSelect: (newlySelected: ProblemTag) => void,
 };
@@ -157,10 +153,8 @@ export function ProblemSelector(props: ProblemSelectorProps) {
 }
 
 export function TagSelector(props: TagSelectorProps) {
-  const { selectedTags, onSelect } = props;
+  const { tags, selectedTags, onSelect } = props;
 
-  const [error, setError] = useState('');
-  const [tags, setTags] = useState<ProblemTag[]>([]);
   const [showTags, setShowTags] = useState(false);
   const [searchText, setSearchText] = useState('');
 
@@ -177,16 +171,6 @@ export function TagSelector(props: TagSelectorProps) {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [ref]);
-
-  useEffect(() => {
-    getAllProblemTags()
-      .then((res) => {
-        setTags(res);
-      })
-      .catch((err) => {
-        setError(err.message);
-      });
-  }, []);
 
   const setSelectedStatus = (index: number) => {
     setShowTags(false);
@@ -228,8 +212,6 @@ export function TagSelector(props: TagSelectorProps) {
           );
         })}
       </InnerContent>
-
-      { error ? <ErrorMessage message={error} /> : null }
     </Content>
   );
 }

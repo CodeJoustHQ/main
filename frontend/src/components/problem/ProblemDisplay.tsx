@@ -1,10 +1,12 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import MarkdownEditor from 'rich-markdown-editor';
 import {
+  createProblemTag,
   deleteProblem,
+  getAllProblemTags,
   Problem,
   ProblemIOType,
   problemIOTypeToString,
@@ -154,6 +156,11 @@ const DeleteButton = styled(PrimaryButton)`
   background: ${({ theme }) => theme.colors.white};
 `;
 
+const LargeTextInput = styled(TextInput)`
+  width: 40%;
+  margin: 5px 0;
+`;
+
 type ProblemDisplayParams = {
   problem: Problem,
   actionText: string,
@@ -181,6 +188,18 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
   const [tagModal, setTagModal] = useState<boolean>(false);
+  const [tagName, setTagName] = useState('');
+  const [allTags, setAllTags] = useState<ProblemTag[]>([]);
+
+  useEffect(() => {
+    getAllProblemTags()
+      .then((res) => {
+        setAllTags(res);
+      })
+      .catch((err) => {
+        setError(err.message);
+      });
+  }, []);
 
   // Get current mouse position.
   const mouseMoveHandler = useCallback((e: any) => {
@@ -318,6 +337,27 @@ function ProblemDisplay(props: ProblemDisplayParams) {
     setNewProblem({
       ...newProblem,
       testCases: newProblem.testCases.filter((_, i) => index !== i),
+    });
+  };
+
+  // Make request to create a new tag, refresh tag list
+  const createNewTag = (newTagName: string) => {
+    const tag: ProblemTag = {
+      name: newTagName,
+    };
+    setLoading(true);
+    createProblemTag(tag).then(() => {
+      // If the tag was created, refresh all problem tags.
+      getAllProblemTags().then((allProblemTags) => {
+        setAllTags(allProblemTags);
+        setError('');
+      }).catch((err) => {
+        setError(err.message);
+      });
+    }).catch((err) => {
+      setError(err.message);
+    }).finally(() => {
+      setLoading(false);
     });
   };
 
@@ -517,6 +557,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             onRemove={removeTag}
           />
           <TagSelector
+            tags={allTags}
             selectedTags={newProblem.problemTags}
             onSelect={addTag}
           />
@@ -527,7 +568,22 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           </GrayTextButton>
           <Modal show={tagModal} onExit={() => setTagModal(false)} fullScreen>
             <LowMarginMediumText>Create New Tag</LowMarginMediumText>
-            <FilterAllTagsDisplay />
+            <LargeTextInput
+              value={tagName}
+              placeholder="Enter new tag name"
+              onChange={(e) => setTagName(e.target.value)}
+            />
+            <SmallButton
+              onClick={() => createNewTag(tagName)}
+            >
+              Create Tag
+            </SmallButton>
+            {loading ? <Loading /> : null}
+            {error ? <ErrorMessage message={error} /> : null}
+            <LowMarginMediumText>Filter Tags</LowMarginMediumText>
+            <FilterAllTagsDisplay
+              tags={allTags}
+            />
           </Modal>
 
           <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
