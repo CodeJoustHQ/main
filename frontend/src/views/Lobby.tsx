@@ -41,9 +41,9 @@ import { FlexBareContainer } from '../components/core/Container';
 import { Slider, SliderContainer } from '../components/core/RangeSlider';
 import { Coordinate } from '../components/special/FloatingCircle';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
-import { SelectableProblem } from '../api/Problem';
-import { ProblemSelector } from '../components/problem/Selector';
-import SelectedProblemsDisplay from '../components/problem/SelectedDisplay';
+import { ProblemTag, SelectableProblem } from '../api/Problem';
+import { ProblemSelector, TagSelector } from '../components/problem/Selector';
+import { SelectedProblemsDisplay, SelectedTagsDisplay } from '../components/problem/SelectedDisplay';
 
 type LobbyPageLocation = {
   user: User,
@@ -146,6 +146,7 @@ function LobbyPage() {
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [duration, setDuration] = useState<number | undefined>(15);
   const [selectedProblems, setSelectedProblems] = useState<SelectableProblem[]>([]);
+  const [selectedTags, setSelectedTags] = useState<ProblemTag[]>([]);
   const [size, setSize] = useState<number | undefined>(10);
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
@@ -370,6 +371,40 @@ function LobbyPage() {
   const removeProblem = (index: number) => {
     const newProblems = selectedProblems.filter((_, i) => i !== index);
     updateSelectedProblems(newProblems);
+  };
+
+  /**
+   * Update the list of selected tags
+   */
+  const updateSelectedTags = (newTags: ProblemTag[]) => {
+    setError('');
+    setLoading(true);
+
+    const prevTags = selectedTags;
+    setSelectedTags(newTags);
+
+    const settings = {
+      initiator: currentUser!,
+      tags: newTags,
+    };
+
+    updateRoomSettings(currentRoomId, settings)
+      .then(() => setLoading(false))
+      .catch((err) => {
+        setLoading(false);
+        setError(err.message);
+        setSelectedTags(prevTags);
+      });
+  };
+
+  const addTag = (newTag: ProblemTag) => {
+    const newTags = [...selectedTags, newTag];
+    updateSelectedTags(newTags);
+  };
+
+  const removeTag = (index: number) => {
+    const newTags = selectedTags.filter((_, i) => i !== index);
+    updateSelectedTags(newTags);
   };
 
   const onSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -683,6 +718,18 @@ function LobbyPage() {
                 );
               })}
             </DifficultyContainer>
+
+            <NoMarginMediumText>Selected Tags</NoMarginMediumText>
+            <SelectedTagsDisplay
+              tags={selectedTags}
+              onRemove={isHost(currentUser) ? removeTag : null}
+            />
+            {isHost(currentUser) ? (
+              <TagSelector
+                selectedTags={selectedTags}
+                onSelect={addTag}
+              />
+            ) : null}
 
             <NoMarginMediumText>Selected Problems</NoMarginMediumText>
             <SelectedProblemsDisplay

@@ -1,11 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
-import { SelectableProblem } from '../../api/Problem';
+import { ProblemTag, SelectableProblem } from '../../api/Problem';
 import { InlineDifficultyDisplayButton } from '../core/Button';
 import { displayNameFromDifficulty } from '../../api/Difficulty';
 
 type SelectedProblemsDisplayProps = {
   problems: SelectableProblem[],
+  onRemove: ((index: number) => void) | null,
+}
+
+type SelectedTagsDisplayProps = {
+  tags: ProblemTag[],
   onRemove: ((index: number) => void) | null,
 }
 
@@ -40,7 +45,7 @@ const RemoveText = styled.p`
   }
 `;
 
-function SelectedProblemsDisplay(props: SelectedProblemsDisplayProps) {
+export function SelectedProblemsDisplay(props: SelectedProblemsDisplayProps) {
   const { problems, onRemove } = props;
 
   return (
@@ -66,4 +71,21 @@ function SelectedProblemsDisplay(props: SelectedProblemsDisplayProps) {
   );
 }
 
-export default SelectedProblemsDisplay;
+export function SelectedTagsDisplay(props: SelectedTagsDisplayProps) {
+  const { tags, onRemove } = props;
+
+  return (
+    <Content>
+      {tags.map((tag, index) => (
+        <ProblemDisplay key={tag.tagId}>
+          <ProblemName>
+            {tag.name}
+          </ProblemName>
+          {onRemove ? <RemoveText onClick={() => onRemove(index)}>✕</RemoveText> : null}
+        </ProblemDisplay>
+      ))}
+
+      { !tags.length ? <p>Selected problems will show here.</p> : null }
+    </Content>
+  );
+}

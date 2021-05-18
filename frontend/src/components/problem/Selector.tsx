@@ -1,6 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { getProblems, SelectableProblem } from '../../api/Problem';
+import {
+  getAllProblemTags,
+  getProblems,
+  ProblemTag,
+  SelectableProblem,
+} from '../../api/Problem';
 import ErrorMessage from '../core/Error';
 import { displayNameFromDifficulty } from '../../api/Difficulty';
 import { InlineDifficultyDisplayButton } from '../core/Button';
@@ -12,8 +17,8 @@ type ProblemSelectorProps = {
 };
 
 type TagSelectorProps = {
-  selectedTags: SelectableProblem[],
-  onSelect: (newlySelected: SelectableProblem) => void,
+  selectedTags: ProblemTag[],
+  onSelect: (newlySelected: ProblemTag) => void,
 };
 
 type ContentProps = {
@@ -151,12 +156,12 @@ export function ProblemSelector(props: ProblemSelectorProps) {
   );
 }
 
-export function TagSelector(props: ProblemSelectorProps) {
-  const { selectedProblems, onSelect } = props;
+export function TagSelector(props: TagSelectorProps) {
+  const { selectedTags, onSelect } = props;
 
   const [error, setError] = useState('');
-  const [problems, setProblems] = useState<SelectableProblem[]>([]);
-  const [showProblems, setShowProblems] = useState(false);
+  const [tags, setTags] = useState<ProblemTag[]>([]);
+  const [showTags, setShowTags] = useState(false);
   const [searchText, setSearchText] = useState('');
 
   const ref = useRef<HTMLDivElement>(null);
@@ -165,7 +170,7 @@ export function TagSelector(props: ProblemSelectorProps) {
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (ref.current && !ref.current!.contains(e.target as Node)) {
-        setShowProblems(false);
+        setShowTags(false);
       }
     };
 
@@ -174,9 +179,9 @@ export function TagSelector(props: ProblemSelectorProps) {
   }, [ref]);
 
   useEffect(() => {
-    getProblems(true)
+    getAllProblemTags()
       .then((res) => {
-        setProblems(res);
+        setTags(res);
       })
       .catch((err) => {
         setError(err.message);
@@ -184,8 +189,8 @@ export function TagSelector(props: ProblemSelectorProps) {
   }, []);
 
   const setSelectedStatus = (index: number) => {
-    setShowProblems(false);
-    onSelect(problems[index]);
+    setShowTags(false);
+    onSelect(tags[index]);
   };
 
   const setSearchStatus = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -195,37 +200,30 @@ export function TagSelector(props: ProblemSelectorProps) {
   return (
     <Content>
       <ProblemSearch
-        onClick={() => setShowProblems(!showProblems)}
+        onClick={() => setShowTags(!showTags)}
         onChange={setSearchStatus}
-        placeholder={problems.length ? 'Select problems (optional)' : 'Loading...'}
+        placeholder={tags.length ? 'Select tags (optional)' : 'Loading...'}
       />
 
-      <InnerContent show={showProblems} ref={ref}>
-        {problems.map((problem, index) => {
-          // Only show problems that haven't been selected yet
-          if (selectedProblems.some((p) => p.problemId === problem.problemId)) {
+      <InnerContent show={showTags} ref={ref}>
+        {tags.map((tag, index) => {
+          // Only show tags that haven't been selected yet
+          if (selectedTags.some((t) => t.tagId === tag.tagId)) {
             return null;
           }
 
-          if (searchText && !problem.name.toLowerCase().includes(searchText.toLowerCase())) {
+          if (searchText && !tag.name.toLowerCase().includes(searchText.toLowerCase())) {
             return null;
           }
 
           return (
             <InlineProblem
-              key={problem.problemId}
+              key={tag.tagId}
               onClick={() => setSelectedStatus(index)}
             >
               <ProblemName>
-                {problem.name}
+                {tag.name}
               </ProblemName>
-              <ClickableInlineDifficultyDisplayButton
-                difficulty={problem.difficulty}
-                enabled={false}
-                active
-              >
-                {displayNameFromDifficulty(problem.difficulty)}
-              </ClickableInlineDifficultyDisplayButton>
             </InlineProblem>
           );
         })}
