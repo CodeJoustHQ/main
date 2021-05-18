@@ -83,7 +83,7 @@ public class ProblemService {
             }
         }
 
-        // Set the owner of this problem
+        // Set the owner of this problem (guaranteed to be non-null due to the verifyToken call)
         problem.setOwner(accountRepository.findAccountByUid(uid));
 
         repository.save(problem);

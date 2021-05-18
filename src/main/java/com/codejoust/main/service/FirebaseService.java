@@ -41,6 +41,7 @@ public class FirebaseService {
         return uid;
     }
 
+    // Verifies that the token decodes into the given UID, and triggers a request error otherwise
     public void verifyTokenMatchesUid(String token, String uid) {
         String decodedUid = verifyToken(token);
         if (!decodedUid.equals(uid)) {
