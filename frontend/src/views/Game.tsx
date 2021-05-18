@@ -6,6 +6,7 @@ import MarkdownEditor from 'rich-markdown-editor';
 import { useBeforeunload } from 'react-beforeunload';
 import { Message, Subscription } from 'stompjs';
 import copy from 'copy-to-clipboard';
+import { unwrapResult } from '@reduxjs/toolkit';
 import Editor from '../components/game/Editor';
 import { DefaultCodeType, getDefaultCodeMap, Problem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
@@ -45,7 +46,6 @@ import {
 import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { fetchGame, setGame } from '../redux/Game';
 import { setCurrentUser } from '../redux/User';
-import { unwrapResult } from '@reduxjs/toolkit';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
   margin-top: 15px;
@@ -142,7 +142,6 @@ function GamePage() {
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
   const setStateFromGame = (newGame: Game) => {
-    setGame(newGame);
     setRoomId(newGame.room.roomId);
     setPlayers(newGame.players);
     setGameTimer(newGame.gameTimer);
@@ -152,8 +151,7 @@ function GamePage() {
   };
 
   const dispatch = useAppDispatch();
-  const { game } = useAppSelector((state) => state);
-  const { currentUser } = useAppSelector((state) => state);
+  const { currentUser, game } = useAppSelector((state) => state);
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
     code: string, language: Language) => {
@@ -189,6 +187,7 @@ function GamePage() {
       setFullPageLoading(false);
       setStateFromGame(game);
 
+      // If default code list is empty and current user is loaded, fetch the code from the backend
       if (!defaultCodeList.length && currentUser) {
         let matchFound = false;
 

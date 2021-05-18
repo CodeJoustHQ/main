@@ -9,10 +9,7 @@ import { Account } from '../api/Account';
  * https://firebase.google.com/docs/reference/js/firebase.User
  */
 export type FirebaseUserType = {
-  displayName: string,
   email: string,
-  emailVerified: boolean,
-  refreshToken: string,
   uid: string,
 }
 
@@ -22,7 +19,7 @@ export type AccountType = {
   token: string | null,
 };
 
-const initialState = { firebaseUser: null, token: null } as AccountType;
+const initialState = { firebaseUser: null, account: null, token: null } as AccountType;
 
 const accountSlice = createSlice({
   name: 'account',
