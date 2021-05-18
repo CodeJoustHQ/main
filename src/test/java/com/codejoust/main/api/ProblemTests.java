@@ -40,12 +40,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.log4j.Log4j2;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+@Log4j2
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -456,20 +459,29 @@ class ProblemTests {
         assertEquals(problemDto.getName(), problems.get(0).getName());
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void getAllProblemTagsSuccess() throws Exception {
         /**
          * 1. Create a problem tag.
-         * 2. Perform the GET request and verify the result is correct.
+         * 2. Perform the GET request and convert the result using type token.
+         * - This is necessary for the inner type conversion.
+         * 3. Verify the correct response and equality.
          */
 
         ProblemTagDto problemTag = ProblemTestMethods.createSingleProblemTag(this.mockMvc);
 
-        List<ProblemTagDto> problemTags = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblemTags(), List.class, HttpStatus.OK);
+        // After creating two problems, check that the GET request finds them all
+        MvcResult result = this.mockMvc.perform(get(TestUrls.getAllProblemTags()))
+            .andDo(print()).andExpect(status().isOk())
+            .andReturn();
 
-        assertEquals(1, problemTags.size());
-        assertEquals(problemTag.getName(), problemTags.get(0).getName());
+        // Special conversion process for lists of generic type
+        String jsonResponse = result.getResponse().getContentAsString();
+        Type listType = new TypeToken<ArrayList<ProblemTagDto>>(){}.getType();
+        List<ProblemTagDto> problemTagResult = new Gson().fromJson(jsonResponse, listType);
+
+        assertEquals(1, problemTagResult.size());
+        assertEquals(problemTag, problemTagResult.get(0));
     }
 
     @Test

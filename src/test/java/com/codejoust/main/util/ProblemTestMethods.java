@@ -167,10 +167,10 @@ public class ProblemTestMethods {
         problemTag.setTagId(TestFields.TAG_ID);
         problemActual.setProblemTags(Collections.singletonList(problemTag));
 
-        MvcResult problemResult2 = mockMvc.perform(post(PUT_PROBLEM_EDIT)
+        MvcResult problemResult2 = mockMvc.perform(put(String.format(PUT_PROBLEM_EDIT, problemActual.getProblemId()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(problemActual)))
-                .andDo(print()).andExpect(status().isCreated())
+                .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
         String problemJsonResponse2 = problemResult2.getResponse().getContentAsString();
@@ -187,7 +187,6 @@ public class ProblemTestMethods {
     public static ProblemTagDto createSingleProblemTag(MockMvc mockMvc) throws Exception {
         ProblemTag problemTag = new ProblemTag();
         problemTag.setName(TestFields.TAG_NAME);
-        problemTag.setTagId(TestFields.TAG_ID);
 
         MvcResult problemTagResult = mockMvc.perform(post(POST_PROBLEM_TAG_CREATE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -199,7 +198,6 @@ public class ProblemTestMethods {
         ProblemTagDto problemTagActual = UtilityTestMethods.toObject(problemTagJsonResponse, ProblemTagDto.class);
 
         assertEquals(problemTag.getName(), problemTagActual.getName());
-        assertEquals(problemTag.getTagId(), problemTagActual.getTagId());
 
         return problemTagActual;
     }
