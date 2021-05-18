@@ -10,11 +10,13 @@ import java.util.stream.Collectors;
 import com.codejoust.main.dto.problem.ProblemDto;
 import com.codejoust.main.dto.problem.ProblemInputDto;
 import com.codejoust.main.dto.problem.ProblemMapper;
+import com.codejoust.main.dto.problem.ProblemTagDto;
 import com.codejoust.main.dto.problem.ProblemTestCaseDto;
 import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
 import com.codejoust.main.model.problem.ProblemInput;
+import com.codejoust.main.model.problem.ProblemTag;
 import com.codejoust.main.model.problem.ProblemTestCase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -88,5 +90,17 @@ public class ProblemMapperTests {
 
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getType(), actual.getType());
+    }
+
+    @Test
+    public void entityToProblemTagDto() {
+        ProblemTag expected = new ProblemTag();
+        expected.setName(TestFields.TAG_NAME);
+        expected.setTagId(TestFields.TAG_ID);
+
+        ProblemTagDto actual = ProblemMapper.toProblemTagDto(expected);
+
+        assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getTagId(), actual.getTagId());
     }
 }
