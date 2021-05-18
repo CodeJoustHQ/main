@@ -8,10 +8,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
  * https://firebase.google.com/docs/reference/js/firebase.User
  */
 export type AccountType = {
-  displayName: string,
   email: string,
-  emailVerified: boolean,
-  refreshToken: string,
   uid: string,
 }
 
