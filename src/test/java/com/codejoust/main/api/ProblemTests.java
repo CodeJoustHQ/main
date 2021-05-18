@@ -40,15 +40,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.extern.log4j.Log4j2;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-@Log4j2
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -443,20 +440,27 @@ class ProblemTests {
         assertEquals(ERROR.getResponse(), actual);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void getProblemsWithTagSuccess() throws Exception {
         /**
          * 1. Create a problem with tags.
-         * 2. Perform the GET request and verify the result is correct.
+         * 2. Perform the GET request and convert the result using type token.
+         * - This is necessary for the inner type conversion.
+         * 3. Verify the correct response and equality.
          */
 
         ProblemDto problemDto = ProblemTestMethods.createSingleProblemAndTags(this.mockMvc);
 
-        List<ProblemDto> problems = MockHelper.getRequest(this.mockMvc, TestUrls.getProblemsWithTag(TestFields.TAG_ID), List.class, HttpStatus.OK);
+        String tagId = problemDto.getProblemTags().get(0).getTagId();
+        MvcResult result = this.mockMvc.perform(get(TestUrls.getProblemsWithTag(tagId)))
+            .andDo(print()).andExpect(status().isOk())
+            .andReturn();
+        String jsonResponse = result.getResponse().getContentAsString();
+        Type listType = new TypeToken<ArrayList<ProblemDto>>(){}.getType();
+        List<ProblemDto> problemResult = new Gson().fromJson(jsonResponse, listType);
 
-        assertEquals(1, problems.size());
-        assertEquals(problemDto.getName(), problems.get(0).getName());
+        assertEquals(1, problemResult.size());
+        assertEquals(problemDto, problemResult.get(0));
     }
 
     @Test
@@ -470,12 +474,9 @@ class ProblemTests {
 
         ProblemTagDto problemTag = ProblemTestMethods.createSingleProblemTag(this.mockMvc);
 
-        // After creating two problems, check that the GET request finds them all
         MvcResult result = this.mockMvc.perform(get(TestUrls.getAllProblemTags()))
             .andDo(print()).andExpect(status().isOk())
             .andReturn();
-
-        // Special conversion process for lists of generic type
         String jsonResponse = result.getResponse().getContentAsString();
         Type listType = new TypeToken<ArrayList<ProblemTagDto>>(){}.getType();
         List<ProblemTagDto> problemTagResult = new Gson().fromJson(jsonResponse, listType);
@@ -493,8 +494,8 @@ class ProblemTests {
 
         ProblemTagDto problemTag = ProblemTestMethods.createSingleProblemTag(this.mockMvc);
 
-        ProblemTagDto problemTagReturn = MockHelper.getRequest(this.mockMvc, TestUrls.deleteProblemTag(problemTag.getTagId()), ProblemTagDto.class, HttpStatus.OK);
+        ProblemTagDto problemTagReturn = MockHelper.deleteRequest(this.mockMvc, TestUrls.deleteProblemTag(problemTag.getTagId()), null, ProblemTagDto.class, HttpStatus.OK);
 
-        assertEquals(problemTag.getName(), problemTagReturn.getName());
+        assertEquals(problemTag, problemTagReturn);
     }
 }
