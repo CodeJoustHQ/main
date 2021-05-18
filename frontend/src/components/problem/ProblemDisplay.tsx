@@ -43,8 +43,9 @@ import { FlexBareContainer } from '../core/Container';
 import { generateRandomId, validIdentifier } from '../../util/Utility';
 import { HoverTooltip } from '../core/HoverTooltip';
 import { Coordinate } from '../special/FloatingCircle';
-import { SelectedTagsDisplay } from './SelectedDisplay';
+import { FilterAllTagsDisplay, SelectedTagsDisplay } from './SelectedDisplay';
 import { TagSelector } from './Selector';
+import Modal from '../core/Modal';
 
 const MainContent = styled.div`
   text-align: left;
@@ -179,6 +180,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const [error, setError] = useState('');
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
+  const [tagModal, setTagModal] = useState<boolean>(false);
 
   // Get current mouse position.
   const mouseMoveHandler = useCallback((e: any) => {
@@ -518,6 +520,15 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             selectedTags={newProblem.problemTags}
             onSelect={addTag}
           />
+          <GrayTextButton
+            onClick={() => setTagModal(true)}
+          >
+            Create New Tag +
+          </GrayTextButton>
+          <Modal show={tagModal} onExit={() => setTagModal(false)} fullScreen>
+            <LowMarginMediumText>Create New Tag</LowMarginMediumText>
+            <FilterAllTagsDisplay />
+          </Modal>
 
           <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
           {newProblem.problemInputs.map((input, index) => (

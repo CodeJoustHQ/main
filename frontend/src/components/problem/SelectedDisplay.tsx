@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { ProblemTag, SelectableProblem } from '../../api/Problem';
+import { getAllProblemTags, ProblemTag, SelectableProblem } from '../../api/Problem';
 import { InlineDifficultyDisplayButton } from '../core/Button';
 import { displayNameFromDifficulty } from '../../api/Difficulty';
+import { TextInput } from '../core/Input';
+import ErrorMessage from '../core/Error';
 
 type SelectedProblemsDisplayProps = {
   problems: SelectableProblem[],
@@ -43,6 +45,12 @@ const RemoveText = styled.p`
   &:hover {
     cursor: pointer;
   }
+`;
+
+const TextSearch = styled(TextInput)`
+  display: block;
+  width: 40%;
+  margin: 5px 0;
 `;
 
 export function SelectedProblemsDisplay(props: SelectedProblemsDisplayProps) {
@@ -86,6 +94,51 @@ export function SelectedTagsDisplay(props: SelectedTagsDisplayProps) {
       ))}
 
       { !tags.length ? <p>Selected tags will show here.</p> : null }
+    </Content>
+  );
+}
+
+export function FilterAllTagsDisplay() {
+  const [searchText, setSearchText] = useState('');
+  const [tags, setTags] = useState<ProblemTag[]>([]);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    getAllProblemTags()
+      .then((res) => {
+        setTags(res);
+      })
+      .catch((err) => {
+        setError(err.message);
+      });
+  }, []);
+
+  const setSearchStatus = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+  };
+
+  return (
+    <Content>
+      <TextSearch
+        onChange={setSearchStatus}
+        placeholder={tags.length ? 'Filter tags' : 'Loading...'}
+      />
+
+      {tags.map((tag) => {
+        if (searchText && !tag.name.toLowerCase().includes(searchText.toLowerCase())) {
+          return null;
+        }
+
+        return (
+          <ProblemDisplay key={tag.tagId}>
+            <ProblemName>
+              {tag.name}
+            </ProblemName>
+          </ProblemDisplay>
+        );
+      })}
+
+      { error ? <ErrorMessage message={error} /> : null }
     </Content>
   );
 }

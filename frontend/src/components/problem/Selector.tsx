@@ -40,7 +40,7 @@ const InnerContent = styled.div<ContentProps>`
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);
 `;
 
-const InlineProblem = styled.div`
+const InlineElement = styled.div`
   width: 100%;
   padding: 8px 15px;
   display: flex;
@@ -61,12 +61,12 @@ const ClickableInlineDifficultyDisplayButton = styled(InlineDifficultyDisplayBut
   }
 `;
 
-const ProblemSearch = styled(TextInput)`
+const TextSearch = styled(TextInput)`
   width: 100%;
   margin: 0;
 `;
 
-const ProblemName = styled.p`
+const ElementName = styled.p`
   font-weight: bold;
   margin: 0;
 `;
@@ -114,7 +114,7 @@ export function ProblemSelector(props: ProblemSelectorProps) {
 
   return (
     <Content>
-      <ProblemSearch
+      <TextSearch
         onClick={() => setShowProblems(!showProblems)}
         onChange={setSearchStatus}
         placeholder={problems.length ? 'Select problems (optional)' : 'Loading...'}
@@ -132,13 +132,13 @@ export function ProblemSelector(props: ProblemSelectorProps) {
           }
 
           return (
-            <InlineProblem
+            <InlineElement
               key={problem.problemId}
               onClick={() => setSelectedStatus(index)}
             >
-              <ProblemName>
+              <ElementName>
                 {problem.name}
-              </ProblemName>
+              </ElementName>
               <ClickableInlineDifficultyDisplayButton
                 difficulty={problem.difficulty}
                 enabled={false}
@@ -146,7 +146,7 @@ export function ProblemSelector(props: ProblemSelectorProps) {
               >
                 {displayNameFromDifficulty(problem.difficulty)}
               </ClickableInlineDifficultyDisplayButton>
-            </InlineProblem>
+            </InlineElement>
           );
         })}
       </InnerContent>
@@ -199,7 +199,7 @@ export function TagSelector(props: TagSelectorProps) {
 
   return (
     <Content>
-      <ProblemSearch
+      <TextSearch
         onClick={() => setShowTags(!showTags)}
         onChange={setSearchStatus}
         placeholder={tags.length ? 'Select tags (optional)' : 'Loading...'}
@@ -217,14 +217,14 @@ export function TagSelector(props: TagSelectorProps) {
           }
 
           return (
-            <InlineProblem
+            <InlineElement
               key={tag.tagId}
               onClick={() => setSelectedStatus(index)}
             >
-              <ProblemName>
+              <ElementName>
                 {tag.name}
-              </ProblemName>
-            </InlineProblem>
+              </ElementName>
+            </InlineElement>
           );
         })}
       </InnerContent>
