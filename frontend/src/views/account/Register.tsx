@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import app from '../../api/Firebase';
@@ -31,9 +31,15 @@ function RegisterPage() {
 
   const redirectAction = () => history.replace('/dashboard');
 
-  if (firebaseUser) {
-    redirectAction();
-  }
+  // Redirect if logged in already
+  useEffect(() => {
+    app.auth().getRedirectResult()
+      .then(() => {
+        if (firebaseUser) redirectAction();
+      }).catch((err) => {
+        setError(err.message);
+      });
+  }, [firebaseUser]);
 
   const handleChange = (func: (val: string) => void, val: string) => {
     func(val);

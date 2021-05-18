@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useAppSelector } from '../../util/Hook';
@@ -35,9 +35,15 @@ function LoginPage() {
 
   const redirectAction = () => history.replace(location.state?.from || '/dashboard');
 
-  if (firebaseUser) {
-    redirectAction();
-  }
+  // Redirect if logged in already
+  useEffect(() => {
+    app.auth().getRedirectResult()
+      .then(() => {
+        if (firebaseUser) redirectAction();
+      }).catch((err) => {
+        setError(err.message);
+      });
+  }, [firebaseUser]);
 
   const handleChange = (func: (val: string) => void, val: string) => {
     func(val);
