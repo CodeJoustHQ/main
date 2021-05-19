@@ -432,23 +432,22 @@ function LobbyPage() {
   const displayUsers = (userList: User[] | null, isActive: boolean) => {
     if (userList) {
       return userList.map((user) => (
-        <PlayerCard
-          user={user}
-          me={currentUser !== null && (user.nickname === currentUser.nickname)}
-          isHost={isHost(user)}
-          isActive={isActive}
-          key={user.userId}
-        >
-          {isHost(currentUser) && (user.userId !== currentUser?.userId) ? (
-            // If currentUser is host, pass in an on-click action card for all other users
+          <PlayerCard
+            user={user}
+            me={currentUser !== null && (user.nickname === currentUser.nickname)}
+            isHost={isHost(user)}
+            isActive={isActive}
+            key={user.userId}
+          >
             <HostActionCard
               user={user}
+              isHost={isHost(currentUser)}
+              isCurrentUser={user.userId === currentUser?.userId}
               userIsActive={Boolean(user.sessionId)}
               onMakeHost={changeHosts}
               onRemoveUser={kickUser}
             />
-          ) : null}
-        </PlayerCard>
+          </PlayerCard>
       ));
     }
     return null;

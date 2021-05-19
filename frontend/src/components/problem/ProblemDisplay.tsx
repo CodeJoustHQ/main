@@ -81,7 +81,7 @@ const ApprovalContainer = styled.div<ShowProps>`
 const ApprovalText = styled(Text)`
   display: inline-block;
   margin: 0 0 0 0.75rem;
-  font-size: ${({ theme }) => theme.fontSize.subtitleXMediumLarge}
+  font-size: ${({ theme }) => theme.fontSize.subtitleXMediumLarge};
 `;
 
 const SettingsContainerRelative = styled(SettingsContainer)`
