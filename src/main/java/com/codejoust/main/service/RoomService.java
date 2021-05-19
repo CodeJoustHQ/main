@@ -75,9 +75,9 @@ public class RoomService {
             throw new ApiException(RoomError.DUPLICATE_USERNAME);
         }
 
-        // Return error if room is already active.
+        // Make user a spectator if the room is already active.
         if (room.getActive()) {
-            throw new ApiException(RoomError.ALREADY_ACTIVE);
+            user.setSpectator(true);
         }
 
         // Add userId if not already present.
@@ -361,6 +361,11 @@ public class RoomService {
         // Return error if room could not be found
         if (room == null) {
             throw new ApiException(RoomError.NOT_FOUND);
+        }
+
+        // Return error if user enters game as non-spectator in active game.
+        if (room.getActive() && request.getSpectator()) {
+            throw new ApiException(RoomError.ACTIVE_GAME);
         }
 
         // Return error if the initiator or receiver are null
