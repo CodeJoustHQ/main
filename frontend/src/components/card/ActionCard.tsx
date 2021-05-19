@@ -19,7 +19,7 @@ const Content = styled.div<PlayerIconType>`
   border-radius: 0.5rem;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   
-  height: ${({ isActive }) => (isActive ? '90px' : '65px')};
+  /* height: ${({ isActive }) => (isActive ? '90px' : '65px')}; */
   padding: 8px;
 
   z-index: 2;
@@ -40,32 +40,69 @@ const ActionCardSeparator = styled.hr`
   border-top: 1px solid ${({ theme }) => theme.colors.text};
 `;
 
-type HostActionCardProps = {
+const InlineHostIcon = styled.i.attrs(() => ({
+  className: 'material-icons',
+}))`
+  margin-right: 3px;
+  font-size: 12px;
+`;
+
+type ActionCardProps = {
   user: User,
+  userIsHost: boolean,
+  currentUserIsHost: boolean,
+  isCurrentUser: boolean,
   userIsActive: boolean,
   onMakeHost: (newHost: User) => void,
   onRemoveUser: (user: User) => void,
 };
 
-function HostActionCard(props: HostActionCardProps) {
+function ActionCard(props: ActionCardProps) {
   const {
-    user, userIsActive, onMakeHost, onRemoveUser,
+    user, userIsHost, currentUserIsHost, isCurrentUser, userIsActive, onMakeHost, onRemoveUser,
   } = props;
 
   return (
     <Content isActive={userIsActive}>
       <ActionCardActiveIcon isActive={userIsActive} />
-      <SmallActionHeaderText>{userIsActive ? 'active' : 'inactive'}</SmallActionHeaderText>
+      <SmallActionHeaderText>
+        {userIsActive ? 'active' : 'inactive'}
+      </SmallActionHeaderText>
+      {
+        userIsHost ? (
+          <>
+            <br />
+            <SmallActionHeaderText>
+              <InlineHostIcon>flag</InlineHostIcon>
+              host
+            </SmallActionHeaderText>
+          </>
+        ) : null
+      }
       <ActionCardSeparator />
       {
-        // Only show the make host button if user is active
-        userIsActive
-          ? <SmallActionText onClick={() => onMakeHost(user)}>Make Host</SmallActionText>
-          : null
+        (!currentUserIsHost && !isCurrentUser) ? (
+          <SmallActionHeaderText>No actions allowed</SmallActionHeaderText>
+        ) : null
       }
-      <SmallActionText onClick={() => onRemoveUser(user)}>Kick</SmallActionText>
+      {
+        isCurrentUser ? (
+          <SmallActionText onClick={() => {}}>Spectate Game</SmallActionText>
+        ) : null
+      }
+      {
+        // Only show the make host button if user is active
+        (currentUserIsHost && !isCurrentUser && userIsActive) ? (
+          <SmallActionText onClick={() => onMakeHost(user)}>Make Host</SmallActionText>
+        ) : null
+      }
+      {
+        (currentUserIsHost && !isCurrentUser) ? (
+          <SmallActionText onClick={() => onRemoveUser(user)}>Kick</SmallActionText>
+        ) : null
+      }
     </Content>
   );
 }
 
-export default HostActionCard;
+export default ActionCard;

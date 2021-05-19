@@ -24,7 +24,7 @@ import {
 } from '../components/core/Button';
 import Loading from '../components/core/Loading';
 import PlayerCard from '../components/card/PlayerCard';
-import HostActionCard from '../components/card/HostActionCard';
+import ActionCard from '../components/card/ActionCard';
 import { startGame } from '../api/Game';
 import {
   getRoom, Room, changeRoomHost, updateRoomSettings, removeUser,
@@ -432,22 +432,23 @@ function LobbyPage() {
   const displayUsers = (userList: User[] | null, isActive: boolean) => {
     if (userList) {
       return userList.map((user) => (
-          <PlayerCard
+        <PlayerCard
+          user={user}
+          me={currentUser !== null && (user.nickname === currentUser.nickname)}
+          isHost={isHost(user)}
+          isActive={isActive}
+          key={user.userId}
+        >
+          <ActionCard
             user={user}
-            me={currentUser !== null && (user.nickname === currentUser.nickname)}
-            isHost={isHost(user)}
-            isActive={isActive}
-            key={user.userId}
-          >
-            <HostActionCard
-              user={user}
-              isHost={isHost(currentUser)}
-              isCurrentUser={user.userId === currentUser?.userId}
-              userIsActive={Boolean(user.sessionId)}
-              onMakeHost={changeHosts}
-              onRemoveUser={kickUser}
-            />
-          </PlayerCard>
+            userIsHost={isHost(user)}
+            currentUserIsHost={isHost(currentUser)}
+            isCurrentUser={user.userId === currentUser?.userId}
+            userIsActive={Boolean(user.sessionId)}
+            onMakeHost={changeHosts}
+            onRemoveUser={kickUser}
+          />
+        </PlayerCard>
       ));
     }
     return null;
