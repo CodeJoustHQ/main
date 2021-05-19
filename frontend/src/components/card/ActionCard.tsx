@@ -19,7 +19,6 @@ const Content = styled.div<PlayerIconType>`
   border-radius: 0.5rem;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   
-  /* height: ${({ isActive }) => (isActive ? '90px' : '65px')}; */
   padding: 8px;
 
   z-index: 2;
@@ -43,7 +42,14 @@ const ActionCardSeparator = styled.hr`
 const InlineHostIcon = styled.i.attrs(() => ({
   className: 'material-icons',
 }))`
-  margin-right: 3px;
+  margin-right: 5px;
+  font-size: 12px;
+`;
+
+const InlineSpectatorIcon = styled.i.attrs(() => ({
+  className: 'material-icons',
+}))`
+  margin-right: 5px;
   font-size: 12px;
 `;
 
