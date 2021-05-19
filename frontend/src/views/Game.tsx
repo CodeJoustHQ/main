@@ -113,6 +113,7 @@ function GamePage() {
   const [error, setError] = useState<string>('');
 
   const [game, setGame] = useState<Game | null>(null);
+  const [host, setHost] = useState<User | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
@@ -142,6 +143,7 @@ function GamePage() {
 
   const setStateFromGame = (newGame: Game) => {
     setGame(newGame);
+    setHost(newGame.room.host);
     setPlayers(newGame.players);
     setGameTimer(newGame.gameTimer);
     setProblems(newGame.problems);
@@ -359,6 +361,16 @@ function GamePage() {
       });
   };
 
+  const endGameAction = () => {
+    // eslint-disable-next-line no-alert
+    if (!window.confirm('Are you sure you want to end the game?')) {
+      return;
+    }
+
+    manuallyEndGame(roomId, { initiator: currentUser! })
+      .catch((err) => setError(err.message));
+  };
+
   const displayPlayerLeaderboard = useCallback(() => players.map((player, index) => (
     <LeaderboardCard
       player={player}
@@ -400,8 +412,8 @@ function GamePage() {
           <GameTimerContainer gameTimer={gameTimer || null} />
         </FlexCenter>
         <FlexRight>
-          {currentUser?.userId === game?.room.host.userId ? (
-            <TextButton onClick={() => manuallyEndGame(roomId, { initiator: currentUser! })}>
+          {currentUser?.userId === host?.userId ? (
+            <TextButton onClick={endGameAction}>
               End Game
             </TextButton>
           ) : null}
