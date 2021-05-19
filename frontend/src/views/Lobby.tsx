@@ -27,7 +27,7 @@ import PlayerCard from '../components/card/PlayerCard';
 import ActionCard from '../components/card/ActionCard';
 import { startGame } from '../api/Game';
 import {
-  getRoom, Room, changeRoomHost, updateRoomSettings, removeUser,
+  getRoom, Room, changeRoomHost, updateRoomSettings, removeUser, setSpectator,
 } from '../api/Room';
 import { errorHandler } from '../api/Error';
 import {
@@ -275,6 +275,25 @@ function LobbyPage() {
     }
   };
 
+  const updateSpectator = (updatedSpectatorUser: User) => {
+    setError('');
+    const request = {
+      initiator: currentUser!,
+      receiver: updatedSpectatorUser,
+      spectator: !updatedSpectatorUser.spectator,
+    };
+
+    if (!loading) {
+      setLoading(true);
+      setSpectator(currentRoomId, request)
+        .then(() => setLoading(false))
+        .catch((err) => {
+          setError(err.message);
+          setLoading(false);
+        });
+    }
+  };
+
   const handleStartGame = () => {
     setError('');
     const request = { initiator: currentUser as User };
@@ -445,6 +464,7 @@ function LobbyPage() {
             currentUserIsHost={isHost(currentUser)}
             isCurrentUser={user.userId === currentUser?.userId}
             userIsActive={Boolean(user.sessionId)}
+            onUpdateSpectator={updateSpectator}
             onMakeHost={changeHosts}
             onRemoveUser={kickUser}
           />

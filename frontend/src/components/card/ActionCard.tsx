@@ -61,11 +61,13 @@ type ActionCardProps = {
   userIsActive: boolean,
   onMakeHost: (newHost: User) => void,
   onRemoveUser: (user: User) => void,
+  onUpdateSpectator: (user: User) => void,
 };
 
 function ActionCard(props: ActionCardProps) {
   const {
-    user, userIsHost, currentUserIsHost, isCurrentUser, userIsActive, onMakeHost, onRemoveUser,
+    user, userIsHost, currentUserIsHost, isCurrentUser, userIsActive,
+    onMakeHost, onRemoveUser, onUpdateSpectator,
   } = props;
 
   return (
@@ -85,6 +87,17 @@ function ActionCard(props: ActionCardProps) {
           </>
         ) : null
       }
+      {
+        user.spectator ? (
+          <>
+            <br />
+            <SmallActionHeaderText>
+              <InlineSpectatorIcon>visibility</InlineSpectatorIcon>
+              spectator
+            </SmallActionHeaderText>
+          </>
+        ) : null
+      }
       <ActionCardSeparator />
       {
         (!currentUserIsHost && !isCurrentUser) ? (
@@ -93,7 +106,9 @@ function ActionCard(props: ActionCardProps) {
       }
       {
         isCurrentUser ? (
-          <SmallActionText onClick={() => {}}>Spectate Game</SmallActionText>
+          <SmallActionText onClick={() => onUpdateSpectator(user)}>
+            {user.spectator ? 'Play Game' : 'Spectate Game'}
+          </SmallActionText>
         ) : null
       }
       {
