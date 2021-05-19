@@ -116,10 +116,10 @@ function GamePage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [languageList, setLanguageList] = useState<Language[]>([Language.Python]);
+  const [languageList, setLanguageList] = useState<Language[]>([Language.Java]);
   const [codeList, setCodeList] = useState<string[]>(['']);
   const [currentSubmission, setCurrentSubmission] = useState<Submission | null>(null);
-  const [currentProblem, setCurrentProblem] = useState<number>(0);
+  const [currentProblemIndex, setCurrentProblem] = useState<number>(0);
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
   const [defaultCodeList, setDefaultCodeList] = useState<DefaultCodeType[]>([]);
@@ -152,7 +152,7 @@ function GamePage() {
 
   const createCodeLanguageArray = () => {
     while (languageList.length < problems.length) {
-      languageList.push(Language.Python);
+      languageList.push(Language.Java);
     }
 
     while (codeList.length < problems.length) {
@@ -163,13 +163,14 @@ function GamePage() {
   createCodeLanguageArray();
 
   const setOneCurrentLanguage = (newLanguage: Language) => {
-    languageList[currentProblem] = newLanguage;
+    languageList[currentProblemIndex] = newLanguage;
   };
 
   const setOneCurrentCode = (newCode: string) => {
-    codeList[currentProblem] = newCode;
+    codeList[currentProblemIndex] = newCode;
   };
 
+  // Returns the most recent submission made for problem of index curr.
   const getSubmission = (curr: number, playerSubmissions: Submission[]) => {
     for (let i = playerSubmissions.length - 1; i >= 0; i -= 1) {
       if (playerSubmissions[i].problemIndex === curr) {
@@ -197,8 +198,8 @@ function GamePage() {
       const codeMap = result;
 
       for (let i = 0; i < result.length; i += 1) {
-        newCodeList.push(result[i][Language.Python]);
-        newLanguageList.push(Language.Python);
+        newCodeList.push(result[i][Language.Java]);
+        newLanguageList.push(Language.Java);
       }
 
       // If previous code and language specified, save those as defaults
@@ -358,9 +359,9 @@ function GamePage() {
     const request = {
       initiator: currentUser!,
       input,
-      code: codeList[currentProblem],
-      language: languageList[currentProblem],
-      problemIndex: currentProblem,
+      code: codeList[currentProblemIndex],
+      language: languageList[currentProblemIndex],
+      problemIndex: currentProblemIndex,
     };
 
     runSolution(roomId, request)
@@ -370,7 +371,7 @@ function GamePage() {
         // Set the 'test' submission type to correctly display result.
         res.submissionType = SubmissionType.Test;
         submissions.push(res);
-        setCurrentSubmission(getSubmission(currentProblem, submissions));
+        setCurrentSubmission(getSubmission(currentProblemIndex, submissions));
         checkSendTestCorrectNotification(res);
       })
       .catch((err) => {
@@ -385,9 +386,9 @@ function GamePage() {
     setError('');
     const request = {
       initiator: currentUser!,
-      code: codeList[currentProblem],
-      language: languageList[currentProblem],
-      problemIndex: currentProblem,
+      code: codeList[currentProblemIndex],
+      language: languageList[currentProblemIndex],
+      problemIndex: currentProblemIndex,
     };
 
     submitSolution(roomId, request)
@@ -397,7 +398,7 @@ function GamePage() {
         // Set the 'submit' submission type to correctly display result.
         res.submissionType = SubmissionType.Submit;
         submissions.push(res);
-        setCurrentSubmission(getSubmission(currentProblem, submissions));
+        setCurrentSubmission(getSubmission(currentProblemIndex, submissions));
         checkSendSolutionCorrectNotification(res);
       })
       .catch((err) => {
@@ -407,19 +408,19 @@ function GamePage() {
   };
 
   const nextProblem = () => {
-    setCurrentProblem((currentProblem + 1) % problems?.length);
-    setCurrentSubmission(getSubmission(currentProblem, submissions));
+    setCurrentProblem((currentProblemIndex + 1) % problems?.length);
+    setCurrentSubmission(getSubmission(currentProblemIndex, submissions));
   };
 
   const previousProblem = () => {
-    let temp = currentProblem - 1;
+    let temp = currentProblemIndex - 1;
 
     if (temp < 0) {
       temp += problems?.length;
     }
 
     setCurrentProblem(temp);
-    setCurrentSubmission(getSubmission(currentProblem, submissions));
+    setCurrentSubmission(getSubmission(currentProblemIndex, submissions));
   };
 
   const displayPlayerLeaderboard = useCallback(() => players.map((player, index) => (
@@ -482,19 +483,19 @@ function GamePage() {
         >
           {/* Problem title/description panel */}
           <OverflowPanel className="display-box-shadow">
-            <ProblemHeaderText>{problems[currentProblem]?.name}</ProblemHeaderText>
-            {problems[currentProblem] ? (
+            <ProblemHeaderText>{problems[currentProblemIndex]?.name}</ProblemHeaderText>
+            {problems[currentProblemIndex] ? (
               <DifficultyDisplayButton
-                difficulty={problems[currentProblem].difficulty!}
+                difficulty={problems[currentProblemIndex].difficulty!}
                 enabled={false}
                 active
               >
-                {displayNameFromDifficulty(problems[currentProblem].difficulty!)}
+                {displayNameFromDifficulty(problems[currentProblemIndex].difficulty!)}
               </DifficultyDisplayButton>
             ) : null}
             <StyledMarkdownEditor
               defaultValue={problems[0]?.description}
-              value={problems[currentProblem]?.description}
+              value={problems[currentProblemIndex]?.description}
               onChange={() => ''}
               readOnly
             />
@@ -523,17 +524,17 @@ function GamePage() {
               <Editor
                 onCodeChange={setOneCurrentCode}
                 onLanguageChange={setOneCurrentLanguage}
-                getCurrentLanguage={() => languageList[currentProblem]}
+                getCurrentLanguage={() => languageList[currentProblemIndex]}
                 defaultCodeMap={defaultCodeList}
-                currentProblem={currentProblem}
-                defaultLanguage={Language.Python}
+                currentProblem={currentProblemIndex}
+                defaultLanguage={Language.Java}
                 defaultCode={null}
               />
             </NoPaddingPanel>
 
             <Panel>
               <Console
-                testCases={problems[currentProblem]?.testCases}
+                testCases={problems[currentProblemIndex]?.testCases}
                 submission={currentSubmission}
                 onRun={runCode}
                 onSubmit={submitCode}
