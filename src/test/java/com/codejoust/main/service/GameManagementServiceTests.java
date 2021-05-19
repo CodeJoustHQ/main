@@ -1,5 +1,6 @@
 package com.codejoust.main.service;
 
+import com.codejoust.main.dto.game.EndGameRequest;
 import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -1148,5 +1149,24 @@ public class GameManagementServiceTests {
 
         gameService.conditionallyUpdateSocketInfo(room, newUser);
         verify(socketService, never()).sendSocketUpdate(Mockito.any(GameDto.class));
+    }
+
+    @Test
+    public void manuallyEndGamePermissionDenied() {
+        User host = new User();
+        host.setUserId(TestFields.USER_ID);
+
+        Room room = new Room();
+        room.setRoomId(TestFields.ROOM_ID);
+        room.setHost(host);
+
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        gameService.createAddGameFromRoom(room);
+
+        EndGameRequest request = new EndGameRequest();
+        request.setInitiator(new UserDto());
+
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.manuallyEndGame(TestFields.ROOM_ID, request));
+        assertEquals(GameError.INVALID_PERMISSIONS, exception.getError());
     }
 }
