@@ -275,6 +275,7 @@ function LobbyPage() {
     }
   };
 
+  // Update the spectator status of the user in question.
   const updateSpectator = (updatedSpectatorUser: User) => {
     setError('');
     const request = {
@@ -286,9 +287,12 @@ function LobbyPage() {
     if (!loading) {
       setLoading(true);
       setSpectator(currentRoomId, request)
-        .then(() => setLoading(false))
+        .then((res) => setStateFromRoom(res))
         .catch((err) => {
           setError(err.message);
+          setLoading(false);
+        })
+        .finally(() => {
           setLoading(false);
         });
     }

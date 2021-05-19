@@ -107,7 +107,7 @@ function ActionCard(props: ActionCardProps) {
       {
         isCurrentUser ? (
           <SmallActionText onClick={() => onUpdateSpectator(user)}>
-            {user.spectator ? 'Play Game' : 'Spectate Game'}
+            {user.spectator ? 'Enter Game' : 'Spectate Game'}
           </SmallActionText>
         ) : null
       }

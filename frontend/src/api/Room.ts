@@ -108,7 +108,7 @@ export const removeUser = (roomId: string, roomParams: RemoveUserParams):
   });
 
 export const setSpectator = (roomId: string, roomParams: SetSpectatorParams):
-  Promise<Room> => axios.put<Room>(routes.setSpectator(roomId), roomParams)
+  Promise<Room> => axios.post<Room>(routes.setSpectator(roomId), roomParams)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
