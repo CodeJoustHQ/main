@@ -56,7 +56,7 @@ function ProblemPage() {
   const handleEdit = (newProblem: Problem) => {
     if (!token) {
       setError('An error occurred fetching your credentials; '
-        + 'please try again in a few seconds or refresh the page.');
+        + 'please try again in a few seconds.');
       return;
     }
 

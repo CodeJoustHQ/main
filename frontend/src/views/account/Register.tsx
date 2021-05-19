@@ -30,7 +30,11 @@ function RegisterPage() {
       .then(() => {
         if (firebaseUser) redirectAction();
       }).catch((err) => {
-        setError(err.message);
+        if (err.message.includes('cookies')) {
+          setError(`${err.message} Note: Google login does not currently support Chrome incognito windows.`);
+        } else {
+          setError(err.message);
+        }
       });
   }, [firebaseUser]);
 
