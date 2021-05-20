@@ -61,7 +61,7 @@ public class Problem {
 
     // List of tags associated with this problem
     @ManyToMany(mappedBy = "problems", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @Setter
+    @Setter(AccessLevel.PRIVATE)
     @Fetch(value = FetchMode.SUBSELECT)
     private List<ProblemTag> problemTags = new ArrayList<>();
 
