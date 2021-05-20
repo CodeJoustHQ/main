@@ -39,14 +39,7 @@ const ActionCardSeparator = styled.hr`
   border-top: 1px solid ${({ theme }) => theme.colors.text};
 `;
 
-const InlineHostIcon = styled.i.attrs(() => ({
-  className: 'material-icons',
-}))`
-  margin-right: 5px;
-  font-size: 12px;
-`;
-
-const InlineSpectatorIcon = styled.i.attrs(() => ({
+const InlineIcon = styled.i.attrs(() => ({
   className: 'material-icons',
 }))`
   margin-right: 5px;
@@ -106,7 +99,7 @@ function ActionCard(props: ActionCardProps) {
           <>
             <br />
             <SmallActionHeaderText>
-              <InlineHostIcon>flag</InlineHostIcon>
+              <InlineIcon>flag</InlineIcon>
               host
             </SmallActionHeaderText>
           </>
@@ -117,7 +110,7 @@ function ActionCard(props: ActionCardProps) {
           <>
             <br />
             <SmallActionHeaderText>
-              <InlineSpectatorIcon>visibility</InlineSpectatorIcon>
+              <InlineIcon>visibility</InlineIcon>
               spectator
             </SmallActionHeaderText>
           </>

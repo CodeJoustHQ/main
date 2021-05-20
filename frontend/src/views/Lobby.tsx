@@ -132,6 +132,27 @@ const HoverElementSlider = styled(HoverElement)`
 `;
 
 const ActionCardHelpText = styled(Text)`
+  display: inline-block;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+`;
+
+type PlayerIconType = {
+  isActive: boolean,
+};
+
+const ActionCardActiveIcon = styled.div<PlayerIconType>`
+  display: inline-block;
+  margin-right: 5px;
+  background: ${({ theme, isActive }) => (isActive ? theme.colors.gradients.green : theme.colors.gradients.red)};
+  border-radius: 0.5rem;
+  height: 0.8rem;
+  width: 0.8rem;
+`;
+
+const InlineIcon = styled.i.attrs(() => ({
+  className: 'material-icons',
+}))`
+  margin-right: 5px;
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
 `;
 
@@ -622,22 +643,39 @@ function LobbyPage() {
       >
         <LeftContainer>
           <LargeText>Terminology</LargeText>
-          <ActionCardHelpText>
-            active and inactive: These attributes show the user&apos;s current
-            connection status. Active means the user can send and receive room
-            updates, while inactive means they cannot and are connecting or
-            have the tab closed.
-          </ActionCardHelpText>
-          <ActionCardHelpText>
-            host: Every room has one host, and they control the room and user
-            settings and the ability to start the game. They can transfer the
-            host role to any other connected user in the room.
-          </ActionCardHelpText>
-          <ActionCardHelpText>
-            spectator: The spectator attribute determines whether or not the
-            user is actively participating in the game, or simply spectating it.
-            By default, the host is a spectator in the game.
-          </ActionCardHelpText>
+          <div>
+            <ActionCardHelpText>
+              <ActionCardActiveIcon isActive />
+              <b>active</b>
+              {' '}
+              and
+              {' '}
+              <ActionCardActiveIcon isActive={false} />
+              <b>inactive</b>
+              : These attributes show the user&apos;s current connection status.
+              Active means the user can send and receive room updates, while
+              inactive means they cannot and are connecting or have the tab
+              closed.
+            </ActionCardHelpText>
+          </div>
+          <div>
+            <ActionCardHelpText>
+              <InlineIcon>flag</InlineIcon>
+              <b>host</b>
+              : Every room has one host, and they control the room and user
+              settings and the ability to start the game. They can transfer the
+              host role to any other connected user in the room.
+            </ActionCardHelpText>
+          </div>
+          <div>
+            <ActionCardHelpText>
+              <InlineIcon>visibility</InlineIcon>
+              <b>spectator</b>
+              : The spectator attribute determines whether or not the
+              user is actively participating in the game, or simply spectating
+              it. By default, the host is a spectator in the game.
+            </ActionCardHelpText>
+          </div>
         </LeftContainer>
       </Modal>
       <HoverTooltip
