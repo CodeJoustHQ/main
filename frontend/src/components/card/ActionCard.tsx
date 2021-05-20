@@ -81,18 +81,19 @@ type ActionCardProps = {
   onMakeHost: (newHost: User) => void,
   onRemoveUser: (user: User) => void,
   onUpdateSpectator: (user: User) => void,
+  setActionCardHelp: (actionCardHelp: boolean) => void,
 };
 
 function ActionCard(props: ActionCardProps) {
   const {
     user, userIsHost, currentUserIsHost, isCurrentUser, userIsActive,
-    onMakeHost, onRemoveUser, onUpdateSpectator,
+    onMakeHost, onRemoveUser, onUpdateSpectator, setActionCardHelp,
   } = props;
 
   return (
     <Content isActive={userIsActive}>
       <InlineQuestionIcon
-        onClick={() => {}}
+        onClick={() => setActionCardHelp(true)}
       >
         help_outline
       </InlineQuestionIcon>

@@ -9,6 +9,8 @@ import {
   SecondaryHeaderText,
   SmallHeaderText,
   NoMarginSubtitleText,
+  LargeText,
+  Text,
 } from '../components/core/Text';
 import {
   connect, routes, subscribe, disconnect,
@@ -37,13 +39,14 @@ import {
   InlineBackgroundCopyText,
 } from '../components/special/CopyIndicator';
 import IdContainer from '../components/special/IdContainer';
-import { FlexBareContainer } from '../components/core/Container';
+import { FlexBareContainer, LeftContainer } from '../components/core/Container';
 import { Slider, SliderContainer } from '../components/core/RangeSlider';
 import { Coordinate } from '../components/special/FloatingCircle';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
 import { SelectableProblem } from '../api/Problem';
 import ProblemSelector from '../components/problem/ProblemSelector';
 import SelectedProblemsDisplay from '../components/problem/SelectedProblemsDisplay';
+import Modal from '../components/core/Modal';
 
 type LobbyPageLocation = {
   user: User,
@@ -128,6 +131,10 @@ const HoverElementSlider = styled(HoverElement)`
   height: 20px;
 `;
 
+const ActionCardHelpText = styled(Text)`
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+`;
+
 function LobbyPage() {
   // Get history object to be able to move between different pages
   const history = useHistory();
@@ -164,6 +171,9 @@ function LobbyPage() {
 
   // Variable to hold whether the room link was copied.
   const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
+
+  // Variable to hold whether the modal explaining the user cards is active.
+  const [actionCardHelp, setActionCardHelp] = useState<boolean>(false);
 
   /**
    * Set state variables from an updated room object
@@ -469,6 +479,7 @@ function LobbyPage() {
             onUpdateSpectator={updateSpectator}
             onMakeHost={changeHosts}
             onRemoveUser={kickUser}
+            setActionCardHelp={setActionCardHelp}
           />
         </PlayerCard>
       ));
@@ -604,6 +615,31 @@ function LobbyPage() {
   // Render the lobby.
   return (
     <>
+      <Modal
+        show={actionCardHelp}
+        onExit={() => setActionCardHelp(false)}
+        fullScreen
+      >
+        <LeftContainer>
+          <LargeText>Terminology</LargeText>
+          <ActionCardHelpText>
+            active and inactive: These attributes show the user&apos;s current
+            connection status. Active means the user can send and receive room
+            updates, while inactive means they cannot and are connecting or
+            have the tab closed.
+          </ActionCardHelpText>
+          <ActionCardHelpText>
+            host: Every room has one host, and they control the room and user
+            settings and the ability to start the game. They can transfer the
+            host role to any other connected user in the room.
+          </ActionCardHelpText>
+          <ActionCardHelpText>
+            spectator: The spectator attribute determines whether or not the
+            user is actively participating in the game, or simply spectating it.
+            By default, the host is a spectator in the game.
+          </ActionCardHelpText>
+        </LeftContainer>
+      </Modal>
       <HoverTooltip
         visible={hoverVisible}
         x={mousePosition.x}
