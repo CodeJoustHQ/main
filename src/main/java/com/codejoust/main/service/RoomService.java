@@ -394,6 +394,8 @@ public class RoomService {
         modifiedUser.setSpectator(request.getSpectator());
         repository.save(room);
 
+        RoomDto roomDto = RoomMapper.toDto(room);
+        socketService.sendSocketUpdate(roomDto);
         return RoomMapper.toDto(room);
     }
 }
