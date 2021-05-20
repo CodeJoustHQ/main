@@ -701,8 +701,7 @@ public class ProblemServiceTests {
         ProblemTag problemTag = new ProblemTag();
         problemTag.setName(TestFields.TAG_NAME);
         problemTag.setTagId(TestFields.TAG_ID);
-        problemTag.setProblems(Collections.singletonList(problem));
-        problem.setProblemTags(Collections.singletonList(problemTag));
+        problem.addProblemTag(problemTag);
 
         Mockito.doReturn(problemTag).when(tagRepository).findTagByTagId(problemTag.getTagId());
         
