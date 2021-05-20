@@ -363,7 +363,7 @@ function GamePage() {
 
   const endGameAction = () => {
     // eslint-disable-next-line no-alert
-    if (!window.confirm('Are you sure you want to end the game?')) {
+    if (!window.confirm('Are you sure you want to end the game for all players?')) {
       return;
     }
 
