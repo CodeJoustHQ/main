@@ -363,8 +363,8 @@ public class RoomService {
             throw new ApiException(RoomError.NOT_FOUND);
         }
 
-        // Return error if user enters game as non-spectator in active game.
-        if (room.getActive() && request.getSpectator()) {
+        // Return error if user changes status to non-spectator in active game.
+        if (room.getActive() && !request.getSpectator()) {
             throw new ApiException(RoomError.ACTIVE_GAME);
         }
 

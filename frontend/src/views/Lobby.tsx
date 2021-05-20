@@ -287,10 +287,8 @@ function LobbyPage() {
     if (!loading) {
       setLoading(true);
       setSpectator(currentRoomId, request)
-        .then((res) => setStateFromRoom(res))
         .catch((err) => {
           setError(err.message);
-          setLoading(false);
         })
         .finally(() => {
           setLoading(false);
