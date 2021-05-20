@@ -73,6 +73,8 @@ function JoinGamePage() {
       getRoom(roomIdParam)
         .then((res) => {
           setLoading(false);
+
+          // TODO: Check to be removed to allow spectator view.
           if (res.active) {
             setError('This room has already started; please wait for the host to play again.');
           } else {
