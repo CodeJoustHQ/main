@@ -30,7 +30,7 @@ import {
 import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
-import { TextButton, DifficultyDisplayButton } from '../components/core/Button';
+import { TextButton, DifficultyDisplayButton, DangerButton } from '../components/core/Button';
 import {
   connect, routes, send, subscribe,
 } from '../api/Socket';
@@ -412,12 +412,12 @@ function GamePage() {
           <GameTimerContainer gameTimer={gameTimer || null} />
         </FlexCenter>
         <FlexRight>
-          {currentUser?.userId === host?.userId ? (
-            <TextButton onClick={endGameAction}>
-              End Game
-            </TextButton>
-          ) : null}
           <TextButton onClick={() => leaveRoom(history, roomId, currentUser)}>Exit Game</TextButton>
+          {currentUser?.userId === host?.userId ? (
+            <DangerButton onClick={endGameAction}>
+              End Game
+            </DangerButton>
+          ) : null}
         </FlexRight>
       </FlexInfoBar>
       <LeaderboardContent>
