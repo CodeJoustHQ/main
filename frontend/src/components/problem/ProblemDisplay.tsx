@@ -176,6 +176,94 @@ const reorder = (list: TestCase[], startIndex: number, endIndex: number): TestCa
   return result;
 };
 
+type ProblemTagsParams = {
+  problemTags: ProblemTag[],
+  addTag: (problemTag: ProblemTag) => void,
+  removeTag: (index: number) => void,
+};
+
+function ProblemTags(props: ProblemTagsParams) {
+  const {
+    problemTags, addTag, removeTag,
+  } = props;
+
+  const [allTags, setAllTags] = useState<ProblemTag[]>([]);
+  const [tagModal, setTagModal] = useState<boolean>(false);
+  const [tagName, setTagName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    getAllProblemTags()
+      .then((res) => {
+        setAllTags(res);
+      })
+      .catch((err) => {
+        setError(err.message);
+      });
+  }, []);
+
+  // Make request to create a new tag, refresh tag list
+  const createNewTag = (newTagName: string) => {
+    const tag: ProblemTag = {
+      name: newTagName,
+    };
+    setLoading(true);
+    createProblemTag(tag).then(() => {
+      // If the tag was created, refresh all problem tags.
+      getAllProblemTags().then((allProblemTags) => {
+        setAllTags(allProblemTags);
+        setError('');
+      }).catch((err) => {
+        setError(err.message);
+      });
+    }).catch((err) => {
+      setError(err.message);
+    }).finally(() => {
+      setLoading(false);
+    });
+  };
+
+  return (
+    <>
+      <LowMarginMediumText>Tags</LowMarginMediumText>
+      <SelectedTagsDisplay
+        tags={problemTags}
+        onRemove={removeTag}
+      />
+      <TagSelector
+        tags={allTags}
+        selectedTags={problemTags}
+        onSelect={addTag}
+      />
+      <GrayTextButton
+        onClick={() => setTagModal(true)}
+      >
+        Create New Tag +
+      </GrayTextButton>
+      <Modal show={tagModal} onExit={() => setTagModal(false)} fullScreen>
+        <LowMarginMediumText>Create New Tag</LowMarginMediumText>
+        <LargeTextInput
+          value={tagName}
+          placeholder="Enter new tag name"
+          onChange={(e) => setTagName(e.target.value)}
+        />
+        <SmallButton
+          onClick={() => createNewTag(tagName)}
+        >
+          Create Tag
+        </SmallButton>
+        {loading ? <Loading /> : null}
+        {error ? <ErrorMessage message={error} /> : null}
+        <LowMarginMediumText>Filter Tags</LowMarginMediumText>
+        <FilterAllTagsDisplay
+          tags={allTags}
+        />
+      </Modal>
+    </>
+  );
+}
+
 function ProblemDisplay(props: ProblemDisplayParams) {
   const {
     problem, onClick, actionText, editMode,
@@ -187,19 +275,6 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const [error, setError] = useState('');
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
-  const [tagModal, setTagModal] = useState<boolean>(false);
-  const [tagName, setTagName] = useState('');
-  const [allTags, setAllTags] = useState<ProblemTag[]>([]);
-
-  useEffect(() => {
-    getAllProblemTags()
-      .then((res) => {
-        setAllTags(res);
-      })
-      .catch((err) => {
-        setError(err.message);
-      });
-  }, []);
 
   // Get current mouse position.
   const mouseMoveHandler = useCallback((e: any) => {
@@ -337,27 +412,6 @@ function ProblemDisplay(props: ProblemDisplayParams) {
     setNewProblem({
       ...newProblem,
       testCases: newProblem.testCases.filter((_, i) => index !== i),
-    });
-  };
-
-  // Make request to create a new tag, refresh tag list
-  const createNewTag = (newTagName: string) => {
-    const tag: ProblemTag = {
-      name: newTagName,
-    };
-    setLoading(true);
-    createProblemTag(tag).then(() => {
-      // If the tag was created, refresh all problem tags.
-      getAllProblemTags().then((allProblemTags) => {
-        setAllTags(allProblemTags);
-        setError('');
-      }).catch((err) => {
-        setError(err.message);
-      });
-    }).catch((err) => {
-      setError(err.message);
-    }).finally(() => {
-      setLoading(false);
     });
   };
 
@@ -551,40 +605,11 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             return null;
           })}
 
-          <LowMarginMediumText>Tags</LowMarginMediumText>
-          <SelectedTagsDisplay
-            tags={newProblem.problemTags}
-            onRemove={removeTag}
+          <ProblemTags
+            problemTags={newProblem.problemTags}
+            addTag={addTag}
+            removeTag={removeTag}
           />
-          <TagSelector
-            tags={allTags}
-            selectedTags={newProblem.problemTags}
-            onSelect={addTag}
-          />
-          <GrayTextButton
-            onClick={() => setTagModal(true)}
-          >
-            Create New Tag +
-          </GrayTextButton>
-          <Modal show={tagModal} onExit={() => setTagModal(false)} fullScreen>
-            <LowMarginMediumText>Create New Tag</LowMarginMediumText>
-            <LargeTextInput
-              value={tagName}
-              placeholder="Enter new tag name"
-              onChange={(e) => setTagName(e.target.value)}
-            />
-            <SmallButton
-              onClick={() => createNewTag(tagName)}
-            >
-              Create Tag
-            </SmallButton>
-            {loading ? <Loading /> : null}
-            {error ? <ErrorMessage message={error} /> : null}
-            <LowMarginMediumText>Filter Tags</LowMarginMediumText>
-            <FilterAllTagsDisplay
-              tags={allTags}
-            />
-          </Modal>
 
           <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
           {newProblem.problemInputs.map((input, index) => (
