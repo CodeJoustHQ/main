@@ -1,11 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components';
 import 'typeface-roboto';
 import App from './components/config/App';
 import * as serviceWorker from './serviceWorker';
 import Theme, { ThemeType } from './components/config/Theme';
+import store from './redux/Store';
 
 const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
   html {
@@ -35,7 +37,9 @@ ReactDOM.render(
     <Theme>
       <GlobalStyle />
       <BrowserRouter>
-        <App />
+        <Provider store={store}>
+          <App />
+        </Provider>
       </BrowserRouter>
     </Theme>
   </React.StrictMode>,

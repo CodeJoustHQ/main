@@ -24,7 +24,7 @@ ReactGA.initialize('UA-192641172-2');
 function App() {
   const location = useLocation();
 
-  // Track page view on every change in location
+  // Track page view on every change in location and clear errors when switching pages
   useEffect(() => {
     ReactGA.pageview(location.pathname);
   }, [location]);
