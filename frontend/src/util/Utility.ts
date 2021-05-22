@@ -1,3 +1,4 @@
+import React from 'react';
 import { User } from '../api/User';
 import { removeUser } from '../api/Room';
 import { disconnect } from '../api/Socket';
@@ -77,3 +78,9 @@ const isLetter = (character: string) => {
 // Return true iff the variable is a valid identifier, and starts with a letter.
 export const validIdentifier = (identifier: string) => validateIdentifier(identifier)
   && isLetter(identifier.charAt(0));
+
+export const onEnterAction = (action: () => void, event: React.KeyboardEvent<HTMLInputElement>) => {
+  if (event.key === 'Enter') {
+    action();
+  }
+};

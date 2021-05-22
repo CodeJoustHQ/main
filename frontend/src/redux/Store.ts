@@ -2,12 +2,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import roomReducer from './Room';
 import gameReducer from './Game';
 import userReducer from './User';
+import accountReducer from './Account';
 
 const store = configureStore({
   reducer: {
     room: roomReducer,
     game: gameReducer,
     currentUser: userReducer,
+    account: accountReducer,
   },
 });
 

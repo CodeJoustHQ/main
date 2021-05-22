@@ -1,6 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import { NavbarLink } from '../core/Link';
+import app from '../../api/Firebase';
+import { TextButton } from '../core/Button';
+import { useAppSelector } from '../../util/Hook';
 
 const Content = styled.div`
   height: 50px;
@@ -10,7 +13,7 @@ const Content = styled.div`
 
 const MinimalContent = styled.div`
   height: 20px;
-  padding: 20px 20px 0px 20px;
+  padding: 20px 20px 0 20px;
   text-align: center;
 `;
 
@@ -20,6 +23,15 @@ const LeftHeader = styled(NavbarLink)`
 `;
 
 const RightHeader = styled(NavbarLink)`
+  margin: 0 15px;
+`;
+
+const NavButton = styled(TextButton)`
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  margin: 0 15px;
+`;
+
+const RightContainer = styled.div`
   float: right;
   margin-right: 50px;
 `;
@@ -43,19 +55,60 @@ const LogoIcon = styled.img`
 
 // Note: Can also create a center header with simply display: inline-block
 
+function LoggedInContent() {
+  return (
+    <RightContainer>
+      <RightHeader to="/problems/all">
+        Problems
+      </RightHeader>
+      <RightHeader to="/dashboard">
+        Dashboard
+      </RightHeader>
+      <NavButton onClick={() => app.auth().signOut()}>
+        Logout
+      </NavButton>
+      <RightHeader to="/contact-us">
+        Contact Us
+      </RightHeader>
+    </RightContainer>
+  );
+}
+
+function LoggedOutContent() {
+  return (
+    <RightContainer>
+      <RightHeader to="/register">
+        Register
+      </RightHeader>
+      <RightHeader to="/login">
+        Login
+      </RightHeader>
+      <RightHeader to="/contact-us">
+        Contact Us
+      </RightHeader>
+    </RightContainer>
+  );
+}
+
+function HeaderContent() {
+  const { account } = useAppSelector((state) => state);
+
+  return (
+    <nav>
+      <LeftHeader to="/">
+        <LogoIcon src="/logo512.png" alt="Logo Icon" />
+        CodeJoust
+        <InlineHeaderTag>Beta</InlineHeaderTag>
+      </LeftHeader>
+      {account ? <LoggedInContent /> : <LoggedOutContent />}
+    </nav>
+  );
+}
+
 export function Header() {
   return (
     <Content>
-      <nav>
-        <LeftHeader to="/">
-          <LogoIcon src="/logo512.png" alt="Logo Icon" />
-          CodeJoust
-          <InlineHeaderTag>Beta</InlineHeaderTag>
-        </LeftHeader>
-        <RightHeader to="/contact-us">
-          Contact Us
-        </RightHeader>
-      </nav>
+      <HeaderContent />
     </Content>
   );
 }
@@ -63,16 +116,7 @@ export function Header() {
 export function MinimalHeader() {
   return (
     <MinimalContent>
-      <nav>
-        <LeftHeader to="/">
-          <LogoIcon src="/logo512.png" alt="Logo Icon" />
-          CodeJoust
-          <InlineHeaderTag>Beta</InlineHeaderTag>
-        </LeftHeader>
-        <RightHeader to="/contact-us">
-          Contact Us
-        </RightHeader>
-      </nav>
+      <HeaderContent />
     </MinimalContent>
   );
 }
