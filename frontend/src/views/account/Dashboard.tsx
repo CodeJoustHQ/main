@@ -26,7 +26,7 @@ function DashboardPage() {
         .catch((err) => setError(err.message))
         .finally(() => setLoading(false));
     }
-  }, [firebaseUser, token]);
+  }, [dispatch, firebaseUser, token]);
 
   return (
     <div>

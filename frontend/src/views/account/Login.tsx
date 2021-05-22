@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useAppSelector } from '../../util/Hook';
 import { AuthInput, AuthPasswordInput } from '../../components/core/Input';
@@ -26,7 +26,7 @@ function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const redirectAction = () => history.replace(location.state?.from || '/dashboard');
+  const redirectAction = useCallback(() => history.replace(location.state?.from || '/dashboard'), [history, location]);
 
   // Redirect if logged in already
   useEffect(() => {
@@ -40,7 +40,7 @@ function LoginPage() {
           setError(err.message);
         }
       });
-  }, [firebaseUser]);
+  }, [firebaseUser, redirectAction]);
 
   const handleChange = (func: (val: string) => void, val: string) => {
     func(val);

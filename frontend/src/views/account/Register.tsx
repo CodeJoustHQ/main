@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import app from '../../api/Firebase';
 import { useAppSelector } from '../../util/Hook';
@@ -22,7 +22,7 @@ function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const redirectAction = () => history.replace('/dashboard');
+  const redirectAction = useCallback(() => history.replace('/dashboard'), [history]);
 
   // Redirect if logged in already
   useEffect(() => {
@@ -36,7 +36,7 @@ function RegisterPage() {
           setError(err.message);
         }
       });
-  }, [firebaseUser]);
+  }, [firebaseUser, redirectAction]);
 
   const handleChange = (func: (val: string) => void, val: string) => {
     func(val);
