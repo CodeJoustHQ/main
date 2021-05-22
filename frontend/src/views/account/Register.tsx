@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import app from '../../api/Firebase';
 import { useAppSelector } from '../../util/Hook';
@@ -13,7 +13,7 @@ import { onEnterAction } from '../../util/Utility';
 
 function RegisterPage() {
   const history = useHistory();
-  const { account } = useAppSelector((state) => state);
+  const { firebaseUser } = useAppSelector((state) => state.account);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,11 +22,21 @@ function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const redirectAction = () => history.replace('/dashboard');
+  const redirectAction = useCallback(() => history.replace('/dashboard'), [history]);
 
-  if (account) {
-    redirectAction();
-  }
+  // Redirect if logged in already
+  useEffect(() => {
+    app.auth().getRedirectResult()
+      .then(() => {
+        if (firebaseUser) redirectAction();
+      }).catch((err) => {
+        if (err.message.includes('cookies')) {
+          setError(`${err.message} Note: Google login does not currently support Chrome incognito windows.`);
+        } else {
+          setError(err.message);
+        }
+      });
+  }, [firebaseUser, redirectAction]);
 
   const handleChange = (func: (val: string) => void, val: string) => {
     func(val);

@@ -107,8 +107,6 @@ public class SocketTestMethods {
 
     /**
      * Sets the approval for a new problem to true. Necessary for a number of tests
-     *
-     * @return the new problem
      * @throws Exception if anything wrong occurs
      */
     public static void createSingleApprovedProblemAndTestCases(TestRestTemplate template, int port) throws Exception {
@@ -120,6 +118,7 @@ public class SocketTestMethods {
 
         ProblemDto problemActual = template.exchange(editProblemEndpoint, HttpMethod.PUT, editProblemEntity, ProblemDto.class).getBody();
 
+        assertNotNull(problemActual);
         assertTrue(problemActual.getApproval());
     }
 }

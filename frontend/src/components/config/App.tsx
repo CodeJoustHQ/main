@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ReactGA from 'react-ga';
+import { hotjar } from 'react-hotjar';
 import { Switch, useLocation } from 'react-router-dom';
 import MainLayout from '../layout/Main';
 import LandingPage from '../../views/Landing';
@@ -22,12 +23,14 @@ import ContactUsPage from '../../views/ContactUs';
 import MinimalLayout from '../layout/MinimalLayout';
 import { useAppDispatch } from '../../util/Hook';
 import app from '../../api/Firebase';
-import { setAccount, AccountType } from '../../redux/Account';
+import { setFirebaseUser, FirebaseUserType, setToken } from '../../redux/Account';
 import { CenteredContainer } from '../core/Container';
 import Loading from '../core/Loading';
 
 // Set up Google Analytics
 ReactGA.initialize('UA-192641172-2');
+// Set up Hotjar
+hotjar.initialize(2398506, 6);
 
 function App() {
   const location = useLocation();
@@ -41,9 +44,15 @@ function App() {
 
   // Set authentication status when Firebase auth status changes
   useEffect(() => {
-    app.auth().onAuthStateChanged((account) => {
-      dispatch(setAccount(account?.toJSON() as AccountType || null));
+    app.auth().onAuthStateChanged((firebaseUser) => {
+      dispatch(setFirebaseUser(firebaseUser?.toJSON() as FirebaseUserType || null));
       setLoading(false);
+
+      // Save Token in Redux state if authenticated
+      if (firebaseUser) {
+        firebaseUser.getIdToken(true)
+          .then((token) => dispatch(setToken(token)));
+      }
     });
   }, [dispatch, setLoading]);
 

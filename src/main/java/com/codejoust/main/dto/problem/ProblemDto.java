@@ -7,6 +7,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.codejoust.main.dto.account.AccountUidDto;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
 
@@ -16,6 +17,7 @@ import com.codejoust.main.model.problem.ProblemIOType;
 public class ProblemDto {
     private String problemId;
     private String name;
+    private AccountUidDto owner;
     private String description;
     private Boolean approval;
     private ProblemDifficulty difficulty;

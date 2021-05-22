@@ -29,6 +29,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -62,6 +63,14 @@ public class RoomSocketTests {
 
     @BeforeEach
     public void setup() throws Exception {
+        // Include the test authorization token in each request
+        template.getRestTemplate().setInterceptors(
+                Collections.singletonList((request, body, execution) -> {
+                    request.getHeaders()
+                            .add("Authorization", TestFields.TOKEN);
+                    return execution.execute(request, body);
+                }));
+
         // Set up a room with a single user (the host)
         baseRestEndpoint = "http://localhost:" + port + "/api/v1/rooms";
 

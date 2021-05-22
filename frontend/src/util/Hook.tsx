@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { Player, Submission } from '../api/Game';
 import { AppDispatch, RootState } from '../redux/Store';
+import { FirebaseUserType } from '../redux/Account';
+import { Problem } from '../api/Problem';
 
 export const useBestSubmission = (player?: Player) => {
   const [bestSubmission, setBestSubmission] = useState<Submission | null>(null);
@@ -22,6 +24,20 @@ export const useBestSubmission = (player?: Player) => {
   }, [player, setBestSubmission]);
 
   return bestSubmission;
+};
+
+export const useProblemEditable = (user: FirebaseUserType | null, problem: Problem | null) => {
+  const [editable, setEditable] = useState(false);
+
+  useEffect(() => {
+    if (!user || !problem || user.uid !== problem.owner.uid) {
+      setEditable(false);
+    } else {
+      setEditable(true);
+    }
+  }, [user, problem]);
+
+  return editable;
 };
 
 // Custom Redux Hooks with our store's types
