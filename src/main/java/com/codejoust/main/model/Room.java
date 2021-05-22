@@ -71,6 +71,11 @@ public class Room {
     @Fetch(FetchMode.SUBSELECT)
     private List<Problem> problems = new ArrayList<>();
 
+    // chat_id column in room table holds the primary key of the chat
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "chat_id")
+    private Chat chat;
+
     public void addUser(User user) {
         users.add(user);
         user.setRoom(this);
