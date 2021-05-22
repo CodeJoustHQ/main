@@ -1,5 +1,6 @@
 package com.codejoust.main.mapper;
 
+import com.codejoust.main.model.Account;
 import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +29,10 @@ public class ProblemMapperTests {
         expected.setName(TestFields.PROBLEM_NAME);
         expected.setDescription(TestFields.PROBLEM_DESCRIPTION);
         expected.setDifficulty(ProblemDifficulty.HARD);
+
+        Account account = new Account();
+        account.setUid(TestFields.UID);
+        expected.setOwner(account);
 
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(TestFields.INPUT);
@@ -62,6 +67,7 @@ public class ProblemMapperTests {
         assertEquals(expectedProblemInputs, actual.getProblemInputs());
 
         assertEquals(expected.getOutputType(), actual.getOutputType());
+        assertEquals(expected.getOwner().getUid(), actual.getOwner().getUid());
     }
 
     @Test

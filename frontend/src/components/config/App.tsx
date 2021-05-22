@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ReactGA from 'react-ga';
+import { hotjar } from 'react-hotjar';
 import { Switch, useLocation } from 'react-router-dom';
 import MainLayout from '../layout/Main';
 import LandingPage from '../../views/Landing';
@@ -28,6 +29,8 @@ import Loading from '../core/Loading';
 
 // Set up Google Analytics
 ReactGA.initialize('UA-192641172-2');
+// Set up Hotjar
+hotjar.initialize(2398506, 6);
 
 function App() {
   const location = useLocation();

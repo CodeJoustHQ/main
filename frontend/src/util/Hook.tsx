@@ -38,7 +38,7 @@ export const useProblemEditable = (user: FirebaseUserType | null, problem: Probl
   }, [user, problem]);
 
   return editable;
-}
+};
 
 // Custom Redux Hooks with our store's types
 export const useAppDispatch = () => useDispatch<AppDispatch>();

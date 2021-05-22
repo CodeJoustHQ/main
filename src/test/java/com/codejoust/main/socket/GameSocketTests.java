@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -74,6 +75,14 @@ public class GameSocketTests {
 
     @BeforeEach
     public void setup() throws Exception {
+        // Include the test authorization token in each request
+        template.getRestTemplate().setInterceptors(
+                Collections.singletonList((request, body, execution) -> {
+                    request.getHeaders()
+                            .add("Authorization", TestFields.TOKEN);
+                    return execution.execute(request, body);
+                }));
+
         baseRestEndpoint = "http://localhost:" + port + "/api/v1";
 
         UserDto host = TestFields.userDto1();
