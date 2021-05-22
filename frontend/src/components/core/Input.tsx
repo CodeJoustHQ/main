@@ -165,6 +165,16 @@ export const TextInput = styled(Input).attrs(() => ({
   }
 `;
 
+export const AuthInput = styled(TextInput)`
+  display: block;
+  margin: 15px auto;
+  width: 20rem;
+`;
+
+export const AuthPasswordInput = styled(AuthInput).attrs(() => ({
+  type: 'password',
+}))``;
+
 export const CheckboxInput = styled(Input).attrs(() => ({
   type: 'checkbox',
 }))`

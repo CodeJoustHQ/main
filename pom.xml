@@ -150,6 +150,12 @@
       <artifactId>httpclient</artifactId>
       <version>4.5.13</version>
     </dependency>
+    <!-- Firebase for user authentication -->
+    <dependency>
+      <groupId>com.google.firebase</groupId>
+      <artifactId>firebase-admin</artifactId>
+      <version>7.2.0</version>
+    </dependency>
   </dependencies>
   
   <build>

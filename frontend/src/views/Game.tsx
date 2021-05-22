@@ -6,6 +6,7 @@ import MarkdownEditor from 'rich-markdown-editor';
 import { useBeforeunload } from 'react-beforeunload';
 import { Message, Subscription } from 'stompjs';
 import copy from 'copy-to-clipboard';
+import { unwrapResult } from '@reduxjs/toolkit';
 import Editor from '../components/game/Editor';
 import { DefaultCodeType, getDefaultCodeMap, Problem } from '../api/Problem';
 import { errorHandler } from '../api/Error';
@@ -24,7 +25,7 @@ import { User } from '../api/User';
 import { GameNotification, NotificationType } from '../api/GameNotification';
 import { Difficulty, displayNameFromDifficulty } from '../api/Difficulty';
 import {
-  Game, getGame, Player, runSolution,
+  Game, Player, runSolution,
   Submission, SubmissionType, submitSolution, manuallyEndGame,
 } from '../api/Game';
 import LeaderboardCard from '../components/card/LeaderboardCard';
@@ -42,6 +43,9 @@ import {
   SmallInlineCopyIcon,
   SmallInlineCopyText,
 } from '../components/special/CopyIndicator';
+import { useAppDispatch, useAppSelector } from '../util/Hook';
+import { fetchGame, setGame } from '../redux/Game';
+import { setCurrentUser } from '../redux/User';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
   margin-top: 15px;
@@ -105,14 +109,12 @@ function GamePage() {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [submission, setSubmission] = useState<Submission | null>(null);
 
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [roomId, setRoomId] = useState<string>('');
 
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
-  const [game, setGame] = useState<Game | null>(null);
   const [host, setHost] = useState<User | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
@@ -142,8 +144,8 @@ function GamePage() {
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
   const setStateFromGame = (newGame: Game) => {
-    setGame(newGame);
     setHost(newGame.room.host);
+    setRoomId(newGame.room.roomId);
     setPlayers(newGame.players);
     setGameTimer(newGame.gameTimer);
     setProblems(newGame.problems);
@@ -151,6 +153,9 @@ function GamePage() {
     setTimeUp(newGame.gameTimer.timeUp);
     setGameEnded(newGame.gameEnded);
   };
+
+  const dispatch = useAppDispatch();
+  const { currentUser, game } = useAppSelector((state) => state);
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
     code: string, language: Language) => {
@@ -179,6 +184,32 @@ function GamePage() {
       setError(err.message);
     });
   }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage]);
+
+  // Map the game in Redux to the state variables used in this file
+  useEffect(() => {
+    if (game) {
+      setFullPageLoading(false);
+      setStateFromGame(game);
+
+      // If default code list is empty and current user is loaded, fetch the code from the backend
+      if (!defaultCodeList.length && currentUser) {
+        let matchFound = false;
+
+        // If this user refreshed and has already submitted code, load and save their latest code
+        game.players.forEach((player) => {
+          if (player.user.userId === currentUser?.userId && player.code) {
+            setDefaultCodeFromProblems(game.problems, player.code, player.language as Language);
+            matchFound = true;
+          }
+        });
+
+        // If no previous code, proceed as normal with the default Java language
+        if (!matchFound) {
+          setDefaultCodeFromProblems(game.problems, '', Language.Java);
+        }
+      }
+    }
+  }, [game, currentUser, defaultCodeList, setDefaultCodeFromProblems, setFullPageLoading]);
 
   /**
    * Display the notification as a callback from the notification
@@ -212,7 +243,7 @@ function GamePage() {
   const subscribePrimary = useCallback((roomIdParam: string, userId: string) => {
     const subscribeUserCallback = (result: Message) => {
       const updatedGame: Game = JSON.parse(result.body);
-      setStateFromGame(updatedGame);
+      dispatch(setGame(updatedGame));
     };
 
     // Connect to the socket if not already
@@ -222,6 +253,9 @@ function GamePage() {
         subscribe(routes(roomIdParam).subscribe_game, subscribeUserCallback)
           .then((subscription) => {
             setGameSocket(subscription);
+            dispatch(fetchGame(roomIdParam))
+              .then(unwrapResult)
+              .catch((err) => setError(err.message));
           }).catch((err) => {
             setError(err.message);
           });
@@ -237,45 +271,25 @@ function GamePage() {
           });
       }
     });
-  }, [displayNotification, gameSocket, notificationSocket]);
+  }, [dispatch, displayNotification, gameSocket, notificationSocket]);
 
   // Called every time location changes
   useEffect(() => {
-    if (checkLocationState(location, 'roomId', 'currentUser', 'difficulty')) {
-      setCurrentUser(location.state.currentUser);
-      setRoomId(location.state.roomId);
-
-      // Get game object with problem and room details.
-      getGame(location.state.roomId)
-        .then((res) => {
-          setStateFromGame(res);
-          setFullPageLoading(false);
-
-          let matchFound = false;
-
-          // If this user refreshed and has already submitted code, load and save their latest code
-          res.players.forEach((player) => {
-            if (player.user.userId === location.state.currentUser.userId && player.code) {
-              setDefaultCodeFromProblems(res.problems, player.code, player.language as Language);
-              matchFound = true;
-            }
-          });
-
-          // If no previous code, proceed as normal with the default Java language
-          if (!matchFound) {
-            setDefaultCodeFromProblems(res.problems, '', Language.Java);
-          }
-        })
-        .catch((err) => {
-          setFullPageLoading(false);
-          setError(err.message);
-        });
+    if (checkLocationState(location, 'roomId', 'currentUser')) {
+      if (!game || game?.room.roomId !== location.state.roomId) {
+        dispatch(fetchGame(location.state.roomId))
+          .then(unwrapResult)
+          .catch((err) => setError(err.message));
+      }
+      if (!currentUser) {
+        dispatch(setCurrentUser(location.state.currentUser));
+      }
     } else {
       history.replace('/game/join', {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
       });
     }
-  }, [location, history, setDefaultCodeFromProblems]);
+  }, [game, currentUser, dispatch, location, history, setDefaultCodeFromProblems]);
 
   // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {
@@ -412,7 +426,9 @@ function GamePage() {
           <GameTimerContainer gameTimer={gameTimer || null} />
         </FlexCenter>
         <FlexRight>
-          <TextButton onClick={() => leaveRoom(history, roomId, currentUser)}>Exit Game</TextButton>
+          <TextButton onClick={() => leaveRoom(dispatch, history, roomId, currentUser)}>
+            Exit Game
+          </TextButton>
           {currentUser?.userId === host?.userId ? (
             <DangerButton onClick={endGameAction}>
               End Game

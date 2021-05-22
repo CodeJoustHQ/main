@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
   editProblem,
   getSingleProblem,
   Problem,
-  sendAccessProblemPartial,
 } from '../api/Problem';
 import NotFound from './NotFound';
 import { LargeText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import ProblemDisplay from '../components/problem/ProblemDisplay';
-import { checkLocationState, generateRandomId } from '../util/Utility';
-import LockScreen from '../components/core/LockScreen';
+import { generateRandomId } from '../util/Utility';
+import { useAppSelector, useProblemEditable } from '../util/Hook';
 
 const Content = styled.div`
   display: flex;
@@ -23,68 +22,29 @@ type ProblemParams = {
   id: string,
 };
 
-type LocationState = {
-  locked: boolean,
-};
-
 function ProblemPage() {
-  const history = useHistory();
-  const location = useLocation<LocationState>();
+  const { firebaseUser, token } = useAppSelector((state) => state.account);
+
   const [problem, setProblem] = useState<Problem | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const problemEditable = useProblemEditable(firebaseUser, problem);
   const params = useParams<ProblemParams>();
 
-  // The problems page is loading or locked until a valid password is supplied.
-  const [locked, setLocked] = useState<boolean | null>(null);
-
   useEffect(() => {
-    if (checkLocationState(location, 'locked')) {
-      setLocked(location.state.locked);
-    } else {
-      setLocked(true);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (!locked) {
-      setLoading(true);
-      getSingleProblem(params.id)
-        .then((res) => {
-          res.testCases.forEach((testCase) => {
-            // eslint-disable-next-line no-param-reassign
-            testCase.id = generateRandomId();
-          });
-          setProblem(res);
-          setLoading(false);
-        })
-        .catch((err) => {
-          setError(err.message);
-          setLoading(false);
+    setLoading(true);
+    getSingleProblem(params.id)
+      .then((res) => {
+        res.testCases.forEach((testCase) => {
+          // eslint-disable-next-line no-param-reassign
+          testCase.id = generateRandomId();
         });
-    }
-  }, [params, locked]);
-
-  // Display loading page while locked value is being calculated.
-  if (locked === null) {
-    return <Loading />;
-  }
-
-  if (locked) {
-    return (
-      <LockScreen
-        loading={loading}
-        error={error}
-        enterPasswordAction={sendAccessProblemPartial(
-          `/problem/${params.id}`,
-          history,
-          setLoading,
-          setError,
-        )}
-      />
-    );
-  }
+        setProblem(res);
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [params]);
 
   if (!problem) {
     if (loading) {
@@ -94,10 +54,15 @@ function ProblemPage() {
   }
 
   const handleEdit = (newProblem: Problem) => {
+    if (!token) {
+      setError('An error occurred fetching your credentials; '
+        + 'please try again in a few seconds.');
+      return;
+    }
+
     setLoading(true);
     setError('');
-
-    editProblem(newProblem.problemId, newProblem)
+    editProblem(newProblem.problemId, newProblem, token!)
       .then((res) => {
         setProblem(res);
         setLoading(false);
@@ -110,7 +75,7 @@ function ProblemPage() {
 
   return (
     <>
-      <LargeText>Edit Problem</LargeText>
+      <LargeText>{problemEditable ? 'Edit Problem' : 'Preview Problem'}</LargeText>
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
       <Content>
