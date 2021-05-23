@@ -22,6 +22,7 @@ export type Game = {
   problems: Problem[],
   playAgain: boolean,
   allSolved: boolean,
+  gameEnded: boolean,
 };
 
 export type StartGameParams = {
@@ -29,6 +30,10 @@ export type StartGameParams = {
 };
 
 export type PlayAgainParams = {
+  initiator: User,
+};
+
+export type EndGameParams = {
   initiator: User,
 };
 
@@ -79,6 +84,7 @@ const routes = {
   getGame: (roomId: string) => `${basePath}/games/${roomId}`,
   runCode: (roomId: string) => `${basePath}/games/${roomId}/run-code`,
   submitSolution: (roomId: string) => `${basePath}/games/${roomId}/submission`,
+  endGame: (roomId: string) => `${basePath}/games/${roomId}/game-over`,
   playAgain: (roomId: string) => `${basePath}/games/${roomId}/restart`,
 };
 
@@ -112,6 +118,13 @@ export const submitSolution = (roomId: string, params: SubmitSolutionParams):
 
 export const playAgain = (roomId: string, params: PlayAgainParams):
   Promise<Room> => axios.post<Room>(routes.playAgain(roomId), params)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const manuallyEndGame = (roomId: string, params: EndGameParams):
+  Promise<Room> => axios.post<Room>(routes.endGame(roomId), params)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

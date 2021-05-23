@@ -26,12 +26,12 @@ import { GameNotification, NotificationType } from '../api/GameNotification';
 import { Difficulty, displayNameFromDifficulty } from '../api/Difficulty';
 import {
   Game, Player, runSolution,
-  Submission, SubmissionType, submitSolution,
+  Submission, SubmissionType, submitSolution, manuallyEndGame,
 } from '../api/Game';
 import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
-import { TextButton, DifficultyDisplayButton } from '../components/core/Button';
+import { TextButton, DifficultyDisplayButton, DangerButton } from '../components/core/Button';
 import {
   connect, routes, send, subscribe,
 } from '../api/Socket';
@@ -115,6 +115,7 @@ function GamePage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
+  const [host, setHost] = useState<User | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
@@ -122,6 +123,7 @@ function GamePage() {
   const [currentCode, setCurrentCode] = useState('');
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
+  const [gameEnded, setGameEnded] = useState(false);
   const [defaultCodeList, setDefaultCodeList] = useState<DefaultCodeType[]>([]);
 
   // When variable null, show nothing; otherwise, show notification.
@@ -142,12 +144,14 @@ function GamePage() {
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
   const setStateFromGame = (newGame: Game) => {
+    setHost(newGame.room.host);
     setRoomId(newGame.room.roomId);
     setPlayers(newGame.players);
     setGameTimer(newGame.gameTimer);
     setProblems(newGame.problems);
     setAllSolved(newGame.allSolved);
     setTimeUp(newGame.gameTimer.timeUp);
+    setGameEnded(newGame.gameEnded);
   };
 
   const dispatch = useAppDispatch();
@@ -221,7 +225,7 @@ function GamePage() {
 
   // Check if game is over or not and redirect to results page if so
   useEffect(() => {
-    if (timeUp || allSolved) {
+    if (gameEnded || timeUp || allSolved) {
       // eslint-disable-next-line no-unused-expressions
       gameSocket?.unsubscribe();
       // eslint-disable-next-line no-unused-expressions
@@ -232,7 +236,8 @@ function GamePage() {
         currentUser,
       });
     }
-  }, [timeUp, allSolved, history, currentUser, gameSocket, notificationSocket, roomId]);
+  }, [gameEnded, timeUp, allSolved, game, history,
+    currentUser, gameSocket, notificationSocket, roomId]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePrimary = useCallback((roomIdParam: string, userId: string) => {
@@ -370,6 +375,16 @@ function GamePage() {
       });
   };
 
+  const endGameAction = () => {
+    // eslint-disable-next-line no-alert
+    if (!window.confirm('Are you sure you want to end the game for all players?')) {
+      return;
+    }
+
+    manuallyEndGame(roomId, { initiator: currentUser! })
+      .catch((err) => setError(err.message));
+  };
+
   const displayPlayerLeaderboard = useCallback(() => players.map((player, index) => (
     <LeaderboardCard
       player={player}
@@ -414,6 +429,11 @@ function GamePage() {
           <TextButton onClick={() => leaveRoom(dispatch, history, roomId, currentUser)}>
             Exit Game
           </TextButton>
+          {currentUser?.userId === host?.userId ? (
+            <DangerButton onClick={endGameAction}>
+              End Game
+            </DangerButton>
+          ) : null}
         </FlexRight>
       </FlexInfoBar>
       <LeaderboardContent>
