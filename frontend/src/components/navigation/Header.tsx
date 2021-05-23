@@ -61,9 +61,6 @@ function LoggedInContent() {
       <RightHeader to="/problems/all">
         Problems
       </RightHeader>
-      <RightHeader to="/dashboard">
-        Dashboard
-      </RightHeader>
       <NavButton onClick={() => app.auth().signOut()}>
         Logout
       </NavButton>

@@ -4,6 +4,8 @@ import { ThemeConfig } from '../config/Theme';
 import { FloatingCircle, Coordinate } from '../special/FloatingCircle';
 import { MainContainer, DynamicWidthContainer } from '../core/Container';
 import { Header } from '../navigation/Header';
+import { useAppSelector } from '../../util/Hook';
+import MinimalLayout from './MinimalLayout';
 
 const Content = styled.div`
   position: relative;
@@ -19,6 +21,7 @@ type MyProps = {
 }
 
 function CircleBackgroundLayout({ children }: MyProps) {
+  const { firebaseUser } = useAppSelector((state) => state.account);
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
 
   const mouseMoveHandler = useCallback((e: MouseEvent) => {
@@ -28,6 +31,11 @@ function CircleBackgroundLayout({ children }: MyProps) {
   useEffect(() => {
     window.onmousemove = mouseMoveHandler;
   }, [mouseMoveHandler]);
+
+  // If logged in, the home page becomes the dashboard, which uses a minimal layout
+  if (firebaseUser) {
+    return <MinimalLayout>{children}</MinimalLayout>;
+  }
 
   return (
     <Content>

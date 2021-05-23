@@ -76,7 +76,6 @@ function App() {
       <PrivateRoute path="/problems/all" component={AllProblemsPage} layout={MinimalLayout} exact />
       <PrivateRoute path="/problem/create" component={CreateProblemPage} layout={MinimalLayout} exact />
       <PrivateRoute path="/problem/:id" component={ProblemPage} layout={MinimalLayout} exact />
-      <PrivateRoute path="/dashboard" component={DashboardPage} layout={MinimalLayout} exact />
       <CustomRoute path="/login" component={LoginPage} layout={MainLayout} exact />
       <CustomRoute path="/register" component={RegisterPage} layout={MainLayout} exact />
       <CustomRoute path="/contact-us" component={ContactUsPage} layout={MainLayout} exact />
