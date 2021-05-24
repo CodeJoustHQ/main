@@ -25,6 +25,11 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
+    // The chat associated with the message.
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_table_id")
+    private Chat chat;
+
     // The user who sent the message.
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_table_id")
