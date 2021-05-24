@@ -32,6 +32,8 @@ public class TestUrls {
     private static final String USER = "/api/v1/user";
     private static final String GET_INSTANT = "/api/v1/get-instant";
 
+    private static final String GET_ACCOUNT = "/api/v1/accounts/%s";
+
 
     public static String getRoom(String roomId) {
         return String.format(GET_ROOM, roomId);
@@ -135,5 +137,9 @@ public class TestUrls {
 
     public static String getInstant() {
         return GET_INSTANT;
+    }
+
+    public static String getAccount(String uid) {
+        return String.format(GET_ACCOUNT, uid);
     }
 }

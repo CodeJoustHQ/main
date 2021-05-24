@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Timer;
 
 import com.codejoust.main.dao.RoomRepository;
+import com.codejoust.main.dto.game.EndGameRequest;
 import com.codejoust.main.dto.game.GameDto;
 import com.codejoust.main.dto.game.GameMapper;
 import com.codejoust.main.dto.game.GameNotificationDto;
@@ -209,7 +210,7 @@ public class GameManagementService {
         SubmissionDto submissionDto = submitService.submitSolution(game, request);
 
         if (isGameOver(game)) {
-            endGame(game);
+            handleEndGame(game);
         }
 
         // Send socket update with latest leaderboard info
@@ -265,7 +266,24 @@ public class GameManagementService {
         liveGameService.updateCode(game.getPlayers().get(userId), playerCode);
     }
 
-    protected void endGame(Game game) {
+    public GameDto manuallyEndGame(String roomId, EndGameRequest request) {
+        Game game = getGameFromRoomId(roomId);
+
+        User initiator = UserMapper.toEntity(request.getInitiator());
+        if (!game.getRoom().getHost().equals(initiator)) {
+            throw new ApiException(GameError.INVALID_PERMISSIONS);
+        }
+
+        game.setGameEnded(true);
+        handleEndGame(game);
+
+        GameDto gameDto = GameMapper.toDto(game);
+        socketService.sendSocketUpdate(gameDto);
+
+        return gameDto;
+    }
+
+    protected void handleEndGame(Game game) {
         // Cancel all previously scheduled timers
         GameTimer gameTimer = game.getGameTimer();
         gameTimer.getTimer().cancel();
@@ -276,7 +294,7 @@ public class GameManagementService {
     }
 
     protected boolean isGameOver(Game game) {
-        return game.getAllSolved() || (game.getGameTimer() != null && game.getGameTimer().isTimeUp());
+        return game.getGameEnded() || game.getAllSolved() || (game.getGameTimer() != null && game.getGameTimer().isTimeUp());
     }
 
     // Update people's socket active status

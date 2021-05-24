@@ -1,5 +1,6 @@
 package com.codejoust.main.service;
 
+import com.codejoust.main.dao.AccountRepository;
 import com.codejoust.main.dao.ProblemRepository;
 import com.codejoust.main.dao.ProblemTagRepository;
 import com.codejoust.main.dto.problem.CreateProblemRequest;
@@ -37,22 +38,32 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProblemService {
-
+    
+    private final FirebaseService service;
     private final ProblemRepository problemRepository;
     private final ProblemTagRepository problemTagRepository;
+    private final AccountRepository accountRepository;
     private final List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList;
     private final Random random = new Random();
     private final Gson gson = new Gson();
-    private static final String PROBLEM_ACCESS_PASSWORD_KEY = "PROBLEM_ACCESS_PASSWORD";
 
     @Autowired
-    public ProblemService(ProblemRepository problemRepository, ProblemTagRepository problemTagRepository, List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList) {
+    public ProblemService(FirebaseService service,
+        ProblemRepository problemRepository,
+        ProblemTagRepository problemTagRepository,
+        AccountRepository accountRepository,
+        List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList) {
+
+        this.service = service;
         this.problemRepository = problemRepository;
         this.problemTagRepository = problemTagRepository;
+        this.accountRepository = accountRepository;
         this.defaultCodeGeneratorServiceList = defaultCodeGeneratorServiceList;
     }
 
-    public ProblemDto createProblem(CreateProblemRequest request) {
+    public ProblemDto createProblem(CreateProblemRequest request, String token) {
+        String uid = service.verifyToken(token);
+
         if (request.getName() == null || request.getDescription() == null
                 || request.getName().isEmpty() || request.getDescription().isEmpty()
                 || request.getDifficulty() == null
@@ -82,6 +93,8 @@ public class ProblemService {
             }
         }
 
+        // Set the owner of this problem (guaranteed to be non-null due to the verifyToken call)
+        problem.setOwner(accountRepository.findAccountByUid(uid));
         problemRepository.save(problem);
 
         return ProblemMapper.toDto(problem);
@@ -102,7 +115,7 @@ public class ProblemService {
         return problemRepository.findProblemByProblemId(problemId);
     }
 
-    public ProblemDto editProblem(String problemId, ProblemDto updatedProblem) {
+    public ProblemDto editProblem(String problemId, ProblemDto updatedProblem, String token) {
         Problem problem = problemRepository.findProblemByProblemId(problemId);
 
         if (problem == null) {
@@ -113,6 +126,7 @@ public class ProblemService {
                 || updatedProblem.getDescription() == null
                 || updatedProblem.getName().isEmpty()
                 || updatedProblem.getDescription().isEmpty()
+                || updatedProblem.getOwner() == null
                 || updatedProblem.getDifficulty() == null
                 || updatedProblem.getProblemInputs() == null
                 || updatedProblem.getTestCases() == null
@@ -120,6 +134,8 @@ public class ProblemService {
                 || updatedProblem.getApproval() == null) {
             throw new ApiException(ProblemError.EMPTY_FIELD);
         }
+
+        service.verifyTokenMatchesUid(token, updatedProblem.getOwner().getUid());
 
         if (updatedProblem.getApproval() && updatedProblem.getTestCases().size() == 0) {
             throw new ApiException(ProblemError.BAD_APPROVAL);
@@ -224,13 +240,13 @@ public class ProblemService {
         return true;
     }
 
-    public ProblemDto deleteProblem(String problemId) {
+    public ProblemDto deleteProblem(String problemId, String token) {
         Problem problem = problemRepository.findProblemByProblemId(problemId);
-
         if (problem == null) {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
 
+        service.verifyTokenMatchesUid(token, problem.getOwner().getUid());
         problemRepository.delete(problem);
 
         return ProblemMapper.toDto(problem);
@@ -293,11 +309,13 @@ public class ProblemService {
         return chosenProblems;
     }
 
-    public ProblemTestCaseDto createTestCase(String problemId, CreateTestCaseRequest request) {
+    public ProblemTestCaseDto createTestCase(String problemId, CreateTestCaseRequest request, String token) {
         Problem problem = problemRepository.findProblemByProblemId(problemId);
         if (problem == null) {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
+
+        service.verifyTokenMatchesUid(token, problem.getOwner().getUid());
 
         // Problem input and output are the two required fields.
         if (request.getInput() == null || request.getOutput() == null) {
@@ -451,20 +469,5 @@ public class ProblemService {
 
     private boolean validProblemTagName(String name) {
         return name != null && name.length() > 0 && name.length() < 20;
-    }
-
-    /**
-     * This method is used in a GET request to see if users can access the
-     * problem pages on the frontend. The parameter is compared against the
-     * problem access password environment variable; if no environment variable
-     * is set, then it returns false.
-     * 
-     * @param password the password supplied by the user
-     * @return true iff the password supplied by the user matches the set system
-     * password, false otherwise
-     */
-    public Boolean accessProblems(String password) {
-        return System.getenv(PROBLEM_ACCESS_PASSWORD_KEY) != null
-            && password.equals(System.getenv(PROBLEM_ACCESS_PASSWORD_KEY));
     }
 }
