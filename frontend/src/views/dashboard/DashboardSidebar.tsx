@@ -35,6 +35,7 @@ const InnerContent = styled.div`
 const DashboardText = styled.p`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   font-weight: bold;
+  color: ${({ theme }) => theme.colors.darkText};
   margin: 4px 15px;
 `;
 

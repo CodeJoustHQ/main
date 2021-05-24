@@ -1,5 +1,9 @@
 import styled from 'styled-components';
 
+export const RelativeContainer = styled.div`
+  position: relative;
+`;
+
 export const FlexContainer = styled.div`
   display: flex;
   flex: auto;
@@ -14,7 +18,6 @@ export const FlexBareContainer = styled.div`
 export const FlexHorizontalContainer = styled.div`
   display: flex;
   flex: auto;
-  margin: 1rem;
 `;
 
 export const FlexInfoBar = styled.div`

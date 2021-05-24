@@ -13,7 +13,7 @@ export enum DashboardTab {
 }
 
 const Content = styled.div`
-  padding-top: 40px;
+  padding-top: 60px;
   padding-bottom: 50px;
 `;
 
@@ -62,9 +62,9 @@ function DashboardPage() {
     <Content>
       <DashboardSidebar tab={tab} onClick={setTab} />
       <RightContent>
-        { error ? <ErrorMessage message={error} /> : null }
-        { loading ? <Loading /> : null }
         <InnerContent>
+          { error ? <ErrorMessage message={error} /> : null }
+          { loading ? <Loading /> : null }
           {getDisplay()}
         </InnerContent>
       </RightContent>
