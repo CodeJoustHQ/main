@@ -1,16 +1,8 @@
 import React from 'react';
 import { PrimaryButtonLink, TextLink } from '../components/core/Link';
 import { MainHeaderText, LandingHeaderTitle } from '../components/core/Text';
-import { useAppSelector } from '../util/Hook';
-import DashboardPage from './account/Dashboard';
 
 function LandingPage() {
-  const { firebaseUser } = useAppSelector((state) => state.account);
-
-  if (firebaseUser) {
-    return <DashboardPage />;
-  }
-
   return (
     <>
       <LandingHeaderTitle>

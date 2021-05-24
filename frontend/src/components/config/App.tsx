@@ -16,12 +16,12 @@ import AllProblemsPage from '../../views/AllProblemsPage';
 import ProblemPage from '../../views/ProblemPage';
 import CreateProblemPage from '../../views/CreateProblemPage';
 import CircleBackgroundLayout from '../layout/CircleBackground';
-import DashboardPage from '../../views/account/Dashboard';
+import DashboardPage from '../../views/dashboard/Dashboard';
 import LoginPage from '../../views/account/Login';
 import RegisterPage from '../../views/account/Register';
 import ContactUsPage from '../../views/ContactUs';
 import MinimalLayout from '../layout/MinimalLayout';
-import { useAppDispatch } from '../../util/Hook';
+import { useAppDispatch, useAppSelector } from '../../util/Hook';
 import app from '../../api/Firebase';
 import { setFirebaseUser, FirebaseUserType, setToken } from '../../redux/Account';
 import { CenteredContainer } from '../core/Container';
@@ -37,6 +37,8 @@ function App() {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
 
+  const { firebaseUser } = useAppSelector((state) => state.account);
+
   // Track page view on every change in location and clear errors when switching pages
   useEffect(() => {
     ReactGA.pageview(location.pathname);
@@ -44,13 +46,13 @@ function App() {
 
   // Set authentication status when Firebase auth status changes
   useEffect(() => {
-    app.auth().onAuthStateChanged((firebaseUser) => {
-      dispatch(setFirebaseUser(firebaseUser?.toJSON() as FirebaseUserType || null));
+    app.auth().onAuthStateChanged((user) => {
+      dispatch(setFirebaseUser(user?.toJSON() as FirebaseUserType || null));
       setLoading(false);
 
       // Save Token in Redux state if authenticated
-      if (firebaseUser) {
-        firebaseUser.getIdToken(true)
+      if (user) {
+        user.getIdToken(true)
           .then((token) => dispatch(setToken(token)));
       }
     });
@@ -67,7 +69,9 @@ function App() {
 
   return (
     <Switch>
-      <CustomRoute path="/" component={LandingPage} layout={CircleBackgroundLayout} exact />
+      {firebaseUser
+        ? <CustomRoute path="/" component={DashboardPage} layout={MinimalLayout} exact />
+        : <CustomRoute path="/" component={LandingPage} layout={CircleBackgroundLayout} exact />}
       <CustomRoute path="/game" component={GamePage} layout={GameLayout} exact />
       <CustomRoute path="/game/join" component={JoinGamePage} layout={CircleBackgroundLayout} exact />
       <CustomRoute path="/game/create" component={CreateGamePage} layout={CircleBackgroundLayout} exact />
