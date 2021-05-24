@@ -30,11 +30,12 @@ type ProblemTagsParams = {
   problemTags: ProblemTag[],
   addTag: (problemTag: ProblemTag) => void,
   removeTag: (index: number) => void,
+  viewOnly: boolean,
 };
 
 function ProblemTags(props: ProblemTagsParams) {
   const {
-    problemTags, addTag, removeTag,
+    problemTags, addTag, removeTag, viewOnly,
   } = props;
 
   const [allTags, setAllTags] = useState<ProblemTag[]>([]);
@@ -81,35 +82,41 @@ function ProblemTags(props: ProblemTagsParams) {
         tags={problemTags}
         onRemove={removeTag}
       />
-      <TagSelector
-        tags={allTags}
-        selectedTags={problemTags}
-        onSelect={addTag}
-      />
-      <GrayTextButton
-        onClick={() => setTagModal(true)}
-      >
-        Create New Tag +
-      </GrayTextButton>
-      <Modal show={tagModal} onExit={() => setTagModal(false)} fullScreen>
-        <LowMarginMediumText>Create New Tag</LowMarginMediumText>
-        <LargeTextInput
-          value={tagName}
-          placeholder="Enter new tag name"
-          onChange={(e) => setTagName(e.target.value)}
-        />
-        <SmallButton
-          onClick={() => createNewTag(tagName)}
-        >
-          Create Tag
-        </SmallButton>
-        {loading ? <Loading /> : null}
-        {error ? <ErrorMessage message={error} /> : null}
-        <LowMarginMediumText>Filter Tags</LowMarginMediumText>
-        <FilterAllTagsDisplay
-          tags={allTags}
-        />
-      </Modal>
+      {
+        !viewOnly ? (
+          <>
+            <TagSelector
+              tags={allTags}
+              selectedTags={problemTags}
+              onSelect={addTag}
+            />
+            <GrayTextButton
+              onClick={() => setTagModal(true)}
+            >
+              Create New Tag +
+            </GrayTextButton>
+            <Modal show={tagModal} onExit={() => setTagModal(false)} fullScreen>
+              <LowMarginMediumText>Create New Tag</LowMarginMediumText>
+              <LargeTextInput
+                value={tagName}
+                placeholder="Enter new tag name"
+                onChange={(e) => setTagName(e.target.value)}
+              />
+              <SmallButton
+                onClick={() => createNewTag(tagName)}
+              >
+                Create Tag
+              </SmallButton>
+              {loading ? <Loading /> : null}
+              {error ? <ErrorMessage message={error} /> : null}
+              <LowMarginMediumText>Filter Tags</LowMarginMediumText>
+              <FilterAllTagsDisplay
+                tags={allTags}
+              />
+            </Modal>
+          </>
+        ) : null
+      }
     </>
   );
 }

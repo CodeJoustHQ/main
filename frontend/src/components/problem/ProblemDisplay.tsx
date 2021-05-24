@@ -515,11 +515,16 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             return null;
           })}
 
-          <ProblemTags
-            problemTags={newProblem.problemTags}
-            addTag={addTag}
-            removeTag={removeTag}
-          />
+          {
+            editMode ? (
+              <ProblemTags
+                problemTags={newProblem.problemTags}
+                addTag={addTag}
+                removeTag={removeTag}
+                viewOnly={!problemEditable}
+              />
+            ) : null
+          }
 
           <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
           {newProblem.problemInputs.map((input, index) => (
