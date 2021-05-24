@@ -14,9 +14,10 @@ type TabItemProps = {
 const Content = styled.div`
   position: absolute;
   width: 300px;
-  top: 20px;
-  bottom: 20px;
-  padding: 16px;
+  top: 100px;
+  left: 30px;
+  bottom: 30px;
+  padding: 15px;
   text-align: left;
   
   border-radius: 12px;

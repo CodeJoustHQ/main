@@ -1,11 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
 import { MinimalHeader } from '../navigation/Header';
-import { FullWidthContainer } from '../core/Container';
+import { FullContainer } from '../core/Container';
 
 const Content = styled.div`
   width: 100%;
   min-height: 100vh;
+  //display: flex;
+  //flex-direction: column;
+  
   text-align: center;
   background-color: ${({ theme }) => theme.colors.background};
 `;
@@ -14,15 +17,15 @@ type MyProps = {
   children: React.ReactNode,
 }
 
-function FullWidthLayout({ children }: MyProps) {
+function FullLayout({ children }: MyProps) {
   return (
     <Content>
       <MinimalHeader />
-      <FullWidthContainer>
+      <FullContainer>
         {children}
-      </FullWidthContainer>
+      </FullContainer>
     </Content>
   );
 }
 
-export default FullWidthLayout;
+export default FullLayout;

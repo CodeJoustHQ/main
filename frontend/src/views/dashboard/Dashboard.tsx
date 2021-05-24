@@ -7,16 +7,22 @@ import ErrorMessage from '../../components/core/Error';
 import Loading from '../../components/core/Loading';
 import MyProblems from './MyProblems';
 import DashboardSidebar from './DashboardSidebar';
-import { Row, Column } from '../../components/core/Grid';
 
 export enum DashboardTab {
   PROBLEMS, GAME_HISTORY, SUGGEST_FEATURE,
 }
 
 const Content = styled.div`
-  position: relative;
-  height: 85vh;
-  padding: 20px;
+  padding-bottom: 50px;
+`;
+
+const RightContent = styled.div`
+  // [Dashboard: left + 2*padding + width] + [Problem Card: margin]
+  margin-left: 380px;
+`;
+
+const InnerContent = styled.div`
+  width: 80%;
 `;
 
 function DashboardPage() {
@@ -45,14 +51,12 @@ function DashboardPage() {
 
       <br />
       <br />
-      <Row>
-        <Column>
-          <DashboardSidebar tab={tab} />
-        </Column>
-        <Column>
+      <DashboardSidebar tab={tab} />
+      <RightContent>
+        <InnerContent>
           <MyProblems loading={loading} />
-        </Column>
-      </Row>
+        </InnerContent>
+      </RightContent>
     </Content>
   );
 }

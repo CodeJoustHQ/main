@@ -105,7 +105,7 @@ export const ProblemContainer = styled.div`
   width: 80%;
 `;
 
-export const FullWidthContainer = styled.div`
+export const FullContainer = styled.div`
   width: 100%;
 `;
 

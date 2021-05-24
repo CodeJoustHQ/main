@@ -21,7 +21,7 @@ import LoginPage from '../../views/account/Login';
 import RegisterPage from '../../views/account/Register';
 import ContactUsPage from '../../views/ContactUs';
 import MinimalLayout from '../layout/MinimalLayout';
-import FullWidthLayout from '../layout/FullWidthLayout';
+import FullLayout from '../layout/FullLayout';
 import { useAppDispatch, useAppSelector } from '../../util/Hook';
 import app from '../../api/Firebase';
 import { setFirebaseUser, FirebaseUserType, setToken } from '../../redux/Account';
@@ -71,7 +71,7 @@ function App() {
   return (
     <Switch>
       {firebaseUser
-        ? <CustomRoute path="/" component={DashboardPage} layout={FullWidthLayout} exact />
+        ? <CustomRoute path="/" component={DashboardPage} layout={FullLayout} exact />
         : <CustomRoute path="/" component={LandingPage} layout={CircleBackgroundLayout} exact />}
       <CustomRoute path="/game" component={GamePage} layout={GameLayout} exact />
       <CustomRoute path="/game/join" component={JoinGamePage} layout={CircleBackgroundLayout} exact />
