@@ -5,6 +5,7 @@ import ErrorMessage from '../core/Error';
 import { displayNameFromDifficulty } from '../../api/Difficulty';
 import { InlineDifficultyDisplayButton } from '../core/Button';
 import { TextInput } from '../core/Input';
+import { useClickOutside } from '../../util/Hook';
 
 type ProblemSelectorProps = {
   selectedProblems: SelectableProblem[],
@@ -78,16 +79,7 @@ export function ProblemSelector(props: ProblemSelectorProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   // Close list of problems if clicked outside of div
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current!.contains(e.target as Node)) {
-        setShowProblems(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [ref]);
+  useClickOutside(ref, () => setShowProblems(false));
 
   useEffect(() => {
     getProblems(true)
@@ -160,17 +152,8 @@ export function TagSelector(props: TagSelectorProps) {
 
   const ref = useRef<HTMLDivElement>(null);
 
-  // Close list of problems if clicked outside of div
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current!.contains(e.target as Node)) {
-        setShowTags(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [ref]);
+  // Close list of tags if clicked outside of div
+  useClickOutside(ref, () => setShowTags(false));
 
   const setSelectedStatus = (index: number) => {
     setShowTags(false);
