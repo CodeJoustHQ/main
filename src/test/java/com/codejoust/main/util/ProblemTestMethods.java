@@ -148,6 +148,7 @@ public class ProblemTestMethods {
         problemActual.setProblemTags(Collections.singletonList(problemTag));
 
         MvcResult problemResult2 = mockMvc.perform(put(String.format(PUT_PROBLEM_EDIT, problemActual.getProblemId()))
+                .header(HttpHeaders.AUTHORIZATION, TestFields.TOKEN)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(problemActual)))
                 .andDo(print()).andExpect(status().isOk())
