@@ -1,10 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Problem } from '../../api/Problem';
-import { Text } from '../core/Text';
-import {
-  CenteredContainer, FlexHorizontalContainer, FlexLeft, FlexRight,
-} from '../core/Container';
+import { LargeText, Text } from '../core/Text';
+import { getDifficultyDisplayButton } from '../core/Button';
 
 type ProblemCardProps = {
   problem: Problem,
@@ -14,13 +12,21 @@ type ProblemCardProps = {
 const Content = styled.div`
   display: block;
   margin: 10px;
-  border-radius: 5px;
-  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
+  padding: 10px 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   background-color: ${({ theme }) => theme.colors.white};
+  text-align: left;
   
   &:hover {
     cursor: pointer;
   }
+`;
+
+const TitleText = styled(LargeText)`
+  margin: 10px 12px 10px 0;
+  display: inline;
+  vertical-align: middle;
 `;
 
 function ProblemCard(props: ProblemCardProps) {
@@ -28,23 +34,9 @@ function ProblemCard(props: ProblemCardProps) {
 
   return (
     <Content onClick={() => onClick(problem.problemId)}>
-      <FlexHorizontalContainer>
-        <FlexLeft>
-          <CenteredContainer>
-            <Text bold>{problem.name}</Text>
-            <br />
-            <Text>{problem.description.substring(0, 50)}</Text>
-          </CenteredContainer>
-        </FlexLeft>
-
-        <FlexRight>
-          <CenteredContainer>
-            <Text>{problem.approval ? 'Approved' : 'Pending Approval'}</Text>
-            <br />
-            <Text>{problem.difficulty}</Text>
-          </CenteredContainer>
-        </FlexRight>
-      </FlexHorizontalContainer>
+      <TitleText>{problem.name}</TitleText>
+      {getDifficultyDisplayButton(problem.difficulty)}
+      <Text>{`${problem.description.substring(0, 80)}...`}</Text>
     </Content>
   );
 }
