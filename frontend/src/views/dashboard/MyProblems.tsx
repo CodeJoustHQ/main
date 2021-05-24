@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import { MainHeaderText } from '../../components/core/Text';
 import ProblemCard from '../../components/card/ProblemCard';
@@ -9,6 +10,10 @@ type MyProblemsProps = {
   loading: boolean,
 };
 
+const Content = styled.div`
+  text-align: left;
+`;
+
 function MyProblems(props: MyProblemsProps) {
   const { loading } = props;
 
@@ -16,7 +21,7 @@ function MyProblems(props: MyProblemsProps) {
   const { account } = useAppSelector((state) => state.account);
 
   return (
-    <>
+    <Content>
       <MainHeaderText>My Problems</MainHeaderText>
       {account?.problems.map((problem, index) => (
         <ProblemCard
@@ -34,7 +39,7 @@ function MyProblems(props: MyProblemsProps) {
           </TextLink>
         </>
       ) : null}
-    </>
+    </Content>
   );
 }
 

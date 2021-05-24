@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useAppDispatch, useAppSelector } from '../../util/Hook';
 import { getAccount } from '../../api/Account';
@@ -13,12 +13,13 @@ export enum DashboardTab {
 }
 
 const Content = styled.div`
+  padding-top: 40px;
   padding-bottom: 50px;
 `;
 
 const RightContent = styled.div`
-  // [Dashboard: left + 2*padding + width] + [Problem Card: margin]
-  margin-left: 380px;
+  // [Dashboard: left + width] + [Problem Card: margin]
+  margin-left: 350px;
 `;
 
 const InnerContent = styled.div`
@@ -44,17 +45,27 @@ function DashboardPage() {
     }
   }, [dispatch, firebaseUser, token]);
 
+  const getDisplay = useCallback(() => {
+    switch (tab) {
+      case DashboardTab.PROBLEMS:
+        return <MyProblems loading={loading} />;
+      case DashboardTab.GAME_HISTORY:
+        return <p>game history</p>;
+      case DashboardTab.SUGGEST_FEATURE:
+        return <p>suggest a feature</p>;
+      default:
+        return <p>Option not found.</p>;
+    }
+  }, [tab]);
+
   return (
     <Content>
-      { error ? <ErrorMessage message={error} /> : null }
-      { loading ? <Loading /> : null }
-
-      <br />
-      <br />
-      <DashboardSidebar tab={tab} />
+      <DashboardSidebar tab={tab} onClick={setTab} />
       <RightContent>
+        { error ? <ErrorMessage message={error} /> : null }
+        { loading ? <Loading /> : null }
         <InnerContent>
-          <MyProblems loading={loading} />
+          {getDisplay()}
         </InnerContent>
       </RightContent>
     </Content>
