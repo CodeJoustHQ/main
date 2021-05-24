@@ -69,8 +69,9 @@ public class Problem {
     private List<ProblemInput> problemInputs = new ArrayList<>();
 
     // List of tags associated with this problem
-    @ManyToMany(mappedBy = "problems", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Setter(AccessLevel.PRIVATE)
+    @JoinColumn(name = "problem_tag_id")
     @Fetch(value = FetchMode.SUBSELECT)
     private List<ProblemTag> problemTags = new ArrayList<>();
 
@@ -88,11 +89,9 @@ public class Problem {
 
     public void addProblemTag(ProblemTag problemTag) {
         problemTags.add(problemTag);
-        problemTag.addProblem(this);
     }
 
     public boolean removeProblemTag(ProblemTag problemTag) {
-        problemTag.removeProblem(this);
         return problemTags.remove(problemTag);
     }
 

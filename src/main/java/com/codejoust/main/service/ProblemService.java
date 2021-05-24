@@ -181,18 +181,12 @@ public class ProblemService {
             throw new ApiException(ProblemError.DUPLICATE_TAG_NAME);
         }
 
-        // The old problem tags associated with the problem.
-        List<ProblemTag> oldProblemTags = new ArrayList<>(problem.getProblemTags());
+        problem.getProblemTags().clear();
         for (ProblemTagDto problemTagDto : updatedProblemTags) {
             // Add the tag if the name already exists, or create a new one.
             ProblemTag existingProblemTag = problemTagRepository.findTagByName(problemTagDto.getName());
             if (existingProblemTag != null) {
-                // Add the problem tag or remove from old list to be removed.
-                if (oldProblemTags.contains(existingProblemTag)) {
-                    oldProblemTags.remove(existingProblemTag);
-                } else {
-                    problem.addProblemTag(existingProblemTag);
-                }
+                problem.addProblemTag(existingProblemTag);
             } else if (validProblemTagName(problemTagDto.getName())) {
                 ProblemTag problemTag = new ProblemTag();
                 problemTag.setName(problemTagDto.getName());
@@ -202,21 +196,7 @@ public class ProblemService {
             }
         }
 
-        /**
-         * Remove all the old problem tags.
-         * The tags own the removal side of the relationship, and are
-         * updated here whereas the problem is updated below.
-         */
-        for (ProblemTag oldProblemTag : oldProblemTags) {
-            oldProblemTag.removeProblem(problem);
-        }
-
         problemRepository.save(problem);
-
-        // Remove the old problem tags from the problem to update the DTO.
-        for (ProblemTag oldProblemTag : oldProblemTags) {
-            problem.removeProblemTag(oldProblemTag);
-        }
 
         return ProblemMapper.toDto(problem);
     }
@@ -414,15 +394,10 @@ public class ProblemService {
     }
 
     public List<ProblemDto> getProblemsWithTag(String tagId) {
-        ProblemTag problemTag = problemTagRepository.findTagByTagId(tagId);
-
-        // Throw an exception if no tag with the provided id exists.
-        if (problemTag == null) {
-            throw new ApiException(ProblemError.TAG_NOT_FOUND);
-        }
+        List<Problem> problems = problemRepository.findByProblemTags_TagId(tagId);
 
         List<ProblemDto> problemDtos = new ArrayList<>();
-        problemTag.getProblems().forEach(problem -> problemDtos.add(ProblemMapper.toDto(problem)));
+        problems.forEach(problem -> problemDtos.add(ProblemMapper.toDto(problem)));
         return problemDtos;
     }
 
