@@ -14,6 +14,7 @@ public interface ProblemRepository extends CrudRepository<Problem, Integer> {
     Problem findProblemByProblemId(String problemId);
     List<Problem> findAllByDifficultyAndApproval(ProblemDifficulty difficulty, Boolean approval);
     List<Problem> findAllByApproval(Boolean approval);
+    List<Problem> findByProblemTags_TagId(String tagId);
     @Override
     List<Problem> findAll();
 }

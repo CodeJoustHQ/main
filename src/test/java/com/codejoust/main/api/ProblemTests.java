@@ -70,8 +70,9 @@ class ProblemTests {
     ).replaceAll("\t", "    ");
 
     public static final String pythonDefaultCode = String.join("\n",
-        "class Solution(object):",
-        "\tdef solve(nums):",
+        "class Solution:",
+        "",
+        "\tdef solve(self, nums: list[int]) -> list[int]:",
         "\t\t"
     ).replaceAll("\t", "    ");
 
@@ -452,12 +453,8 @@ class ProblemTests {
         ProblemDto problemDto = ProblemTestMethods.createSingleProblemAndTags(this.mockMvc);
 
         String tagId = problemDto.getProblemTags().get(0).getTagId();
-        MvcResult result = this.mockMvc.perform(get(TestUrls.getProblemsWithTag(tagId)))
-            .andDo(print()).andExpect(status().isOk())
-            .andReturn();
-        String jsonResponse = result.getResponse().getContentAsString();
         Type listType = new TypeToken<ArrayList<ProblemDto>>(){}.getType();
-        List<ProblemDto> problemResult = new Gson().fromJson(jsonResponse, listType);
+        List<ProblemDto> problemResult = MockHelper.getRequest(this.mockMvc, TestUrls.getProblemsWithTag(tagId), listType, HttpStatus.OK);
 
         assertEquals(1, problemResult.size());
         assertEquals(problemDto, problemResult.get(0));
@@ -474,12 +471,8 @@ class ProblemTests {
 
         ProblemTagDto problemTag = ProblemTestMethods.createSingleProblemTag(this.mockMvc);
 
-        MvcResult result = this.mockMvc.perform(get(TestUrls.getAllProblemTags()))
-            .andDo(print()).andExpect(status().isOk())
-            .andReturn();
-        String jsonResponse = result.getResponse().getContentAsString();
         Type listType = new TypeToken<ArrayList<ProblemTagDto>>(){}.getType();
-        List<ProblemTagDto> problemTagResult = new Gson().fromJson(jsonResponse, listType);
+        List<ProblemDto> problemTagResult = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblemTags(), listType, HttpStatus.OK);
 
         assertEquals(1, problemTagResult.size());
         assertEquals(problemTag, problemTagResult.get(0));

@@ -2,6 +2,8 @@ import axios from 'axios';
 import { axiosErrorHandler } from './Error';
 import { Difficulty } from './Difficulty';
 import Language from './Language';
+import { AccountUid } from './Account';
+import { getAuthHttpHeader } from '../util/Utility';
 
 export type TestCase = {
   id: string,
@@ -14,6 +16,7 @@ export type TestCase = {
 export type Problem = {
   problemId: string,
   name: string,
+  owner: AccountUid,
   description: string,
   approval: boolean,
   difficulty: Difficulty,
@@ -93,7 +96,6 @@ const routes = {
   getProblems: `${basePath}/`,
   createProblem: `${basePath}/`,
   getRandomProblem: `${basePath}/random`,
-  accessProblems: (password: string) => `${basePath}/access/${password}`,
   getSingleProblem: (problemId: string) => `${basePath}/${problemId}`,
   editProblem: (problemId: string) => `${basePath}/${problemId}`,
   deleteProblem: (problemId: string) => `${basePath}/${problemId}`,
@@ -126,63 +128,27 @@ export const getSingleProblem = (problemId: string): Promise<Problem> => axios
     throw axiosErrorHandler(err);
   });
 
-export const createProblem = (problem: Problem): Promise<Problem> => axios
-  .post<Problem>(routes.createProblem, problem)
+export const createProblem = (problem: Problem, token: string): Promise<Problem> => axios
+  .post<Problem>(routes.createProblem, problem, getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
 
-export const editProblem = (problemId: string, updatedProblem: Problem): Promise<Problem> => axios
-  .put<Problem>(routes.editProblem(problemId), updatedProblem)
+export const editProblem = (problemId: string,
+  updatedProblem: Problem, token: string): Promise<Problem> => axios
+  .put<Problem>(routes.editProblem(problemId), updatedProblem, getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
 
-export const deleteProblem = (problemId: string): Promise<Problem> => axios
-  .delete<Problem>(routes.deleteProblem(problemId))
+export const deleteProblem = (problemId: string, token: string): Promise<Problem> => axios
+  .delete<Problem>(routes.deleteProblem(problemId), getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
-
-export const accessProblems = (password: string): Promise<boolean> => axios
-  .get<boolean>(routes.accessProblems(password))
-  .then((res) => res.data)
-  .catch((err) => {
-    throw axiosErrorHandler(err);
-  });
-
-// This function helps check if the user can access the problems.
-const sendAccessProblem = (location: string, passwordParam: string,
-  history: any, setLoading: any, setError: any) => {
-  setLoading(true);
-  setError('');
-  accessProblems(passwordParam)
-    .then((access: boolean) => {
-      setLoading(false);
-      if (access) {
-        // Push to history to give access with location on refresh.
-        history.push(location, {
-          locked: false,
-        });
-      } else {
-        setError('The password was incorrect; please contact support@codejoust.co if you wish to help edit problems.');
-      }
-    })
-    .catch((err) => {
-      setLoading(false);
-      setError(err.message);
-    });
-};
-
-// Partially implemented access problem function.
-export const sendAccessProblemPartial = (
-  location: string, history: any, setLoading: any, setError: any,
-) => (passwordParam: string) => sendAccessProblem(
-  location, passwordParam, history, setLoading, setError,
-);
 
 export const getDefaultCodeMap = (problemId: string): Promise<DefaultCodeType> => axios
   .get<DefaultCodeType>(routes.defaultCodeMap(problemId))

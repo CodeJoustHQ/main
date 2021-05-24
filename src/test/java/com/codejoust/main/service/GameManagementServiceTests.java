@@ -1,5 +1,6 @@
 package com.codejoust.main.service;
 
+import com.codejoust.main.dto.game.EndGameRequest;
 import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -505,7 +506,7 @@ public class GameManagementServiceTests {
         gameService.submitSolution(TestFields.ROOM_ID, request);
 
         verify(submitService).submitSolution(eq(game), eq(request));
-        verify(gameService).endGame(eq(game));
+        verify(gameService).handleEndGame(eq(game));
 
         // Confirm that socket sent updated GameDto object.
         verify(socketService).sendSocketUpdate(eq(GameMapper.toDto(game)));
@@ -1083,7 +1084,7 @@ public class GameManagementServiceTests {
         // Manually schedule notification tasks due to service being mocked
         new NotificationService(socketService).scheduleTimeLeftNotifications(game, 12L);
 
-        gameService.endGame(game);
+        gameService.handleEndGame(game);
 
         // Neither the end game nor time left notifications are sent
         verify(socketService, after(13000).never()).sendSocketUpdate(Mockito.any(String.class), Mockito.any(GameNotificationDto.class));
@@ -1148,5 +1149,24 @@ public class GameManagementServiceTests {
 
         gameService.conditionallyUpdateSocketInfo(room, newUser);
         verify(socketService, never()).sendSocketUpdate(Mockito.any(GameDto.class));
+    }
+
+    @Test
+    public void manuallyEndGamePermissionDenied() {
+        User host = new User();
+        host.setUserId(TestFields.USER_ID);
+
+        Room room = new Room();
+        room.setRoomId(TestFields.ROOM_ID);
+        room.setHost(host);
+
+        Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
+        gameService.createAddGameFromRoom(room);
+
+        EndGameRequest request = new EndGameRequest();
+        request.setInitiator(new UserDto());
+
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.manuallyEndGame(TestFields.ROOM_ID, request));
+        assertEquals(GameError.INVALID_PERMISSIONS, exception.getError());
     }
 }

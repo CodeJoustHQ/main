@@ -44,6 +44,7 @@ import { generateRandomId, validIdentifier } from '../../util/Utility';
 import { HoverTooltip } from '../core/HoverTooltip';
 import { Coordinate } from '../special/FloatingCircle';
 import ProblemTags from './ProblemTags';
+import { useAppSelector, useProblemEditable } from '../../util/Hook';
 
 const MainContent = styled.div`
   text-align: left;
@@ -173,6 +174,9 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   } = props;
 
   const history = useHistory();
+  const { firebaseUser, token } = useAppSelector((state) => state.account);
+  const problemEditable = useProblemEditable(firebaseUser, problem);
+
   const [newProblem, setNewProblem] = useState<Problem>(problem);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -208,7 +212,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
     setLoading(true);
     setError('');
 
-    deleteProblem(newProblem.problemId)
+    deleteProblem(newProblem.problemId, token || '')
       .then(() => {
         setLoading(false);
         history.replace('/problems/all');
@@ -334,18 +338,18 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             <InvertedSmallButton
               onClick={() => {
                 onClick(newProblem);
-                history.push('/problems/all', {
-                  locked: false,
-                });
+                history.goBack();
               }}
             >
               Back
             </InvertedSmallButton>
-            <SmallButton
-              onClick={() => onClick(newProblem)}
-            >
-              {actionText}
-            </SmallButton>
+            {problemEditable ? (
+              <SmallButton
+                onClick={() => onClick(newProblem)}
+              >
+                {actionText}
+              </SmallButton>
+            ) : null}
           </TopButtonsContainer>
         </FlexBareContainer>
         <SettingsContainerHighPadding>
@@ -354,16 +358,18 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             name="name"
             value={newProblem.name}
             onChange={handleChange}
+            readOnly={!problemEditable}
           />
           <TitleDescriptionSeparator />
           <StyledMarkdownEditor
             placeholder="Write a nice description"
             defaultValue={newProblem.description}
             onChange={(getNewValue) => handleDescriptionChange(getNewValue())}
+            readOnly={!problemEditable}
           />
         </SettingsContainerHighPadding>
 
-        {editMode
+        {editMode && problemEditable
           ? (
             <>
               <SmallHeaderText>Test Cases</SmallHeaderText>
@@ -483,6 +489,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           >
             <ToggleButton
               onChangeFunction={() => handleApprovalChange(!newProblem.approval)}
+              editable={problemEditable}
               checked={newProblem.approval}
             />
             <ApprovalText>
@@ -497,9 +504,9 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                 <SmallDifficultyButton
                   key={generateRandomId()}
                   difficulty={difficulty || Difficulty.Random}
-                  onClick={() => handleEnumChange('difficulty', difficulty)}
+                  onClick={() => (problemEditable ? handleEnumChange('difficulty', difficulty) : '')}
                   active={difficulty === newProblem.difficulty}
-                  enabled
+                  enabled={problemEditable}
                 >
                   {key}
                 </SmallDifficultyButton>
@@ -521,6 +528,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                 value={newProblem.problemInputs[index].name}
                 onChange={(e) => handleInputChange(index,
                   e.target.value, newProblem.problemInputs[index].type)}
+                disabled={!problemEditable}
               />
 
               <InlineErrorIcon
@@ -539,6 +547,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                   ProblemIOType[e.target.value as keyof typeof ProblemIOType],
                 )}
                 value={problemIOTypeToString(newProblem.problemInputs[index].type)}
+                disabled={!problemEditable}
               >
                 {
                   Object.keys(ProblemIOType).map((key) => (
@@ -547,23 +556,27 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                 }
               </PrimarySelect>
 
-              <CancelTextButton
-                onClick={() => deleteProblemInput(index)}
-              >
-                ✕
-              </CancelTextButton>
+              {problemEditable ? (
+                <CancelTextButton
+                  onClick={() => deleteProblemInput(index)}
+                >
+                  ✕
+                </CancelTextButton>
+              ) : null}
             </InputTypeContainer>
           ))}
-          <GrayTextButton
-            onClick={addProblemInput}
-          >
-            Add +
-          </GrayTextButton>
+
+          {problemEditable ? (
+            <GrayTextButton onClick={addProblemInput}>
+              Add +
+            </GrayTextButton>
+          ) : null}
 
           <LowMarginMediumText>Problem Output</LowMarginMediumText>
           <PrimarySelect
             onChange={(e) => handleEnumChange('outputType', ProblemIOType[e.target.value as keyof typeof ProblemIOType])}
             value={problemIOTypeToString(newProblem.outputType)}
+            disabled={!problemEditable}
           >
             {
               Object.keys(ProblemIOType).map((key) => (
@@ -572,7 +585,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             }
           </PrimarySelect>
 
-          {editMode
+          {editMode && problemEditable
             ? (
               <>
                 <LowMarginMediumText>Danger Zone</LowMarginMediumText>

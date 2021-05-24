@@ -9,9 +9,12 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.ManyToMany;
 
+import com.codejoust.main.model.Account;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -35,6 +38,12 @@ public class Problem {
     // Auto-generate default business ID for each problem
     @EqualsAndHashCode.Include
     private String problemId = UUID.randomUUID().toString();
+
+    // The person who created the problem and has permissions to edit it
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "account_id")
+    private Account owner;
+
     private String name;
     private Boolean approval = false;
 
@@ -60,8 +69,9 @@ public class Problem {
     private List<ProblemInput> problemInputs = new ArrayList<>();
 
     // List of tags associated with this problem
-    @ManyToMany(mappedBy = "problems", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @Setter
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Setter(AccessLevel.PRIVATE)
+    @JoinColumn(name = "problem_tag_id")
     @Fetch(value = FetchMode.SUBSELECT)
     private List<ProblemTag> problemTags = new ArrayList<>();
 
@@ -79,11 +89,9 @@ public class Problem {
 
     public void addProblemTag(ProblemTag problemTag) {
         problemTags.add(problemTag);
-        problemTag.addProblem(this);
     }
 
     public boolean removeProblemTag(ProblemTag problemTag) {
-        problemTag.removeProblem(this);
         return problemTags.remove(problemTag);
     }
 

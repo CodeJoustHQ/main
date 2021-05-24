@@ -1,5 +1,8 @@
 import React from 'react';
-import { Redirect, Route } from 'react-router-dom';
+import {
+  Redirect, Route, useHistory, useLocation,
+} from 'react-router-dom';
+import { useAppSelector } from '../../util/Hook';
 
 export function CustomRoute(props: any) {
   const { component: Component, layout: Layout, ...rest } = props;
@@ -22,4 +25,17 @@ export function CustomRedirect(props: any) {
   return (
     <Redirect to={newTo} from={from} />
   );
+}
+
+export function PrivateRoute(props: any) {
+  const history = useHistory();
+  const location = useLocation();
+
+  const { firebaseUser } = useAppSelector((state) => state.account);
+
+  if (!firebaseUser) {
+    history.replace('/login', { from: location.pathname + location.search });
+  }
+
+  return <CustomRoute {...props} />;
 }
