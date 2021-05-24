@@ -105,6 +105,10 @@ export const ProblemContainer = styled.div`
   width: 80%;
 `;
 
+export const FullWidthContainer = styled.div`
+  width: 100%;
+`;
+
 export const CenteredContainer = styled.div`
   text-align: center;
   justify-content: center;

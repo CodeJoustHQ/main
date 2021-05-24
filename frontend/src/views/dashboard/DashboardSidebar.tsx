@@ -12,8 +12,10 @@ type TabItemProps = {
 };
 
 const Content = styled.div`
+  position: absolute;
   width: 300px;
-  height: 800px;
+  top: 20px;
+  bottom: 20px;
   padding: 16px;
   text-align: left;
   

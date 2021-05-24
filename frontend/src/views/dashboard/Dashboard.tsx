@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { useAppDispatch, useAppSelector } from '../../util/Hook';
 import { getAccount } from '../../api/Account';
 import { setAccount } from '../../redux/Account';
@@ -6,10 +7,17 @@ import ErrorMessage from '../../components/core/Error';
 import Loading from '../../components/core/Loading';
 import MyProblems from './MyProblems';
 import DashboardSidebar from './DashboardSidebar';
+import { Row, Column } from '../../components/core/Grid';
 
 export enum DashboardTab {
   PROBLEMS, GAME_HISTORY, SUGGEST_FEATURE,
 }
+
+const Content = styled.div`
+  position: relative;
+  height: 85vh;
+  padding: 20px;
+`;
 
 function DashboardPage() {
   const dispatch = useAppDispatch();
@@ -31,14 +39,21 @@ function DashboardPage() {
   }, [dispatch, firebaseUser, token]);
 
   return (
-    <div>
+    <Content>
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
 
       <br />
-      <DashboardSidebar tab={tab} />
-      <MyProblems loading={loading} />
-    </div>
+      <br />
+      <Row>
+        <Column>
+          <DashboardSidebar tab={tab} />
+        </Column>
+        <Column>
+          <MyProblems loading={loading} />
+        </Column>
+      </Row>
+    </Content>
   );
 }
 
