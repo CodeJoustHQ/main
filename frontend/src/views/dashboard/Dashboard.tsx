@@ -5,8 +5,9 @@ import { setAccount } from '../../redux/Account';
 import ErrorMessage from '../../components/core/Error';
 import Loading from '../../components/core/Loading';
 import MyProblems from './MyProblems';
+import DashboardSidebar from './DashboardSidebar';
 
-enum DashboardTab {
+export enum DashboardTab {
   PROBLEMS, GAME_HISTORY, SUGGEST_FEATURE,
 }
 
@@ -34,6 +35,8 @@ function DashboardPage() {
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
 
+      <br />
+      <DashboardSidebar tab={tab} />
       <MyProblems loading={loading} />
     </div>
   );

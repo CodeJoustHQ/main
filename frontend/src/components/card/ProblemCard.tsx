@@ -35,7 +35,7 @@ function ProblemCard(props: ProblemCardProps) {
   return (
     <Content onClick={() => onClick(problem.problemId)}>
       <TitleText>{problem.name}</TitleText>
-      {getDifficultyDisplayButton(problem.difficulty)}
+      {getDifficultyDisplayButton(problem.difficulty, true)}
       <Text>{`${problem.description.substring(0, 80)}...`}</Text>
     </Content>
   );

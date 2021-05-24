@@ -126,10 +126,10 @@ export const DifficultyDisplayButton = styled(SmallDifficultyButton)`
   }
 `;
 
-export const getDifficultyDisplayButton = (difficulty: Difficulty) => (
+export const getDifficultyDisplayButton = (difficulty: Difficulty, enabled = false) => (
   <DifficultyDisplayButton
     difficulty={difficulty}
-    enabled={false}
+    enabled={enabled}
     active
   >
     {displayNameFromDifficulty(difficulty)}
