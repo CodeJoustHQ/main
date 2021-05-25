@@ -99,7 +99,7 @@ function MyProblems(props: MyProblemsProps) {
           onChange={(e) => setFilterText(e.target.value)}
           placeholder="Filter (by name, difficulty, tag, etc.)"
         />
-        <WhiteTextButton>✕</WhiteTextButton>
+        <WhiteTextButton onClick={() => setFilterText('')}>✕</WhiteTextButton>
       </FilterContainer>
 
       {account?.problems.map((problem: Problem, index) => {

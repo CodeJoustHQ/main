@@ -50,11 +50,11 @@ function DashboardPage() {
       case DashboardTab.PROBLEMS:
         return <MyProblems loading={loading} />;
       case DashboardTab.GAME_HISTORY:
-        return <p>game history</p>;
+        return <p>Game History page (coming soon!)</p>;
       case DashboardTab.SUGGEST_FEATURE:
-        return <p>suggest a feature</p>;
+        return <p>If the link did not open, submit feedback here: https://airtable.com/shrGkEhC6RhAxRCxG</p>;
       default:
-        return <p>Option not found.</p>;
+        return <p>Congrats! You found an unreachable page</p>;
     }
   }, [tab]);
 

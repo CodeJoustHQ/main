@@ -11,6 +11,7 @@ type DashboardSidebarProps = {
 type TabItemProps = {
   active: boolean,
   onClick: (tab: DashboardTab) => void,
+  enabled?: boolean,
 };
 
 const Content = styled.div`
@@ -43,7 +44,11 @@ const TabItem = styled.div<TabItemProps>`
   background-color: ${({ theme, active }) => (active ? theme.colors.background : theme.colors.white)};
   border-radius: 6px;
   padding: 8px;
-  cursor: pointer;
+  cursor: ${({ enabled }) => (enabled === false ? 'default' : 'pointer')};
+  
+  &:hover {
+    background-color: ${({ theme, enabled }) => (enabled === false ? theme.colors.white : theme.colors.background)};
+  }
 `;
 
 function DashboardSidebar(props: DashboardSidebarProps) {
@@ -61,13 +66,14 @@ function DashboardSidebar(props: DashboardSidebarProps) {
         </TabItem>
         <TabItem
           active={tab === DashboardTab.GAME_HISTORY}
-          onClick={() => onClick(DashboardTab.GAME_HISTORY)}
+          onClick={() => 'do nothing for now (not implemented)'}
+          enabled={false}
         >
           <NoMarginSubtitleText>Game History (soon!)</NoMarginSubtitleText>
         </TabItem>
         <TabItem
           active={tab === DashboardTab.SUGGEST_FEATURE}
-          onClick={() => onClick(DashboardTab.SUGGEST_FEATURE)}
+          onClick={() => window.open('https://airtable.com/shrGkEhC6RhAxRCxG', '_blank')}
         >
           <NoMarginSubtitleText>Suggest a Feature</NoMarginSubtitleText>
         </TabItem>
