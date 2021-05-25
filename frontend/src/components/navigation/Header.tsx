@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { NavbarLink } from '../core/Link';
 import app from '../../api/Firebase';
 import { TextButton } from '../core/Button';
-import { useAppSelector } from '../../util/Hook';
+import { useAppDispatch, useAppSelector } from '../../util/Hook';
+import { setAccount, setToken } from '../../redux/Account';
 
 const Content = styled.div`
   height: 50px;
@@ -56,13 +57,18 @@ const LogoIcon = styled.img`
 // Note: Can also create a center header with simply display: inline-block
 
 function LoggedInContent() {
+  const dispatch = useAppDispatch();
+
+  const logOut = () => {
+    dispatch(setAccount(null));
+    dispatch(setToken(null));
+    app.auth().signOut();
+  };
+
   return (
     <RightContainer>
-      <RightHeader to="/problems/all">
-        Problems
-      </RightHeader>
-      <NavButton onClick={() => app.auth().signOut()}>
-        Logout
+      <NavButton onClick={logOut}>
+        My Account
       </NavButton>
       <RightHeader to="/contact-us">
         Contact Us

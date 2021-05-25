@@ -56,7 +56,7 @@ function DashboardPage() {
       default:
         return <p>Congrats! You found an unreachable page</p>;
     }
-  }, [tab]);
+  }, [tab, loading]);
 
   return (
     <Content>

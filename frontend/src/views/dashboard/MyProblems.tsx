@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
-import { MainHeaderText } from '../../components/core/Text';
+import { MainHeaderText, SecondaryHeaderText } from '../../components/core/Text';
 import ProblemCard from '../../components/card/ProblemCard';
 import { TextLink } from '../../components/core/Link';
 import { useAppSelector } from '../../util/Hook';
-import { FlexHorizontalContainer, FlexLeft, RelativeContainer } from '../../components/core/Container';
+import {
+  CenteredContainer,
+  FlexHorizontalContainer,
+  FlexLeft,
+  RelativeContainer
+} from '../../components/core/Container';
 import { GreenSmallButton, TextButton } from '../../components/core/Button';
 import { TextInput } from '../../components/core/Input';
 import { Problem } from '../../api/Problem';
@@ -121,12 +126,11 @@ function MyProblems(props: MyProblemsProps) {
       })}
 
       {!loading && !account?.problems.length ? (
-        <>
-          <p>You do not have any problems.</p>
-          <TextLink to="/problem/create">
-            Create one now &#8594;
-          </TextLink>
-        </>
+        <CenteredContainer>
+          <SecondaryHeaderText>
+            You have not written any problems. Create your first or browse our public collection!
+          </SecondaryHeaderText>
+        </CenteredContainer>
       ) : null}
     </Content>
   );

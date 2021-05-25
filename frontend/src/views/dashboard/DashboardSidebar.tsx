@@ -1,7 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useHistory } from 'react-router-dom';
 import { DashboardTab } from './Dashboard';
 import { NoMarginSubtitleText } from '../../components/core/Text';
+import { PrimaryButton } from '../../components/core/Button';
 
 type DashboardSidebarProps = {
   tab: DashboardTab,
@@ -33,6 +35,14 @@ const InnerContent = styled.div`
   flex: 1;
 `;
 
+const BottomContent = styled.div`
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  text-align: center;
+`;
+
 const DashboardText = styled.p`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   font-weight: bold;
@@ -53,6 +63,7 @@ const TabItem = styled.div<TabItemProps>`
 
 function DashboardSidebar(props: DashboardSidebarProps) {
   const { tab, onClick } = props;
+  const history = useHistory();
 
   return (
     <Content>
@@ -78,6 +89,10 @@ function DashboardSidebar(props: DashboardSidebarProps) {
           <NoMarginSubtitleText>Suggest a Feature</NoMarginSubtitleText>
         </TabItem>
       </InnerContent>
+
+      <BottomContent>
+        <PrimaryButton onClick={() => history.push('/game/create')} width="80%">Start New Game</PrimaryButton>
+      </BottomContent>
     </Content>
   );
 }
