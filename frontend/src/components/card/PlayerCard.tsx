@@ -64,6 +64,7 @@ function PlayerCard(props: PlayerCardProps) {
           <PlayerCardActiveIcon isActive={isActive} />
           {user.nickname}
           {isHost ? <InlineHostIcon>flag</InlineHostIcon> : null}
+          {user.spectator ? <InlineHostIcon>visibility</InlineHostIcon> : null}
         </UserNicknameText>
 
         {showActionCard ? actionCard : null}

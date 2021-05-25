@@ -21,6 +21,7 @@ function CreateGamePage() {
     const roomHost: CreateRoomParams = {
       host: {
         nickname,
+        spectator: true,
       },
     };
     createRoom(roomHost)

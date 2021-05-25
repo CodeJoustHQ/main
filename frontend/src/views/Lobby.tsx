@@ -20,15 +20,19 @@ import { Difficulty } from '../api/Difficulty';
 import {
   PrimaryButton,
   SmallDifficultyButtonNoMargin,
-  InlineRefreshIcon,
+  InlineLobbyIcon,
   SecondaryRedButton,
 } from '../components/core/Button';
 import Loading from '../components/core/Loading';
 import PlayerCard from '../components/card/PlayerCard';
-import HostActionCard from '../components/card/HostActionCard';
+import ActionCard from '../components/card/ActionCard';
 import { startGame } from '../api/Game';
 import {
-  Room, changeRoomHost, updateRoomSettings, removeUser,
+  Room,
+  changeRoomHost,
+  updateRoomSettings,
+  removeUser,
+  setSpectator,
 } from '../api/Room';
 import { errorHandler } from '../api/Error';
 import {
@@ -48,6 +52,7 @@ import { SelectedProblemsDisplay, SelectedTagsDisplay } from '../components/prob
 import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { fetchRoom, setRoom } from '../redux/Room';
 import { setCurrentUser } from '../redux/User';
+import ActionCardHelpModal from '../components/core/ActionCardHelpModal';
 
 type LobbyPageLocation = {
   user: User,
@@ -170,6 +175,9 @@ function LobbyPage() {
   // Variable to hold whether the room link was copied.
   const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
 
+  // Variable to hold whether the modal explaining the user cards is active.
+  const [actionCardHelp, setActionCardHelp] = useState<boolean>(false);
+
   /**
    * Set state variables from an updated room object
    */
@@ -254,6 +262,27 @@ function LobbyPage() {
         .then(() => setLoading(false))
         .catch((err) => {
           setError(err.message);
+          setLoading(false);
+        });
+    }
+  };
+
+  // Update the spectator status of the user in question.
+  const updateSpectator = (updatedSpectatorUser: User) => {
+    setError('');
+    const request = {
+      initiator: currentUser!,
+      receiver: updatedSpectatorUser,
+      spectator: !updatedSpectatorUser.spectator,
+    };
+
+    if (!loading) {
+      setLoading(true);
+      setSpectator(currentRoomId, request)
+        .catch((err) => {
+          setError(err.message);
+        })
+        .finally(() => {
           setLoading(false);
         });
     }
@@ -433,15 +462,16 @@ function LobbyPage() {
           isActive={isActive}
           key={user.userId}
         >
-          {isHost(currentUser) && (user.userId !== currentUser?.userId) ? (
-            // If currentUser is host, pass in an on-click action card for all other users
-            <HostActionCard
-              user={user}
-              userIsActive={Boolean(user.sessionId)}
-              onMakeHost={changeHosts}
-              onRemoveUser={kickUser}
-            />
-          ) : null}
+          <ActionCard
+            user={user}
+            userIsHost={isHost(user)}
+            currentUserIsHost={isHost(currentUser)}
+            isCurrentUser={user.userId === currentUser?.userId}
+            userIsActive={Boolean(user.sessionId)}
+            onUpdateSpectator={updateSpectator}
+            onMakeHost={changeHosts}
+            onRemoveUser={kickUser}
+          />
         </PlayerCard>
       ));
     }
@@ -569,6 +599,10 @@ function LobbyPage() {
   // Render the lobby.
   return (
     <>
+      <ActionCardHelpModal
+        show={actionCardHelp}
+        exitModal={() => setActionCardHelp(false)}
+      />
       <HoverTooltip
         visible={hoverVisible}
         x={mousePosition.x}
@@ -630,11 +664,16 @@ function LobbyPage() {
                 ? ` (${users.length})`
                 : null
             }
-            <InlineRefreshIcon
+            <InlineLobbyIcon
               onClick={refreshRoomDetails}
             >
               refresh
-            </InlineRefreshIcon>
+            </InlineLobbyIcon>
+            <InlineLobbyIcon
+              onClick={() => setActionCardHelp(true)}
+            >
+              help_outline
+            </InlineLobbyIcon>
           </LobbyContainerTitle>
           <BackgroundContainer>
             {

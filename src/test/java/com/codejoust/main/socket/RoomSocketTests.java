@@ -6,6 +6,7 @@ import com.codejoust.main.dto.room.CreateRoomRequest;
 import com.codejoust.main.dto.room.JoinRoomRequest;
 import com.codejoust.main.dto.room.RemoveUserRequest;
 import com.codejoust.main.dto.room.RoomDto;
+import com.codejoust.main.dto.room.SetSpectatorRequest;
 import com.codejoust.main.dto.room.UpdateHostRequest;
 import com.codejoust.main.dto.room.UpdateSettingsRequest;
 import com.codejoust.main.dto.user.UserDto;
@@ -367,5 +368,40 @@ public class RoomSocketTests {
 
         assertEquals(expected.getRoomId(), actual.getRoomId());
         assertFalse(actual.getUsers().contains(newUser));
+    }
+
+    @Test
+    public void socketReceivesMessageOnSpectatorChange() throws Exception {
+        UserDto newUser = TestFields.userDto2();
+        JoinRoomRequest joinRequest = new JoinRoomRequest();
+        joinRequest.setUser(newUser);
+
+        HttpEntity<JoinRoomRequest> joinEntity = new HttpEntity<>(joinRequest);
+        String joinRoomEndpoint = String.format("%s/%s/users", baseRestEndpoint, room.getRoomId());
+        template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
+
+        RoomDto actual = blockingQueue.poll(5, SECONDS);
+        assertNotNull(actual);
+
+        // Check that the room contains the user
+        assertTrue(actual.getUsers().contains(newUser));
+
+        // Create the spectator request.
+        SetSpectatorRequest spectatorRequest = new SetSpectatorRequest();
+        spectatorRequest.setInitiator(room.getHost());
+        spectatorRequest.setReceiver(newUser);
+        spectatorRequest.setSpectator(true);
+
+        HttpEntity<SetSpectatorRequest> spectatorEntity = new HttpEntity<>(spectatorRequest);
+        String setSpectatorEndpoint = String.format("%s/%s/spectator", baseRestEndpoint, room.getRoomId());
+        actual = template.exchange(setSpectatorEndpoint, HttpMethod.POST, spectatorEntity, RoomDto.class).getBody();
+
+        assertNotNull(actual);
+        assertEquals(spectatorRequest.getSpectator(), actual.getUsers().get(1).getSpectator());
+
+        // Verify that the socket receives a message with the updated settings
+        actual = blockingQueue.poll(5, SECONDS);
+        assertNotNull(actual);
+        assertEquals(spectatorRequest.getSpectator(), actual.getUsers().get(1).getSpectator());
     }
 }
