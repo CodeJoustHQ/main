@@ -8,6 +8,7 @@ import {
   Problem,
   ProblemIOType,
   problemIOTypeToString,
+  ProblemTag,
   TestCase,
 } from '../../api/Problem';
 import {
@@ -42,6 +43,7 @@ import { FlexBareContainer } from '../core/Container';
 import { generateRandomId, validIdentifier } from '../../util/Utility';
 import { HoverTooltip } from '../core/HoverTooltip';
 import { Coordinate } from '../special/FloatingCircle';
+import ProblemTags from './ProblemTags';
 import { useAppSelector, useProblemEditable } from '../../util/Hook';
 
 const MainContent = styled.div`
@@ -82,7 +84,7 @@ const ApprovalContainer = styled.div<ShowProps>`
 const ApprovalText = styled(Text)`
   display: inline-block;
   margin: 0 0 0 0.75rem;
-  font-size: ${({ theme }) => theme.fontSize.subtitleXMediumLarge}
+  font-size: ${({ theme }) => theme.fontSize.subtitleXMediumLarge};
 `;
 
 const SettingsContainerRelative = styled(SettingsContainer)`
@@ -249,6 +251,20 @@ function ProblemDisplay(props: ProblemDisplayParams) {
         }
         return input;
       }),
+    });
+  };
+
+  const addTag = (newTag: ProblemTag) => {
+    setNewProblem({
+      ...newProblem,
+      problemTags: [...newProblem.problemTags, newTag],
+    });
+  };
+
+  const removeTag = (index: number) => {
+    setNewProblem({
+      ...newProblem,
+      problemTags: newProblem.problemTags.filter((_, i) => index !== i),
     });
   };
 
@@ -498,6 +514,17 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             }
             return null;
           })}
+
+          {
+            editMode ? (
+              <ProblemTags
+                problemTags={newProblem.problemTags}
+                addTag={addTag}
+                removeTag={removeTag}
+                viewOnly={!problemEditable}
+              />
+            ) : null
+          }
 
           <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
           {newProblem.problemInputs.map((input, index) => (

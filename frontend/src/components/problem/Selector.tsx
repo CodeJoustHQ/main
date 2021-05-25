@@ -1,14 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { getProblems, SelectableProblem } from '../../api/Problem';
+import { getProblems, ProblemTag, SelectableProblem } from '../../api/Problem';
 import ErrorMessage from '../core/Error';
 import { displayNameFromDifficulty } from '../../api/Difficulty';
 import { InlineDifficultyDisplayButton } from '../core/Button';
 import { TextInput } from '../core/Input';
+import { useClickOutside } from '../../util/Hook';
 
 type ProblemSelectorProps = {
   selectedProblems: SelectableProblem[],
   onSelect: (newlySelected: SelectableProblem) => void,
+};
+
+type TagSelectorProps = {
+  tags: ProblemTag[],
+  selectedTags: ProblemTag[],
+  onSelect: (newlySelected: ProblemTag) => void,
 };
 
 type ContentProps = {
@@ -30,7 +37,7 @@ const InnerContent = styled.div<ContentProps>`
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);
 `;
 
-const InlineProblem = styled.div`
+const InlineElement = styled.div`
   width: 100%;
   padding: 8px 15px;
   display: flex;
@@ -51,17 +58,17 @@ const ClickableInlineDifficultyDisplayButton = styled(InlineDifficultyDisplayBut
   }
 `;
 
-const ProblemSearch = styled(TextInput)`
+const TextSearch = styled(TextInput)`
   width: 100%;
   margin: 0;
 `;
 
-const ProblemName = styled.p`
+const ElementName = styled.p`
   font-weight: bold;
   margin: 0;
 `;
 
-function ProblemSelector(props: ProblemSelectorProps) {
+export function ProblemSelector(props: ProblemSelectorProps) {
   const { selectedProblems, onSelect } = props;
 
   const [error, setError] = useState('');
@@ -72,16 +79,7 @@ function ProblemSelector(props: ProblemSelectorProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   // Close list of problems if clicked outside of div
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current!.contains(e.target as Node)) {
-        setShowProblems(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [ref]);
+  useClickOutside(ref, () => setShowProblems(false));
 
   useEffect(() => {
     getProblems(true)
@@ -104,7 +102,7 @@ function ProblemSelector(props: ProblemSelectorProps) {
 
   return (
     <Content>
-      <ProblemSearch
+      <TextSearch
         onClick={() => setShowProblems(!showProblems)}
         onChange={setSearchStatus}
         placeholder={problems.length ? 'Select problems (optional)' : 'Loading...'}
@@ -122,13 +120,13 @@ function ProblemSelector(props: ProblemSelectorProps) {
           }
 
           return (
-            <InlineProblem
+            <InlineElement
               key={problem.problemId}
               onClick={() => setSelectedStatus(index)}
             >
-              <ProblemName>
+              <ElementName>
                 {problem.name}
-              </ProblemName>
+              </ElementName>
               <ClickableInlineDifficultyDisplayButton
                 difficulty={problem.difficulty}
                 enabled={false}
@@ -136,7 +134,7 @@ function ProblemSelector(props: ProblemSelectorProps) {
               >
                 {displayNameFromDifficulty(problem.difficulty)}
               </ClickableInlineDifficultyDisplayButton>
-            </InlineProblem>
+            </InlineElement>
           );
         })}
       </InnerContent>
@@ -146,4 +144,57 @@ function ProblemSelector(props: ProblemSelectorProps) {
   );
 }
 
-export default ProblemSelector;
+export function TagSelector(props: TagSelectorProps) {
+  const { tags, selectedTags, onSelect } = props;
+
+  const [showTags, setShowTags] = useState(false);
+  const [searchText, setSearchText] = useState('');
+
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close list of tags if clicked outside of div
+  useClickOutside(ref, () => setShowTags(false));
+
+  const setSelectedStatus = (index: number) => {
+    setShowTags(false);
+    onSelect(tags[index]);
+  };
+
+  const setSearchStatus = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+  };
+
+  return (
+    <Content>
+      <TextSearch
+        onClick={() => setShowTags(!showTags)}
+        onChange={setSearchStatus}
+        placeholder={tags.length ? 'Select tags (optional)' : 'Loading...'}
+      />
+
+      <InnerContent show={showTags} ref={ref}>
+        {tags.map((tag, index) => {
+          // Only show tags that haven't been selected yet
+          if (selectedTags.some((t) => t.tagId === tag.tagId)) {
+            return null;
+          }
+
+          if (searchText && !tag.name.toLowerCase().includes(searchText.toLowerCase())) {
+            return null;
+          }
+
+          return (
+            <InlineElement
+              key={tag.tagId}
+              onClick={() => setSelectedStatus(index)}
+            >
+              <ElementName>
+                {tag.name}
+              </ElementName>
+            </InlineElement>
+          );
+        })}
+      </InnerContent>
+    </Content>
+  );
+}

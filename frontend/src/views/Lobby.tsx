@@ -42,9 +42,9 @@ import { FlexBareContainer } from '../components/core/Container';
 import { Slider, SliderContainer } from '../components/core/RangeSlider';
 import { Coordinate } from '../components/special/FloatingCircle';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
-import { SelectableProblem } from '../api/Problem';
-import ProblemSelector from '../components/problem/ProblemSelector';
-import SelectedProblemsDisplay from '../components/problem/SelectedProblemsDisplay';
+import { getAllProblemTags, ProblemTag, SelectableProblem } from '../api/Problem';
+import { ProblemSelector, TagSelector } from '../components/problem/Selector';
+import { SelectedProblemsDisplay, SelectedTagsDisplay } from '../components/problem/SelectedDisplay';
 import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { fetchRoom, setRoom } from '../redux/Room';
 import { setCurrentUser } from '../redux/User';
@@ -147,6 +147,8 @@ function LobbyPage() {
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [duration, setDuration] = useState<number | undefined>(15);
   const [selectedProblems, setSelectedProblems] = useState<SelectableProblem[]>([]);
+  const [selectedTags, setSelectedTags] = useState<ProblemTag[]>([]);
+  const [allTags, setAllTags] = useState<ProblemTag[]>([]);
   const [size, setSize] = useState<number | undefined>(10);
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
@@ -354,6 +356,16 @@ function LobbyPage() {
     updateSelectedProblems(newProblems);
   };
 
+  const addTag = (newTag: ProblemTag) => {
+    const newTags = [...selectedTags, newTag];
+    setSelectedTags(newTags);
+  };
+
+  const removeTag = (index: number) => {
+    const newTags = selectedTags.filter((_, i) => i !== index);
+    setSelectedTags(newTags);
+  };
+
   const onSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
@@ -481,6 +493,16 @@ function LobbyPage() {
   const mouseMoveHandler = useCallback((e: MouseEvent) => {
     setMousePosition({ x: e.pageX, y: e.pageY });
   }, [setMousePosition]);
+
+  useEffect(() => {
+    getAllProblemTags()
+      .then((res) => {
+        setAllTags(res);
+      })
+      .catch((err) => {
+        setError(err.message);
+      });
+  }, []);
 
   useEffect(() => {
     window.onmousemove = mouseMoveHandler;
@@ -648,6 +670,19 @@ function LobbyPage() {
                 );
               })}
             </DifficultyContainer>
+
+            <NoMarginMediumText>Selected Tags</NoMarginMediumText>
+            <SelectedTagsDisplay
+              tags={selectedTags}
+              onRemove={isHost(currentUser) ? removeTag : null}
+            />
+            {isHost(currentUser) ? (
+              <TagSelector
+                tags={allTags}
+                selectedTags={selectedTags}
+                onSelect={addTag}
+              />
+            ) : null}
 
             <NoMarginMediumText>Selected Problems</NoMarginMediumText>
             <SelectedProblemsDisplay

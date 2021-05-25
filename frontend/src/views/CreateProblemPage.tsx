@@ -30,6 +30,7 @@ function CreateProblemPage() {
     difficulty: Difficulty.Easy,
     testCases: [],
     problemInputs: [],
+    problemTags: [],
     outputType: ProblemIOType.Integer,
   };
 
