@@ -10,8 +10,6 @@ import {
   SecondaryHeaderText,
   SmallHeaderText,
   NoMarginSubtitleText,
-  LargeText,
-  Text,
 } from '../components/core/Text';
 import {
   connect, routes, subscribe, disconnect,
@@ -44,17 +42,17 @@ import {
   InlineBackgroundCopyText,
 } from '../components/special/CopyIndicator';
 import IdContainer from '../components/special/IdContainer';
-import { FlexBareContainer, LeftContainer } from '../components/core/Container';
+import { FlexBareContainer } from '../components/core/Container';
 import { Slider, SliderContainer } from '../components/core/RangeSlider';
 import { Coordinate } from '../components/special/FloatingCircle';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
 import { SelectableProblem } from '../api/Problem';
 import ProblemSelector from '../components/problem/ProblemSelector';
 import SelectedProblemsDisplay from '../components/problem/SelectedProblemsDisplay';
-import Modal from '../components/core/Modal';
 import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { fetchRoom, setRoom } from '../redux/Room';
 import { setCurrentUser } from '../redux/User';
+import ActionCardHelpModal from '../components/core/ActionCardHelpModal';
 
 type LobbyPageLocation = {
   user: User,
@@ -137,31 +135,6 @@ const HoverElementSlider = styled(HoverElement)`
   max-width: 370px;
   width: 100%;
   height: 20px;
-`;
-
-const ActionCardHelpText = styled(Text)`
-  display: inline-block;
-  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
-`;
-
-type PlayerIconType = {
-  isActive: boolean,
-};
-
-const ActionCardActiveIcon = styled.div<PlayerIconType>`
-  display: inline-block;
-  margin-right: 5px;
-  background: ${({ theme, isActive }) => (isActive ? theme.colors.gradients.green : theme.colors.gradients.red)};
-  border-radius: 0.5rem;
-  height: 0.8rem;
-  width: 0.8rem;
-`;
-
-const InlineIcon = styled.i.attrs(() => ({
-  className: 'material-icons',
-}))`
-  margin-right: 5px;
-  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
 `;
 
 function LobbyPage() {
@@ -605,48 +578,10 @@ function LobbyPage() {
   // Render the lobby.
   return (
     <>
-      <Modal
+      <ActionCardHelpModal
         show={actionCardHelp}
-        onExit={() => setActionCardHelp(false)}
-        fullScreen
-      >
-        <LeftContainer>
-          <LargeText>Terminology</LargeText>
-          <div>
-            <ActionCardHelpText>
-              <ActionCardActiveIcon isActive />
-              <b>active</b>
-              {' '}
-              and
-              {' '}
-              <ActionCardActiveIcon isActive={false} />
-              <b>inactive</b>
-              : These attributes show the user&apos;s current connection status.
-              Active means the user can send and receive room updates, while
-              inactive means they cannot and are connecting or have the tab
-              closed.
-            </ActionCardHelpText>
-          </div>
-          <div>
-            <ActionCardHelpText>
-              <InlineIcon>flag</InlineIcon>
-              <b>host</b>
-              : Every room has one host, and they control the room settings,
-              user settings, and the ability to start the game. They can
-              transfer the host role to any other connected user in the room.
-            </ActionCardHelpText>
-          </div>
-          <div>
-            <ActionCardHelpText>
-              <InlineIcon>visibility</InlineIcon>
-              <b>spectator</b>
-              : The spectator attribute determines whether the user is an active
-              player in the game, or simply spectating it. By default, the host
-              is a spectator in the game, but they can change this setting.
-            </ActionCardHelpText>
-          </div>
-        </LeftContainer>
-      </Modal>
+        exitModal={() => setActionCardHelp(false)}
+      />
       <HoverTooltip
         visible={hoverVisible}
         x={mousePosition.x}
