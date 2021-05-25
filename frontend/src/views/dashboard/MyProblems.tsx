@@ -6,7 +6,8 @@ import ProblemCard from '../../components/card/ProblemCard';
 import { TextLink } from '../../components/core/Link';
 import { useAppSelector } from '../../util/Hook';
 import { FlexHorizontalContainer, FlexLeft, RelativeContainer } from '../../components/core/Container';
-import { GreenSmallButton } from '../../components/core/Button';
+import { GreenSmallButton, TextButton } from '../../components/core/Button';
+import { TextInput } from '../../components/core/Input';
 
 type MyProblemsProps = {
   loading: boolean,
@@ -30,6 +31,38 @@ const CreateButton = styled(GreenSmallButton)`
   position: absolute;
   bottom: 0;
   right: 0;
+`;
+
+const FilterContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+
+  background-color: ${({ theme }) => theme.colors.white};
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  border-radius: 5px;
+  height: 35px;
+  margin: 15px 10px 25px 10px;
+  padding: 4px;
+`;
+
+const FilterInput = styled(TextInput)`
+  flex-grow: 2;
+  border: none;
+  border-radius: 5px;
+  
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  
+  &:focus {
+    outline: none;
+    border: none;
+  }
+`;
+
+const WhiteTextButton = styled(TextButton)`
+  background-color: ${({ theme }) => theme.colors.white};
+  border-radius: 5px;
+  margin-right: 8px;
 `;
 
 function MyProblems(props: MyProblemsProps) {
@@ -57,13 +90,22 @@ function MyProblems(props: MyProblemsProps) {
           </RelativeContainer>
         </FlexHorizontalContainer>
       </TopText>
-      {account?.problems.map((problem, index) => (
-        <ProblemCard
-          key={index}
-          problem={problem}
-          onClick={() => history.push(`/problem/${problem.problemId}`)}
-        />
-      ))}
+
+      <FilterContainer>
+        <FilterInput />
+        <WhiteTextButton>✕</WhiteTextButton>
+      </FilterContainer>
+
+      {account?.problems.map((problem, index) => {
+        // todo
+        return (
+          <ProblemCard
+            key={index}
+            problem={problem}
+            onClick={() => history.push(`/problem/${problem.problemId}`)}
+          />
+        );
+      })}
 
       {!loading && !account?.problems.length ? (
         <>
