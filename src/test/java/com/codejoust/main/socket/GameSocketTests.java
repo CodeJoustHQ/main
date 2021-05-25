@@ -1,6 +1,7 @@
 package com.codejoust.main.socket;
 
 import com.codejoust.main.controller.v1.BaseRestController;
+import com.codejoust.main.dto.game.EndGameRequest;
 import com.codejoust.main.dto.game.GameDto;
 import com.codejoust.main.dto.game.GameNotificationDto;
 import com.codejoust.main.dto.game.PlayAgainRequest;
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -74,6 +76,14 @@ public class GameSocketTests {
 
     @BeforeEach
     public void setup() throws Exception {
+        // Include the test authorization token in each request
+        template.getRestTemplate().setInterceptors(
+                Collections.singletonList((request, body, execution) -> {
+                    request.getHeaders()
+                            .add("Authorization", TestFields.TOKEN);
+                    return execution.execute(request, body);
+                }));
+
         baseRestEndpoint = "http://localhost:" + port + "/api/v1";
 
         UserDto host = TestFields.userDto1();
@@ -182,7 +192,6 @@ public class GameSocketTests {
         request.setCode(TestFields.PYTHON_CODE);
         request.setLanguage(TestFields.PYTHON_LANGUAGE);
 
-        // Create room
         HttpEntity<SubmissionRequest> entity = new HttpEntity<>(request);
         String submitEndpoint = String.format("%s/games/%s/submission", baseRestEndpoint, room.getRoomId());
         SubmissionDto submissionDto = template.postForObject(submitEndpoint, entity, SubmissionDto.class);
@@ -264,5 +273,22 @@ public class GameSocketTests {
                 assertNull(player.getUser().getSessionId());
             }
         }
+    }
+
+    @Test
+    public void socketReceivesMessageOnManuallyEndGame() throws Exception {
+        EndGameRequest request = new EndGameRequest();
+        request.setInitiator(room.getHost());
+
+        HttpEntity<EndGameRequest> entity = new HttpEntity<>(request);
+        String endGameEndpoint = String.format("%s/games/%s/game-over", baseRestEndpoint, room.getRoomId());
+        GameDto gameDto = template.postForObject(endGameEndpoint, entity, GameDto.class);
+
+        assertNotNull(gameDto);
+        assertTrue(gameDto.getGameEnded());
+
+        gameDto = userBlockingQueue.poll(DURATION, SECONDS);
+        assertNotNull(gameDto);
+        assertTrue(gameDto.getGameEnded());
     }
 }

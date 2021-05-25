@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
 import { Color } from '../../api/Color';
-import useBestSubmission from '../../util/Hook';
+import { useBestSubmission } from '../../util/Hook';
 import Language, { displayNameFromLanguage } from '../../api/Language';
 import { TextButton } from '../core/Button';
 

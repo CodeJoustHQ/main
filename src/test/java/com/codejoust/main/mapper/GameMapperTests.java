@@ -86,6 +86,7 @@ public class GameMapperTests {
         game.setProblems(problems);
         game.setPlayAgain(true);
         game.setAllSolved(true);
+        game.setGameEnded(true);
 
         PlayerCode playerCode = new PlayerCode();
         playerCode.setCode(TestFields.PYTHON_CODE);
@@ -108,6 +109,7 @@ public class GameMapperTests {
         assertEquals(ProblemMapper.toDto(problem), gameDto.getProblems().get(0));
         assertEquals(game.getPlayAgain(), gameDto.getPlayAgain());
         assertEquals(game.getAllSolved(), gameDto.getAllSolved());
+        assertEquals(game.getGameEnded(), gameDto.getGameEnded());
 
         PlayerDto playerDto = gameDto.getPlayers().get(0);
         assertEquals(UserMapper.toDto(user), playerDto.getUser());

@@ -11,6 +11,9 @@ import ErrorMessage from '../components/core/Error';
 import { ErrorResponse } from '../api/Error';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
 import { TextLink } from '../components/core/Link';
+import { useAppDispatch } from '../util/Hook';
+import { setRoom } from '../redux/Room';
+import { setCurrentUser } from '../redux/User';
 
 const Content = styled.div`
   padding-top: 20px;
@@ -24,6 +27,7 @@ function JoinGamePage() {
   // Get history object to be able to move between different pages
   const history = useHistory();
   const location = useLocation<JoinPageLocation>();
+  const dispatch = useAppDispatch();
 
   /**
    * Page state variable that defines whether the user is
@@ -91,12 +95,22 @@ function JoinGamePage() {
    * Join the room and redirect the user to the lobby.
    */
   const redirectToLobby = (nickname: string) => new Promise<undefined>((_, reject) => {
-    const user: User = { nickname };
-    const roomParams = { user };
+    let currentUser: User = { nickname };
+    const roomParams = { user: currentUser };
 
     joinRoom(roomId, roomParams)
-      .then(() => {
-        history.push(`/game/lobby?room=${roomId}`, { user, roomId });
+      .then((res) => {
+        dispatch(setRoom(res));
+
+        // Find and set the current user
+        res.users.forEach((user: User) => {
+          if (user.nickname === currentUser.nickname) {
+            dispatch(setCurrentUser(user));
+            currentUser = user;
+          }
+        });
+
+        history.push(`/game/lobby?room=${roomId}`, { user: currentUser, roomId });
       }).catch((err) => reject(err));
   });
 

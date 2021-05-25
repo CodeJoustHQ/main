@@ -52,6 +52,18 @@ export const SecondaryRedButton = styled(PrimaryButton)`
   margin: 1.2rem 0;
 `;
 
+export const DangerButton = styled(PrimaryButton)`
+  display: inline-block;
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.red2};
+  font-size: ${({ theme }) => theme.fontSize.default};
+  width: 120px;
+  min-width: 120px;
+  height: 35px;
+  min-height: 35px;
+  margin: 2px 10px;
+`;
+
 export const TextButton = styled.button<ThemeType>`
   background: none;
   border: none;

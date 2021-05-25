@@ -5,6 +5,7 @@ import ErrorMessage from './Error';
 import { LargeCenterPassword, PrimaryInput } from './Input';
 import Loading from './Loading';
 import { LargeText, SmallHoverText } from './Text';
+import { onEnterAction } from '../../util/Utility';
 
 const Content = styled.div`
   padding: 0 20%;
@@ -47,11 +48,7 @@ export default function LockScreen(props: LockScreenProps) {
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
           setPassword(event.target.value);
         }}
-        onKeyPress={(event: React.KeyboardEvent<HTMLInputElement>) => {
-          if (event.key === 'Enter') {
-            enterPasswordAction(password);
-          }
-        }}
+        onKeyPress={(e) => onEnterAction(() => enterPasswordAction(password), e)}
       />
       <ShowHideTextContainer>
         <SmallHoverText

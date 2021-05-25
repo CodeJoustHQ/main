@@ -28,4 +28,7 @@ public class Game {
 
     // Boolean to hold whether all users have solved the problem.
     private Boolean allSolved = false;
+
+    // Boolean to hold whether the host ended the game early
+    private Boolean gameEnded = false;
 }

@@ -8,6 +8,7 @@ import com.codejoust.main.dto.problem.ProblemTestCaseDto;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
 import com.codejoust.main.service.SubmitService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -55,6 +56,7 @@ public class ProblemTestMethods {
         createProblemRequest.setOutputType(IO_TYPE);
 
         MvcResult problemResult = mockMvc.perform(post(POST_PROBLEM_CREATE)
+                .header(HttpHeaders.AUTHORIZATION, TestFields.TOKEN)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(createProblemRequest)))
                 .andDo(print()).andExpect(status().isCreated())
@@ -87,6 +89,7 @@ public class ProblemTestMethods {
 
         String endpoint = String.format(POST_TEST_CASE_CREATE, problemActual.getProblemId());
         MvcResult testCaseResult = mockMvc.perform(post(endpoint)
+                .header(HttpHeaders.AUTHORIZATION, TestFields.TOKEN)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(createTestCaseRequest)))
                 .andDo(print()).andExpect(status().isCreated())
@@ -116,6 +119,7 @@ public class ProblemTestMethods {
         // Edit problem with new values
         String endpoint = String.format(PUT_PROBLEM_EDIT, problemDto.getProblemId());
         mockMvc.perform(put(endpoint)
+                .header(HttpHeaders.AUTHORIZATION, TestFields.TOKEN)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(problemDto)))
                 .andDo(print()).andExpect(status().isOk())
