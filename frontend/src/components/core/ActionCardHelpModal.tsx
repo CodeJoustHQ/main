@@ -98,17 +98,17 @@ function ActionCardHelpModal(props: ActionCardHelpModalProps) {
             <b>Selected Problems</b>
             : The selected problems are the problems that the players must solve
             during the game. Currently, this feature is optional: only one
-            problem is allowed, and if none is selected then a random one is
-            chosen with the provided difficulty setting when the game starts. However, in the future, these will be the only problems in the game.
+            problem is allowed, and if none are selected then a random one is
+            chosen with the provided difficulty setting when the game starts.
+            In the future, these will be the only problems in the game.
           </ActionCardHelpText>
         </div>
         <div>
           <ActionCardHelpText>
             <b>Difficulty</b>
-            : The difficulty setting currently filters the random problem
-            chosen by this difficulty. However, in the future, this will be
-            used to filter the selected problems widget for problems only of
-            that difficulty.
+            : The difficulty setting currently filters the random problems
+            chosen by this difficulty. In the future, this will be
+            used to filter the selected problems.
           </ActionCardHelpText>
         </div>
         <div>
@@ -116,8 +116,7 @@ function ActionCardHelpModal(props: ActionCardHelpModalProps) {
             <b>Selected Tags</b>
             : The selected tags currently allows the user to search and select
             certain tags, but does not yet have an impact on game settings.
-            However, in the future, this will be used to filter the selected
-            problems widget for problems only with those tags.
+            In the future, this will be used to filter the selected problems.
           </ActionCardHelpText>
         </div>
         <div>
