@@ -125,14 +125,18 @@ function ActionCard(props: ActionCardProps) {
       {
         isCurrentUser ? (
           <SmallActionText onClick={() => onUpdateSpectator(user)}>
-            {user.spectator ? 'Compete in Game' : 'Spectate Game'}
+            Become
+            {' '}
+            {user.spectator ? 'Player' : 'Spectator'}
           </SmallActionText>
         ) : null
       }
       {
         (currentUserIsHost && !userIsHost) ? (
           <SmallActionText onClick={() => onUpdateSpectator(user)}>
-            {user.spectator ? 'Make Competitor' : 'Make Spectator'}
+            Make
+            {' '}
+            {user.spectator ? 'Player' : 'Spectator'}
           </SmallActionText>
         ) : null
       }

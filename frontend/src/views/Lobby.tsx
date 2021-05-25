@@ -631,18 +631,18 @@ function LobbyPage() {
             <ActionCardHelpText>
               <InlineIcon>flag</InlineIcon>
               <b>host</b>
-              : Every room has one host, and they control the room and user
-              settings and the ability to start the game. They can transfer the
-              host role to any other connected user in the room.
+              : Every room has one host, and they control the room settings,
+              user settings, and the ability to start the game. They can
+              transfer the host role to any other connected user in the room.
             </ActionCardHelpText>
           </div>
           <div>
             <ActionCardHelpText>
               <InlineIcon>visibility</InlineIcon>
               <b>spectator</b>
-              : The spectator attribute determines whether or not the
-              user is actively participating in the game, or simply spectating
-              it. By default, the host is a spectator in the game.
+              : The spectator attribute determines whether the user is an active
+              player in the game, or simply spectating it. By default, the host
+              is a spectator in the game, but they can change this setting.
             </ActionCardHelpText>
           </div>
         </LeftContainer>
