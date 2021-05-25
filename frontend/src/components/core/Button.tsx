@@ -204,7 +204,7 @@ export const InvertedSmallButton = styled(SmallButton)`
   background: ${({ theme }) => theme.colors.white};
 `;
 
-export const InlineRefreshIcon = styled.i.attrs(() => ({
+export const InlineLobbyIcon = styled.i.attrs(() => ({
   className: 'material-icons',
 }))`
   display: inline-block;
@@ -226,7 +226,7 @@ type ShowError = {
   show: boolean,
 };
 
-export const InlineErrorIcon = styled(InlineRefreshIcon).attrs((props: ShowError) => ({
+export const InlineErrorIcon = styled(InlineLobbyIcon).attrs((props: ShowError) => ({
   style: {
     display: props.show ? 'inline-block' : 'none',
   },

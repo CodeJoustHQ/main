@@ -20,7 +20,7 @@ import { Difficulty } from '../api/Difficulty';
 import {
   PrimaryButton,
   SmallDifficultyButtonNoMargin,
-  InlineRefreshIcon,
+  InlineLobbyIcon,
   SecondaryRedButton,
 } from '../components/core/Button';
 import Loading from '../components/core/Loading';
@@ -459,7 +459,6 @@ function LobbyPage() {
             onUpdateSpectator={updateSpectator}
             onMakeHost={changeHosts}
             onRemoveUser={kickUser}
-            setActionCardHelp={setActionCardHelp}
           />
         </PlayerCard>
       ));
@@ -643,11 +642,16 @@ function LobbyPage() {
                 ? ` (${users.length})`
                 : null
             }
-            <InlineRefreshIcon
+            <InlineLobbyIcon
               onClick={refreshRoomDetails}
             >
               refresh
-            </InlineRefreshIcon>
+            </InlineLobbyIcon>
+            <InlineLobbyIcon
+              onClick={() => setActionCardHelp(true)}
+            >
+              help_outline
+            </InlineLobbyIcon>
           </LobbyContainerTitle>
           <BackgroundContainer>
             {

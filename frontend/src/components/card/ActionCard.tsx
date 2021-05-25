@@ -46,25 +46,6 @@ const InlineIcon = styled.i.attrs(() => ({
   font-size: 12px;
 `;
 
-export const InlineQuestionIcon = styled.i.attrs(() => ({
-  className: 'material-icons',
-}))`
-  position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
-  padding: 0.25rem;
-  border-radius: 1rem;
-  font-size: ${({ theme }) => theme.fontSize.default};
-  background: ${({ theme }) => theme.colors.white};
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-  color: ${({ theme }) => theme.colors.font};
-
-  &:hover {
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  }
-`;
-
 type ActionCardProps = {
   user: User,
   userIsHost: boolean,
@@ -74,22 +55,16 @@ type ActionCardProps = {
   onMakeHost: (newHost: User) => void,
   onRemoveUser: (user: User) => void,
   onUpdateSpectator: (user: User) => void,
-  setActionCardHelp: (actionCardHelp: boolean) => void,
 };
 
 function ActionCard(props: ActionCardProps) {
   const {
     user, userIsHost, currentUserIsHost, isCurrentUser, userIsActive,
-    onMakeHost, onRemoveUser, onUpdateSpectator, setActionCardHelp,
+    onMakeHost, onRemoveUser, onUpdateSpectator,
   } = props;
 
   return (
     <Content isActive={userIsActive}>
-      <InlineQuestionIcon
-        onClick={() => setActionCardHelp(true)}
-      >
-        help_outline
-      </InlineQuestionIcon>
       <ActionCardActiveIcon isActive={userIsActive} />
       <SmallActionHeaderText>
         {userIsActive ? 'active' : 'inactive'}
