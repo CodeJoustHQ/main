@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 
 import com.codejoust.main.model.Account;
 import lombok.AccessLevel;
@@ -67,6 +68,13 @@ public class Problem {
     @Fetch(value = FetchMode.SUBSELECT)
     private List<ProblemInput> problemInputs = new ArrayList<>();
 
+    // List of tags associated with this problem
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Setter(AccessLevel.PRIVATE)
+    @JoinColumn(name = "problem_tag_id")
+    @Fetch(value = FetchMode.SUBSELECT)
+    private List<ProblemTag> problemTags = new ArrayList<>();
+
     @Enumerated(EnumType.STRING)
     private ProblemIOType outputType;
 
@@ -77,6 +85,14 @@ public class Problem {
 
     public boolean removeTestCase(ProblemTestCase testCase) {
         return testCases.remove(testCase);
+    }
+
+    public void addProblemTag(ProblemTag problemTag) {
+        problemTags.add(problemTag);
+    }
+
+    public boolean removeProblemTag(ProblemTag problemTag) {
+        return problemTags.remove(problemTag);
     }
 
     public void addProblemInput(ProblemInput problemInput) {
