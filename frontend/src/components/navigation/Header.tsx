@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { NavbarLink } from '../core/Link';
 import app from '../../api/Firebase';
 import { TextButton } from '../core/Button';
 import { useAppDispatch, useAppSelector } from '../../util/Hook';
 import { setAccount, setToken } from '../../redux/Account';
+import Dropdown from '../core/Dropdown';
+import { RelativeContainer } from '../core/Container';
 
 const Content = styled.div`
   height: 50px;
@@ -58,6 +60,7 @@ const LogoIcon = styled.img`
 
 function LoggedInContent() {
   const dispatch = useAppDispatch();
+  const [mouseOver, setMouseOver] = useState(false);
 
   const logOut = () => {
     dispatch(setAccount(null));
@@ -67,9 +70,15 @@ function LoggedInContent() {
 
   return (
     <RightContainer>
-      <NavButton onClick={logOut}>
-        My Account
-      </NavButton>
+      <RelativeContainer
+        onMouseEnter={() => setMouseOver(true)}
+        onMouseLeave={() => setMouseOver(false)}
+      >
+        <NavButton onClick={logOut}>
+          My Account
+        </NavButton>
+        { mouseOver ? <Dropdown /> : null}
+      </RelativeContainer>
       <RightHeader to="/contact-us">
         Contact Us
       </RightHeader>
