@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import { MainHeaderText } from '../../components/core/Text';
@@ -8,6 +8,7 @@ import { useAppSelector } from '../../util/Hook';
 import { FlexHorizontalContainer, FlexLeft, RelativeContainer } from '../../components/core/Container';
 import { GreenSmallButton, TextButton } from '../../components/core/Button';
 import { TextInput } from '../../components/core/Input';
+import { Problem } from '../../api/Problem';
 
 type MyProblemsProps = {
   loading: boolean,
@@ -70,6 +71,7 @@ function MyProblems(props: MyProblemsProps) {
 
   const history = useHistory();
   const { account } = useAppSelector((state) => state.account);
+  const [filterText, setFilterText] = useState('');
 
   return (
     <Content>
@@ -92,12 +94,23 @@ function MyProblems(props: MyProblemsProps) {
       </TopText>
 
       <FilterContainer>
-        <FilterInput />
+        <FilterInput
+          value={filterText}
+          onChange={(e) => setFilterText(e.target.value)}
+          placeholder="Filter (by name, difficulty, tag, etc.)"
+        />
         <WhiteTextButton>✕</WhiteTextButton>
       </FilterContainer>
 
-      {account?.problems.map((problem, index) => {
-        // todo
+      {account?.problems.map((problem: Problem, index) => {
+        // Filter by name and difficulty
+        if (filterText
+          && !problem.name.toLowerCase().includes(filterText.toLowerCase())
+          && !problem.difficulty.toLowerCase().includes(filterText.toLowerCase())) {
+          // TODO: tags, after merging
+          return null;
+        }
+
         return (
           <ProblemCard
             key={index}
