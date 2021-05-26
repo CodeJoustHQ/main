@@ -132,3 +132,12 @@ export const DynamicWidthContainer = styled.div`
     width: 100%;
   }
 `;
+
+export const SelectedItemContainer = styled.div`
+  display: inline-block;
+  padding: 5px;
+  margin: 5px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);
+  background-color: ${({ theme }) => theme.colors.white};
+  border-radius: 5px;
+`;
