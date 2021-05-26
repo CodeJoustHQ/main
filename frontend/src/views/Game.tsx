@@ -303,7 +303,7 @@ function GamePage() {
             }
           });
 
-          // If no previous code, proceed as normal with the default Python language
+          // If no previous code, proceed as normal with the default Java language
           if (!matchFound) {
             setDefaultCodeFromProblems(res.problems, []);
           }

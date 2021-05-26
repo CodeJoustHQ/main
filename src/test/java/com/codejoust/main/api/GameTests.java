@@ -338,9 +338,7 @@ public class GameTests {
         jsonResponse = result.getResponse().getContentAsString();
         GameDto gameDto = UtilityTestMethods.toObjectInstant(jsonResponse, GameDto.class);
 
-        // Confirm that running the code does not create a submission.
         assertEquals(1, gameDto.getPlayers().size());
-        PlayerDto player = gameDto.getPlayers().get(0);
         assertFalse(gameDto.getAllSolved());
     }
     
