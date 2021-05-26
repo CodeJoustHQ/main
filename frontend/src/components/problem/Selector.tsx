@@ -42,6 +42,10 @@ const InnerContent = styled.div<ContentProps>`
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);
 `;
 
+const SpectatorInnerContent = styled(InnerContent)`
+  width: 8rem;
+`;
+
 const InlineElement = styled.div`
   width: 100%;
   padding: 8px 15px;
@@ -57,6 +61,13 @@ const InlineElement = styled.div`
   }
 `;
 
+const SpectatorInlineElement = styled.div`
+  &:hover {
+    cursor: default;
+    background-color: auto;
+  }
+`;
+
 const ClickableInlineDifficultyDisplayButton = styled(InlineDifficultyDisplayButton)`
   &:hover {
     cursor: pointer;
@@ -66,6 +77,10 @@ const ClickableInlineDifficultyDisplayButton = styled(InlineDifficultyDisplayBut
 const TextSearch = styled(TextInput)`
   width: 100%;
   margin: 0;
+`;
+
+const SpectatorTextSearch = styled(TextSearch)`
+  width: 8rem;
 `;
 
 const ElementName = styled.p`
@@ -204,7 +219,7 @@ export function TagSelector(props: TagSelectorProps) {
   );
 }
 
-export function SpectatorSelector(props: SpectatorSelectorProps) {
+export function SpectatorFilter(props: SpectatorSelectorProps) {
   const { spectators } = props;
 
   const [showSpectators, setShowSpectators] = useState(false);
@@ -221,30 +236,29 @@ export function SpectatorSelector(props: SpectatorSelectorProps) {
 
   return (
     <Content>
-      <TextSearch
+      <SpectatorTextSearch
         onClick={() => setShowSpectators(!showSpectators)}
         onChange={setSearchStatus}
-        placeholder={spectators.length ? 'Select tags (optional)' : 'Loading...'}
+        placeholder={spectators !== null ? `Spectators (${spectators.length})` : 'Loading...'}
       />
 
-      <InnerContent show={showSpectators} ref={ref}>
+      <SpectatorInnerContent show={showSpectators} ref={ref}>
         {spectators.map((spectator) => {
           if (searchText && !spectator.nickname.toLowerCase().includes(searchText.toLowerCase())) {
             return null;
           }
 
           return (
-            <InlineElement
+            <SpectatorInlineElement
               key={spectator.userId}
-              onClick={() => setShowSpectators(false)}
             >
               <ElementName>
                 {spectator.nickname}
               </ElementName>
-            </InlineElement>
+            </SpectatorInlineElement>
           );
         })}
-      </InnerContent>
+      </SpectatorInnerContent>
     </Content>
   );
 }

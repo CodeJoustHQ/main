@@ -46,6 +46,7 @@ import {
 import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { fetchGame, setGame } from '../redux/Game';
 import { setCurrentUser } from '../redux/User';
+import { SpectatorFilter } from '../components/problem/Selector';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
   margin-top: 15px;
@@ -436,9 +437,9 @@ function GamePage() {
           Room:
           {' '}
           {roomId || 'N/A'}
-          Spectators (
-          {spectators.length}
-          )
+          <SpectatorFilter
+            spectators={spectators}
+          />
         </FlexLeft>
         <FlexCenter>
           <GameTimerContainer gameTimer={gameTimer || null} />
