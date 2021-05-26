@@ -181,7 +181,7 @@ function LobbyPage() {
   /**
    * Set state variables from an updated room object
    */
-  const setStateFromRoom = (newRoom: Room) => {
+  const setStateFromRoom = useCallback((newRoom: Room) => {
     setHost(newRoom.host);
     setUsers(newRoom.users);
     setActiveUsers(newRoom.activeUsers);
@@ -192,14 +192,22 @@ function LobbyPage() {
     setDuration(newRoom.duration / 60);
     setSelectedProblems(newRoom.problems);
     setSize(newRoom.size);
-  };
+
+    // Set the room and current user.
+    dispatch(setRoom(newRoom));
+    newRoom.users.forEach((user) => {
+      if (user.userId === currentUser?.userId) {
+        dispatch(setCurrentUser(user));
+      }
+    });
+  }, [currentUser, dispatch, location]);
 
   // Map the room in Redux to the state variables used in this file
   useEffect(() => {
     if (room) {
       setStateFromRoom(room);
     }
-  }, [room]);
+  }, [room, setStateFromRoom]);
 
   // Function to determine if the given user is the host or not
   const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
@@ -259,9 +267,10 @@ function LobbyPage() {
     if (!loading) {
       setLoading(true);
       changeRoomHost(currentRoomId, request)
-        .then(() => setLoading(false))
         .catch((err) => {
           setError(err.message);
+        })
+        .finally(() => {
           setLoading(false);
         });
     }
@@ -279,6 +288,9 @@ function LobbyPage() {
     if (!loading) {
       setLoading(true);
       setSpectator(currentRoomId, request)
+        .then((res) => {
+          setStateFromRoom(res);
+        })
         .catch((err) => {
           setError(err.message);
         })

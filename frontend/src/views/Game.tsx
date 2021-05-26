@@ -191,8 +191,11 @@ function GamePage() {
       setFullPageLoading(false);
       setStateFromGame(game);
 
-      // If default code list is empty and current user is loaded, fetch the code from the backend
-      if (!defaultCodeList.length && currentUser) {
+      /**
+       * If default code list is empty and current user (non-spectator) is
+       * loaded, fetch the code from the backend
+       */
+      if (!defaultCodeList.length && currentUser && !currentUser.spectator) {
         let matchFound = false;
 
         // If this user refreshed and has already submitted code, load and save their latest code
@@ -340,6 +343,7 @@ function GamePage() {
         setLoading(false);
 
         // Set the 'test' submission type to correctly display result.
+        // eslint-disable-next-line no-param-reassign
         res.submissionType = SubmissionType.Test;
         setSubmission(res);
         checkSendTestCorrectNotification(res);
@@ -365,6 +369,7 @@ function GamePage() {
         setLoading(false);
 
         // Set the 'submit' submission type to correctly display result.
+        // eslint-disable-next-line no-param-reassign
         res.submissionType = SubmissionType.Submit;
         setSubmission(res);
         checkSendSolutionCorrectNotification(res);
