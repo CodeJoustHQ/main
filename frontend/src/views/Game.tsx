@@ -218,14 +218,20 @@ function GamePage() {
           ) : null}
         </FlexRight>
       </FlexInfoBar>
-      <PlayerGameView
-        gameError={error}
-        roomId={roomId}
-        players={players}
-        problems={problems}
-        currentUser={currentUser}
-        game={game}
-      />
+      {
+        currentUser?.spectator ? (
+          null
+        ) : (
+          <PlayerGameView
+            gameError={error}
+            roomId={roomId}
+            players={players}
+            problems={problems}
+            currentUser={currentUser}
+            game={game}
+          />
+        )
+      }
     </FlexContainer>
   );
 }
