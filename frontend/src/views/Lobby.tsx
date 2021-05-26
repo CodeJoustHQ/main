@@ -200,7 +200,7 @@ function LobbyPage() {
         dispatch(setCurrentUser(user));
       }
     });
-  }, [currentUser, dispatch, location]);
+  }, [currentUser, dispatch]);
 
   // Map the room in Redux to the state variables used in this file
   useEffect(() => {
