@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import app from '../../api/Firebase';
-import { useAppSelector, useAuthCheck } from '../../util/Hook';
+import { useAuthCheck } from '../../util/Hook';
 import { AuthInput, AuthPasswordInput } from '../../components/core/Input';
 import { PrimaryButton } from '../../components/core/Button';
 import ErrorMessage from '../../components/core/Error';

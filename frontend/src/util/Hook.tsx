@@ -72,5 +72,5 @@ export const useAuthCheck = (redirectAction: () => void, errorAction: (msg: stri
           errorAction(err.message);
         }
       });
-  }, [firebaseUser, redirectAction]);
+  }, [firebaseUser, redirectAction, errorAction]);
 };
