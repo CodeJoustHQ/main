@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { NavbarLink } from '../core/Link';
 import app from '../../api/Firebase';
@@ -60,6 +61,7 @@ const LogoIcon = styled.img`
 
 function LoggedInContent() {
   const dispatch = useAppDispatch();
+  const history = useHistory();
   const [mouseOver, setMouseOver] = useState(false);
 
   const logOut = () => {
@@ -67,6 +69,12 @@ function LoggedInContent() {
     dispatch(setToken(null));
     app.auth().signOut();
   };
+
+  const loggedInAccountItems = [
+    { title: 'Dashboard', action: () => history.push('/') },
+    { title: 'Profile', action: () => history.push('/profile') },
+    { title: 'Dashboard', action: logOut },
+  ];
 
   return (
     <RightContainer>
@@ -77,7 +85,7 @@ function LoggedInContent() {
         <NavButton onClick={logOut}>
           My Account
         </NavButton>
-        { mouseOver ? <Dropdown /> : null}
+        { mouseOver ? <Dropdown items={loggedInAccountItems} /> : null}
       </RelativeContainer>
       <RightHeader to="/contact-us">
         Contact Us
