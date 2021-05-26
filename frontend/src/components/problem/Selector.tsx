@@ -33,6 +33,11 @@ const Content = styled.div`
   margin: 10px 0;
 `;
 
+const SpectatorContent = styled.div`
+  position: relative;
+  margin-left: 10px;
+`;
+
 const InnerContent = styled.div<ContentProps>`
   width: 100%;
   max-height: 200px;
@@ -43,6 +48,8 @@ const InnerContent = styled.div<ContentProps>`
 `;
 
 const SpectatorInnerContent = styled(InnerContent)`
+  position: absolute;
+  max-height: 100px;
   width: 8rem;
 `;
 
@@ -61,10 +68,12 @@ const InlineElement = styled.div`
   }
 `;
 
-const SpectatorInlineElement = styled.div`
+const SpectatorInlineElement = styled(InlineElement)`
+  background-color: ${({ theme }) => theme.colors.white};
+
   &:hover {
     cursor: default;
-    background-color: auto;
+    background-color: ${({ theme }) => theme.colors.white};
   }
 `;
 
@@ -235,7 +244,7 @@ export function SpectatorFilter(props: SpectatorSelectorProps) {
   };
 
   return (
-    <Content>
+    <SpectatorContent>
       <SpectatorTextSearch
         onClick={() => setShowSpectators(!showSpectators)}
         onChange={setSearchStatus}
@@ -259,6 +268,6 @@ export function SpectatorFilter(props: SpectatorSelectorProps) {
           );
         })}
       </SpectatorInnerContent>
-    </Content>
+    </SpectatorContent>
   );
 }
