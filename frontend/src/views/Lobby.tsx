@@ -20,15 +20,19 @@ import { Difficulty } from '../api/Difficulty';
 import {
   PrimaryButton,
   SmallDifficultyButtonNoMargin,
-  InlineRefreshIcon,
+  InlineLobbyIcon,
   SecondaryRedButton,
 } from '../components/core/Button';
 import Loading from '../components/core/Loading';
 import PlayerCard from '../components/card/PlayerCard';
-import HostActionCard from '../components/card/HostActionCard';
+import ActionCard from '../components/card/ActionCard';
 import { startGame } from '../api/Game';
 import {
-  Room, changeRoomHost, updateRoomSettings, removeUser,
+  Room,
+  changeRoomHost,
+  updateRoomSettings,
+  removeUser,
+  setSpectator,
 } from '../api/Room';
 import { errorHandler } from '../api/Error';
 import {
@@ -42,12 +46,13 @@ import { FlexBareContainer } from '../components/core/Container';
 import { Slider, SliderContainer } from '../components/core/RangeSlider';
 import { Coordinate } from '../components/special/FloatingCircle';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
-import { SelectableProblem } from '../api/Problem';
-import ProblemSelector from '../components/problem/ProblemSelector';
-import SelectedProblemsDisplay from '../components/problem/SelectedProblemsDisplay';
+import { getAllProblemTags, ProblemTag, SelectableProblem } from '../api/Problem';
+import { ProblemSelector, TagSelector } from '../components/problem/Selector';
+import { SelectedProblemsDisplay, SelectedTagsDisplay } from '../components/problem/SelectedDisplay';
 import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { fetchRoom, setRoom } from '../redux/Room';
 import { setCurrentUser } from '../redux/User';
+import ActionCardHelpModal from '../components/core/ActionCardHelpModal';
 
 type LobbyPageLocation = {
   user: User,
@@ -147,6 +152,8 @@ function LobbyPage() {
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [duration, setDuration] = useState<number | undefined>(15);
   const [selectedProblems, setSelectedProblems] = useState<SelectableProblem[]>([]);
+  const [selectedTags, setSelectedTags] = useState<ProblemTag[]>([]);
+  const [allTags, setAllTags] = useState<ProblemTag[]>([]);
   const [size, setSize] = useState<number | undefined>(10);
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
@@ -167,6 +174,9 @@ function LobbyPage() {
 
   // Variable to hold whether the room link was copied.
   const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
+
+  // Variable to hold whether the modal explaining the user cards is active.
+  const [actionCardHelp, setActionCardHelp] = useState<boolean>(false);
 
   /**
    * Set state variables from an updated room object
@@ -252,6 +262,27 @@ function LobbyPage() {
         .then(() => setLoading(false))
         .catch((err) => {
           setError(err.message);
+          setLoading(false);
+        });
+    }
+  };
+
+  // Update the spectator status of the user in question.
+  const updateSpectator = (updatedSpectatorUser: User) => {
+    setError('');
+    const request = {
+      initiator: currentUser!,
+      receiver: updatedSpectatorUser,
+      spectator: !updatedSpectatorUser.spectator,
+    };
+
+    if (!loading) {
+      setLoading(true);
+      setSpectator(currentRoomId, request)
+        .catch((err) => {
+          setError(err.message);
+        })
+        .finally(() => {
           setLoading(false);
         });
     }
@@ -354,6 +385,16 @@ function LobbyPage() {
     updateSelectedProblems(newProblems);
   };
 
+  const addTag = (newTag: ProblemTag) => {
+    const newTags = [...selectedTags, newTag];
+    setSelectedTags(newTags);
+  };
+
+  const removeTag = (index: number) => {
+    const newTags = selectedTags.filter((_, i) => i !== index);
+    setSelectedTags(newTags);
+  };
+
   const onSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
@@ -421,15 +462,16 @@ function LobbyPage() {
           isActive={isActive}
           key={user.userId}
         >
-          {isHost(currentUser) && (user.userId !== currentUser?.userId) ? (
-            // If currentUser is host, pass in an on-click action card for all other users
-            <HostActionCard
-              user={user}
-              userIsActive={Boolean(user.sessionId)}
-              onMakeHost={changeHosts}
-              onRemoveUser={kickUser}
-            />
-          ) : null}
+          <ActionCard
+            user={user}
+            userIsHost={isHost(user)}
+            currentUserIsHost={isHost(currentUser)}
+            isCurrentUser={user.userId === currentUser?.userId}
+            userIsActive={Boolean(user.sessionId)}
+            onUpdateSpectator={updateSpectator}
+            onMakeHost={changeHosts}
+            onRemoveUser={kickUser}
+          />
         </PlayerCard>
       ));
     }
@@ -481,6 +523,16 @@ function LobbyPage() {
   const mouseMoveHandler = useCallback((e: MouseEvent) => {
     setMousePosition({ x: e.pageX, y: e.pageY });
   }, [setMousePosition]);
+
+  useEffect(() => {
+    getAllProblemTags()
+      .then((res) => {
+        setAllTags(res);
+      })
+      .catch((err) => {
+        setError(err.message);
+      });
+  }, []);
 
   useEffect(() => {
     window.onmousemove = mouseMoveHandler;
@@ -547,6 +599,10 @@ function LobbyPage() {
   // Render the lobby.
   return (
     <>
+      <ActionCardHelpModal
+        show={actionCardHelp}
+        exitModal={() => setActionCardHelp(false)}
+      />
       <HoverTooltip
         visible={hoverVisible}
         x={mousePosition.x}
@@ -608,11 +664,16 @@ function LobbyPage() {
                 ? ` (${users.length})`
                 : null
             }
-            <InlineRefreshIcon
+            <InlineLobbyIcon
               onClick={refreshRoomDetails}
             >
               refresh
-            </InlineRefreshIcon>
+            </InlineLobbyIcon>
+            <InlineLobbyIcon
+              onClick={() => setActionCardHelp(true)}
+            >
+              help_outline
+            </InlineLobbyIcon>
           </LobbyContainerTitle>
           <BackgroundContainer>
             {
@@ -648,6 +709,19 @@ function LobbyPage() {
                 );
               })}
             </DifficultyContainer>
+
+            <NoMarginMediumText>Selected Tags</NoMarginMediumText>
+            <SelectedTagsDisplay
+              tags={selectedTags}
+              onRemove={isHost(currentUser) ? removeTag : null}
+            />
+            {isHost(currentUser) ? (
+              <TagSelector
+                tags={allTags}
+                selectedTags={selectedTags}
+                onSelect={addTag}
+              />
+            ) : null}
 
             <NoMarginMediumText>Selected Problems</NoMarginMediumText>
             <SelectedProblemsDisplay

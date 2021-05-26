@@ -12,6 +12,7 @@ import com.codejoust.main.dto.problem.CreateProblemRequest;
 import com.codejoust.main.dto.problem.CreateTestCaseRequest;
 import com.codejoust.main.dto.problem.ProblemDto;
 import com.codejoust.main.dto.problem.ProblemInputDto;
+import com.codejoust.main.dto.problem.ProblemTagDto;
 import com.codejoust.main.dto.problem.ProblemTestCaseDto;
 import com.codejoust.main.exception.ProblemError;
 import com.codejoust.main.exception.api.ApiError;
@@ -438,5 +439,56 @@ class ProblemTests {
 
         ApiErrorResponse actual = MockHelper.getRequest(this.mockMvc, TestUrls.getDefaultCode("999999"), ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @Test
+    public void getProblemsWithTagSuccess() throws Exception {
+        /**
+         * 1. Create a problem with tags.
+         * 2. Perform the GET request and convert the result using type token.
+         * - This is necessary for the inner type conversion.
+         * 3. Verify the correct response and equality.
+         */
+
+        ProblemDto problemDto = ProblemTestMethods.createSingleProblemAndTags(this.mockMvc);
+
+        String tagId = problemDto.getProblemTags().get(0).getTagId();
+        Type listType = new TypeToken<ArrayList<ProblemDto>>(){}.getType();
+        List<ProblemDto> problemResult = MockHelper.getRequest(this.mockMvc, TestUrls.getProblemsWithTag(tagId), listType, HttpStatus.OK);
+
+        assertEquals(1, problemResult.size());
+        assertEquals(problemDto, problemResult.get(0));
+    }
+
+    @Test
+    public void getAllProblemTagsSuccess() throws Exception {
+        /**
+         * 1. Create a problem tag.
+         * 2. Perform the GET request and convert the result using type token.
+         * - This is necessary for the inner type conversion.
+         * 3. Verify the correct response and equality.
+         */
+
+        ProblemTagDto problemTag = ProblemTestMethods.createSingleProblemTag(this.mockMvc);
+
+        Type listType = new TypeToken<ArrayList<ProblemTagDto>>(){}.getType();
+        List<ProblemDto> problemTagResult = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblemTags(), listType, HttpStatus.OK);
+
+        assertEquals(1, problemTagResult.size());
+        assertEquals(problemTag, problemTagResult.get(0));
+    }
+
+    @Test
+    public void deleteProblemTagSuccess() throws Exception {
+        /**
+         * 1. Create a problem tag.
+         * 2. Perform the DELETE request and verify the result is correct.
+         */
+
+        ProblemTagDto problemTag = ProblemTestMethods.createSingleProblemTag(this.mockMvc);
+
+        ProblemTagDto problemTagReturn = MockHelper.deleteRequest(this.mockMvc, TestUrls.deleteProblemTag(problemTag.getTagId()), null, ProblemTagDto.class, HttpStatus.OK);
+
+        assertEquals(problemTag, problemTagReturn);
     }
 }

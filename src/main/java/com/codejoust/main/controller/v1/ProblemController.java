@@ -18,10 +18,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.codejoust.main.dto.problem.CreateProblemRequest;
+import com.codejoust.main.dto.problem.CreateProblemTagRequest;
 import com.codejoust.main.dto.problem.CreateTestCaseRequest;
 import com.codejoust.main.dto.problem.ProblemDto;
 import com.codejoust.main.dto.problem.ProblemMapper;
 import com.codejoust.main.dto.problem.ProblemSettingsDto;
+import com.codejoust.main.dto.problem.ProblemTagDto;
 import com.codejoust.main.dto.problem.ProblemTestCaseDto;
 import com.codejoust.main.game_object.CodeLanguage;
 import com.codejoust.main.model.problem.Problem;
@@ -85,5 +87,25 @@ public class ProblemController extends BaseRestController {
     @GetMapping("/problems/{problemId}/default-code")
     public ResponseEntity<Map<CodeLanguage, String>> getDefaultCode(@PathVariable String problemId) {
         return new ResponseEntity<>(service.getDefaultCode(problemId), HttpStatus.OK);
+    }
+
+    @GetMapping("/problems/tags/{tagId}")
+    public ResponseEntity<List<ProblemDto>> getProblemsWithTag(@PathVariable String tagId) {
+        return new ResponseEntity<>(service.getProblemsWithTag(tagId), HttpStatus.OK);
+    }
+
+    @GetMapping("/problems/tags")
+    public ResponseEntity<List<ProblemTagDto>> getAllProblemTags() {
+        return new ResponseEntity<>(service.getAllProblemTags(), HttpStatus.OK);
+    }
+
+    @PostMapping("/problems/tags")
+    public ResponseEntity<ProblemTagDto> createProblemTag(@RequestBody CreateProblemTagRequest request) {
+        return new ResponseEntity<>(service.createProblemTag(request), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/problems/tags/{tagId}")
+    public ResponseEntity<ProblemTagDto> deleteProblemTag(@PathVariable String tagId) {
+        return new ResponseEntity<>(service.deleteProblemTag(tagId), HttpStatus.OK);
     }
 }

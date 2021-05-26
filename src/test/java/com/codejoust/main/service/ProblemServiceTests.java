@@ -19,11 +19,14 @@ import java.util.Collections;
 import java.util.List;
 
 import com.codejoust.main.dao.ProblemRepository;
+import com.codejoust.main.dao.ProblemTagRepository;
 import com.codejoust.main.dto.problem.CreateProblemRequest;
+import com.codejoust.main.dto.problem.CreateProblemTagRequest;
 import com.codejoust.main.dto.problem.CreateTestCaseRequest;
 import com.codejoust.main.dto.problem.ProblemDto;
 import com.codejoust.main.dto.problem.ProblemInputDto;
 import com.codejoust.main.dto.problem.ProblemMapper;
+import com.codejoust.main.dto.problem.ProblemTagDto;
 import com.codejoust.main.dto.problem.ProblemTestCaseDto;
 import com.codejoust.main.exception.ProblemError;
 import com.codejoust.main.exception.api.ApiException;
@@ -31,6 +34,7 @@ import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
 import com.codejoust.main.model.problem.ProblemInput;
+import com.codejoust.main.model.problem.ProblemTag;
 import com.codejoust.main.model.problem.ProblemTestCase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,6 +50,9 @@ public class ProblemServiceTests {
 
     @Mock
     private ProblemRepository repository;
+
+    @Mock
+    private ProblemTagRepository tagRepository;
 
     @Mock
     private AccountRepository accountRepository;
@@ -419,13 +426,18 @@ public class ProblemServiceTests {
         testCaseDto.setInput(TestFields.INPUT_3);
         testCaseDto.setOutput(TestFields.OUTPUT_3);
 
+        ProblemTagDto problemTagDto = new ProblemTagDto();
+        problemTagDto.setName(TestFields.TAG_NAME);
+
         ProblemDto updatedProblem = ProblemMapper.toDto(problem);
         updatedProblem.setTestCases(Collections.singletonList(testCaseDto));
+        updatedProblem.setProblemTags(Collections.singletonList(problemTagDto));
 
         problemService.editProblem(problem.getProblemId(), updatedProblem, TestFields.TOKEN);
 
         verify(repository).save(problem);
         assertEquals(1, problem.getTestCases().size());
+        assertEquals(1, problem.getProblemTags().size());
         assertEquals(1, problem.getProblemInputs().size());
 
         ProblemTestCase testCase = problem.getTestCases().get(0);
@@ -673,6 +685,92 @@ public class ProblemServiceTests {
                 problemService.validateInputsGsonParseable("true\n[a]\n3.0\n[]", inputs));
 
         assertEquals(ProblemError.BAD_INPUT, exception.getError());
+    }
+
+    @Test
+    public void getProblemsWithTagSuccess() {
+        /**
+         * 1. Create a problem and problem tag.
+         * 2. Add the problem to the problem tag, and vice versa.
+         * 3. Mock repository return and verify that the correct problem
+         * is returned with "getProblemsWithTag."
+         */
+
+        Problem problem = new Problem();
+        problem.setName(TestFields.NAME);
+
+        ProblemTag problemTag = new ProblemTag();
+        problemTag.setName(TestFields.TAG_NAME);
+        problemTag.setTagId(TestFields.TAG_ID);
+        problem.addProblemTag(problemTag);
+
+        Mockito.doReturn(Collections.singletonList(problem)).when(repository).findByProblemTags_TagId(problemTag.getTagId());
+        
+        List<ProblemDto> problems = problemService.getProblemsWithTag(problemTag.getTagId());
+
+        assertEquals(1, problems.size());
+        assertEquals(problem.getName(), problems.get(0).getName());
+    }
+
+    @Test
+    public void getAllProblemTagsSuccess() {
+        /**
+         * 1. Create a problem tag.
+         * 2. Mock repository return and verify that tag
+         * is returned with "getAllProblemTags."
+         */
+
+        ProblemTag problemTag = new ProblemTag();
+        problemTag.setName(TestFields.TAG_NAME);
+        problemTag.setTagId(TestFields.TAG_ID);
+
+        Mockito.doReturn(Collections.singletonList(problemTag)).when(tagRepository).findAll();
+        
+        List<ProblemTagDto> problemTags = problemService.getAllProblemTags();
+
+        assertEquals(1, problemTags.size());
+        assertEquals(problemTag.getName(), problemTags.get(0).getName());
+    }
+
+    @Test
+    public void createProblemTagSuccess() {
+        // Create problem tag and verify save was called.
+        CreateProblemTagRequest request = new CreateProblemTagRequest();
+        request.setName(TestFields.TAG_NAME);
+
+        problemService.createProblemTag(request);
+        verify(tagRepository).save(Mockito.any(ProblemTag.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "longerthantwentycharactersistherule"})
+    public void createProblemTagInvalidName(String tagName) {
+        // Create problem tag and verify save was called.
+        CreateProblemTagRequest request = new CreateProblemTagRequest();
+        request.setName(tagName);
+
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblemTag(request));
+        assertEquals(ProblemError.BAD_PROBLEM_TAG, exception.getError());
+    }
+
+    @Test
+    public void deleteProblemTagSuccess() {
+        /**
+         * 1. Create a problem tag.
+         * 2. Mock repository return to return problem tag.
+         * 3. Delete problem tag and verify delete is called and method
+         * returns properly.
+         */
+
+        ProblemTag problemTag = new ProblemTag();
+        problemTag.setName(TestFields.TAG_NAME);
+        problemTag.setTagId(TestFields.TAG_ID);
+
+        Mockito.doReturn(problemTag).when(tagRepository).findTagByTagId(problemTag.getTagId());
+
+        ProblemTagDto problemTagDto = problemService.deleteProblemTag(problemTag.getTagId());
+        verify(tagRepository).delete(Mockito.any(ProblemTag.class));
+        assertEquals(problemTag.getName(), problemTagDto.getName());
     }
 
     @Test

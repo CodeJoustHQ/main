@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, RefObject } from 'react';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { Player, Submission } from '../api/Game';
 import { AppDispatch, RootState } from '../redux/Store';
@@ -39,6 +39,19 @@ export const useProblemEditable = (user: FirebaseUserType | null, problem: Probl
   }, [user, problem]);
 
   return editable;
+};
+
+export const useClickOutside = (ref: RefObject<HTMLDivElement>, closeFunction: () => void) => {
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current!.contains(e.target as Node)) {
+        closeFunction();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [ref, closeFunction]);
 };
 
 // Custom Redux Hooks with our store's types

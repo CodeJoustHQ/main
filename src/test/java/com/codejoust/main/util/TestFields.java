@@ -42,6 +42,8 @@ public class TestFields {
     public static final String PROBLEM_ID = "abcxyz";
     public static final String INPUT_NAME = "nums";
     public static final ProblemIOType IO_TYPE = ProblemIOType.ARRAY_INTEGER;
+    public static final String TAG_NAME = "Binary Search";
+    public static final String TAG_ID = "klmno";
 
     public static final String INPUT = "[1, 3, 2]";
     public static final String OUTPUT = "[1, 2, 3]";

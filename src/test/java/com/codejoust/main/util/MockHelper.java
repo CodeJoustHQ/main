@@ -13,6 +13,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.lang.reflect.Type;
+
 public class MockHelper {
 
     public static <T> T getRequest(MockMvc mockMvc, String url, Class<T> c, HttpStatus status) throws Exception {
@@ -23,6 +25,15 @@ public class MockHelper {
 
         String jsonResponse = result.getResponse().getContentAsString();
         return UtilityTestMethods.toObject(jsonResponse, c);
+    }
+
+    public static <T> T getRequest(MockMvc mockMvc, String url, Type type, HttpStatus status) throws Exception {
+        MvcResult result = mockMvc.perform(get(url))
+                .andDo(print()).andExpect(status().is(status.value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        return UtilityTestMethods.toObjectType(jsonResponse, type);
     }
 
     public static <T> T postRequest(MockMvc mockMvc, String url, Object body, Class<T> c, HttpStatus status) throws Exception {

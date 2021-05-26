@@ -1,5 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import styled from 'styled-components';
+import { useClickOutside } from '../../util/Hook';
 import { GrayTextButton } from './Button';
 
 type ContentProps = {
@@ -54,17 +55,7 @@ function Modal(props: ModalProps) {
 
   const modalRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (modalRef.current && !modalRef.current!.contains(e.target as Node)) {
-        onExit();
-      }
-    };
-
-    // Bind the onClick event listener (and remove it on finish)
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [modalRef, onExit]);
+  useClickOutside(modalRef, () => onExit());
 
   return (
     <Content show={show} ref={modalRef} fullScreen={fullScreen}>
