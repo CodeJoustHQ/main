@@ -16,20 +16,25 @@ const Content = styled.div`
   z-index: 2;
 `;
 
-const DropdownItemContainer = styled.div`
-  background-color: ${({ theme }) => theme.colors.white};
+const DropdownItemContainer = styled.div<DropdownItemContainerProps>`
+  background-color: ${({ theme, active }) => (active ? theme.colors.background : theme.colors.white)};
   border-radius: 6px;
   padding: 8px;
-  cursor: pointer;
+  cursor: ${({ active }) => (active ? 'default' : 'pointer')};
   
   &:hover {
     background-color: ${({ theme }) => theme.colors.background};
   }
 `;
 
+type DropdownItemContainerProps = {
+  active: boolean,
+};
+
 type DropdownItem = {
   title: string,
   action: () => void,
+  active: boolean,
 };
 
 type DropdownProps = {
@@ -42,7 +47,7 @@ function Dropdown(props: DropdownProps) {
   return (
     <Content>
       {items.map((item) => (
-        <DropdownItemContainer onClick={item.action}>
+        <DropdownItemContainer onClick={item.action} active={item.active}>
           <NoMarginSubtitleText>{item.title}</NoMarginSubtitleText>
         </DropdownItemContainer>
       ))}

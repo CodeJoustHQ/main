@@ -7,7 +7,6 @@ import { TextButton } from '../core/Button';
 import { useAppDispatch, useAppSelector } from '../../util/Hook';
 import { setAccount, setToken } from '../../redux/Account';
 import Dropdown from '../core/Dropdown';
-import { RelativeContainer } from '../core/Container';
 
 const Content = styled.div`
   height: 50px;
@@ -40,6 +39,12 @@ const RightContainer = styled.div`
   margin-right: 50px;
 `;
 
+const DropdownContainer = styled.div`
+  position: relative;
+  display: inline;
+  padding: 10px 0;
+`;
+
 const InlineHeaderTag = styled.span`
   position: relative;
   top: -0.1rem;
@@ -68,25 +73,26 @@ function LoggedInContent() {
     dispatch(setAccount(null));
     dispatch(setToken(null));
     app.auth().signOut();
+    history.push('/');
   };
 
   const loggedInAccountItems = [
-    { title: 'Dashboard', action: () => history.push('/') },
-    { title: 'Profile', action: () => history.push('/profile') },
-    { title: 'Dashboard', action: logOut },
+    { title: 'Dashboard', action: () => history.push('/'), active: window.location.pathname === '/' },
+    { title: 'Profile', action: () => history.push('/profile'), active: window.location.pathname === '/profile' },
+    { title: 'Logout', action: logOut, active: false },
   ];
 
   return (
     <RightContainer>
-      <RelativeContainer
+      <DropdownContainer
         onMouseEnter={() => setMouseOver(true)}
         onMouseLeave={() => setMouseOver(false)}
       >
-        <NavButton onClick={logOut}>
+        <NavButton>
           My Account
         </NavButton>
         { mouseOver ? <Dropdown items={loggedInAccountItems} /> : null}
-      </RelativeContainer>
+      </DropdownContainer>
       <RightHeader to="/contact-us">
         Contact Us
       </RightHeader>
