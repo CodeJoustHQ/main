@@ -117,6 +117,7 @@ function GamePage() {
 
   const [host, setHost] = useState<User | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
+  const [spectators, setSpectators] = useState<User[]>([]);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
   const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.Java);
@@ -152,6 +153,15 @@ function GamePage() {
     setAllSolved(newGame.allSolved);
     setTimeUp(newGame.gameTimer.timeUp);
     setGameEnded(newGame.gameEnded);
+
+    // Set the spectator list in the game.
+    const spectatorList: User[] = [];
+    newGame.room.users.forEach((user) => {
+      if (user.spectator) {
+        spectatorList.push(user);
+      }
+    });
+    setSpectators(spectatorList);
   };
 
   const dispatch = useAppDispatch();
@@ -426,6 +436,9 @@ function GamePage() {
           Room:
           {' '}
           {roomId || 'N/A'}
+          Spectators (
+          {spectators.length}
+          )
         </FlexLeft>
         <FlexCenter>
           <GameTimerContainer gameTimer={gameTimer || null} />

@@ -6,6 +6,7 @@ import { displayNameFromDifficulty } from '../../api/Difficulty';
 import { InlineDifficultyDisplayButton } from '../core/Button';
 import { TextInput } from '../core/Input';
 import { useClickOutside } from '../../util/Hook';
+import { User } from '../../api/User';
 
 type ProblemSelectorProps = {
   selectedProblems: SelectableProblem[],
@@ -16,6 +17,10 @@ type TagSelectorProps = {
   tags: ProblemTag[],
   selectedTags: ProblemTag[],
   onSelect: (newlySelected: ProblemTag) => void,
+};
+
+type SpectatorSelectorProps = {
+  spectators: User[],
 };
 
 type ContentProps = {
@@ -190,6 +195,51 @@ export function TagSelector(props: TagSelectorProps) {
             >
               <ElementName>
                 {tag.name}
+              </ElementName>
+            </InlineElement>
+          );
+        })}
+      </InnerContent>
+    </Content>
+  );
+}
+
+export function SpectatorSelector(props: SpectatorSelectorProps) {
+  const { spectators } = props;
+
+  const [showSpectators, setShowSpectators] = useState(false);
+  const [searchText, setSearchText] = useState('');
+
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close list of tags if clicked outside of div
+  useClickOutside(ref, () => setShowSpectators(false));
+
+  const setSearchStatus = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+  };
+
+  return (
+    <Content>
+      <TextSearch
+        onClick={() => setShowSpectators(!showSpectators)}
+        onChange={setSearchStatus}
+        placeholder={spectators.length ? 'Select tags (optional)' : 'Loading...'}
+      />
+
+      <InnerContent show={showSpectators} ref={ref}>
+        {spectators.map((spectator) => {
+          if (searchText && !spectator.nickname.toLowerCase().includes(searchText.toLowerCase())) {
+            return null;
+          }
+
+          return (
+            <InlineElement
+              key={spectator.userId}
+              onClick={() => setShowSpectators(false)}
+            >
+              <ElementName>
+                {spectator.nickname}
               </ElementName>
             </InlineElement>
           );
