@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import copy from 'copy-to-clipboard';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { LargeText, SecondaryHeaderText, MainHeaderText } from '../components/core/Text';
 import {
   Game, Player, playAgain, Submission,
@@ -33,7 +34,6 @@ import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { fetchGame, setGame } from '../redux/Game';
 import { setCurrentUser } from '../redux/User';
 import { setRoom } from '../redux/Room';
-import { unwrapResult } from '@reduxjs/toolkit';
 
 const Content = styled.div`
   padding: 0;

@@ -3,6 +3,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { useBeforeunload } from 'react-beforeunload';
 import { Message, Subscription } from 'stompjs';
 import { unwrapResult } from '@reduxjs/toolkit';
+import styled from 'styled-components';
 import { errorHandler } from '../api/Error';
 import {
   FlexCenter, FlexContainer, FlexInfoBar, FlexLeft,
@@ -13,7 +14,9 @@ import { checkLocationState, leaveRoom } from '../util/Utility';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
 import { Difficulty } from '../api/Difficulty';
-import { Game, manuallyEndGame, Player } from '../api/Game';
+import {
+  Game, manuallyEndGame, Player, Submission,
+} from '../api/Game';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
 import { TextButton, DangerButton } from '../components/core/Button';
@@ -24,6 +27,24 @@ import { setCurrentUser } from '../redux/User';
 import { SpectatorFilter } from '../components/problem/Selector';
 import PlayerGameView from '../components/game/PlayerGameView';
 import { Problem } from '../api/Problem';
+import { LargeCenterText, SecondaryHeaderText } from '../components/core/Text';
+import ResultsTable from '../components/results/ResultsTable';
+import Modal from '../components/core/Modal';
+import Language from '../api/Language';
+import ResizableMonacoEditor from '../components/game/Editor';
+
+const CodePreview = styled.div`
+  position: relative;
+  text-align: left;
+  margin: 10px auto;
+  
+  width: 75%;
+  height: 45vh;
+  padding: 8px 0;
+  box-sizing: border-box;
+  border: 1px solid ${({ theme }) => theme.colors.blue};
+  border-radius: 8px;
+`;
 
 type LocationState = {
   roomId: string,
@@ -49,6 +70,8 @@ function GamePage() {
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);
+  const [startTime, setStartTime] = useState<string>('');
+  const [codeModal, setCodeModal] = useState(-1);
 
   // Variable to hold whether the user is subscribed to the primary Game socket.
   const [gameSocket, setGameSocket] = useState<Subscription | null>(null);
@@ -73,6 +96,7 @@ function GamePage() {
     setAllSolved(newGame.allSolved);
     setTimeUp(newGame.gameTimer.timeUp);
     setGameEnded(newGame.gameEnded);
+    setStartTime(newGame.gameTimer.startTime);
 
     // Set the spectator list in the game.
     const spectatorList: User[] = [];
@@ -86,6 +110,36 @@ function GamePage() {
 
   const dispatch = useAppDispatch();
   const { currentUser, game } = useAppSelector((state) => state);
+
+  const getPreviewCodeContent = useCallback(() => {
+    if (!players[codeModal] || !players[codeModal].submissions.length) {
+      return null;
+    }
+
+    let bestSubmission: Submission | undefined;
+    players[codeModal].submissions.forEach((submission) => {
+      if (!bestSubmission || submission.numCorrect > bestSubmission.numCorrect) {
+        bestSubmission = submission;
+      }
+    });
+
+    return (
+      <div>
+        <SecondaryHeaderText bold>
+          {`Previewing code for player "${players[codeModal].user.nickname}"`}
+        </SecondaryHeaderText>
+        <CodePreview>
+          <ResizableMonacoEditor
+            onLanguageChange={null}
+            onCodeChange={null}
+            codeMap={null}
+            defaultLanguage={bestSubmission?.language as Language || Language.Python}
+            defaultCode={bestSubmission?.code || 'Uh oh! An error occurred fetching this player\'s code'}
+          />
+        </CodePreview>
+      </div>
+    );
+  }, [players, codeModal]);
 
   // Map the game in Redux to the state variables used in this file
   useEffect(() => {
@@ -220,7 +274,18 @@ function GamePage() {
       </FlexInfoBar>
       {
         currentUser?.spectator ? (
-          null
+          <>
+            <Modal show={codeModal !== -1} onExit={() => setCodeModal(-1)} fullScreen>
+              {getPreviewCodeContent()}
+            </Modal>
+            <LargeCenterText>Live Scoreboard</LargeCenterText>
+            <ResultsTable
+              players={players}
+              currentUser={currentUser}
+              gameStartTime={startTime}
+              viewPlayerCode={(index: number) => setCodeModal(index)}
+            />
+          </>
         ) : (
           <PlayerGameView
             gameError={error}

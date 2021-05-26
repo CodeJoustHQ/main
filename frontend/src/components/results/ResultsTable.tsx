@@ -5,6 +5,7 @@ import PlayerResultsItem from './PlayerResultsItem';
 import { User } from '../../api/User';
 
 const Content = styled.table`
+  text-align: center;
   width: 65%;
   min-width: 600px;
   margin: 0 auto;
