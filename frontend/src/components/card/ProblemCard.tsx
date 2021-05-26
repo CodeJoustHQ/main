@@ -1,8 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Problem } from '../../api/Problem';
-import { LargeText, Text } from '../core/Text';
+import { LargeText, SelectedItemText, Text } from '../core/Text';
 import { getDifficultyDisplayButton } from '../core/Button';
+import { SelectedItemContainer } from '../core/Container';
 
 type ProblemCardProps = {
   problem: Problem,
@@ -23,6 +24,16 @@ const Content = styled.div`
   }
 `;
 
+const ProblemTagContainer = styled(SelectedItemContainer)`
+  margin: 5px 10px 5px 0;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+`;
+
+const ProblemTagText = styled(SelectedItemText)`
+  font-weight: normal;
+`;
+
 const TitleText = styled(LargeText)`
   margin: 10px 12px 10px 0;
   display: inline;
@@ -37,6 +48,12 @@ function ProblemCard(props: ProblemCardProps) {
       <TitleText>{problem.name}</TitleText>
       {getDifficultyDisplayButton(problem.difficulty, true)}
       <Text>{`${problem.description.substring(0, 80)}...`}</Text>
+
+      {problem.problemTags.map((tag) => (
+        <ProblemTagContainer key={tag.name}>
+          <ProblemTagText>{tag.name}</ProblemTagText>
+        </ProblemTagContainer>
+      ))}
     </Content>
   );
 }

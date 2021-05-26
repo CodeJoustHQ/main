@@ -108,11 +108,13 @@ function MyProblems(props: MyProblemsProps) {
       </FilterContainer>
 
       {account?.problems.map((problem: Problem, index) => {
-        // Filter by name and difficulty
+        const text = filterText.toLowerCase();
+
+        // Filter by name, difficulty, and tags
         if (filterText
-          && !problem.name.toLowerCase().includes(filterText.toLowerCase())
-          && !problem.difficulty.toLowerCase().includes(filterText.toLowerCase())) {
-          // TODO: tags, after merging
+          && !problem.name.toLowerCase().includes(text)
+          && !problem.difficulty.toLowerCase().includes(text)
+          && !problem.problemTags.some((tag) => tag.name.toLowerCase().includes(text))) {
           return null;
         }
 
