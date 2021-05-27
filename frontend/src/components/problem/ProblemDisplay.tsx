@@ -467,7 +467,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
                                 <FlexBareContainerMarginBottom>
                                   <ExplanationContainer>
-                                    <Text>Explanation</Text>
+                                    <Text>Explanation (optional)</Text>
                                     <FixedTextArea
                                       value={newProblem.testCases[index].explanation}
                                       onChange={(e) => {

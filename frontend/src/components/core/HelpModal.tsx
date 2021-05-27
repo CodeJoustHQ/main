@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { LargeText, NoMarginMediumText, Text } from './Text';
 import { LeftContainer } from './Container';
 import Modal from './Modal';
+import { InlineExternalLink } from './Link';
 
 const HelpText = styled(Text)`
   display: inline-block;
@@ -158,36 +159,90 @@ export function ProblemHelpModal(props: HelpModalProps) {
         <div>
           <HelpText>
             <b>Overview</b>
-            : You can view a complete example problem here at http://codejoust.co/problem/791d34a1-5525-4a33-95c3-d604fef6c94d.
+            : The problem page is where you can create or edit your problems,
+            as well as preview problems created by others. Be sure to save
+            any changes before leaving the page! You can view a
+            {' '}
+            <InlineExternalLink href="/problem/791d34a1-5525-4a33-95c3-d604fef6c94d" target="_blank">
+              complete problem
+            </InlineExternalLink>
+            {' '}
+            created by the CodeJoust team to see an example.
           </HelpText>
         </div>
         <NoMarginMediumText>Options</NoMarginMediumText>
         <div>
           <HelpText>
-            <b>Difficulty</b>
-            : The difficulty setting currently filters the random problems
-            chosen by this difficulty. In the future, this will be
-            used to filter the selected problems.
+            <b>Approved or Approval Pending</b>
+            : The Approved or Approval Pending toggle allows the user to
+            determine when the problem is ready to be used in games. In the
+            future, this feature will likely be discontinued and replaced with
+            a more robust public, private, and verified problem system.
           </HelpText>
         </div>
         <div>
           <HelpText>
-            <b>Tags</b>
-            : The selected tags currently allows the user to search and select
-            certain tags, but does not yet have an impact on game settings.
-            In the future, this will be used to filter the selected problems.
+            <b>Difficulty and Tags</b>
+            : The difficulty and tags settings add more information to the
+            problem, and allow users to filter their collection to find
+            relevant problems.
           </HelpText>
         </div>
         <div>
           <HelpText>
             <b>Problem Inputs</b>
-            : ...
+            : Every problem is structured in the form of a method with
+            parameters and a return type, and the problem inputs and their
+            names are added here. There are some restrictions on valid names
+            (no spaces or special characters).
           </HelpText>
         </div>
         <div>
           <HelpText>
             <b>Problem Output</b>
-            : ...
+            : The problem output type is defined here. Further types may be
+            added in the future; if you have any requests, please
+            {' '}
+            <InlineExternalLink href="/contact-us" target="_blank">
+              contact us
+            </InlineExternalLink>
+            .
+          </HelpText>
+        </div>
+        <NoMarginMediumText>Test Cases</NoMarginMediumText>
+        <div>
+          <HelpText>
+            <b>Input</b>
+            : The Input is the first required setting for test cases. Each line
+            represents the next parameter, in order. This means that
+            Strings cannot have newlines - special characters are also not
+            allowed. This input must perfectly match the parameters selected
+            in Problem Inputs.
+          </HelpText>
+        </div>
+        <div>
+          <HelpText>
+            <b>Output</b>
+            : The Output should be just one line, which must have the same form
+            as the Problem Output type selected under Options.
+          </HelpText>
+        </div>
+        <div>
+          <HelpText>
+            <b>Explanation</b>
+            : The Explanation is an optional field that is not currently in use
+            on the game page, but may be used in the future to help players
+            understand the test case. The CodeJoust team suggests you only add
+            an explanation for the first test case.
+          </HelpText>
+        </div>
+        <div>
+          <HelpText>
+            <b>Hidden</b>
+            : The Hidden toggle determines whether the player will be able
+            to see the contents of the test case when coding. We suggest making
+            at least one non-hidden test case, and at least one hidden test
+            case.
           </HelpText>
         </div>
       </LeftContainer>
