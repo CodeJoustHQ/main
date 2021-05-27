@@ -160,8 +160,9 @@ export function ProblemHelpModal(props: HelpModalProps) {
           <HelpText>
             <b>Overview</b>
             : The problem page is where you can create or edit your problems,
-            as well as preview problems created by others. Be sure to save
-            any changes before leaving the page! You can view a
+            as well as preview problems created by others. Be sure to
+            <i> save any changes </i>
+            before leaving the page! You can view a
             {' '}
             <InlineExternalLink href="/problem/791d34a1-5525-4a33-95c3-d604fef6c94d" target="_blank">
               complete problem
@@ -185,7 +186,8 @@ export function ProblemHelpModal(props: HelpModalProps) {
             <b>Difficulty and Tags</b>
             : The difficulty and tags settings add more information to the
             problem, and allow users to filter their collection to find
-            relevant problems.
+            relevant problems. Tags can only be added once the problem has
+            been created.
           </HelpText>
         </div>
         <div>
@@ -212,6 +214,14 @@ export function ProblemHelpModal(props: HelpModalProps) {
         <NoMarginMediumText>Test Cases</NoMarginMediumText>
         <div>
           <HelpText>
+            <b>Overview</b>
+            : Test cases is how this platform judges the accuracy of problem
+            solutions. These can only be added once the initial problem was
+            created.
+          </HelpText>
+        </div>
+        <div>
+          <HelpText>
             <b>Input</b>
             : The Input is the first required setting for test cases. Each line
             represents the next parameter, in order. This means that
@@ -223,7 +233,8 @@ export function ProblemHelpModal(props: HelpModalProps) {
         <div>
           <HelpText>
             <b>Output</b>
-            : The Output should be just one line, which must have the same form
+            : The Output is the second required setting for test cases.
+            The Output should be just one line, which must have the same form
             as the Problem Output type selected under Options.
           </HelpText>
         </div>
