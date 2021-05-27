@@ -6,28 +6,20 @@ import MarkdownEditor from 'rich-markdown-editor';
 import {
   deleteProblem,
   Problem,
-  ProblemInput,
   ProblemIOType,
   problemIOTypeToString,
   ProblemTag,
   TestCase,
 } from '../../api/Problem';
-import {
-  FixedTextArea,
-  PureTextInputTitle,
-  TextInput,
-  CheckboxInput,
-} from '../core/Input';
+import { FixedTextArea, PureTextInputTitle, CheckboxInput } from '../core/Input';
 import { Difficulty } from '../../api/Difficulty';
 import {
   SmallDifficultyButton,
   PrimaryButton,
-  TextButton,
   RedTextButton,
   GrayTextButton,
   SmallButton,
   GreenSmallButtonBlock,
-  InlineErrorIcon,
   InvertedSmallButton,
 } from '../core/Button';
 import ToggleButton from '../core/ToggleButton';
@@ -41,11 +33,12 @@ import {
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
 import { FlexBareContainer } from '../core/Container';
-import { generateRandomId, validIdentifier } from '../../util/Utility';
+import { generateRandomId } from '../../util/Utility';
 import { HoverTooltip } from '../core/HoverTooltip';
 import { Coordinate } from '../special/FloatingCircle';
 import ProblemTags from './ProblemTags';
 import { useAppSelector, useProblemEditable } from '../../util/Hook';
+import ProblemInputDisplay from './ProblemInputDisplay';
 
 const MainContent = styled.div`
   text-align: left;
@@ -139,15 +132,6 @@ const NoMarginTopText = styled(Text)`
   margin-top: 0px;
 `;
 
-const InputTypeContainer = styled.div`
-  margin-bottom: 5px;
-`;
-
-const CancelTextButton = styled(TextButton)`
-  margin-left: 2.5px;
-  color: ${({ theme }) => theme.colors.gray};
-`;
-
 const DeleteButton = styled(PrimaryButton)`
   margin: 0 0 1rem 0;
   color: ${({ theme }) => theme.colors.red2};
@@ -160,67 +144,6 @@ type ProblemDisplayParams = {
   onClick: (newProblem: Problem) => void,
   editMode: boolean,
 };
-
-type ProblemInputDisplayProps = {
-  input: ProblemInput,
-  index: number,
-  handleInputChange: (index: number, newInput: string, inputType: ProblemIOType) => void,
-  problemEditable: boolean,
-  setHoverVisible: (hoverVisible: boolean) => void,
-  mouseMoveHandler: (e: any) => void,
-  deleteProblemInput: (index: number) => void,
-};
-
-function ProblemInputDisplay(props: ProblemInputDisplayProps) {
-  const {
-    input, index, handleInputChange, problemEditable,
-    setHoverVisible, mouseMoveHandler, deleteProblemInput,
-  } = props;
-
-  return (
-    <InputTypeContainer>
-      <TextInput
-        value={input.name}
-        onChange={(e) => handleInputChange(index,
-          e.target.value, input.type)}
-        disabled={!problemEditable}
-      />
-
-      <InlineErrorIcon
-        show={!validIdentifier(input.name)}
-        onMouseEnter={() => setHoverVisible(true)}
-        onMouseMove={mouseMoveHandler}
-        onMouseLeave={() => setHoverVisible(false)}
-      >
-        error_outline
-      </InlineErrorIcon>
-
-      <PrimarySelect
-        onChange={(e) => handleInputChange(
-          index,
-          input.name,
-          ProblemIOType[e.target.value as keyof typeof ProblemIOType],
-        )}
-        value={problemIOTypeToString(input.type)}
-        disabled={!problemEditable}
-      >
-        {
-          Object.keys(ProblemIOType).map((key) => (
-            <option key={key} value={key}>{key}</option>
-          ))
-        }
-      </PrimarySelect>
-
-      {problemEditable ? (
-        <CancelTextButton
-          onClick={() => deleteProblemInput(index)}
-        >
-          ✕
-        </CancelTextButton>
-      ) : null}
-    </InputTypeContainer>
-  );
-}
 
 // a little function to help us with reordering the result
 const reorder = (list: TestCase[], startIndex: number, endIndex: number): TestCase[] => {
