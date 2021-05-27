@@ -13,7 +13,7 @@ import { ProblemHeaderText, BottomFooterText } from '../core/Text';
 import Console from './Console';
 import Loading from '../core/Loading';
 import { User } from '../../api/User';
-import { Difficulty, displayNameFromDifficulty } from '../../api/Difficulty';
+import { displayNameFromDifficulty } from '../../api/Difficulty';
 import {
   Game,
   Player, runSolution, Submission, SubmissionType, submitSolution,
@@ -83,12 +83,6 @@ type PlayerGameViewProps = {
   problems: Problem[],
   currentUser: User | null,
   game: Game | null,
-};
-
-type LocationState = {
-  roomId: string,
-  currentUser: User,
-  difficulty: Difficulty,
 };
 
 function PlayerGameView(props: PlayerGameViewProps) {
