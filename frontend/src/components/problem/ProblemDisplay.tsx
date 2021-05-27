@@ -528,16 +528,16 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
           <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
           {newProblem.problemInputs.map((input, index) => (
-            <InputTypeContainer key={generateRandomId()}>
+            <InputTypeContainer>
               <TextInput
-                value={newProblem.problemInputs[index].name}
+                value={input.name}
                 onChange={(e) => handleInputChange(index,
-                  e.target.value, newProblem.problemInputs[index].type)}
+                  e.target.value, input.type)}
                 disabled={!problemEditable}
               />
 
               <InlineErrorIcon
-                show={!validIdentifier(newProblem.problemInputs[index].name)}
+                show={!validIdentifier(input.name)}
                 onMouseEnter={() => setHoverVisible(true)}
                 onMouseMove={mouseMoveHandler}
                 onMouseLeave={() => setHoverVisible(false)}
@@ -548,10 +548,10 @@ function ProblemDisplay(props: ProblemDisplayParams) {
               <PrimarySelect
                 onChange={(e) => handleInputChange(
                   index,
-                  newProblem.problemInputs[index].name,
+                  input.name,
                   ProblemIOType[e.target.value as keyof typeof ProblemIOType],
                 )}
-                value={problemIOTypeToString(newProblem.problemInputs[index].type)}
+                value={problemIOTypeToString(input.type)}
                 disabled={!problemEditable}
               >
                 {
