@@ -21,6 +21,7 @@ import {
   SmallButton,
   GreenSmallButtonBlock,
   InvertedSmallButton,
+  TextButton,
 } from '../core/Button';
 import ToggleButton from '../core/ToggleButton';
 import PrimarySelect from '../core/Select';
@@ -39,6 +40,24 @@ import { Coordinate } from '../special/FloatingCircle';
 import ProblemTags from './ProblemTags';
 import { useAppSelector, useProblemEditable } from '../../util/Hook';
 import ProblemInputDisplay from './ProblemInputDisplay';
+
+const defaultDescription: string = [
+  'Replace this line with a short description.',
+  '### Input',
+  'This problem accepts X parameter(s): `name` (Integer).',
+  '1. `name`: Description of the parameter.',
+  '### Output',
+  'This problem outputs a(n) Integer.',
+  '\\',
+  'Explanation of the output.',
+  '### Example Test Case',
+  '**Input**',
+  '`name`: `5`',
+  '**Output**',
+  '`1`',
+  '**Explanation**',
+  'Explanation of the test case input and output.',
+].join('\n\n');
 
 const MainContent = styled.div`
   text-align: left;
@@ -138,6 +157,13 @@ const DeleteButton = styled(PrimaryButton)`
   background: ${({ theme }) => theme.colors.white};
 `;
 
+const TextButtonLink = styled(TextButton)`
+  padding: 0;
+  margin-top: 10px;
+  text-decoration: underline;
+  text-align: left;
+`;
+
 type ProblemDisplayParams = {
   problem: Problem,
   actionText: string,
@@ -167,6 +193,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const [error, setError] = useState('');
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
+  const [refreshEditor, setRefreshEditor] = useState<number>(0);
 
   // Get current mouse position.
   const mouseMoveHandler = useCallback((e: any) => {
@@ -347,11 +374,24 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           />
           <TitleDescriptionSeparator />
           <StyledMarkdownEditor
+            key={refreshEditor}
             placeholder="Write a nice description"
             defaultValue={newProblem.description}
             onChange={(getNewValue) => handleDescriptionChange(getNewValue())}
             readOnly={!problemEditable}
           />
+          {
+            (newProblem.description.length === 0 || newProblem.description === '\\\n') ? (
+              <TextButtonLink
+                onClick={() => {
+                  newProblem.description = defaultDescription;
+                  setRefreshEditor(refreshEditor + 1);
+                }}
+              >
+                Not sure what to write? Add a template description.
+              </TextButtonLink>
+            ) : null
+          }
         </SettingsContainerHighPadding>
 
         {editMode && problemEditable
