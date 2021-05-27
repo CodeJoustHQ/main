@@ -171,6 +171,15 @@ export function ProblemHelpModal(props: HelpModalProps) {
             created by the CodeJoust team to see an example.
           </HelpText>
         </div>
+        <div>
+          <HelpText>
+            <b>Description</b>
+            : The problem description uses a Markdown editor, meaning you can
+            add headings, lists, tables, quotes, code, links, and much more. You
+            can customize this however you wish, or use the default template
+            description provided by the CodeJoust team.
+          </HelpText>
+        </div>
         <NoMarginMediumText>Options</NoMarginMediumText>
         <div>
           <HelpText>
@@ -215,7 +224,7 @@ export function ProblemHelpModal(props: HelpModalProps) {
         <div>
           <HelpText>
             <b>Overview</b>
-            : Test cases is how this platform judges the accuracy of problem
+            : Test cases are how this platform judges the accuracy of problem
             solutions. These can only be added once the initial problem was
             created.
           </HelpText>
@@ -226,7 +235,7 @@ export function ProblemHelpModal(props: HelpModalProps) {
             : The Input is the first required setting for test cases. Each line
             represents the next parameter, in order. This means that
             Strings cannot have newlines - special characters are also not
-            allowed. This input must perfectly match the parameters selected
+            allowed. The input must perfectly match the parameters selected
             in Problem Inputs.
           </HelpText>
         </div>
@@ -234,8 +243,8 @@ export function ProblemHelpModal(props: HelpModalProps) {
           <HelpText>
             <b>Output</b>
             : The Output is the second required setting for test cases.
-            The Output should be just one line, which must have the same form
-            as the Problem Output type selected under Options.
+            The Output should be just one line, and must perfectly match the
+            type selected in Problem Output.
           </HelpText>
         </div>
         <div>

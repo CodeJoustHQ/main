@@ -47,18 +47,18 @@ const defaultDescription: string = [
   'Replace this line with a short description.',
   '### Input',
   'This problem accepts X parameter(s): `name` (Integer).',
-  '1. `name`: Description of the parameter.',
+  '1. `name`: Replace this with a description of the parameter.',
   '### Output',
   'This problem outputs a(n) Integer.',
   '\\',
-  'Explanation of the output.',
+  'Replace this with an explanation of the output, if necessary.',
   '### Example Test Case',
   '**Input**',
   '`name`: `5`',
   '**Output**',
   '`1`',
   '**Explanation**',
-  'Explanation of the test case input and output.',
+  'Replace this line with an explanation of this example test case.',
 ].join('\n\n');
 
 const MainContent = styled.div`
