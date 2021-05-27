@@ -119,7 +119,7 @@ function GamePage() {
   const [languageList, setLanguageList] = useState<Language[]>([Language.Java]);
   const [codeList, setCodeList] = useState<string[]>(['']);
   const [currentSubmission, setCurrentSubmission] = useState<Submission | null>(null);
-  const [currentProblemIndex, setCurrentProblem] = useState<number>(0);
+  const [currentProblemIndex, setCurrentProblemIndex] = useState<number>(0);
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
   const [defaultCodeList, setDefaultCodeList] = useState<DefaultCodeType[]>([]);
@@ -151,6 +151,12 @@ function GamePage() {
   };
 
   const createCodeLanguageArray = () => {
+    /*
+    Here is the console log statement I added that was being executed several times.
+    The languageList.length kept throwing a null pointer exception, despite being defined above.
+    */
+    console.log(languageList);
+
     while (languageList.length < problems.length) {
       languageList.push(Language.Java);
     }
@@ -210,7 +216,7 @@ function GamePage() {
           newCodeList[i] = temp.code;
           codeMap[i][temp.language as Language] = temp.code;
           newLanguageList[i] = temp.language as Language;
-          setCurrentProblem(i);
+          setCurrentProblemIndex(i);
         }
       }
 
@@ -408,7 +414,7 @@ function GamePage() {
   };
 
   const nextProblem = () => {
-    setCurrentProblem((currentProblemIndex + 1) % problems?.length);
+    setCurrentProblemIndex((currentProblemIndex + 1) % problems?.length);
     setCurrentSubmission(getSubmission(currentProblemIndex, submissions));
   };
 
@@ -419,7 +425,7 @@ function GamePage() {
       temp += problems?.length;
     }
 
-    setCurrentProblem(temp);
+    setCurrentProblemIndex(temp);
     setCurrentSubmission(getSubmission(currentProblemIndex, submissions));
   };
 
@@ -429,6 +435,7 @@ function GamePage() {
       isCurrentPlayer={player.user.userId === currentUser?.userId}
       place={index + 1}
       color={player.color}
+      numProblems={problems.length}
     />
   )), [players, currentUser]);
 

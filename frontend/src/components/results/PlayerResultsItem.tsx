@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Player } from '../../api/Game';
+import { Player, Submission } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
 import { Color } from '../../api/Color';
-import useBestSubmission from '../../util/Hook';
+import useGetScore, { useBestSubmission } from '../../util/Hook';
 import Language, { displayNameFromLanguage } from '../../api/Language';
 import { TextButton } from '../core/Button';
 
@@ -90,7 +90,8 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
     player, place, isCurrentPlayer, color, gameStartTime, onViewCode,
   } = props;
 
-  const bestSubmission = useBestSubmission(player);
+  const score = useGetScore(player);
+  const bestSubmission : Submission | null = useBestSubmission(player);
 
   const getDisplayNickname = () => {
     const { nickname } = player.user;
@@ -98,11 +99,11 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
   };
 
   const getScore = () => {
-    if (!bestSubmission) {
+    if (!score) {
       return '0';
     }
 
-    const percent = Math.round((bestSubmission.numCorrect / bestSubmission.numTestCases) * 100);
+    const percent = Math.round((score / 12321) * 100);
     return `${percent}%`;
   };
 

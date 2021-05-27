@@ -4,7 +4,7 @@ import { Player } from '../../api/Game';
 import { LowMarginText, SmallText } from '../core/Text';
 import PlayerIcon from './PlayerIcon';
 import { Color } from '../../api/Color';
-import useBestSubmission from '../../util/Hook';
+import useGetScore, { useGetSubmissionTime } from '../../util/Hook';
 
 type ContentStyleType = {
   isCurrentPlayer: boolean,
@@ -67,37 +67,39 @@ type LeaderboardCardProps = {
   isCurrentPlayer: boolean,
   place: number,
   color: Color,
+  numProblems: number,
 };
 
 function LeaderboardCard(props: LeaderboardCardProps) {
   const {
-    place, player, isCurrentPlayer, color,
+    place, player, isCurrentPlayer, color, numProblems,
   } = props;
 
   const [showHover, setShowHover] = useState(false);
-  const bestSubmission = useBestSubmission(player);
+  const score = useGetScore(player);
+  const time = useGetSubmissionTime(player);
 
   const getScoreDisplay = () => {
-    if (!bestSubmission) {
-      return '0';
+    if (!score) {
+      return 0;
     }
-    return `${bestSubmission.numCorrect}/${bestSubmission.numTestCases}`;
+    return score;
   };
 
   const getScorePercentage = () => {
-    if (!bestSubmission) {
+    if (!score) {
       return '';
     }
-    return ` ${Math.round((bestSubmission.numCorrect / bestSubmission.numTestCases) * 100)}%`;
+    return ` ${Math.round((score / numProblems) * 100)}%`;
   };
 
   const getSubmissionTime = () => {
-    if (!bestSubmission) {
+    if (!time) {
       return 'Never';
     }
 
     const currentTime = new Date().getTime();
-    const diffMilliseconds = currentTime - new Date(bestSubmission.startTime).getTime();
+    const diffMilliseconds = currentTime - new Date(time).getTime();
     const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
     return `${diffMinutes}m ago`;
   };

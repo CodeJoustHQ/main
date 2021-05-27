@@ -152,15 +152,17 @@ public class SubmitService {
         player.getSubmissions().add(submission);
 
         if (submission.getNumCorrect().equals(submission.getNumTestCases())) {
-            player.setSolved(true);
+            player.getSolved()[request.getProblemIndex()] = true;
         }
 
         // Variable to indicate whether all players have solved the problem.
         boolean allSolved = true;
         for (Player p : game.getPlayers().values()) {
-            if (p.getSolved() == null || !p.getSolved()) {
-                allSolved = false;
-                break;
+            for (Boolean b : p.getSolved()) {
+                if (b == null || !b) {
+                    allSolved = false;
+                    break;
+                }
             }
         }
 
