@@ -245,6 +245,14 @@ export function ProblemHelpModal(props: HelpModalProps) {
             case.
           </HelpText>
         </div>
+        <div>
+          <HelpText>
+            <b>Ordering</b>
+            : The test cases can be ordered by simply dragging them higher or
+            lower. This simply impacts which test cases the player will see
+            first when they are solving a problem.
+          </HelpText>
+        </div>
       </LeftContainer>
     </Modal>
   );
