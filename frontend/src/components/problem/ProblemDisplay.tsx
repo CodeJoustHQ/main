@@ -6,6 +6,7 @@ import MarkdownEditor from 'rich-markdown-editor';
 import {
   deleteProblem,
   Problem,
+  ProblemInput,
   ProblemIOType,
   problemIOTypeToString,
   ProblemTag,
@@ -159,6 +160,67 @@ type ProblemDisplayParams = {
   onClick: (newProblem: Problem) => void,
   editMode: boolean,
 };
+
+type ProblemInputDisplayProps = {
+  input: ProblemInput,
+  index: number,
+  handleInputChange: (index: number, newInput: string, inputType: ProblemIOType) => void,
+  problemEditable: boolean,
+  setHoverVisible: (hoverVisible: boolean) => void,
+  mouseMoveHandler: (e: any) => void,
+  deleteProblemInput: (index: number) => void,
+};
+
+function ProblemInputDisplay(props: ProblemInputDisplayProps) {
+  const {
+    input, index, handleInputChange, problemEditable,
+    setHoverVisible, mouseMoveHandler, deleteProblemInput,
+  } = props;
+
+  return (
+    <InputTypeContainer>
+      <TextInput
+        value={input.name}
+        onChange={(e) => handleInputChange(index,
+          e.target.value, input.type)}
+        disabled={!problemEditable}
+      />
+
+      <InlineErrorIcon
+        show={!validIdentifier(input.name)}
+        onMouseEnter={() => setHoverVisible(true)}
+        onMouseMove={mouseMoveHandler}
+        onMouseLeave={() => setHoverVisible(false)}
+      >
+        error_outline
+      </InlineErrorIcon>
+
+      <PrimarySelect
+        onChange={(e) => handleInputChange(
+          index,
+          input.name,
+          ProblemIOType[e.target.value as keyof typeof ProblemIOType],
+        )}
+        value={problemIOTypeToString(input.type)}
+        disabled={!problemEditable}
+      >
+        {
+          Object.keys(ProblemIOType).map((key) => (
+            <option key={key} value={key}>{key}</option>
+          ))
+        }
+      </PrimarySelect>
+
+      {problemEditable ? (
+        <CancelTextButton
+          onClick={() => deleteProblemInput(index)}
+        >
+          ✕
+        </CancelTextButton>
+      ) : null}
+    </InputTypeContainer>
+  );
+}
 
 // a little function to help us with reordering the result
 const reorder = (list: TestCase[], startIndex: number, endIndex: number): TestCase[] => {
@@ -528,47 +590,17 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
           <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
           {newProblem.problemInputs.map((input, index) => (
-            <InputTypeContainer>
-              <TextInput
-                value={input.name}
-                onChange={(e) => handleInputChange(index,
-                  e.target.value, input.type)}
-                disabled={!problemEditable}
-              />
-
-              <InlineErrorIcon
-                show={!validIdentifier(input.name)}
-                onMouseEnter={() => setHoverVisible(true)}
-                onMouseMove={mouseMoveHandler}
-                onMouseLeave={() => setHoverVisible(false)}
-              >
-                error_outline
-              </InlineErrorIcon>
-
-              <PrimarySelect
-                onChange={(e) => handleInputChange(
-                  index,
-                  input.name,
-                  ProblemIOType[e.target.value as keyof typeof ProblemIOType],
-                )}
-                value={problemIOTypeToString(input.type)}
-                disabled={!problemEditable}
-              >
-                {
-                  Object.keys(ProblemIOType).map((key) => (
-                    <option key={key} value={key}>{key}</option>
-                  ))
-                }
-              </PrimarySelect>
-
-              {problemEditable ? (
-                <CancelTextButton
-                  onClick={() => deleteProblemInput(index)}
-                >
-                  ✕
-                </CancelTextButton>
-              ) : null}
-            </InputTypeContainer>
+            <ProblemInputDisplay
+              // eslint-disable-next-line react/no-array-index-key
+              key={index}
+              input={input}
+              index={index}
+              handleInputChange={handleInputChange}
+              problemEditable={problemEditable}
+              setHoverVisible={(hoverVisibleParam: boolean) => setHoverVisible(hoverVisibleParam)}
+              mouseMoveHandler={mouseMoveHandler}
+              deleteProblemInput={deleteProblemInput}
+            />
           ))}
 
           {problemEditable ? (
