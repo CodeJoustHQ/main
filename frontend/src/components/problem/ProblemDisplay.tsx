@@ -22,6 +22,7 @@ import {
   GreenSmallButtonBlock,
   InvertedSmallButton,
   TextButton,
+  InlineLobbyIcon,
 } from '../core/Button';
 import ToggleButton from '../core/ToggleButton';
 import PrimarySelect from '../core/Select';
@@ -40,6 +41,7 @@ import { Coordinate } from '../special/FloatingCircle';
 import ProblemTags from './ProblemTags';
 import { useAppSelector, useProblemEditable } from '../../util/Hook';
 import ProblemInputDisplay from './ProblemInputDisplay';
+import { ProblemHelpModal } from '../core/HelpModal';
 
 const defaultDescription: string = [
   'Replace this line with a short description.',
@@ -164,6 +166,11 @@ const TextButtonLink = styled(TextButton)`
   text-align: left;
 `;
 
+const InlineProblemIcon = styled(InlineLobbyIcon)`
+  margin: 10px;
+  height: 1rem;
+`;
+
 type ProblemDisplayParams = {
   problem: Problem,
   actionText: string,
@@ -193,6 +200,9 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const [error, setError] = useState('');
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
+  const [helpModal, setHelpModal] = useState<boolean>(false);
+
+  // Variable used to force refresh the editor.
   const [refreshEditor, setRefreshEditor] = useState<number>(0);
 
   // Get current mouse position.
@@ -336,6 +346,10 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
   return (
     <>
+      <ProblemHelpModal
+        show={helpModal}
+        exitModal={() => setHelpModal(false)}
+      />
       <HoverTooltip
         visible={hoverVisible}
         x={mousePosition.x}
@@ -346,6 +360,11 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       <MainContent>
         <FlexBareContainer>
           <SmallHeaderText>Problem</SmallHeaderText>
+          <InlineProblemIcon
+            onClick={() => setHelpModal(true)}
+          >
+            help_outline
+          </InlineProblemIcon>
           <TopButtonsContainer>
             <InvertedSmallButton
               onClick={() => {
@@ -384,6 +403,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             (newProblem.description.length === 0 || newProblem.description === '\\\n') ? (
               <TextButtonLink
                 onClick={() => {
+                  // Add default description and force refresh editor.
                   newProblem.description = defaultDescription;
                   setRefreshEditor(refreshEditor + 1);
                 }}
