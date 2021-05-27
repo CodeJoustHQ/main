@@ -24,10 +24,7 @@ import { setCurrentUser } from '../redux/User';
 import { SpectatorFilter } from '../components/problem/Selector';
 import PlayerGameView from '../components/game/PlayerGameView';
 import { Problem } from '../api/Problem';
-import { LargeCenterText } from '../components/core/Text';
-import ResultsTable from '../components/results/ResultsTable';
-import Modal from '../components/core/Modal';
-import PreviewCodeContent from '../components/results/PreviewCodeContent';
+import SpectatorGameView from '../components/game/SpectatorGameView';
 
 type LocationState = {
   roomId: string,
@@ -54,7 +51,6 @@ function GamePage() {
   const [allSolved, setAllSolved] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);
   const [startTime, setStartTime] = useState<string>('');
-  const [codeModal, setCodeModal] = useState(-1);
 
   // Variable to hold whether the user is subscribed to the primary Game socket.
   const [gameSocket, setGameSocket] = useState<Subscription | null>(null);
@@ -223,21 +219,11 @@ function GamePage() {
       </FlexInfoBar>
       {
         currentUser?.spectator ? (
-          <>
-            <Modal show={codeModal !== -1} onExit={() => setCodeModal(-1)} fullScreen>
-              <PreviewCodeContent
-                players={players}
-                playerIndex={codeModal}
-              />
-            </Modal>
-            <LargeCenterText>Live Scoreboard</LargeCenterText>
-            <ResultsTable
-              players={players}
-              currentUser={currentUser}
-              gameStartTime={startTime}
-              viewPlayerCode={(index: number) => setCodeModal(index)}
-            />
-          </>
+          <SpectatorGameView
+            players={players}
+            currentUser={currentUser}
+            startTime={startTime}
+          />
         ) : (
           <PlayerGameView
             gameError={error}
