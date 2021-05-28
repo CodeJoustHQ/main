@@ -19,6 +19,6 @@ public class PlayerDto {
     private String code;
     private CodeLanguage language;
     private List<SubmissionDto> submissions = new ArrayList<>();
-    private Boolean solved;
+    private Boolean[] solved;
     private Color color;
 }

@@ -61,7 +61,7 @@ export const useGetSubmissionTime = (player?: Player) => {
     }
   }, [player]);
 
-  if (!time && player) {
+  if (!time && player && player.submissions.length > 0) {
     time = player.submissions[player.submissions.length - 1].startTime;
   }
 
