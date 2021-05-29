@@ -77,8 +77,8 @@ function LoggedInContent() {
   };
 
   const loggedInAccountItems = [
-    { title: 'Dashboard', action: () => history.push('/'), active: window.location.pathname === '/' },
-    { title: 'Profile', action: () => history.push('/profile'), active: window.location.pathname === '/profile' },
+    { title: 'Dashboard', link: '/', active: window.location.pathname === '/' },
+    { title: 'Profile', link: '/profile', active: window.location.pathname === '/profile' },
     { title: 'Logout', action: logOut, active: false },
   ];
 

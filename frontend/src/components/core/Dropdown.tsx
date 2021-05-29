@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { NoMarginSubtitleText } from './Text';
+import { DivLink } from './Link';
 
 const Content = styled.div`
   position: absolute;
@@ -16,10 +17,9 @@ const Content = styled.div`
   z-index: 2;
 `;
 
-const DropdownItemContainer = styled.div<DropdownItemContainerProps>`
+const DropdownItemLinkContainer = styled.div<DropdownItemContainerProps>`
   background-color: ${({ theme, active }) => (active ? theme.colors.background : theme.colors.white)};
   border-radius: 6px;
-  padding: 8px;
   cursor: ${({ active }) => (active ? 'default' : 'pointer')};
   
   &:hover {
@@ -27,13 +27,23 @@ const DropdownItemContainer = styled.div<DropdownItemContainerProps>`
   }
 `;
 
+const DropdownItemButtonContainer = styled(DropdownItemLinkContainer)`
+  padding: 8px;
+`;
+
+const InnerLinkContent = styled.div`
+  padding: 8px;
+`;
+
 type DropdownItemContainerProps = {
   active: boolean,
 };
 
+// Specify either an action or a link
 type DropdownItem = {
   title: string,
-  action: () => void,
+  action?: () => void,
+  link?: string
   active: boolean,
 };
 
@@ -47,9 +57,21 @@ function Dropdown(props: DropdownProps) {
   return (
     <Content>
       {items.map((item) => (
-        <DropdownItemContainer onClick={item.action} active={item.active}>
-          <NoMarginSubtitleText>{item.title}</NoMarginSubtitleText>
-        </DropdownItemContainer>
+        <>
+          {item.action ? (
+            <DropdownItemButtonContainer onClick={item.action} active={item.active}>
+              <NoMarginSubtitleText>{item.title}</NoMarginSubtitleText>
+            </DropdownItemButtonContainer>
+          ) : (
+            <DropdownItemLinkContainer active={item.active}>
+              <DivLink to={item.link || '/'}>
+                <InnerLinkContent>
+                  <NoMarginSubtitleText>{item.title}</NoMarginSubtitleText>
+                </InnerLinkContent>
+              </DivLink>
+            </DropdownItemLinkContainer>
+          )}
+        </>
       ))}
     </Content>
   );
