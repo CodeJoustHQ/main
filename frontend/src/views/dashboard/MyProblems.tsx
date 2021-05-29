@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useHistory } from 'react-router-dom';
 import { MainHeaderText, SecondaryHeaderText } from '../../components/core/Text';
 import ProblemCard from '../../components/card/ProblemCard';
-import { TextLink } from '../../components/core/Link';
+import { GreenSmallButtonLink, TextLink } from '../../components/core/Link';
 import { useAppSelector } from '../../util/Hook';
 import {
   CenteredContainer,
   FlexHorizontalContainer,
   FlexLeft,
-  RelativeContainer
+  RelativeContainer,
 } from '../../components/core/Container';
-import { GreenSmallButton, TextButton } from '../../components/core/Button';
+import { TextButton } from '../../components/core/Button';
 import { TextInput } from '../../components/core/Input';
 import { Problem } from '../../api/Problem';
 
@@ -33,7 +32,7 @@ const MyProblemsText = styled(MainHeaderText)`
   margin: 0;
 `;
 
-const CreateButton = styled(GreenSmallButton)`
+const CreateButtonLink = styled(GreenSmallButtonLink)`
   position: absolute;
   bottom: 0;
   right: 0;
@@ -74,7 +73,6 @@ const WhiteTextButton = styled(TextButton)`
 function MyProblems(props: MyProblemsProps) {
   const { loading } = props;
 
-  const history = useHistory();
   const { account } = useAppSelector((state) => state.account);
   const [filterText, setFilterText] = useState('');
 
@@ -91,9 +89,9 @@ function MyProblems(props: MyProblemsProps) {
             </div>
           </FlexLeft>
           <RelativeContainer>
-            <CreateButton onClick={() => history.push('/problem/create')}>
+            <CreateButtonLink to="/problem/create">
               Create
-            </CreateButton>
+            </CreateButtonLink>
           </RelativeContainer>
         </FlexHorizontalContainer>
       </TopText>
@@ -122,7 +120,6 @@ function MyProblems(props: MyProblemsProps) {
           <ProblemCard
             key={index}
             problem={problem}
-            onClick={() => history.push(`/problem/${problem.problemId}`)}
           />
         );
       })}

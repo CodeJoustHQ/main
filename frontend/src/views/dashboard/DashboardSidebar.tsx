@@ -1,9 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useHistory } from 'react-router-dom';
 import { DashboardTab } from './Dashboard';
 import { NoMarginSubtitleText } from '../../components/core/Text';
-import { PrimaryButton } from '../../components/core/Button';
+import { PrimaryButtonLink } from '../../components/core/Link';
 
 type DashboardSidebarProps = {
   tab: DashboardTab,
@@ -61,9 +60,12 @@ const TabItem = styled.div<TabItemProps>`
   }
 `;
 
+const NewGameLink = styled(PrimaryButtonLink)`
+  width: 80%;
+`;
+
 function DashboardSidebar(props: DashboardSidebarProps) {
   const { tab, onClick } = props;
-  const history = useHistory();
 
   return (
     <Content>
@@ -91,7 +93,7 @@ function DashboardSidebar(props: DashboardSidebarProps) {
       </InnerContent>
 
       <BottomContent>
-        <PrimaryButton onClick={() => history.push('/game/create')} width="80%">Start New Game</PrimaryButton>
+        <NewGameLink to="/game/create">Start New Game</NewGameLink>
       </BottomContent>
     </Content>
   );

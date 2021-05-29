@@ -4,16 +4,15 @@ import { Problem } from '../../api/Problem';
 import { LargeText, SelectedItemText, Text } from '../core/Text';
 import { getDifficultyDisplayButton } from '../core/Button';
 import { SelectedItemContainer } from '../core/Container';
+import { DivLink } from '../core/Link';
 
 type ProblemCardProps = {
   problem: Problem,
-  onClick: (problemId: string) => void,
 };
 
 const Content = styled.div`
   display: block;
   margin: 15px 10px;
-  padding: 15px 30px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   background-color: ${({ theme }) => theme.colors.white};
@@ -22,6 +21,10 @@ const Content = styled.div`
   &:hover {
     cursor: pointer;
   }
+`;
+
+const InnerContent = styled.div`
+  padding: 15px 30px;
 `;
 
 const ProblemTagContainer = styled(SelectedItemContainer)`
@@ -41,19 +44,23 @@ const TitleText = styled(LargeText)`
 `;
 
 function ProblemCard(props: ProblemCardProps) {
-  const { problem, onClick } = props;
+  const { problem } = props;
 
   return (
-    <Content onClick={() => onClick(problem.problemId)}>
-      <TitleText>{problem.name}</TitleText>
-      {getDifficultyDisplayButton(problem.difficulty, true)}
-      <Text>{`${problem.description.substring(0, 80)}...`}</Text>
+    <Content>
+      <DivLink to={`/problem/${problem.problemId}`}>
+        <InnerContent>
+          <TitleText>{problem.name}</TitleText>
+          {getDifficultyDisplayButton(problem.difficulty, true)}
+          <Text>{`${problem.description.substring(0, 80)}...`}</Text>
 
-      {problem.problemTags.map((tag) => (
-        <ProblemTagContainer key={tag.name}>
-          <ProblemTagText>{tag.name}</ProblemTagText>
-        </ProblemTagContainer>
-      ))}
+          {problem.problemTags.map((tag) => (
+            <ProblemTagContainer key={tag.name}>
+              <ProblemTagText>{tag.name}</ProblemTagText>
+            </ProblemTagContainer>
+          ))}
+        </InnerContent>
+      </DivLink>
     </Content>
   );
 }
