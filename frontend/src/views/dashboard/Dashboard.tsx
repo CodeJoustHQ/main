@@ -63,9 +63,9 @@ function DashboardPage() {
       <DashboardSidebar tab={tab} onClick={setTab} />
       <RightContent>
         <InnerContent>
+          {getDisplay()}
           { error ? <ErrorMessage message={error} /> : null }
           { loading ? <Loading /> : null }
-          {getDisplay()}
         </InnerContent>
       </RightContent>
     </Content>
