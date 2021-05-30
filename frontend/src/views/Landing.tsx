@@ -48,7 +48,7 @@ function LandingPage() {
       <Separator />
 
       <RowContainer>
-        <ColumnContainer width="80%">
+        <ColumnContainer width="90%">
           <LargeText>
             Invite the class to an energetic coding session
           </LargeText>
@@ -59,6 +59,67 @@ function LandingPage() {
           </SecondaryHeaderText>
           <br />
           <ShadowImage src="/landing/lobby.png" alt="Image of lobby page" />
+        </ColumnContainer>
+      </RowContainer>
+
+      <Separator />
+      <Separator />
+
+      <RowContainer>
+        <ColumnContainer width="400px">
+          <LargeText>
+            Practice problems for all scenarios
+          </LargeText>
+          <SecondaryHeaderText>
+            Browse through our large collection of problems covering everything from basic
+            conditional logic to sets, maps, and dynamic programming. Or, if you can’t find
+            what you&apos;re looking for, create your own set of unique problems.
+          </SecondaryHeaderText>
+        </ColumnContainer>
+        <ColumnContainer width="600px">
+          <Image src="/landing/problems.png" alt="Multiple example problem cards" />
+        </ColumnContainer>
+      </RowContainer>
+
+      <Separator />
+      <Separator />
+
+      <RowContainer>
+        <ColumnContainer width="80%">
+          <LargeText>
+            A clean interface for students and teachers alike
+          </LargeText>
+          <SecondaryHeaderText>
+            Students can read the problem description, write code, and test their solution all
+            on a single page. Meanwhile, as a teacher, you&apos;ll have a bird&apos;s-eye view
+            of all of your students&apos; progress throughout the game.
+          </SecondaryHeaderText>
+        </ColumnContainer>
+      </RowContainer>
+      <RowContainer>
+        <ColumnContainer>
+          <ShadowImage src="/landing/game_abstract.png" alt="Abstract design of game page" />
+        </ColumnContainer>
+        <ColumnContainer>
+          <ShadowImage src="/landing/admin_abstract.png" alt="Abstract design of admin page" />
+        </ColumnContainer>
+      </RowContainer>
+
+      <Separator />
+      <Separator />
+
+      <RowContainer>
+        <ColumnContainer width="90%">
+          <LargeText>
+            Celebrate top performers and view detailed results
+          </LargeText>
+          <SecondaryHeaderText>
+            Motivate students to do well by competing for a spot on the coveted podium. Once the
+            game ends, you&apos;ll also be able to view detailed results about students&apos;
+            submissions and code.
+          </SecondaryHeaderText>
+          <br />
+          <Image src="/landing/results.png" alt="Example of the results shown" />
         </ColumnContainer>
       </RowContainer>
     </>
