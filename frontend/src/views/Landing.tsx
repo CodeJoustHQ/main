@@ -6,9 +6,7 @@ import { Image, ShadowImage } from '../components/core/Image';
 import {
   MainHeaderText, LandingHeaderTitle, SecondaryHeaderText, LargeText,
 } from '../components/core/Text';
-import {
-  ColumnContainer, RowContainer, Separator, TextLeftContainer,
-} from '../components/core/Container';
+import { ColumnContainer, RowContainer, Separator } from '../components/core/Container';
 import { CopyIndicator, CopyIndicatorContainer, InheritedCopyIcon } from '../components/special/CopyIndicator';
 import { InheritedTextButton } from '../components/core/Button';
 
@@ -16,17 +14,51 @@ const CreateAccountButtonLink = styled(PrimaryButtonLink)`
   margin: 10px 0;
 `;
 
+const HeroTextContainer = styled.div`
+  text-align: left;
+  
+  @media(max-width: 1000px) {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+`;
+
 const HeroText = styled(LandingHeaderTitle)`
   font-size: ${({ theme }) => theme.fontSize.xxxLarge};
   margin: 5px 0;
   line-height: 1.2;
+  
+  @media(max-width: 1450px) {
+    font-size: ${({ theme }) => theme.fontSize.xxLarge};
+  }
 `;
 
-const BackgroundCircleRow = styled.div`
+const HeroSubtitleText = styled(MainHeaderText)`
+  @media(max-width: 1450px) {
+    font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  }
+`;
+
+const BackgroundCircleRow = styled(RowContainer)`
   background-image: url("/landing/background_circles.png");
   background-repeat: no-repeat;
   background-position: center;
-  padding: 150px 200px;
+  padding: 150px 30px;
+  margin-bottom: 50px;
+  
+  @media(max-width: 1000px) {
+    padding: 0;
+    background-image: none;
+  }
+`;
+
+const CalToActionColumn = styled(ColumnContainer)`
+  flex: 0 0 60%;
+
+  @media(max-width: 1000px) {
+    width: 70%;
+    margin: 0 auto;
+  }
 `;
 
 function LandingPage() {
@@ -41,12 +73,12 @@ function LandingPage() {
       </CopyIndicatorContainer>
 
       <RowContainer>
-        <ColumnContainer width="400px">
-          <TextLeftContainer>
+        <ColumnContainer width="40%">
+          <HeroTextContainer>
             <HeroText>Group coding made fun</HeroText>
-            <MainHeaderText>
+            <HeroSubtitleText>
               Engage your students with real-time programming practice that they&apos;ll enjoy
-            </MainHeaderText>
+            </HeroSubtitleText>
 
             <CreateAccountButtonLink to="/register">
               Create an account
@@ -55,9 +87,9 @@ function LandingPage() {
             <TextLink to="/game/join">
               Or demo a game &#8594;
             </TextLink>
-          </TextLeftContainer>
+          </HeroTextContainer>
         </ColumnContainer>
-        <ColumnContainer width="600px">
+        <ColumnContainer width="60%">
           <ShadowImage src="/landing/game.png" alt="Image of game page" />
         </ColumnContainer>
       </RowContainer>
@@ -84,7 +116,7 @@ function LandingPage() {
       <Separator />
 
       <RowContainer>
-        <ColumnContainer width="400px">
+        <ColumnContainer width="40%">
           <LargeText>
             Practice problems for all scenarios
           </LargeText>
@@ -94,7 +126,7 @@ function LandingPage() {
             what you&apos;re looking for, create your own set of unique problems.
           </SecondaryHeaderText>
         </ColumnContainer>
-        <ColumnContainer width="600px">
+        <ColumnContainer width="60%">
           <Image src="/landing/problems.png" alt="Multiple example problem cards" />
         </ColumnContainer>
       </RowContainer>
@@ -103,7 +135,7 @@ function LandingPage() {
       <Separator />
 
       <RowContainer>
-        <ColumnContainer width="80%">
+        <ColumnContainer width="90%">
           <LargeText>
             A clean interface for students and teachers alike
           </LargeText>
@@ -112,6 +144,7 @@ function LandingPage() {
             on a single page. Meanwhile, as a teacher, you&apos;ll have a bird&apos;s-eye view
             of all of your students&apos; progress throughout the game.
           </SecondaryHeaderText>
+          <br />
         </ColumnContainer>
       </RowContainer>
       <RowContainer>
@@ -142,7 +175,7 @@ function LandingPage() {
       </RowContainer>
 
       <BackgroundCircleRow>
-        <ColumnContainer width="600px">
+        <CalToActionColumn>
           <LargeText>
             Want to try out CodeJoust in your classroom?
           </LargeText>
@@ -165,7 +198,7 @@ function LandingPage() {
           <CreateAccountButtonLink to="/register">
             Create an account
           </CreateAccountButtonLink>
-        </ColumnContainer>
+        </CalToActionColumn>
       </BackgroundCircleRow>
     </>
   );

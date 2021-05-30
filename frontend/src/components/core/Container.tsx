@@ -133,6 +133,18 @@ export const DynamicWidthContainer = styled.div`
 export const RowContainer = styled.div`
   display: flex;
   justify-content: center;
+  margin: 0 auto;
+  width: 1200px;
+  
+  @media(max-width: 1450px) {
+    width: 800px;
+  }
+  
+  @media(max-width: 1000px) {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
 `;
 
 export type WidthProps = {
@@ -150,5 +162,9 @@ export const Separator = styled.div`
   &:after {
     content: '.';
     visibility: hidden;
+  }
+  
+  @media(max-width: 1000px) {
+    margin-top: 0;
   }
 `;
