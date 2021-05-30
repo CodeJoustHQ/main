@@ -1,30 +1,42 @@
 import React from 'react';
+import styled from 'styled-components';
 import { PrimaryButtonLink, TextLink } from '../components/core/Link';
+import { Image } from '../components/core/Image';
 import { MainHeaderText, LandingHeaderTitle } from '../components/core/Text';
-import { ColumnContainer, LeftContainer, RowContainer } from '../components/core/Container';
+import { ColumnContainer, RowContainer, TextLeftContainer } from '../components/core/Container';
+
+const CreateAccountButtonLink = styled(PrimaryButtonLink)`
+  margin: 10px 0;
+`;
+
+const HeroText = styled(LandingHeaderTitle)`
+  font-size: ${({ theme }) => theme.fontSize.xxxLarge};
+  margin: 5px 0;
+  line-height: 1.2;
+`;
 
 function LandingPage() {
   return (
     <>
       <RowContainer>
-        <ColumnContainer>
-          <LeftContainer>
-            <LandingHeaderTitle>Group coding made fun</LandingHeaderTitle>
+        <ColumnContainer width="40%">
+          <TextLeftContainer>
+            <HeroText>Group coding made fun</HeroText>
             <MainHeaderText>
               Engage your students with real-time programming practice that they&apos;ll enjoy
             </MainHeaderText>
 
-            <PrimaryButtonLink to="/register">
+            <CreateAccountButtonLink to="/register">
               Create an account
-            </PrimaryButtonLink>
+            </CreateAccountButtonLink>
             <br />
             <TextLink to="/game/join">
               Or demo a game &#8594;
             </TextLink>
-          </LeftContainer>
+          </TextLeftContainer>
         </ColumnContainer>
-        <ColumnContainer>
-          <img width="100%" src="/landing/game.png" alt="Image of game page" />
+        <ColumnContainer width="60%">
+          <Image width="100%" src="/landing/game.png" alt="Image of game page" />
         </ColumnContainer>
       </RowContainer>
     </>

@@ -93,6 +93,10 @@ export const SplitterContainer = styled.div`
   }
 `;
 
+export const TextLeftContainer = styled.div`
+  text-align: left;
+`;
+
 export const LeftContainer = styled.div`
   padding: 0 5rem;
   text-align: left;
@@ -102,12 +106,6 @@ export const MainContainer = styled.div`
   margin: 0 auto;
   padding: 3rem 0;
   width: 80%;
-`;
-
-export const FullMainContainer = styled.div`
-  padding: 3rem 0;
-  margin: 0 auto;
-  width: 90%;
 `;
 
 export const ProblemContainer = styled.div`
@@ -136,6 +134,10 @@ export const RowContainer = styled.div`
   display: flex;
 `;
 
-export const ColumnContainer = styled.div`
-  flex: 50%;
+export type WidthProps = {
+  width?: string,
+};
+
+export const ColumnContainer = styled.div<WidthProps>`
+  flex: ${({ width }) => width || '50%'};
 `;
