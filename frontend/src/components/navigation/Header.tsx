@@ -6,9 +6,11 @@ import { TextButton } from '../core/Button';
 import { useAppSelector } from '../../util/Hook';
 
 const Content = styled.div`
+  position: relative;
   height: 50px;
   padding: 20px;
   text-align: center;
+  z-index: 1;
 `;
 
 const MinimalContent = styled.div`

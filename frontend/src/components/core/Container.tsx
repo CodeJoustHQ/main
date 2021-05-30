@@ -140,6 +140,7 @@ export const RowContainer = styled.div`
     width: 800px;
   }
   
+  // Switch to single-column layout
   @media(max-width: 1000px) {
     display: block;
     width: 100%;
@@ -164,6 +165,7 @@ export const Separator = styled.div`
     visibility: hidden;
   }
   
+  // Remove separator effect below a certain screen size
   @media(max-width: 1000px) {
     margin-top: 0;
   }

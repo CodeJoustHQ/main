@@ -84,7 +84,7 @@ function LandingPage() {
               Create an account
             </CreateAccountButtonLink>
             <br />
-            <TextLink to="/game/join">
+            <TextLink to="/game/create">
               Or demo a game &#8594;
             </TextLink>
           </HeroTextContainer>

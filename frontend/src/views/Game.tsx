@@ -31,18 +31,15 @@ import {
 import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
-import { TextButton, DifficultyDisplayButton, DangerButton } from '../components/core/Button';
+import {
+  TextButton, DifficultyDisplayButton, DangerButton, InheritedTextButton,
+} from '../components/core/Button';
 import {
   connect, routes, send, subscribe,
 } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
 import Language from '../api/Language';
-import {
-  CopyIndicator,
-  BottomCopyIndicatorContainer,
-  SmallInlineCopyIcon,
-  SmallInlineCopyText,
-} from '../components/special/CopyIndicator';
+import { CopyIndicator, BottomCopyIndicatorContainer, InheritedCopyIcon } from '../components/special/CopyIndicator';
 import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { fetchGame, setGame } from '../redux/Game';
 import { setCurrentUser } from '../redux/User';
@@ -469,15 +466,15 @@ function GamePage() {
             />
             <BottomFooterText>
               {'Notice an issue? Contact us at '}
-              <SmallInlineCopyText
+              <InheritedTextButton
                 onClick={() => {
                   copy('support@codejoust.co');
                   setCopiedEmail(true);
                 }}
               >
                 support@codejoust.co
-                <SmallInlineCopyIcon>content_copy</SmallInlineCopyIcon>
-              </SmallInlineCopyText>
+                <InheritedCopyIcon>content_copy</InheritedCopyIcon>
+              </InheritedTextButton>
             </BottomFooterText>
           </OverflowPanel>
 

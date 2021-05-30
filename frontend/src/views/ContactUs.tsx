@@ -3,13 +3,9 @@ import copy from 'copy-to-clipboard';
 import { DynamicWidthContainer } from '../components/core/Container';
 import { InlineExternalLink } from '../components/core/Link';
 import { ContactHeaderTitle, ContactHeaderText } from '../components/core/Text';
-import {
-  CopyIndicator,
-  CopyIndicatorContainer,
-  InlineCopyIcon,
-  InlineCopyText,
-} from '../components/special/CopyIndicator';
+import { CopyIndicator, CopyIndicatorContainer, InheritedCopyIcon } from '../components/special/CopyIndicator';
 import Subscribe from '../components/special/Subscribe';
+import { InheritedTextButton } from '../components/core/Button';
 
 function ContactUsPage() {
   const [copiedEmail, setCopiedEmail] = useState<boolean>(false);
@@ -42,15 +38,15 @@ function ContactUsPage() {
         <ContactHeaderText>
           You can contact us at
           {' '}
-          <InlineCopyText
+          <InheritedTextButton
             onClick={() => {
               copy('support@codejoust.co');
               setCopiedEmail(true);
             }}
           >
             support@codejoust.co
-            <InlineCopyIcon>content_copy</InlineCopyIcon>
-          </InlineCopyText>
+            <InheritedCopyIcon>content_copy</InheritedCopyIcon>
+          </InheritedTextButton>
           . Say hello!
         </ContactHeaderText>
         <br />

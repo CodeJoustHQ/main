@@ -7,6 +7,7 @@ export const Image = styled.img`
     width: 90%;
   }
   
+  // Changes to single-column layout
   @media(max-width: 1000px) {
     width: 70%;
     margin: 20px 0;
