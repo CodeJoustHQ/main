@@ -71,3 +71,7 @@ export const InlineCopyIcon = styled.i.attrs(() => ({
 export const SmallInlineCopyIcon = styled(InlineCopyIcon)`
   font-size: ${({ theme }) => theme.fontSize.mediumSmall};
 `;
+
+export const InheritedCopyIcon = styled(InlineCopyIcon)`
+  font-size: inherit;
+`;

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import copy from 'copy-to-clipboard';
 import { PrimaryButtonLink, TextLink } from '../components/core/Link';
 import { Image, ShadowImage } from '../components/core/Image';
 import {
@@ -8,6 +9,8 @@ import {
 import {
   ColumnContainer, RowContainer, Separator, TextLeftContainer,
 } from '../components/core/Container';
+import { CopyIndicator, CopyIndicatorContainer, InheritedCopyIcon } from '../components/special/CopyIndicator';
+import { InheritedTextButton } from '../components/core/Button';
 
 const CreateAccountButtonLink = styled(PrimaryButtonLink)`
   margin: 10px 0;
@@ -19,9 +22,24 @@ const HeroText = styled(LandingHeaderTitle)`
   line-height: 1.2;
 `;
 
+const BackgroundCircleRow = styled.div`
+  background-image: url("/landing/background_circles.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  padding: 150px 200px;
+`;
+
 function LandingPage() {
+  const [copiedEmail, setCopiedEmail] = useState(false);
+
   return (
     <>
+      <CopyIndicatorContainer copied={copiedEmail}>
+        <CopyIndicator onClick={() => setCopiedEmail(false)}>
+          Link copied!&nbsp;&nbsp;✕
+        </CopyIndicator>
+      </CopyIndicatorContainer>
+
       <RowContainer>
         <ColumnContainer width="400px">
           <TextLeftContainer>
@@ -122,6 +140,33 @@ function LandingPage() {
           <Image src="/landing/results.png" alt="Example of the results shown" />
         </ColumnContainer>
       </RowContainer>
+
+      <BackgroundCircleRow>
+        <ColumnContainer width="600px">
+          <LargeText>
+            Want to try out CodeJoust in your classroom?
+          </LargeText>
+          <SecondaryHeaderText>
+            Create an account now or email us at
+            {' '}
+            <InheritedTextButton
+              onClick={() => {
+                copy('hello@codejoust.co');
+                setCopiedEmail(true);
+              }}
+            >
+              hello@codejoust.co
+              <InheritedCopyIcon>content_copy</InheritedCopyIcon>
+            </InheritedTextButton>
+            {' '}
+            for one-on-one support within 24 hours.
+          </SecondaryHeaderText>
+
+          <CreateAccountButtonLink to="/register">
+            Create an account
+          </CreateAccountButtonLink>
+        </ColumnContainer>
+      </BackgroundCircleRow>
     </>
   );
 }

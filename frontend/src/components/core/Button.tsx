@@ -77,6 +77,12 @@ export const TextButton = styled.button<ThemeType>`
   }
 `;
 
+export const InheritedTextButton = styled(TextButton)`
+  font-size: inherit;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.text};
+  padding: 0;
+`;
+
 export const RedTextButton = styled(TextButton)`
   color: ${({ theme }) => theme.colors.red2};
 `;
