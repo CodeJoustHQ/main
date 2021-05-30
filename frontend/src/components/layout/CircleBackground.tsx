@@ -9,7 +9,6 @@ const Content = styled.div`
   position: relative;
   width: 100%;
   min-height: 100vh;
-  //min-height: 750px;
   text-align: center;
   background-color: ${({ theme }) => theme.colors.background};
 `;
@@ -17,6 +16,15 @@ const Content = styled.div`
 const InnerContent = styled.div`
   position: relative;
   z-index: 1;
+`;
+
+const CircleContent = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  min-height: 750px;
 `;
 
 type MyProps = {
@@ -41,7 +49,7 @@ function CircleBackgroundLayout({ children }: MyProps) {
         <InnerContent>
           {children}
         </InnerContent>
-        <div>
+        <CircleContent>
           <FloatingCircle
             color={ThemeConfig.colors.gradients.red}
             x={mousePosition.x}
@@ -82,7 +90,7 @@ function CircleBackgroundLayout({ children }: MyProps) {
             left={71}
             size={4}
           />
-        </div>
+        </CircleContent>
       </MainContainer>
     </Content>
   );
