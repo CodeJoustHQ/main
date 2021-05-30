@@ -104,6 +104,12 @@ export const MainContainer = styled.div`
   width: 80%;
 `;
 
+export const FullMainContainer = styled.div`
+  padding: 3rem 0;
+  margin: 0 auto;
+  width: 90%;
+`;
+
 export const ProblemContainer = styled.div`
   margin: 0 auto;
   padding-bottom: 3rem;
@@ -124,4 +130,12 @@ export const DynamicWidthContainer = styled.div`
   @media(max-width: 640px) {
     width: 100%;
   }
+`;
+
+export const RowContainer = styled.div`
+  display: flex;
+`;
+
+export const ColumnContainer = styled.div`
+  flex: 50%;
 `;

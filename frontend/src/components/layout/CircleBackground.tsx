@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ThemeConfig } from '../config/Theme';
 import { FloatingCircle, Coordinate } from '../special/FloatingCircle';
-import { MainContainer, DynamicWidthContainer } from '../core/Container';
+import { FullMainContainer } from '../core/Container';
 import { Header } from '../navigation/Header';
 
 const Content = styled.div`
@@ -12,6 +12,11 @@ const Content = styled.div`
   min-height: 750px;
   text-align: center;
   background-color: ${({ theme }) => theme.colors.background};
+`;
+
+const InnerContent = styled.div`
+  position: relative;
+  z-index: 1;
 `;
 
 type MyProps = {
@@ -32,10 +37,10 @@ function CircleBackgroundLayout({ children }: MyProps) {
   return (
     <Content>
       <Header />
-      <MainContainer>
-        <DynamicWidthContainer>
+      <FullMainContainer>
+        <InnerContent>
           {children}
-        </DynamicWidthContainer>
+        </InnerContent>
         <div>
           <FloatingCircle
             color={ThemeConfig.colors.gradients.red}
@@ -78,7 +83,7 @@ function CircleBackgroundLayout({ children }: MyProps) {
             size={4}
           />
         </div>
-      </MainContainer>
+      </FullMainContainer>
     </Content>
   );
 }
