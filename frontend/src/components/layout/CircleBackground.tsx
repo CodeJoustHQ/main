@@ -8,8 +8,8 @@ import { Header } from '../navigation/Header';
 const Content = styled.div`
   position: relative;
   width: 100%;
-  height: 100vh;
-  min-height: 750px;
+  min-height: 100vh;
+  //min-height: 750px;
   text-align: center;
   background-color: ${({ theme }) => theme.colors.background};
 `;

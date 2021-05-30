@@ -132,6 +132,7 @@ export const DynamicWidthContainer = styled.div`
 
 export const RowContainer = styled.div`
   display: flex;
+  justify-content: center;
 `;
 
 export type WidthProps = {
@@ -139,5 +140,15 @@ export type WidthProps = {
 };
 
 export const ColumnContainer = styled.div<WidthProps>`
-  flex: ${({ width }) => width || '50%'};
+  flex: ${({ width }) => (width ? `0 0 ${width}` : '50%')};
+`;
+
+export const Separator = styled.div`
+  display: block;
+  margin-top: 20px;
+  
+  &:after {
+    content: '.';
+    visibility: hidden;
+  }
 `;
