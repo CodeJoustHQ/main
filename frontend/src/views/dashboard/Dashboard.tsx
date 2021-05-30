@@ -13,13 +13,15 @@ export enum DashboardTab {
 }
 
 const Content = styled.div`
-  padding-top: 60px;
-  padding-bottom: 50px;
+  padding: 50px 30px;
+  display: flex;
+  flex-direction: row;
+  width: calc(100% - 60px);
 `;
 
 const RightContent = styled.div`
-  // [Dashboard: left + width] + [Problem Card: margin]
-  margin-left: 350px;
+  padding: 0 20px;
+  flex: 1;
 `;
 
 const InnerContent = styled.div`

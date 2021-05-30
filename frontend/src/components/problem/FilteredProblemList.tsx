@@ -54,7 +54,7 @@ function FilteredProblemList(props: FilteredProblemListProps) {
           onChange={(e) => setFilterText(e.target.value)}
           placeholder="Filter by name, difficulty, or tag (separate queries by comma)"
         />
-        <WhiteTextButton onClick={() => setFilterText('')}>✕</WhiteTextButton>
+        {filterText ? <WhiteTextButton onClick={() => setFilterText('')}>✕</WhiteTextButton> : null}
       </FilterContainer>
 
       {problems.map((problem: Problem) => {

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { DashboardTab } from './Dashboard';
 import { NoMarginSubtitleText } from '../../components/core/Text';
-import { PrimaryButtonLink } from '../../components/core/Link';
+import { PrimaryButtonLink, TextLink } from '../../components/core/Link';
 
 type DashboardSidebarProps = {
   tab: DashboardTab,
@@ -16,14 +16,14 @@ type TabItemProps = {
 };
 
 const Content = styled.div`
-  position: absolute;
+  position: relative;
   width: 300px;
-  top: 100px;
-  left: 30px;
-  bottom: 30px;
   text-align: left;
   display: flex;
   flex-direction: column;
+  
+  // [Header: height + padding] + [Dashboard: margin-top] + desired padding-bottom
+  height: calc(100vh - 130px);
 `;
 
 const InnerContent = styled.div`
@@ -36,7 +36,7 @@ const InnerContent = styled.div`
 
 const BottomContent = styled.div`
   position: absolute;
-  bottom: 10px;
+  bottom: 15px;
   left: 0;
   right: 0;
   text-align: center;
@@ -61,6 +61,7 @@ const TabItem = styled.div<TabItemProps>`
 `;
 
 const NewGameLink = styled(PrimaryButtonLink)`
+  margin: 5px auto;
   width: 80%;
 `;
 
@@ -94,6 +95,10 @@ function DashboardSidebar(props: DashboardSidebarProps) {
 
       <BottomContent>
         <NewGameLink to="/game/create">Start New Game</NewGameLink>
+        <br />
+        <TextLink to="/game/join">
+          Or join a room &#8594;
+        </TextLink>
       </BottomContent>
     </Content>
   );

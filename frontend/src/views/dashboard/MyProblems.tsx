@@ -19,7 +19,7 @@ const Content = styled.div`
   text-align: left;
 `;
 
-const TopText = styled.div`
+const TopTextContainer = styled.div`
   padding: 0 10px;
 `;
 
@@ -42,7 +42,7 @@ function MyProblems(props: MyProblemsProps) {
 
   return (
     <Content>
-      <TopText>
+      <TopTextContainer>
         <FlexHorizontalContainer>
           <FlexLeft>
             <div>
@@ -58,7 +58,7 @@ function MyProblems(props: MyProblemsProps) {
             </CreateButtonLink>
           </RelativeContainer>
         </FlexHorizontalContainer>
-      </TopText>
+      </TopTextContainer>
 
       <FilteredProblemList problems={account?.problems || []} />
 

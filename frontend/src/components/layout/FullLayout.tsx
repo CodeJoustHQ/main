@@ -6,8 +6,6 @@ import { FullContainer } from '../core/Container';
 const Content = styled.div`
   width: 100%;
   min-height: 100vh;
-  //display: flex;
-  //flex-direction: column;
   
   text-align: center;
   background-color: ${({ theme }) => theme.colors.background};
