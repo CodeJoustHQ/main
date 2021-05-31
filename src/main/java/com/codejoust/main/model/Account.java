@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import com.codejoust.main.model.problem.Problem;
+import com.codejoust.main.model.problem.ProblemTag;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,4 +34,8 @@ public class Account {
     @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
     @Setter(AccessLevel.PRIVATE)
     private List<Problem> problems = new ArrayList<>();
+
+    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
+    @Setter(AccessLevel.PRIVATE)
+    private List<ProblemTag> problemTags = new ArrayList<>();
 }

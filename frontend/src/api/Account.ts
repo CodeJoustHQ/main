@@ -1,11 +1,12 @@
 import axios from 'axios';
 import { axiosErrorHandler } from './Error';
-import { Problem } from './Problem';
+import { Problem, ProblemTag } from './Problem';
 import { getAuthHttpHeader } from '../util/Utility';
 
 export type Account = {
   uid: string,
   problems: Problem[],
+  problemTags: ProblemTag[],
 };
 
 export type AccountUid = {
