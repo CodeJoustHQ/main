@@ -17,7 +17,6 @@ public class AccountMapperTests {
     public void toDto() {
         Account account = new Account();
         account.setUid(TestFields.UID);
-        account.set
 
         AccountDto accountDto = AccountMapper.toDto(account);
         assertEquals(account.getUid(), accountDto.getUid());

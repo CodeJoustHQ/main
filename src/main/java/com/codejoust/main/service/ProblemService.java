@@ -14,6 +14,7 @@ import com.codejoust.main.dto.problem.ProblemTestCaseDto;
 import com.codejoust.main.exception.ProblemError;
 import com.codejoust.main.exception.api.ApiException;
 import com.codejoust.main.game_object.CodeLanguage;
+import com.codejoust.main.model.Account;
 import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
@@ -135,7 +136,7 @@ public class ProblemService {
             throw new ApiException(ProblemError.EMPTY_FIELD);
         }
 
-        service.verifyTokenMatchesUid(token, updatedProblem.getOwner().getUid());
+        service.verifyTokenMatchesUid(token, problem.getOwner().getUid());
 
         if (updatedProblem.getApproval() && updatedProblem.getTestCases().size() == 0) {
             throw new ApiException(ProblemError.BAD_APPROVAL);
@@ -181,15 +182,18 @@ public class ProblemService {
             throw new ApiException(ProblemError.DUPLICATE_TAG_NAME);
         }
 
+        Account owner = problem.getOwner();
+
         problem.getProblemTags().clear();
         for (ProblemTagDto problemTagDto : updatedProblemTags) {
             // Add the tag if the name already exists, or create a new one.
-            ProblemTag existingProblemTag = problemTagRepository.findTagByName(problemTagDto.getName());
+            ProblemTag existingProblemTag = problemTagRepository.findTagByNameAndOwner_Uid(problemTagDto.getName(), owner.getUid());
             if (existingProblemTag != null) {
                 problem.addProblemTag(existingProblemTag);
             } else if (validProblemTagName(problemTagDto.getName())) {
                 ProblemTag problemTag = new ProblemTag();
                 problemTag.setName(problemTagDto.getName());
+                problemTag.setOwner(owner);
                 problem.addProblemTag(problemTag);
             } else {
                 throw new ApiException(ProblemError.BAD_PROBLEM_TAG);
@@ -408,8 +412,10 @@ public class ProblemService {
         return problemTagDtos;
     }
 
-    public ProblemTagDto createProblemTag(CreateProblemTagRequest request) {
-        ProblemTag existingProblemTag = problemTagRepository.findTagByName(request.getName());
+    public ProblemTagDto createProblemTag(CreateProblemTagRequest request, String token) {
+        String uid = service.verifyToken(token);
+
+        ProblemTag existingProblemTag = problemTagRepository.findTagByNameAndOwner_Uid(request.getName(), uid);
 
         // Handle invalid request, with restraints on the length of the name.
         if (!validProblemTagName(request.getName())) {
@@ -424,17 +430,20 @@ public class ProblemService {
         // Add the problem tag to the database.
         ProblemTag problemTag = new ProblemTag();
         problemTag.setName(request.getName());
+        problemTag.setOwner(accountRepository.findAccountByUid(uid));
         problemTagRepository.save(problemTag);
         return ProblemMapper.toProblemTagDto(problemTag);
     }
 
-    public ProblemTagDto deleteProblemTag(String tagId) {
+    public ProblemTagDto deleteProblemTag(String tagId, String token) {
         ProblemTag problemTag = problemTagRepository.findTagByTagId(tagId);
 
         // Do not create the new problem tag if one with this name exists.
-        if (problemTag == null) {
+        if (problemTag == null || problemTag.getOwner() == null) {
             throw new ApiException(ProblemError.TAG_NOT_FOUND);
         }
+
+        service.verifyTokenMatchesUid(token, problemTag.getOwner().getUid());
 
         // Remove the problem tag from the database.
         ProblemTagDto problemTagDto = ProblemMapper.toProblemTagDto(problemTag);

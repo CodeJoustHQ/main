@@ -68,6 +68,7 @@ public class ProblemController extends BaseRestController {
         return new ResponseEntity<>(service.createTestCase(problemId, request, token), HttpStatus.CREATED);
     }
 
+    // TODO: require admin token for viewing all problems
     @GetMapping("/problems")
     public ResponseEntity<List<ProblemDto>> getAllProblems(@RequestParam(required = false) Boolean approved) {
         return new ResponseEntity<>(service.getAllProblems(approved), HttpStatus.OK);
@@ -89,23 +90,25 @@ public class ProblemController extends BaseRestController {
         return new ResponseEntity<>(service.getDefaultCode(problemId), HttpStatus.OK);
     }
 
+    // TODO: require admin token
     @GetMapping("/problems/tags/{tagId}")
     public ResponseEntity<List<ProblemDto>> getProblemsWithTag(@PathVariable String tagId) {
         return new ResponseEntity<>(service.getProblemsWithTag(tagId), HttpStatus.OK);
     }
 
+    // TODO: require admin token
     @GetMapping("/problems/tags")
     public ResponseEntity<List<ProblemTagDto>> getAllProblemTags() {
         return new ResponseEntity<>(service.getAllProblemTags(), HttpStatus.OK);
     }
 
     @PostMapping("/problems/tags")
-    public ResponseEntity<ProblemTagDto> createProblemTag(@RequestBody CreateProblemTagRequest request) {
-        return new ResponseEntity<>(service.createProblemTag(request), HttpStatus.CREATED);
+    public ResponseEntity<ProblemTagDto> createProblemTag(@RequestBody CreateProblemTagRequest request, @RequestHeader(name="Authorization") String token) {
+        return new ResponseEntity<>(service.createProblemTag(request, token), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/problems/tags/{tagId}")
-    public ResponseEntity<ProblemTagDto> deleteProblemTag(@PathVariable String tagId) {
-        return new ResponseEntity<>(service.deleteProblemTag(tagId), HttpStatus.OK);
+    public ResponseEntity<ProblemTagDto> deleteProblemTag(@PathVariable String tagId, @RequestHeader(name="Authorization") String token) {
+        return new ResponseEntity<>(service.deleteProblemTag(tagId, token), HttpStatus.OK);
     }
 }

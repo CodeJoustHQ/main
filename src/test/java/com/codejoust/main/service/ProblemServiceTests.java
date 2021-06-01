@@ -738,7 +738,8 @@ public class ProblemServiceTests {
         CreateProblemTagRequest request = new CreateProblemTagRequest();
         request.setName(TestFields.TAG_NAME);
 
-        problemService.createProblemTag(request);
+        Mockito.doReturn(TestFields.UID).when(firebaseService).verifyToken(TestFields.TOKEN);
+        problemService.createProblemTag(request, TestFields.TOKEN);
         verify(tagRepository).save(Mockito.any(ProblemTag.class));
     }
 
@@ -749,7 +750,8 @@ public class ProblemServiceTests {
         CreateProblemTagRequest request = new CreateProblemTagRequest();
         request.setName(tagName);
 
-        ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblemTag(request));
+        Mockito.doReturn(TestFields.UID).when(firebaseService).verifyToken(TestFields.TOKEN);
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblemTag(request, TestFields.TOKEN));
         assertEquals(ProblemError.BAD_PROBLEM_TAG, exception.getError());
     }
 
@@ -765,10 +767,11 @@ public class ProblemServiceTests {
         ProblemTag problemTag = new ProblemTag();
         problemTag.setName(TestFields.TAG_NAME);
         problemTag.setTagId(TestFields.TAG_ID);
+        problemTag.setOwner(TestFields.account1());
 
         Mockito.doReturn(problemTag).when(tagRepository).findTagByTagId(problemTag.getTagId());
 
-        ProblemTagDto problemTagDto = problemService.deleteProblemTag(problemTag.getTagId());
+        ProblemTagDto problemTagDto = problemService.deleteProblemTag(problemTag.getTagId(), TestFields.TOKEN);
         verify(tagRepository).delete(Mockito.any(ProblemTag.class));
         assertEquals(problemTag.getName(), problemTagDto.getName());
     }

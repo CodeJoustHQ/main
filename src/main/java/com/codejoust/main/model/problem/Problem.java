@@ -69,7 +69,7 @@ public class Problem {
     private List<ProblemInput> problemInputs = new ArrayList<>();
 
     // List of tags associated with this problem
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Setter(AccessLevel.PRIVATE)
     @JoinColumn(name = "problem_tag_id")
     @Fetch(value = FetchMode.SUBSELECT)

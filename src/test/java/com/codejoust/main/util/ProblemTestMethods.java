@@ -170,6 +170,7 @@ public class ProblemTestMethods {
         problemTag.setName(TestFields.TAG_NAME);
 
         MvcResult problemTagResult = mockMvc.perform(post(POST_PROBLEM_TAG_CREATE)
+                .header(HttpHeaders.AUTHORIZATION, TestFields.TOKEN)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(problemTag)))
                 .andDo(print()).andExpect(status().isCreated())
