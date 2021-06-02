@@ -3,6 +3,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { useBeforeunload } from 'react-beforeunload';
 import { Message, Subscription } from 'stompjs';
 import { unwrapResult } from '@reduxjs/toolkit';
+import styled from 'styled-components';
 import { errorHandler } from '../api/Error';
 import {
   FlexCenter, FlexContainer, FlexInfoBar, FlexLeft,
@@ -21,9 +22,13 @@ import { connect, routes, subscribe } from '../api/Socket';
 import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { fetchGame, setGame } from '../redux/Game';
 import { setCurrentUser } from '../redux/User';
-import { SpectatorFilter } from '../components/problem/Selector';
 import PlayerGameView from '../components/game/PlayerGameView';
 import SpectatorGameView from '../components/game/SpectatorGameView';
+import { Text } from '../components/core/Text';
+
+const SpectatorText = styled(Text)`
+  margin: 0 0 0 10px;
+`;
 
 type LocationState = {
   roomId: string,
@@ -184,9 +189,11 @@ function GamePage() {
           Room:
           {' '}
           {roomId || 'N/A'}
-          <SpectatorFilter
-            spectators={spectators}
-          />
+          <SpectatorText>
+            Spectators (
+            {spectators.length}
+            )
+          </SpectatorText>
         </FlexLeft>
         <FlexCenter>
           <GameTimerContainer gameTimer={gameTimer || null} />
