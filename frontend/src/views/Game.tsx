@@ -50,7 +50,6 @@ function GamePage() {
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);
-  const [startTime, setStartTime] = useState<string>('');
 
   // Variable to hold whether the user is subscribed to the primary Game socket.
   const [gameSocket, setGameSocket] = useState<Subscription | null>(null);
@@ -75,7 +74,6 @@ function GamePage() {
     setAllSolved(newGame.allSolved);
     setTimeUp(newGame.gameTimer.timeUp);
     setGameEnded(newGame.gameEnded);
-    setStartTime(newGame.gameTimer.startTime);
     setSpectators(newGame.room.spectators);
   };
 
@@ -211,11 +209,7 @@ function GamePage() {
       </FlexInfoBar>
       {
         currentUser?.spectator ? (
-          <SpectatorGameView
-            players={players}
-            currentUser={currentUser}
-            startTime={startTime}
-          />
+          <SpectatorGameView />
         ) : (
           <PlayerGameView
             gameError={error}

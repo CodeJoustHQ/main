@@ -20,7 +20,7 @@ const CodePreview = styled.div`
 `;
 
 type PreviewCodeContentProps = {
-  player: Player,
+  player: Player | undefined,
 }
 
 function PreviewCodeContent(props: PreviewCodeContentProps) {
@@ -28,7 +28,7 @@ function PreviewCodeContent(props: PreviewCodeContentProps) {
 
   const bestSubmission = useBestSubmission(player);
 
-  if (!player || !player.submissions.length) {
+  if (player === undefined || !player || !player.submissions.length) {
     return null;
   }
 
