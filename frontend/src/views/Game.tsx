@@ -76,15 +76,7 @@ function GamePage() {
     setTimeUp(newGame.gameTimer.timeUp);
     setGameEnded(newGame.gameEnded);
     setStartTime(newGame.gameTimer.startTime);
-
-    // Set the spectator list in the game.
-    const spectatorList: User[] = [];
-    newGame.room.users.forEach((user) => {
-      if (user.spectator) {
-        spectatorList.push(user);
-      }
-    });
-    setSpectators(spectatorList);
+    setSpectators(newGame.room.spectators);
   };
 
   const dispatch = useAppDispatch();
