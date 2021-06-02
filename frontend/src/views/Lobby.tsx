@@ -299,13 +299,25 @@ function LobbyPage() {
   const handleStartGame = () => {
     setError('');
     const request = { initiator: currentUser as User };
-    startGame(currentRoomId, request)
-      .then(() => {
-        setLoading(true);
-      })
-      .catch((err) => {
-        setError(err.message);
-      });
+
+    // Determine if the room only has spectators.
+    let allSpectators: boolean = true;
+    room!.users.forEach((user: User) => {
+      if (!user.spectator) {
+        allSpectators = false;
+      }
+    });
+
+    // eslint-disable-next-line no-alert
+    if (!allSpectators || window.confirm('Everybody in this room is a spectator, which means this is going to be a pretty boring game... are you sure you want to start the game?')) {
+      startGame(currentRoomId, request)
+        .then(() => {
+          setLoading(true);
+        })
+        .catch((err) => {
+          setError(err.message);
+        });
+    }
   };
 
   /**
