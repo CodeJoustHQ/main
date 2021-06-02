@@ -1,12 +1,15 @@
 package com.codejoust.main.model;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.codejoust.main.dto.account.AccountRole;
 import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.model.problem.ProblemTag;
 import lombok.AccessLevel;
@@ -42,4 +45,7 @@ public class Account {
     @Setter(AccessLevel.PRIVATE)
     @Fetch(value = FetchMode.SUBSELECT)
     private List<ProblemTag> problemTags = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    private AccountRole role = AccountRole.TEACHER;
 }

@@ -15,4 +15,5 @@ public class AccountDto {
     private String uid;
     private List<ProblemDto> problems;
     private List<ProblemTagDto> problemTags;
+    private AccountRole role;
 }
