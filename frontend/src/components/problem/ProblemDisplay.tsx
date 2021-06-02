@@ -50,18 +50,13 @@ import { ProblemHelpModal } from '../core/HelpModal';
 
 const defaultDescription: string = [
   'Replace this line with a short description.',
-  '### Input',
-  'This problem accepts X parameter(s): `name` (Integer).',
+  '### Parameters',
   '1. `name`: Replace this with a description of the parameter.',
-  '### Output',
-  'This problem outputs a(n) Integer.',
-  '\\',
-  'Replace this with an explanation of the output, if necessary.',
   '### Example Test Case',
   '**Input**',
-  '`name`: `5`',
+  '`name`: `value`',
   '**Output**',
-  '`1`',
+  '`value`',
   '**Explanation**',
   'Replace this line with an explanation of this example test case.',
 ].join('\n\n');
@@ -586,7 +581,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             ) : null
           }
 
-          <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
+          <LowMarginMediumText>Parameters</LowMarginMediumText>
           {newProblem.problemInputs.map((input, index) => (
             <InputTypeContainer
               // eslint-disable-next-line react/no-array-index-key
@@ -640,7 +635,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             </GrayTextButton>
           ) : null}
 
-          <LowMarginMediumText>Problem Output</LowMarginMediumText>
+          <LowMarginMediumText>Return Type</LowMarginMediumText>
           <PrimarySelect
             onChange={(e) => handleEnumChange('outputType', ProblemIOType[e.target.value as keyof typeof ProblemIOType])}
             value={problemIOTypeToString(newProblem.outputType)}
