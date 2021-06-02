@@ -11,7 +11,12 @@ import {
   ProblemTag,
   TestCase,
 } from '../../api/Problem';
-import { FixedTextArea, PureTextInputTitle, CheckboxInput } from '../core/Input';
+import {
+  FixedTextArea,
+  PureTextInputTitle,
+  CheckboxInput,
+  TextInput,
+} from '../core/Input';
 import { Difficulty } from '../../api/Difficulty';
 import {
   SmallDifficultyButton,
@@ -23,6 +28,7 @@ import {
   InvertedSmallButton,
   TextButton,
   InlineLobbyIcon,
+  InlineErrorIcon,
 } from '../core/Button';
 import ToggleButton from '../core/ToggleButton';
 import PrimarySelect from '../core/Select';
@@ -35,12 +41,11 @@ import {
 import Loading from '../core/Loading';
 import ErrorMessage from '../core/Error';
 import { FlexBareContainer } from '../core/Container';
-import { generateRandomId } from '../../util/Utility';
+import { generateRandomId, validIdentifier } from '../../util/Utility';
 import { HoverTooltip } from '../core/HoverTooltip';
 import { Coordinate } from '../special/FloatingCircle';
 import ProblemTags from './ProblemTags';
 import { useAppSelector, useProblemEditable } from '../../util/Hook';
-import ProblemInputDisplay from './ProblemInputDisplay';
 import { ProblemHelpModal } from '../core/HelpModal';
 
 const defaultDescription: string = [
@@ -160,8 +165,9 @@ const DeleteButton = styled(PrimaryButton)`
 `;
 
 const TextButtonLink = styled(TextButton)`
+  color: ${({ theme }) => theme.colors.placeholderGray};
   padding: 0;
-  margin-top: 10px;
+  margin-top: 30px;
   text-decoration: underline;
   text-align: left;
 `;
@@ -169,6 +175,15 @@ const TextButtonLink = styled(TextButton)`
 const InlineProblemIcon = styled(InlineLobbyIcon)`
   margin: 10px;
   height: 1rem;
+`;
+
+const InputTypeContainer = styled.div`
+  margin-bottom: 5px;
+`;
+
+const CancelTextButton = styled(TextButton)`
+  margin-left: 2.5px;
+  color: ${({ theme }) => theme.colors.gray};
 `;
 
 type ProblemDisplayParams = {
@@ -404,7 +419,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
               <TextButtonLink
                 onClick={() => {
                   // Add default description and force refresh editor.
-                  newProblem.description = defaultDescription;
+                  handleDescriptionChange(defaultDescription);
                   setRefreshEditor(refreshEditor + 1);
                 }}
               >
@@ -573,17 +588,50 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
           <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
           {newProblem.problemInputs.map((input, index) => (
-            <ProblemInputDisplay
+            <InputTypeContainer
               // eslint-disable-next-line react/no-array-index-key
               key={index}
-              input={input}
-              index={index}
-              handleInputChange={handleInputChange}
-              problemEditable={problemEditable}
-              setHoverVisible={(hoverVisibleParam: boolean) => setHoverVisible(hoverVisibleParam)}
-              mouseMoveHandler={mouseMoveHandler}
-              deleteProblemInput={deleteProblemInput}
-            />
+            >
+              <TextInput
+                value={input.name}
+                onChange={(e) => handleInputChange(index,
+                  e.target.value, input.type)}
+                disabled={!problemEditable}
+              />
+
+              <InlineErrorIcon
+                show={!validIdentifier(input.name)}
+                onMouseEnter={() => setHoverVisible(true)}
+                onMouseMove={mouseMoveHandler}
+                onMouseLeave={() => setHoverVisible(false)}
+              >
+                error_outline
+              </InlineErrorIcon>
+
+              <PrimarySelect
+                onChange={(e) => handleInputChange(
+                  index,
+                  input.name,
+                  ProblemIOType[e.target.value as keyof typeof ProblemIOType],
+                )}
+                value={problemIOTypeToString(input.type)}
+                disabled={!problemEditable}
+              >
+                {
+                  Object.keys(ProblemIOType).map((key) => (
+                    <option key={key} value={key}>{key}</option>
+                  ))
+                }
+              </PrimarySelect>
+
+              {problemEditable ? (
+                <CancelTextButton
+                  onClick={() => deleteProblemInput(index)}
+                >
+                  ✕
+                </CancelTextButton>
+              ) : null}
+            </InputTypeContainer>
           ))}
 
           {problemEditable ? (
