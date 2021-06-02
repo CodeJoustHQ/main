@@ -1,7 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Player, Submission } from '../../api/Game';
+import { Player } from '../../api/Game';
 import Language from '../../api/Language';
+import { useBestSubmission } from '../../util/Hook';
 import { SecondaryHeaderText } from '../core/Text';
 import ResizableMonacoEditor from '../game/Editor';
 
@@ -19,28 +20,22 @@ const CodePreview = styled.div`
 `;
 
 type PreviewCodeContentProps = {
-  players: Player[],
-  playerIndex: number,
+  player: Player,
 }
 
 function PreviewCodeContent(props: PreviewCodeContentProps) {
-  const { players, playerIndex } = props;
+  const { player } = props;
 
-  if (!players[playerIndex] || !players[playerIndex].submissions.length) {
+  const bestSubmission = useBestSubmission(player);
+
+  if (!player || !player.submissions.length) {
     return null;
   }
-
-  let bestSubmission: Submission | undefined;
-  players[playerIndex].submissions.forEach((submission) => {
-    if (!bestSubmission || submission.numCorrect > bestSubmission.numCorrect) {
-      bestSubmission = submission;
-    }
-  });
 
   return (
     <div>
       <SecondaryHeaderText bold>
-        {`Previewing code for player "${players[playerIndex].user.nickname}"`}
+        {`Previewing code for player "${player.user.nickname}"`}
       </SecondaryHeaderText>
       <CodePreview>
         <ResizableMonacoEditor

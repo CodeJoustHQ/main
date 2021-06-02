@@ -21,8 +21,7 @@ function SpectatorGameView(props: SpectatorGameViewProps) {
     <>
       <Modal show={codeModal !== -1} onExit={() => setCodeModal(-1)} fullScreen>
         <PreviewCodeContent
-          players={players}
-          playerIndex={codeModal}
+          player={players[codeModal]}
         />
       </Modal>
       <LargeCenterText>Live Scoreboard</LargeCenterText>

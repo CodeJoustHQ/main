@@ -219,11 +219,10 @@ function LobbyPage() {
       initiator: currentUser as User,
       userToDelete: user,
     })
-      .then(() => {
-        setLoading(false);
-      })
       .catch((err) => {
         setError(err.message);
+      })
+      .finally(() => {
         setLoading(false);
       });
   };
@@ -288,9 +287,6 @@ function LobbyPage() {
     if (!loading) {
       setLoading(true);
       setSpectator(currentRoomId, request)
-        .then((res) => {
-          setStateFromRoom(res);
-        })
         .catch((err) => {
           setError(err.message);
         })
@@ -331,12 +327,13 @@ function LobbyPage() {
       };
 
       updateRoomSettings(currentRoomId, newSettings)
-        .then(() => setLoading(false))
         .catch((err) => {
-          setLoading(false);
           setError(err.message);
           // Set difficulty back to original if REST call failed
           setDifficulty(oldDifficulty);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     }
   };
@@ -354,12 +351,13 @@ function LobbyPage() {
     };
 
     updateRoomSettings(currentRoomId, settings)
-      .then(() => setLoading(false))
       .catch((err) => {
-        setLoading(false);
         setError(err.message);
         // Set duration back to original if REST call failed
         setDuration(prevDuration);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -379,11 +377,12 @@ function LobbyPage() {
     };
 
     updateRoomSettings(currentRoomId, settings)
-      .then(() => setLoading(false))
       .catch((err) => {
-        setLoading(false);
         setError(err.message);
         setSelectedProblems(prevProblems);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -450,13 +449,14 @@ function LobbyPage() {
     };
 
     updateRoomSettings(currentRoomId, settings)
-      .then(() => setLoading(false))
       .then(() => setError(''))
       .catch((err) => {
-        setLoading(false);
         setError(err.message);
         // Set size back to original if REST call failed
         setSize(prevSize);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 

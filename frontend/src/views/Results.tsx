@@ -267,8 +267,7 @@ function GameResultsPage() {
 
       <Modal show={codeModal !== -1} onExit={() => setCodeModal(-1)} fullScreen>
         <PreviewCodeContent
-          players={players}
-          playerIndex={codeModal}
+          player={players[codeModal]}
         />
       </Modal>
 
