@@ -13,7 +13,7 @@ import { checkLocationState, leaveRoom } from '../util/Utility';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
 import { Difficulty } from '../api/Difficulty';
-import { Game, manuallyEndGame, Player } from '../api/Game';
+import { Game, manuallyEndGame } from '../api/Game';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
 import { TextButton, DangerButton } from '../components/core/Button';
@@ -23,7 +23,6 @@ import { fetchGame, setGame } from '../redux/Game';
 import { setCurrentUser } from '../redux/User';
 import { SpectatorFilter } from '../components/problem/Selector';
 import PlayerGameView from '../components/game/PlayerGameView';
-import { Problem } from '../api/Problem';
 import SpectatorGameView from '../components/game/SpectatorGameView';
 
 type LocationState = {
@@ -43,10 +42,8 @@ function GamePage() {
   const [error, setError] = useState<string>('');
 
   const [host, setHost] = useState<User | null>(null);
-  const [players, setPlayers] = useState<Player[]>([]);
   const [spectators, setSpectators] = useState<User[]>([]);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
-  const [problems, setProblems] = useState<Problem[]>([]);
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);
@@ -68,9 +65,7 @@ function GamePage() {
   const setStateFromGame = (newGame: Game) => {
     setHost(newGame.room.host);
     setRoomId(newGame.room.roomId);
-    setPlayers(newGame.players);
     setGameTimer(newGame.gameTimer);
-    setProblems(newGame.problems);
     setAllSolved(newGame.allSolved);
     setTimeUp(newGame.gameTimer.timeUp);
     setGameEnded(newGame.gameEnded);
@@ -213,11 +208,6 @@ function GamePage() {
         ) : (
           <PlayerGameView
             gameError={error}
-            roomId={roomId}
-            players={players}
-            problems={problems}
-            currentUser={currentUser}
-            game={game}
           />
         )
       }

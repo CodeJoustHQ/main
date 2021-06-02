@@ -12,11 +12,9 @@ import 'react-splitter-layout/lib/index.css';
 import { ProblemHeaderText, BottomFooterText } from '../core/Text';
 import Console from './Console';
 import Loading from '../core/Loading';
-import { User } from '../../api/User';
 import { displayNameFromDifficulty } from '../../api/Difficulty';
 import {
-  Game,
-  Player, runSolution, Submission, SubmissionType, submitSolution,
+  runSolution, Submission, SubmissionType, submitSolution,
 } from '../../api/Game';
 import LeaderboardCard from '../card/LeaderboardCard';
 import { DifficultyDisplayButton } from '../core/Button';
@@ -27,6 +25,7 @@ import {
   SmallInlineCopyIcon,
   SmallInlineCopyText,
 } from '../special/CopyIndicator';
+import { useAppSelector } from '../../util/Hook';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
   margin-top: 15px;
@@ -78,17 +77,14 @@ const LeaderboardContent = styled.div`
 
 type PlayerGameViewProps = {
   gameError: string,
-  roomId: string,
-  players: Player[],
-  problems: Problem[],
-  currentUser: User | null,
-  game: Game | null,
 };
 
 function PlayerGameView(props: PlayerGameViewProps) {
   const {
-    gameError, roomId, players, problems, currentUser, game,
+    gameError,
   } = props;
+
+  const { currentUser, game } = useAppSelector((state) => state);
 
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [submission, setSubmission] = useState<Submission | null>(null);
@@ -181,7 +177,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
       language: currentLanguage,
     };
 
-    runSolution(roomId, request)
+    runSolution(game!.room.roomId, request)
       .then((res) => {
         setLoading(false);
 
@@ -206,7 +202,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
       language: currentLanguage,
     };
 
-    submitSolution(roomId, request)
+    submitSolution(game!.room.roomId, request)
       .then((res) => {
         setLoading(false);
 
@@ -221,14 +217,14 @@ function PlayerGameView(props: PlayerGameViewProps) {
       });
   };
 
-  const displayPlayerLeaderboard = useCallback(() => players.map((player, index) => (
+  const displayPlayerLeaderboard = useCallback(() => game?.players.map((player, index) => (
     <LeaderboardCard
       player={player}
       isCurrentPlayer={player.user.userId === currentUser?.userId}
       place={index + 1}
       color={player.color}
     />
-  )), [players, currentUser]);
+  )), [game, currentUser]);
 
   return (
     <>
@@ -248,18 +244,18 @@ function PlayerGameView(props: PlayerGameViewProps) {
         >
           {/* Problem title/description panel */}
           <OverflowPanel className="display-box-shadow">
-            <ProblemHeaderText>{problems[0]?.name}</ProblemHeaderText>
-            {problems[0] ? (
+            <ProblemHeaderText>{game?.problems[0]?.name}</ProblemHeaderText>
+            {game?.problems[0] ? (
               <DifficultyDisplayButton
-                difficulty={problems[0].difficulty!}
+                difficulty={game?.problems[0].difficulty!}
                 enabled={false}
                 active
               >
-                {displayNameFromDifficulty(problems[0].difficulty!)}
+                {displayNameFromDifficulty(game?.problems[0].difficulty!)}
               </DifficultyDisplayButton>
             ) : null}
             <StyledMarkdownEditor
-              defaultValue={problems[0]?.description}
+              defaultValue={game?.problems[0]?.description}
               onChange={() => ''}
               readOnly
             />
@@ -296,7 +292,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
             <Panel>
               <Console
-                testCases={problems[0]?.testCases}
+                testCases={game?.problems[0]?.testCases || []}
                 submission={submission}
                 onRun={runCode}
                 onSubmit={submitCode}
