@@ -30,6 +30,7 @@ public class RoomMapperTests {
         User host = new User();
         host.setNickname(TestFields.NICKNAME);
         host.setUserId(TestFields.USER_ID);
+        host.setSpectator(true);
         User user = new User();
         user.setNickname(TestFields.NICKNAME_2);
         user.setUserId(TestFields.USER_ID_2);
@@ -98,6 +99,18 @@ public class RoomMapperTests {
                 .map(UserMapper::toEntity)
                 .collect(Collectors.toList());
         assertEquals(expectedActiveUsers, actualActiveUsers);
+
+        // Map set of UserDtos on spectators to a set of Users
+        List<User> expectedSpectators = new ArrayList<>();
+        expectedSpectators.add(host);
+        List<User> actualSpectators = response.getSpectators()
+            .stream()
+            .map(UserMapper::toEntity)
+            .collect(Collectors.toList());
+        assertEquals(expectedSpectators, actualSpectators);
+
+
+        
     }
 
     @Test
