@@ -6,13 +6,13 @@ import {
   getSingleProblem,
   Problem,
 } from '../api/Problem';
-import NotFound from './NotFound';
-import { LargeText } from '../components/core/Text';
+import { LargeText, MediumText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import ProblemDisplay from '../components/problem/ProblemDisplay';
-import { generateRandomId } from '../util/Utility';
+import { generateRandomId, verifyToken } from '../util/Utility';
 import { useAppSelector, useProblemEditable } from '../util/Hook';
+import { PrimaryButtonLink } from '../components/core/Link';
 
 const Content = styled.div`
   display: flex;
@@ -33,8 +33,12 @@ function ProblemPage() {
   const params = useParams<ProblemParams>();
 
   useEffect(() => {
+    if (!verifyToken(token, setError)) {
+      return;
+    }
+
     setLoading(true);
-    getSingleProblem(params.id)
+    getSingleProblem(params.id, token!)
       .then((res) => {
         res.testCases.forEach((testCase) => {
           // eslint-disable-next-line no-param-reassign
@@ -44,13 +48,19 @@ function ProblemPage() {
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [params]);
+  }, [params, token]);
 
   if (!problem) {
     if (loading) {
       return <Loading />;
     }
-    return <NotFound />;
+    return (
+      <MediumText>
+        You do not have permission to view this problem, or the problem does not exist.
+        <br />
+        <PrimaryButtonLink to="/problems/all">Go back</PrimaryButtonLink>
+      </MediumText>
+    );
   }
 
   const handleEdit = (newProblem: Problem) => {

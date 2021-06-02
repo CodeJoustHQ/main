@@ -90,3 +90,12 @@ export const getAuthHttpHeader = (token: string) => ({
     Authorization: token,
   },
 });
+
+export const verifyToken = (token: string | null, errorAction: (msg: string) => void): boolean => {
+  if (!token) {
+    errorAction('An error occurred fetching your credentials; '
+      + 'please try again in a few seconds.');
+    return false;
+  }
+  return true;
+};

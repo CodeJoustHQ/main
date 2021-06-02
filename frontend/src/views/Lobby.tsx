@@ -15,7 +15,7 @@ import {
   connect, routes, subscribe, disconnect,
 } from '../api/Socket';
 import { User } from '../api/User';
-import { isValidRoomId, leaveRoom, checkLocationState } from '../util/Utility';
+import { isValidRoomId, leaveRoom, checkLocationState, verifyToken } from '../util/Utility';
 import { Difficulty } from '../api/Difficulty';
 import {
   PrimaryButton,
@@ -162,6 +162,7 @@ function LobbyPage() {
   const dispatch = useAppDispatch();
   const { room } = useAppSelector((state) => state);
   const { currentUser } = useAppSelector((state) => state);
+  const { token } = useAppSelector((state) => state.account);
 
   // Hold error text.
   const [error, setError] = useState('');
@@ -525,14 +526,18 @@ function LobbyPage() {
   }, [setMousePosition]);
 
   useEffect(() => {
-    getAllProblemTags()
+    if (!verifyToken(token, () => '')) {
+      return;
+    }
+
+    getAllProblemTags(token!)
       .then((res) => {
         setAllTags(res);
       })
       .catch((err) => {
         setError(err.message);
       });
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     window.onmousemove = mouseMoveHandler;
@@ -710,17 +715,21 @@ function LobbyPage() {
               })}
             </DifficultyContainer>
 
-            <NoMarginMediumText>Selected Tags</NoMarginMediumText>
-            <SelectedTagsDisplay
-              tags={selectedTags}
-              onRemove={isHost(currentUser) ? removeTag : null}
-            />
-            {isHost(currentUser) ? (
-              <TagSelector
-                tags={allTags}
-                selectedTags={selectedTags}
-                onSelect={addTag}
-              />
+            {token ? (
+              <>
+                <NoMarginMediumText>Selected Tags</NoMarginMediumText>
+                <SelectedTagsDisplay
+                  tags={selectedTags}
+                  onRemove={isHost(currentUser) ? removeTag : null}
+                />
+                {isHost(currentUser) ? (
+                  <TagSelector
+                    tags={allTags}
+                    selectedTags={selectedTags}
+                    onSelect={addTag}
+                  />
+                ) : null}
+              </>
             ) : null}
 
             <NoMarginMediumText>Selected Problems</NoMarginMediumText>

@@ -5,7 +5,8 @@ import ErrorMessage from '../core/Error';
 import { displayNameFromDifficulty } from '../../api/Difficulty';
 import { InlineDifficultyDisplayButton } from '../core/Button';
 import { TextInput } from '../core/Input';
-import { useClickOutside } from '../../util/Hook';
+import { useAppSelector, useClickOutside } from '../../util/Hook';
+import { verifyToken } from '../../util/Utility';
 
 type ProblemSelectorProps = {
   selectedProblems: SelectableProblem[],
@@ -76,20 +77,21 @@ export function ProblemSelector(props: ProblemSelectorProps) {
   const [showProblems, setShowProblems] = useState(false);
   const [searchText, setSearchText] = useState('');
 
+  const { token } = useAppSelector((state) => state.account);
   const ref = useRef<HTMLDivElement>(null);
 
   // Close list of problems if clicked outside of div
   useClickOutside(ref, () => setShowProblems(false));
 
   useEffect(() => {
-    getProblems(true)
+    getProblems(token || 'None - only approved problems will work', true)
       .then((res) => {
         setProblems(res);
       })
       .catch((err) => {
         setError(err.message);
       });
-  }, []);
+  }, [token]);
 
   const setSelectedStatus = (index: number) => {
     setShowProblems(false);

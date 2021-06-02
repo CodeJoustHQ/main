@@ -6,6 +6,8 @@ import { Text, LargeText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import ProblemCard from '../components/card/ProblemCard';
+import { useAppSelector } from '../util/Hook';
+import { verifyToken } from '../util/Utility';
 
 const Content = styled.div`
   padding: 0 20%;
@@ -23,13 +25,19 @@ function AllProblemsPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const { token } = useAppSelector((state) => state.account);
+
   useEffect(() => {
+    if (!verifyToken(token, setError)) {
+      return;
+    }
+
     setLoading(true);
-    getProblems()
+    getProblems(token!)
       .then((res) => setProblems(res))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [token]);
 
   const redirect = (problemId: string) => {
     history.push(`/problem/${problemId}`);
