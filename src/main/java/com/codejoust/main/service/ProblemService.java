@@ -101,12 +101,14 @@ public class ProblemService {
         return ProblemMapper.toDto(problem);
     }
 
-    public ProblemDto getProblem(String problemId) {
+    public ProblemDto getProblem(String problemId, String token) {
         Problem problem = problemRepository.findProblemByProblemId(problemId);
 
-        if (problem == null) {
+        if (problem == null || problem.getOwner() == null) {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
+
+        service.verifyTokenMatchesUid(token, problem.getOwner().getUid());
 
         return ProblemMapper.toDto(problem);
     }
@@ -236,11 +238,12 @@ public class ProblemService {
         return ProblemMapper.toDto(problem);
     }
 
-    public List<ProblemDto> getAllProblems(Boolean approved) {
+    public List<ProblemDto> getAllProblems(Boolean approved, String token) {
         List<ProblemDto> problems = new ArrayList<>();
         if (approved != null && approved) {
             problemRepository.findAllByApproval(true).forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
         } else {
+            service.verifyAdminAccount(token);
             problemRepository.findAll().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
         }
 
@@ -405,7 +408,9 @@ public class ProblemService {
         return problemDtos;
     }
 
-    public List<ProblemTagDto> getAllProblemTags() {
+    public List<ProblemTagDto> getAllProblemTags(String token) {
+        // todo: make return list of your own tags
+
         // Get all problem tags and convert them to DTOs.
         List<ProblemTagDto> problemTagDtos = new ArrayList<>();
         problemTagRepository.findAll().forEach(problemTag -> problemTagDtos.add(ProblemMapper.toProblemTagDto(problemTag)));

@@ -1,6 +1,7 @@
 package com.codejoust.main.service;
 
 import com.codejoust.main.dao.AccountRepository;
+import com.codejoust.main.dto.account.AccountRole;
 import com.codejoust.main.exception.AccountError;
 import com.codejoust.main.exception.api.ApiException;
 import com.codejoust.main.model.Account;
@@ -46,11 +47,23 @@ public class FirebaseService {
         return uid;
     }
 
-    // Verifies that the token decodes into the given UID, and triggers a request error otherwise
+    public void verifyAdminAccount(String token) {
+        String decodedUid = verifyToken(token);
+        Account account = repository.findAccountByUid(decodedUid);
+
+        if (account.getRole() == null || !account.getRole().equals(AccountRole.ADMIN)) {
+            throw new ApiException(AccountError.INVALID_CREDENTIALS);
+        }
+    }
+
+    // Verifies that the token decodes into the given UID (or into an admin account), and triggers a request error otherwise
     public void verifyTokenMatchesUid(String token, String uid) {
         String decodedUid = verifyToken(token);
         if (!decodedUid.equals(uid)) {
-            throw new ApiException(AccountError.INVALID_CREDENTIALS);
+            Account account = repository.findAccountByUid(decodedUid);
+            if (account.getRole() == null || !account.getRole().equals(AccountRole.ADMIN)) {
+                throw new ApiException(AccountError.INVALID_CREDENTIALS);
+            }
         }
     }
 

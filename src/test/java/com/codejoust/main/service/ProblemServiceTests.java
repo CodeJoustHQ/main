@@ -70,6 +70,7 @@ public class ProblemServiceTests {
         expected.setName(TestFields.NAME);
         expected.setDescription(TestFields.DESCRIPTION);
         expected.setDifficulty(ProblemDifficulty.EASY);
+        expected.setOwner(TestFields.account1());
 
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(TestFields.INPUT);
@@ -79,7 +80,7 @@ public class ProblemServiceTests {
 
         Mockito.doReturn(expected).when(repository).findProblemByProblemId(expected.getProblemId());
 
-        ProblemDto response = problemService.getProblem(expected.getProblemId());
+        ProblemDto response = problemService.getProblem(expected.getProblemId(), TestFields.TOKEN);
 
         assertEquals(expected.getProblemId(), response.getProblemId());
         assertEquals(expected.getName(), response.getName());
@@ -93,7 +94,7 @@ public class ProblemServiceTests {
 
     @Test
     public void getProblemNotFound() {
-        ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblem("ZZZ"));
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblem("ZZZ", TestFields.TOKEN));
 
         verify(repository).findProblemByProblemId("ZZZ");
         assertEquals(ProblemError.NOT_FOUND, exception.getError());
@@ -220,7 +221,7 @@ public class ProblemServiceTests {
         expected.add(problem);
         Mockito.doReturn(expected).when(repository).findAll();
 
-        List<ProblemDto> response = problemService.getAllProblems(null);
+        List<ProblemDto> response = problemService.getAllProblems(null, TestFields.TOKEN);
 
         assertEquals(1, response.size());
         assertNotNull(response.get(0).getProblemId());
@@ -240,7 +241,7 @@ public class ProblemServiceTests {
         expected.add(problem);
         Mockito.doReturn(expected).when(repository).findAllByApproval(true);
 
-        List<ProblemDto> response = problemService.getAllProblems(true);
+        List<ProblemDto> response = problemService.getAllProblems(true, TestFields.TOKEN);
 
         assertEquals(1, response.size());
         assertEquals(TestFields.NAME, response.get(0).getName());
@@ -726,7 +727,7 @@ public class ProblemServiceTests {
 
         Mockito.doReturn(Collections.singletonList(problemTag)).when(tagRepository).findAll();
         
-        List<ProblemTagDto> problemTags = problemService.getAllProblemTags();
+        List<ProblemTagDto> problemTags = problemService.getAllProblemTags(TestFields.TOKEN);
 
         assertEquals(1, problemTags.size());
         assertEquals(problemTag.getName(), problemTags.get(0).getName());

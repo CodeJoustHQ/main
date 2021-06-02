@@ -46,8 +46,8 @@ public class ProblemController extends BaseRestController {
     }
 
     @GetMapping("/problems/{problemId}")
-    public ResponseEntity<ProblemDto> getProblem(@PathVariable String problemId) {
-        return new ResponseEntity<>(service.getProblem(problemId), HttpStatus.OK);
+    public ResponseEntity<ProblemDto> getProblem(@PathVariable String problemId, @RequestHeader (name="Authorization") String token) {
+        return new ResponseEntity<>(service.getProblem(problemId, token), HttpStatus.OK);
     }
 
     @PutMapping("/problems/{problemId}")
@@ -70,36 +70,19 @@ public class ProblemController extends BaseRestController {
 
     // TODO: require admin token for viewing all problems
     @GetMapping("/problems")
-    public ResponseEntity<List<ProblemDto>> getAllProblems(@RequestParam(required = false) Boolean approved) {
-        return new ResponseEntity<>(service.getAllProblems(approved), HttpStatus.OK);
-    }
-
-    // Note: Since this GET request takes query parameters, the difficulty to enum
-    // conversion does not automatically match case (i.e. Easy != easy != EASY)
-    @GetMapping("/problems/random")
-    public ResponseEntity<List<ProblemDto>> getRandomProblem(ProblemSettingsDto request) {
-        // Convert from the Problem object to Problem DTOs.
-        List<Problem> problems = service.getProblemsFromDifficulty(request.getDifficulty(), request.getNumProblems());
-        List<ProblemDto> problemDtos = new ArrayList<>();
-        problems.forEach(problem -> problemDtos.add(ProblemMapper.toDto(problem)));
-        return new ResponseEntity<>(problemDtos, HttpStatus.OK);
+    public ResponseEntity<List<ProblemDto>> getAllProblems(@RequestParam(required = false) Boolean approved, @RequestHeader (name="Authorization") String token) {
+        return new ResponseEntity<>(service.getAllProblems(approved, token), HttpStatus.OK);
     }
 
     @GetMapping("/problems/{problemId}/default-code")
     public ResponseEntity<Map<CodeLanguage, String>> getDefaultCode(@PathVariable String problemId) {
+        // Note: slight security issue in that anyone can access this for any problem
         return new ResponseEntity<>(service.getDefaultCode(problemId), HttpStatus.OK);
     }
 
-    // TODO: require admin token
-    @GetMapping("/problems/tags/{tagId}")
-    public ResponseEntity<List<ProblemDto>> getProblemsWithTag(@PathVariable String tagId) {
-        return new ResponseEntity<>(service.getProblemsWithTag(tagId), HttpStatus.OK);
-    }
-
-    // TODO: require admin token
     @GetMapping("/problems/tags")
-    public ResponseEntity<List<ProblemTagDto>> getAllProblemTags() {
-        return new ResponseEntity<>(service.getAllProblemTags(), HttpStatus.OK);
+    public ResponseEntity<List<ProblemTagDto>> getAllProblemTags(@RequestHeader(name="Authorization") String token) {
+        return new ResponseEntity<>(service.getAllProblemTags(token), HttpStatus.OK);
     }
 
     @PostMapping("/problems/tags")
