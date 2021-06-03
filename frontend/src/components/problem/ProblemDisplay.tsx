@@ -160,7 +160,7 @@ const DeleteButton = styled(PrimaryButton)`
 `;
 
 const TextButtonLink = styled(TextButton)`
-  color: ${({ theme }) => theme.colors.placeholderGray};
+  color: ${({ theme }) => theme.colors.gray};
   padding: 0;
   margin-top: 30px;
   text-decoration: underline;

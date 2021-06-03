@@ -23,7 +23,6 @@ export const ThemeConfig: any = {
     red2: '#dd4b4b',
     yellow: '#f3d251',
     purple: '#b97df6',
-    placeholderGray: '#B1BECC',
     gradients: {
       green: 'linear-gradient(207.68deg, #14D633 10.68%, #DAFFB5 91.96%)',
       red: 'linear-gradient(207.68deg, #DD145D 10.68%, #FFB7B7 91.96%)',
