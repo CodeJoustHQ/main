@@ -23,7 +23,7 @@ import Console from '../components/game/Console';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
 import { GameNotification, NotificationType } from '../api/GameNotification';
-import { Difficulty, displayNameFromDifficulty } from '../api/Difficulty';
+import { Difficulty } from '../api/Difficulty';
 import {
   Game, Player, runSolution,
   Submission, SubmissionType, submitSolution, manuallyEndGame,
@@ -31,7 +31,7 @@ import {
 import LeaderboardCard from '../components/card/LeaderboardCard';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
-import { TextButton, DifficultyDisplayButton, DangerButton } from '../components/core/Button';
+import { TextButton, getDifficultyDisplayButton, DangerButton } from '../components/core/Button';
 import {
   connect, routes, send, subscribe,
 } from '../api/Socket';
@@ -453,15 +453,7 @@ function GamePage() {
           {/* Problem title/description panel */}
           <OverflowPanel className="display-box-shadow">
             <ProblemHeaderText>{problems[0]?.name}</ProblemHeaderText>
-            {problems[0] ? (
-              <DifficultyDisplayButton
-                difficulty={problems[0].difficulty!}
-                enabled={false}
-                active
-              >
-                {displayNameFromDifficulty(problems[0].difficulty!)}
-              </DifficultyDisplayButton>
-            ) : null}
+            {problems[0] ? getDifficultyDisplayButton(problems[0].difficulty!) : null}
             <StyledMarkdownEditor
               defaultValue={problems[0]?.description}
               onChange={() => ''}

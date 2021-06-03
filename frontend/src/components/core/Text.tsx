@@ -137,3 +137,9 @@ export const BottomFooterText = styled(Text)`
   color: ${({ theme }) => theme.colors.gray};
   font-size: ${({ theme }) => theme.fontSize.mediumSmall};
 `;
+
+export const SelectedItemText = styled.p`
+  font-weight: bold;
+  display: inline;
+  margin: 0 10px;
+`;
