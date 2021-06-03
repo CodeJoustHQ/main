@@ -51,9 +51,14 @@ function SpectatorGameView() {
       });
   }, [playerSocket, unsubscribePlayer]);
 
+  const closeModal = () => {
+    setCodeModal(-1);
+    unsubscribePlayer();
+  };
+
   return (
     <>
-      <Modal show={codeModal !== -1} onExit={() => setCodeModal(-1)} fullScreen>
+      <Modal show={codeModal !== -1} onExit={closeModal} fullScreen>
         <PreviewCodeContent
           player={game?.players[codeModal]}
         />
@@ -63,7 +68,12 @@ function SpectatorGameView() {
         players={game?.players || []}
         currentUser={currentUser}
         gameStartTime={game?.gameTimer.startTime || ''}
-        viewPlayerCode={(index: number) => setCodeModal(index)}
+        viewPlayerCode={(index: number) => {
+          if (game) {
+            subscribePlayer(game.room.roomId, game.players[index].user.userId!);
+          }
+          setCodeModal(index);
+        }}
       />
       {error ? <CenteredContainer><ErrorMessage message={error} /></CenteredContainer> : null}
     </>
