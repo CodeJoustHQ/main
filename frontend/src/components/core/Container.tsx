@@ -93,10 +93,6 @@ export const SplitterContainer = styled.div`
   }
 `;
 
-export const TextLeftContainer = styled.div`
-  text-align: left;
-`;
-
 export const LeftContainer = styled.div`
   padding: 0 5rem;
   text-align: left;
@@ -154,6 +150,14 @@ export type WidthProps = {
 
 export const ColumnContainer = styled.div<WidthProps>`
   flex: ${({ width }) => (width ? `0 0 ${width}` : '50%')};
+`;
+
+export const TextLeftColumnContainer = styled(ColumnContainer)`
+  text-align: left;
+  
+  @media(max-width: 1000px) {
+    text-align: center;
+  }
 `;
 
 export const Separator = styled.div`

@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { ThemeConfig } from '../config/Theme';
-import { FloatingCircle, Coordinate } from '../special/FloatingCircle';
+import { FloatingCircle } from '../special/FloatingCircle';
 import { MainContainer } from '../core/Container';
 import { Header } from '../navigation/Header';
+import { useMousePosition } from '../../util/Hook';
 
 const Content = styled.div`
   position: relative;
@@ -11,6 +12,7 @@ const Content = styled.div`
   min-height: 100vh;
   text-align: center;
   background-color: ${({ theme }) => theme.colors.background};
+  overflow-x: hidden;
 `;
 
 const InnerContent = styled.div`
@@ -23,25 +25,63 @@ const CircleContent = styled.div`
   top: 0;
   left: 0;
   right: 0;
-  height: 100vh;
-  min-height: 750px;
+  height: 800px;
 `;
 
 type MyProps = {
   children: React.ReactNode,
 }
 
+export function FloatingCircles() {
+  const mousePosition = useMousePosition();
+
+  return (
+    <>
+      <FloatingCircle
+        color={ThemeConfig.colors.gradients.red}
+        x={mousePosition.x}
+        y={mousePosition.y}
+        bottom={65}
+        left={2}
+        size={4}
+      />
+      <FloatingCircle
+        color={ThemeConfig.colors.gradients.green}
+        x={mousePosition.x}
+        y={mousePosition.y}
+        bottom={30}
+        left={5}
+        size={7}
+      />
+      <FloatingCircle
+        color={ThemeConfig.colors.gradients.yellow}
+        x={mousePosition.x}
+        y={mousePosition.y}
+        bottom={87}
+        left={36}
+        size={3}
+      />
+      <FloatingCircle
+        color={ThemeConfig.colors.gradients.pink}
+        x={mousePosition.x}
+        y={mousePosition.y}
+        bottom={32}
+        left={90}
+        size={7}
+      />
+      <FloatingCircle
+        color={ThemeConfig.colors.gradients.blue}
+        x={mousePosition.x}
+        y={mousePosition.y}
+        bottom={76}
+        left={87}
+        size={4}
+      />
+    </>
+  );
+}
+
 function CircleBackgroundLayout({ children }: MyProps) {
-  const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
-
-  const mouseMoveHandler = useCallback((e: MouseEvent) => {
-    setMousePosition({ x: e.clientX, y: e.clientY });
-  }, [setMousePosition]);
-
-  useEffect(() => {
-    window.onmousemove = mouseMoveHandler;
-  }, [mouseMoveHandler]);
-
   return (
     <Content>
       <Header />
@@ -50,46 +90,7 @@ function CircleBackgroundLayout({ children }: MyProps) {
           {children}
         </InnerContent>
         <CircleContent>
-          <FloatingCircle
-            color={ThemeConfig.colors.gradients.red}
-            x={mousePosition.x}
-            y={mousePosition.y}
-            bottom={60}
-            left={7}
-            size={4}
-          />
-          <FloatingCircle
-            color={ThemeConfig.colors.gradients.green}
-            x={mousePosition.x}
-            y={mousePosition.y}
-            bottom={35}
-            left={13}
-            size={8}
-          />
-          <FloatingCircle
-            color={ThemeConfig.colors.gradients.yellow}
-            x={mousePosition.x}
-            y={mousePosition.y}
-            bottom={32}
-            left={48}
-            size={2}
-          />
-          <FloatingCircle
-            color={ThemeConfig.colors.gradients.pink}
-            x={mousePosition.x}
-            y={mousePosition.y}
-            bottom={35}
-            left={74}
-            size={7}
-          />
-          <FloatingCircle
-            color={ThemeConfig.colors.gradients.blue}
-            x={mousePosition.x}
-            y={mousePosition.y}
-            bottom={76}
-            left={71}
-            size={4}
-          />
+          <FloatingCircles />
         </CircleContent>
       </MainContainer>
     </Content>

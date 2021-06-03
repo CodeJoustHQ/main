@@ -6,9 +6,16 @@ import { Image, ShadowImage } from '../components/core/Image';
 import {
   MainHeaderText, LandingHeaderTitle, SecondaryHeaderText, LargeText,
 } from '../components/core/Text';
-import { ColumnContainer, RowContainer, Separator } from '../components/core/Container';
+import {
+  ColumnContainer, RowContainer, Separator, TextLeftColumnContainer,
+} from '../components/core/Container';
 import { CopyIndicator, CopyIndicatorContainer, InlineCopyIcon } from '../components/special/CopyIndicator';
 import { InheritedTextButton } from '../components/core/Button';
+import { FloatingCircles } from '../components/layout/CircleBackground';
+
+const Content = styled.div`
+  margin-bottom: 200px;
+`;
 
 const CreateAccountButtonLink = styled(PrimaryButtonLink)`
   margin: 10px 0;
@@ -39,21 +46,22 @@ const HeroSubtitleText = styled(MainHeaderText)`
   }
 `;
 
-const BackgroundCircleRow = styled(RowContainer)`
-  background-image: url("/landing/background_circles.png");
-  background-repeat: no-repeat;
-  background-position: center;
-  padding: 150px 30px;
-  margin-bottom: 50px;
-  
-  @media(max-width: 1000px) {
-    padding: 0;
-    background-image: none;
-  }
+const CircleRowContainer = styled(RowContainer)`
+  position: relative;
+`;
+
+const BottomCircleContainer = styled.div`
+  position: absolute;
+  top: -75px;
+  left: 0;
+  right: 0;
+  height: 575px;
 `;
 
 const CallToActionColumn = styled(ColumnContainer)`
   flex: 0 0 60%;
+  position: relative;
+  z-index: 1;
 
   @media(max-width: 1000px) {
     width: 70%;
@@ -65,7 +73,7 @@ function LandingPage() {
   const [copiedEmail, setCopiedEmail] = useState(false);
 
   return (
-    <>
+    <Content>
       <CopyIndicatorContainer copied={copiedEmail}>
         <CopyIndicator onClick={() => setCopiedEmail(false)}>
           Link copied!&nbsp;&nbsp;✕
@@ -116,7 +124,7 @@ function LandingPage() {
       <Separator />
 
       <RowContainer>
-        <ColumnContainer width="40%">
+        <TextLeftColumnContainer width="40%">
           <LargeText>
             Practice problems for all scenarios
           </LargeText>
@@ -125,7 +133,7 @@ function LandingPage() {
             conditional logic to sets, maps, and dynamic programming. Or, if you can’t find
             what you&apos;re looking for, create your own set of unique problems.
           </SecondaryHeaderText>
-        </ColumnContainer>
+        </TextLeftColumnContainer>
         <ColumnContainer width="60%">
           <Image src="/landing/problems.png" alt="Multiple example problem cards" />
         </ColumnContainer>
@@ -174,7 +182,10 @@ function LandingPage() {
         </ColumnContainer>
       </RowContainer>
 
-      <BackgroundCircleRow>
+      <Separator />
+      <Separator />
+
+      <CircleRowContainer>
         <CallToActionColumn>
           <LargeText>
             Want to try out CodeJoust in your classroom?
@@ -199,8 +210,11 @@ function LandingPage() {
             Create an account
           </CreateAccountButtonLink>
         </CallToActionColumn>
-      </BackgroundCircleRow>
-    </>
+        <BottomCircleContainer>
+          <FloatingCircles />
+        </BottomCircleContainer>
+      </CircleRowContainer>
+    </Content>
   );
 }
 
