@@ -1,5 +1,6 @@
 package com.codejoust.main.service;
 
+import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,33 +39,29 @@ public class UserServiceTests {
     @InjectMocks
     private UserService service;
 
-    // Predefine user and room attributes.
-    private static final String NICKNAME = "rocket";
-    private static final String USER_ID = "012345";
-
     @Test
     public void createUserSuccess() {
         CreateUserRequest request = new CreateUserRequest();
-        request.setNickname(NICKNAME);
-        request.setUserId(USER_ID);
+        request.setNickname(TestFields.NICKNAME);
+        request.setUserId(TestFields.USER_ID);
 
         UserDto response = service.createUser(request);
         verify(repository).save(Mockito.any(User.class));
-        assertEquals(NICKNAME, response.getNickname());
-        assertEquals(USER_ID, response.getUserId());
+        assertEquals(TestFields.NICKNAME, response.getNickname());
+        assertEquals(TestFields.USER_ID, response.getUserId());
     }
 
     @Test
     public void createUserNoUserIdSuccess() {
         CreateUserRequest request = new CreateUserRequest();
-        request.setNickname(NICKNAME);
+        request.setNickname(TestFields.NICKNAME);
 
-        Mockito.doReturn(USER_ID).when(utility).generateUniqueId(eq(UserService.USER_ID_LENGTH), eq(Utility.USER_ID_KEY));
+        Mockito.doReturn(TestFields.USER_ID).when(utility).generateUniqueId(eq(UserService.USER_ID_LENGTH), eq(Utility.USER_ID_KEY));
 
         UserDto response = service.createUser(request);
         verify(repository).save(Mockito.any(User.class));
-        assertEquals(NICKNAME, response.getNickname());
-        assertEquals(USER_ID, response.getUserId());
+        assertEquals(TestFields.NICKNAME, response.getNickname());
+        assertEquals(TestFields.USER_ID, response.getUserId());
     }
 
     @Test
@@ -80,22 +77,22 @@ public class UserServiceTests {
     @Test
     public void deleteExistingUser() {
         User user = new User();
-        user.setUserId(USER_ID);
-        when(repository.findUserByUserId(USER_ID)).thenReturn(user);
+        user.setUserId(TestFields.USER_ID);
+        when(repository.findUserByUserId(TestFields.USER_ID)).thenReturn(user);
 
         DeleteUserRequest request = new DeleteUserRequest();
         request.setUserToDelete(UserMapper.toDto(user));
 
         UserDto response = service.deleteUser(request);
         verify(repository).delete(user);
-        assertEquals(USER_ID, response.getUserId());
+        assertEquals(TestFields.USER_ID, response.getUserId());
     }
 
     @Test
     public void deleteNonExistentUser() {
         User user = new User();
-        user.setUserId(USER_ID);
-        when(repository.findUserByUserId(USER_ID)).thenReturn(null);
+        user.setUserId(TestFields.USER_ID);
+        when(repository.findUserByUserId(TestFields.USER_ID)).thenReturn(null);
 
         DeleteUserRequest request = new DeleteUserRequest();
         request.setUserToDelete(UserMapper.toDto(user));
@@ -108,8 +105,8 @@ public class UserServiceTests {
     @Test
     public void deleteUserInRoom() {
         User user = new User();
-        user.setUserId(USER_ID);
-        when(repository.findUserByUserId(USER_ID)).thenReturn(user);
+        user.setUserId(TestFields.USER_ID);
+        when(repository.findUserByUserId(TestFields.USER_ID)).thenReturn(user);
 
         Room room = new Room();
         room.addUser(user);

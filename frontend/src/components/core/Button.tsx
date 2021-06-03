@@ -52,6 +52,18 @@ export const SecondaryRedButton = styled(PrimaryButton)`
   margin: 1.2rem 0;
 `;
 
+export const DangerButton = styled(PrimaryButton)`
+  display: inline-block;
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.red2};
+  font-size: ${({ theme }) => theme.fontSize.default};
+  width: 120px;
+  min-width: 120px;
+  height: 35px;
+  min-height: 35px;
+  margin: 2px 10px;
+`;
+
 export const TextButton = styled.button<ThemeType>`
   background: none;
   border: none;
@@ -192,7 +204,7 @@ export const InvertedSmallButton = styled(SmallButton)`
   background: ${({ theme }) => theme.colors.white};
 `;
 
-export const InlineRefreshIcon = styled.i.attrs(() => ({
+export const InlineLobbyIcon = styled.i.attrs(() => ({
   className: 'material-icons',
 }))`
   display: inline-block;
@@ -214,7 +226,7 @@ type ShowError = {
   show: boolean,
 };
 
-export const InlineErrorIcon = styled(InlineRefreshIcon).attrs((props: ShowError) => ({
+export const InlineErrorIcon = styled(InlineLobbyIcon).attrs((props: ShowError) => ({
   style: {
     display: props.show ? 'inline-block' : 'none',
   },

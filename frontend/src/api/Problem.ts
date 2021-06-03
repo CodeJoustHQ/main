@@ -2,6 +2,8 @@ import axios from 'axios';
 import { axiosErrorHandler } from './Error';
 import { Difficulty } from './Difficulty';
 import Language from './Language';
+import { AccountUid } from './Account';
+import { getAuthHttpHeader } from '../util/Utility';
 
 export type TestCase = {
   id: string,
@@ -14,11 +16,13 @@ export type TestCase = {
 export type Problem = {
   problemId: string,
   name: string,
+  owner: AccountUid,
   description: string,
   approval: boolean,
   difficulty: Difficulty,
   testCases: TestCase[],
   problemInputs: ProblemInput[],
+  problemTags: ProblemTag[],
   outputType: ProblemIOType,
 };
 
@@ -82,17 +86,25 @@ export type DefaultCodeType = {
   [language in Language]: string
 };
 
+export type ProblemTag = {
+  name: string,
+  tagId?: string,
+};
+
 const basePath = '/api/v1/problems';
 const routes = {
   getProblems: `${basePath}/`,
   createProblem: `${basePath}/`,
   getRandomProblem: `${basePath}/random`,
-  accessProblems: (password: string) => `${basePath}/access/${password}`,
   getSingleProblem: (problemId: string) => `${basePath}/${problemId}`,
   editProblem: (problemId: string) => `${basePath}/${problemId}`,
   deleteProblem: (problemId: string) => `${basePath}/${problemId}`,
   createTestCase: (problemId: string) => `${basePath}/${problemId}/test-case`,
   defaultCodeMap: (problemId: string) => `${basePath}/${problemId}/default-code`,
+  getProblemsWithTag: (tagId: string) => `${basePath}/tags/${tagId}`,
+  getAllProblemTags: `${basePath}/tags`,
+  createProblemTag: `${basePath}/tags`,
+  deleteProblemTag: (tagId: string) => `${basePath}/tags/${tagId}`,
 };
 
 export const getProblems = (approved?: boolean): Promise<Problem[]> => axios
@@ -116,66 +128,58 @@ export const getSingleProblem = (problemId: string): Promise<Problem> => axios
     throw axiosErrorHandler(err);
   });
 
-export const createProblem = (problem: Problem): Promise<Problem> => axios
-  .post<Problem>(routes.createProblem, problem)
+export const createProblem = (problem: Problem, token: string): Promise<Problem> => axios
+  .post<Problem>(routes.createProblem, problem, getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
 
-export const editProblem = (problemId: string, updatedProblem: Problem): Promise<Problem> => axios
-  .put<Problem>(routes.editProblem(problemId), updatedProblem)
+export const editProblem = (problemId: string,
+  updatedProblem: Problem, token: string): Promise<Problem> => axios
+  .put<Problem>(routes.editProblem(problemId), updatedProblem, getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
 
-export const deleteProblem = (problemId: string): Promise<Problem> => axios
-  .delete<Problem>(routes.deleteProblem(problemId))
+export const deleteProblem = (problemId: string, token: string): Promise<Problem> => axios
+  .delete<Problem>(routes.deleteProblem(problemId), getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
-
-export const accessProblems = (password: string): Promise<boolean> => axios
-  .get<boolean>(routes.accessProblems(password))
-  .then((res) => res.data)
-  .catch((err) => {
-    throw axiosErrorHandler(err);
-  });
-
-// This function helps check if the user can access the problems.
-const sendAccessProblem = (location: string, passwordParam: string,
-  history: any, setLoading: any, setError: any) => {
-  setLoading(true);
-  setError('');
-  accessProblems(passwordParam)
-    .then((access: boolean) => {
-      setLoading(false);
-      if (access) {
-        // Push to history to give access with location on refresh.
-        history.push(location, {
-          locked: false,
-        });
-      } else {
-        setError('The password was incorrect; please contact support@codejoust.co if you wish to help edit problems.');
-      }
-    })
-    .catch((err) => {
-      setLoading(false);
-      setError(err.message);
-    });
-};
-
-// Partially implemented access problem function.
-export const sendAccessProblemPartial = (
-  location: string, history: any, setLoading: any, setError: any,
-) => (passwordParam: string) => sendAccessProblem(
-  location, passwordParam, history, setLoading, setError,
-);
 
 export const getDefaultCodeMap = (problemId: string): Promise<DefaultCodeType> => axios
   .get<DefaultCodeType>(routes.defaultCodeMap(problemId))
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const getProblemsWithTag = (tagId: string): Promise<Problem[]> => axios
+  .get<Problem[]>(routes.getProblemsWithTag(tagId))
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const getAllProblemTags = (): Promise<ProblemTag[]> => axios
+  .get<ProblemTag[]>(routes.getAllProblemTags)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const createProblemTag = (problemTag: ProblemTag): Promise<ProblemTag> => axios
+  .post<ProblemTag>(routes.createProblemTag, problemTag)
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const deleteProblemTag = (tagId: string): Promise<ProblemTag> => axios
+  .post<ProblemTag>(routes.deleteProblemTag(tagId))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

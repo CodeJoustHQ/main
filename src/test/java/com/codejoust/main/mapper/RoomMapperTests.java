@@ -1,6 +1,7 @@
 package com.codejoust.main.mapper;
 
 import com.codejoust.main.model.problem.ProblemIOType;
+import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -24,47 +25,32 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @SpringBootTest
 public class RoomMapperTests {
 
-    // Predefine user and room attributes.
-    private static final String NICKNAME = "rocket";
-    private static final String USER_ID = "012345";
-    private static final String NICKNAME_2 = "rocketrocket";
-    private static final String USER_ID_2 = "678910";
-    private static final String SESSION_ID = "234567";
-    private static final String ROOM_ID = "012345";
-
-    private static final String PROBLEM_ID = "abcdef";
-    private static final String PROBLEM_NAME = "name1";
-    private static final ProblemDifficulty PROBLEM_DIFFICULTY = ProblemDifficulty.EASY;
-    private static final String PROBLEM_ID_2 = "ghijkl";
-    private static final String PROBLEM_NAME_2 = "name2";
-    private static final ProblemDifficulty PROBLEM_DIFFICULTY_2 = ProblemDifficulty.HARD;
-
     @Test
     public void entityToDto() {
         User host = new User();
-        host.setNickname(NICKNAME);
-        host.setUserId(USER_ID);
+        host.setNickname(TestFields.NICKNAME);
+        host.setUserId(TestFields.USER_ID);
         User user = new User();
-        user.setNickname(NICKNAME_2);
-        user.setUserId(USER_ID_2);
-        user.setSessionId(SESSION_ID);
+        user.setNickname(TestFields.NICKNAME_2);
+        user.setUserId(TestFields.USER_ID_2);
+        user.setSessionId(TestFields.SESSION_ID);
 
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         room.setDifficulty(ProblemDifficulty.MEDIUM);
         room.setHost(host);
         room.setNumProblems(3);
 
         Problem problem1 = new Problem();
-        problem1.setProblemId(PROBLEM_ID);
-        problem1.setName(PROBLEM_NAME);
-        problem1.setDifficulty(PROBLEM_DIFFICULTY);
+        problem1.setProblemId(TestFields.PROBLEM_ID);
+        problem1.setName(TestFields.PROBLEM_NAME);
+        problem1.setDifficulty(ProblemDifficulty.EASY);
         problem1.setDescription("irrelevant");
 
         Problem problem2 = new Problem();
-        problem1.setProblemId(PROBLEM_ID_2);
-        problem1.setName(PROBLEM_NAME_2);
-        problem1.setDifficulty(PROBLEM_DIFFICULTY_2);
+        problem1.setProblemId(TestFields.PROBLEM_ID_2);
+        problem1.setName(TestFields.PROBLEM_NAME_2);
+        problem1.setDifficulty(ProblemDifficulty.HARD);
         problem1.setOutputType(ProblemIOType.INTEGER);
 
         room.setProblems(Arrays.asList(problem1, problem2));

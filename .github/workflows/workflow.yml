@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       JASYPT_ENCRYPTOR_PASSWORD: ${{secrets.JASYPT_ENCRYPTOR_PASSWORD}}
-      PROBLEM_ACCESS_PASSWORD: ${{secrets.PROBLEM_ACCESS_PASSWORD}}
+      FIREBASE_KEYFILE: ${{secrets.FIREBASE_KEYFILE}}
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 11

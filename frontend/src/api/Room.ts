@@ -45,6 +45,12 @@ export type RemoveUserParams = {
   userToDelete: User,
 };
 
+export type SetSpectatorParams = {
+  initiator: User,
+  receiver: User,
+  spectator: boolean,
+};
+
 const basePath = '/api/v1/rooms';
 const routes = {
   createRoom: `${basePath}`,
@@ -53,6 +59,7 @@ const routes = {
   updateRoomSettings: (roomId: string) => `${basePath}/${roomId}/settings`,
   changeRoomHost: (roomId: string) => `${basePath}/${roomId}/host`,
   removeUser: (roomId: string) => `${basePath}/${roomId}/users`,
+  setSpectator: (roomId: string) => `${basePath}/${roomId}/spectator`,
 };
 
 export const createRoom = (roomParams: CreateRoomParams):
@@ -96,6 +103,13 @@ export const removeUser = (roomId: string, roomParams: RemoveUserParams):
   method: 'DELETE',
   data: roomParams,
 })
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const setSpectator = (roomId: string, roomParams: SetSpectatorParams):
+  Promise<Room> => axios.post<Room>(routes.setSpectator(roomId), roomParams)
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

@@ -1,5 +1,6 @@
 package com.codejoust.main.controller.v1;
 
+import com.codejoust.main.dto.game.EndGameRequest;
 import com.codejoust.main.dto.game.GameDto;
 import com.codejoust.main.dto.game.GameNotificationDto;
 import com.codejoust.main.dto.game.GameNotificationRequest;
@@ -55,6 +56,12 @@ public class GameController extends BaseRestController {
     public ResponseEntity<SubmissionDto> submitSolution(@PathVariable String roomId,
                                                         @RequestBody SubmissionRequest request) {
         return new ResponseEntity<>(service.submitSolution(roomId, request), HttpStatus.OK);
+    }
+
+    @PostMapping("/games/{roomId}/game-over")
+    public ResponseEntity<GameDto> manuallyEndGame(@PathVariable String roomId,
+                                             @RequestBody EndGameRequest request) {
+        return new ResponseEntity<>(service.manuallyEndGame(roomId, request), HttpStatus.OK);
     }
 
     @PostMapping("/games/{roomId}/restart")

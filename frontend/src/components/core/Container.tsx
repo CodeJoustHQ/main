@@ -93,6 +93,11 @@ export const SplitterContainer = styled.div`
   }
 `;
 
+export const LeftContainer = styled.div`
+  padding: 0 5rem;
+  text-align: left;
+`;
+
 export const MainContainer = styled.div`
   margin: 0 auto;
   padding: 3rem 0;

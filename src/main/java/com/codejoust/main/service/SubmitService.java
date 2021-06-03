@@ -125,7 +125,6 @@ public class SubmitService {
         // Return submission, and no further records necessary for running code.
         Submission submission = getSubmission(testerRequest);
         submission.setProblemIndex(request.getProblemIndex());
-        player.getSubmissions().add(submission);
         return GameMapper.submissionToDto(submission);
     }
 

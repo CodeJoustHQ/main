@@ -12,6 +12,7 @@ import com.codejoust.main.exception.api.ApiError;
 import com.codejoust.main.exception.api.ApiErrorResponse;
 import com.codejoust.main.util.SocketTestMethods;
 
+import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,19 +47,12 @@ public class RoomHostTests {
     private String changeHostsEndpoint;
     private RoomDto room;
 
-    private static final String NICKNAME = "rocket";
-    private static final String USER_ID = "012345";
-    private static final String NICKNAME_2 = "rocketrocket";
-    private static final String USER_ID_2 = "098765";
-
     @BeforeEach
     public void setup() throws Exception {
         // Set up a room with two users
         baseRestEndpoint = "http://localhost:" + port + "/api/v1/rooms";
 
-        UserDto host = new UserDto();
-        host.setNickname(NICKNAME);
-        host.setUserId(USER_ID);
+        UserDto host = TestFields.userDto1();
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
@@ -72,12 +66,10 @@ public class RoomHostTests {
         changeHostsEndpoint = String.format("%s/%s/host", baseRestEndpoint, room.getRoomId());
 
         // Connect host to the socket endpoint
-        SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, USER_ID, this.port);
+        SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, TestFields.USER_ID, this.port);
 
         // Second user joins room but has not connected to the socket yet
-        UserDto user = new UserDto();
-        user.setNickname(NICKNAME_2);
-        user.setUserId(USER_ID_2);
+        UserDto user = TestFields.userDto2();
 
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(user);
@@ -93,7 +85,7 @@ public class RoomHostTests {
     @Test
     public void changeRoomHostSuccess() throws Exception {
         // Connect second user to the socket
-        SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, USER_ID_2, this.port);
+        SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, TestFields.USER_ID_2, this.port);
         UserDto user = room.getUsers().get(1);
 
         UpdateHostRequest request = new UpdateHostRequest();
@@ -117,7 +109,7 @@ public class RoomHostTests {
 
     @Test
     public void changeRoomHostInvalidPermissions() throws Exception {
-        SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, USER_ID_2, this.port);
+        SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, TestFields.USER_ID_2, this.port);
         UserDto user = room.getUsers().get(1);
 
         UpdateHostRequest request = new UpdateHostRequest();
@@ -137,7 +129,7 @@ public class RoomHostTests {
 
     @Test
     public void changeRoomHostNonExistentRoom() throws Exception {
-        SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, USER_ID_2, this.port);
+        SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, TestFields.USER_ID_2, this.port);
         UserDto user = room.getUsers().get(1);
 
         UpdateHostRequest request = new UpdateHostRequest();

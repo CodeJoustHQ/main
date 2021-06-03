@@ -1,6 +1,7 @@
 package com.codejoust.main.socket;
 
 import com.codejoust.main.controller.v1.BaseRestController;
+import com.codejoust.main.dto.game.EndGameRequest;
 import com.codejoust.main.dto.game.GameDto;
 import com.codejoust.main.dto.game.GameNotificationDto;
 import com.codejoust.main.dto.game.PlayAgainRequest;
@@ -13,10 +14,10 @@ import com.codejoust.main.dto.room.JoinRoomRequest;
 import com.codejoust.main.dto.room.RoomDto;
 import com.codejoust.main.dto.room.UpdateSettingsRequest;
 import com.codejoust.main.dto.user.UserDto;
-import com.codejoust.main.game_object.CodeLanguage;
 import com.codejoust.main.game_object.NotificationType;
 import com.codejoust.main.util.SocketTestMethods;
 
+import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -67,24 +69,24 @@ public class GameSocketTests {
     private RoomDto room;
     private StompSession hostSession;
 
-    // Predefine user and room attributes.
-    private static final String NICKNAME = "rocket";
-    private static final String USER_ID = "012345";
-    private static final String NICKNAME_2 = "rocketrocket";
-    private static final String USER_ID_2 = "098765";
+    // Predefined attributes.
     private static final String TIME_LEFT = "are ten seconds";
     private static final long DURATION = 15;
     private static final long TIME_UNTIL_TEN_LEFT = 5;
-    private static final String CODE = "print('hi')";
-    private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
 
     @BeforeEach
     public void setup() throws Exception {
+        // Include the test authorization token in each request
+        template.getRestTemplate().setInterceptors(
+                Collections.singletonList((request, body, execution) -> {
+                    request.getHeaders()
+                            .add("Authorization", TestFields.TOKEN);
+                    return execution.execute(request, body);
+                }));
+
         baseRestEndpoint = "http://localhost:" + port + "/api/v1";
 
-        UserDto host = new UserDto();
-        host.setNickname(NICKNAME);
-        host.setUserId(USER_ID);
+        UserDto host = TestFields.userDto1();
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
@@ -94,9 +96,7 @@ public class GameSocketTests {
         room = template.postForObject(createEndpoint, createEntity, RoomDto.class);
         assertNotNull(room);
 
-        UserDto user = new UserDto();
-        user.setNickname(NICKNAME_2);
-        user.setUserId(USER_ID_2);
+        UserDto user = TestFields.userDto2();
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(user);
 
@@ -128,7 +128,7 @@ public class GameSocketTests {
 
         // Set up the user socket connection and subscription
         userBlockingQueue = new ArrayBlockingQueue<>(2);
-        hostSession = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, USER_ID, this.port);
+        hostSession = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, TestFields.USER_ID, this.port);
 
         hostSession.subscribe(String.format(GAME_SUBSCRIBE_ENDPOINT, room.getRoomId()), new StompFrameHandler() {
             @Override
@@ -189,17 +189,16 @@ public class GameSocketTests {
     public void socketReceivesMessageOnSubmit() throws Exception {
         SubmissionRequest request = new SubmissionRequest();
         request.setInitiator(room.getHost());
-        request.setCode(CODE);
-        request.setLanguage(LANGUAGE);
+        request.setCode(TestFields.PYTHON_CODE);
+        request.setLanguage(TestFields.PYTHON_LANGUAGE);
 
-        // Create room
         HttpEntity<SubmissionRequest> entity = new HttpEntity<>(request);
         String submitEndpoint = String.format("%s/games/%s/submission", baseRestEndpoint, room.getRoomId());
         SubmissionDto submissionDto = template.postForObject(submitEndpoint, entity, SubmissionDto.class);
 
         assertNotNull(submissionDto);
-        assertEquals(CODE, submissionDto.getCode());
-        assertEquals(LANGUAGE, submissionDto.getLanguage());
+        assertEquals(TestFields.PYTHON_CODE, submissionDto.getCode());
+        assertEquals(TestFields.PYTHON_LANGUAGE, submissionDto.getLanguage());
 
         GameDto gameDto = userBlockingQueue.poll(DURATION, SECONDS);
 
@@ -274,5 +273,22 @@ public class GameSocketTests {
                 assertNull(player.getUser().getSessionId());
             }
         }
+    }
+
+    @Test
+    public void socketReceivesMessageOnManuallyEndGame() throws Exception {
+        EndGameRequest request = new EndGameRequest();
+        request.setInitiator(room.getHost());
+
+        HttpEntity<EndGameRequest> entity = new HttpEntity<>(request);
+        String endGameEndpoint = String.format("%s/games/%s/game-over", baseRestEndpoint, room.getRoomId());
+        GameDto gameDto = template.postForObject(endGameEndpoint, entity, GameDto.class);
+
+        assertNotNull(gameDto);
+        assertTrue(gameDto.getGameEnded());
+
+        gameDto = userBlockingQueue.poll(DURATION, SECONDS);
+        assertNotNull(gameDto);
+        assertTrue(gameDto.getGameEnded());
     }
 }

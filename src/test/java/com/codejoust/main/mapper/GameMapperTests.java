@@ -1,5 +1,6 @@
 package com.codejoust.main.mapper;
 
+import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -17,7 +18,6 @@ import com.codejoust.main.dto.game.SubmissionDto;
 import com.codejoust.main.dto.problem.ProblemMapper;
 import com.codejoust.main.dto.room.RoomMapper;
 import com.codejoust.main.dto.user.UserMapper;
-import com.codejoust.main.game_object.CodeLanguage;
 import com.codejoust.main.game_object.Game;
 import com.codejoust.main.game_object.Player;
 import com.codejoust.main.game_object.PlayerCode;
@@ -31,18 +31,7 @@ import com.codejoust.main.model.problem.ProblemTestCase;
 @SpringBootTest
 public class GameMapperTests {
 
-    private static final String ROOM_ID = "012345";
-    private static final String USER_ID = "098765";
-    private static final String NICKNAME = "test";
-    private static final String CODE = "print('hi')";
-    private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
     private static final int TEST_CASES = 10;
-
-    private static final String NAME = "Sort a List";
-    private static final String DESCRIPTION = "Sort the given list in O(n log n) time.";
-
-    private static final String INPUT = "[1, 8, 2]";
-    private static final String OUTPUT = "[1, 2, 8]";
 
     // Helper method to add a dummy submission to a PlayerDto object
     private void addSubmissionHelper(PlayerDto playerDto, int numCorrect) {
@@ -56,58 +45,59 @@ public class GameMapperTests {
     @Test
     public void fromRoom() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         User user = new User();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
+        user.setNickname(TestFields.NICKNAME);
+        user.setUserId(TestFields.USER_ID);
         room.addUser(user);
         
         Game game = GameMapper.fromRoom(room);
 
         assertEquals(room, game.getRoom());
-        assertNotNull(game.getPlayers().get(USER_ID));
-        assertEquals(user, game.getPlayers().get(USER_ID).getUser());
+        assertNotNull(game.getPlayers().get(TestFields.USER_ID));
+        assertEquals(user, game.getPlayers().get(TestFields.USER_ID).getUser());
         assertEquals(false, game.getAllSolved());
     }
 
     @Test
     public void toDto() {
         Problem problem = new Problem();
-        problem.setName(NAME);
-        problem.setDescription(DESCRIPTION);
+        problem.setName(TestFields.PROBLEM_NAME);
+        problem.setDescription(TestFields.PROBLEM_DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.MEDIUM);
 
         ProblemTestCase testCase = new ProblemTestCase();
-        testCase.setInput(INPUT);
-        testCase.setOutput(OUTPUT);
+        testCase.setInput(TestFields.INPUT);
+        testCase.setOutput(TestFields.OUTPUT);
         testCase.setProblem(problem);
 
         List<Problem> problems = new ArrayList<>();
         problems.add(problem);
 
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
 
         User user = new User();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
+        user.setNickname(TestFields.NICKNAME);
+        user.setUserId(TestFields.USER_ID);
         room.addUser(user);
 
         Game game = GameMapper.fromRoom(room);
         game.setProblems(problems);
         game.setPlayAgain(true);
         game.setAllSolved(true);
+        game.setGameEnded(true);
 
         PlayerCode playerCode = new PlayerCode();
-        playerCode.setCode(CODE);
-        playerCode.setLanguage(LANGUAGE);
+        playerCode.setCode(TestFields.PYTHON_CODE);
+        playerCode.setLanguage(TestFields.PYTHON_LANGUAGE);
 
         Submission submission = new Submission();
         submission.setPlayerCode(playerCode);
         submission.setNumTestCases(TEST_CASES);
         submission.setNumCorrect(TEST_CASES);
 
-        Player player = game.getPlayers().get(USER_ID);
+        Player player = game.getPlayers().get(TestFields.USER_ID);
         player.setSolved(true);
         player.setPlayerCode(playerCode);
         player.getSubmissions().add(submission);
@@ -119,6 +109,7 @@ public class GameMapperTests {
         assertEquals(ProblemMapper.toDto(problem), gameDto.getProblems().get(0));
         assertEquals(game.getPlayAgain(), gameDto.getPlayAgain());
         assertEquals(game.getAllSolved(), gameDto.getAllSolved());
+        assertEquals(game.getGameEnded(), gameDto.getGameEnded());
 
         PlayerDto playerDto = gameDto.getPlayers().get(0);
         assertEquals(UserMapper.toDto(user), playerDto.getUser());
@@ -137,8 +128,8 @@ public class GameMapperTests {
     @Test
     public void submissionToDto() {
         PlayerCode playerCode = new PlayerCode();
-        playerCode.setCode(CODE);
-        playerCode.setLanguage(LANGUAGE);
+        playerCode.setCode(TestFields.PYTHON_CODE);
+        playerCode.setLanguage(TestFields.PYTHON_LANGUAGE);
 
         Submission submission = new Submission();
         submission.setPlayerCode(playerCode);

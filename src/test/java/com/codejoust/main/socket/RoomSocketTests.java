@@ -6,12 +6,14 @@ import com.codejoust.main.dto.room.CreateRoomRequest;
 import com.codejoust.main.dto.room.JoinRoomRequest;
 import com.codejoust.main.dto.room.RemoveUserRequest;
 import com.codejoust.main.dto.room.RoomDto;
+import com.codejoust.main.dto.room.SetSpectatorRequest;
 import com.codejoust.main.dto.room.UpdateHostRequest;
 import com.codejoust.main.dto.room.UpdateSettingsRequest;
 import com.codejoust.main.dto.user.UserDto;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.util.SocketTestMethods;
 
+import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -59,20 +62,20 @@ public class RoomSocketTests {
     private RoomDto room;
     private StompSession hostSession;
 
-    // Predefine user and room attributes.
-    private static final String NICKNAME = "rocket";
-    private static final String USER_ID = "012345";
-    private static final String NICKNAME_2 = "rocketrocket";
-    private static final String USER_ID_2 = "098765";
-
     @BeforeEach
     public void setup() throws Exception {
+        // Include the test authorization token in each request
+        template.getRestTemplate().setInterceptors(
+                Collections.singletonList((request, body, execution) -> {
+                    request.getHeaders()
+                            .add("Authorization", TestFields.TOKEN);
+                    return execution.execute(request, body);
+                }));
+
         // Set up a room with a single user (the host)
         baseRestEndpoint = "http://localhost:" + port + "/api/v1/rooms";
 
-        UserDto host = new UserDto();
-        host.setNickname(NICKNAME);
-        host.setUserId(USER_ID);
+        UserDto host = TestFields.userDto1();
         CreateRoomRequest createRequest = new CreateRoomRequest();
         createRequest.setHost(host);
 
@@ -88,7 +91,7 @@ public class RoomSocketTests {
         blockingQueue = new ArrayBlockingQueue<>(2);
 
         // Connect to the socket endpoint
-        hostSession = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, USER_ID, this.port);
+        hostSession = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, TestFields.USER_ID, this.port);
 
         // Add socket messages to BlockingQueue so we can verify expected behavior
         hostSession.subscribe(String.format(SUBSCRIBE_ENDPOINT, response.getRoomId()), new StompFrameHandler() {
@@ -107,8 +110,7 @@ public class RoomSocketTests {
     @Test
     public void socketReceivesMessageOnJoin() throws Exception {
         // Join the room, which should trigger a socket message to be sent
-        UserDto newUser = new UserDto();
-        newUser.setNickname(NICKNAME_2);
+        UserDto newUser = TestFields.userDto2();
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(newUser);
 
@@ -128,9 +130,7 @@ public class RoomSocketTests {
     @Test
     public void socketReceivesMessageOnHostChange() throws Exception {
         // A second user joins the room
-        UserDto newUser = new UserDto();
-        newUser.setNickname(NICKNAME_2);
-        newUser.setUserId(USER_ID_2);
+        UserDto newUser = TestFields.userDto2();
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(newUser);
 
@@ -202,8 +202,7 @@ public class RoomSocketTests {
         assertNotNull(actual.getHost().getSessionId());
 
         // Have someone else join the room
-        UserDto user = new UserDto();
-        user.setNickname(NICKNAME_2);
+        UserDto user = TestFields.userDto2();
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(user);
 
@@ -230,8 +229,7 @@ public class RoomSocketTests {
     @Test
     public void socketReceivesMessageOnDisconnection() throws Exception {
         // Have someone join the room
-        UserDto user = new UserDto();
-        user.setNickname(NICKNAME_2);
+        UserDto user = TestFields.userDto2();
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(user);
 
@@ -265,8 +263,7 @@ public class RoomSocketTests {
     @Test
     public void socketChangesHostOnDisconnection() throws Exception {
         // Have someone join the room
-        UserDto user = new UserDto();
-        user.setNickname(NICKNAME_2);
+        UserDto user = TestFields.userDto2();
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(user);
 
@@ -343,9 +340,7 @@ public class RoomSocketTests {
 
     @Test
     public void socketReceivesMessageOnUserKicked() throws Exception {
-        UserDto newUser = new UserDto();
-        newUser.setNickname(NICKNAME_2);
-        newUser.setUserId(USER_ID_2);
+        UserDto newUser = TestFields.userDto2();
         JoinRoomRequest joinRequest = new JoinRoomRequest();
         joinRequest.setUser(newUser);
 
@@ -373,5 +368,40 @@ public class RoomSocketTests {
 
         assertEquals(expected.getRoomId(), actual.getRoomId());
         assertFalse(actual.getUsers().contains(newUser));
+    }
+
+    @Test
+    public void socketReceivesMessageOnSpectatorChange() throws Exception {
+        UserDto newUser = TestFields.userDto2();
+        JoinRoomRequest joinRequest = new JoinRoomRequest();
+        joinRequest.setUser(newUser);
+
+        HttpEntity<JoinRoomRequest> joinEntity = new HttpEntity<>(joinRequest);
+        String joinRoomEndpoint = String.format("%s/%s/users", baseRestEndpoint, room.getRoomId());
+        template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
+
+        RoomDto actual = blockingQueue.poll(5, SECONDS);
+        assertNotNull(actual);
+
+        // Check that the room contains the user
+        assertTrue(actual.getUsers().contains(newUser));
+
+        // Create the spectator request.
+        SetSpectatorRequest spectatorRequest = new SetSpectatorRequest();
+        spectatorRequest.setInitiator(room.getHost());
+        spectatorRequest.setReceiver(newUser);
+        spectatorRequest.setSpectator(true);
+
+        HttpEntity<SetSpectatorRequest> spectatorEntity = new HttpEntity<>(spectatorRequest);
+        String setSpectatorEndpoint = String.format("%s/%s/spectator", baseRestEndpoint, room.getRoomId());
+        actual = template.exchange(setSpectatorEndpoint, HttpMethod.POST, spectatorEntity, RoomDto.class).getBody();
+
+        assertNotNull(actual);
+        assertEquals(spectatorRequest.getSpectator(), actual.getUsers().get(1).getSpectator());
+
+        // Verify that the socket receives a message with the updated settings
+        actual = blockingQueue.poll(5, SECONDS);
+        assertNotNull(actual);
+        assertEquals(spectatorRequest.getSpectator(), actual.getUsers().get(1).getSpectator());
     }
 }

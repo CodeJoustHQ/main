@@ -1,5 +1,7 @@
 package com.codejoust.main.service;
 
+import com.codejoust.main.model.problem.ProblemDifficulty;
+import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -30,14 +32,12 @@ import com.codejoust.main.exception.GameError;
 import com.codejoust.main.exception.TesterError;
 import com.codejoust.main.exception.api.ApiErrorResponse;
 import com.codejoust.main.exception.api.ApiException;
-import com.codejoust.main.game_object.CodeLanguage;
 import com.codejoust.main.game_object.Game;
 import com.codejoust.main.game_object.Submission;
 import com.codejoust.main.game_object.SubmissionResult;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.Problem;
-import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemTestCase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,22 +52,6 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 public class SubmitServiceTests {
 
-    private static final String PROBLEM_ID = "abcde-fghij";
-    private static final String NAME = "Sort an Array";
-    private static final String DESCRIPTION = "Given an array, sort it.";
-    private static final ProblemDifficulty DIFFICULTY = ProblemDifficulty.EASY;
-    private static final String INPUT = "[1, 3, 2]";
-    private static final String OUTPUT = SubmitService.DUMMY_OUTPUT;
-    private static final Double RUNTIME = SubmitService.DUMMY_RUNTIME;
-
-    private static final String NICKNAME = "rocket";
-    private static final String USER_ID = "098765";
-    private static final String NICKNAME_2 = "rocketrocket";
-    private static final String USER_ID_2 = "345678";
-    private static final String ROOM_ID = "012345";
-    private static final String CODE = "print('hi')";
-    private static final CodeLanguage LANGUAGE = CodeLanguage.PYTHON;
-
     @Spy
     @InjectMocks
     private SubmitService submitService;
@@ -78,32 +62,32 @@ public class SubmitServiceTests {
     @Test
     public void runCodeSuccess() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         User user = new User();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
+        user.setNickname(TestFields.NICKNAME);
+        user.setUserId(TestFields.USER_ID);
         room.addUser(user);
 
         Game game = GameMapper.fromRoom(room);
 
         List<Problem> problems = new ArrayList<>();
         Problem problem = new Problem();
-        problem.setName(NAME);
-        problem.setDescription(DESCRIPTION);
-        problem.setProblemId(PROBLEM_ID);
-        problem.setDifficulty(DIFFICULTY);
+        problem.setName(TestFields.NAME);
+        problem.setDescription(TestFields.DESCRIPTION);
+        problem.setProblemId(TestFields.PROBLEM_ID);
+        problem.setDifficulty(ProblemDifficulty.EASY);
 
         ProblemTestCase testCase = new ProblemTestCase();
-        testCase.setInput(INPUT);
-        testCase.setOutput(OUTPUT);
+        testCase.setInput(TestFields.INPUT);
+        testCase.setOutput(TestFields.OUTPUT);
         problem.addTestCase(testCase);
         problems.add(problem);
         game.setProblems(problems);
 
         SubmissionRequest request = new SubmissionRequest();
-        request.setLanguage(LANGUAGE);
-        request.setCode(CODE);
-        request.setInput(INPUT);
+        request.setLanguage(TestFields.PYTHON_LANGUAGE);
+        request.setCode(TestFields.PYTHON_CODE);
+        request.setInput(TestFields.INPUT);
         request.setInitiator(UserMapper.toDto(user));
 
         SubmissionDto submissionDto = submitService.runCode(game, request);
@@ -117,19 +101,19 @@ public class SubmitServiceTests {
         assertNull(testerRequest.getProblem().getDescription());
         assertNull(testerRequest.getProblem().getDifficulty());
 
-        assertEquals(CODE, submissionDto.getCode());
-        assertEquals(LANGUAGE, submissionDto.getLanguage());
+        assertEquals(TestFields.PYTHON_CODE, submissionDto.getCode());
+        assertEquals(TestFields.PYTHON_LANGUAGE, submissionDto.getLanguage());
         assertEquals(submissionDto.getNumCorrect(), submissionDto.getNumTestCases());
         assertNull(submissionDto.getCompilationError());
-        assertEquals(RUNTIME, submissionDto.getRuntime());
+        assertEquals(TestFields.RUNTIME, submissionDto.getRuntime());
         assertTrue(Instant.now().isAfter(submissionDto.getStartTime())
             || Instant.now().minusSeconds((long) 1).isBefore(submissionDto.getStartTime()));
 
         SubmissionResultDto resultDto = submissionDto.getResults().get(0);
-        assertEquals(OUTPUT, resultDto.getUserOutput());
+        assertEquals(TestFields.OUTPUT, resultDto.getUserOutput());
         assertNull(resultDto.getError());
-        assertEquals(INPUT, resultDto.getInput());
-        assertEquals(OUTPUT, resultDto.getCorrectOutput());
+        assertEquals(TestFields.INPUT, resultDto.getInput());
+        assertEquals(TestFields.OUTPUT, resultDto.getCorrectOutput());
         assertFalse(resultDto.isHidden());
         assertTrue(resultDto.isCorrect());
         
@@ -139,31 +123,31 @@ public class SubmitServiceTests {
     @Test
     public void submitSolutionSuccess() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         User user = new User();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
+        user.setNickname(TestFields.NICKNAME);
+        user.setUserId(TestFields.USER_ID);
         room.addUser(user);
 
         Game game = GameMapper.fromRoom(room);
 
         List<Problem> problems = new ArrayList<>();
         Problem problem = new Problem();
-        problem.setName(NAME);
-        problem.setDescription(DESCRIPTION);
-        problem.setProblemId(PROBLEM_ID);
-        problem.setDifficulty(DIFFICULTY);
+        problem.setName(TestFields.NAME);
+        problem.setDescription(TestFields.DESCRIPTION);
+        problem.setProblemId(TestFields.PROBLEM_ID);
+        problem.setDifficulty(ProblemDifficulty.EASY);
 
         ProblemTestCase testCase = new ProblemTestCase();
-        testCase.setInput(INPUT);
-        testCase.setOutput(OUTPUT);
+        testCase.setInput(TestFields.INPUT);
+        testCase.setOutput(TestFields.OUTPUT);
         problem.addTestCase(testCase);
         problems.add(problem);
         game.setProblems(problems);
 
         SubmissionRequest request = new SubmissionRequest();
-        request.setLanguage(LANGUAGE);
-        request.setCode(CODE);
+        request.setLanguage(TestFields.PYTHON_LANGUAGE);
+        request.setCode(TestFields.PYTHON_CODE);
         request.setInitiator(UserMapper.toDto(user));
 
         submitService.submitSolution(game, request);
@@ -177,23 +161,23 @@ public class SubmitServiceTests {
         assertNull(testerRequest.getProblem().getDescription());
         assertNull(testerRequest.getProblem().getDifficulty());
 
-        List<Submission> submissions = game.getPlayers().get(USER_ID).getSubmissions();
+        List<Submission> submissions = game.getPlayers().get(TestFields.USER_ID).getSubmissions();
         assertEquals(1, submissions.size());
 
         Submission submission = submissions.get(0);
-        assertEquals(CODE, submission.getPlayerCode().getCode());
-        assertEquals(LANGUAGE, submission.getPlayerCode().getLanguage());
+        assertEquals(TestFields.PYTHON_CODE, submission.getPlayerCode().getCode());
+        assertEquals(TestFields.PYTHON_LANGUAGE, submission.getPlayerCode().getLanguage());
         assertEquals(submission.getNumCorrect(), submission.getNumTestCases());
         assertNull(submission.getCompilationError());
-        assertEquals(RUNTIME, submission.getRuntime());
+        assertEquals(TestFields.RUNTIME, submission.getRuntime());
         assertTrue(Instant.now().isAfter(submission.getStartTime())
             || Instant.now().minusSeconds((long) 1).isBefore(submission.getStartTime()));
 
         SubmissionResult submissionResult = submission.getResults().get(0);
-        assertEquals(OUTPUT, submissionResult.getUserOutput());
+        assertEquals(TestFields.OUTPUT, submissionResult.getUserOutput());
         assertNull(submissionResult.getError());
-        assertEquals(INPUT, submissionResult.getInput());
-        assertEquals(OUTPUT, submissionResult.getCorrectOutput());
+        assertEquals(TestFields.INPUT, submissionResult.getInput());
+        assertEquals(TestFields.OUTPUT, submissionResult.getCorrectOutput());
         assertFalse(submissionResult.isHidden());
         assertTrue(submissionResult.isCorrect());
         
@@ -203,52 +187,52 @@ public class SubmitServiceTests {
     @Test
     public void submitSolutionNotAllSolvedSuccess() {
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         User user = new User();
-        user.setNickname(NICKNAME);
-        user.setUserId(USER_ID);
+        user.setNickname(TestFields.NICKNAME);
+        user.setUserId(TestFields.USER_ID);
         room.addUser(user);
         User user2 = new User();
-        user2.setNickname(NICKNAME_2);
-        user2.setUserId(USER_ID_2);
+        user2.setNickname(TestFields.NICKNAME_2);
+        user2.setUserId(TestFields.USER_ID_2);
         room.addUser(user2);
 
         Game game = GameMapper.fromRoom(room);
         List<Problem> problems = new ArrayList<>();
         Problem problem = new Problem();
-        problem.setName(NAME);
+        problem.setName(TestFields.NAME);
 
         ProblemTestCase testCase = new ProblemTestCase();
-        testCase.setInput(INPUT);
-        testCase.setOutput(OUTPUT);
+        testCase.setInput(TestFields.INPUT);
+        testCase.setOutput(TestFields.OUTPUT);
         problem.addTestCase(testCase);
         problems.add(problem);
         game.setProblems(problems);
 
         SubmissionRequest request = new SubmissionRequest();
-        request.setLanguage(LANGUAGE);
-        request.setCode(CODE);
+        request.setLanguage(TestFields.PYTHON_LANGUAGE);
+        request.setCode(TestFields.PYTHON_CODE);
         request.setInitiator(UserMapper.toDto(user));
 
         submitService.submitSolution(game, request);
 
-        List<Submission> submissions = game.getPlayers().get(USER_ID).getSubmissions();
+        List<Submission> submissions = game.getPlayers().get(TestFields.USER_ID).getSubmissions();
         assertEquals(1, submissions.size());
 
         Submission submission = submissions.get(0);
-        assertEquals(CODE, submission.getPlayerCode().getCode());
-        assertEquals(LANGUAGE, submission.getPlayerCode().getLanguage());
+        assertEquals(TestFields.PYTHON_CODE, submission.getPlayerCode().getCode());
+        assertEquals(TestFields.PYTHON_LANGUAGE, submission.getPlayerCode().getLanguage());
         assertEquals(submission.getNumCorrect(), submission.getNumTestCases());
         assertNull(submission.getCompilationError());
-        assertEquals(RUNTIME, submission.getRuntime());
+        assertEquals(TestFields.RUNTIME, submission.getRuntime());
         assertTrue(Instant.now().isAfter(submission.getStartTime())
             || Instant.now().minusSeconds((long) 1).isBefore(submission.getStartTime()));
 
         SubmissionResult submissionResult = submission.getResults().get(0);
-        assertEquals(OUTPUT, submissionResult.getUserOutput());
+        assertEquals(TestFields.OUTPUT, submissionResult.getUserOutput());
         assertNull(submissionResult.getError());
-        assertEquals(INPUT, submissionResult.getInput());
-        assertEquals(OUTPUT, submissionResult.getCorrectOutput());
+        assertEquals(TestFields.INPUT, submissionResult.getInput());
+        assertEquals(TestFields.OUTPUT, submissionResult.getCorrectOutput());
         assertFalse(submissionResult.isHidden());
         assertTrue(submissionResult.isCorrect());
         
@@ -262,8 +246,8 @@ public class SubmitServiceTests {
         problemDto.setTestCases(Collections.singletonList(testCaseDto));
 
         TesterRequest request = new TesterRequest();
-        request.setCode(CODE);
-        request.setLanguage(LANGUAGE);
+        request.setCode(TestFields.PYTHON_CODE);
+        request.setLanguage(TestFields.PYTHON_LANGUAGE);
         request.setProblem(problemDto);
 
         Submission response = submitService.getSubmission(request);
@@ -281,8 +265,8 @@ public class SubmitServiceTests {
         problemDto.setTestCases(Collections.singletonList(testCaseDto));
 
         TesterRequest request = new TesterRequest();
-        request.setCode(CODE);
-        request.setLanguage(LANGUAGE);
+        request.setCode(TestFields.PYTHON_CODE);
+        request.setLanguage(TestFields.PYTHON_LANGUAGE);
         request.setProblem(problemDto);
 
         TesterResponse testerResponse = new TesterResponse();
@@ -311,8 +295,8 @@ public class SubmitServiceTests {
         problemDto.setTestCases(Collections.singletonList(testCaseDto));
 
         TesterRequest request = new TesterRequest();
-        request.setCode(CODE);
-        request.setLanguage(LANGUAGE);
+        request.setCode(TestFields.PYTHON_CODE);
+        request.setLanguage(TestFields.PYTHON_LANGUAGE);
         request.setProblem(problemDto);
 
         TesterResponse testerResponse = new TesterResponse();
@@ -338,8 +322,8 @@ public class SubmitServiceTests {
         problemDto.setTestCases(Collections.singletonList(testCaseDto));
 
         TesterRequest request = new TesterRequest();
-        request.setCode(CODE);
-        request.setLanguage(LANGUAGE);
+        request.setCode(TestFields.PYTHON_CODE);
+        request.setLanguage(TestFields.PYTHON_LANGUAGE);
         request.setProblem(problemDto);
 
         TesterResponse testerResponse = new TesterResponse();
