@@ -3,7 +3,7 @@ import copy from 'copy-to-clipboard';
 import { DynamicWidthContainer } from '../components/core/Container';
 import { InlineExternalLink } from '../components/core/Link';
 import { ContactHeaderTitle, ContactHeaderText } from '../components/core/Text';
-import { CopyIndicator, CopyIndicatorContainer, InheritedCopyIcon } from '../components/special/CopyIndicator';
+import { CopyIndicator, CopyIndicatorContainer, InlineCopyIcon } from '../components/special/CopyIndicator';
 import Subscribe from '../components/special/Subscribe';
 import { InheritedTextButton } from '../components/core/Button';
 
@@ -45,7 +45,7 @@ function ContactUsPage() {
             }}
           >
             support@codejoust.co
-            <InheritedCopyIcon>content_copy</InheritedCopyIcon>
+            <InlineCopyIcon>content_copy</InlineCopyIcon>
           </InheritedTextButton>
           . Say hello!
         </ContactHeaderText>

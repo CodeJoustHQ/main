@@ -53,10 +53,7 @@ export const InlineBackgroundCopyText = styled(ContactHeaderText)`
 export const InlineCopyIcon = styled.i.attrs(() => ({
   className: 'material-icons',
 }))`
-  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   margin-left: 5px;
-`;
-
-export const InheritedCopyIcon = styled(InlineCopyIcon)`
   font-size: inherit;
 `;
+

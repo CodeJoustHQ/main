@@ -39,7 +39,7 @@ import {
 } from '../api/Socket';
 import GameNotificationContainer from '../components/game/GameNotificationContainer';
 import Language from '../api/Language';
-import { CopyIndicator, BottomCopyIndicatorContainer, InheritedCopyIcon } from '../components/special/CopyIndicator';
+import { CopyIndicator, BottomCopyIndicatorContainer, InlineCopyIcon } from '../components/special/CopyIndicator';
 import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { fetchGame, setGame } from '../redux/Game';
 import { setCurrentUser } from '../redux/User';
@@ -473,7 +473,7 @@ function GamePage() {
                 }}
               >
                 support@codejoust.co
-                <InheritedCopyIcon>content_copy</InheritedCopyIcon>
+                <InlineCopyIcon>content_copy</InlineCopyIcon>
               </InheritedTextButton>
             </BottomFooterText>
           </OverflowPanel>

@@ -48,7 +48,7 @@ export const ThemeConfig: any = {
     large: '1.8rem',
     xLarge: '2rem',
     xxLarge: '2.5rem',
-    xxxLarge: '3.2rem',
+    epic: '3.3rem',
     globalDefault: '16px',
     globalSmall: '14px',
   },

@@ -7,7 +7,7 @@ import {
   MainHeaderText, LandingHeaderTitle, SecondaryHeaderText, LargeText,
 } from '../components/core/Text';
 import { ColumnContainer, RowContainer, Separator } from '../components/core/Container';
-import { CopyIndicator, CopyIndicatorContainer, InheritedCopyIcon } from '../components/special/CopyIndicator';
+import { CopyIndicator, CopyIndicatorContainer, InlineCopyIcon } from '../components/special/CopyIndicator';
 import { InheritedTextButton } from '../components/core/Button';
 
 const CreateAccountButtonLink = styled(PrimaryButtonLink)`
@@ -24,7 +24,7 @@ const HeroTextContainer = styled.div`
 `;
 
 const HeroText = styled(LandingHeaderTitle)`
-  font-size: ${({ theme }) => theme.fontSize.xxxLarge};
+  font-size: ${({ theme }) => theme.fontSize.epic};
   margin: 5px 0;
   line-height: 1.2;
   
@@ -52,7 +52,7 @@ const BackgroundCircleRow = styled(RowContainer)`
   }
 `;
 
-const CalToActionColumn = styled(ColumnContainer)`
+const CallToActionColumn = styled(ColumnContainer)`
   flex: 0 0 60%;
 
   @media(max-width: 1000px) {
@@ -75,9 +75,9 @@ function LandingPage() {
       <RowContainer>
         <ColumnContainer width="40%">
           <HeroTextContainer>
-            <HeroText>Group coding made fun</HeroText>
+            <HeroText>Coding practice made fun</HeroText>
             <HeroSubtitleText>
-              Engage your students with real-time programming practice that they&apos;ll enjoy
+              Engage your students with real-time programming practice that they&apos;ll love
             </HeroSubtitleText>
 
             <CreateAccountButtonLink to="/register">
@@ -166,7 +166,7 @@ function LandingPage() {
           </LargeText>
           <SecondaryHeaderText>
             Motivate students to do well by competing for a spot on the coveted podium. Once the
-            game ends, you&apos;ll also be able to view detailed results about students&apos;
+            game ends, you&apos;ll also be able to view detailed results about student
             submissions and code.
           </SecondaryHeaderText>
           <br />
@@ -175,7 +175,7 @@ function LandingPage() {
       </RowContainer>
 
       <BackgroundCircleRow>
-        <CalToActionColumn>
+        <CallToActionColumn>
           <LargeText>
             Want to try out CodeJoust in your classroom?
           </LargeText>
@@ -189,7 +189,7 @@ function LandingPage() {
               }}
             >
               hello@codejoust.co
-              <InheritedCopyIcon>content_copy</InheritedCopyIcon>
+              <InlineCopyIcon>content_copy</InlineCopyIcon>
             </InheritedTextButton>
             {' '}
             for one-on-one support within 24 hours.
@@ -198,7 +198,7 @@ function LandingPage() {
           <CreateAccountButtonLink to="/register">
             Create an account
           </CreateAccountButtonLink>
-        </CalToActionColumn>
+        </CallToActionColumn>
       </BackgroundCircleRow>
     </>
   );
