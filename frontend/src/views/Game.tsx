@@ -27,7 +27,7 @@ import SpectatorGameView from '../components/game/SpectatorGameView';
 import { Text } from '../components/core/Text';
 
 const SpectatorText = styled(Text)`
-  margin: 0 0 0 10px;
+  margin: 0 0 0 20px;
 `;
 
 type LocationState = {
