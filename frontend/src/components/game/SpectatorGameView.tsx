@@ -126,7 +126,7 @@ function SpectatorGameView() {
                 ) : null
               }
               <StyledMarkdownEditor
-                defaultValue={spectateGame?.problem.description}
+                value={spectateGame?.problem.description}
                 onChange={() => ''}
                 readOnly
               />
@@ -150,8 +150,9 @@ function SpectatorGameView() {
                 onLanguageChange={null}
                 onCodeChange={null}
                 codeMap={null}
-                defaultLanguage={spectateGame?.language as Language || Language.Python}
+                defaultLanguage={spectateGame?.language as Language || Language.Java}
                 defaultCode={spectateGame?.code || 'Uh oh! An error occurred fetching this player\'s code'}
+                liveCode={spectateGame?.code || null}
               />
             </NoPaddingPanel>
           </SplitterLayout>
