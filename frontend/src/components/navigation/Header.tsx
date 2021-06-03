@@ -22,20 +22,36 @@ const MinimalContent = styled.div`
 const LeftHeader = styled(NavbarLink)`
   float: left;
   margin-left: 50px;
+  
+  @media(max-width: 600px) {
+    margin-left: 0;
+  }
 `;
 
 const RightHeader = styled(NavbarLink)`
   margin: 0 15px;
+  
+  @media(max-width: 600px) {
+    margin: 0 8px;
+  }
 `;
 
 const NavButton = styled(TextButton)`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   margin: 0 15px;
+  
+  @media(max-width: 600px) {
+    margin: 0 8px;
+  }
 `;
 
 const RightContainer = styled.div`
   float: right;
   margin-right: 50px;
+  
+  @media(max-width: 600px) {
+    margin-right: 0;
+  }
 `;
 
 const InlineHeaderTag = styled.span`
