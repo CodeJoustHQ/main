@@ -52,7 +52,7 @@ import { SelectedProblemsDisplay, SelectedTagsDisplay } from '../components/prob
 import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { fetchRoom, setRoom } from '../redux/Room';
 import { setCurrentUser } from '../redux/User';
-import ActionCardHelpModal from '../components/core/ActionCardHelpModal';
+import { LobbyHelpModal } from '../components/core/HelpModal';
 
 type LobbyPageLocation = {
   user: User,
@@ -623,7 +623,7 @@ function LobbyPage() {
   // Render the lobby.
   return (
     <>
-      <ActionCardHelpModal
+      <LobbyHelpModal
         show={actionCardHelp}
         exitModal={() => setActionCardHelp(false)}
       />
