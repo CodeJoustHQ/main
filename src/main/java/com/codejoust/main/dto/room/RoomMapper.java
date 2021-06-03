@@ -20,18 +20,24 @@ public class RoomMapper {
         }
         RoomDto roomDto = mapper.map(entity, RoomDto.class);
 
-        // Separate users into active and inactive ones.
+        // Separate users into active and inactive ones, spectator list.
         List<UserDto> activeUsers = new ArrayList<>();
         List<UserDto> inactiveUsers = new ArrayList<>();
+        List<UserDto> spectators = new ArrayList<>();
         for (UserDto userDto : roomDto.getUsers()) {
             if (userDto.getSessionId() != null) {
                 activeUsers.add(userDto);
             } else {
                 inactiveUsers.add(userDto);
             }
+
+            if (userDto.getSpectator()) {
+                spectators.add(userDto);
+            }
         }
         roomDto.setActiveUsers(activeUsers);
         roomDto.setInactiveUsers(inactiveUsers);
+        roomDto.setSpectators(spectators);
 
         return roomDto;
     }

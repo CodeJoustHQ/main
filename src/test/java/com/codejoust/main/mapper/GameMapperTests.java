@@ -46,16 +46,22 @@ public class GameMapperTests {
     public void fromRoom() {
         Room room = new Room();
         room.setRoomId(TestFields.ROOM_ID);
-        User user = new User();
-        user.setNickname(TestFields.NICKNAME);
-        user.setUserId(TestFields.USER_ID);
-        room.addUser(user);
+        User user1 = new User();
+        user1.setNickname(TestFields.NICKNAME);
+        user1.setUserId(TestFields.USER_ID);
+        User user2 = new User();
+        user2.setNickname(TestFields.NICKNAME_2);
+        user2.setUserId(TestFields.USER_ID_2);
+        user2.setSpectator(true);
+        room.addUser(user1);
+        room.addUser(user2);
         
         Game game = GameMapper.fromRoom(room);
 
         assertEquals(room, game.getRoom());
         assertNotNull(game.getPlayers().get(TestFields.USER_ID));
-        assertEquals(user, game.getPlayers().get(TestFields.USER_ID).getUser());
+        assertEquals(user1, game.getPlayers().get(TestFields.USER_ID).getUser());
+        assertEquals(1, game.getPlayers().size());
         assertEquals(false, game.getAllSolved());
     }
 

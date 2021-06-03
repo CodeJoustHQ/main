@@ -62,6 +62,11 @@ export const LargeText = styled.h3`
   font-size: ${({ theme }) => theme.fontSize.xLarge};
 `;
 
+export const LargeCenterText = styled.h3`
+  font-size: ${({ theme }) => theme.fontSize.xLarge};
+  text-align: center;
+`;
+
 export const LandingHeaderTitle = styled.h1`
   font-size: ${({ theme }) => theme.fontSize.xxLarge};
   color: ${({ theme }) => theme.colors.darkText};

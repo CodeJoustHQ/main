@@ -18,6 +18,7 @@ public class RoomDto {
     private List<UserDto> users;
     private List<UserDto> activeUsers;
     private List<UserDto> inactiveUsers;
+    private List<UserDto> spectators;
     private boolean active;
     private ProblemDifficulty difficulty;
     private List<SelectableProblemDto> problems;
