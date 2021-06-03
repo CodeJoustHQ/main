@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Player } from '../../api/Game';
+import { Player, Submission } from '../../api/Game';
 import Language from '../../api/Language';
-import { useBestSubmission } from '../../util/Hook';
 import { SecondaryHeaderText } from '../core/Text';
 import ResizableMonacoEditor from '../game/Editor';
 
@@ -26,11 +25,16 @@ type PreviewCodeContentProps = {
 function PreviewCodeContent(props: PreviewCodeContentProps) {
   const { player } = props;
 
-  const bestSubmission = useBestSubmission(player);
-
   if (player === undefined || !player || !player.submissions.length) {
     return null;
   }
+
+  let bestSubmission: Submission | undefined;
+  player.submissions.forEach((submission) => {
+    if (!bestSubmission || submission.numCorrect > bestSubmission.numCorrect) {
+      bestSubmission = submission;
+    }
+  });
 
   return (
     <div>

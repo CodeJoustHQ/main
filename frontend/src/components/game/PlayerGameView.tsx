@@ -14,12 +14,11 @@ import 'react-splitter-layout/lib/index.css';
 import { ProblemHeaderText, BottomFooterText } from '../core/Text';
 import Console from './Console';
 import Loading from '../core/Loading';
-import { displayNameFromDifficulty } from '../../api/Difficulty';
 import {
   runSolution, Submission, SubmissionType, submitSolution,
 } from '../../api/Game';
 import LeaderboardCard from '../card/LeaderboardCard';
-import { DifficultyDisplayButton } from '../core/Button';
+import { getDifficultyDisplayButton } from '../core/Button';
 import Language from '../../api/Language';
 import {
   CopyIndicator,
@@ -264,15 +263,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
           {/* Problem title/description panel */}
           <OverflowPanel className="display-box-shadow">
             <ProblemHeaderText>{game?.problems[0]?.name}</ProblemHeaderText>
-            {game?.problems[0] ? (
-              <DifficultyDisplayButton
-                difficulty={game?.problems[0].difficulty!}
-                enabled={false}
-                active
-              >
-                {displayNameFromDifficulty(game?.problems[0].difficulty!)}
-              </DifficultyDisplayButton>
-            ) : null}
+            {game?.problems[0] ? getDifficultyDisplayButton(game?.problems[0].difficulty!) : null}
             <StyledMarkdownEditor
               defaultValue={game?.problems[0]?.description}
               onChange={() => ''}
