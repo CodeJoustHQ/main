@@ -38,11 +38,12 @@ type ResultsTableProps = {
   currentUser: User | null,
   gameStartTime: string,
   viewPlayerCode: (index: number) => void,
+  spectatePlayer: ((index: number) => void) | null,
 };
 
 function ResultsTable(props: ResultsTableProps) {
   const {
-    players, currentUser, gameStartTime, viewPlayerCode,
+    players, currentUser, gameStartTime, viewPlayerCode, spectatePlayer,
   } = props;
 
   return (
@@ -54,6 +55,7 @@ function ResultsTable(props: ResultsTableProps) {
         <th>Time</th>
         <SmallColumn>Submissions</SmallColumn>
         <th>Code</th>
+        {spectatePlayer ? <th>Spectate Live</th> : null}
       </tr>
       {players?.map((player, index) => (
         <PlayerResultsItem
@@ -63,6 +65,9 @@ function ResultsTable(props: ResultsTableProps) {
           gameStartTime={gameStartTime}
           color={player.color}
           onViewCode={() => viewPlayerCode(index)}
+          onSpectateLive={
+            spectatePlayer ? (() => spectatePlayer(index)) : null
+          }
         />
       ))}
     </Content>

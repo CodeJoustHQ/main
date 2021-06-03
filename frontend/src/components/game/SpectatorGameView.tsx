@@ -186,11 +186,11 @@ function SpectatorGameView() {
         players={game?.players || []}
         currentUser={currentUser}
         gameStartTime={game?.gameTimer.startTime || ''}
-        viewPlayerCode={(index: number) => {
+        viewPlayerCode={(index: number) => setCodeModal(index)}
+        spectatePlayer={(index: number) => {
           if (game) {
             subscribePlayer(game.room.roomId, game.players[index].user.userId!);
           }
-          // setCodeModal(index);
         }}
       />
       {error ? <CenteredContainer><ErrorMessage message={error} /></CenteredContainer> : null}

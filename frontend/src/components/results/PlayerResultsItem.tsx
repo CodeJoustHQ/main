@@ -83,11 +83,13 @@ type PlayerResultsCardProps = {
   gameStartTime: string,
   color: Color,
   onViewCode: () => void,
+  onSpectateLive: (() => void) | null,
 };
 
 function PlayerResultsItem(props: PlayerResultsCardProps) {
   const {
     player, place, isCurrentPlayer, color, gameStartTime, onViewCode,
+    onSpectateLive,
   } = props;
 
   const bestSubmission = useBestSubmission(player);
@@ -159,6 +161,16 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
         <Text>{getSubmissionCount()}</Text>
       </td>
       <CodeColumn>{getSubmissionLanguage()}</CodeColumn>
+      {onSpectateLive ? (
+        <CodeColumn>
+          <PreviewContainer>
+            <TextButton onClick={onSpectateLive}>
+              Launch
+              <PreviewIcon className="material-icons">launch</PreviewIcon>
+            </TextButton>
+          </PreviewContainer>
+        </CodeColumn>
+      ) : null}
     </Content>
   );
 }

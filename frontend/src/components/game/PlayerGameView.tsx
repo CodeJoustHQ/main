@@ -166,11 +166,14 @@ function PlayerGameView(props: PlayerGameViewProps) {
       }
     };
 
+    setLoading(true);
     subscribe(routes(roomIdParam, userIdParam).subscribe_player, subscribePlayerCallback)
       .then((subscription) => {
         setPlayerSocket(subscription);
       }).catch((err) => {
         setError(err.message);
+      }).finally(() => {
+        setLoading(false);
       });
   }, [playerSocket, sendViewUpdate]);
 
