@@ -112,7 +112,7 @@ function GamePage() {
     };
 
     // Connect to the socket if not already
-    connect(roomIdParam, userId).then(() => {
+    connect(userId).then(() => {
       // Subscribe to the main Game channel to receive Game updates.
       if (!gameSocket) {
         subscribe(routes(roomIdParam).subscribe_game, subscribeUserCallback)

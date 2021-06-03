@@ -527,7 +527,7 @@ function LobbyPage() {
     };
 
     setLoading(true);
-    connect(roomId, userId).then(() => {
+    connect(userId).then(() => {
       // Body encrypt through JSON.
       subscribe(routes(roomId).subscribe_lobby, subscribeCallback).then((subscriptionParam) => {
         setSubscription(subscriptionParam);
