@@ -7,7 +7,7 @@ import { Message, Subscription } from 'stompjs';
 import styled from 'styled-components';
 import { Game, Player, SpectateGame } from '../../api/Game';
 import Language from '../../api/Language';
-import { routes, subscribe } from '../../api/Socket';
+import { routes, send, subscribe } from '../../api/Socket';
 import { useAppSelector } from '../../util/Hook';
 import { getDifficultyDisplayButton } from '../core/Button';
 import { CenteredContainer, Panel, SplitterContainer } from '../core/Container';
@@ -73,15 +73,23 @@ function SpectatorGameView() {
 
     // Update the spectate view based on player activity.
     const subscribePlayerCallback = (result: Message) => {
-      const updatedGame: SpectateGame = JSON.parse(result.body);
+      if (!JSON.parse(result.body).newSpectator) {
+        const updatedSpectateGame: SpectateGame = JSON.parse(result.body);
 
-      // TODO: Include cursor location?
-      setSpectateGame(updatedGame);
+        // TODO: Include cursor location?
+        setSpectateGame(updatedSpectateGame);
+      }
     };
 
     subscribe(routes(roomIdParam, userIdParam).subscribe_player, subscribePlayerCallback)
       .then((subscription) => {
         setPlayerSocket(subscription);
+
+        // Send socket message to inform player new spectator is present.
+        const newSpectator: string = JSON.stringify({
+          newSpectator: true,
+        });
+        send(routes(roomIdParam, userIdParam).subscribe_player, {}, newSpectator);
       }).catch((err) => {
         setError(err.message);
       });
@@ -99,7 +107,7 @@ function SpectatorGameView() {
   };
 
   // Display the spectate player view if currently viewing another player.
-  if (playerSocket) {
+  if (playerSocket && spectateGame) {
     return (
       <>
         <p>
@@ -182,7 +190,7 @@ function SpectatorGameView() {
           if (game) {
             subscribePlayer(game.room.roomId, game.players[index].user.userId!);
           }
-          setCodeModal(index);
+          // setCodeModal(index);
         }}
       />
       {error ? <CenteredContainer><ErrorMessage message={error} /></CenteredContainer> : null}

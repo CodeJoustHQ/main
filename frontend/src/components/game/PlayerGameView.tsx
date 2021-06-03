@@ -5,7 +5,7 @@ import SplitterLayout from 'react-splitter-layout';
 import MarkdownEditor from 'rich-markdown-editor';
 import { useBeforeunload } from 'react-beforeunload';
 import copy from 'copy-to-clipboard';
-import { Subscription } from 'stompjs';
+import { Message, Subscription } from 'stompjs';
 import Editor from './Editor';
 import { DefaultCodeType, getDefaultCodeMap, Problem } from '../../api/Problem';
 import { CenteredContainer, Panel, SplitterContainer } from '../core/Container';
@@ -27,7 +27,7 @@ import {
   SmallInlineCopyText,
 } from '../special/CopyIndicator';
 import { useAppSelector } from '../../util/Hook';
-import { routes, send } from '../../api/Socket';
+import { routes, send, subscribe } from '../../api/Socket';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
   margin-top: 15px;
@@ -140,8 +140,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
     });
   }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage]);
 
-  // Send updates via socket to any spectators.
-  useEffect(() => {
+  const sendViewUpdate = useCallback(() => {
     if (game && currentUser && currentCode && currentLanguage) {
       const spectatorViewBody: string = JSON.stringify({
         player: currentUser,
@@ -153,14 +152,41 @@ function PlayerGameView(props: PlayerGameViewProps) {
     }
   }, [game, currentUser, currentCode, currentLanguage]);
 
+  // Send updates via socket to any spectators.
+  useEffect(() => {
+    sendViewUpdate();
+  }, [game, currentUser, currentCode, currentLanguage, sendViewUpdate]);
+
+  // Re-subscribe in order to get the correct subscription callback.
+  const subscribePlayer = useCallback((roomIdParam: string, userIdParam: string) => {
+    // Update the spectate view based on player activity.
+    const subscribePlayerCallback = (result: Message) => {
+      if (JSON.parse(result.body).newSpectator) {
+        sendViewUpdate();
+      }
+    };
+
+    subscribe(routes(roomIdParam, userIdParam).subscribe_player, subscribePlayerCallback)
+      .then((subscription) => {
+        setPlayerSocket(subscription);
+      }).catch((err) => {
+        setError(err.message);
+      });
+  }, [playerSocket, sendViewUpdate]);
+
   // Map the game in Redux to the state variables used in this file
   useEffect(() => {
-    if (game) {
+    if (game && currentUser && currentUser.userId) {
+      // Subscribe the player to their own socket.
+      if (!playerSocket) {
+        subscribePlayer(game.room.roomId, currentUser.userId);
+      }
+
       /**
        * If default code list is empty and current user (non-spectator) is
        * loaded, fetch the code from the backend
        */
-      if (!defaultCodeList.length && currentUser && !currentUser.spectator) {
+      if (!defaultCodeList.length && !currentUser.spectator) {
         let matchFound = false;
 
         // If this user refreshed and has already submitted code, load and save their latest code
@@ -177,7 +203,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
         }
       }
     }
-  }, [game, currentUser, defaultCodeList, setDefaultCodeFromProblems]);
+  }, [game, currentUser, defaultCodeList, setDefaultCodeFromProblems,
+    subscribePlayer, playerSocket]);
 
   // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {
