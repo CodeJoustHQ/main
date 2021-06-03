@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import SplitterLayout from 'react-splitter-layout';
 import MarkdownEditor from 'rich-markdown-editor';
 import { useBeforeunload } from 'react-beforeunload';
 import copy from 'copy-to-clipboard';
+import { Subscription } from 'stompjs';
 import Editor from './Editor';
 import { DefaultCodeType, getDefaultCodeMap, Problem } from '../../api/Problem';
 import { CenteredContainer, Panel, SplitterContainer } from '../core/Container';
@@ -26,6 +28,7 @@ import {
   SmallInlineCopyText,
 } from '../special/CopyIndicator';
 import { useAppSelector } from '../../util/Hook';
+import { routes, send } from '../../api/Socket';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
   margin-top: 15px;
@@ -84,7 +87,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
     gameError,
   } = props;
 
-  const { currentUser, game } = useAppSelector((state) => state);
+  // const { currentUser, game } = useAppSelector((state) => state);
 
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [submission, setSubmission] = useState<Submission | null>(null);
@@ -96,6 +99,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
   const [currentCode, setCurrentCode] = useState('');
   const [defaultCodeList, setDefaultCodeList] = useState<DefaultCodeType[]>([]);
 
+  // Variable to hold whether the user is subscribed to their own player socket.
+  const [playerSocket, setPlayerSocket] = useState<Subscription | null>(null);
+
   /**
    * Display beforeUnload message to inform the user that they may lose
    * their code / data if they leave the page.
@@ -104,7 +110,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
-  // const { currentUser, game } = useAppSelector((state) => state);
+  const { currentUser, game } = useAppSelector((state) => state);
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
     code: string, language: Language) => {
@@ -133,6 +139,19 @@ function PlayerGameView(props: PlayerGameViewProps) {
       setError(err.message);
     });
   }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage]);
+
+  // Send updates via socket to any spectators.
+  useEffect(() => {
+    if (game && currentUser && currentCode && currentLanguage) {
+      const spectatorViewBody: string = JSON.stringify({
+        initiator: currentUser,
+        problem: game.problems[0],
+        code: currentCode,
+        language: currentLanguage,
+      });
+      send(routes(game.room.roomId, currentUser.userId).subscribe_player, {}, spectatorViewBody);
+    }
+  }, [game, currentUser, currentCode, currentLanguage]);
 
   // Map the game in Redux to the state variables used in this file
   useEffect(() => {
