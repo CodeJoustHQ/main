@@ -144,7 +144,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
   useEffect(() => {
     if (game && currentUser && currentCode && currentLanguage) {
       const spectatorViewBody: string = JSON.stringify({
-        initiator: currentUser,
+        player: currentUser,
         problem: game.problems[0],
         code: currentCode,
         language: currentLanguage,
