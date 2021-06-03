@@ -86,6 +86,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
     gameError,
   } = props;
 
+  // TODO: Figure out what's going on here.
   // const { currentUser, game } = useAppSelector((state) => state);
 
   const [copiedEmail, setCopiedEmail] = useState(false);

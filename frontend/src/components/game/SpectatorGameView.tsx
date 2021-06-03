@@ -1,20 +1,57 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import copy from 'copy-to-clipboard';
 import React, { useCallback, useState } from 'react';
 import SplitterLayout from 'react-splitter-layout';
+import MarkdownEditor from 'rich-markdown-editor';
 import { Message, Subscription } from 'stompjs';
+import styled from 'styled-components';
 import { Game, Player, SpectateGame } from '../../api/Game';
+import Language from '../../api/Language';
 import { routes, subscribe } from '../../api/Socket';
 import { useAppSelector } from '../../util/Hook';
-import { CenteredContainer, SplitterContainer } from '../core/Container';
+import { getDifficultyDisplayButton } from '../core/Button';
+import { CenteredContainer, Panel, SplitterContainer } from '../core/Container';
 import ErrorMessage from '../core/Error';
 import Modal from '../core/Modal';
-import { LargeCenterText } from '../core/Text';
+import { BottomFooterText, LargeCenterText, ProblemHeaderText } from '../core/Text';
 import PreviewCodeContent from '../results/PreviewCodeContent';
 import ResultsTable from '../results/ResultsTable';
+import {
+  BottomCopyIndicatorContainer,
+  CopyIndicator,
+  SmallInlineCopyIcon,
+  SmallInlineCopyText,
+} from '../special/CopyIndicator';
+import Editor from './Editor';
+
+const StyledMarkdownEditor = styled(MarkdownEditor)`
+  margin-top: 15px;
+  padding: 0;
+  
+  p {
+    font-family: ${({ theme }) => theme.font};
+  }
+
+  // The specific list of attributes to have dark text color.
+  .ProseMirror > p, blockquote, h1, h2, h3, ul, ol, table {
+    color: ${({ theme }) => theme.colors.text};
+  }
+`;
+
+const OverflowPanel = styled(Panel)`
+  overflow-y: auto;
+  height: 100%;
+  padding: 0 25px;
+`;
+
+const NoPaddingPanel = styled(Panel)`
+  padding: 0;
+`;
 
 function SpectatorGameView() {
   const { currentUser, game } = useAppSelector((state) => state);
 
+  const [copiedEmail, setCopiedEmail] = useState(false);
   const [codeModal, setCodeModal] = useState(-1);
   const [playerSocket, setPlayerSocket] = useState<Subscription | null>();
   const [spectateGame, setSpectateGame] = useState<SpectateGame | null>();
@@ -82,18 +119,14 @@ function SpectatorGameView() {
           >
             {/* Problem title/description panel */}
             <OverflowPanel className="display-box-shadow">
-              <ProblemHeaderText>{game?.problems[0]?.name}</ProblemHeaderText>
-              {game?.problems[0] ? (
-                <DifficultyDisplayButton
-                  difficulty={game?.problems[0].difficulty!}
-                  enabled={false}
-                  active
-                >
-                  {displayNameFromDifficulty(game?.problems[0].difficulty!)}
-                </DifficultyDisplayButton>
-              ) : null}
+              <ProblemHeaderText>{spectateGame?.problem.name}</ProblemHeaderText>
+              {
+                spectateGame?.problem ? (
+                  getDifficultyDisplayButton(spectateGame?.problem.difficulty!)
+                ) : null
+              }
               <StyledMarkdownEditor
-                defaultValue={game?.problems[0]?.description}
+                defaultValue={spectateGame?.problem.description}
                 onChange={() => ''}
                 readOnly
               />
@@ -114,11 +147,11 @@ function SpectatorGameView() {
             {/* Code editor */}
             <NoPaddingPanel>
               <Editor
-                onCodeChange={setCurrentCode}
-                onLanguageChange={setCurrentLanguage}
-                codeMap={defaultCodeList[0]}
-                defaultLanguage={currentLanguage}
-                defaultCode={null}
+                onLanguageChange={null}
+                onCodeChange={null}
+                codeMap={null}
+                defaultLanguage={spectateGame?.language as Language || Language.Python}
+                defaultCode={spectateGame?.code || 'Uh oh! An error occurred fetching this player\'s code'}
               />
             </NoPaddingPanel>
           </SplitterLayout>
