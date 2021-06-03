@@ -24,6 +24,7 @@ const Content = styled.div`
   
   // [Header: height + padding] + [Dashboard: margin-top] + desired padding-bottom
   height: calc(100vh - 130px);
+  min-height: 20rem;
 `;
 
 const InnerContent = styled.div`

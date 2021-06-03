@@ -16,7 +16,8 @@ const Content = styled.div`
   padding: 50px 30px;
   display: flex;
   flex-direction: row;
-  width: calc(100% - 60px);
+  width: calc(85% - 60px);
+  margin: 0 auto;
 `;
 
 const RightContent = styled.div`
@@ -25,7 +26,7 @@ const RightContent = styled.div`
 `;
 
 const InnerContent = styled.div`
-  width: 80%;
+  width: 100%;
 `;
 
 function DashboardPage() {
