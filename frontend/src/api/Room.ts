@@ -10,6 +10,7 @@ export type Room = {
   users: User[],
   activeUsers: User[],
   inactiveUsers: User[],
+  spectators: User[],
   active: boolean,
   difficulty: Difficulty,
   duration: number,

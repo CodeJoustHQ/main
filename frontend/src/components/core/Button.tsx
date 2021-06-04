@@ -1,6 +1,7 @@
 import styled from 'styled-components';
-import { Difficulty, difficultyToColor } from '../../api/Difficulty';
+import { Difficulty, difficultyToColor, displayNameFromDifficulty } from '../../api/Difficulty';
 import { ThemeType } from '../config/Theme';
+import React from 'react';
 
 type Dimensions = {
   width?: string,
@@ -142,6 +143,16 @@ export const DifficultyDisplayButton = styled(SmallDifficultyButton)`
     box-shadow: 0 1px 6px rgba(0, 0, 0, 0.24);
   }
 `;
+
+export const getDifficultyDisplayButton = (difficulty: Difficulty, enabled = false) => (
+  <DifficultyDisplayButton
+    difficulty={difficulty}
+    enabled={enabled}
+    active
+  >
+    {displayNameFromDifficulty(difficulty)}
+  </DifficultyDisplayButton>
+);
 
 export const InlineDifficultyDisplayButton = styled(DifficultyDisplayButton)`
   padding: 1px 10px;

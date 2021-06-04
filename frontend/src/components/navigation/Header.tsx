@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { NavbarLink } from '../core/Link';
 import app from '../../api/Firebase';
 import { TextButton } from '../core/Button';
-import { useAppSelector } from '../../util/Hook';
+import { useAppDispatch, useAppSelector } from '../../util/Hook';
+import { setAccount, setToken } from '../../redux/Account';
+import Dropdown from '../core/Dropdown';
 
 const Content = styled.div`
   position: relative;
@@ -54,6 +57,12 @@ const RightContainer = styled.div`
   }
 `;
 
+const DropdownContainer = styled.div`
+  position: relative;
+  display: inline;
+  padding: 10px 0;
+`;
+
 const InlineHeaderTag = styled.span`
   position: relative;
   top: -0.1rem;
@@ -74,17 +83,34 @@ const LogoIcon = styled.img`
 // Note: Can also create a center header with simply display: inline-block
 
 function LoggedInContent() {
+  const dispatch = useAppDispatch();
+  const history = useHistory();
+  const [mouseOver, setMouseOver] = useState(false);
+
+  const logOut = () => {
+    dispatch(setAccount(null));
+    dispatch(setToken(null));
+    app.auth().signOut();
+    history.push('/');
+  };
+
+  const loggedInAccountItems = [
+    { title: 'Dashboard', link: '/', active: window.location.pathname === '/' },
+    { title: 'Profile', link: '/profile', active: window.location.pathname === '/profile' },
+    { title: 'Logout', action: logOut, active: false },
+  ];
+
   return (
     <RightContainer>
-      <RightHeader to="/problems/all">
-        Problems
-      </RightHeader>
-      <RightHeader to="/dashboard">
-        Dashboard
-      </RightHeader>
-      <NavButton onClick={() => app.auth().signOut()}>
-        Logout
-      </NavButton>
+      <DropdownContainer
+        onMouseEnter={() => setMouseOver(true)}
+        onMouseLeave={() => setMouseOver(false)}
+      >
+        <NavButton>
+          My Account
+        </NavButton>
+        { mouseOver ? <Dropdown items={loggedInAccountItems} /> : null}
+      </DropdownContainer>
       <RightHeader to="/contact-us">
         Contact Us
       </RightHeader>

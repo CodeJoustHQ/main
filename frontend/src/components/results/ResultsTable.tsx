@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/control-has-associated-label */
 import React from 'react';
 import styled from 'styled-components';
 import { Player } from '../../api/Game';
@@ -5,6 +6,7 @@ import PlayerResultsItem from './PlayerResultsItem';
 import { User } from '../../api/User';
 
 const Content = styled.table`
+  text-align: center;
   width: 65%;
   min-width: 600px;
   margin: 0 auto;

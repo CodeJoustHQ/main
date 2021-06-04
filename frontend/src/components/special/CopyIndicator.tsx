@@ -56,4 +56,3 @@ export const InlineCopyIcon = styled.i.attrs(() => ({
   margin-left: 5px;
   font-size: inherit;
 `;
-

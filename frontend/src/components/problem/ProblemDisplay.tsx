@@ -14,20 +14,21 @@ import {
 import {
   FixedTextArea,
   PureTextInputTitle,
-  TextInput,
   CheckboxInput,
+  TextInput,
 } from '../core/Input';
 import { Difficulty } from '../../api/Difficulty';
 import {
   SmallDifficultyButton,
   PrimaryButton,
-  TextButton,
   RedTextButton,
   GrayTextButton,
   SmallButton,
   GreenSmallButtonBlock,
-  InlineErrorIcon,
   InvertedSmallButton,
+  TextButton,
+  InlineLobbyIcon,
+  InlineErrorIcon,
 } from '../core/Button';
 import ToggleButton from '../core/ToggleButton';
 import PrimarySelect from '../core/Select';
@@ -45,6 +46,20 @@ import { HoverTooltip } from '../core/HoverTooltip';
 import { Coordinate } from '../special/FloatingCircle';
 import ProblemTags from './ProblemTags';
 import { useAppSelector, useProblemEditable } from '../../util/Hook';
+import { ProblemHelpModal } from '../core/HelpModal';
+
+const defaultDescription: string = [
+  'Replace this line with a short description.',
+  '### Parameters',
+  '1. `name`: Replace this with a description of the parameter.',
+  '### Example Test Case',
+  '**Input**',
+  '`name`: `value`',
+  '**Output**',
+  '`value`',
+  '**Explanation**',
+  'Replace this line with an explanation of this example test case.',
+].join('\n\n');
 
 const MainContent = styled.div`
   text-align: left;
@@ -138,6 +153,25 @@ const NoMarginTopText = styled(Text)`
   margin-top: 0px;
 `;
 
+const DeleteButton = styled(PrimaryButton)`
+  margin: 0 0 1rem 0;
+  color: ${({ theme }) => theme.colors.red2};
+  background: ${({ theme }) => theme.colors.white};
+`;
+
+const TextButtonLink = styled(TextButton)`
+  color: ${({ theme }) => theme.colors.gray};
+  padding: 0;
+  margin-top: 30px;
+  text-decoration: underline;
+  text-align: left;
+`;
+
+const InlineProblemIcon = styled(InlineLobbyIcon)`
+  margin: 10px;
+  height: 1rem;
+`;
+
 const InputTypeContainer = styled.div`
   margin-bottom: 5px;
 `;
@@ -145,12 +179,6 @@ const InputTypeContainer = styled.div`
 const CancelTextButton = styled(TextButton)`
   margin-left: 2.5px;
   color: ${({ theme }) => theme.colors.gray};
-`;
-
-const DeleteButton = styled(PrimaryButton)`
-  margin: 0 0 1rem 0;
-  color: ${({ theme }) => theme.colors.red2};
-  background: ${({ theme }) => theme.colors.white};
 `;
 
 type ProblemDisplayParams = {
@@ -182,6 +210,10 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const [error, setError] = useState('');
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
+  const [helpModal, setHelpModal] = useState<boolean>(false);
+
+  // Variable used to force refresh the editor.
+  const [refreshEditor, setRefreshEditor] = useState<number>(0);
 
   // Get current mouse position.
   const mouseMoveHandler = useCallback((e: any) => {
@@ -324,6 +356,10 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
   return (
     <>
+      <ProblemHelpModal
+        show={helpModal}
+        exitModal={() => setHelpModal(false)}
+      />
       <HoverTooltip
         visible={hoverVisible}
         x={mousePosition.x}
@@ -334,6 +370,11 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       <MainContent>
         <FlexBareContainer>
           <SmallHeaderText>Problem</SmallHeaderText>
+          <InlineProblemIcon
+            onClick={() => setHelpModal(true)}
+          >
+            help_outline
+          </InlineProblemIcon>
           <TopButtonsContainer>
             <InvertedSmallButton
               onClick={() => {
@@ -362,11 +403,25 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           />
           <TitleDescriptionSeparator />
           <StyledMarkdownEditor
+            key={refreshEditor}
             placeholder="Write a nice description"
             defaultValue={newProblem.description}
             onChange={(getNewValue) => handleDescriptionChange(getNewValue())}
             readOnly={!problemEditable}
           />
+          {
+            (newProblem.description.length === 0 || newProblem.description === '\\\n') ? (
+              <TextButtonLink
+                onClick={() => {
+                  // Add default description and force refresh editor.
+                  handleDescriptionChange(defaultDescription);
+                  setRefreshEditor(refreshEditor + 1);
+                }}
+              >
+                Not sure what to write? Add a template description.
+              </TextButtonLink>
+            ) : null
+          }
         </SettingsContainerHighPadding>
 
         {editMode && problemEditable
@@ -422,7 +477,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
 
                                 <FlexBareContainerMarginBottom>
                                   <ExplanationContainer>
-                                    <Text>Explanation</Text>
+                                    <Text>Explanation (optional)</Text>
                                     <FixedTextArea
                                       value={newProblem.testCases[index].explanation}
                                       onChange={(e) => {
@@ -526,18 +581,21 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             ) : null
           }
 
-          <LowMarginMediumText>Problem Inputs</LowMarginMediumText>
+          <LowMarginMediumText>Parameters</LowMarginMediumText>
           {newProblem.problemInputs.map((input, index) => (
-            <InputTypeContainer key={generateRandomId()}>
+            <InputTypeContainer
+              // eslint-disable-next-line react/no-array-index-key
+              key={index}
+            >
               <TextInput
-                value={newProblem.problemInputs[index].name}
+                value={input.name}
                 onChange={(e) => handleInputChange(index,
-                  e.target.value, newProblem.problemInputs[index].type)}
+                  e.target.value, input.type)}
                 disabled={!problemEditable}
               />
 
               <InlineErrorIcon
-                show={!validIdentifier(newProblem.problemInputs[index].name)}
+                show={!validIdentifier(input.name)}
                 onMouseEnter={() => setHoverVisible(true)}
                 onMouseMove={mouseMoveHandler}
                 onMouseLeave={() => setHoverVisible(false)}
@@ -548,10 +606,10 @@ function ProblemDisplay(props: ProblemDisplayParams) {
               <PrimarySelect
                 onChange={(e) => handleInputChange(
                   index,
-                  newProblem.problemInputs[index].name,
+                  input.name,
                   ProblemIOType[e.target.value as keyof typeof ProblemIOType],
                 )}
-                value={problemIOTypeToString(newProblem.problemInputs[index].type)}
+                value={problemIOTypeToString(input.type)}
                 disabled={!problemEditable}
               >
                 {
@@ -577,7 +635,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             </GrayTextButton>
           ) : null}
 
-          <LowMarginMediumText>Problem Output</LowMarginMediumText>
+          <LowMarginMediumText>Return Type</LowMarginMediumText>
           <PrimarySelect
             onChange={(e) => handleEnumChange('outputType', ProblemIOType[e.target.value as keyof typeof ProblemIOType])}
             value={problemIOTypeToString(newProblem.outputType)}

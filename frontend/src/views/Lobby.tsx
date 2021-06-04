@@ -52,7 +52,7 @@ import { SelectedProblemsDisplay, SelectedTagsDisplay } from '../components/prob
 import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { fetchRoom, setRoom } from '../redux/Room';
 import { setCurrentUser } from '../redux/User';
-import ActionCardHelpModal from '../components/core/ActionCardHelpModal';
+import { LobbyHelpModal } from '../components/core/HelpModal';
 
 type LobbyPageLocation = {
   user: User,
@@ -181,7 +181,7 @@ function LobbyPage() {
   /**
    * Set state variables from an updated room object
    */
-  const setStateFromRoom = (newRoom: Room) => {
+  const setStateFromRoom = useCallback((newRoom: Room) => {
     setHost(newRoom.host);
     setUsers(newRoom.users);
     setActiveUsers(newRoom.activeUsers);
@@ -192,14 +192,22 @@ function LobbyPage() {
     setDuration(newRoom.duration / 60);
     setSelectedProblems(newRoom.problems);
     setSize(newRoom.size);
-  };
+
+    // Set the room and current user.
+    dispatch(setRoom(newRoom));
+    newRoom.users.forEach((user) => {
+      if (user.userId === currentUser?.userId) {
+        dispatch(setCurrentUser(user));
+      }
+    });
+  }, [currentUser, dispatch]);
 
   // Map the room in Redux to the state variables used in this file
   useEffect(() => {
     if (room) {
       setStateFromRoom(room);
     }
-  }, [room]);
+  }, [room, setStateFromRoom]);
 
   // Function to determine if the given user is the host or not
   const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
@@ -211,11 +219,10 @@ function LobbyPage() {
       initiator: currentUser as User,
       userToDelete: user,
     })
-      .then(() => {
-        setLoading(false);
-      })
       .catch((err) => {
         setError(err.message);
+      })
+      .finally(() => {
         setLoading(false);
       });
   };
@@ -259,9 +266,10 @@ function LobbyPage() {
     if (!loading) {
       setLoading(true);
       changeRoomHost(currentRoomId, request)
-        .then(() => setLoading(false))
         .catch((err) => {
           setError(err.message);
+        })
+        .finally(() => {
           setLoading(false);
         });
     }
@@ -291,13 +299,25 @@ function LobbyPage() {
   const handleStartGame = () => {
     setError('');
     const request = { initiator: currentUser as User };
-    startGame(currentRoomId, request)
-      .then(() => {
-        setLoading(true);
-      })
-      .catch((err) => {
-        setError(err.message);
-      });
+
+    // Determine if the room only has spectators.
+    let allSpectators: boolean = true;
+    room!.users.forEach((user: User) => {
+      if (!user.spectator) {
+        allSpectators = false;
+      }
+    });
+
+    // eslint-disable-next-line no-alert
+    if (!allSpectators || window.confirm('Everybody in this room is a spectator, which means this is going to be a pretty boring game... are you sure you want to start the game?')) {
+      startGame(currentRoomId, request)
+        .then(() => {
+          setLoading(true);
+        })
+        .catch((err) => {
+          setError(err.message);
+        });
+    }
   };
 
   /**
@@ -319,12 +339,13 @@ function LobbyPage() {
       };
 
       updateRoomSettings(currentRoomId, newSettings)
-        .then(() => setLoading(false))
         .catch((err) => {
-          setLoading(false);
           setError(err.message);
           // Set difficulty back to original if REST call failed
           setDifficulty(oldDifficulty);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     }
   };
@@ -342,12 +363,13 @@ function LobbyPage() {
     };
 
     updateRoomSettings(currentRoomId, settings)
-      .then(() => setLoading(false))
       .catch((err) => {
-        setLoading(false);
         setError(err.message);
         // Set duration back to original if REST call failed
         setDuration(prevDuration);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -367,11 +389,12 @@ function LobbyPage() {
     };
 
     updateRoomSettings(currentRoomId, settings)
-      .then(() => setLoading(false))
       .catch((err) => {
-        setLoading(false);
         setError(err.message);
         setSelectedProblems(prevProblems);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -438,13 +461,14 @@ function LobbyPage() {
     };
 
     updateRoomSettings(currentRoomId, settings)
-      .then(() => setLoading(false))
       .then(() => setError(''))
       .catch((err) => {
-        setLoading(false);
         setError(err.message);
         // Set size back to original if REST call failed
         setSize(prevSize);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -599,7 +623,7 @@ function LobbyPage() {
   // Render the lobby.
   return (
     <>
-      <ActionCardHelpModal
+      <LobbyHelpModal
         show={actionCardHelp}
         exitModal={() => setActionCardHelp(false)}
       />

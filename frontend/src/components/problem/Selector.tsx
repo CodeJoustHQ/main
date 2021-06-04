@@ -6,6 +6,7 @@ import { displayNameFromDifficulty } from '../../api/Difficulty';
 import { InlineDifficultyDisplayButton } from '../core/Button';
 import { TextInput } from '../core/Input';
 import { useClickOutside } from '../../util/Hook';
+import { User } from '../../api/User';
 
 type ProblemSelectorProps = {
   selectedProblems: SelectableProblem[],
@@ -18,6 +19,10 @@ type TagSelectorProps = {
   onSelect: (newlySelected: ProblemTag) => void,
 };
 
+type SpectatorSelectorProps = {
+  spectators: User[],
+};
+
 type ContentProps = {
   show: boolean,
 };
@@ -28,6 +33,11 @@ const Content = styled.div`
   margin: 10px 0;
 `;
 
+const SpectatorContent = styled.div`
+  position: relative;
+  margin-left: 10px;
+`;
+
 const InnerContent = styled.div<ContentProps>`
   width: 100%;
   max-height: 200px;
@@ -35,6 +45,12 @@ const InnerContent = styled.div<ContentProps>`
   display: ${({ show }) => (show ? 'block' : 'none')};
   border-radius: 5px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);
+`;
+
+const SpectatorInnerContent = styled(InnerContent)`
+  position: absolute;
+  max-height: 100px;
+  width: 8rem;
 `;
 
 const InlineElement = styled.div`
@@ -52,6 +68,15 @@ const InlineElement = styled.div`
   }
 `;
 
+const SpectatorInlineElement = styled(InlineElement)`
+  background-color: ${({ theme }) => theme.colors.white};
+
+  &:hover {
+    cursor: default;
+    background-color: ${({ theme }) => theme.colors.white};
+  }
+`;
+
 const ClickableInlineDifficultyDisplayButton = styled(InlineDifficultyDisplayButton)`
   &:hover {
     cursor: pointer;
@@ -61,6 +86,10 @@ const ClickableInlineDifficultyDisplayButton = styled(InlineDifficultyDisplayBut
 const TextSearch = styled(TextInput)`
   width: 100%;
   margin: 0;
+`;
+
+const SpectatorTextSearch = styled(TextSearch)`
+  width: 8rem;
 `;
 
 const ElementName = styled.p`
@@ -196,5 +225,49 @@ export function TagSelector(props: TagSelectorProps) {
         })}
       </InnerContent>
     </Content>
+  );
+}
+
+export function SpectatorFilter(props: SpectatorSelectorProps) {
+  const { spectators } = props;
+
+  const [showSpectators, setShowSpectators] = useState(false);
+  const [searchText, setSearchText] = useState('');
+
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close list of tags if clicked outside of div
+  useClickOutside(ref, () => setShowSpectators(false));
+
+  const setSearchStatus = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+  };
+
+  return (
+    <SpectatorContent>
+      <SpectatorTextSearch
+        onClick={() => setShowSpectators(!showSpectators)}
+        onChange={setSearchStatus}
+        placeholder={spectators !== null ? `Spectators (${spectators.length})` : 'Loading...'}
+      />
+
+      <SpectatorInnerContent show={showSpectators} ref={ref}>
+        {spectators.map((spectator) => {
+          if (searchText && !spectator.nickname.toLowerCase().includes(searchText.toLowerCase())) {
+            return null;
+          }
+
+          return (
+            <SpectatorInlineElement
+              key={spectator.userId}
+            >
+              <ElementName>
+                {spectator.nickname}
+              </ElementName>
+            </SpectatorInlineElement>
+          );
+        })}
+      </SpectatorInnerContent>
+    </SpectatorContent>
   );
 }

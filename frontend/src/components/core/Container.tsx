@@ -1,5 +1,9 @@
 import styled from 'styled-components';
 
+export const RelativeContainer = styled.div`
+  position: relative;
+`;
+
 export const FlexContainer = styled.div`
   display: flex;
   flex: auto;
@@ -14,7 +18,6 @@ export const FlexBareContainer = styled.div`
 export const FlexHorizontalContainer = styled.div`
   display: flex;
   flex: auto;
-  margin: 1rem;
 `;
 
 export const FlexInfoBar = styled.div`
@@ -110,6 +113,10 @@ export const ProblemContainer = styled.div`
   width: 80%;
 `;
 
+export const FullContainer = styled.div`
+  width: 100%;
+`;
+
 export const CenteredContainer = styled.div`
   text-align: center;
   justify-content: center;
@@ -173,4 +180,13 @@ export const Separator = styled.div`
   @media(max-width: 1000px) {
     margin-top: 0;
   }
+`;
+
+export const SelectedItemContainer = styled.div`
+  display: inline-block;
+  padding: 5px;
+  margin: 5px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);
+  background-color: ${({ theme }) => theme.colors.white};
+  border-radius: 5px;
 `;
