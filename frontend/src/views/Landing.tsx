@@ -135,7 +135,7 @@ function LandingPage() {
           </SecondaryHeaderText>
         </TextLeftColumnContainer>
         <ColumnContainer width="60%">
-          <Image src="/landing/problems.png" alt="Multiple example problem cards" />
+          <Image src="/landing/problems.svg" alt="Multiple example problem cards" />
         </ColumnContainer>
       </RowContainer>
 

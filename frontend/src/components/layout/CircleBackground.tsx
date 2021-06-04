@@ -66,7 +66,7 @@ export function FloatingCircles() {
         x={mousePosition.x}
         y={mousePosition.y}
         bottom={32}
-        left={90}
+        left={82}
         size={7}
       />
       <FloatingCircle
@@ -74,7 +74,7 @@ export function FloatingCircles() {
         x={mousePosition.x}
         y={mousePosition.y}
         bottom={76}
-        left={87}
+        left={88}
         size={4}
       />
     </>
