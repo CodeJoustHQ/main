@@ -11,6 +11,7 @@ import com.codejoust.main.dto.problem.ProblemInputDto;
 import com.codejoust.main.dto.problem.ProblemMapper;
 import com.codejoust.main.dto.problem.ProblemTagDto;
 import com.codejoust.main.dto.problem.ProblemTestCaseDto;
+import com.codejoust.main.exception.AccountError;
 import com.codejoust.main.exception.ProblemError;
 import com.codejoust.main.exception.api.ApiException;
 import com.codejoust.main.game_object.CodeLanguage;
@@ -108,7 +109,9 @@ public class ProblemService {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
 
-        service.verifyTokenMatchesUid(token, problem.getOwner().getUid());
+        if (!problem.getApproval()) {
+            service.verifyTokenMatchesUid(token, problem.getOwner().getUid());
+        }
 
         return ProblemMapper.toDto(problem);
     }
@@ -139,6 +142,10 @@ public class ProblemService {
         }
 
         service.verifyTokenMatchesUid(token, problem.getOwner().getUid());
+
+        if (updatedProblem.getApproval() != problem.getApproval()) {
+            throw new ApiException(AccountError.INVALID_CREDENTIALS);
+        }
 
         if (updatedProblem.getApproval() && updatedProblem.getTestCases().size() == 0) {
             throw new ApiException(ProblemError.BAD_APPROVAL);

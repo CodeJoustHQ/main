@@ -46,7 +46,7 @@ public class ProblemController extends BaseRestController {
     }
 
     @GetMapping("/problems/{problemId}")
-    public ResponseEntity<ProblemDto> getProblem(@PathVariable String problemId, @RequestHeader (name="Authorization") String token) {
+    public ResponseEntity<ProblemDto> getProblem(@PathVariable String problemId, @RequestHeader (name="Authorization", required = false) String token) {
         return new ResponseEntity<>(service.getProblem(problemId, token), HttpStatus.OK);
     }
 
@@ -68,9 +68,8 @@ public class ProblemController extends BaseRestController {
         return new ResponseEntity<>(service.createTestCase(problemId, request, token), HttpStatus.CREATED);
     }
 
-    // TODO: require admin token for viewing all problems
     @GetMapping("/problems")
-    public ResponseEntity<List<ProblemDto>> getAllProblems(@RequestParam(required = false) Boolean approved, @RequestHeader (name="Authorization") String token) {
+    public ResponseEntity<List<ProblemDto>> getAllProblems(@RequestParam(required = false) Boolean approved, @RequestHeader (name="Authorization", required = false) String token) {
         return new ResponseEntity<>(service.getAllProblems(approved, token), HttpStatus.OK);
     }
 

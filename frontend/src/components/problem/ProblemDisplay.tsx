@@ -47,6 +47,7 @@ import { Coordinate } from '../special/FloatingCircle';
 import ProblemTags from './ProblemTags';
 import { useAppSelector, useProblemEditable } from '../../util/Hook';
 import { ProblemHelpModal } from '../core/HelpModal';
+import { AccountRole } from '../../api/Account';
 
 const defaultDescription: string = [
   'Replace this line with a short description.',
@@ -202,7 +203,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   } = props;
 
   const history = useHistory();
-  const { firebaseUser, token } = useAppSelector((state) => state.account);
+  const { account, firebaseUser, token } = useAppSelector((state) => state.account);
   const problemEditable = useProblemEditable(firebaseUser, problem);
 
   const [newProblem, setNewProblem] = useState<Problem>(problem);
@@ -540,7 +541,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
         <SmallHeaderText>Options</SmallHeaderText>
         <SettingsContainer>
           <ApprovalContainer
-            show={editMode}
+            show={editMode && account?.role === AccountRole.Admin}
           >
             <ToggleButton
               onChangeFunction={() => handleApprovalChange(!newProblem.approval)}
