@@ -62,6 +62,11 @@ export const LargeText = styled.h3`
   font-size: ${({ theme }) => theme.fontSize.xLarge};
 `;
 
+export const LargeCenterText = styled.h3`
+  font-size: ${({ theme }) => theme.fontSize.xLarge};
+  text-align: center;
+`;
+
 export const LandingHeaderTitle = styled.h1`
   font-size: ${({ theme }) => theme.fontSize.xxLarge};
   color: ${({ theme }) => theme.colors.darkText};
@@ -136,4 +141,10 @@ export const WhiteText = styled(Text)`
 export const BottomFooterText = styled(Text)`
   color: ${({ theme }) => theme.colors.gray};
   font-size: ${({ theme }) => theme.fontSize.mediumSmall};
+`;
+
+export const SelectedItemText = styled.p`
+  font-weight: bold;
+  display: inline;
+  margin: 0 10px;
 `;

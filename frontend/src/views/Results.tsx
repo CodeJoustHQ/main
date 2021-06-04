@@ -3,10 +3,9 @@ import styled from 'styled-components';
 import copy from 'copy-to-clipboard';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
-import { LargeText, SecondaryHeaderText, MainHeaderText } from '../components/core/Text';
-import {
-  Game, Player, playAgain, Submission,
-} from '../api/Game';
+import { unwrapResult } from '@reduxjs/toolkit';
+import { LargeText, MainHeaderText } from '../components/core/Text';
+import { Game, Player, playAgain } from '../api/Game';
 import { checkLocationState, leaveRoom } from '../util/Utility';
 import { errorHandler } from '../api/Error';
 import { TextButton, PrimaryButton, SecondaryRedButton } from '../components/core/Button';
@@ -27,13 +26,11 @@ import {
 import ResultsTable from '../components/results/ResultsTable';
 import Modal from '../components/core/Modal';
 import FeedbackPopup from '../components/results/FeedbackPopup';
-import ResizableMonacoEditor from '../components/game/Editor';
-import Language from '../api/Language';
 import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { fetchGame, setGame } from '../redux/Game';
 import { setCurrentUser } from '../redux/User';
 import { setRoom } from '../redux/Room';
-import { unwrapResult } from '@reduxjs/toolkit';
+import PreviewCodeContent from '../components/results/PreviewCodeContent';
 
 const Content = styled.div`
   padding: 0;
@@ -48,19 +45,6 @@ const FeedbackButton = styled(TextButton)<ShowFeedbackPrompt>`
   top: 50%;
   right: ${({ show }) => (show ? '20px' : '-100px')};
   transition: right 300ms;
-`;
-
-const CodePreview = styled.div`
-  position: relative;
-  text-align: left;
-  margin: 10px auto;
-  
-  width: 75%;
-  height: 45vh;
-  padding: 8px 0;
-  box-sizing: border-box;
-  border: 1px solid ${({ theme }) => theme.colors.blue};
-  border-radius: 8px;
 `;
 
 const PrimaryButtonHoverElement = styled(HoverElement)`
@@ -259,36 +243,6 @@ function GameResultsPage() {
     </InviteContainer>
   );
 
-  const getPreviewCodeContent = useCallback(() => {
-    if (!players[codeModal] || !players[codeModal].submissions.length) {
-      return null;
-    }
-
-    let bestSubmission: Submission | undefined;
-    players[codeModal].submissions.forEach((submission) => {
-      if (!bestSubmission || submission.numCorrect > bestSubmission.numCorrect) {
-        bestSubmission = submission;
-      }
-    });
-
-    return (
-      <div>
-        <SecondaryHeaderText bold>
-          {`Previewing code for player "${players[codeModal].user.nickname}"`}
-        </SecondaryHeaderText>
-        <CodePreview>
-          <ResizableMonacoEditor
-            onLanguageChange={null}
-            onCodeChange={null}
-            codeMap={null}
-            defaultLanguage={bestSubmission?.language as Language || Language.Python}
-            defaultCode={bestSubmission?.code || 'Uh oh! An error occurred fetching this player\'s code'}
-          />
-        </CodePreview>
-      </div>
-    );
-  }, [players, codeModal]);
-
   return (
     <Content>
       <CopyIndicatorContainer copied={copiedRoomLink}>
@@ -312,7 +266,9 @@ function GameResultsPage() {
       </Modal>
 
       <Modal show={codeModal !== -1} onExit={() => setCodeModal(-1)} fullScreen>
-        {getPreviewCodeContent()}
+        <PreviewCodeContent
+          player={players[codeModal]}
+        />
       </Modal>
 
       <Modal
