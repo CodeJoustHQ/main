@@ -16,14 +16,9 @@ import {
   runSolution, Submission, SubmissionType, submitSolution,
 } from '../../api/Game';
 import LeaderboardCard from '../card/LeaderboardCard';
-import { getDifficultyDisplayButton } from '../core/Button';
+import { getDifficultyDisplayButton, InheritedTextButton } from '../core/Button';
 import Language from '../../api/Language';
-import {
-  CopyIndicator,
-  BottomCopyIndicatorContainer,
-  SmallInlineCopyIcon,
-  SmallInlineCopyText,
-} from '../special/CopyIndicator';
+import { CopyIndicator, BottomCopyIndicatorContainer, InlineCopyIcon } from '../special/CopyIndicator';
 import { useAppSelector } from '../../util/Hook';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
@@ -252,15 +247,15 @@ function PlayerGameView(props: PlayerGameViewProps) {
             />
             <BottomFooterText>
               {'Notice an issue? Contact us at '}
-              <SmallInlineCopyText
+              <InheritedTextButton
                 onClick={() => {
                   copy('support@codejoust.co');
                   setCopiedEmail(true);
                 }}
               >
                 support@codejoust.co
-                <SmallInlineCopyIcon>content_copy</SmallInlineCopyIcon>
-              </SmallInlineCopyText>
+                <InlineCopyIcon>content_copy</InlineCopyIcon>
+              </InheritedTextButton>
             </BottomFooterText>
           </OverflowPanel>
 

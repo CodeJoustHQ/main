@@ -247,7 +247,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
     deleteProblem(newProblem.problemId, token || '')
       .then(() => {
         setLoading(false);
-        history.replace('/problems/all');
+        history.replace('/');
       })
       .catch((err) => {
         setError(err.message);
