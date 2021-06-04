@@ -20,6 +20,7 @@ public class FirebaseService {
     private final AccountRepository repository;
 
     public static final String TEST_UID = "asdfghjkl";
+    public static final String TEST_UID_2 = "zyxwvutsr";
 
     @Value("${firebase.debugMode}")
     private Boolean debugMode;
@@ -83,6 +84,11 @@ public class FirebaseService {
         if (account == null) {
             account = new Account();
             account.setUid(uid);
+
+            // Testing purposes only
+            if (debugMode != null && debugMode && TEST_UID.equals(uid)) {
+                account.setRole(AccountRole.ADMIN);
+            }
 
             repository.save(account);
         }

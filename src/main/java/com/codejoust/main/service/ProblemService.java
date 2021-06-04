@@ -3,6 +3,7 @@ package com.codejoust.main.service;
 import com.codejoust.main.dao.AccountRepository;
 import com.codejoust.main.dao.ProblemRepository;
 import com.codejoust.main.dao.ProblemTagRepository;
+import com.codejoust.main.dto.account.AccountRole;
 import com.codejoust.main.dto.problem.CreateProblemRequest;
 import com.codejoust.main.dto.problem.CreateProblemTagRequest;
 import com.codejoust.main.dto.problem.CreateTestCaseRequest;
@@ -143,7 +144,7 @@ public class ProblemService {
 
         service.verifyTokenMatchesUid(token, problem.getOwner().getUid());
 
-        if (updatedProblem.getApproval() != problem.getApproval()) {
+        if (updatedProblem.getApproval() != problem.getApproval() && problem.getOwner().getRole() != AccountRole.ADMIN) {
             throw new ApiException(AccountError.INVALID_CREDENTIALS);
         }
 

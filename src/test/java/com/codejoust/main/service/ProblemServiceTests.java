@@ -64,6 +64,17 @@ public class ProblemServiceTests {
     @InjectMocks
     private ProblemService problemService;
 
+    /**
+     * TODO:
+     * 1. get approved problems no token success
+     * 2. get all problems no token failure
+     * 3. get single problem invalid token failure
+     * 4. delete problem tag failure
+     * 5. set approval failure
+     * 6. get all problem tags only shows own
+     * 7. can delete problem with active tag
+     */
+
     @Test
     public void getProblemSuccess() {
         Problem expected = new Problem();

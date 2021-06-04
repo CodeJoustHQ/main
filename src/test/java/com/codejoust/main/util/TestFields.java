@@ -1,5 +1,6 @@
 package com.codejoust.main.util;
 
+import com.codejoust.main.dto.account.AccountRole;
 import com.codejoust.main.dto.problem.CreateProblemRequest;
 import com.codejoust.main.dto.problem.ProblemInputDto;
 import com.codejoust.main.dto.user.UserDto;
@@ -76,6 +77,9 @@ public class TestFields {
     public static final String TOKEN = "aWbXcYdZ123";
     public static final String UID = FirebaseService.TEST_UID;
 
+    public static final String TOKEN_2 = "tYrUeIwO99";
+    public static final String UID_2 = FirebaseService.TEST_UID_2;
+
     public static UserDto userDto1() {
         UserDto user = new UserDto();
         user.setNickname(NICKNAME);
@@ -134,6 +138,14 @@ public class TestFields {
     public static Account account1() {
         Account account = new Account();
         account.setUid(UID);
+        account.setRole(AccountRole.ADMIN);
+        return account;
+    }
+
+    public static Account account2() {
+        Account account = new Account();
+        account.setUid(UID_2);
+        account.setRole(AccountRole.TEACHER);
         return account;
     }
 }
