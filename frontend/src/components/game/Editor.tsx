@@ -89,8 +89,8 @@ const monacoEditorOptions: EditorConstructionOptions = {
 // This function refreshes the width of Monaco editor upon change in container size
 function ResizableMonacoEditor(props: EditorProps) {
   const {
-    onLanguageChange, onCodeChange, codeMap, defaultLanguage, defaultCode,
-    liveCode,
+    onLanguageChange, onCodeChange, codeMap, defaultLanguage,
+    defaultCode, liveCode,
   } = props;
 
   const theme = useContext(ThemeContext);
@@ -102,7 +102,6 @@ function ResizableMonacoEditor(props: EditorProps) {
   }, [defaultLanguage]);
 
   const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor) => {
-    setCodeEditor(editor);
     window.addEventListener('resize', () => {
       editor.layout();
     });

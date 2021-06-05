@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import copy from 'copy-to-clipboard';
 import React, { useCallback, useState } from 'react';
 import SplitterLayout from 'react-splitter-layout';
 import MarkdownEditor from 'rich-markdown-editor';
 import { Message, Subscription } from 'stompjs';
 import styled from 'styled-components';
-import { Game, Player, SpectateGame } from '../../api/Game';
+import { SpectateGame } from '../../api/Game';
 import Language from '../../api/Language';
 import { routes, send, subscribe } from '../../api/Socket';
 import { useAppSelector } from '../../util/Hook';
