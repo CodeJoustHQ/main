@@ -8,6 +8,7 @@ import { DefaultCodeType } from '../../api/Problem';
 type EditorProps = {
   onLanguageChange: ((language: Language) => void) | null,
   onCodeChange: ((code: string) => void) | null,
+  onCursorChange: ((position: monaco.Position) => void) | null,
   codeMap: DefaultCodeType | null,
   defaultLanguage: Language,
   defaultCode: string | null,
@@ -89,8 +90,8 @@ const monacoEditorOptions: EditorConstructionOptions = {
 // This function refreshes the width of Monaco editor upon change in container size
 function ResizableMonacoEditor(props: EditorProps) {
   const {
-    onLanguageChange, onCodeChange, codeMap, defaultLanguage, defaultCode,
-    liveCode,
+    onLanguageChange, onCodeChange, onCursorChange, codeMap, defaultLanguage,
+    defaultCode, liveCode,
   } = props;
 
   const theme = useContext(ThemeContext);
@@ -102,7 +103,13 @@ function ResizableMonacoEditor(props: EditorProps) {
   }, [defaultLanguage]);
 
   const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor) => {
-    setCodeEditor(editor);
+    // If cursor event exists, attach listener for position change.
+    if (onCursorChange) {
+      editor.onDidChangeCursorPosition((e) => {
+        onCursorChange(e.position);
+      });
+    }
+
     window.addEventListener('resize', () => {
       editor.layout();
     });

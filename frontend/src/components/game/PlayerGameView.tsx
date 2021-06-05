@@ -11,6 +11,7 @@ import MarkdownEditor from 'rich-markdown-editor';
 import { useBeforeunload } from 'react-beforeunload';
 import copy from 'copy-to-clipboard';
 import { Message, Subscription } from 'stompjs';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import Editor from './Editor';
 import { DefaultCodeType, getDefaultCodeMap, Problem } from '../../api/Problem';
 import { CenteredContainer, Panel, SplitterContainer } from '../core/Container';
@@ -115,6 +116,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
   const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.Java);
   const [currentCode, setCurrentCode] = useState('');
+  const [currentCursor, setCurrentCursor] = useState<monaco.Position | null>();
   const [defaultCodeList, setDefaultCodeList] = useState<DefaultCodeType[]>([]);
 
   // Variable to hold whether the user is subscribed to their own player socket.
@@ -178,8 +180,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
         code: currentCodeParam,
         language: currentLanguageParam,
       });
-      console.log('Spectator view');
-      console.log(spectatorViewBody);
       send(
         routes(gameParam.room.roomId, currentUserParam.userId).subscribe_player,
         {},
@@ -198,7 +198,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
     // Update the spectate view based on player activity.
     const subscribePlayerCallback = (result: Message) => {
       if (JSON.parse(result.body).newSpectator) {
-        console.log(stateRef.current);
         sendViewUpdate(stateRef.current?.game, stateRef.current?.currentUser,
           stateRef.current?.currentCode, stateRef.current?.currentLanguage);
       }
@@ -364,6 +363,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
               <Editor
                 onCodeChange={setCurrentCode}
                 onLanguageChange={setCurrentLanguage}
+                onCursorChange={setCurrentCursor}
                 codeMap={defaultCodeList[0]}
                 defaultLanguage={currentLanguage}
                 defaultCode={null}

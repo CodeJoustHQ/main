@@ -80,9 +80,6 @@ function SpectatorGameView() {
       if (!JSON.parse(result.body).newSpectator) {
         const updatedSpectateGame: SpectateGame = JSON.parse(result.body);
 
-        console.log('Spectator view');
-        console.log(updatedSpectateGame);
-
         // TODO: Include cursor location?
         setSpectateGame(updatedSpectateGame);
       }
@@ -171,6 +168,7 @@ function SpectatorGameView() {
               <Editor
                 onLanguageChange={null}
                 onCodeChange={null}
+                onCursorChange={null}
                 codeMap={null}
                 defaultLanguage={spectateGame?.language as Language || Language.Java}
                 defaultCode={spectateGame?.code || 'Uh oh! An error occurred fetching this player\'s code'}

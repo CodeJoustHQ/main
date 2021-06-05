@@ -45,6 +45,7 @@ function PreviewCodeContent(props: PreviewCodeContentProps) {
         <ResizableMonacoEditor
           onLanguageChange={null}
           onCodeChange={null}
+          onCursorChange={null}
           codeMap={null}
           defaultLanguage={bestSubmission?.language as Language || Language.Java}
           defaultCode={bestSubmission?.code || 'Uh oh! An error occurred fetching this player\'s code'}
