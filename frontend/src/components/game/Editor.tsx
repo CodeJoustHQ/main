@@ -102,6 +102,7 @@ function ResizableMonacoEditor(props: EditorProps) {
   }, [defaultLanguage]);
 
   const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor) => {
+    setCodeEditor(editor);
     window.addEventListener('resize', () => {
       editor.layout();
     });
@@ -164,7 +165,7 @@ function ResizableMonacoEditor(props: EditorProps) {
           height="100%"
           editorDidMount={handleEditorDidMount}
           editorWillMount={handleEditorWillMount}
-          onChange={() => onCodeChange && onCodeChange(codeEditor?.getValue() || 'Loading...')}
+          onChange={() => onCodeChange && onCodeChange(codeEditor?.getValue() || '')}
           language={languageToEditorLanguage(currentLanguage)}
           defaultValue={defaultCode || 'Loading...'}
           value={liveCode}

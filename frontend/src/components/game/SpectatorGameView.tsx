@@ -166,9 +166,9 @@ function SpectatorGameView() {
                 onLanguageChange={null}
                 onCodeChange={null}
                 codeMap={null}
-                defaultLanguage={spectateGame?.language as Language || Language.Java}
-                defaultCode={spectateGame?.code || 'Uh oh! An error occurred fetching this player\'s code'}
-                liveCode={spectateGame?.code || null}
+                defaultLanguage={spectateGame?.language as Language}
+                defaultCode={spectateGame?.code}
+                liveCode={spectateGame?.code}
               />
             </NoPaddingPanel>
           </SplitterLayout>
