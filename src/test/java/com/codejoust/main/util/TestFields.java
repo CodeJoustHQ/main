@@ -11,6 +11,7 @@ import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
 import com.codejoust.main.model.problem.ProblemInput;
+import com.codejoust.main.model.problem.ProblemTag;
 import com.codejoust.main.model.problem.ProblemTestCase;
 import com.codejoust.main.service.FirebaseService;
 
@@ -118,6 +119,15 @@ public class TestFields {
         problem.addTestCase(originalTestCase);
 
         return problem;
+    }
+
+    public static ProblemTag problemTag1() {
+        ProblemTag tag = new ProblemTag();
+        tag.setTagId(TAG_ID);
+        tag.setName(TAG_ID);
+        tag.setOwner(account1());
+
+        return tag;
     }
 
     public static CreateProblemRequest createProblemRequest1() {

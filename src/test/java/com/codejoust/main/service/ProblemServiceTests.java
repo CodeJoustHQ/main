@@ -66,9 +66,6 @@ public class ProblemServiceTests {
 
     /**
      * TODO:
-     * 1. get approved problems no token success
-     * 2. get all problems no token failure
-     * 3. get single problem invalid token failure
      * 4. delete problem tag failure
      * 5. set approval failure
      * 6. get all problem tags only shows own
@@ -101,6 +98,28 @@ public class ProblemServiceTests {
         assertEquals(expected.getTestCases().get(0).getInput(), response.getTestCases().get(0).getInput());
         assertEquals(expected.getTestCases().get(0).getOutput(), response.getTestCases().get(0).getOutput());
         assertEquals(expected.getTestCases().get(0).getExplanation(), response.getTestCases().get(0).getExplanation());
+    }
+
+    @Test
+    public void getProblemNotApprovedPermissionsFailure() {
+        Problem problem = TestFields.problem1();
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
+        Mockito.doThrow(new ApiException(AccountError.INVALID_CREDENTIALS)).when(firebaseService).verifyTokenMatchesUid(TestFields.TOKEN_2, problem.getOwner().getUid());
+
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblem(problem.getProblemId(), TestFields.TOKEN_2));
+        assertEquals(AccountError.INVALID_CREDENTIALS, exception.getError());
+    }
+
+    @Test
+    public void getProblemApprovedSuccess() {
+        Problem problem = TestFields.problem1();
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
+        Mockito.verify(firebaseService, Mockito.never()).verifyTokenMatchesUid(Mockito.any(), Mockito.any());
+
+        ProblemDto response = problemService.getProblem(problem.getProblemId(), "fake");
+        assertEquals(problem.getName(), response.getName());
     }
 
     @Test
@@ -223,7 +242,7 @@ public class ProblemServiceTests {
     }
 
     @Test
-    public void getProblemsSuccess() {
+    public void getAllProblemsAdminAccountSuccess() {
         Problem problem = new Problem();
         problem.setName(TestFields.NAME);
         problem.setDescription(TestFields.DESCRIPTION);
@@ -242,6 +261,13 @@ public class ProblemServiceTests {
     }
 
     @Test
+    public void getAllProblemsNoTokenFailure() {
+        Mockito.doThrow(new ApiException(AccountError.INVALID_CREDENTIALS)).when(firebaseService).verifyAdminAccount(null);
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.getAllProblems(false, null));
+        assertEquals(AccountError.INVALID_CREDENTIALS, exception.getError());
+    }
+
+    @Test
     public void getAllProblemsOnlyApproved() {
         Problem problem = new Problem();
         problem.setName(TestFields.NAME);
@@ -252,7 +278,7 @@ public class ProblemServiceTests {
         expected.add(problem);
         Mockito.doReturn(expected).when(repository).findAllByApproval(true);
 
-        List<ProblemDto> response = problemService.getAllProblems(true, TestFields.TOKEN);
+        List<ProblemDto> response = problemService.getAllProblems(true, null);
 
         assertEquals(1, response.size());
         assertEquals(TestFields.NAME, response.get(0).getName());
@@ -786,6 +812,16 @@ public class ProblemServiceTests {
         ProblemTagDto problemTagDto = problemService.deleteProblemTag(problemTag.getTagId(), TestFields.TOKEN);
         verify(tagRepository).delete(Mockito.any(ProblemTag.class));
         assertEquals(problemTag.getName(), problemTagDto.getName());
+    }
+
+    @Test
+    public void deleteProblemTagFailure() {
+        ProblemTag problemTag = TestFields.problemTag1();
+
+        Mockito.doReturn(problemTag).when(tagRepository).findTagByTagId(problemTag.getTagId());
+        Mockito.doThrow(new ApiException(AccountError.INVALID_CREDENTIALS)).when(firebaseService).verifyTokenMatchesUid(TestFields.TOKEN_2, TestFields.UID);
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.deleteProblemTag(problemTag.getTagId(), TestFields.TOKEN_2));
+        assertEquals(AccountError.INVALID_CREDENTIALS, exception.getError());
     }
 
     @Test
