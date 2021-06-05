@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import styled from 'styled-components';
 import SplitterLayout from 'react-splitter-layout';
 import MarkdownEditor from 'rich-markdown-editor';
@@ -15,7 +20,11 @@ import { ProblemHeaderText, BottomFooterText } from '../core/Text';
 import Console from './Console';
 import Loading from '../core/Loading';
 import {
-  runSolution, Submission, SubmissionType, submitSolution,
+  Game,
+  runSolution,
+  Submission,
+  SubmissionType,
+  submitSolution,
 } from '../../api/Game';
 import LeaderboardCard from '../card/LeaderboardCard';
 import { getDifficultyDisplayButton } from '../core/Button';
@@ -28,6 +37,7 @@ import {
 } from '../special/CopyIndicator';
 import { useAppSelector } from '../../util/Hook';
 import { routes, send, subscribe } from '../../api/Socket';
+import { User } from '../../api/User';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
   margin-top: 15px;
@@ -77,6 +87,14 @@ const LeaderboardContent = styled.div`
   background-attachment: local, local, scroll, scroll;
 `;
 
+// The type used for the state reference.
+type StateRefType = {
+  game: Game | null,
+  currentUser: User | null,
+  currentCode: string,
+  currentLanguage: string,
+}
+
 type PlayerGameViewProps = {
   gameError: string,
 };
@@ -112,6 +130,15 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
   const { currentUser, game } = useAppSelector((state) => state);
 
+  // References necessary for the spectator subscription callback.
+  const stateRef = useRef<StateRefType>();
+  stateRef.current = {
+    game,
+    currentUser,
+    currentCode,
+    currentLanguage,
+  };
+
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
     code: string, language: Language) => {
     const promises: Promise<DefaultCodeType>[] = [];
@@ -140,23 +167,30 @@ function PlayerGameView(props: PlayerGameViewProps) {
     });
   }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage]);
 
-  const sendViewUpdate = useCallback(() => {
-    if (game && currentUser && currentCode && currentLanguage) {
+  const sendViewUpdate = useCallback((gameParam: Game | null | undefined,
+    currentUserParam: User | null | undefined,
+    currentCodeParam: string | undefined,
+    currentLanguageParam: string | undefined) => {
+    if (gameParam && currentUserParam) {
       const spectatorViewBody: string = JSON.stringify({
-        player: currentUser,
-        problem: game.problems[0],
-        code: currentCode,
-        language: currentLanguage,
+        player: currentUserParam,
+        problem: gameParam.problems[0],
+        code: currentCodeParam,
+        language: currentLanguageParam,
       });
       console.log('Spectator view');
       console.log(spectatorViewBody);
-      send(routes(game.room.roomId, currentUser.userId).subscribe_player, {}, spectatorViewBody);
+      send(
+        routes(gameParam.room.roomId, currentUserParam.userId).subscribe_player,
+        {},
+        spectatorViewBody,
+      );
     }
-  }, [game, currentUser, currentCode, currentLanguage]);
+  }, []);
 
   // Send updates via socket to any spectators.
   useEffect(() => {
-    sendViewUpdate();
+    sendViewUpdate(game, currentUser, currentCode, currentLanguage);
   }, [game, currentUser, currentCode, currentLanguage, sendViewUpdate]);
 
   // Re-subscribe in order to get the correct subscription callback.
@@ -164,7 +198,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
     // Update the spectate view based on player activity.
     const subscribePlayerCallback = (result: Message) => {
       if (JSON.parse(result.body).newSpectator) {
-        sendViewUpdate();
+        console.log(stateRef.current);
+        sendViewUpdate(stateRef.current?.game, stateRef.current?.currentUser,
+          stateRef.current?.currentCode, stateRef.current?.currentLanguage);
       }
     };
 
