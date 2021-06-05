@@ -102,10 +102,11 @@ public class TestFields {
         return user;
     }
 
+    // Problem owned by admin
     public static Problem problem1() {
         Problem problem = new Problem();
-        problem.setName(TestFields.NAME);
-        problem.setDescription(TestFields.DESCRIPTION);
+        problem.setName(TestFields.PROBLEM_NAME);
+        problem.setDescription(TestFields.PROBLEM_DESCRIPTION);
         problem.setDifficulty(ProblemDifficulty.MEDIUM);
         problem.setOwner(account1());
 
@@ -121,10 +122,30 @@ public class TestFields {
         return problem;
     }
 
+    // Problem owned by teacher
+    public static Problem problem2() {
+        Problem problem = new Problem();
+        problem.setName(TestFields.PROBLEM_NAME_2);
+        problem.setDescription(TestFields.PROBLEM_DESCRIPTION_2);
+        problem.setDifficulty(ProblemDifficulty.HARD);
+        problem.setOwner(account2());
+
+        ProblemInput problemInput = new ProblemInput(TestFields.INPUT_NAME, TestFields.IO_TYPE);
+        problem.addProblemInput(problemInput);
+        problem.setOutputType(TestFields.IO_TYPE);
+
+        ProblemTestCase originalTestCase = new ProblemTestCase();
+        originalTestCase.setInput(TestFields.INPUT);
+        originalTestCase.setOutput(TestFields.OUTPUT);
+        problem.addTestCase(originalTestCase);
+
+        return problem;
+    }
+
     public static ProblemTag problemTag1() {
         ProblemTag tag = new ProblemTag();
         tag.setTagId(TAG_ID);
-        tag.setName(TAG_ID);
+        tag.setName(TAG_NAME);
         tag.setOwner(account1());
 
         return tag;

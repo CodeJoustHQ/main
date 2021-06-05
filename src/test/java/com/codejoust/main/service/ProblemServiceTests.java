@@ -64,14 +64,6 @@ public class ProblemServiceTests {
     @InjectMocks
     private ProblemService problemService;
 
-    /**
-     * TODO:
-     * 4. delete problem tag failure
-     * 5. set approval failure
-     * 6. get all problem tags only shows own
-     * 7. can delete problem with active tag
-     */
-
     @Test
     public void getProblemSuccess() {
         Problem expected = new Problem();
@@ -483,6 +475,18 @@ public class ProblemServiceTests {
         assertEquals(testCaseDto.getOutput(), testCase.getOutput());
     }
 
+    @Test
+    public void editProblemApprovalFailure() {
+        Problem problem = TestFields.problem2();
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
+
+        ProblemDto request = ProblemMapper.toDto(problem);
+        request.setApproval(true);
+
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.editProblem(problem.getProblemId(), request, TestFields.TOKEN_2));
+        assertEquals(AccountError.INVALID_CREDENTIALS, exception.getError());
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"class", "true", " ", "()", "\\"})
     public void editProblemInvalidIdentifier(String inputName) {
@@ -758,12 +762,9 @@ public class ProblemServiceTests {
          * is returned with "getAllProblemTags."
          */
 
-        ProblemTag problemTag = new ProblemTag();
-        problemTag.setName(TestFields.TAG_NAME);
-        problemTag.setTagId(TestFields.TAG_ID);
+        ProblemTag problemTag = TestFields.problemTag1();
+        Mockito.doReturn(Collections.singletonList(problemTag)).when(tagRepository).findAllByOwner_Uid(problemTag.getOwner().getUid());
 
-        Mockito.doReturn(Collections.singletonList(problemTag)).when(tagRepository).findAll();
-        
         List<ProblemTagDto> problemTags = problemService.getAllProblemTags(TestFields.TOKEN);
 
         assertEquals(1, problemTags.size());

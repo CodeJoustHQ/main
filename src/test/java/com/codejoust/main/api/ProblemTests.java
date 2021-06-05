@@ -429,4 +429,25 @@ class ProblemTests {
 
         assertEquals(problemTag, problemTagReturn);
     }
+
+    @Test
+    public void deleteProblemWithExistingTagsSuccess() throws Exception {
+        /**
+         * 1. Create two problems with the same tag (tag should be reused)
+         * 2. Delete one of the problems successfully
+         * 3. The tag should remain in the database
+         */
+
+        ProblemTestMethods.createSingleProblemAndTags(this.mockMvc);
+        ProblemDto problemDto = ProblemTestMethods.createSingleProblemAndTags(this.mockMvc);
+
+        ProblemDto response = MockHelper.deleteRequest(this.mockMvc, TestUrls.deleteProblem(problemDto.getProblemId()), null, ProblemDto.class, HttpStatus.OK);
+
+        assertEquals(problemDto.getDescription(), response.getDescription());
+
+        Type listType = new TypeToken<ArrayList<ProblemTagDto>>(){}.getType();
+        List<ProblemDto> tags = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblemTags(), listType, HttpStatus.OK);
+
+        assertEquals(1, tags.size());
+    }
 }
