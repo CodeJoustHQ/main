@@ -369,6 +369,7 @@ function GameResultsPage() {
           currentUser={currentUser}
           gameStartTime={startTime}
           viewPlayerCode={(index: number) => setCodeModal(index)}
+          spectatePlayer={null}
         />
       ) : null}
     </Content>

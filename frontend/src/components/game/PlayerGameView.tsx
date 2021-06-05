@@ -148,6 +148,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
         code: currentCode,
         language: currentLanguage,
       });
+      console.log('Spectator view');
+      console.log(spectatorViewBody);
       send(routes(game.room.roomId, currentUser.userId).subscribe_player, {}, spectatorViewBody);
     }
   }, [game, currentUser, currentCode, currentLanguage]);
@@ -170,12 +172,13 @@ function PlayerGameView(props: PlayerGameViewProps) {
     subscribe(routes(roomIdParam, userIdParam).subscribe_player, subscribePlayerCallback)
       .then((subscription) => {
         setPlayerSocket(subscription);
+        setError('');
       }).catch((err) => {
         setError(err.message);
       }).finally(() => {
         setLoading(false);
       });
-  }, [playerSocket, sendViewUpdate]);
+  }, [sendViewUpdate]);
 
   // Map the game in Redux to the state variables used in this file
   useEffect(() => {

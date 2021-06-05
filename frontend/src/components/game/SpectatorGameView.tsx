@@ -9,9 +9,10 @@ import { Game, Player, SpectateGame } from '../../api/Game';
 import Language from '../../api/Language';
 import { routes, send, subscribe } from '../../api/Socket';
 import { useAppSelector } from '../../util/Hook';
-import { getDifficultyDisplayButton } from '../core/Button';
+import { getDifficultyDisplayButton, PrimaryButton } from '../core/Button';
 import { CenteredContainer, Panel, SplitterContainer } from '../core/Container';
 import ErrorMessage from '../core/Error';
+import Loading from '../core/Loading';
 import Modal from '../core/Modal';
 import { BottomFooterText, LargeCenterText, ProblemHeaderText } from '../core/Text';
 import PreviewCodeContent from '../results/PreviewCodeContent';
@@ -56,6 +57,7 @@ function SpectatorGameView() {
   const [playerSocket, setPlayerSocket] = useState<Subscription | null>();
   const [spectateGame, setSpectateGame] = useState<SpectateGame | null>();
   const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
   // Unsubscribe from the player socket.
   const unsubscribePlayer = useCallback(() => {
@@ -66,6 +68,8 @@ function SpectatorGameView() {
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePlayer = useCallback((roomIdParam: string, userIdParam: string) => {
+    setLoading(true);
+
     // If the spectator is currently subscribed, unsubscribe them.
     if (playerSocket) {
       unsubscribePlayer();
@@ -75,6 +79,9 @@ function SpectatorGameView() {
     const subscribePlayerCallback = (result: Message) => {
       if (!JSON.parse(result.body).newSpectator) {
         const updatedSpectateGame: SpectateGame = JSON.parse(result.body);
+
+        console.log('Spectator view');
+        console.log(updatedSpectateGame);
 
         // TODO: Include cursor location?
         setSpectateGame(updatedSpectateGame);
@@ -90,8 +97,11 @@ function SpectatorGameView() {
           newSpectator: true,
         });
         send(routes(roomIdParam, userIdParam).subscribe_player, {}, newSpectator);
+        setError('');
       }).catch((err) => {
         setError(err.message);
+      }).finally(() => {
+        setLoading(false);
       });
   }, [playerSocket, unsubscribePlayer]);
 
@@ -116,6 +126,10 @@ function SpectatorGameView() {
           {spectateGame?.player.nickname}
         </p>
 
+        <PrimaryButton onClick={unsubscribePlayer}>
+          Go Back
+        </PrimaryButton>
+
         {error ? <CenteredContainer><ErrorMessage message={error} /></CenteredContainer> : null}
         <SplitterContainer>
           <SplitterLayout
@@ -123,7 +137,6 @@ function SpectatorGameView() {
             percentage
             primaryMinSize={20}
             secondaryMinSize={35}
-            customClassName="game-splitter-container"
           >
             {/* Problem title/description panel */}
             <OverflowPanel className="display-box-shadow">
@@ -134,6 +147,7 @@ function SpectatorGameView() {
                 ) : null
               }
               <StyledMarkdownEditor
+                defaultValue={spectateGame?.problem.description}
                 value={spectateGame?.problem.description}
                 onChange={() => ''}
                 readOnly
@@ -153,7 +167,7 @@ function SpectatorGameView() {
             </OverflowPanel>
 
             {/* Code editor */}
-            <NoPaddingPanel>
+            <NoPaddingPanel className="display-box-shadow">
               <Editor
                 onLanguageChange={null}
                 onCodeChange={null}
@@ -194,6 +208,7 @@ function SpectatorGameView() {
         }}
       />
       {error ? <CenteredContainer><ErrorMessage message={error} /></CenteredContainer> : null}
+      {loading ? <CenteredContainer><Loading /></CenteredContainer> : null}
     </>
   );
 }
