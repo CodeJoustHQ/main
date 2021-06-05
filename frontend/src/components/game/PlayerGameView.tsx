@@ -178,8 +178,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
         code: currentCodeParam,
         language: currentLanguageParam,
       });
-      console.log('Spectator view');
-      console.log(spectatorViewBody);
       send(
         routes(gameParam.room.roomId, currentUserParam.userId).subscribe_player,
         {},
@@ -198,7 +196,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
     // Update the spectate view based on player activity.
     const subscribePlayerCallback = (result: Message) => {
       if (JSON.parse(result.body).newSpectator) {
-        console.log(stateRef.current);
         sendViewUpdate(stateRef.current?.game, stateRef.current?.currentUser,
           stateRef.current?.currentCode, stateRef.current?.currentLanguage);
       }
