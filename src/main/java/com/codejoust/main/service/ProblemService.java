@@ -417,11 +417,11 @@ public class ProblemService {
     }
 
     public List<ProblemTagDto> getAllProblemTags(String token) {
-        // todo: make return list of your own tags
+        // Get all problem tags this person owns and convert them to DTOs.
+        String uid = service.verifyToken(token);
 
-        // Get all problem tags and convert them to DTOs.
         List<ProblemTagDto> problemTagDtos = new ArrayList<>();
-        problemTagRepository.findAll().forEach(problemTag -> problemTagDtos.add(ProblemMapper.toProblemTagDto(problemTag)));
+        problemTagRepository.findAllByOwner_Uid(uid).forEach(problemTag -> problemTagDtos.add(ProblemMapper.toProblemTagDto(problemTag)));
         return problemTagDtos;
     }
 

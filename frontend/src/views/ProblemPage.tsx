@@ -10,7 +10,7 @@ import { LargeText, MediumText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import ProblemDisplay from '../components/problem/ProblemDisplay';
-import { generateRandomId, verifyToken } from '../util/Utility';
+import { generateRandomId } from '../util/Utility';
 import { useAppSelector, useProblemEditable } from '../util/Hook';
 import { PrimaryButtonLink } from '../components/core/Link';
 
@@ -33,7 +33,7 @@ function ProblemPage() {
   const params = useParams<ProblemParams>();
 
   useEffect(() => {
-    if (!verifyToken(token, setError)) {
+    if (!token) {
       return;
     }
 
@@ -51,16 +51,17 @@ function ProblemPage() {
   }, [params, token]);
 
   if (!problem) {
-    if (loading) {
-      return <Loading />;
+    if (error && !loading) {
+      return (
+        <MediumText>
+          You do not have permission to view this problem, or the problem does not exist.
+          <br />
+          <PrimaryButtonLink to="/problems/all">Go back</PrimaryButtonLink>
+        </MediumText>
+      );
     }
-    return (
-      <MediumText>
-        You do not have permission to view this problem, or the problem does not exist.
-        <br />
-        <PrimaryButtonLink to="/problems/all">Go back</PrimaryButtonLink>
-      </MediumText>
-    );
+
+    return <Loading />;
   }
 
   const handleEdit = (newProblem: Problem) => {

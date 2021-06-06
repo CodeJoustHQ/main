@@ -15,7 +15,7 @@ import {
   connect, routes, subscribe, disconnect,
 } from '../api/Socket';
 import { User } from '../api/User';
-import { isValidRoomId, leaveRoom, checkLocationState, verifyToken } from '../util/Utility';
+import { isValidRoomId, leaveRoom, checkLocationState } from '../util/Utility';
 import { Difficulty } from '../api/Difficulty';
 import {
   PrimaryButton,
@@ -550,7 +550,7 @@ function LobbyPage() {
   }, [setMousePosition]);
 
   useEffect(() => {
-    if (!verifyToken(token, () => '')) {
+    if (!token) {
       return;
     }
 

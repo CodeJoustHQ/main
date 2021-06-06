@@ -764,6 +764,7 @@ public class ProblemServiceTests {
 
         ProblemTag problemTag = TestFields.problemTag1();
         Mockito.doReturn(Collections.singletonList(problemTag)).when(tagRepository).findAllByOwner_Uid(problemTag.getOwner().getUid());
+        Mockito.doReturn(problemTag.getOwner().getUid()).when(firebaseService).verifyToken(TestFields.TOKEN);
 
         List<ProblemTagDto> problemTags = problemService.getAllProblemTags(TestFields.TOKEN);
 

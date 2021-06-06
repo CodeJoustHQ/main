@@ -5,7 +5,6 @@ import { LargeText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
 import { useAppSelector } from '../util/Hook';
-import { verifyToken } from '../util/Utility';
 import { TextLink } from '../components/core/Link';
 import FilteredProblemList from '../components/problem/FilteredProblemList';
 
@@ -21,12 +20,12 @@ function AllProblemsPage() {
   const { token } = useAppSelector((state) => state.account);
 
   useEffect(() => {
-    if (!verifyToken(token, setError)) {
+    if (!token) {
       return;
     }
 
     setLoading(true);
-    getProblems(token!)
+    getProblems(token!, true)
       .then((res) => setProblems(res))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -35,7 +34,7 @@ function AllProblemsPage() {
   return (
     <Content>
       <LargeText>View All Problems</LargeText>
-      <TextLink to="/game/create">Create new problem</TextLink>
+      <TextLink to="/problem/create">Create new problem</TextLink>
 
       <FilteredProblemList problems={problems} />
 

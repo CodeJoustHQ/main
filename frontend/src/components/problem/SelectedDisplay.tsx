@@ -101,7 +101,7 @@ export function FilterAllTagsDisplay(props: TagProps) {
     <Content>
       <TextSearch
         onChange={setSearchStatus}
-        placeholder={tags.length ? 'Filter tags' : 'Loading...'}
+        placeholder={tags.length ? 'Filter tags' : 'No tags found'}
       />
 
       {tags.map((tag) => {

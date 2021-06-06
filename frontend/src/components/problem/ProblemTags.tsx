@@ -21,7 +21,6 @@ import { FilterAllTagsDisplay, SelectedTagsDisplay } from './SelectedDisplay';
 import { TagSelector } from './Selector';
 import Modal from '../core/Modal';
 import { useAppSelector } from '../../util/Hook';
-import { verifyToken } from '../../util/Utility';
 
 const LargeTextInput = styled(TextInput)`
   width: 40%;
@@ -49,7 +48,7 @@ function ProblemTags(props: ProblemTagsParams) {
   const { token } = useAppSelector((state) => state.account);
 
   const fetchTags = useCallback(() => {
-    if (!verifyToken(token, setError)) {
+    if (!token) {
       return;
     }
 
@@ -69,7 +68,7 @@ function ProblemTags(props: ProblemTagsParams) {
 
   // Make request to create a new tag, refresh tag list
   const createNewTag = (newTagName: string) => {
-    if (!verifyToken(token, setError)) {
+    if (!token) {
       return;
     }
 
@@ -80,6 +79,7 @@ function ProblemTags(props: ProblemTagsParams) {
     createProblemTag(tag, token!).then(() => {
       // If the tag was created, refresh all problem tags.
       fetchTags();
+      setTagName('');
     }).catch((err) => setError(err))
       .finally(() => setLoading(false));
   };
@@ -89,7 +89,7 @@ function ProblemTags(props: ProblemTagsParams) {
       <LowMarginMediumText>Tags</LowMarginMediumText>
       <SelectedTagsDisplay
         tags={problemTags}
-        onRemove={removeTag}
+        onRemove={!viewOnly ? removeTag : null}
       />
       {
         !viewOnly ? (

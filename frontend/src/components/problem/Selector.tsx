@@ -199,7 +199,7 @@ export function TagSelector(props: TagSelectorProps) {
       <TextSearch
         onClick={() => setShowTags(!showTags)}
         onChange={setSearchStatus}
-        placeholder={tags.length ? 'Select tags (optional)' : 'Loading...'}
+        placeholder={tags.length ? 'Select tags (optional)' : 'No tags found'}
       />
 
       <InnerContent show={showTags} ref={ref}>
