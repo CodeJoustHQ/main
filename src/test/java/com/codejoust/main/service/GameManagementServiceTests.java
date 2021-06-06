@@ -297,7 +297,6 @@ public class GameManagementServiceTests {
 
     @Test
     public void startGameNoProblemsFound() {
-        // todo: problem exists, but not approved nor owned by this person
         User host = new User();
         host.setNickname(TestFields.NICKNAME);
         host.setUserId(TestFields.USER_ID);

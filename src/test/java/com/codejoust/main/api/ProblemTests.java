@@ -134,7 +134,6 @@ class ProblemTests {
         MockHelper.postRequest(this.mockMvc, TestUrls.createProblem(), request, ProblemDto.class, HttpStatus.CREATED);
 
         // After creating two problems, check that the GET request finds them all
-        // todo: give permission here
         Type listType = new TypeToken<ArrayList<ProblemDto>>(){}.getType();
         List<ProblemDto> actual = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblems(), listType, HttpStatus.OK);
 
@@ -265,7 +264,6 @@ class ProblemTests {
 
     @Test
     public void getProblemsEmptyList() throws Exception {
-        // todo: give permission here
         Type listType = new TypeToken<ArrayList<ProblemDto>>(){}.getType();
         List<ProblemDto> actual = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblems(), listType, HttpStatus.OK);
 
@@ -405,8 +403,6 @@ class ProblemTests {
          * 3. Verify the correct response and equality.
          */
 
-        // todo: should only its own problem tags
-
         ProblemTagDto problemTag = ProblemTestMethods.createSingleProblemTag(this.mockMvc);
 
         Type listType = new TypeToken<ArrayList<ProblemTagDto>>(){}.getType();
@@ -444,6 +440,23 @@ class ProblemTests {
         ProblemDto response = MockHelper.deleteRequest(this.mockMvc, TestUrls.deleteProblem(problemDto.getProblemId()), null, ProblemDto.class, HttpStatus.OK);
 
         assertEquals(problemDto.getDescription(), response.getDescription());
+
+        Type listType = new TypeToken<ArrayList<ProblemTagDto>>(){}.getType();
+        List<ProblemDto> tags = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblemTags(), listType, HttpStatus.OK);
+
+        assertEquals(1, tags.size());
+    }
+
+    @Test
+    public void deleteProblemKeepUnusedTag() throws Exception {
+        /**
+         * 1. Create problem with a tag
+         * 2. Delete the problem
+         * 3. The tag should not be deleted
+         */
+
+        ProblemDto problemDto = ProblemTestMethods.createSingleProblemAndTags(this.mockMvc);
+        MockHelper.deleteRequest(this.mockMvc, TestUrls.deleteProblem(problemDto.getProblemId()), null, ProblemDto.class, HttpStatus.OK);
 
         Type listType = new TypeToken<ArrayList<ProblemTagDto>>(){}.getType();
         List<ProblemDto> tags = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblemTags(), listType, HttpStatus.OK);

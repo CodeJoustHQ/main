@@ -80,7 +80,7 @@ function ProblemTags(props: ProblemTagsParams) {
       // If the tag was created, refresh all problem tags.
       fetchTags();
       setTagName('');
-    }).catch((err) => setError(err))
+    }).catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   };
 
