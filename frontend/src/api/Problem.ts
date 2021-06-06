@@ -165,7 +165,7 @@ export const createProblemTag = (tag: ProblemTag, token: string): Promise<Proble
   });
 
 export const deleteProblemTag = (tagId: string, token: string): Promise<ProblemTag> => axios
-  .post<ProblemTag>(routes.deleteProblemTag(tagId), getAuthHttpHeader(token))
+  .delete<ProblemTag>(routes.deleteProblemTag(tagId), getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
-  createProblemTag,
+  createProblemTag, deleteProblemTag,
   getAllProblemTags,
   ProblemTag,
 } from '../../api/Problem';
@@ -84,6 +84,25 @@ function ProblemTags(props: ProblemTagsParams) {
       .finally(() => setLoading(false));
   };
 
+  const deleteTag = (tagId: string) => {
+    if (!token || !window.confirm('Delete this tag? It will be removed from all problems that have it selected.')) {
+      return;
+    }
+
+    setLoading(true);
+    deleteProblemTag(tagId, token!)
+      .then(() => {
+        problemTags.forEach((tag, index) => {
+          if (tag.tagId === tagId) {
+            removeTag(index);
+          }
+        });
+        setAllTags(allTags.filter((tag) => tag.tagId !== tagId));
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  };
+
   return (
     <>
       <LowMarginMediumText>Tags</LowMarginMediumText>
@@ -121,6 +140,7 @@ function ProblemTags(props: ProblemTagsParams) {
               <LowMarginMediumText>Filter Tags</LowMarginMediumText>
               <FilterAllTagsDisplay
                 tags={allTags}
+                onDelete={deleteTag}
               />
             </Modal>
           </>

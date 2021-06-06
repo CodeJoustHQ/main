@@ -451,12 +451,18 @@ public class ProblemService {
     public ProblemTagDto deleteProblemTag(String tagId, String token) {
         ProblemTag problemTag = problemTagRepository.findTagByTagId(tagId);
 
-        // Do not create the new problem tag if one with this name exists.
         if (problemTag == null || problemTag.getOwner() == null) {
             throw new ApiException(ProblemError.TAG_NOT_FOUND);
         }
 
         service.verifyTokenMatchesUid(token, problemTag.getOwner().getUid());
+
+        // Remove this tag from problems associated with it
+        List<Problem> problems = problemRepository.findByProblemTags_TagId(tagId);
+        for (Problem problem : problems) {
+            problem.removeProblemTag(problemTag);
+            problemRepository.save(problem);
+        }
 
         // Remove the problem tag from the database.
         ProblemTagDto problemTagDto = ProblemMapper.toProblemTagDto(problemTag);

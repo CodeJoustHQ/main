@@ -463,4 +463,26 @@ class ProblemTests {
 
         assertEquals(1, tags.size());
     }
+
+    @Test
+    public void deleteTagRemovesItFromProblems() throws Exception {
+        /**
+         * 1. Create problem with a tag
+         * 2. Delete the tag
+         * 3. Verify the problem no longer has that tag
+         * 4. Verify the tag is actually deleted (i.e. no bidirectional issues)
+         */
+
+        ProblemDto problemDto = ProblemTestMethods.createSingleProblemAndTags(this.mockMvc);
+        ProblemTagDto tagDto = problemDto.getProblemTags().get(0);
+
+        MockHelper.deleteRequest(this.mockMvc, TestUrls.deleteProblemTag(tagDto.getTagId()), null, ProblemTagDto.class, HttpStatus.OK);
+
+        problemDto = MockHelper.getRequest(this.mockMvc, TestUrls.getProblem(problemDto.getProblemId()), ProblemDto.class, HttpStatus.OK);
+        assertEquals(0, problemDto.getProblemTags().size());
+
+        Type listType = new TypeToken<ArrayList<ProblemTagDto>>(){}.getType();
+        List<ProblemDto> tags = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblemTags(), listType, HttpStatus.OK);
+        assertEquals(0, tags.size());
+    }
 }
