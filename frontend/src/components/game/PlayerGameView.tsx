@@ -103,8 +103,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
     gameError,
   } = props;
 
-  // TODO: Figure out what's going on here.
-  // const { currentUser, game } = useAppSelector((state) => state);
+  const { currentUser, game } = useAppSelector((state) => state);
 
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [submission, setSubmission] = useState<Submission | null>(null);
@@ -126,8 +125,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
    * message; see https://github.com/jacobbuck/react-beforeunload.
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
-
-  const { currentUser, game } = useAppSelector((state) => state);
 
   // References necessary for the spectator subscription callback.
   const stateRef = useRef<StateRefType>();
