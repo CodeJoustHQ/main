@@ -1,7 +1,7 @@
 import styled from 'styled-components';
+import React from 'react';
 import { Difficulty, difficultyToColor, displayNameFromDifficulty } from '../../api/Difficulty';
 import { ThemeType } from '../config/Theme';
-import React from 'react';
 
 type Dimensions = {
   width?: string,

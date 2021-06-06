@@ -8,12 +8,17 @@ import { SpectateGame } from '../../api/Game';
 import Language from '../../api/Language';
 import { routes, send, subscribe } from '../../api/Socket';
 import { useAppSelector } from '../../util/Hook';
-import { getDifficultyDisplayButton, PrimaryButton } from '../core/Button';
+import { getDifficultyDisplayButton, InlineLobbyIcon, PrimaryButton } from '../core/Button';
 import { CenteredContainer, Panel, SplitterContainer } from '../core/Container';
 import ErrorMessage from '../core/Error';
 import Loading from '../core/Loading';
 import Modal from '../core/Modal';
-import { BottomFooterText, LargeCenterText, ProblemHeaderText } from '../core/Text';
+import {
+  BottomFooterText,
+  LargeCenterText,
+  ProblemHeaderText,
+  Text,
+} from '../core/Text';
 import PreviewCodeContent from '../results/PreviewCodeContent';
 import ResultsTable from '../results/ResultsTable';
 import {
@@ -46,6 +51,28 @@ const OverflowPanel = styled(Panel)`
 
 const NoPaddingPanel = styled(Panel)`
   padding: 0;
+`;
+
+const TopFlexContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  height: 100px;
+`;
+
+const InlineBackIcon = styled(InlineLobbyIcon)`
+  flex: 1;
+  width: 3rem;
+  height: 3rem;
+`;
+
+const CenterText = styled(Text)`
+  flex: 3;
+  font-size: 2.5rem;
+  text-align: center;
+`;
+
+const RightCardText = styled(Text)`
+  flex: 1;
 `;
 
 function SpectatorGameView() {
@@ -114,11 +141,17 @@ function SpectatorGameView() {
   if (playerSocket && spectateGame) {
     return (
       <>
-        <p>
-          Spectate
-          {' '}
-          {spectateGame?.player.nickname}
-        </p>
+        <TopFlexContainer>
+          <InlineBackIcon>arrow_back</InlineBackIcon>
+          <CenterText>
+            Spectate
+            {' '}
+            {spectateGame?.player.nickname}
+          </CenterText>
+          <RightCardText>
+            Stats and Whatnot
+          </RightCardText>
+        </TopFlexContainer>
 
         <PrimaryButton onClick={unsubscribePlayer}>
           Go Back
