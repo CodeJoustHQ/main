@@ -36,7 +36,7 @@ function CreateGamePage() {
   // Render the "Enter nickname" state.
   return (
     <EnterNicknamePage
-      enterNicknameHeaderText="Enter a nickname to create the game!"
+      enterNicknameHeaderText="Enter your name to create the room!"
       enterNicknameAction={createJoinLobby}
     />
   );

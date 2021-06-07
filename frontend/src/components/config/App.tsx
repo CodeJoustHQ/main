@@ -12,7 +12,7 @@ import JoinGamePage from '../../views/Join';
 import CreateGamePage from '../../views/Create';
 import GameResultsPage from '../../views/Results';
 import LobbyPage from '../../views/Lobby';
-import AllProblemsPage from '../../views/AllProblemsPage';
+import VerifiedProblemsPage from '../../views/VerifiedProblemsPage';
 import ProblemPage from '../../views/ProblemPage';
 import CreateProblemPage from '../../views/CreateProblemPage';
 import CircleBackgroundLayout from '../layout/CircleBackground';
@@ -78,7 +78,7 @@ function App() {
       <CustomRoute path="/game/create" component={CreateGamePage} layout={CircleBackgroundLayout} exact />
       <CustomRoute path="/game/lobby" component={LobbyPage} layout={MinimalLayout} exact />
       <CustomRoute path="/game/results" component={GameResultsPage} layout={MinimalLayout} exact />
-      <PrivateRoute path="/problems/all" component={AllProblemsPage} layout={MinimalLayout} exact />
+      <PrivateRoute path="/problems/all" component={VerifiedProblemsPage} layout={MinimalLayout} exact />
       <PrivateRoute path="/problem/create" component={CreateProblemPage} layout={MinimalLayout} exact />
       <PrivateRoute path="/problem/:id" component={ProblemPage} layout={MinimalLayout} exact />
       <CustomRoute path="/login" component={LoginPage} layout={MainLayout} exact />

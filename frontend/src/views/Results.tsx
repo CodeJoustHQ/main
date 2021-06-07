@@ -26,7 +26,7 @@ import {
 import ResultsTable from '../components/results/ResultsTable';
 import Modal from '../components/core/Modal';
 import FeedbackPopup from '../components/results/FeedbackPopup';
-import { useAppDispatch, useAppSelector } from '../util/Hook';
+import { useAppDispatch, useAppSelector, useMousePosition } from '../util/Hook';
 import { fetchGame, setGame } from '../redux/Game';
 import { setCurrentUser } from '../redux/User';
 import { setRoom } from '../redux/Room';
@@ -100,7 +100,6 @@ function GameResultsPage() {
   const [roomId, setRoomId] = useState('');
 
   const [connected, setConnected] = useState(false);
-  const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
   const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState<boolean>(false);
@@ -112,6 +111,7 @@ function GameResultsPage() {
   const dispatch = useAppDispatch();
   const { game } = useAppSelector((state) => state);
   const { currentUser } = useAppSelector((state) => state);
+  const mousePosition = useMousePosition();
 
   useEffect(() => {
     if (game) {
@@ -188,15 +188,6 @@ function GameResultsPage() {
   };
 
   const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
-
-  // Get current mouse position.
-  const mouseMoveHandler = useCallback((e: MouseEvent) => {
-    setMousePosition({ x: e.pageX, y: e.pageY });
-  }, [setMousePosition]);
-
-  useEffect(() => {
-    window.onmousemove = mouseMoveHandler;
-  }, [mouseMoveHandler]);
 
   useEffect(() => {
     players.forEach((player, index) => {

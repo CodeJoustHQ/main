@@ -67,7 +67,7 @@ export default function EnterNicknamePage(props: EnterNicknameProps) {
         {enterNicknameHeaderText}
       </LargeText>
       <LargeCenterInputText
-        placeholder="Your nickname"
+        placeholder="Your display name"
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
           setNickname(event.target.value);
         }}

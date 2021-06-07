@@ -44,12 +44,11 @@ import {
 import IdContainer from '../components/special/IdContainer';
 import { FlexBareContainer } from '../components/core/Container';
 import { Slider, SliderContainer } from '../components/core/RangeSlider';
-import { Coordinate } from '../components/special/FloatingCircle';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
 import { getAllProblemTags, ProblemTag, SelectableProblem } from '../api/Problem';
 import { ProblemSelector, TagSelector } from '../components/problem/Selector';
 import { SelectedProblemsDisplay, SelectedTagsDisplay } from '../components/problem/SelectedDisplay';
-import { useAppDispatch, useAppSelector } from '../util/Hook';
+import { useAppDispatch, useAppSelector, useMousePosition } from '../util/Hook';
 import { fetchRoom, setRoom } from '../redux/Room';
 import { setCurrentUser } from '../redux/User';
 import { LobbyHelpModal } from '../components/core/HelpModal';
@@ -155,13 +154,14 @@ function LobbyPage() {
   const [selectedTags, setSelectedTags] = useState<ProblemTag[]>([]);
   const [allTags, setAllTags] = useState<ProblemTag[]>([]);
   const [size, setSize] = useState<number | undefined>(10);
-  const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
 
   // React Redux
   const dispatch = useAppDispatch();
   const { room } = useAppSelector((state) => state);
   const { currentUser } = useAppSelector((state) => state);
+
+  const mousePosition = useMousePosition();
 
   // Hold error text.
   const [error, setError] = useState('');
@@ -543,11 +543,6 @@ function LobbyPage() {
     }).finally(() => setLoading(false));
   }, [dispatch]);
 
-  // Get current mouse position.
-  const mouseMoveHandler = useCallback((e: MouseEvent) => {
-    setMousePosition({ x: e.pageX, y: e.pageY });
-  }, [setMousePosition]);
-
   useEffect(() => {
     getAllProblemTags()
       .then((res) => {
@@ -557,10 +552,6 @@ function LobbyPage() {
         setError(err.message);
       });
   }, []);
-
-  useEffect(() => {
-    window.onmousemove = mouseMoveHandler;
-  }, [mouseMoveHandler]);
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {

@@ -45,7 +45,7 @@ import { generateRandomId, validIdentifier } from '../../util/Utility';
 import { HoverTooltip } from '../core/HoverTooltip';
 import { Coordinate } from '../special/FloatingCircle';
 import ProblemTags from './ProblemTags';
-import { useAppSelector, useProblemEditable } from '../../util/Hook';
+import { useAppSelector, useMousePosition, useProblemEditable } from '../../util/Hook';
 import { ProblemHelpModal } from '../core/HelpModal';
 
 const defaultDescription: string = [
@@ -208,17 +208,13 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const [newProblem, setNewProblem] = useState<Problem>(problem);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
   const [helpModal, setHelpModal] = useState<boolean>(false);
 
   // Variable used to force refresh the editor.
   const [refreshEditor, setRefreshEditor] = useState<number>(0);
 
-  // Get current mouse position.
-  const mouseMoveHandler = useCallback((e: any) => {
-    setMousePosition({ x: e.pageX, y: e.pageY });
-  }, [setMousePosition]);
+  const mousePosition = useMousePosition();
 
   const onDragEnd = (result: any) => {
     // dropped outside the list
@@ -597,7 +593,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
               <InlineErrorIcon
                 show={!validIdentifier(input.name)}
                 onMouseEnter={() => setHoverVisible(true)}
-                onMouseMove={mouseMoveHandler}
+                // onMouseMove={mouseMoveHandler}
                 onMouseLeave={() => setHoverVisible(false)}
               >
                 error_outline
