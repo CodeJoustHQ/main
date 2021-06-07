@@ -3,6 +3,7 @@ import roomReducer from './Room';
 import gameReducer from './Game';
 import userReducer from './User';
 import accountReducer from './Account';
+import problemReducer from './Problem';
 
 const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
     game: gameReducer,
     currentUser: userReducer,
     account: accountReducer,
+    problem: problemReducer,
   },
 });
 
