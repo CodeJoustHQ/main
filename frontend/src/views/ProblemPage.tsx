@@ -56,7 +56,7 @@ function ProblemPage() {
         <MediumText>
           You do not have permission to view this problem, or the problem does not exist.
           <br />
-          <PrimaryButtonLink to="/problems/all">Go back</PrimaryButtonLink>
+          <PrimaryButtonLink to="/problems/all">Go Back</PrimaryButtonLink>
         </MediumText>
       );
     }

@@ -28,7 +28,6 @@ public class ProblemTag {
     @EqualsAndHashCode.Include
     private String tagId =  UUID.randomUUID().toString();
 
-    @Column(unique = true)
     @EqualsAndHashCode.Include
     private String name;
 
