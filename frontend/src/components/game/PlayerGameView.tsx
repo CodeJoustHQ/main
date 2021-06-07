@@ -15,7 +15,7 @@ import { DefaultCodeType, getDefaultCodeMap, Problem } from '../../api/Problem';
 import { CenteredContainer, Panel, SplitterContainer } from '../core/Container';
 import ErrorMessage from '../core/Error';
 import 'react-splitter-layout/lib/index.css';
-import { ProblemHeaderText, BottomFooterText } from '../core/Text';
+import { ProblemHeaderText, BottomFooterText, Text } from '../core/Text';
 import Console from './Console';
 import Loading from '../core/Loading';
 import {
@@ -24,16 +24,17 @@ import {
   Submission,
   SubmissionType,
   submitSolution,
+  SpectateGame,
 } from '../../api/Game';
 import LeaderboardCard from '../card/LeaderboardCard';
-import { getDifficultyDisplayButton } from '../core/Button';
-import Language from '../../api/Language';
 import {
-  CopyIndicator,
-  BottomCopyIndicatorContainer,
-  SmallInlineCopyIcon,
-  SmallInlineCopyText,
-} from '../special/CopyIndicator';
+  getDifficultyDisplayButton,
+  InheritedTextButton,
+  InlineLobbyIcon,
+  PrimaryButton,
+} from '../core/Button';
+import Language from '../../api/Language';
+import { CopyIndicator, BottomCopyIndicatorContainer, InlineCopyIcon } from '../special/CopyIndicator';
 import { useAppSelector } from '../../util/Hook';
 import { routes, send, subscribe } from '../../api/Socket';
 import { User } from '../../api/User';
@@ -86,6 +87,28 @@ const LeaderboardContent = styled.div`
   background-attachment: local, local, scroll, scroll;
 `;
 
+const TopFlexContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  height: 100px;
+`;
+
+const InlineBackIcon = styled(InlineLobbyIcon)`
+  flex: 1;
+  width: 3rem;
+  height: 3rem;
+`;
+
+const CenterText = styled(Text)`
+  flex: 3;
+  font-size: 2.5rem;
+  text-align: center;
+`;
+
+const RightCardText = styled(Text)`
+  flex: 1;
+`;
+
 // The type used for the state reference.
 type StateRefType = {
   game: Game | null,
@@ -96,15 +119,16 @@ type StateRefType = {
 
 type PlayerGameViewProps = {
   gameError: string,
+  spectateGame: SpectateGame | null,
+  spectatorUnsubscribePlayer: (() => void) | null,
 };
 
 function PlayerGameView(props: PlayerGameViewProps) {
   const {
-    gameError,
+    gameError, spectateGame, spectatorUnsubscribePlayer,
   } = props;
 
-  // TODO: Figure out what's going on here.
-  // const { currentUser, game } = useAppSelector((state) => state);
+  const { currentUser, game } = useAppSelector((state) => state);
 
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [submission, setSubmission] = useState<Submission | null>(null);
@@ -126,8 +150,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
    * message; see https://github.com/jacobbuck/react-beforeunload.
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
-
-  const { currentUser, game } = useAppSelector((state) => state);
 
   // References necessary for the spectator subscription callback.
   const stateRef = useRef<StateRefType>();
@@ -312,9 +334,29 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
   return (
     <>
-      <LeaderboardContent>
-        {displayPlayerLeaderboard()}
-      </LeaderboardContent>
+      {!spectatorUnsubscribePlayer && !spectateGame ? (
+        <LeaderboardContent>
+          {displayPlayerLeaderboard()}
+        </LeaderboardContent>
+      ) : (
+        <>
+          <TopFlexContainer>
+            <InlineBackIcon>arrow_back</InlineBackIcon>
+            <CenterText>
+              Spectate
+              {' '}
+              {spectateGame?.player.nickname}
+            </CenterText>
+            <RightCardText>
+              Stats and Whatnot
+            </RightCardText>
+          </TopFlexContainer>
+
+          <PrimaryButton onClick={spectatorUnsubscribePlayer || (() => {})}>
+            Go Back
+          </PrimaryButton>
+        </>
+      )}
 
       {loading ? <CenteredContainer><Loading /></CenteredContainer> : null}
       {error ? <CenteredContainer><ErrorMessage message={error} /></CenteredContainer> : null}
@@ -324,58 +366,86 @@ function PlayerGameView(props: PlayerGameViewProps) {
           percentage
           primaryMinSize={20}
           secondaryMinSize={35}
-          customClassName="game-splitter-container"
+          customClassName={!spectateGame ? 'game-splitter-container' : undefined}
         >
           {/* Problem title/description panel */}
           <OverflowPanel className="display-box-shadow">
-            <ProblemHeaderText>{game?.problems[0]?.name}</ProblemHeaderText>
-            {game?.problems[0] ? getDifficultyDisplayButton(game?.problems[0].difficulty!) : null}
+            <ProblemHeaderText>
+              {!spectateGame ? game?.problems[0]?.name : spectateGame?.problem.name}
+            </ProblemHeaderText>
+            {/* TODO: I don't know whether we have to verify that the problem exists. */}
+            {
+              !spectateGame ? (
+                getDifficultyDisplayButton(game?.problems[0].difficulty!)
+              ) : (
+                getDifficultyDisplayButton(spectateGame?.problem.difficulty!)
+              )
+            }
             <StyledMarkdownEditor
-              defaultValue={game?.problems[0]?.description}
+              defaultValue={!spectateGame ? (
+                game?.problems[0]?.description
+              ) : (
+                spectateGame?.problem.description
+              )}
+              value={spectateGame ? spectateGame?.problem.description : undefined}
               onChange={() => ''}
               readOnly
             />
             <BottomFooterText>
               {'Notice an issue? Contact us at '}
-              <SmallInlineCopyText
+              <InheritedTextButton
                 onClick={() => {
                   copy('support@codejoust.co');
                   setCopiedEmail(true);
                 }}
               >
                 support@codejoust.co
-                <SmallInlineCopyIcon>content_copy</SmallInlineCopyIcon>
-              </SmallInlineCopyText>
+                <InlineCopyIcon>content_copy</InlineCopyIcon>
+              </InheritedTextButton>
             </BottomFooterText>
           </OverflowPanel>
 
           {/* Code editor and console panels */}
-          <SplitterLayout
-            vertical
-            percentage
-            primaryMinSize={20}
-            secondaryMinSize={0}
-          >
-            <NoPaddingPanel>
-              <Editor
-                onCodeChange={setCurrentCode}
-                onLanguageChange={setCurrentLanguage}
-                codeMap={defaultCodeList[0]}
-                defaultLanguage={currentLanguage}
-                defaultCode={null}
-                liveCode={null}
-              />
-            </NoPaddingPanel>
-
-            <Panel>
-              <Console
-                testCases={game?.problems[0]?.testCases || []}
-                submission={submission}
-                onRun={runCode}
-                onSubmit={submitCode}
-              />
-            </Panel>
-          </SplitterLayout>
+          {
+            !spectateGame ? (
+              <SplitterLayout
+                vertical
+                percentage
+                primaryMinSize={20}
+                secondaryMinSize={0}
+              >
+                <NoPaddingPanel>
+                  <Editor
+                    onCodeChange={setCurrentCode}
+                    onLanguageChange={setCurrentLanguage}
+                    codeMap={defaultCodeList[0]}
+                    defaultLanguage={currentLanguage}
+                    defaultCode={null}
+                    liveCode={null}
+                  />
+                </NoPaddingPanel>
+                <Panel>
+                  <Console
+                    testCases={game?.problems[0]?.testCases || []}
+                    submission={submission}
+                    onRun={runCode}
+                    onSubmit={submitCode}
+                  />
+                </Panel>
+              </SplitterLayout>
+            ) : (
+              <NoPaddingPanel className="display-box-shadow">
+                <Editor
+                  onLanguageChange={null}
+                  onCodeChange={null}
+                  codeMap={null}
+                  defaultLanguage={spectateGame?.language as Language}
+                  defaultCode={spectateGame?.code}
+                  liveCode={spectateGame?.code}
+                />
+              </NoPaddingPanel>
+            )
+          }
         </SplitterLayout>
       </SplitterContainer>
       <BottomCopyIndicatorContainer copied={copiedEmail}>

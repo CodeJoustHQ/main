@@ -1,9 +1,12 @@
-import { useState, useEffect, RefObject } from 'react';
+import {
+  useState, useEffect, RefObject, useCallback,
+} from 'react';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { Player, Submission } from '../api/Game';
 import { AppDispatch, RootState } from '../redux/Store';
 import { FirebaseUserType } from '../redux/Account';
 import { Problem } from '../api/Problem';
+import { Coordinate } from '../components/special/FloatingCircle';
 import app from '../api/Firebase';
 
 export const useBestSubmission = (player?: Player) => {
@@ -57,6 +60,21 @@ export const useClickOutside = (ref: RefObject<HTMLDivElement>, closeFunction: (
 // Custom Redux Hooks with our store's types
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+
+export const useMousePosition = () => {
+  const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
+
+  const mouseMoveHandler = useCallback((e: MouseEvent) => {
+    setMousePosition({ x: e.clientX, y: e.clientY });
+  }, [setMousePosition]);
+
+  useEffect(() => {
+    document.addEventListener('mousemove', mouseMoveHandler);
+    return () => window.removeEventListener('mousemove', mouseMoveHandler);
+  }, [mouseMoveHandler]);
+
+  return mousePosition;
+};
 
 export const useAuthCheck = (redirectAction: () => void, errorAction: (msg: string) => void) => {
   const { firebaseUser } = useAppSelector((state) => state.account);

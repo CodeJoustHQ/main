@@ -82,7 +82,7 @@ type PlayerResultsCardProps = {
   isCurrentPlayer: boolean,
   gameStartTime: string,
   color: Color,
-  onViewCode: () => void,
+  onViewCode: (() => void) | null,
   onSpectateLive: (() => void) | null,
 };
 
@@ -160,7 +160,9 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
       <td>
         <Text>{getSubmissionCount()}</Text>
       </td>
-      <CodeColumn>{getSubmissionLanguage()}</CodeColumn>
+      {!onSpectateLive ? (
+        <CodeColumn>{getSubmissionLanguage()}</CodeColumn>
+      ) : null}
       {onSpectateLive ? (
         <CodeColumn>
           <PreviewContainer>

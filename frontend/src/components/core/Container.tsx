@@ -133,6 +133,55 @@ export const DynamicWidthContainer = styled.div`
   }
 `;
 
+export const RowContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+  width: 1200px;
+  
+  @media(max-width: 1450px) {
+    width: 800px;
+  }
+  
+  // Switch to single-column layout
+  @media(max-width: 1000px) {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+`;
+
+export type WidthProps = {
+  width?: string,
+};
+
+export const ColumnContainer = styled.div<WidthProps>`
+  flex: ${({ width }) => (width ? `0 0 ${width}` : '50%')};
+`;
+
+export const TextLeftColumnContainer = styled(ColumnContainer)`
+  text-align: left;
+  
+  @media(max-width: 1000px) {
+    text-align: center;
+  }
+`;
+
+export const Separator = styled.div`
+  display: block;
+  margin-top: 20px;
+  
+  &:after {
+    content: '.';
+    visibility: hidden;
+  }
+  
+  // Remove separator effect below a certain screen size
+  @media(max-width: 1000px) {
+    margin-top: 0;
+  }
+`;
+
 export const SelectedItemContainer = styled.div`
   display: inline-block;
   padding: 5px;
