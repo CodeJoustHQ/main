@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Player, Submission } from '../../api/Game';
+import { Player } from '../../api/Game';
 import { Text, MediumText } from '../core/Text';
 import Language, { displayNameFromLanguage } from '../../api/Language';
-import { useBestSubmission } from '../../util/Hook';
+import useGetScore, { useBestSubmission, useGetSubmissionTime } from '../../util/Hook';
 
 type PodiumProps = {
   place: number,
@@ -12,6 +12,7 @@ type PodiumProps = {
   inviteContent: React.ReactNode,
   loading: boolean,
   isCurrentPlayer: boolean,
+  numProblems: number,
 };
 
 type MedalProps = {
@@ -85,10 +86,12 @@ const Medal = styled.div<MedalProps>`
 
 function Podium(props: PodiumProps) {
   const {
-    place, player, gameStartTime, loading, inviteContent, isCurrentPlayer,
+    place, player, gameStartTime, loading, inviteContent, isCurrentPlayer, numProblems,
   } = props;
 
+  const score = useGetScore(player);
   const bestSubmission = useBestSubmission(player);
+  const time = useGetSubmissionTime(player);
 
   const getMedalColor = () => {
     switch (place) {
@@ -120,7 +123,7 @@ function Podium(props: PodiumProps) {
       return inviteContent;
     }
 
-    if (!bestSubmission) {
+    if (!score) {
       return (
         <ScoreText>
           Scored
@@ -130,7 +133,7 @@ function Podium(props: PodiumProps) {
       );
     }
 
-    const percent = Math.round((bestSubmission.numCorrect / bestSubmission.numTestCases) * 100);
+    const percent = Math.round((score / numProblems) * 100);
     return (
       <ScoreText>
         Scored
@@ -140,13 +143,13 @@ function Podium(props: PodiumProps) {
   };
 
   const getTimeText = () => {
-    if (!bestSubmission) {
+    if (!time) {
       return <SmallerText />;
     }
 
     // Calculate time from start of game till best submission
     const startTime = new Date(gameStartTime).getTime();
-    const diffMilliseconds = new Date(bestSubmission.startTime).getTime() - startTime;
+    const diffMilliseconds = new Date(time).getTime() - startTime;
     const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
 
     return (

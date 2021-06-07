@@ -98,7 +98,7 @@ public class GameMapperTests {
         submission.setNumCorrect(TEST_CASES);
 
         Player player = game.getPlayers().get(TestFields.USER_ID);
-        player.setSolved(true);
+        player.setSolved(new boolean[]{true});
         player.setPlayerCode(playerCode);
         player.getSubmissions().add(submission);
 

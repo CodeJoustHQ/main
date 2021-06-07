@@ -284,10 +284,10 @@ public class RoomServiceTests {
          * set to outside of the allowable range
          */
         User host = new User();
-        host.setNickname(NICKNAME);
+        host.setNickname(TestFields.NICKNAME);
 
         Room room = new Room();
-        room.setRoomId(ROOM_ID);
+        room.setRoomId(TestFields.ROOM_ID);
         room.setHost(host);
         room.addUser(host);
         
@@ -296,10 +296,10 @@ public class RoomServiceTests {
         request.setNumProblems(15);
 
         // Mock repository to return room when called
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(ROOM_ID));
-        ApiException exception = assertThrows(ApiException.class, () -> roomService.updateRoomSettings(ROOM_ID, request));
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.updateRoomSettings(TestFields.ROOM_ID, request));
 
-        verify(repository).findRoomByRoomId(ROOM_ID);
+        verify(repository).findRoomByRoomId(TestFields.ROOM_ID);
         assertEquals(ProblemError.INVALID_NUMBER_REQUEST, exception.getError());
     }
     

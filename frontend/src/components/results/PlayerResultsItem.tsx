@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Player, Submission } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
 import { Color } from '../../api/Color';
-import useGetScore, { useBestSubmission } from '../../util/Hook';
+import useGetScore, { useBestSubmission, useGetSubmissionTime } from '../../util/Hook';
 import Language, { displayNameFromLanguage } from '../../api/Language';
 import { TextButton } from '../core/Button';
 
@@ -82,15 +82,17 @@ type PlayerResultsCardProps = {
   isCurrentPlayer: boolean,
   gameStartTime: string,
   color: Color,
+  numProblems: number,
   onViewCode: () => void,
 };
 
 function PlayerResultsItem(props: PlayerResultsCardProps) {
   const {
-    player, place, isCurrentPlayer, color, gameStartTime, onViewCode,
+    player, place, isCurrentPlayer, color, gameStartTime, numProblems, onViewCode,
   } = props;
 
   const score = useGetScore(player);
+  const time = useGetSubmissionTime(player);
   const bestSubmission : Submission | null = useBestSubmission(player);
 
   const getDisplayNickname = () => {
@@ -103,21 +105,19 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
       return '0';
     }
 
-    const percent = Math.round((score / 12321) * 100);
+    const percent = Math.round((score / numProblems) * 100);
     return `${percent}%`;
   };
 
   const getSubmissionTime = () => {
-    if (!bestSubmission) {
-      return 'N/A';
+    if (!time) {
+      return 'Never';
     }
 
-    // Calculate time from start of game till best submission
-    const startTime = new Date(gameStartTime).getTime();
-    const diffMilliseconds = new Date(bestSubmission.startTime).getTime() - startTime;
+    const currentTime = new Date().getTime();
+    const diffMilliseconds = currentTime - new Date(time).getTime();
     const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
-
-    return ` ${diffMinutes} min`;
+    return `${diffMinutes}m ago`;
   };
 
   const getSubmissionCount = () => player.submissions.length || '0';
