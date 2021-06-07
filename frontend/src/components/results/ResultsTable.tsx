@@ -37,7 +37,7 @@ type ResultsTableProps = {
   players: Player[],
   currentUser: User | null,
   gameStartTime: string,
-  viewPlayerCode: (index: number) => void,
+  viewPlayerCode: ((index: number) => void) | null,
   spectatePlayer: ((index: number) => void) | null,
 };
 
@@ -54,7 +54,7 @@ function ResultsTable(props: ResultsTableProps) {
         <th>Score</th>
         <th>Time</th>
         <SmallColumn>Submissions</SmallColumn>
-        <th>Code</th>
+        {!spectatePlayer ? <th>Code</th> : null}
         {spectatePlayer ? <th>Spectate Live</th> : null}
       </tr>
       {players?.map((player, index) => (
@@ -64,10 +64,8 @@ function ResultsTable(props: ResultsTableProps) {
           isCurrentPlayer={currentUser?.userId === player.user.userId}
           gameStartTime={gameStartTime}
           color={player.color}
-          onViewCode={() => viewPlayerCode(index)}
-          onSpectateLive={
-            spectatePlayer ? (() => spectatePlayer(index)) : null
-          }
+          onViewCode={viewPlayerCode ? (() => viewPlayerCode(index)) : null}
+          onSpectateLive={spectatePlayer ? (() => spectatePlayer(index)) : null}
         />
       ))}
     </Content>

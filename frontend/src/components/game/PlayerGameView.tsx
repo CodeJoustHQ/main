@@ -24,9 +24,10 @@ import {
   Submission,
   SubmissionType,
   submitSolution,
+  SpectateGame,
 } from '../../api/Game';
 import LeaderboardCard from '../card/LeaderboardCard';
-import { getDifficultyDisplayButton } from '../core/Button';
+import { getDifficultyDisplayButton, PrimaryButton } from '../core/Button';
 import Language from '../../api/Language';
 import {
   CopyIndicator,
@@ -96,11 +97,13 @@ type StateRefType = {
 
 type PlayerGameViewProps = {
   gameError: string,
+  spectateGame: SpectateGame | null,
+  spectatorUnsubscribePlayer: (() => void) | null,
 };
 
 function PlayerGameView(props: PlayerGameViewProps) {
   const {
-    gameError,
+    gameError, spectateGame, spectatorUnsubscribePlayer,
   } = props;
 
   const { currentUser, game } = useAppSelector((state) => state);
@@ -309,9 +312,23 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
   return (
     <>
-      <LeaderboardContent>
-        {displayPlayerLeaderboard()}
-      </LeaderboardContent>
+      {!spectatorUnsubscribePlayer ? (
+        <LeaderboardContent>
+          {displayPlayerLeaderboard()}
+        </LeaderboardContent>
+      ) : (
+        <>
+          <p>
+            Spectate
+            {' '}
+            {spectateGame?.player.nickname}
+          </p>
+
+          <PrimaryButton onClick={spectatorUnsubscribePlayer}>
+            Go Back
+          </PrimaryButton>
+        </>
+      )}
 
       {loading ? <CenteredContainer><Loading /></CenteredContainer> : null}
       {error ? <CenteredContainer><ErrorMessage message={error} /></CenteredContainer> : null}
@@ -321,14 +338,28 @@ function PlayerGameView(props: PlayerGameViewProps) {
           percentage
           primaryMinSize={20}
           secondaryMinSize={35}
-          customClassName="game-splitter-container"
+          customClassName={!spectateGame ? 'game-splitter-container' : undefined}
         >
           {/* Problem title/description panel */}
           <OverflowPanel className="display-box-shadow">
-            <ProblemHeaderText>{game?.problems[0]?.name}</ProblemHeaderText>
-            {game?.problems[0] ? getDifficultyDisplayButton(game?.problems[0].difficulty!) : null}
+            <ProblemHeaderText>
+              {!spectateGame ? game?.problems[0]?.name : spectateGame?.problem.name}
+            </ProblemHeaderText>
+            {/* TODO: I don't know whether we have to verify that the problem exists. */}
+            {
+              !spectateGame ? (
+                getDifficultyDisplayButton(game?.problems[0].difficulty!)
+              ) : (
+                getDifficultyDisplayButton(spectateGame?.problem.difficulty!)
+              )
+            }
             <StyledMarkdownEditor
-              defaultValue={game?.problems[0]?.description}
+              defaultValue={!spectateGame ? (
+                game?.problems[0]?.description
+              ) : (
+                spectateGame?.problem.description
+              )}
+              value={spectateGame ? spectateGame?.problem.description : undefined}
               onChange={() => ''}
               readOnly
             />
@@ -347,32 +378,46 @@ function PlayerGameView(props: PlayerGameViewProps) {
           </OverflowPanel>
 
           {/* Code editor and console panels */}
-          <SplitterLayout
-            vertical
-            percentage
-            primaryMinSize={20}
-            secondaryMinSize={0}
-          >
-            <NoPaddingPanel>
-              <Editor
-                onCodeChange={setCurrentCode}
-                onLanguageChange={setCurrentLanguage}
-                codeMap={defaultCodeList[0]}
-                defaultLanguage={currentLanguage}
-                defaultCode={null}
-                liveCode={null}
-              />
-            </NoPaddingPanel>
-
-            <Panel>
-              <Console
-                testCases={game?.problems[0]?.testCases || []}
-                submission={submission}
-                onRun={runCode}
-                onSubmit={submitCode}
-              />
-            </Panel>
-          </SplitterLayout>
+          {
+            !spectateGame ? (
+              <SplitterLayout
+                vertical
+                percentage
+                primaryMinSize={20}
+                secondaryMinSize={0}
+              >
+                <NoPaddingPanel>
+                  <Editor
+                    onCodeChange={setCurrentCode}
+                    onLanguageChange={setCurrentLanguage}
+                    codeMap={defaultCodeList[0]}
+                    defaultLanguage={currentLanguage}
+                    defaultCode={null}
+                    liveCode={null}
+                  />
+                </NoPaddingPanel>
+                <Panel>
+                  <Console
+                    testCases={game?.problems[0]?.testCases || []}
+                    submission={submission}
+                    onRun={runCode}
+                    onSubmit={submitCode}
+                  />
+                </Panel>
+              </SplitterLayout>
+            ) : (
+              <NoPaddingPanel className="display-box-shadow">
+                <Editor
+                  onLanguageChange={null}
+                  onCodeChange={null}
+                  codeMap={null}
+                  defaultLanguage={spectateGame?.language as Language}
+                  defaultCode={spectateGame?.code}
+                  liveCode={spectateGame?.code}
+                />
+              </NoPaddingPanel>
+            )
+          }
         </SplitterLayout>
       </SplitterContainer>
       <BottomCopyIndicatorContainer copied={copiedEmail}>

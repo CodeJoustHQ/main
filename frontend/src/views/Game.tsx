@@ -215,6 +215,8 @@ function GamePage() {
         ) : (
           <PlayerGameView
             gameError={error}
+            spectateGame={null}
+            spectatorUnsubscribePlayer={null}
           />
         )
       }
