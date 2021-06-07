@@ -27,14 +27,9 @@ import {
   SpectateGame,
 } from '../../api/Game';
 import LeaderboardCard from '../card/LeaderboardCard';
-import { getDifficultyDisplayButton, PrimaryButton } from '../core/Button';
+import { getDifficultyDisplayButton, InheritedTextButton, PrimaryButton } from '../core/Button';
 import Language from '../../api/Language';
-import {
-  CopyIndicator,
-  BottomCopyIndicatorContainer,
-  SmallInlineCopyIcon,
-  SmallInlineCopyText,
-} from '../special/CopyIndicator';
+import { CopyIndicator, BottomCopyIndicatorContainer, InlineCopyIcon } from '../special/CopyIndicator';
 import { useAppSelector } from '../../util/Hook';
 import { routes, send, subscribe } from '../../api/Socket';
 import { User } from '../../api/User';
@@ -365,15 +360,15 @@ function PlayerGameView(props: PlayerGameViewProps) {
             />
             <BottomFooterText>
               {'Notice an issue? Contact us at '}
-              <SmallInlineCopyText
+              <InheritedTextButton
                 onClick={() => {
                   copy('support@codejoust.co');
                   setCopiedEmail(true);
                 }}
               >
                 support@codejoust.co
-                <SmallInlineCopyIcon>content_copy</SmallInlineCopyIcon>
-              </SmallInlineCopyText>
+                <InlineCopyIcon>content_copy</InlineCopyIcon>
+              </InheritedTextButton>
             </BottomFooterText>
           </OverflowPanel>
 

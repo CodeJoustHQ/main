@@ -17,8 +17,12 @@ import { Difficulty } from '../api/Difficulty';
 import { Game, manuallyEndGame } from '../api/Game';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
-import { TextButton, DangerButton } from '../components/core/Button';
-import { connect, routes, subscribe } from '../api/Socket';
+import {
+  TextButton, DangerButton,
+} from '../components/core/Button';
+import {
+  connect, routes, subscribe,
+} from '../api/Socket';
 import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { fetchGame, setGame } from '../redux/Game';
 import { setCurrentUser } from '../redux/User';
