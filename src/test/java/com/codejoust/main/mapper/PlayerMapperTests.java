@@ -24,7 +24,6 @@ public class PlayerMapperTests {
 
         assertEquals(user, player.getUser());
         assertNull(player.getPlayerCode());
-        assertEquals(new boolean[]{false}, player.getSolved());
         assertEquals(0, player.getSubmissions().size());
     }
 }

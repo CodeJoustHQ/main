@@ -418,7 +418,7 @@ function GamePage() {
         // Set the 'submit' submission type to correctly display result.
         res.submissionType = SubmissionType.Submit;
         setSubmissions(submissions.concat([res]));
-        setCurrentSubmission(getSubmission(currentProblemIndex, submissions));
+        setCurrentSubmission(res);
         checkSendSolutionCorrectNotification(res);
       })
       .catch((err) => {
@@ -429,7 +429,7 @@ function GamePage() {
 
   const nextProblem = () => {
     setCurrentProblemIndex((currentProblemIndex + 1) % problems?.length);
-    setCurrentSubmission(getSubmission(currentProblemIndex, submissions));
+    setCurrentSubmission(getSubmission((currentProblemIndex + 1) % problems?.length, submissions));
   };
 
   const previousProblem = () => {
@@ -440,7 +440,7 @@ function GamePage() {
     }
 
     setCurrentProblemIndex(temp);
-    setCurrentSubmission(getSubmission(currentProblemIndex, submissions));
+    setCurrentSubmission(getSubmission(temp, submissions));
   };
 
   const endGameAction = () => {
