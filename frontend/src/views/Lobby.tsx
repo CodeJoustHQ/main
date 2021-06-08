@@ -10,6 +10,8 @@ import {
   SecondaryHeaderText,
   SmallHeaderText,
   NoMarginSubtitleText,
+  LowMarginText,
+  Text,
 } from '../components/core/Text';
 import {
   connect, routes, subscribe, disconnect,
@@ -21,7 +23,7 @@ import {
   PrimaryButton,
   SmallDifficultyButtonNoMargin,
   InlineLobbyIcon,
-  SecondaryRedButton,
+  SecondaryRedButton, TextButton,
 } from '../components/core/Button';
 import Loading from '../components/core/Loading';
 import PlayerCard from '../components/card/PlayerCard';
@@ -42,7 +44,7 @@ import {
   InlineBackgroundCopyText,
 } from '../components/special/CopyIndicator';
 import IdContainer from '../components/special/IdContainer';
-import { FlexBareContainer } from '../components/core/Container';
+import { FlexBareContainer, LeftContainer } from '../components/core/Container';
 import { Slider, SliderContainer } from '../components/core/RangeSlider';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
 import { SelectableProblem } from '../api/Problem';
@@ -102,6 +104,10 @@ const BackgroundContainer = styled.div`
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
   border-radius: 0.75rem;
   overflow: auto;
+`;
+
+const ShowProblemSelectorContainer = styled.div`
+  margin: 10px 0;
 `;
 
 const DifficultyContainer = styled.div`
@@ -598,11 +604,27 @@ function LobbyPage() {
         show={actionCardHelp}
         exitModal={() => setActionCardHelp(false)}
       />
-      <Modal show={showProblemSelector} onExit={() => setShowProblemSelector(false)} fullScreen>
-        <ProblemSelector
-          selectedProblems={selectedProblems}
-          onSelect={addProblem}
-        />
+      <Modal
+        show={showProblemSelector && isHost(currentUser)}
+        onExit={() => setShowProblemSelector(false)}
+        fullScreen
+      >
+        <LeftContainer>
+          <NoMarginMediumText>Select problems for this game:</NoMarginMediumText>
+          <Text>
+            Use the dropdown below to select the problems for your game.
+            Alternatively, skip this step to create a game with a random problem.
+          </Text>
+          { error ? <ErrorMessage message={error} /> : null }
+          <ProblemSelector
+            selectedProblems={selectedProblems}
+            onSelect={addProblem}
+          />
+          <SelectedProblemsDisplay
+            problems={selectedProblems}
+            onRemove={isHost(currentUser) ? removeProblem : null}
+          />
+        </LeftContainer>
       </Modal>
       <HoverTooltip
         visible={hoverVisible}
@@ -694,6 +716,11 @@ function LobbyPage() {
             {!selectedProblems.length ? (
               <>
                 <NoMarginMediumText>Difficulty</NoMarginMediumText>
+                {isHost(currentUser) ? (
+                  <LowMarginText>
+                    Choose a difficulty for your randomly selected problem:
+                  </LowMarginText>
+                ) : null}
                 <DifficultyContainer>
                   {Object.keys(Difficulty).map((key) => {
                     const difficultyKey: Difficulty = Difficulty[key as keyof typeof Difficulty];
@@ -716,13 +743,22 @@ function LobbyPage() {
               </>
             ) : (
               <>
-                <NoMarginMediumText>Selected Problems</NoMarginMediumText>
+                <NoMarginMediumText>Problems</NoMarginMediumText>
                 <SelectedProblemsDisplay
                   problems={selectedProblems}
                   onRemove={isHost(currentUser) ? removeProblem : null}
                 />
               </>
             )}
+
+            {isHost(currentUser) ? (
+              <ShowProblemSelectorContainer>
+                <TextButton onClick={() => setShowProblemSelector(true)}>
+                  {selectedProblems.length ? 'Edit problem selection ' : 'Or choose a specific problem '}
+                  &#8594;
+                </TextButton>
+              </ShowProblemSelectorContainer>
+            ) : null}
 
             <NoMarginMediumText>Duration</NoMarginMediumText>
             <NoMarginSubtitleText>
