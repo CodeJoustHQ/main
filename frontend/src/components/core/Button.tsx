@@ -270,3 +270,26 @@ export const InlineShowIcon = styled.i.attrs(() => ({
   font-size: ${({ theme }) => theme.fontSize.medium};
   color: ${({ theme }) => theme.colors.font};
 `;
+
+export const SpectatorBackIcon = styled.i.attrs(() => ({
+  className: 'material-icons',
+}))`
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  transform: translate(0%, -50%);
+  text-align: center;
+  margin: 0;
+  border-radius: 2rem;
+  font-size: 2rem;
+  padding: 1rem;
+  width: 2rem;
+  height: 2rem;
+  background: ${({ theme }) => theme.colors.white};
+  box-shadow: 0 -1px 8px rgb(0 0 0 / 8%);
+
+  &:hover {
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.24);
+  }
+`;

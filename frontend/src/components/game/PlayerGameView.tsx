@@ -12,10 +12,15 @@ import copy from 'copy-to-clipboard';
 import { Message, Subscription } from 'stompjs';
 import Editor from './Editor';
 import { DefaultCodeType, getDefaultCodeMap, Problem } from '../../api/Problem';
-import { CenteredContainer, Panel, SplitterContainer } from '../core/Container';
+import {
+  CenteredContainer,
+  Panel,
+  SplitterContainer,
+  FlexBareContainer,
+} from '../core/Container';
 import ErrorMessage from '../core/Error';
 import 'react-splitter-layout/lib/index.css';
-import { ProblemHeaderText, BottomFooterText, Text } from '../core/Text';
+import { ProblemHeaderText, BottomFooterText, NoMarginDefaultText } from '../core/Text';
 import Console from './Console';
 import Loading from '../core/Loading';
 import {
@@ -27,12 +32,7 @@ import {
   SpectateGame,
 } from '../../api/Game';
 import LeaderboardCard from '../card/LeaderboardCard';
-import {
-  getDifficultyDisplayButton,
-  InheritedTextButton,
-  InlineLobbyIcon,
-  PrimaryButton,
-} from '../core/Button';
+import { getDifficultyDisplayButton, InheritedTextButton, SpectatorBackIcon } from '../core/Button';
 import Language from '../../api/Language';
 import { CopyIndicator, BottomCopyIndicatorContainer, InlineCopyIcon } from '../special/CopyIndicator';
 import { useAppSelector } from '../../util/Hook';
@@ -87,26 +87,43 @@ const LeaderboardContent = styled.div`
   background-attachment: local, local, scroll, scroll;
 `;
 
-const TopFlexContainer = styled.div`
+const GameHeaderContainer = styled(FlexBareContainer)`
+  margin: 0 20px;
+  height: 5rem;
+`;
+
+const GameHeaderContainerChild = styled.div`
+  flex: 3;
+  position: relative;
+`;
+
+const GameHeaderText = styled.p`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  text-align: center;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+`;
+
+const GameHeaderStatsContainer = styled.div`
+  position: absolute;
+  top: 50%;
+  right: 0%;
+  transform: translate(0%, -50%);
+  width: 100%;
+`;
+
+const GameHeaderStatsSubContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  height: 100px;
-`;
-
-const InlineBackIcon = styled(InlineLobbyIcon)`
-  flex: 1;
-  width: 3rem;
-  height: 3rem;
-`;
-
-const CenterText = styled(Text)`
-  flex: 3;
-  font-size: 2.5rem;
-  text-align: center;
-`;
-
-const RightCardText = styled(Text)`
-  flex: 1;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  text-align: left;
+  background: ${({ theme }) => theme.colors.white};
+  border-radius: 0.5rem;
+  box-shadow: 0 -1px 8px rgb(0 0 0 / 8%);
 `;
 
 // The type used for the state reference.
@@ -339,23 +356,39 @@ function PlayerGameView(props: PlayerGameViewProps) {
           {displayPlayerLeaderboard()}
         </LeaderboardContent>
       ) : (
-        <>
-          <TopFlexContainer>
-            <InlineBackIcon>arrow_back</InlineBackIcon>
-            <CenterText>
-              Spectate
+        <GameHeaderContainer>
+          <GameHeaderContainerChild>
+            <SpectatorBackIcon>arrow_back</SpectatorBackIcon>
+          </GameHeaderContainerChild>
+          <GameHeaderContainerChild>
+            <GameHeaderText>
+              Spectating:
               {' '}
-              {spectateGame?.player.nickname}
-            </CenterText>
-            <RightCardText>
-              Stats and Whatnot
-            </RightCardText>
-          </TopFlexContainer>
-
-          <PrimaryButton onClick={spectatorUnsubscribePlayer || (() => {})}>
-            Go Back
-          </PrimaryButton>
-        </>
+              <b>{spectateGame?.player.nickname}</b>
+            </GameHeaderText>
+          </GameHeaderContainerChild>
+          <GameHeaderContainerChild>
+            <GameHeaderStatsContainer>
+              <GameHeaderStatsSubContainer>
+                <NoMarginDefaultText>
+                  <b>Score:</b>
+                  {' '}
+                  50%
+                </NoMarginDefaultText>
+                <NoMarginDefaultText>
+                  <b>Time:</b>
+                  {' '}
+                  21 min
+                </NoMarginDefaultText>
+                <NoMarginDefaultText>
+                  <b>Submissions:</b>
+                  {' '}
+                  3
+                </NoMarginDefaultText>
+              </GameHeaderStatsSubContainer>
+            </GameHeaderStatsContainer>
+          </GameHeaderContainerChild>
+        </GameHeaderContainer>
       )}
 
       {loading ? <CenteredContainer><Loading /></CenteredContainer> : null}
