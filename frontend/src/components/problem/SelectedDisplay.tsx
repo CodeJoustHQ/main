@@ -60,7 +60,7 @@ export function SelectedProblemsDisplay(props: SelectedProblemsDisplayProps) {
         </SelectedItemContainer>
       ))}
 
-      { !problems.length ? <p>Selected problems will show here.</p> : null }
+      { !problems.length ? <p>No problems currently selected.</p> : null }
     </Content>
   );
 }

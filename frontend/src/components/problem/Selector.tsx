@@ -5,8 +5,10 @@ import ErrorMessage from '../core/Error';
 import { displayNameFromDifficulty } from '../../api/Difficulty';
 import { InlineDifficultyDisplayButton } from '../core/Button';
 import { TextInput } from '../core/Input';
-import { useClickOutside } from '../../util/Hook';
+import { useAppDispatch, useAppSelector, useClickOutside } from '../../util/Hook';
 import { User } from '../../api/User';
+import { fetchAccount } from '../../redux/Account';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 type ProblemSelectorProps = {
   selectedProblems: SelectableProblem[],
@@ -101,9 +103,26 @@ export function ProblemSelector(props: ProblemSelectorProps) {
   const { selectedProblems, onSelect } = props;
 
   const [error, setError] = useState('');
-  const [problems, setProblems] = useState<SelectableProblem[]>([]);
+  const [verifiedProblems, setVerifiedProblems] = useState<SelectableProblem[]>([]);
   const [showProblems, setShowProblems] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const [allProblems, setAllProblems] = useState<SelectableProblem[]>([]);
+
+  const { account, token } = useAppSelector((state) => state.account);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchAccount());
+    }
+  }, [token, dispatch]);
+
+  useEffect(() => {
+    let accountProblems = account?.problems || [];
+    accountProblems = accountProblems.filter((problem) => problem.testCases.length > 0);
+
+    setAllProblems((accountProblems as SelectableProblem[]).concat(verifiedProblems));
+  }, [account, verifiedProblems]);
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -113,7 +132,7 @@ export function ProblemSelector(props: ProblemSelectorProps) {
   useEffect(() => {
     getProblems(true)
       .then((res) => {
-        setProblems(res);
+        setVerifiedProblems(res);
       })
       .catch((err) => {
         setError(err.message);
@@ -122,7 +141,7 @@ export function ProblemSelector(props: ProblemSelectorProps) {
 
   const setSelectedStatus = (index: number) => {
     setShowProblems(false);
-    onSelect(problems[index]);
+    onSelect(allProblems[index]);
   };
 
   const setSearchStatus = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,11 +153,11 @@ export function ProblemSelector(props: ProblemSelectorProps) {
       <TextSearch
         onClick={() => setShowProblems(!showProblems)}
         onChange={setSearchStatus}
-        placeholder={problems.length ? 'Select problems (optional)' : 'Loading...'}
+        placeholder={allProblems.length ? 'Select problems' : 'Loading...'}
       />
 
       <InnerContent show={showProblems} ref={ref}>
-        {problems.map((problem, index) => {
+        {allProblems.map((problem, index) => {
           // Only show problems that haven't been selected yet
           if (selectedProblems.some((p) => p.problemId === problem.problemId)) {
             return null;
