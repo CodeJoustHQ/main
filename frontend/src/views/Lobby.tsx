@@ -45,13 +45,14 @@ import IdContainer from '../components/special/IdContainer';
 import { FlexBareContainer } from '../components/core/Container';
 import { Slider, SliderContainer } from '../components/core/RangeSlider';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
-import { getAllProblemTags, ProblemTag, SelectableProblem } from '../api/Problem';
-import { ProblemSelector, TagSelector } from '../components/problem/Selector';
-import { SelectedProblemsDisplay, SelectedTagsDisplay } from '../components/problem/SelectedDisplay';
+import { SelectableProblem } from '../api/Problem';
+import { ProblemSelector } from '../components/problem/Selector';
+import { SelectedProblemsDisplay } from '../components/problem/SelectedDisplay';
 import { useAppDispatch, useAppSelector, useMousePosition } from '../util/Hook';
 import { fetchRoom, setRoom } from '../redux/Room';
 import { setCurrentUser } from '../redux/User';
 import { LobbyHelpModal } from '../components/core/HelpModal';
+import Modal from '../components/core/Modal';
 
 type LobbyPageLocation = {
   user: User,
@@ -151,10 +152,9 @@ function LobbyPage() {
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [duration, setDuration] = useState<number | undefined>(15);
   const [selectedProblems, setSelectedProblems] = useState<SelectableProblem[]>([]);
-  const [selectedTags, setSelectedTags] = useState<ProblemTag[]>([]);
-  const [allTags, setAllTags] = useState<ProblemTag[]>([]);
   const [size, setSize] = useState<number | undefined>(10);
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
+  const [showProblemSelector, setShowProblemSelector] = useState(true);
 
   // React Redux
   const dispatch = useAppDispatch();
@@ -408,16 +408,6 @@ function LobbyPage() {
     updateSelectedProblems(newProblems);
   };
 
-  const addTag = (newTag: ProblemTag) => {
-    const newTags = [...selectedTags, newTag];
-    setSelectedTags(newTags);
-  };
-
-  const removeTag = (index: number) => {
-    const newTags = selectedTags.filter((_, i) => i !== index);
-    setSelectedTags(newTags);
-  };
-
   const onSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
@@ -543,16 +533,6 @@ function LobbyPage() {
     }).finally(() => setLoading(false));
   }, [dispatch]);
 
-  useEffect(() => {
-    getAllProblemTags()
-      .then((res) => {
-        setAllTags(res);
-      })
-      .catch((err) => {
-        setError(err.message);
-      });
-  }, []);
-
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
     // Grab the user and room information; otherwise, redirect to the join page
@@ -618,6 +598,12 @@ function LobbyPage() {
         show={actionCardHelp}
         exitModal={() => setActionCardHelp(false)}
       />
+      <Modal show={showProblemSelector} onExit={() => setShowProblemSelector(false)} fullScreen>
+        <ProblemSelector
+          selectedProblems={selectedProblems}
+          onSelect={addProblem}
+        />
+      </Modal>
       <HoverTooltip
         visible={hoverVisible}
         x={mousePosition.x}
@@ -704,51 +690,39 @@ function LobbyPage() {
         <RoomSettingsContainer>
           <LobbyContainerTitle>Room Settings</LobbyContainerTitle>
           <BackgroundContainer>
-            <NoMarginMediumText>Difficulty</NoMarginMediumText>
-            <DifficultyContainer>
-              {Object.keys(Difficulty).map((key) => {
-                const difficultyKey: Difficulty = Difficulty[key as keyof typeof Difficulty];
-                return (
-                  <HoverContainerSmallDifficultyButton key={key}>
-                    <HoverElementSmallDifficultyButton {...hoverProps} />
-                    <SmallDifficultyButtonNoMargin
-                      difficulty={difficultyKey}
-                      onClick={() => updateDifficultySetting(key)}
-                      active={difficulty === difficultyKey}
-                      enabled={isHost(currentUser)}
-                      disabled={!isHost(currentUser)}
-                    >
-                      {key}
-                    </SmallDifficultyButtonNoMargin>
-                  </HoverContainerSmallDifficultyButton>
-                );
-              })}
-            </DifficultyContainer>
 
-            <NoMarginMediumText>Selected Tags</NoMarginMediumText>
-            <SelectedTagsDisplay
-              tags={selectedTags}
-              onRemove={isHost(currentUser) ? removeTag : null}
-            />
-            {isHost(currentUser) ? (
-              <TagSelector
-                tags={allTags}
-                selectedTags={selectedTags}
-                onSelect={addTag}
-              />
-            ) : null}
-
-            <NoMarginMediumText>Selected Problems</NoMarginMediumText>
-            <SelectedProblemsDisplay
-              problems={selectedProblems}
-              onRemove={isHost(currentUser) ? removeProblem : null}
-            />
-            {isHost(currentUser) ? (
-              <ProblemSelector
-                selectedProblems={selectedProblems}
-                onSelect={addProblem}
-              />
-            ) : null}
+            {!selectedProblems.length ? (
+              <>
+                <NoMarginMediumText>Difficulty</NoMarginMediumText>
+                <DifficultyContainer>
+                  {Object.keys(Difficulty).map((key) => {
+                    const difficultyKey: Difficulty = Difficulty[key as keyof typeof Difficulty];
+                    return (
+                      <HoverContainerSmallDifficultyButton key={key}>
+                        <HoverElementSmallDifficultyButton {...hoverProps} />
+                        <SmallDifficultyButtonNoMargin
+                          difficulty={difficultyKey}
+                          onClick={() => updateDifficultySetting(key)}
+                          active={difficulty === difficultyKey}
+                          enabled={isHost(currentUser)}
+                          disabled={!isHost(currentUser)}
+                        >
+                          {key}
+                        </SmallDifficultyButtonNoMargin>
+                      </HoverContainerSmallDifficultyButton>
+                    );
+                  })}
+                </DifficultyContainer>
+              </>
+            ) : (
+              <>
+                <NoMarginMediumText>Selected Problems</NoMarginMediumText>
+                <SelectedProblemsDisplay
+                  problems={selectedProblems}
+                  onRemove={isHost(currentUser) ? removeProblem : null}
+                />
+              </>
+            )}
 
             <NoMarginMediumText>Duration</NoMarginMediumText>
             <NoMarginSubtitleText>

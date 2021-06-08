@@ -94,7 +94,7 @@ export default function EnterNicknamePage(props: EnterNicknameProps) {
       />
       { focusInput && !validNickname ? (
         <Text>
-          The nickname must be non-empty, have no spaces, and be less than 16 characters.
+          Your name must be non-empty, have no spaces, and be less than 16 characters.
         </Text>
       ) : null}
       { loading ? <Loading /> : null }
