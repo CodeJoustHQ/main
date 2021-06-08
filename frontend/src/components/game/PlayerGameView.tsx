@@ -219,7 +219,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
     currentLanguageParam: string | undefined) => {
     if (gameParam && currentUserParam) {
       const spectatorViewBody: string = JSON.stringify({
-        player: currentUserParam,
+        user: currentUserParam,
         problem: gameParam.problems[0],
         code: currentCodeParam,
         language: currentLanguageParam,
@@ -264,7 +264,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
     if (game && currentUser && currentUser.userId) {
       // Get the new player object for spectating.
       game.players.forEach((player) => {
-        if (currentUser.userId === player.user.userId) {
+        if (player.user.userId === spectateGame?.user.userId) {
           setPlayerSpectate(player);
         }
       });
@@ -383,7 +383,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
             <GameHeaderText>
               Spectating:
               {' '}
-              <b>{spectateGame?.player.nickname}</b>
+              <b>{spectateGame?.user.nickname}</b>
             </GameHeaderText>
           </GameHeaderContainerChild>
           <GameHeaderContainerChild>
