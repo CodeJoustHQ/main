@@ -136,3 +136,27 @@ export const manuallyEndGame = (roomId: string, params: EndGameParams):
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
+
+export const getScore = (bestSubmission: Submission | null) => {
+  if (!bestSubmission) {
+    return '0';
+  }
+
+  const percent = Math.round((bestSubmission.numCorrect / bestSubmission.numTestCases) * 100);
+  return `${percent}%`;
+};
+
+export const getSubmissionTime = (bestSubmission: Submission | null, gameStartTime: string) => {
+  if (!bestSubmission) {
+    return 'N/A';
+  }
+
+  // Calculate time from start of game till best submission
+  const startTime = new Date(gameStartTime).getTime();
+  const diffMilliseconds = new Date(bestSubmission.startTime).getTime() - startTime;
+  const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
+
+  return ` ${diffMinutes} min`;
+};
+
+export const getSubmissionCount = (player: Player) => player.submissions.length || '0';
