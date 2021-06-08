@@ -286,7 +286,7 @@ export const SpectatorBackIcon = styled.i.attrs(() => ({
   width: 2rem;
   height: 2rem;
   background: ${({ theme }) => theme.colors.white};
-  box-shadow: 0 -1px 8px rgb(0 0 0 / 8%);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
 
   &:hover {
     cursor: pointer;

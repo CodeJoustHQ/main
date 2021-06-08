@@ -104,7 +104,7 @@ const GameHeaderText = styled.p`
   transform: translate(-50%, -50%);
   margin: 0;
   text-align: center;
-  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
 `;
 
 const GameHeaderStatsContainer = styled.div`
@@ -358,7 +358,11 @@ function PlayerGameView(props: PlayerGameViewProps) {
       ) : (
         <GameHeaderContainer>
           <GameHeaderContainerChild>
-            <SpectatorBackIcon>arrow_back</SpectatorBackIcon>
+            <SpectatorBackIcon
+              onClick={spectatorUnsubscribePlayer || (() => {})}
+            >
+              arrow_back
+            </SpectatorBackIcon>
           </GameHeaderContainerChild>
           <GameHeaderContainerChild>
             <GameHeaderText>
