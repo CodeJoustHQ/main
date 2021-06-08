@@ -11,6 +11,7 @@ type EditorProps = {
   codeMap: DefaultCodeType | null,
   defaultLanguage: Language,
   defaultCode: string | null,
+  liveCode: string | null,
 };
 
 const Content = styled.div`
@@ -88,7 +89,8 @@ const monacoEditorOptions: EditorConstructionOptions = {
 // This function refreshes the width of Monaco editor upon change in container size
 function ResizableMonacoEditor(props: EditorProps) {
   const {
-    onLanguageChange, onCodeChange, codeMap, defaultLanguage, defaultCode,
+    onLanguageChange, onCodeChange, codeMap, defaultLanguage,
+    defaultCode, liveCode,
   } = props;
 
   const theme = useContext(ThemeContext);
@@ -163,9 +165,10 @@ function ResizableMonacoEditor(props: EditorProps) {
           height="100%"
           editorDidMount={handleEditorDidMount}
           editorWillMount={handleEditorWillMount}
-          onChange={() => onCodeChange && onCodeChange(codeEditor?.getValue() || 'Loading...')}
+          onChange={() => onCodeChange && onCodeChange(codeEditor?.getValue() || '')}
           language={languageToEditorLanguage(currentLanguage)}
           defaultValue={defaultCode || 'Loading...'}
+          value={liveCode}
         />
       </EditorContainer>
     </Content>

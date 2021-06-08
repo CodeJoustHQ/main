@@ -46,8 +46,9 @@ function PreviewCodeContent(props: PreviewCodeContentProps) {
           onLanguageChange={null}
           onCodeChange={null}
           codeMap={null}
-          defaultLanguage={bestSubmission?.language as Language || Language.Python}
+          defaultLanguage={bestSubmission?.language as Language || Language.Java}
           defaultCode={bestSubmission?.code || 'Uh oh! An error occurred fetching this player\'s code'}
+          liveCode={null}
         />
       </CodePreview>
     </div>

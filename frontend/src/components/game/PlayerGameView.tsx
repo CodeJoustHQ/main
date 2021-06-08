@@ -1,9 +1,15 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import styled from 'styled-components';
 import SplitterLayout from 'react-splitter-layout';
 import MarkdownEditor from 'rich-markdown-editor';
 import { useBeforeunload } from 'react-beforeunload';
 import copy from 'copy-to-clipboard';
+import { Message, Subscription } from 'stompjs';
 import Editor from './Editor';
 import { DefaultCodeType, getDefaultCodeMap, Problem } from '../../api/Problem';
 import { CenteredContainer, Panel, SplitterContainer } from '../core/Container';
@@ -13,13 +19,20 @@ import { ProblemHeaderText, BottomFooterText } from '../core/Text';
 import Console from './Console';
 import Loading from '../core/Loading';
 import {
-  runSolution, Submission, SubmissionType, submitSolution,
+  Game,
+  runSolution,
+  Submission,
+  SubmissionType,
+  submitSolution,
+  SpectateGame,
 } from '../../api/Game';
 import LeaderboardCard from '../card/LeaderboardCard';
-import { getDifficultyDisplayButton, InheritedTextButton } from '../core/Button';
+import { getDifficultyDisplayButton, InheritedTextButton, PrimaryButton } from '../core/Button';
 import Language from '../../api/Language';
 import { CopyIndicator, BottomCopyIndicatorContainer, InlineCopyIcon } from '../special/CopyIndicator';
 import { useAppSelector } from '../../util/Hook';
+import { routes, send, subscribe } from '../../api/Socket';
+import { User } from '../../api/User';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
   margin-top: 15px;
@@ -69,13 +82,23 @@ const LeaderboardContent = styled.div`
   background-attachment: local, local, scroll, scroll;
 `;
 
+// The type used for the state reference.
+type StateRefType = {
+  game: Game | null,
+  currentUser: User | null,
+  currentCode: string,
+  currentLanguage: string,
+}
+
 type PlayerGameViewProps = {
   gameError: string,
+  spectateGame: SpectateGame | null,
+  spectatorUnsubscribePlayer: (() => void) | null,
 };
 
 function PlayerGameView(props: PlayerGameViewProps) {
   const {
-    gameError,
+    gameError, spectateGame, spectatorUnsubscribePlayer,
   } = props;
 
   const { currentUser, game } = useAppSelector((state) => state);
@@ -90,6 +113,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
   const [currentCode, setCurrentCode] = useState('');
   const [defaultCodeList, setDefaultCodeList] = useState<DefaultCodeType[]>([]);
 
+  // Variable to hold whether the user is subscribed to their own player socket.
+  const [playerSocket, setPlayerSocket] = useState<Subscription | null>(null);
+
   /**
    * Display beforeUnload message to inform the user that they may lose
    * their code / data if they leave the page.
@@ -98,7 +124,14 @@ function PlayerGameView(props: PlayerGameViewProps) {
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
-  // const { currentUser, game } = useAppSelector((state) => state);
+  // References necessary for the spectator subscription callback.
+  const stateRef = useRef<StateRefType>();
+  stateRef.current = {
+    game,
+    currentUser,
+    currentCode,
+    currentLanguage,
+  };
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
     code: string, language: Language) => {
@@ -128,14 +161,65 @@ function PlayerGameView(props: PlayerGameViewProps) {
     });
   }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage]);
 
+  const sendViewUpdate = useCallback((gameParam: Game | null | undefined,
+    currentUserParam: User | null | undefined,
+    currentCodeParam: string | undefined,
+    currentLanguageParam: string | undefined) => {
+    if (gameParam && currentUserParam) {
+      const spectatorViewBody: string = JSON.stringify({
+        player: currentUserParam,
+        problem: gameParam.problems[0],
+        code: currentCodeParam,
+        language: currentLanguageParam,
+      });
+      send(
+        routes(gameParam.room.roomId, currentUserParam.userId).subscribe_player,
+        {},
+        spectatorViewBody,
+      );
+    }
+  }, []);
+
+  // Send updates via socket to any spectators.
+  useEffect(() => {
+    sendViewUpdate(game, currentUser, currentCode, currentLanguage);
+  }, [game, currentUser, currentCode, currentLanguage, sendViewUpdate]);
+
+  // Re-subscribe in order to get the correct subscription callback.
+  const subscribePlayer = useCallback((roomIdParam: string, userIdParam: string) => {
+    // Update the spectate view based on player activity.
+    const subscribePlayerCallback = (result: Message) => {
+      if (JSON.parse(result.body).newSpectator) {
+        sendViewUpdate(stateRef.current?.game, stateRef.current?.currentUser,
+          stateRef.current?.currentCode, stateRef.current?.currentLanguage);
+      }
+    };
+
+    setLoading(true);
+    subscribe(routes(roomIdParam, userIdParam).subscribe_player, subscribePlayerCallback)
+      .then((subscription) => {
+        setPlayerSocket(subscription);
+        setError('');
+      }).catch((err) => {
+        setError(err.message);
+      }).finally(() => {
+        setLoading(false);
+      });
+  }, [sendViewUpdate]);
+
   // Map the game in Redux to the state variables used in this file
   useEffect(() => {
-    if (game) {
+    if (game && currentUser && currentUser.userId) {
+      // Subscribe the player to their own socket.
+      if (!playerSocket) {
+        subscribePlayer(game.room.roomId, currentUser.userId);
+      }
+
       /**
        * If default code list is empty and current user (non-spectator) is
        * loaded, fetch the code from the backend
        */
-      if (!defaultCodeList.length && currentUser && !currentUser.spectator) {
+      if (!defaultCodeList.length && !currentUser.spectator) {
         let matchFound = false;
 
         // If this user refreshed and has already submitted code, load and save their latest code
@@ -152,7 +236,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
         }
       }
     }
-  }, [game, currentUser, defaultCodeList, setDefaultCodeFromProblems]);
+  }, [game, currentUser, defaultCodeList, setDefaultCodeFromProblems,
+    subscribePlayer, playerSocket]);
 
   // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {
@@ -222,9 +307,23 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
   return (
     <>
-      <LeaderboardContent>
-        {displayPlayerLeaderboard()}
-      </LeaderboardContent>
+      {!spectatorUnsubscribePlayer ? (
+        <LeaderboardContent>
+          {displayPlayerLeaderboard()}
+        </LeaderboardContent>
+      ) : (
+        <>
+          <p>
+            Spectate
+            {' '}
+            {spectateGame?.player.nickname}
+          </p>
+
+          <PrimaryButton onClick={spectatorUnsubscribePlayer}>
+            Go Back
+          </PrimaryButton>
+        </>
+      )}
 
       {loading ? <CenteredContainer><Loading /></CenteredContainer> : null}
       {error ? <CenteredContainer><ErrorMessage message={error} /></CenteredContainer> : null}
@@ -234,14 +333,28 @@ function PlayerGameView(props: PlayerGameViewProps) {
           percentage
           primaryMinSize={20}
           secondaryMinSize={35}
-          customClassName="game-splitter-container"
+          customClassName={!spectateGame ? 'game-splitter-container' : undefined}
         >
           {/* Problem title/description panel */}
           <OverflowPanel className="display-box-shadow">
-            <ProblemHeaderText>{game?.problems[0]?.name}</ProblemHeaderText>
-            {game?.problems[0] ? getDifficultyDisplayButton(game?.problems[0].difficulty!) : null}
+            <ProblemHeaderText>
+              {!spectateGame ? game?.problems[0]?.name : spectateGame?.problem.name}
+            </ProblemHeaderText>
+            {/* TODO: I don't know whether we have to verify that the problem exists. */}
+            {
+              !spectateGame ? (
+                getDifficultyDisplayButton(game?.problems[0].difficulty!)
+              ) : (
+                getDifficultyDisplayButton(spectateGame?.problem.difficulty!)
+              )
+            }
             <StyledMarkdownEditor
-              defaultValue={game?.problems[0]?.description}
+              defaultValue={!spectateGame ? (
+                game?.problems[0]?.description
+              ) : (
+                spectateGame?.problem.description
+              )}
+              value={spectateGame ? spectateGame?.problem.description : undefined}
               onChange={() => ''}
               readOnly
             />
@@ -260,31 +373,46 @@ function PlayerGameView(props: PlayerGameViewProps) {
           </OverflowPanel>
 
           {/* Code editor and console panels */}
-          <SplitterLayout
-            vertical
-            percentage
-            primaryMinSize={20}
-            secondaryMinSize={0}
-          >
-            <NoPaddingPanel>
-              <Editor
-                onCodeChange={setCurrentCode}
-                onLanguageChange={setCurrentLanguage}
-                codeMap={defaultCodeList[0]}
-                defaultLanguage={currentLanguage}
-                defaultCode={null}
-              />
-            </NoPaddingPanel>
-
-            <Panel>
-              <Console
-                testCases={game?.problems[0]?.testCases || []}
-                submission={submission}
-                onRun={runCode}
-                onSubmit={submitCode}
-              />
-            </Panel>
-          </SplitterLayout>
+          {
+            !spectateGame ? (
+              <SplitterLayout
+                vertical
+                percentage
+                primaryMinSize={20}
+                secondaryMinSize={0}
+              >
+                <NoPaddingPanel>
+                  <Editor
+                    onCodeChange={setCurrentCode}
+                    onLanguageChange={setCurrentLanguage}
+                    codeMap={defaultCodeList[0]}
+                    defaultLanguage={currentLanguage}
+                    defaultCode={null}
+                    liveCode={null}
+                  />
+                </NoPaddingPanel>
+                <Panel>
+                  <Console
+                    testCases={game?.problems[0]?.testCases || []}
+                    submission={submission}
+                    onRun={runCode}
+                    onSubmit={submitCode}
+                  />
+                </Panel>
+              </SplitterLayout>
+            ) : (
+              <NoPaddingPanel className="display-box-shadow">
+                <Editor
+                  onLanguageChange={null}
+                  onCodeChange={null}
+                  codeMap={null}
+                  defaultLanguage={spectateGame?.language as Language}
+                  defaultCode={spectateGame?.code}
+                  liveCode={spectateGame?.code}
+                />
+              </NoPaddingPanel>
+            )
+          }
         </SplitterLayout>
       </SplitterContainer>
       <BottomCopyIndicatorContainer copied={copiedEmail}>

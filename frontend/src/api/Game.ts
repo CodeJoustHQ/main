@@ -78,6 +78,13 @@ export type Submission = {
   submissionType: SubmissionType,
 };
 
+export type SpectateGame = {
+  player: User,
+  problem: Problem,
+  code: string,
+  language: string,
+};
+
 const basePath = '/api/v1';
 const routes = {
   startGame: (roomId: string) => `${basePath}/rooms/${roomId}/start`,

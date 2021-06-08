@@ -162,7 +162,7 @@ function GameResultsPage() {
         dispatch(setGame(updatedGame));
       };
 
-      connect(roomId, currentUser!.userId!).then(() => {
+      connect(currentUser!.userId!).then(() => {
         subscribe(routes(roomId).subscribe_game, subscribeCallback)
           .then(() => {
             setLoading(false);
@@ -369,6 +369,7 @@ function GameResultsPage() {
           currentUser={currentUser}
           gameStartTime={startTime}
           viewPlayerCode={(index: number) => setCodeModal(index)}
+          spectatePlayer={null}
         />
       ) : null}
     </Content>
