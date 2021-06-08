@@ -9,7 +9,7 @@ import { Problem } from '../api/Problem';
 import { Coordinate } from '../components/special/FloatingCircle';
 import app from '../api/Firebase';
 
-export const useBestSubmission = (player?: Player) => {
+export const useBestSubmission = (player?: Player | null) => {
   const [bestSubmission, setBestSubmission] = useState<Submission | null>(null);
 
   useEffect(() => {

@@ -146,8 +146,9 @@ export const getScore = (bestSubmission: Submission | null) => {
   return `${percent}%`;
 };
 
-export const getSubmissionTime = (bestSubmission: Submission | null, gameStartTime: string) => {
-  if (!bestSubmission) {
+export const getSubmissionTime = (bestSubmission: Submission | null,
+  gameStartTime: string | null) => {
+  if (!bestSubmission || !gameStartTime) {
     return 'N/A';
   }
 
@@ -159,4 +160,4 @@ export const getSubmissionTime = (bestSubmission: Submission | null, gameStartTi
   return ` ${diffMinutes} min`;
 };
 
-export const getSubmissionCount = (player: Player) => player.submissions.length || '0';
+export const getSubmissionCount = (player: Player | null) => player?.submissions.length || '0';

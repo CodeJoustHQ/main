@@ -30,12 +30,16 @@ import {
   SubmissionType,
   submitSolution,
   SpectateGame,
+  Player,
+  getScore,
+  getSubmissionTime,
+  getSubmissionCount,
 } from '../../api/Game';
 import LeaderboardCard from '../card/LeaderboardCard';
 import { getDifficultyDisplayButton, InheritedTextButton, SpectatorBackIcon } from '../core/Button';
 import Language from '../../api/Language';
 import { CopyIndicator, BottomCopyIndicatorContainer, InlineCopyIcon } from '../special/CopyIndicator';
-import { useAppSelector } from '../../util/Hook';
+import { useAppSelector, useBestSubmission } from '../../util/Hook';
 import { routes, send, subscribe } from '../../api/Socket';
 import { User } from '../../api/User';
 
@@ -160,6 +164,10 @@ function PlayerGameView(props: PlayerGameViewProps) {
   // Variable to hold whether the user is subscribed to their own player socket.
   const [playerSocket, setPlayerSocket] = useState<Subscription | null>(null);
 
+  // Variables to hold the player stats when spectating.
+  const [playerSpectate, setPlayerSpectate] = useState<Player | null>(null);
+  const bestSubmission = useBestSubmission(playerSpectate);
+
   /**
    * Display beforeUnload message to inform the user that they may lose
    * their code / data if they leave the page.
@@ -254,6 +262,13 @@ function PlayerGameView(props: PlayerGameViewProps) {
   // Map the game in Redux to the state variables used in this file
   useEffect(() => {
     if (game && currentUser && currentUser.userId) {
+      // Get the new player object for spectating.
+      game.players.forEach((player) => {
+        if (currentUser.userId === player.user.userId) {
+          setPlayerSpectate(player);
+        }
+      });
+
       // Subscribe the player to their own socket.
       if (!playerSocket) {
         subscribePlayer(game.room.roomId, currentUser.userId);
@@ -377,17 +392,17 @@ function PlayerGameView(props: PlayerGameViewProps) {
                 <NoMarginDefaultText>
                   <b>Score:</b>
                   {' '}
-                  50%
+                  {getScore(bestSubmission)}
                 </NoMarginDefaultText>
                 <NoMarginDefaultText>
                   <b>Time:</b>
                   {' '}
-                  21 min
+                  {getSubmissionTime(bestSubmission, game?.gameTimer.startTime || null)}
                 </NoMarginDefaultText>
                 <NoMarginDefaultText>
                   <b>Submissions:</b>
                   {' '}
-                  3
+                  {getSubmissionCount(playerSpectate)}
                 </NoMarginDefaultText>
               </GameHeaderStatsSubContainer>
             </GameHeaderStatsContainer>
