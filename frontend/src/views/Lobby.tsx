@@ -143,6 +143,10 @@ const HoverElementSlider = styled(HoverElement)`
   height: 20px;
 `;
 
+const ExitModalButton = styled(PrimaryButton)`
+  margin: 20px 0;
+`;
+
 function LobbyPage() {
   // Get history object to be able to move between different pages
   const history = useHistory();
@@ -624,6 +628,11 @@ function LobbyPage() {
             problems={selectedProblems}
             onRemove={isHost(currentUser) ? removeProblem : null}
           />
+          <ExitModalButton
+            onClick={() => setShowProblemSelector(false)}
+          >
+            All Good!
+          </ExitModalButton>
         </LeftContainer>
       </Modal>
       <HoverTooltip

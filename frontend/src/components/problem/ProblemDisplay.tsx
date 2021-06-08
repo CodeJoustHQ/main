@@ -43,7 +43,6 @@ import ErrorMessage from '../core/Error';
 import { FlexBareContainer } from '../core/Container';
 import { generateRandomId, validIdentifier } from '../../util/Utility';
 import { HoverTooltip } from '../core/HoverTooltip';
-import { Coordinate } from '../special/FloatingCircle';
 import ProblemTags from './ProblemTags';
 import { useAppSelector, useMousePosition, useProblemEditable } from '../../util/Hook';
 import { ProblemHelpModal } from '../core/HelpModal';
@@ -521,6 +520,9 @@ function ProblemDisplay(props: ProblemDisplayParams) {
                   )}
                 </Droppable>
               </DragDropContext>
+              {newProblem.testCases.length ? (
+                <Text>No test cases. At least 1 is required in order to be used in a game.</Text>
+              ) : null}
               <GreenSmallButtonBlock
                 onClick={addTestCase}
               >

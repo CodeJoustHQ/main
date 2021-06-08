@@ -30,6 +30,7 @@ export type SelectableProblem = {
   problemId: string,
   name: string,
   difficulty: Difficulty,
+  problemTags: ProblemTag[],
   selected?: boolean,
 };
 

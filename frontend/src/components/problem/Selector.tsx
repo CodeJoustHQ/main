@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector, useClickOutside } from '../../util/Hook
 import { User } from '../../api/User';
 import { fetchAccount } from '../../redux/Account';
 import { unwrapResult } from '@reduxjs/toolkit';
+import { problemMatchesFilterText } from '../../util/Utility';
 
 type ProblemSelectorProps = {
   selectedProblems: SelectableProblem[],
@@ -153,7 +154,7 @@ export function ProblemSelector(props: ProblemSelectorProps) {
       <TextSearch
         onClick={() => setShowProblems(!showProblems)}
         onChange={setSearchStatus}
-        placeholder={allProblems.length ? 'Select problems' : 'Loading...'}
+        placeholder={allProblems.length ? 'Search by name, difficulty, etc.' : 'Loading...'}
       />
 
       <InnerContent show={showProblems} ref={ref}>
@@ -163,7 +164,7 @@ export function ProblemSelector(props: ProblemSelectorProps) {
             return null;
           }
 
-          if (searchText && !problem.name.toLowerCase().includes(searchText.toLowerCase())) {
+          if (!problemMatchesFilterText(problem, searchText)) {
             return null;
           }
 
