@@ -31,6 +31,7 @@ public class ProblemMapperTests {
         expected.setName(TestFields.PROBLEM_NAME);
         expected.setDescription(TestFields.PROBLEM_DESCRIPTION);
         expected.setDifficulty(ProblemDifficulty.HARD);
+        expected.setVerified(true);
 
         Account account = new Account();
         account.setUid(TestFields.UID);
@@ -53,6 +54,7 @@ public class ProblemMapperTests {
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getDescription(), actual.getDescription());
         assertEquals(expected.getDifficulty(), actual.getDifficulty());
+        assertEquals(expected.getVerified(), actual.getVerified());
 
         List<ProblemTestCaseDto> expectedTestCases = expected.getTestCases()
                 .stream()

@@ -47,6 +47,7 @@ import { Coordinate } from '../special/FloatingCircle';
 import ProblemTags from './ProblemTags';
 import { useAppSelector, useProblemEditable } from '../../util/Hook';
 import { ProblemHelpModal } from '../core/HelpModal';
+import { AccountRole } from '../../api/Account';
 
 const defaultDescription: string = [
   'Replace this line with a short description.',
@@ -90,13 +91,13 @@ type ShowProps = {
   show: boolean,
 };
 
-const ApprovalContainer = styled.div<ShowProps>`
+const VerifiedContainer = styled.div<ShowProps>`
   display: ${({ show }) => (show ? 'inline-block' : 'none')};
   text-align: left;
   margin-top: 0.5rem;
 `;
 
-const ApprovalText = styled(Text)`
+const VerifiedText = styled(Text)`
   display: inline-block;
   margin: 0 0 0 0.75rem;
   font-size: ${({ theme }) => theme.fontSize.subtitleXMediumLarge};
@@ -202,7 +203,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   } = props;
 
   const history = useHistory();
-  const { firebaseUser, token } = useAppSelector((state) => state.account);
+  const { account, firebaseUser, token } = useAppSelector((state) => state.account);
   const problemEditable = useProblemEditable(firebaseUser, problem);
 
   const [newProblem, setNewProblem] = useState<Problem>(problem);
@@ -270,8 +271,8 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   // Handle description change
   const handleDescriptionChange = (value: string) => handleChange({ target: { name: 'description', value } });
 
-  // Handle approval change
-  const handleApprovalChange = (value: boolean) => handleChange({ target: { name: 'approval', value } });
+  // Handle verified change
+  const handleVerifiedChange = (value: boolean) => handleChange({ target: { name: 'verified', value } });
 
   // Handle updating of problem inputs
   const handleInputChange = (index: number, name: string, type: ProblemIOType) => {
@@ -539,18 +540,18 @@ function ProblemDisplay(props: ProblemDisplayParams) {
       <SidebarContent>
         <SmallHeaderText>Options</SmallHeaderText>
         <SettingsContainer>
-          <ApprovalContainer
-            show={editMode}
+          <VerifiedContainer
+            show={editMode && account?.role === AccountRole.Admin}
           >
             <ToggleButton
-              onChangeFunction={() => handleApprovalChange(!newProblem.approval)}
+              onChangeFunction={() => handleVerifiedChange(!newProblem.verified)}
               editable={problemEditable}
-              checked={newProblem.approval}
+              checked={newProblem.verified}
             />
-            <ApprovalText>
-              {newProblem.approval ? 'Approved' : 'Approval Pending'}
-            </ApprovalText>
-          </ApprovalContainer>
+            <VerifiedText>
+              {newProblem.verified ? 'Verified' : 'Not Verified'}
+            </VerifiedText>
+          </VerifiedContainer>
           <LowMarginMediumText>Difficulty</LowMarginMediumText>
           {Object.keys(Difficulty).map((key) => {
             const difficulty = Difficulty[key as keyof typeof Difficulty];

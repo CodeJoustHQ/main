@@ -5,7 +5,7 @@ import ErrorMessage from '../core/Error';
 import { displayNameFromDifficulty } from '../../api/Difficulty';
 import { InlineDifficultyDisplayButton } from '../core/Button';
 import { TextInput } from '../core/Input';
-import { useClickOutside } from '../../util/Hook';
+import { useAppSelector, useClickOutside } from '../../util/Hook';
 import { User } from '../../api/User';
 
 type ProblemSelectorProps = {
@@ -105,20 +105,22 @@ export function ProblemSelector(props: ProblemSelectorProps) {
   const [showProblems, setShowProblems] = useState(false);
   const [searchText, setSearchText] = useState('');
 
+  const { token } = useAppSelector((state) => state.account);
   const ref = useRef<HTMLDivElement>(null);
 
   // Close list of problems if clicked outside of div
   useClickOutside(ref, () => setShowProblems(false));
 
   useEffect(() => {
-    getProblems(true)
+    // If not logged in/no token provided, will only be able to view verified problems
+    getProblems(token || '', true)
       .then((res) => {
         setProblems(res);
       })
       .catch((err) => {
         setError(err.message);
       });
-  }, []);
+  }, [token]);
 
   const setSelectedStatus = (index: number) => {
     setShowProblems(false);
@@ -198,7 +200,7 @@ export function TagSelector(props: TagSelectorProps) {
       <TextSearch
         onClick={() => setShowTags(!showTags)}
         onChange={setSearchStatus}
-        placeholder={tags.length ? 'Select tags (optional)' : 'Loading...'}
+        placeholder={tags.length ? 'Select tags (optional)' : 'No tags found'}
       />
 
       <InnerContent show={showTags} ref={ref}>

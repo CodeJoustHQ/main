@@ -3,6 +3,7 @@ package com.codejoust.main.service;
 import com.codejoust.main.dao.AccountRepository;
 import com.codejoust.main.dao.ProblemRepository;
 import com.codejoust.main.dao.ProblemTagRepository;
+import com.codejoust.main.dto.account.AccountRole;
 import com.codejoust.main.dto.problem.CreateProblemRequest;
 import com.codejoust.main.dto.problem.CreateProblemTagRequest;
 import com.codejoust.main.dto.problem.CreateTestCaseRequest;
@@ -11,9 +12,11 @@ import com.codejoust.main.dto.problem.ProblemInputDto;
 import com.codejoust.main.dto.problem.ProblemMapper;
 import com.codejoust.main.dto.problem.ProblemTagDto;
 import com.codejoust.main.dto.problem.ProblemTestCaseDto;
+import com.codejoust.main.exception.AccountError;
 import com.codejoust.main.exception.ProblemError;
 import com.codejoust.main.exception.api.ApiException;
 import com.codejoust.main.game_object.CodeLanguage;
+import com.codejoust.main.model.Account;
 import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
@@ -100,11 +103,15 @@ public class ProblemService {
         return ProblemMapper.toDto(problem);
     }
 
-    public ProblemDto getProblem(String problemId) {
+    public ProblemDto getProblem(String problemId, String token) {
         Problem problem = problemRepository.findProblemByProblemId(problemId);
 
-        if (problem == null) {
+        if (problem == null || problem.getOwner() == null) {
             throw new ApiException(ProblemError.NOT_FOUND);
+        }
+
+        if (!problem.getVerified()) {
+            service.verifyTokenMatchesUid(token, problem.getOwner().getUid());
         }
 
         return ProblemMapper.toDto(problem);
@@ -131,14 +138,18 @@ public class ProblemService {
                 || updatedProblem.getProblemInputs() == null
                 || updatedProblem.getTestCases() == null
                 || updatedProblem.getOutputType() == null
-                || updatedProblem.getApproval() == null) {
+                || updatedProblem.getVerified() == null) {
             throw new ApiException(ProblemError.EMPTY_FIELD);
         }
 
-        service.verifyTokenMatchesUid(token, updatedProblem.getOwner().getUid());
+        service.verifyTokenMatchesUid(token, problem.getOwner().getUid());
 
-        if (updatedProblem.getApproval() && updatedProblem.getTestCases().size() == 0) {
-            throw new ApiException(ProblemError.BAD_APPROVAL);
+        if (updatedProblem.getVerified() != problem.getVerified() && problem.getOwner().getRole() != AccountRole.ADMIN) {
+            throw new ApiException(AccountError.INVALID_CREDENTIALS);
+        }
+
+        if (updatedProblem.getVerified() && updatedProblem.getTestCases().size() == 0) {
+            throw new ApiException(ProblemError.BAD_VERIFIED_STATUS);
         }
 
         if (updatedProblem.getDifficulty() == ProblemDifficulty.RANDOM) {
@@ -149,7 +160,7 @@ public class ProblemService {
         problem.setDescription(updatedProblem.getDescription());
         problem.setDifficulty(updatedProblem.getDifficulty());
         problem.setOutputType(updatedProblem.getOutputType());
-        problem.setApproval(updatedProblem.getApproval());
+        problem.setVerified(updatedProblem.getVerified());
 
         problem.getProblemInputs().clear();
         for (ProblemInputDto problemInput : updatedProblem.getProblemInputs()) {
@@ -181,15 +192,18 @@ public class ProblemService {
             throw new ApiException(ProblemError.DUPLICATE_TAG_NAME);
         }
 
+        Account owner = problem.getOwner();
+
         problem.getProblemTags().clear();
         for (ProblemTagDto problemTagDto : updatedProblemTags) {
             // Add the tag if the name already exists, or create a new one.
-            ProblemTag existingProblemTag = problemTagRepository.findTagByName(problemTagDto.getName());
+            ProblemTag existingProblemTag = problemTagRepository.findTagByNameAndOwner_Uid(problemTagDto.getName(), owner.getUid());
             if (existingProblemTag != null) {
                 problem.addProblemTag(existingProblemTag);
             } else if (validProblemTagName(problemTagDto.getName())) {
                 ProblemTag problemTag = new ProblemTag();
                 problemTag.setName(problemTagDto.getName());
+                problemTag.setOwner(owner);
                 problem.addProblemTag(problemTag);
             } else {
                 throw new ApiException(ProblemError.BAD_PROBLEM_TAG);
@@ -232,11 +246,12 @@ public class ProblemService {
         return ProblemMapper.toDto(problem);
     }
 
-    public List<ProblemDto> getAllProblems(Boolean approved) {
+    public List<ProblemDto> getAllProblems(Boolean verified, String token) {
         List<ProblemDto> problems = new ArrayList<>();
-        if (approved != null && approved) {
-            problemRepository.findAllByApproval(true).forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
+        if (verified != null && verified) {
+            problemRepository.findAllByVerified(true).forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
         } else {
+            service.verifyAdminAccount(token);
             problemRepository.findAll().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
         }
 
@@ -260,9 +275,9 @@ public class ProblemService {
 
         List<Problem> problems;
         if (difficulty == ProblemDifficulty.RANDOM) {
-            problems = problemRepository.findAllByApproval(true);
+            problems = problemRepository.findAllByVerified(true);
         } else {
-            problems = problemRepository.findAllByDifficultyAndApproval(difficulty, true);
+            problems = problemRepository.findAllByDifficultyAndVerified(difficulty, true);
         }
 
         if (problems == null) {
@@ -401,15 +416,19 @@ public class ProblemService {
         return problemDtos;
     }
 
-    public List<ProblemTagDto> getAllProblemTags() {
-        // Get all problem tags and convert them to DTOs.
+    public List<ProblemTagDto> getAllProblemTags(String token) {
+        // Get all problem tags this person owns and convert them to DTOs.
+        String uid = service.verifyToken(token);
+
         List<ProblemTagDto> problemTagDtos = new ArrayList<>();
-        problemTagRepository.findAll().forEach(problemTag -> problemTagDtos.add(ProblemMapper.toProblemTagDto(problemTag)));
+        problemTagRepository.findAllByOwner_Uid(uid).forEach(problemTag -> problemTagDtos.add(ProblemMapper.toProblemTagDto(problemTag)));
         return problemTagDtos;
     }
 
-    public ProblemTagDto createProblemTag(CreateProblemTagRequest request) {
-        ProblemTag existingProblemTag = problemTagRepository.findTagByName(request.getName());
+    public ProblemTagDto createProblemTag(CreateProblemTagRequest request, String token) {
+        String uid = service.verifyToken(token);
+
+        ProblemTag existingProblemTag = problemTagRepository.findTagByNameAndOwner_Uid(request.getName(), uid);
 
         // Handle invalid request, with restraints on the length of the name.
         if (!validProblemTagName(request.getName())) {
@@ -424,16 +443,25 @@ public class ProblemService {
         // Add the problem tag to the database.
         ProblemTag problemTag = new ProblemTag();
         problemTag.setName(request.getName());
+        problemTag.setOwner(accountRepository.findAccountByUid(uid));
         problemTagRepository.save(problemTag);
         return ProblemMapper.toProblemTagDto(problemTag);
     }
 
-    public ProblemTagDto deleteProblemTag(String tagId) {
+    public ProblemTagDto deleteProblemTag(String tagId, String token) {
         ProblemTag problemTag = problemTagRepository.findTagByTagId(tagId);
 
-        // Do not create the new problem tag if one with this name exists.
-        if (problemTag == null) {
+        if (problemTag == null || problemTag.getOwner() == null) {
             throw new ApiException(ProblemError.TAG_NOT_FOUND);
+        }
+
+        service.verifyTokenMatchesUid(token, problemTag.getOwner().getUid());
+
+        // Remove this tag from problems associated with it
+        List<Problem> problems = problemRepository.findByProblemTags_TagId(tagId);
+        for (Problem problem : problems) {
+            problem.removeProblemTag(problemTag);
+            problemRepository.save(problem);
         }
 
         // Remove the problem tag from the database.

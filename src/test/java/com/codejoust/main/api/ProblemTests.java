@@ -134,14 +134,8 @@ class ProblemTests {
         MockHelper.postRequest(this.mockMvc, TestUrls.createProblem(), request, ProblemDto.class, HttpStatus.CREATED);
 
         // After creating two problems, check that the GET request finds them all
-        MvcResult result = this.mockMvc.perform(get(TestUrls.getAllProblems()))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
-
-        // Special conversion process for lists of generic type
-        String jsonResponse = result.getResponse().getContentAsString();
         Type listType = new TypeToken<ArrayList<ProblemDto>>(){}.getType();
-        List<ProblemDto> actual = new Gson().fromJson(jsonResponse, listType);
+        List<ProblemDto> actual = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblems(), listType, HttpStatus.OK);
 
         assertEquals(2, actual.size());
         assertEquals(TestFields.PROBLEM_NAME, actual.get(0).getName());
@@ -270,13 +264,8 @@ class ProblemTests {
 
     @Test
     public void getProblemsEmptyList() throws Exception {
-        MvcResult result = this.mockMvc.perform(get(TestUrls.getAllProblems()))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
         Type listType = new TypeToken<ArrayList<ProblemDto>>(){}.getType();
-        List<ProblemDto> actual = new Gson().fromJson(jsonResponse, listType);
+        List<ProblemDto> actual = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblems(), listType, HttpStatus.OK);
 
         assertTrue(actual.isEmpty());
     }
@@ -382,42 +371,6 @@ class ProblemTests {
     }
 
     @Test
-    public void getRandomProblemSuccess() throws Exception {
-        ProblemDto problem = ProblemTestMethods.createSingleApprovedProblemAndTestCases(this.mockMvc);
-
-        MvcResult result = this.mockMvc.perform(get(TestUrls.getRandomProblem())
-                .param(DIFFICULTY_KEY, "EASY")
-                .param(NUM_PROBLEMS_KEY, "1"))
-                .andDo(print()).andExpect(status().isOk())
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        List<ProblemDto> actual = UtilityTestMethods.toObjectType(jsonResponse, new TypeToken<List<ProblemDto>>(){}.getType());
-
-        assertEquals(problem.getName(), actual.get(0).getName());
-        assertEquals(problem.getDescription(), actual.get(0).getDescription());
-        assertEquals(ProblemDifficulty.EASY, actual.get(0).getDifficulty());
-        assertEquals(problem.getProblemId(), actual.get(0).getProblemId());
-        assertEquals(problem.getTestCases(), actual.get(0).getTestCases());
-    }
-
-    @Test
-    public void getRandomProblemNotFound() throws Exception {
-        ApiError ERROR = ProblemError.NOT_ENOUGH_FOUND;
-
-        MvcResult result = this.mockMvc.perform(get(TestUrls.getRandomProblem())
-                .param(DIFFICULTY_KEY, "MEDIUM")
-                .param(NUM_PROBLEMS_KEY, "1"))
-                .andDo(print()).andExpect(status().is(ERROR.getStatus().value()))
-                .andReturn();
-
-        String jsonResponse = result.getResponse().getContentAsString();
-        ApiErrorResponse actual = UtilityTestMethods.toObject(jsonResponse, ApiErrorResponse.class);
-
-        assertEquals(ERROR.getResponse(), actual);
-    }
-
-    @Test
     public void getDefaultCodeSuccess() throws Exception {
         ProblemDto problem = ProblemTestMethods.createSingleProblem(this.mockMvc);
 
@@ -439,25 +392,6 @@ class ProblemTests {
 
         ApiErrorResponse actual = MockHelper.getRequest(this.mockMvc, TestUrls.getDefaultCode("999999"), ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
-    }
-
-    @Test
-    public void getProblemsWithTagSuccess() throws Exception {
-        /**
-         * 1. Create a problem with tags.
-         * 2. Perform the GET request and convert the result using type token.
-         * - This is necessary for the inner type conversion.
-         * 3. Verify the correct response and equality.
-         */
-
-        ProblemDto problemDto = ProblemTestMethods.createSingleProblemAndTags(this.mockMvc);
-
-        String tagId = problemDto.getProblemTags().get(0).getTagId();
-        Type listType = new TypeToken<ArrayList<ProblemDto>>(){}.getType();
-        List<ProblemDto> problemResult = MockHelper.getRequest(this.mockMvc, TestUrls.getProblemsWithTag(tagId), listType, HttpStatus.OK);
-
-        assertEquals(1, problemResult.size());
-        assertEquals(problemDto, problemResult.get(0));
     }
 
     @Test
@@ -490,5 +424,65 @@ class ProblemTests {
         ProblemTagDto problemTagReturn = MockHelper.deleteRequest(this.mockMvc, TestUrls.deleteProblemTag(problemTag.getTagId()), null, ProblemTagDto.class, HttpStatus.OK);
 
         assertEquals(problemTag, problemTagReturn);
+    }
+
+    @Test
+    public void deleteProblemWithExistingTagsSuccess() throws Exception {
+        /**
+         * 1. Create two problems with the same tag (tag should be reused)
+         * 2. Delete one of the problems successfully
+         * 3. The tag should remain in the database
+         */
+
+        ProblemTestMethods.createSingleProblemAndTags(this.mockMvc);
+        ProblemDto problemDto = ProblemTestMethods.createSingleProblemAndTags(this.mockMvc);
+
+        ProblemDto response = MockHelper.deleteRequest(this.mockMvc, TestUrls.deleteProblem(problemDto.getProblemId()), null, ProblemDto.class, HttpStatus.OK);
+
+        assertEquals(problemDto.getDescription(), response.getDescription());
+
+        Type listType = new TypeToken<ArrayList<ProblemTagDto>>(){}.getType();
+        List<ProblemDto> tags = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblemTags(), listType, HttpStatus.OK);
+
+        assertEquals(1, tags.size());
+    }
+
+    @Test
+    public void deleteProblemKeepUnusedTag() throws Exception {
+        /**
+         * 1. Create problem with a tag
+         * 2. Delete the problem
+         * 3. The tag should not be deleted
+         */
+
+        ProblemDto problemDto = ProblemTestMethods.createSingleProblemAndTags(this.mockMvc);
+        MockHelper.deleteRequest(this.mockMvc, TestUrls.deleteProblem(problemDto.getProblemId()), null, ProblemDto.class, HttpStatus.OK);
+
+        Type listType = new TypeToken<ArrayList<ProblemTagDto>>(){}.getType();
+        List<ProblemDto> tags = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblemTags(), listType, HttpStatus.OK);
+
+        assertEquals(1, tags.size());
+    }
+
+    @Test
+    public void deleteTagRemovesItFromProblems() throws Exception {
+        /**
+         * 1. Create problem with a tag
+         * 2. Delete the tag
+         * 3. Verify the problem no longer has that tag
+         * 4. Verify the tag is actually deleted (i.e. no bidirectional issues)
+         */
+
+        ProblemDto problemDto = ProblemTestMethods.createSingleProblemAndTags(this.mockMvc);
+        ProblemTagDto tagDto = problemDto.getProblemTags().get(0);
+
+        MockHelper.deleteRequest(this.mockMvc, TestUrls.deleteProblemTag(tagDto.getTagId()), null, ProblemTagDto.class, HttpStatus.OK);
+
+        problemDto = MockHelper.getRequest(this.mockMvc, TestUrls.getProblem(problemDto.getProblemId()), ProblemDto.class, HttpStatus.OK);
+        assertEquals(0, problemDto.getProblemTags().size());
+
+        Type listType = new TypeToken<ArrayList<ProblemTagDto>>(){}.getType();
+        List<ProblemDto> tags = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblemTags(), listType, HttpStatus.OK);
+        assertEquals(0, tags.size());
     }
 }

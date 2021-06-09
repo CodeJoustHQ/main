@@ -183,15 +183,6 @@ export function ProblemHelpModal(props: HelpModalProps) {
         <NoMarginMediumText>Options</NoMarginMediumText>
         <div>
           <HelpText>
-            <b>Approved or Approval Pending</b>
-            : The Approved or Approval Pending toggle allows the user to
-            determine when the problem is ready to be used in games. In the
-            future, this feature will likely be discontinued and replaced with
-            a more robust public, private, and verified problem system.
-          </HelpText>
-        </div>
-        <div>
-          <HelpText>
             <b>Difficulty and Tags</b>
             : The difficulty and tags settings add more information to the
             problem, and allow users to filter their collection to find

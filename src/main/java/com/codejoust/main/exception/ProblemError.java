@@ -20,7 +20,7 @@ public enum ProblemError implements ApiError {
     EMPTY_FIELD(HttpStatus.BAD_REQUEST, "Please enter a value for each required field."),
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "An internal error occurred when attempting to find a problem."),
     NOT_ENOUGH_FOUND(HttpStatus.NOT_FOUND, "Not enough problems could be found with the given criteria."),
-    BAD_APPROVAL(HttpStatus.BAD_REQUEST, "Cannot approve a problem with no test cases."),
+    BAD_VERIFIED_STATUS(HttpStatus.BAD_REQUEST, "Cannot verify a problem with no test cases."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "A problem could not be found with the given criteria."),
     TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "A problem tag with these attributes could not be found."),
     TAG_NAME_ALREADY_EXISTS(HttpStatus.FORBIDDEN, "A problem tag with this name already exists."),

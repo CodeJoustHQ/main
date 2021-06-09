@@ -46,8 +46,8 @@ public class ProblemController extends BaseRestController {
     }
 
     @GetMapping("/problems/{problemId}")
-    public ResponseEntity<ProblemDto> getProblem(@PathVariable String problemId) {
-        return new ResponseEntity<>(service.getProblem(problemId), HttpStatus.OK);
+    public ResponseEntity<ProblemDto> getProblem(@PathVariable String problemId, @RequestHeader (name="Authorization", required = false) String token) {
+        return new ResponseEntity<>(service.getProblem(problemId, token), HttpStatus.OK);
     }
 
     @PutMapping("/problems/{problemId}")
@@ -69,43 +69,28 @@ public class ProblemController extends BaseRestController {
     }
 
     @GetMapping("/problems")
-    public ResponseEntity<List<ProblemDto>> getAllProblems(@RequestParam(required = false) Boolean approved) {
-        return new ResponseEntity<>(service.getAllProblems(approved), HttpStatus.OK);
-    }
-
-    // Note: Since this GET request takes query parameters, the difficulty to enum
-    // conversion does not automatically match case (i.e. Easy != easy != EASY)
-    @GetMapping("/problems/random")
-    public ResponseEntity<List<ProblemDto>> getRandomProblem(ProblemSettingsDto request) {
-        // Convert from the Problem object to Problem DTOs.
-        List<Problem> problems = service.getProblemsFromDifficulty(request.getDifficulty(), request.getNumProblems());
-        List<ProblemDto> problemDtos = new ArrayList<>();
-        problems.forEach(problem -> problemDtos.add(ProblemMapper.toDto(problem)));
-        return new ResponseEntity<>(problemDtos, HttpStatus.OK);
+    public ResponseEntity<List<ProblemDto>> getAllProblems(@RequestParam(required = false) Boolean verified, @RequestHeader (name="Authorization", required = false) String token) {
+        return new ResponseEntity<>(service.getAllProblems(verified, token), HttpStatus.OK);
     }
 
     @GetMapping("/problems/{problemId}/default-code")
     public ResponseEntity<Map<CodeLanguage, String>> getDefaultCode(@PathVariable String problemId) {
+        // Note: slight security issue in that anyone can access this for any problem
         return new ResponseEntity<>(service.getDefaultCode(problemId), HttpStatus.OK);
     }
 
-    @GetMapping("/problems/tags/{tagId}")
-    public ResponseEntity<List<ProblemDto>> getProblemsWithTag(@PathVariable String tagId) {
-        return new ResponseEntity<>(service.getProblemsWithTag(tagId), HttpStatus.OK);
-    }
-
     @GetMapping("/problems/tags")
-    public ResponseEntity<List<ProblemTagDto>> getAllProblemTags() {
-        return new ResponseEntity<>(service.getAllProblemTags(), HttpStatus.OK);
+    public ResponseEntity<List<ProblemTagDto>> getAllProblemTags(@RequestHeader(name="Authorization") String token) {
+        return new ResponseEntity<>(service.getAllProblemTags(token), HttpStatus.OK);
     }
 
     @PostMapping("/problems/tags")
-    public ResponseEntity<ProblemTagDto> createProblemTag(@RequestBody CreateProblemTagRequest request) {
-        return new ResponseEntity<>(service.createProblemTag(request), HttpStatus.CREATED);
+    public ResponseEntity<ProblemTagDto> createProblemTag(@RequestBody CreateProblemTagRequest request, @RequestHeader(name="Authorization") String token) {
+        return new ResponseEntity<>(service.createProblemTag(request, token), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/problems/tags/{tagId}")
-    public ResponseEntity<ProblemTagDto> deleteProblemTag(@PathVariable String tagId) {
-        return new ResponseEntity<>(service.deleteProblemTag(tagId), HttpStatus.OK);
+    public ResponseEntity<ProblemTagDto> deleteProblemTag(@PathVariable String tagId, @RequestHeader(name="Authorization") String token) {
+        return new ResponseEntity<>(service.deleteProblemTag(tagId, token), HttpStatus.OK);
     }
 }
