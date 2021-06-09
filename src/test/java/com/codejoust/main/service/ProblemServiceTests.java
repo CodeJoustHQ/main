@@ -93,7 +93,7 @@ public class ProblemServiceTests {
     }
 
     @Test
-    public void getProblemNotApprovedPermissionsFailure() {
+    public void getProblemNotVerifiedPermissionsFailure() {
         Problem problem = TestFields.problem1();
 
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
@@ -104,7 +104,7 @@ public class ProblemServiceTests {
     }
 
     @Test
-    public void getProblemApprovedSuccess() {
+    public void getProblemVerifiedSuccess() {
         Problem problem = TestFields.problem1();
 
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
@@ -260,21 +260,21 @@ public class ProblemServiceTests {
     }
 
     @Test
-    public void getAllProblemsOnlyApproved() {
+    public void getAllProblemsOnlyVerified() {
         Problem problem = new Problem();
         problem.setName(TestFields.NAME);
         problem.setDescription(TestFields.DESCRIPTION);
-        problem.setApproval(true);
+        problem.setVerified(true);
 
         List<Problem> expected = new ArrayList<>();
         expected.add(problem);
-        Mockito.doReturn(expected).when(repository).findAllByApproval(true);
+        Mockito.doReturn(expected).when(repository).findAllByVerified(true);
 
         List<ProblemDto> response = problemService.getAllProblems(true, null);
 
         assertEquals(1, response.size());
         assertEquals(TestFields.NAME, response.get(0).getName());
-        assertTrue(problem.getApproval());
+        assertTrue(problem.getVerified());
     }
 
     @Test
@@ -368,7 +368,7 @@ public class ProblemServiceTests {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
-        Mockito.doReturn(problems).when(repository).findAllByDifficultyAndApproval(ProblemDifficulty.MEDIUM, true);
+        Mockito.doReturn(problems).when(repository).findAllByDifficultyAndVerified(ProblemDifficulty.MEDIUM, true);
 
         List<Problem> response = problemService.getProblemsFromDifficulty(ProblemDifficulty.MEDIUM, 1);
 
@@ -380,7 +380,7 @@ public class ProblemServiceTests {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
-        Mockito.doReturn(problems).when(repository).findAllByApproval(true);
+        Mockito.doReturn(problems).when(repository).findAllByVerified(true);
 
         // Return correct problem when selecting random difficulty
         List<Problem> response = problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 1);
@@ -392,7 +392,7 @@ public class ProblemServiceTests {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
-        Mockito.doReturn(problems).when(repository).findAllByApproval(true);
+        Mockito.doReturn(problems).when(repository).findAllByVerified(true);
 
         ApiException exception = assertThrows(ApiException.class, () ->
                 problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 3));
@@ -476,12 +476,12 @@ public class ProblemServiceTests {
     }
 
     @Test
-    public void editProblemApprovalFailure() {
+    public void editProblemVerifiedFailure() {
         Problem problem = TestFields.problem2();
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
 
         ProblemDto request = ProblemMapper.toDto(problem);
-        request.setApproval(true);
+        request.setVerified(true);
 
         ApiException exception = assertThrows(ApiException.class, () -> problemService.editProblem(problem.getProblemId(), request, TestFields.TOKEN_2));
         assertEquals(AccountError.INVALID_CREDENTIALS, exception.getError());
@@ -574,7 +574,7 @@ public class ProblemServiceTests {
         assertEquals(ProblemError.INVALID_INPUT, exception.getError());
     }
     @Test
-    public void editProblemBadApproval() {
+    public void editProblemBadVerified() {
         Problem problem = new Problem();
         problem.setName(TestFields.NAME);
         problem.setDescription(TestFields.DESCRIPTION);
@@ -587,13 +587,13 @@ public class ProblemServiceTests {
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
 
         ProblemDto updatedProblem = ProblemMapper.toDto(problem);
-        updatedProblem.setApproval(true);
+        updatedProblem.setVerified(true);
 
         String problemId = problem.getProblemId();
         ApiException exception = assertThrows(ApiException.class, () ->
                 problemService.editProblem(problemId, updatedProblem, TestFields.TOKEN));
 
-        assertEquals(ProblemError.BAD_APPROVAL, exception.getError());
+        assertEquals(ProblemError.BAD_VERIFIED_STATUS, exception.getError());
     }
 
     @Test

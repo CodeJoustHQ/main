@@ -112,7 +112,7 @@ export function ProblemSelector(props: ProblemSelectorProps) {
   useClickOutside(ref, () => setShowProblems(false));
 
   useEffect(() => {
-    // If not logged in/no token provided, will only be able to view approved problems
+    // If not logged in/no token provided, will only be able to view verified problems
     getProblems(token || '', true)
       .then((res) => {
         setProblems(res);

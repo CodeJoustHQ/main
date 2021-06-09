@@ -109,15 +109,15 @@ public class ProblemTestMethods {
     }
 
     /**
-     * Helper method that creates a problem with the approved boolean set to true.
+     * Helper method that creates a problem with the verified boolean set to true.
      *
      * @return the created problem
      * @throws Exception if anything wrong occurs
      */
-    public static ProblemDto createSingleApprovedProblemAndTestCases(MockMvc mockMvc) throws Exception {
+    public static ProblemDto createSingleVerifiedProblemAndTestCases(MockMvc mockMvc) throws Exception {
         ProblemDto problemDto = createSingleProblemAndTestCases(mockMvc);
         problemDto.setName(NAME);
-        problemDto.setApproval(true);
+        problemDto.setVerified(true);
 
         // Edit problem with new values
         String endpoint = String.format(PUT_PROBLEM_EDIT, problemDto.getProblemId());
@@ -128,7 +128,7 @@ public class ProblemTestMethods {
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn();
 
-        assertTrue(problemDto.getApproval());
+        assertTrue(problemDto.getVerified());
 
         return problemDto;
     }

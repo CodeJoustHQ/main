@@ -18,7 +18,7 @@ export type Problem = {
   name: string,
   owner: AccountUid,
   description: string,
-  approval: boolean,
+  verified: boolean,
   difficulty: Difficulty,
   testCases: TestCase[],
   problemInputs: ProblemInput[],
@@ -107,8 +107,8 @@ const routes = {
   deleteProblemTag: (tagId: string) => `${basePath}/tags/${tagId}`,
 };
 
-export const getProblems = (token: string, approved?: boolean): Promise<Problem[]> => axios
-  .get<Problem[]>(approved ? `${routes.getProblems}?approved=true` : routes.getProblems, getAuthHttpHeader(token))
+export const getProblems = (token: string, verified?: boolean): Promise<Problem[]> => axios
+  .get<Problem[]>(verified ? `${routes.getProblems}?verified=true` : routes.getProblems, getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

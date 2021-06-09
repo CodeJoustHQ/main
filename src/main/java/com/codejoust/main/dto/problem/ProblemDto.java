@@ -19,7 +19,7 @@ public class ProblemDto {
     private String name;
     private AccountUidDto owner;
     private String description;
-    private Boolean approval;
+    private Boolean verified;
     private ProblemDifficulty difficulty;
     private List<ProblemTestCaseDto> testCases = new ArrayList<>();
     private List<ProblemTagDto> problemTags = new ArrayList<>();

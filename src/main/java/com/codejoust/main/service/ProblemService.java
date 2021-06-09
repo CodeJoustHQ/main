@@ -110,7 +110,7 @@ public class ProblemService {
             throw new ApiException(ProblemError.NOT_FOUND);
         }
 
-        if (!problem.getApproval()) {
+        if (!problem.getVerified()) {
             service.verifyTokenMatchesUid(token, problem.getOwner().getUid());
         }
 
@@ -138,18 +138,18 @@ public class ProblemService {
                 || updatedProblem.getProblemInputs() == null
                 || updatedProblem.getTestCases() == null
                 || updatedProblem.getOutputType() == null
-                || updatedProblem.getApproval() == null) {
+                || updatedProblem.getVerified() == null) {
             throw new ApiException(ProblemError.EMPTY_FIELD);
         }
 
         service.verifyTokenMatchesUid(token, problem.getOwner().getUid());
 
-        if (updatedProblem.getApproval() != problem.getApproval() && problem.getOwner().getRole() != AccountRole.ADMIN) {
+        if (updatedProblem.getVerified() != problem.getVerified() && problem.getOwner().getRole() != AccountRole.ADMIN) {
             throw new ApiException(AccountError.INVALID_CREDENTIALS);
         }
 
-        if (updatedProblem.getApproval() && updatedProblem.getTestCases().size() == 0) {
-            throw new ApiException(ProblemError.BAD_APPROVAL);
+        if (updatedProblem.getVerified() && updatedProblem.getTestCases().size() == 0) {
+            throw new ApiException(ProblemError.BAD_VERIFIED_STATUS);
         }
 
         if (updatedProblem.getDifficulty() == ProblemDifficulty.RANDOM) {
@@ -160,7 +160,7 @@ public class ProblemService {
         problem.setDescription(updatedProblem.getDescription());
         problem.setDifficulty(updatedProblem.getDifficulty());
         problem.setOutputType(updatedProblem.getOutputType());
-        problem.setApproval(updatedProblem.getApproval());
+        problem.setVerified(updatedProblem.getVerified());
 
         problem.getProblemInputs().clear();
         for (ProblemInputDto problemInput : updatedProblem.getProblemInputs()) {
@@ -246,10 +246,10 @@ public class ProblemService {
         return ProblemMapper.toDto(problem);
     }
 
-    public List<ProblemDto> getAllProblems(Boolean approved, String token) {
+    public List<ProblemDto> getAllProblems(Boolean verified, String token) {
         List<ProblemDto> problems = new ArrayList<>();
-        if (approved != null && approved) {
-            problemRepository.findAllByApproval(true).forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
+        if (verified != null && verified) {
+            problemRepository.findAllByVerified(true).forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
         } else {
             service.verifyAdminAccount(token);
             problemRepository.findAll().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
@@ -275,9 +275,9 @@ public class ProblemService {
 
         List<Problem> problems;
         if (difficulty == ProblemDifficulty.RANDOM) {
-            problems = problemRepository.findAllByApproval(true);
+            problems = problemRepository.findAllByVerified(true);
         } else {
-            problems = problemRepository.findAllByDifficultyAndApproval(difficulty, true);
+            problems = problemRepository.findAllByDifficultyAndVerified(difficulty, true);
         }
 
         if (problems == null) {

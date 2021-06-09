@@ -45,7 +45,7 @@ public class Problem {
     private Account owner;
 
     private String name;
-    private Boolean approval = false;
+    private Boolean verified = false;
 
     @Column(columnDefinition = "TEXT")
     private String description;

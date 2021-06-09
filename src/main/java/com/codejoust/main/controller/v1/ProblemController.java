@@ -69,8 +69,8 @@ public class ProblemController extends BaseRestController {
     }
 
     @GetMapping("/problems")
-    public ResponseEntity<List<ProblemDto>> getAllProblems(@RequestParam(required = false) Boolean approved, @RequestHeader (name="Authorization", required = false) String token) {
-        return new ResponseEntity<>(service.getAllProblems(approved, token), HttpStatus.OK);
+    public ResponseEntity<List<ProblemDto>> getAllProblems(@RequestParam(required = false) Boolean verified, @RequestHeader (name="Authorization", required = false) String token) {
+        return new ResponseEntity<>(service.getAllProblems(verified, token), HttpStatus.OK);
     }
 
     @GetMapping("/problems/{problemId}/default-code")
