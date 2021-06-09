@@ -19,6 +19,7 @@ import CircleBackgroundLayout from '../layout/CircleBackground';
 import DashboardPage from '../../views/dashboard/Dashboard';
 import LoginPage from '../../views/account/Login';
 import RegisterPage from '../../views/account/Register';
+import ProfilePage from '../../views/account/Profile';
 import ContactUsPage from '../../views/ContactUs';
 import MinimalLayout from '../layout/MinimalLayout';
 import FullLayout from '../layout/FullLayout';
@@ -83,6 +84,7 @@ function App() {
       <PrivateRoute path="/problem/:id" component={ProblemPage} layout={MinimalLayout} exact />
       <CustomRoute path="/login" component={LoginPage} layout={MainLayout} exact />
       <CustomRoute path="/register" component={RegisterPage} layout={MainLayout} exact />
+      <CustomRoute path="/profile" component={ProfilePage} layout={MainLayout} exact />
       <CustomRoute path="/contact-us" component={ContactUsPage} layout={MainLayout} exact />
       <CustomRedirect from="/play" to="/game/join" />
       <CustomRoute path="*" component={NotFound} layout={MainLayout} />
