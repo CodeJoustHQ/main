@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Text, MediumText, LargeText } from '../../components/core/Text';
+import { PrimaryButtonLink } from '../../components/core/Link';
 
 const Content = styled.div`
   text-align: center;
@@ -12,6 +13,8 @@ function DashboardPage() {
       <LargeText>My Profile</LargeText>
       <MediumText>Page coming soon!</MediumText>
       <Text>Update your info, set a default display name, and more.</Text>
+
+      <PrimaryButtonLink to="/">To Dashboard</PrimaryButtonLink>
     </Content>
   );
 }
