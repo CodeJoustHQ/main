@@ -4,12 +4,16 @@ import { useHistory } from 'react-router-dom';
 import { LowMarginMediumText, SmallHeaderText, Text } from '../../core/Text';
 import ToggleButton from '../../core/ToggleButton';
 import { Difficulty } from '../../../api/Difficulty';
-import { GrayTextButton, InlineErrorIcon, PrimaryButton, SmallDifficultyButton, TextButton } from '../../core/Button';
+import {
+  GrayTextButton, InlineErrorIcon, PrimaryButton, SmallDifficultyButton, TextButton,
+} from '../../core/Button';
 import { generateRandomId, validIdentifier } from '../../../util/Utility';
 import ProblemTags from '../ProblemTags';
 import { TextInput } from '../../core/Input';
 import PrimarySelect from '../../core/Select';
-import { deleteProblem, ProblemIOType, problemIOTypeToString, ProblemTag, Problem } from '../../../api/Problem';
+import {
+  deleteProblem, ProblemIOType, problemIOTypeToString, ProblemTag, Problem,
+} from '../../../api/Problem';
 import { SettingsContainer } from '../../core/Container';
 import { HoverTooltip } from '../../core/HoverTooltip';
 import { useAppSelector, useMousePosition, useProblemEditable } from '../../../util/Hook';

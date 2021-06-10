@@ -1,50 +1,20 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import MarkdownEditor from 'rich-markdown-editor';
+import { Problem } from '../../../api/Problem';
+import { PureTextInputTitle } from '../../core/Input';
 import {
-  deleteProblem,
-  Problem,
-  ProblemIOType,
-  problemIOTypeToString,
-  ProblemTag,
-  TestCase,
-} from '../../../api/Problem';
-import {
-  FixedTextArea,
-  PureTextInputTitle,
-  CheckboxInput,
-  TextInput,
-} from '../../core/Input';
-import { Difficulty } from '../../../api/Difficulty';
-import {
-  SmallDifficultyButton,
-  PrimaryButton,
-  RedTextButton,
-  GrayTextButton,
   SmallButton,
-  GreenSmallButtonBlock,
   InvertedSmallButton,
   TextButton,
   InlineLobbyIcon,
-  InlineErrorIcon,
 } from '../../core/Button';
-import ToggleButton from '../../core/ToggleButton';
-import PrimarySelect from '../../core/Select';
-import {
-  SmallHeaderText,
-  LowMarginMediumText,
-  Text,
-  LabelAbsoluteText,
-} from '../../core/Text';
+import { SmallHeaderText } from '../../core/Text';
 import Loading from '../../core/Loading';
 import ErrorMessage from '../../core/Error';
 import { FlexBareContainer, SettingsContainer } from '../../core/Container';
-import { generateRandomId, validIdentifier } from '../../../util/Utility';
-import { HoverTooltip } from '../../core/HoverTooltip';
-import ProblemTags from '../ProblemTags';
-import { useAppSelector, useMousePosition, useProblemEditable } from '../../../util/Hook';
+import { useAppSelector, useProblemEditable } from '../../../util/Hook';
 import { ProblemHelpModal } from '../../core/HelpModal';
 import OptionsPanel from './OptionsPanel';
 import TestCaseEditor from './TestCaseEditor';

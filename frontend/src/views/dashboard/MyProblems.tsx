@@ -1,7 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import { MainHeaderText, SecondaryHeaderText } from '../../components/core/Text';
-import { GreenSmallButtonLink, TextLink } from '../../components/core/Link';
+import {
+  LowMarginText,
+  MainHeaderText,
+  NoMarginMediumText,
+  SecondaryHeaderText,
+} from '../../components/core/Text';
+import { GreenSmallButtonLink, TextLink, InheritedTextLink } from '../../components/core/Link';
 import { useAppSelector } from '../../util/Hook';
 import {
   CenteredContainer,
@@ -64,8 +69,33 @@ function MyProblems(props: MyProblemsProps) {
 
       {!loading && !account?.problems.length ? (
         <CenteredContainer>
+          <NoMarginMediumText>It looks like you&apos;re new here!</NoMarginMediumText>
+          <LowMarginText>Follow these steps to get started:</LowMarginText>
+          <br />
+
           <SecondaryHeaderText>
-            You have not written any problems. Create your first or browse our public collection!
+            <b>Step 1.</b>
+            {' '}
+            <InheritedTextLink to="/problem/create">Create your first problem</InheritedTextLink>
+            , or browse our
+            {' '}
+            <InheritedTextLink to="/problems/all">official collection</InheritedTextLink>
+            {' '}
+            for inspiration.
+          </SecondaryHeaderText>
+
+          <SecondaryHeaderText>
+            <b>Step 2.</b>
+            {' '}
+            <InheritedTextLink to="/problem/create">Create a room</InheritedTextLink>
+            {' '}
+            and choose what problems you want your students to solve.
+          </SecondaryHeaderText>
+
+          <SecondaryHeaderText>
+            <b>Step 3.</b>
+            {' '}
+            Invite your students to the room and start the game whenever you&apos;re ready!
           </SecondaryHeaderText>
         </CenteredContainer>
       ) : null}
