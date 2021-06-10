@@ -55,6 +55,7 @@ import { fetchRoom, setRoom } from '../redux/Room';
 import { setCurrentUser } from '../redux/User';
 import { LobbyHelpModal } from '../components/core/HelpModal';
 import Modal from '../components/core/Modal';
+import { useBeforeunload } from 'react-beforeunload';
 
 type LobbyPageLocation = {
   user: User,
@@ -188,6 +189,13 @@ function LobbyPage() {
   // Variable to hold whether the modal explaining the user cards is active.
   const [actionCardHelp, setActionCardHelp] = useState<boolean>(false);
 
+  // Function to determine if the given user is the host or not
+  const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
+
+  useBeforeunload(() => (isHost(currentUser)
+    ? 'Leave this page? If you leave, host permissions may be transferred to another user.'
+    : 'Leave this page? You can always rejoin later.'));
+
   /**
    * Set state variables from an updated room object
    */
@@ -218,9 +226,6 @@ function LobbyPage() {
       setStateFromRoom(room);
     }
   }, [room, setStateFromRoom]);
-
-  // Function to determine if the given user is the host or not
-  const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
 
   const kickUser = (user: User) => {
     setLoading(true);

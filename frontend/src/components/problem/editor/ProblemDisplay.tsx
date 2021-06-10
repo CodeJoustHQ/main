@@ -130,8 +130,10 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           <TopButtonsContainer>
             <InvertedSmallButton
               onClick={() => {
-                onClick(newProblem);
-                history.goBack();
+                if (JSON.stringify(problem) === JSON.stringify(newProblem)
+                  || window.confirm('Go back? Your unsaved changes will be lost.')) {
+                  history.goBack();
+                }
               }}
             >
               Back

@@ -207,14 +207,14 @@ function TestCaseEditor(props: TestCaseEditorProps) {
           )}
         </Droppable>
       </DragDropContext>
-      {newProblem.testCases.length ? (
-        <Text>No test cases. At least 1 is required in order to be used in a game.</Text>
-      ) : null}
       <GreenSmallButtonBlock
         onClick={addTestCase}
       >
         Add
       </GreenSmallButtonBlock>
+      {!newProblem.testCases.length ? (
+        <Text>At least one test case is required in order to use this problem in a game.</Text>
+      ) : null}
     </>
   );
 }
