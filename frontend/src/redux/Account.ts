@@ -1,8 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Account, getAccount } from '../api/Account';
-import { Game, getGame } from '../api/Game';
 import { RootState } from './Store';
-import { fetchGame } from './Game';
 
 /**
  * Due to serialization issues, we can't directly store the

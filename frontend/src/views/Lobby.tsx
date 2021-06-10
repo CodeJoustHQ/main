@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Message, Subscription } from 'stompjs';
+import { useBeforeunload } from 'react-beforeunload';
 import styled from 'styled-components';
 import copy from 'copy-to-clipboard';
 import ErrorMessage from '../components/core/Error';
@@ -55,7 +56,7 @@ import { fetchRoom, setRoom } from '../redux/Room';
 import { setCurrentUser } from '../redux/User';
 import { LobbyHelpModal } from '../components/core/HelpModal';
 import Modal from '../components/core/Modal';
-import { useBeforeunload } from 'react-beforeunload';
+import { setGame } from '../redux/Game';
 
 type LobbyPageLocation = {
   user: User,
@@ -195,6 +196,11 @@ function LobbyPage() {
   useBeforeunload(() => (isHost(currentUser)
     ? 'Leave this page? If you leave, host permissions may be transferred to another user.'
     : 'Leave this page? You can always rejoin later.'));
+
+  // If playing again, clear any old game state
+  useEffect(() => {
+    dispatch(setGame(null));
+  }, [dispatch]);
 
   /**
    * Set state variables from an updated room object

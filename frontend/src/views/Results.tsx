@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import copy from 'copy-to-clipboard';
+import { useBeforeunload } from 'react-beforeunload';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
 import { unwrapResult } from '@reduxjs/toolkit';
@@ -17,7 +18,6 @@ import {
 import { User } from '../api/User';
 import Podium from '../components/results/Podium';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
-import { Coordinate } from '../components/special/FloatingCircle';
 import {
   CopyIndicator,
   CopyIndicatorContainer,
@@ -113,6 +113,12 @@ function GameResultsPage() {
   const { currentUser } = useAppSelector((state) => state);
   const mousePosition = useMousePosition();
 
+  const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
+
+  useBeforeunload(() => (isHost(currentUser)
+    ? 'Leave this page? If you leave, host permissions may be transferred to another user.'
+    : 'Leave this page? You can always rejoin later.'));
+
   useEffect(() => {
     if (game) {
       setRoomId(game.room.roomId);
@@ -124,7 +130,6 @@ function GameResultsPage() {
         disconnect()
           .then(() => {
             dispatch(setRoom(null));
-            dispatch(setGame(null));
             history.replace(`/game/lobby?room=${game.room.roomId}`, {
               user: currentUser,
               roomId: game.room.roomId,
@@ -186,8 +191,6 @@ function GameResultsPage() {
         setError(err.message);
       });
   };
-
-  const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
 
   useEffect(() => {
     players.forEach((player, index) => {

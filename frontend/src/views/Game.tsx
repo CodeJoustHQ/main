@@ -69,7 +69,7 @@ function GamePage() {
    * Some browsers will display this message, others will display a fixed
    * message; see https://github.com/jacobbuck/react-beforeunload.
    */
-  useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
+  useBeforeunload(() => 'Leaving this page may cause you to lose your code, host status, and/or other data.');
 
   const setStateFromGame = (newGame: Game) => {
     setHost(newGame.room.host);
