@@ -60,10 +60,8 @@ export const SpectatorBackIcon = styled.i.attrs(() => ({
   text-align: center;
   margin: 0;
   border-radius: 2rem;
-  font-size: 2rem;
-  padding: 1rem;
-  width: 2rem;
-  height: 2rem;
+  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+  padding: 0.5rem;
   background: ${({ theme }) => theme.colors.white};
   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.24);
 
