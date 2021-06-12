@@ -137,6 +137,13 @@ type StateRefType = {
   currentLanguage: string,
 }
 
+/**
+ * The spectateGame and spectatorUnsubscribePlayer parameters are only used when
+ * the game page is used for the spectator view. spectateGame is the live data,
+ * primarily the player code, of the player being spectated.
+ * spectatorUnsubscribePlayer unsubscribes the spectator from the player socket
+ * and brings them back to the main spectator page.
+ */
 type PlayerGameViewProps = {
   gameError: string,
   spectateGame: SpectateGame | null,
@@ -164,8 +171,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
   const [playerSocket, setPlayerSocket] = useState<Subscription | null>(null);
 
   // Variables to hold the player stats when spectating.
-  const [playerSpectate, setPlayerSpectate] = useState<Player | null>(null);
-  const bestSubmission = useBestSubmission(playerSpectate);
+  const [spectatedPlayer, setSpectatedPlayer] = useState<Player | null>(null);
+  const bestSubmission = useBestSubmission(spectatedPlayer);
 
   /**
    * Display beforeUnload message to inform the user that they may lose
@@ -264,7 +271,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
       // Get the new player object for spectating.
       game.players.forEach((player) => {
         if (player.user.userId === spectateGame?.user.userId) {
-          setPlayerSpectate(player);
+          setSpectatedPlayer(player);
         }
       });
 
@@ -401,7 +408,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
                 <NoMarginDefaultText>
                   <b>Submissions:</b>
                   {' '}
-                  {getSubmissionCount(playerSpectate)}
+                  {getSubmissionCount(spectatedPlayer)}
                 </NoMarginDefaultText>
               </GameHeaderStatsSubContainer>
             </GameHeaderStatsContainer>
