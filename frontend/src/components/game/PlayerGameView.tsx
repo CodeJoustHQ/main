@@ -33,7 +33,8 @@ import {
   Player,
 } from '../../api/Game';
 import LeaderboardCard from '../card/LeaderboardCard';
-import { getDifficultyDisplayButton, InheritedTextButton, SpectatorBackIcon } from '../core/Button';
+import { getDifficultyDisplayButton, InheritedTextButton } from '../core/Button';
+import { SpectatorBackIcon } from '../core/Icon';
 import Language from '../../api/Language';
 import { CopyIndicator, BottomCopyIndicatorContainer, InlineCopyIcon } from '../special/CopyIndicator';
 import { useAppSelector, useBestSubmission } from '../../util/Hook';
