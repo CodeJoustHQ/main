@@ -2,15 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 import { LowMarginText, Text } from '../core/Text';
 import { Color } from '../../api/Color';
-import {
-  Player,
-  getScore,
-  getSubmissionTime,
-  getSubmissionCount,
-} from '../../api/Game';
+import { Player } from '../../api/Game';
 import { useBestSubmission } from '../../util/Hook';
 import Language, { displayNameFromLanguage } from '../../api/Language';
 import { TextButton } from '../core/Button';
+import { getScore, getSubmissionCount, getSubmissionTime } from '../../util/Utility';
 
 const Content = styled.tr`
   border-radius: 5px;

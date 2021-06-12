@@ -31,9 +31,6 @@ import {
   submitSolution,
   SpectateGame,
   Player,
-  getScore,
-  getSubmissionTime,
-  getSubmissionCount,
 } from '../../api/Game';
 import LeaderboardCard from '../card/LeaderboardCard';
 import { getDifficultyDisplayButton, InheritedTextButton, SpectatorBackIcon } from '../core/Button';
@@ -42,6 +39,7 @@ import { CopyIndicator, BottomCopyIndicatorContainer, InlineCopyIcon } from '../
 import { useAppSelector, useBestSubmission } from '../../util/Hook';
 import { routes, send, subscribe } from '../../api/Socket';
 import { User } from '../../api/User';
+import { getScore, getSubmissionCount, getSubmissionTime } from '../../util/Utility';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
   margin-top: 15px;

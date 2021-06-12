@@ -7,6 +7,7 @@ import { setRoom } from '../redux/Room';
 import { setCurrentUser } from '../redux/User';
 import { setGame } from '../redux/Game';
 import { AppDispatch } from '../redux/Store';
+import { Player, Submission } from '../api/Game';
 
 // Require validator for identifiers as no types are provided.
 const validateIdentifier = require('valid-identifier');
@@ -90,3 +91,28 @@ export const getAuthHttpHeader = (token: string) => ({
     Authorization: token,
   },
 });
+
+export const getScore = (bestSubmission: Submission | null) => {
+  if (!bestSubmission) {
+    return '0';
+  }
+
+  const percent = Math.round((bestSubmission.numCorrect / bestSubmission.numTestCases) * 100);
+  return `${percent}%`;
+};
+
+export const getSubmissionTime = (bestSubmission: Submission | null,
+  gameStartTime: string | null) => {
+  if (!bestSubmission || !gameStartTime) {
+    return 'N/A';
+  }
+
+  // Calculate time from start of game till best submission
+  const startTime = new Date(gameStartTime).getTime();
+  const diffMilliseconds = new Date(bestSubmission.startTime).getTime() - startTime;
+  const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
+
+  return ` ${diffMinutes} min`;
+};
+
+export const getSubmissionCount = (player: Player | null) => player?.submissions.length || '0';
