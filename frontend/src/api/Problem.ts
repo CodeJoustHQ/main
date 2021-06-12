@@ -34,6 +34,10 @@ export type SelectableProblem = {
   selected?: boolean,
 };
 
+export type ProblemIdParam = {
+  problemId: string,
+};
+
 export type ProblemInput = {
   name: string,
   type: ProblemIOType,

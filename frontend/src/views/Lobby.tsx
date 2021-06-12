@@ -406,7 +406,7 @@ function LobbyPage() {
 
     const settings = {
       initiator: currentUser!,
-      problems: newProblems,
+      problems: newProblems.map((problem) => ({ problemId: problem.problemId })),
     };
 
     updateRoomSettings(currentRoomId, settings)
