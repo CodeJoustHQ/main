@@ -265,15 +265,19 @@ function PlayerGameView(props: PlayerGameViewProps) {
       });
   }, [sendViewUpdate]);
 
+  const getSpectatedPlayer = useCallback((gameParam: Game) => {
+    // Get the new player object for spectating.
+    gameParam.players.forEach((player) => {
+      if (player.user.userId === spectateGame?.user.userId) {
+        setSpectatedPlayer(player);
+      }
+    });
+  }, [spectateGame, setSpectatedPlayer]);
+
   // Map the game in Redux to the state variables used in this file
   useEffect(() => {
     if (game && currentUser && currentUser.userId) {
-      // Get the new player object for spectating.
-      game.players.forEach((player) => {
-        if (player.user.userId === spectateGame?.user.userId) {
-          setSpectatedPlayer(player);
-        }
-      });
+      getSpectatedPlayer(game);
 
       // Subscribe the player to their own socket.
       if (!playerSocket) {
@@ -302,7 +306,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
       }
     }
   }, [game, currentUser, defaultCodeList, setDefaultCodeFromProblems,
-    subscribePlayer, playerSocket]);
+    subscribePlayer, playerSocket, getSpectatedPlayer]);
 
   // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {
