@@ -27,9 +27,8 @@ import {
   GreenSmallButtonBlock,
   InvertedSmallButton,
   TextButton,
-  InlineLobbyIcon,
-  InlineErrorIcon,
 } from '../core/Button';
+import { InlineIcon, InlineErrorIcon } from '../core/Icon';
 import ToggleButton from '../core/ToggleButton';
 import PrimarySelect from '../core/Select';
 import {
@@ -168,7 +167,7 @@ const TextButtonLink = styled(TextButton)`
   text-align: left;
 `;
 
-const InlineProblemIcon = styled(InlineLobbyIcon)`
+const InlineProblemIcon = styled(InlineIcon)`
   margin: 10px;
   height: 1rem;
 `;

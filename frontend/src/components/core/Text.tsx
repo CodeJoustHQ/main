@@ -37,6 +37,11 @@ export const NoMarginSubtitleText = styled.p`
   margin: 0;
 `;
 
+export const NoMarginDefaultText = styled.p`
+  font-size: ${({ theme }) => theme.fontSize.default};
+  margin: 0;
+`;
+
 export const SmallHoverText = styled(SmallHeaderText)`
   font-size: ${({ theme }) => theme.fontSize.medium};
   margin: 0;

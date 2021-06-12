@@ -17,12 +17,8 @@ import {
 import { User } from '../api/User';
 import { isValidRoomId, leaveRoom, checkLocationState } from '../util/Utility';
 import { Difficulty } from '../api/Difficulty';
-import {
-  PrimaryButton,
-  SmallDifficultyButtonNoMargin,
-  InlineLobbyIcon,
-  SecondaryRedButton,
-} from '../components/core/Button';
+import { PrimaryButton, SmallDifficultyButtonNoMargin, SecondaryRedButton } from '../components/core/Button';
+import { InlineIcon } from '../components/core/Icon';
 import Loading from '../components/core/Loading';
 import PlayerCard from '../components/card/PlayerCard';
 import ActionCard from '../components/card/ActionCard';
@@ -693,16 +689,16 @@ function LobbyPage() {
                 ? ` (${users.length})`
                 : null
             }
-            <InlineLobbyIcon
+            <InlineIcon
               onClick={refreshRoomDetails}
             >
               refresh
-            </InlineLobbyIcon>
-            <InlineLobbyIcon
+            </InlineIcon>
+            <InlineIcon
               onClick={() => setActionCardHelp(true)}
             >
               help_outline
-            </InlineLobbyIcon>
+            </InlineIcon>
           </LobbyContainerTitle>
           <BackgroundContainer>
             {

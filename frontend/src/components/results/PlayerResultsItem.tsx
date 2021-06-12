@@ -1,11 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Player } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
 import { Color } from '../../api/Color';
+import { Player } from '../../api/Game';
 import { useBestSubmission } from '../../util/Hook';
 import Language, { displayNameFromLanguage } from '../../api/Language';
 import { TextButton } from '../core/Button';
+import { getScore, getSubmissionCount, getSubmissionTime } from '../../util/Utility';
 
 const Content = styled.tr`
   border-radius: 5px;
@@ -99,30 +100,6 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
     return `${nickname} ${isCurrentPlayer ? '(you)' : ''}`;
   };
 
-  const getScore = () => {
-    if (!bestSubmission) {
-      return '0';
-    }
-
-    const percent = Math.round((bestSubmission.numCorrect / bestSubmission.numTestCases) * 100);
-    return `${percent}%`;
-  };
-
-  const getSubmissionTime = () => {
-    if (!bestSubmission) {
-      return 'N/A';
-    }
-
-    // Calculate time from start of game till best submission
-    const startTime = new Date(gameStartTime).getTime();
-    const diffMilliseconds = new Date(bestSubmission.startTime).getTime() - startTime;
-    const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
-
-    return ` ${diffMinutes} min`;
-  };
-
-  const getSubmissionCount = () => player.submissions.length || '0';
-
   const getSubmissionLanguage = () => {
     if (!bestSubmission) {
       return 'N/A';
@@ -152,13 +129,13 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
       </PlayerContent>
 
       <td>
-        <Text>{getScore()}</Text>
+        <Text>{getScore(bestSubmission)}</Text>
       </td>
       <td>
-        <Text>{getSubmissionTime()}</Text>
+        <Text>{getSubmissionTime(bestSubmission, gameStartTime)}</Text>
       </td>
       <td>
-        <Text>{getSubmissionCount()}</Text>
+        <Text>{getSubmissionCount(player)}</Text>
       </td>
       {!onSpectateLive ? (
         <CodeColumn>{getSubmissionLanguage()}</CodeColumn>
