@@ -125,7 +125,6 @@ export function ProblemSelector(props: ProblemSelectorProps) {
     setAllProblems((accountProblems as SelectableProblem[]).concat(verifiedProblems));
   }, [account, verifiedProblems]);
 
-
   // Close list of problems if clicked outside of div
   useClickOutside(ref, () => setShowProblems(false));
 

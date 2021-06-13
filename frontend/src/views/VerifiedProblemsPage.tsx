@@ -32,7 +32,7 @@ function VerifiedProblemsPage() {
       .then((res) => dispatch(setVerifiedProblems(res)))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [token]);
+  }, [token, dispatch]);
 
   return (
     <Content>
