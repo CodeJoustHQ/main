@@ -25,7 +25,7 @@ import MinimalLayout from '../layout/MinimalLayout';
 import FullLayout from '../layout/FullLayout';
 import { useAppDispatch, useAppSelector } from '../../util/Hook';
 import app from '../../api/Firebase';
-import { setFirebaseUser, FirebaseUserType, setToken } from '../../redux/Account';
+import { setFirebaseUser, FirebaseUserType, setToken, fetchAccount } from '../../redux/Account';
 import { CenteredContainer } from '../core/Container';
 import Loading from '../core/Loading';
 
@@ -55,7 +55,10 @@ function App() {
       // Save Token in Redux state if authenticated
       if (user) {
         user.getIdToken(true)
-          .then((token) => dispatch(setToken(token)));
+          .then((token) => {
+            dispatch(setToken(token));
+            dispatch(fetchAccount());
+          });
       }
     });
   }, [dispatch, setLoading]);
