@@ -153,7 +153,7 @@ export function ProblemSelector(props: ProblemSelectorProps) {
       <TextSearch
         onClick={() => setShowProblems(!showProblems)}
         onChange={setSearchStatus}
-        placeholder={allProblems.length ? 'Search by name, difficulty, etc.' : 'Loading...'}
+        placeholder={allProblems.length ? 'Filter by name, difficulty, or tag (separate queries by comma)' : 'Loading...'}
       />
 
       <InnerContent show={showProblems} ref={ref}>
