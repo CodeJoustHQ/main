@@ -225,7 +225,6 @@ function OptionsPanel(props: OptionsPanelProps) {
             <InlineErrorIcon
               show={!validIdentifier(input.name)}
               onMouseEnter={() => setHoverVisible(true)}
-              // onMouseMove={mouseMoveHandler}
               onMouseLeave={() => setHoverVisible(false)}
             >
               error_outline
