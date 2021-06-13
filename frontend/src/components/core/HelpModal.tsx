@@ -36,10 +36,7 @@ type HelpModalProps = {
 };
 
 export function LobbyHelpModal(props: HelpModalProps) {
-  // Grab props variables.
-  const {
-    show, exitModal,
-  } = props;
+  const { show, exitModal } = props;
 
   return (
     <Modal
@@ -50,7 +47,7 @@ export function LobbyHelpModal(props: HelpModalProps) {
       <LeftContainer>
         <LargeText>Help Section</LargeText>
         <NoMarginMediumText>Lobby Page</NoMarginMediumText>
-        <div>
+        <>
           <HelpText>
             <b>Overview</b>
             : The lobby page is where you invite players to the room, and update
@@ -58,9 +55,9 @@ export function LobbyHelpModal(props: HelpModalProps) {
             the link of the form codejoust.co/play?room=ROOM_ID, or by going to
             codejoust.co/play and entering that same Room ID.
           </HelpText>
-        </div>
+        </>
         <NoMarginMediumText>Player Settings</NoMarginMediumText>
-        <div>
+        <>
           <HelpText>
             <ActionCardActiveIcon isActive />
             <b>active</b>
@@ -74,8 +71,8 @@ export function LobbyHelpModal(props: HelpModalProps) {
             inactive means they cannot and are connecting or have the tab
             closed.
           </HelpText>
-        </div>
-        <div>
+        </>
+        <>
           <HelpText>
             <InlineIcon>flag</InlineIcon>
             <b>host</b>
@@ -83,8 +80,8 @@ export function LobbyHelpModal(props: HelpModalProps) {
             user settings, and the ability to start the game. They can
             transfer the host role to any other connected user in the room.
           </HelpText>
-        </div>
-        <div>
+        </>
+        <>
           <HelpText>
             <InlineIcon>visibility</InlineIcon>
             <b>spectator</b>
@@ -92,60 +89,53 @@ export function LobbyHelpModal(props: HelpModalProps) {
             player in the game, or simply spectating it. By default, the host
             is a spectator in the game, but they can change this setting.
           </HelpText>
-        </div>
+        </>
         <NoMarginMediumText>Room Settings</NoMarginMediumText>
-        <div>
+        <>
           <HelpText>
             <b>Selected Problems</b>
             : The selected problems are the problems that the players must solve
-            during the game. Currently, this feature is optional: only one
-            problem is allowed, and if none are selected then a random one is
-            chosen with the provided difficulty setting when the game starts.
-            In the future, these will be the only problems in the game.
+            during the game. The host can specify which problems they want to use
+            (from either their own or CodeJoust&apos;s public collection).
           </HelpText>
-        </div>
-        <div>
+        </>
+        <>
           <HelpText>
             <b>Difficulty</b>
-            : The difficulty setting currently filters the random problems
-            chosen by this difficulty. In the future, this will be
-            used to filter the selected problems.
+            : If no problems are selected, the host can choose a difficulty setting
+            and play the game with a randomly selected problem.
           </HelpText>
-        </div>
-        <div>
+        </>
+        <>
           <HelpText>
-            <b>Selected Tags</b>
-            : The selected tags currently allows the user to search and select
-            certain tags, but does not yet have an impact on game settings.
-            In the future, this will be used to filter the selected problems.
+            <b>Number of Problems</b>
+            : If no problems are manually chosen, the host can choose how many problems
+            they want to be randomly selected for the game.
           </HelpText>
-        </div>
-        <div>
+        </>
+        <>
           <HelpText>
             <b>Duration</b>
             : The duration sets the maximum amount of time the game will last
             before it ends. The default value is fifteen minutes, the minimum
             value is one minute, and the maximum value is one hour.
           </HelpText>
-        </div>
-        <div>
+        </>
+        <>
           <HelpText>
             <b>Room Size</b>
             : The room size setting allows the host to control the maximum
             amount of users that can join the room. The default value is ten,
             and no room can have more than thirty users.
           </HelpText>
-        </div>
+        </>
       </LeftContainer>
     </Modal>
   );
 }
 
 export function ProblemHelpModal(props: HelpModalProps) {
-  // Grab props variables.
-  const {
-    show, exitModal,
-  } = props;
+  const { show, exitModal } = props;
 
   return (
     <Modal
@@ -156,7 +146,7 @@ export function ProblemHelpModal(props: HelpModalProps) {
       <LeftContainer>
         <LargeText>Help Section</LargeText>
         <NoMarginMediumText>Problem Page</NoMarginMediumText>
-        <div>
+        <>
           <HelpText>
             <b>Overview</b>
             : The problem page is where you can create or edit your problems,
@@ -170,8 +160,8 @@ export function ProblemHelpModal(props: HelpModalProps) {
             {' '}
             created by the CodeJoust team to see an example.
           </HelpText>
-        </div>
-        <div>
+        </>
+        <>
           <HelpText>
             <b>Description</b>
             : The problem description uses a Markdown editor, meaning you can
@@ -179,9 +169,9 @@ export function ProblemHelpModal(props: HelpModalProps) {
             can customize this however you wish, or use the default template
             description provided by the CodeJoust team.
           </HelpText>
-        </div>
+        </>
         <NoMarginMediumText>Options</NoMarginMediumText>
-        <div>
+        <>
           <HelpText>
             <b>Difficulty and Tags</b>
             : The difficulty and tags settings add more information to the
@@ -189,8 +179,8 @@ export function ProblemHelpModal(props: HelpModalProps) {
             relevant problems. Tags can only be added once the problem has
             been created.
           </HelpText>
-        </div>
-        <div>
+        </>
+        <>
           <HelpText>
             <b>Problem Inputs</b>
             : Every problem is structured in the form of a method with
@@ -198,8 +188,8 @@ export function ProblemHelpModal(props: HelpModalProps) {
             names are added here. There are some restrictions on valid names
             (no spaces or special characters).
           </HelpText>
-        </div>
-        <div>
+        </>
+        <>
           <HelpText>
             <b>Problem Output</b>
             : The problem output type is defined here. Further types may be
@@ -210,17 +200,17 @@ export function ProblemHelpModal(props: HelpModalProps) {
             </InlineExternalLink>
             .
           </HelpText>
-        </div>
+        </>
         <NoMarginMediumText>Test Cases</NoMarginMediumText>
-        <div>
+        <>
           <HelpText>
             <b>Overview</b>
             : Test cases are how this platform judges the accuracy of problem
             solutions. These can only be added once the initial problem was
             created.
           </HelpText>
-        </div>
-        <div>
+        </>
+        <>
           <HelpText>
             <b>Input</b>
             : The Input is the first required setting for test cases. Each line
@@ -229,16 +219,16 @@ export function ProblemHelpModal(props: HelpModalProps) {
             allowed. The input must perfectly match the parameters selected
             in Problem Inputs.
           </HelpText>
-        </div>
-        <div>
+        </>
+        <>
           <HelpText>
             <b>Output</b>
             : The Output is the second required setting for test cases.
             The Output should be just one line, and must perfectly match the
             type selected in Problem Output.
           </HelpText>
-        </div>
-        <div>
+        </>
+        <>
           <HelpText>
             <b>Explanation</b>
             : The Explanation is an optional field that is not currently in use
@@ -246,8 +236,8 @@ export function ProblemHelpModal(props: HelpModalProps) {
             understand the test case. The CodeJoust team suggests you only add
             an explanation for the first test case.
           </HelpText>
-        </div>
-        <div>
+        </>
+        <>
           <HelpText>
             <b>Hidden</b>
             : The Hidden toggle determines whether the player will be able
@@ -255,15 +245,15 @@ export function ProblemHelpModal(props: HelpModalProps) {
             at least one non-hidden test case, and at least one hidden test
             case.
           </HelpText>
-        </div>
-        <div>
+        </>
+        <>
           <HelpText>
             <b>Ordering</b>
             : The test cases can be ordered by simply dragging them higher or
             lower. This simply impacts which test cases the player will see
             first when they are solving a problem.
           </HelpText>
-        </div>
+        </>
       </LeftContainer>
     </Modal>
   );
