@@ -93,7 +93,8 @@ export const getAuthHttpHeader = (token: string) => ({
   },
 });
 
-export const problemMatchesFilterText = (problem: Problem | SelectableProblem, filterText: string): boolean => {
+export const problemMatchesFilterText = (problem: Problem | SelectableProblem,
+  filterText: string): boolean => {
   const texts = filterText.toLowerCase().split(',');
 
   // Filter by name, difficulty, and tags (multiple queries separated by commas)

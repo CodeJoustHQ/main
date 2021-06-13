@@ -648,7 +648,7 @@ function LobbyPage() {
         </LeftContainer>
       </Modal>
       <HoverTooltip
-        visible={hoverVisible}
+        visible={hoverVisible && !isHost(currentUser)}
         x={mousePosition.x}
         y={mousePosition.y}
       >
@@ -802,19 +802,7 @@ function LobbyPage() {
               {size === 31 ? 'No limit' : `${size === 1 ? '1 person' : `${size} people`}`}
             </NoMarginSubtitleText>
             <HoverContainerSlider>
-              <HoverElementSlider
-                enabled={isHost(currentUser)}
-                onMouseEnter={() => {
-                  if (!isHost(currentUser)) {
-                    setHoverVisible(true);
-                  }
-                }}
-                onMouseLeave={() => {
-                  if (!isHost(currentUser)) {
-                    setHoverVisible(false);
-                  }
-                }}
-              />
+              <HoverElementSlider {...hoverProps} />
               <SliderContainer>
                 <Slider
                   min={1}
