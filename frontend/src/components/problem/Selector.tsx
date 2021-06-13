@@ -110,6 +110,7 @@ export function ProblemSelector(props: ProblemSelectorProps) {
 
   const { account, token } = useAppSelector((state) => state.account);
   const dispatch = useAppDispatch();
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (token) {
@@ -124,8 +125,6 @@ export function ProblemSelector(props: ProblemSelectorProps) {
     setAllProblems((accountProblems as SelectableProblem[]).concat(verifiedProblems));
   }, [account, verifiedProblems]);
 
-  const { token } = useAppSelector((state) => state.account);
-  const ref = useRef<HTMLDivElement>(null);
 
   // Close list of problems if clicked outside of div
   useClickOutside(ref, () => setShowProblems(false));

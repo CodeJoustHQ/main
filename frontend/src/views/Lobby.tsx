@@ -23,9 +23,10 @@ import { Difficulty } from '../api/Difficulty';
 import {
   PrimaryButton,
   SmallDifficultyButtonNoMargin,
-  InlineLobbyIcon,
-  SecondaryRedButton, TextButton,
+  SecondaryRedButton,
+  TextButton,
 } from '../components/core/Button';
+import { InlineIcon } from '../components/core/Icon';
 import Loading from '../components/core/Loading';
 import PlayerCard from '../components/card/PlayerCard';
 import ActionCard from '../components/card/ActionCard';
@@ -172,7 +173,6 @@ function LobbyPage() {
   const dispatch = useAppDispatch();
   const { room } = useAppSelector((state) => state);
   const { currentUser } = useAppSelector((state) => state);
-  const { token } = useAppSelector((state) => state.account);
 
   const mousePosition = useMousePosition();
 
@@ -708,16 +708,16 @@ function LobbyPage() {
                 ? ` (${users.length})`
                 : null
             }
-            <InlineLobbyIcon
+            <InlineIcon
               onClick={refreshRoomDetails}
             >
               refresh
-            </InlineLobbyIcon>
-            <InlineLobbyIcon
+            </InlineIcon>
+            <InlineIcon
               onClick={() => setActionCardHelp(true)}
             >
               help_outline
-            </InlineLobbyIcon>
+            </InlineIcon>
           </LobbyContainerTitle>
           <BackgroundContainer>
             {

@@ -12,10 +12,15 @@ import copy from 'copy-to-clipboard';
 import { Message, Subscription } from 'stompjs';
 import Editor from './Editor';
 import { DefaultCodeType, getDefaultCodeMap, Problem } from '../../api/Problem';
-import { CenteredContainer, Panel, SplitterContainer } from '../core/Container';
+import {
+  CenteredContainer,
+  Panel,
+  SplitterContainer,
+  FlexBareContainer,
+} from '../core/Container';
 import ErrorMessage from '../core/Error';
 import 'react-splitter-layout/lib/index.css';
-import { ProblemHeaderText, BottomFooterText } from '../core/Text';
+import { ProblemHeaderText, BottomFooterText, NoMarginDefaultText } from '../core/Text';
 import Console from './Console';
 import Loading from '../core/Loading';
 import {
@@ -25,14 +30,17 @@ import {
   SubmissionType,
   submitSolution,
   SpectateGame,
+  Player,
 } from '../../api/Game';
 import LeaderboardCard from '../card/LeaderboardCard';
-import { getDifficultyDisplayButton, InheritedTextButton, PrimaryButton } from '../core/Button';
+import { getDifficultyDisplayButton, InheritedTextButton } from '../core/Button';
+import { SpectatorBackIcon } from '../core/Icon';
 import Language from '../../api/Language';
 import { CopyIndicator, BottomCopyIndicatorContainer, InlineCopyIcon } from '../special/CopyIndicator';
-import { useAppSelector } from '../../util/Hook';
+import { useAppSelector, useBestSubmission } from '../../util/Hook';
 import { routes, send, subscribe } from '../../api/Socket';
 import { User } from '../../api/User';
+import { getScore, getSubmissionCount, getSubmissionTime } from '../../util/Utility';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
   margin-top: 15px;
@@ -82,6 +90,45 @@ const LeaderboardContent = styled.div`
   background-attachment: local, local, scroll, scroll;
 `;
 
+const GameHeaderContainer = styled(FlexBareContainer)`
+  margin: 0 20px;
+  height: 5rem;
+`;
+
+const GameHeaderContainerChild = styled.div`
+  flex: 3;
+  position: relative;
+`;
+
+const GameHeaderText = styled.p`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  text-align: center;
+  font-size: ${({ theme }) => theme.fontSize.xMediumLarge};
+`;
+
+const GameHeaderStatsContainer = styled.div`
+  position: absolute;
+  top: 50%;
+  right: 0%;
+  transform: translate(0%, -50%);
+  width: 100%;
+`;
+
+const GameHeaderStatsSubContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  text-align: left;
+  background: ${({ theme }) => theme.colors.white};
+  border-radius: 0.5rem;
+  box-shadow: 0 -1px 8px rgb(0 0 0 / 8%);
+`;
+
 // The type used for the state reference.
 type StateRefType = {
   game: Game | null,
@@ -90,6 +137,13 @@ type StateRefType = {
   currentLanguage: string,
 }
 
+/**
+ * The spectateGame and spectatorUnsubscribePlayer parameters are only used when
+ * the game page is used for the spectator view. spectateGame is the live data,
+ * primarily the player code, of the player being spectated.
+ * spectatorUnsubscribePlayer unsubscribes the spectator from the player socket
+ * and brings them back to the main spectator page.
+ */
 type PlayerGameViewProps = {
   gameError: string,
   spectateGame: SpectateGame | null,
@@ -115,6 +169,10 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
   // Variable to hold whether the user is subscribed to their own player socket.
   const [playerSocket, setPlayerSocket] = useState<Subscription | null>(null);
+
+  // Variables to hold the player stats when spectating.
+  const [spectatedPlayer, setSpectatedPlayer] = useState<Player | null>(null);
+  const bestSubmission = useBestSubmission(spectatedPlayer);
 
   /**
    * Display beforeUnload message to inform the user that they may lose
@@ -167,7 +225,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
     currentLanguageParam: string | undefined) => {
     if (gameParam && currentUserParam) {
       const spectatorViewBody: string = JSON.stringify({
-        player: currentUserParam,
+        user: currentUserParam,
         problem: gameParam.problems[0],
         code: currentCodeParam,
         language: currentLanguageParam,
@@ -207,9 +265,20 @@ function PlayerGameView(props: PlayerGameViewProps) {
       });
   }, [sendViewUpdate]);
 
+  const getSpectatedPlayer = useCallback((gameParam: Game) => {
+    // Get the new player object for spectating.
+    gameParam.players.forEach((player) => {
+      if (player.user.userId === spectateGame?.user.userId) {
+        setSpectatedPlayer(player);
+      }
+    });
+  }, [spectateGame, setSpectatedPlayer]);
+
   // Map the game in Redux to the state variables used in this file
   useEffect(() => {
     if (game && currentUser && currentUser.userId) {
+      getSpectatedPlayer(game);
+
       // Subscribe the player to their own socket.
       if (!playerSocket) {
         subscribePlayer(game.room.roomId, currentUser.userId);
@@ -237,7 +306,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
       }
     }
   }, [game, currentUser, defaultCodeList, setDefaultCodeFromProblems,
-    subscribePlayer, playerSocket]);
+    subscribePlayer, playerSocket, getSpectatedPlayer]);
 
   // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {
@@ -307,22 +376,48 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
   return (
     <>
-      {!spectatorUnsubscribePlayer ? (
+      {!spectatorUnsubscribePlayer && !spectateGame ? (
         <LeaderboardContent>
           {displayPlayerLeaderboard()}
         </LeaderboardContent>
       ) : (
-        <>
-          <p>
-            Spectate
-            {' '}
-            {spectateGame?.player.nickname}
-          </p>
-
-          <PrimaryButton onClick={spectatorUnsubscribePlayer}>
-            Go Back
-          </PrimaryButton>
-        </>
+        <GameHeaderContainer>
+          <GameHeaderContainerChild>
+            <SpectatorBackIcon
+              onClick={spectatorUnsubscribePlayer || (() => {})}
+            >
+              arrow_back
+            </SpectatorBackIcon>
+          </GameHeaderContainerChild>
+          <GameHeaderContainerChild>
+            <GameHeaderText>
+              Spectating:
+              {' '}
+              <b>{spectateGame?.user.nickname}</b>
+            </GameHeaderText>
+          </GameHeaderContainerChild>
+          <GameHeaderContainerChild>
+            <GameHeaderStatsContainer>
+              <GameHeaderStatsSubContainer>
+                <NoMarginDefaultText>
+                  <b>Score:</b>
+                  {' '}
+                  {getScore(bestSubmission)}
+                </NoMarginDefaultText>
+                <NoMarginDefaultText>
+                  <b>Time:</b>
+                  {' '}
+                  {getSubmissionTime(bestSubmission, game?.gameTimer.startTime || null)}
+                </NoMarginDefaultText>
+                <NoMarginDefaultText>
+                  <b>Submissions:</b>
+                  {' '}
+                  {getSubmissionCount(spectatedPlayer)}
+                </NoMarginDefaultText>
+              </GameHeaderStatsSubContainer>
+            </GameHeaderStatsContainer>
+          </GameHeaderContainerChild>
+        </GameHeaderContainer>
       )}
 
       {loading ? <CenteredContainer><Loading /></CenteredContainer> : null}

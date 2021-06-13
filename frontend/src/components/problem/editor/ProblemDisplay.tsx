@@ -8,7 +8,6 @@ import {
   SmallButton,
   InvertedSmallButton,
   TextButton,
-  InlineLobbyIcon,
 } from '../../core/Button';
 import { SmallHeaderText } from '../../core/Text';
 import Loading from '../../core/Loading';
@@ -18,6 +17,7 @@ import { useAppSelector, useProblemEditable } from '../../../util/Hook';
 import { ProblemHelpModal } from '../../core/HelpModal';
 import OptionsPanel from './OptionsPanel';
 import TestCaseEditor from './TestCaseEditor';
+import { InlineIcon } from '../../core/Icon';
 
 const defaultDescription: string = [
   'Replace this line with a short description.',
@@ -71,7 +71,7 @@ const TextButtonLink = styled(TextButton)`
   text-align: left;
 `;
 
-const InlineProblemIcon = styled(InlineLobbyIcon)`
+const InlineProblemIcon = styled(InlineIcon)`
   margin: 10px;
   height: 1rem;
 `;

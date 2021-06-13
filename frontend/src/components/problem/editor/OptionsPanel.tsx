@@ -5,7 +5,7 @@ import { LowMarginMediumText, SmallHeaderText, Text } from '../../core/Text';
 import ToggleButton from '../../core/ToggleButton';
 import { Difficulty } from '../../../api/Difficulty';
 import {
-  GrayTextButton, InlineErrorIcon, PrimaryButton, SmallDifficultyButton, TextButton,
+  GrayTextButton, PrimaryButton, SmallDifficultyButton, TextButton,
 } from '../../core/Button';
 import { generateRandomId, validIdentifier } from '../../../util/Utility';
 import ProblemTags from '../ProblemTags';
@@ -18,6 +18,7 @@ import { SettingsContainer } from '../../core/Container';
 import { HoverTooltip } from '../../core/HoverTooltip';
 import { useAppSelector, useMousePosition, useProblemEditable } from '../../../util/Hook';
 import { AccountRole } from '../../../api/Account';
+import { InlineErrorIcon } from '../../core/Icon';
 
 const SidebarContent = styled.div`
   text-align: left;
