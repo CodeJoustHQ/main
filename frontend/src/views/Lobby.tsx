@@ -174,7 +174,7 @@ function LobbyPage() {
   const { room } = useAppSelector((state) => state);
   const { currentUser } = useAppSelector((state) => state);
 
-  const mousePosition = useMousePosition();
+  const mousePosition = useMousePosition(true);
 
   // Hold error text.
   const [error, setError] = useState('');

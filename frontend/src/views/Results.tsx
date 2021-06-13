@@ -111,7 +111,7 @@ function GameResultsPage() {
   const dispatch = useAppDispatch();
   const { game } = useAppSelector((state) => state);
   const { currentUser } = useAppSelector((state) => state);
-  const mousePosition = useMousePosition();
+  const mousePosition = useMousePosition(true);
 
   const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
 

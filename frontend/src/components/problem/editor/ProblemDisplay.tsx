@@ -130,6 +130,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           <TopButtonsContainer>
             <InvertedSmallButton
               onClick={() => {
+                // eslint-disable-next-line no-alert
                 if (JSON.stringify(problem) === JSON.stringify(newProblem)
                   || window.confirm('Go back? Your unsaved changes will be lost.')) {
                   history.goBack();
