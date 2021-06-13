@@ -87,7 +87,7 @@ function MyProblems(props: MyProblemsProps) {
           <SecondaryHeaderText>
             <b>Step 2.</b>
             {' '}
-            <InheritedTextLink to="/problem/create">Create a room</InheritedTextLink>
+            <InheritedTextLink to="/game/create">Create a room</InheritedTextLink>
             {' '}
             and choose what problems you want your students to solve.
           </SecondaryHeaderText>
