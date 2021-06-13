@@ -86,10 +86,11 @@ export function SelectedTagsDisplay(props: SelectedTagsDisplayProps) {
 
 type TagProps = {
   tags: ProblemTag[],
+  onDelete: (tagId: string) => void,
 };
 
 export function FilterAllTagsDisplay(props: TagProps) {
-  const { tags } = props;
+  const { tags, onDelete } = props;
 
   const [searchText, setSearchText] = useState('');
 
@@ -101,7 +102,7 @@ export function FilterAllTagsDisplay(props: TagProps) {
     <Content>
       <TextSearch
         onChange={setSearchStatus}
-        placeholder={tags.length ? 'Filter tags' : 'Loading...'}
+        placeholder={tags.length ? 'Filter tags' : 'No tags found'}
       />
 
       {tags.map((tag) => {
@@ -114,6 +115,7 @@ export function FilterAllTagsDisplay(props: TagProps) {
             <SelectedItemText>
               {tag.name}
             </SelectedItemText>
+            <RemoveText onClick={() => onDelete(tag.tagId || '')}>✕</RemoveText>
           </SelectedItemContainer>
         );
       })}

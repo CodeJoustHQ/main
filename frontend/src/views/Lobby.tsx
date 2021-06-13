@@ -172,6 +172,7 @@ function LobbyPage() {
   const dispatch = useAppDispatch();
   const { room } = useAppSelector((state) => state);
   const { currentUser } = useAppSelector((state) => state);
+  const { token } = useAppSelector((state) => state.account);
 
   const mousePosition = useMousePosition();
 
@@ -538,7 +539,7 @@ function LobbyPage() {
     };
 
     setLoading(true);
-    connect(roomId, userId).then(() => {
+    connect(userId).then(() => {
       // Body encrypt through JSON.
       subscribe(routes(roomId).subscribe_lobby, subscribeCallback).then((subscriptionParam) => {
         setSubscription(subscriptionParam);
@@ -732,7 +733,6 @@ function LobbyPage() {
         <RoomSettingsContainer>
           <LobbyContainerTitle>Room Settings</LobbyContainerTitle>
           <BackgroundContainer>
-
             {!selectedProblems.length ? (
               <>
                 <NoMarginMediumText>Difficulty</NoMarginMediumText>

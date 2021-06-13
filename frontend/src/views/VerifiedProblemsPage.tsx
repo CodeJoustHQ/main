@@ -20,13 +20,19 @@ function VerifiedProblemsPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const { token } = useAppSelector((state) => state.account);
+
   useEffect(() => {
+    if (!token) {
+      return;
+    }
+
     setLoading(true);
-    getProblems()
+    getProblems(token!, true)
       .then((res) => dispatch(setVerifiedProblems(res)))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [token]);
 
   return (
     <Content>

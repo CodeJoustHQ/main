@@ -26,7 +26,7 @@ function CreateProblemPage() {
     name: '',
     owner: { uid: firebaseUser?.uid || 'n/a' },
     description: '',
-    approval: false,
+    verified: false,
     difficulty: Difficulty.Easy,
     testCases: [],
     problemInputs: [],

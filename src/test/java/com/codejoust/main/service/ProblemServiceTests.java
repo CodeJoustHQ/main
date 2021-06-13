@@ -70,6 +70,7 @@ public class ProblemServiceTests {
         expected.setName(TestFields.NAME);
         expected.setDescription(TestFields.DESCRIPTION);
         expected.setDifficulty(ProblemDifficulty.EASY);
+        expected.setOwner(TestFields.account1());
 
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(TestFields.INPUT);
@@ -79,7 +80,7 @@ public class ProblemServiceTests {
 
         Mockito.doReturn(expected).when(repository).findProblemByProblemId(expected.getProblemId());
 
-        ProblemDto response = problemService.getProblem(expected.getProblemId());
+        ProblemDto response = problemService.getProblem(expected.getProblemId(), TestFields.TOKEN);
 
         assertEquals(expected.getProblemId(), response.getProblemId());
         assertEquals(expected.getName(), response.getName());
@@ -92,8 +93,30 @@ public class ProblemServiceTests {
     }
 
     @Test
+    public void getProblemNotVerifiedPermissionsFailure() {
+        Problem problem = TestFields.problem1();
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
+        Mockito.doThrow(new ApiException(AccountError.INVALID_CREDENTIALS)).when(firebaseService).verifyTokenMatchesUid(TestFields.TOKEN_2, problem.getOwner().getUid());
+
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblem(problem.getProblemId(), TestFields.TOKEN_2));
+        assertEquals(AccountError.INVALID_CREDENTIALS, exception.getError());
+    }
+
+    @Test
+    public void getProblemVerifiedSuccess() {
+        Problem problem = TestFields.problem1();
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
+        Mockito.verify(firebaseService, Mockito.never()).verifyTokenMatchesUid(Mockito.any(), Mockito.any());
+
+        ProblemDto response = problemService.getProblem(problem.getProblemId(), "fake");
+        assertEquals(problem.getName(), response.getName());
+    }
+
+    @Test
     public void getProblemNotFound() {
-        ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblem("ZZZ"));
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.getProblem("ZZZ", TestFields.TOKEN));
 
         verify(repository).findProblemByProblemId("ZZZ");
         assertEquals(ProblemError.NOT_FOUND, exception.getError());
@@ -211,7 +234,7 @@ public class ProblemServiceTests {
     }
 
     @Test
-    public void getProblemsSuccess() {
+    public void getAllProblemsAdminAccountSuccess() {
         Problem problem = new Problem();
         problem.setName(TestFields.NAME);
         problem.setDescription(TestFields.DESCRIPTION);
@@ -220,7 +243,7 @@ public class ProblemServiceTests {
         expected.add(problem);
         Mockito.doReturn(expected).when(repository).findAll();
 
-        List<ProblemDto> response = problemService.getAllProblems(null);
+        List<ProblemDto> response = problemService.getAllProblems(null, TestFields.TOKEN);
 
         assertEquals(1, response.size());
         assertNotNull(response.get(0).getProblemId());
@@ -230,21 +253,28 @@ public class ProblemServiceTests {
     }
 
     @Test
-    public void getAllProblemsOnlyApproved() {
+    public void getAllProblemsNoTokenFailure() {
+        Mockito.doThrow(new ApiException(AccountError.INVALID_CREDENTIALS)).when(firebaseService).verifyAdminAccount(null);
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.getAllProblems(false, null));
+        assertEquals(AccountError.INVALID_CREDENTIALS, exception.getError());
+    }
+
+    @Test
+    public void getAllProblemsOnlyVerified() {
         Problem problem = new Problem();
         problem.setName(TestFields.NAME);
         problem.setDescription(TestFields.DESCRIPTION);
-        problem.setApproval(true);
+        problem.setVerified(true);
 
         List<Problem> expected = new ArrayList<>();
         expected.add(problem);
-        Mockito.doReturn(expected).when(repository).findAllByApproval(true);
+        Mockito.doReturn(expected).when(repository).findAllByVerified(true);
 
-        List<ProblemDto> response = problemService.getAllProblems(true);
+        List<ProblemDto> response = problemService.getAllProblems(true, null);
 
         assertEquals(1, response.size());
         assertEquals(TestFields.NAME, response.get(0).getName());
-        assertTrue(problem.getApproval());
+        assertTrue(problem.getVerified());
     }
 
     @Test
@@ -338,7 +368,7 @@ public class ProblemServiceTests {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
-        Mockito.doReturn(problems).when(repository).findAllByDifficultyAndApproval(ProblemDifficulty.MEDIUM, true);
+        Mockito.doReturn(problems).when(repository).findAllByDifficultyAndVerified(ProblemDifficulty.MEDIUM, true);
 
         List<Problem> response = problemService.getProblemsFromDifficulty(ProblemDifficulty.MEDIUM, 1);
 
@@ -350,7 +380,7 @@ public class ProblemServiceTests {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
-        Mockito.doReturn(problems).when(repository).findAllByApproval(true);
+        Mockito.doReturn(problems).when(repository).findAllByVerified(true);
 
         // Return correct problem when selecting random difficulty
         List<Problem> response = problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 1);
@@ -362,7 +392,7 @@ public class ProblemServiceTests {
         Problem problem1 = new Problem();
         problem1.setDifficulty(ProblemDifficulty.MEDIUM);
         List<Problem> problems = Collections.singletonList(problem1);
-        Mockito.doReturn(problems).when(repository).findAllByApproval(true);
+        Mockito.doReturn(problems).when(repository).findAllByVerified(true);
 
         ApiException exception = assertThrows(ApiException.class, () ->
                 problemService.getProblemsFromDifficulty(ProblemDifficulty.RANDOM, 3));
@@ -443,6 +473,18 @@ public class ProblemServiceTests {
         ProblemTestCase testCase = problem.getTestCases().get(0);
         assertEquals(testCaseDto.getInput(), testCase.getInput());
         assertEquals(testCaseDto.getOutput(), testCase.getOutput());
+    }
+
+    @Test
+    public void editProblemVerifiedFailure() {
+        Problem problem = TestFields.problem2();
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
+
+        ProblemDto request = ProblemMapper.toDto(problem);
+        request.setVerified(true);
+
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.editProblem(problem.getProblemId(), request, TestFields.TOKEN_2));
+        assertEquals(AccountError.INVALID_CREDENTIALS, exception.getError());
     }
 
     @ParameterizedTest
@@ -532,7 +574,7 @@ public class ProblemServiceTests {
         assertEquals(ProblemError.INVALID_INPUT, exception.getError());
     }
     @Test
-    public void editProblemBadApproval() {
+    public void editProblemBadVerified() {
         Problem problem = new Problem();
         problem.setName(TestFields.NAME);
         problem.setDescription(TestFields.DESCRIPTION);
@@ -545,13 +587,13 @@ public class ProblemServiceTests {
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
 
         ProblemDto updatedProblem = ProblemMapper.toDto(problem);
-        updatedProblem.setApproval(true);
+        updatedProblem.setVerified(true);
 
         String problemId = problem.getProblemId();
         ApiException exception = assertThrows(ApiException.class, () ->
                 problemService.editProblem(problemId, updatedProblem, TestFields.TOKEN));
 
-        assertEquals(ProblemError.BAD_APPROVAL, exception.getError());
+        assertEquals(ProblemError.BAD_VERIFIED_STATUS, exception.getError());
     }
 
     @Test
@@ -720,13 +762,11 @@ public class ProblemServiceTests {
          * is returned with "getAllProblemTags."
          */
 
-        ProblemTag problemTag = new ProblemTag();
-        problemTag.setName(TestFields.TAG_NAME);
-        problemTag.setTagId(TestFields.TAG_ID);
+        ProblemTag problemTag = TestFields.problemTag1();
+        Mockito.doReturn(Collections.singletonList(problemTag)).when(tagRepository).findAllByOwner_Uid(problemTag.getOwner().getUid());
+        Mockito.doReturn(problemTag.getOwner().getUid()).when(firebaseService).verifyToken(TestFields.TOKEN);
 
-        Mockito.doReturn(Collections.singletonList(problemTag)).when(tagRepository).findAll();
-        
-        List<ProblemTagDto> problemTags = problemService.getAllProblemTags();
+        List<ProblemTagDto> problemTags = problemService.getAllProblemTags(TestFields.TOKEN);
 
         assertEquals(1, problemTags.size());
         assertEquals(problemTag.getName(), problemTags.get(0).getName());
@@ -738,7 +778,8 @@ public class ProblemServiceTests {
         CreateProblemTagRequest request = new CreateProblemTagRequest();
         request.setName(TestFields.TAG_NAME);
 
-        problemService.createProblemTag(request);
+        Mockito.doReturn(TestFields.UID).when(firebaseService).verifyToken(TestFields.TOKEN);
+        problemService.createProblemTag(request, TestFields.TOKEN);
         verify(tagRepository).save(Mockito.any(ProblemTag.class));
     }
 
@@ -749,7 +790,8 @@ public class ProblemServiceTests {
         CreateProblemTagRequest request = new CreateProblemTagRequest();
         request.setName(tagName);
 
-        ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblemTag(request));
+        Mockito.doReturn(TestFields.UID).when(firebaseService).verifyToken(TestFields.TOKEN);
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.createProblemTag(request, TestFields.TOKEN));
         assertEquals(ProblemError.BAD_PROBLEM_TAG, exception.getError());
     }
 
@@ -765,12 +807,23 @@ public class ProblemServiceTests {
         ProblemTag problemTag = new ProblemTag();
         problemTag.setName(TestFields.TAG_NAME);
         problemTag.setTagId(TestFields.TAG_ID);
+        problemTag.setOwner(TestFields.account1());
 
         Mockito.doReturn(problemTag).when(tagRepository).findTagByTagId(problemTag.getTagId());
 
-        ProblemTagDto problemTagDto = problemService.deleteProblemTag(problemTag.getTagId());
+        ProblemTagDto problemTagDto = problemService.deleteProblemTag(problemTag.getTagId(), TestFields.TOKEN);
         verify(tagRepository).delete(Mockito.any(ProblemTag.class));
         assertEquals(problemTag.getName(), problemTagDto.getName());
+    }
+
+    @Test
+    public void deleteProblemTagFailure() {
+        ProblemTag problemTag = TestFields.problemTag1();
+
+        Mockito.doReturn(problemTag).when(tagRepository).findTagByTagId(problemTag.getTagId());
+        Mockito.doThrow(new ApiException(AccountError.INVALID_CREDENTIALS)).when(firebaseService).verifyTokenMatchesUid(TestFields.TOKEN_2, TestFields.UID);
+        ApiException exception = assertThrows(ApiException.class, () -> problemService.deleteProblemTag(problemTag.getTagId(), TestFields.TOKEN_2));
+        assertEquals(AccountError.INVALID_CREDENTIALS, exception.getError());
     }
 
     @Test

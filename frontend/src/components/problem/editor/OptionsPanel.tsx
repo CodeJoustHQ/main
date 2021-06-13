@@ -17,6 +17,7 @@ import {
 import { SettingsContainer } from '../../core/Container';
 import { HoverTooltip } from '../../core/HoverTooltip';
 import { useAppSelector, useMousePosition, useProblemEditable } from '../../../util/Hook';
+import { AccountRole } from '../../../api/Account';
 
 const SidebarContent = styled.div`
   text-align: left;
@@ -28,13 +29,13 @@ type ShowProps = {
   show: boolean,
 };
 
-const ApprovalContainer = styled.div<ShowProps>`
+const VerifiedContainer = styled.div<ShowProps>`
   display: ${({ show }) => (show ? 'inline-block' : 'none')};
   text-align: left;
   margin-top: 0.5rem;
 `;
 
-const ApprovalText = styled(Text)`
+const VerifiedText = styled(Text)`
   display: inline-block;
   margin: 0 0 0 0.75rem;
   font-size: ${({ theme }) => theme.fontSize.subtitleXMediumLarge};
@@ -71,7 +72,7 @@ function OptionsPanel(props: OptionsPanelProps) {
   const history = useHistory();
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
 
-  const { firebaseUser, token } = useAppSelector((state) => state.account);
+  const { account, firebaseUser, token } = useAppSelector((state) => state.account);
   const mousePosition = useMousePosition();
   const problemEditable = useProblemEditable(firebaseUser, newProblem);
 
@@ -87,8 +88,8 @@ function OptionsPanel(props: OptionsPanelProps) {
   // Handle updating of enum-type fields
   const handleEnumChange = (name: string, value: any) => handleChange({ target: { name, value } });
 
-  // Handle approval change
-  const handleApprovalChange = (value: boolean) => handleChange({ target: { name: 'approval', value } });
+  // Handle verified change
+  const handleVerifiedChange = (value: boolean) => handleChange({ target: { name: 'verified', value } });
 
   // Handle updating of problem inputs
   const handleInputChange = (index: number, name: string, type: ProblemIOType) => {
@@ -165,18 +166,18 @@ function OptionsPanel(props: OptionsPanelProps) {
 
       <SmallHeaderText>Options</SmallHeaderText>
       <SettingsContainer>
-        <ApprovalContainer
-          show={editMode}
+        <VerifiedContainer
+          show={editMode && account?.role === AccountRole.Admin}
         >
           <ToggleButton
-            onChangeFunction={() => handleApprovalChange(!newProblem.approval)}
+            onChangeFunction={() => handleVerifiedChange(!newProblem.verified)}
             editable={problemEditable}
-            checked={newProblem.approval}
+            checked={newProblem.verified}
           />
-          <ApprovalText>
-            {newProblem.approval ? 'Approved' : 'Approval Pending'}
-          </ApprovalText>
-        </ApprovalContainer>
+          <VerifiedText>
+            {newProblem.verified ? 'Verified' : 'Not Verified'}
+          </VerifiedText>
+        </VerifiedContainer>
         <LowMarginMediumText>Difficulty</LowMarginMediumText>
         {Object.keys(Difficulty).map((key) => {
           const difficulty = Difficulty[key as keyof typeof Difficulty];

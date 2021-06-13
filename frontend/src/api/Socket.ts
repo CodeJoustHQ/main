@@ -7,16 +7,13 @@ let stompClient: Client;
 
 // Dynamic route endpoints that depend on the room id
 const basePath = '/api/v1/socket';
-let socketRoomId: string;
-export const routes = (roomId: string) => {
-  socketRoomId = roomId;
-  return {
-    connect: `${basePath}/join-room-endpoint`,
-    subscribe_lobby: `${basePath}/${roomId}/subscribe-lobby`,
-    subscribe_game: `${basePath}/${roomId}/subscribe-game`,
-    subscribe_notification: `${basePath}/${roomId}/subscribe-notification`,
-  };
-};
+export const routes = (roomId?: string, userId?: string) => ({
+  connect: `${basePath}/join-room-endpoint`,
+  subscribe_lobby: `${basePath}/${roomId}/subscribe-lobby`,
+  subscribe_game: `${basePath}/${roomId}/subscribe-game`,
+  subscribe_notification: `${basePath}/${roomId}/subscribe-notification`,
+  subscribe_player: `${basePath}/${roomId}/subscribe-player/${userId}`,
+});
 
 /**
  * The requirements for validity are as follows:
@@ -32,12 +29,11 @@ export const isValidNickname = (nickname: string) => nickname.length > 0
  * @returns void Promise, reject if socket is already connected
  * or fails to connect.
 */
-export const connect = (roomId: string, userId: string):
+export const connect = (userId: string):
   Promise<void> => new Promise<void>((resolve, reject) => {
     if (!stompClient || !stompClient.connected) {
       // Connect to given endpoint, subscribe to future messages, and send user message.
-      socketRoomId = roomId;
-      const socket: WebSocket = new SockJS(routes(socketRoomId).connect);
+      const socket: WebSocket = new SockJS(routes().connect);
       stompClient = Stomp.over(socket);
       stompClient.debug = () => {};
 

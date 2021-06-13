@@ -45,7 +45,7 @@ public class Problem {
     private Account owner;
 
     private String name;
-    private Boolean approval = false;
+    private Boolean verified = false;
 
     @Column(columnDefinition = "TEXT")
     private String description;
@@ -69,7 +69,7 @@ public class Problem {
     private List<ProblemInput> problemInputs = new ArrayList<>();
 
     // List of tags associated with this problem
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH}, fetch = FetchType.EAGER)
     @Setter(AccessLevel.PRIVATE)
     @JoinColumn(name = "problem_tag_id")
     @Fetch(value = FetchMode.SUBSELECT)

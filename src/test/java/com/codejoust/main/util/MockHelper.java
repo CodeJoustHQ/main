@@ -28,7 +28,8 @@ public class MockHelper {
     }
 
     public static <T> T getRequest(MockMvc mockMvc, String url, Type type, HttpStatus status) throws Exception {
-        MvcResult result = mockMvc.perform(get(url))
+        MvcResult result = mockMvc.perform(get(url)
+                .header(HttpHeaders.AUTHORIZATION, TestFields.TOKEN))
                 .andDo(print()).andExpect(status().is(status.value()))
                 .andReturn();
 
