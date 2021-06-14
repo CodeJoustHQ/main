@@ -4,7 +4,6 @@ import com.codejoust.main.dao.AccountRepository;
 import com.codejoust.main.dao.UserRepository;
 import com.codejoust.main.dto.user.CreateUserRequest;
 import com.codejoust.main.dto.user.DeleteUserRequest;
-import com.codejoust.main.dto.user.UpdateUserAccountRequest;
 import com.codejoust.main.dto.user.UserDto;
 import com.codejoust.main.dto.user.UserMapper;
 import com.codejoust.main.exception.UserError;
@@ -29,8 +28,9 @@ public class UserService {
 
     @Autowired
     public UserService(UserRepository repository,
-        FirebaseService firebaseService, AccountRepository accountRepository,
-        Utility utility) {
+                        FirebaseService firebaseService,
+                        AccountRepository accountRepository,
+                        Utility utility) {
         this.repository = repository;
         this.firebaseService = firebaseService;
         this.accountRepository = accountRepository;
@@ -60,8 +60,8 @@ public class UserService {
         return UserMapper.toDto(user);
     }
 
-    public UserDto updateUserAccount(UpdateUserAccountRequest request, String token) {
-        User user = repository.findUserByUserId(request.getUser().getUserId());
+    public UserDto updateUserAccount(String userId, String token) {
+        User user = repository.findUserByUserId(userId);
 
         if (token == null) {
             user.setAccount(null);

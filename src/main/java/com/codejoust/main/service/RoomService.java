@@ -103,6 +103,7 @@ public class RoomService {
             user.setAccount(null);
         } else {
             // If account present, throw error; otherwise, join room.
+            // TODO: Potential error, two users same account, join at same time.
             String uid = firebaseService.verifyToken(token);
             Account account = accountRepository.findAccountByUid(uid);
             for (User roomUser : room.getUsers()) {

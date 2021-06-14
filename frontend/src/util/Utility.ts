@@ -86,7 +86,7 @@ export const onEnterAction = (action: () => void, event: React.KeyboardEvent<HTM
   }
 };
 
-export const getAuthHttpHeader = (token: string) => ({
+export const getAuthHttpHeader = (token: string | null) => ({
   headers: {
     Authorization: token,
   },

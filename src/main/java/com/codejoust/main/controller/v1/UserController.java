@@ -2,7 +2,6 @@ package com.codejoust.main.controller.v1;
 
 import com.codejoust.main.dto.user.CreateUserRequest;
 import com.codejoust.main.dto.user.DeleteUserRequest;
-import com.codejoust.main.dto.user.UpdateUserAccountRequest;
 import com.codejoust.main.dto.user.UserDto;
 import com.codejoust.main.service.UserService;
 
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -31,9 +31,9 @@ public class UserController extends BaseRestController {
         return new ResponseEntity<>(service.createUser(request), HttpStatus.CREATED);
     }
 
-    @PutMapping("/user/account")
-    public ResponseEntity<UserDto> updateUserAccount(@RequestBody UpdateUserAccountRequest request, @RequestHeader(name="Authorization") String token) {
-        return new ResponseEntity<>(service.updateUserAccount(request, token), HttpStatus.CREATED);
+    @PutMapping("/user/{userId}/account")
+    public ResponseEntity<UserDto> updateUserAccount(@RequestParam String userId, @RequestHeader(name="Authorization") String token) {
+        return new ResponseEntity<>(service.updateUserAccount(userId, token), HttpStatus.OK);
     }
 
     @DeleteMapping("/user")
