@@ -1,14 +1,16 @@
 package com.codejoust.main.model.report;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
-import com.codejoust.main.game_object.GameTimer;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.Problem;
 
@@ -22,27 +24,22 @@ import lombok.Setter;
 @Setter
 public class GameReport {
 
-    // ID used for the database.
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Problem> problems = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.EAGER)
     private List<User> users = new ArrayList<>();
 
-    private GameTimer gameTimer;
+    // The start time of the game
+    private Instant createdDateTime;
 
-    private Boolean playAgain = false;
+    // The game duration, in seconds.
+    private Long duration;
 
-    // Boolean to hold whether all users have solved the problem.
-    private Boolean allSolved = false;
-
-    // Boolean to hold whether the host ended the game early
-    private Boolean gameEnded = false;
-
-    // Store an enum for how the game ended.
-    // Potentially store a simpler version of the game timer.
-
+    // How the game ended.
+    private GameEndType gameEndType;
 }
