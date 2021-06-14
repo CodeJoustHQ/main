@@ -1,5 +1,6 @@
 package com.codejoust.main.service;
 
+import com.codejoust.main.dao.AccountRepository;
 import com.codejoust.main.dao.RoomRepository;
 import com.codejoust.main.dto.game.GameMapper;
 import com.codejoust.main.dto.problem.SelectableProblemDto;
@@ -19,6 +20,7 @@ import com.codejoust.main.exception.TimerError;
 import com.codejoust.main.exception.UserError;
 import com.codejoust.main.exception.api.ApiException;
 import com.codejoust.main.game_object.Game;
+import com.codejoust.main.model.Account;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.Problem;
@@ -42,20 +44,26 @@ public class RoomService {
     private final SocketService socketService;
     private final ProblemService problemService;
     private final GameManagementService gameManagementService;
+    private final FirebaseService firebaseService;
+    private final AccountRepository accountRepository;
     private final Utility utility;
 
     @Autowired
     public RoomService(RoomRepository repository, SocketService socketService,
                        ProblemService problemService, Utility utility,
+                       FirebaseService firebaseService,
+                       AccountRepository accountRepository,
                        GameManagementService gameManagementService) {
         this.repository = repository;
         this.socketService = socketService;
         this.problemService = problemService;
         this.gameManagementService = gameManagementService;
+        this.firebaseService = firebaseService;
+        this.accountRepository = accountRepository;
         this.utility = utility;
     }
 
-    public RoomDto joinRoom(String roomId, JoinRoomRequest request) {
+    public RoomDto joinRoom(String roomId, JoinRoomRequest request, String token) {
         Room room = repository.findRoomByRoomId(roomId);
 
         // Return error if room could not be found
@@ -90,6 +98,21 @@ public class RoomService {
             user.setUserId(utility.generateUniqueId(UserService.USER_ID_LENGTH, Utility.USER_ID_KEY));
         }
 
+        // Set the account associated with the host, if any.
+        if (token == null) {
+            user.setAccount(null);
+        } else {
+            // If account present, throw error; otherwise, join room.
+            String uid = firebaseService.verifyToken(token);
+            Account account = accountRepository.findAccountByUid(uid);
+            for (User roomUser : room.getUsers()) {
+                if (roomUser.getAccount() != null && roomUser.getAccount().equals(account)) {
+                    throw new ApiException(RoomError.DUPLICATE_ACCOUNT);
+                }
+            }
+            user.setAccount(account);
+        }
+
         // Add the user to the room.
         room.addUser(user);
         repository.save(room);
@@ -107,7 +130,7 @@ public class RoomService {
         return roomDto;
     }
 
-    public RoomDto createRoom(CreateRoomRequest request) {
+    public RoomDto createRoom(CreateRoomRequest request, String token) {
         User host = UserMapper.toEntity(request.getHost());
 
         // Do not create room if provided host is invalid.
@@ -121,6 +144,14 @@ public class RoomService {
         // Create user ID for the host if not already present.
         if (host.getUserId() == null) {
             host.setUserId(utility.generateUniqueId(UserService.USER_ID_LENGTH, Utility.USER_ID_KEY));
+        }
+
+        // Set the account associated with the host, if any.
+        if (token == null) {
+            host.setAccount(null);
+        } else {
+            String uid = firebaseService.verifyToken(token);
+            host.setAccount(accountRepository.findAccountByUid(uid));
         }
 
         Room room = new Room();
