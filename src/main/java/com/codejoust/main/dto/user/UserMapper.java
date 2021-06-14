@@ -1,5 +1,6 @@
 package com.codejoust.main.dto.user;
 
+import com.codejoust.main.dto.account.AccountUidDto;
 import com.codejoust.main.model.User;
 
 import org.modelmapper.ModelMapper;
@@ -15,7 +16,11 @@ public class UserMapper {
         if (entity == null) {
             return null;
         }
-        return mapper.map(entity, UserDto.class);
+        UserDto userDto = mapper.map(entity, UserDto.class);
+        AccountUidDto accountUidDto = new AccountUidDto();
+        accountUidDto.setUid(entity.getAccount().getUid());
+        userDto.setAccountUidDto(accountUidDto);
+        return userDto;
     }
 
     public static User toEntity(UserDto dto) {

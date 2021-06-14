@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getAuthHttpHeader } from '../util/Utility';
+import { AccountUid } from './Account';
 import { axiosErrorHandler } from './Error';
 
 export type User = {
@@ -7,6 +8,7 @@ export type User = {
   userId?: string,
   spectator?: boolean,
   sessionId?: string,
+  accountUid?: AccountUid,
 };
 
 const basePath = '/api/v1/rooms';

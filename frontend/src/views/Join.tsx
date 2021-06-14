@@ -11,7 +11,7 @@ import ErrorMessage from '../components/core/Error';
 import { ErrorResponse } from '../api/Error';
 import { checkLocationState, isValidRoomId } from '../util/Utility';
 import { TextLink } from '../components/core/Link';
-import { useAppDispatch } from '../util/Hook';
+import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { setRoom } from '../redux/Room';
 import { setCurrentUser } from '../redux/User';
 
@@ -28,6 +28,8 @@ function JoinGamePage() {
   const history = useHistory();
   const location = useLocation<JoinPageLocation>();
   const dispatch = useAppDispatch();
+
+  const { token } = useAppSelector((state) => state.account);
 
   /**
    * Page state variable that defines whether the user is
@@ -94,7 +96,7 @@ function JoinGamePage() {
     let currentUser: User = { nickname };
     const roomParams = { user: currentUser };
 
-    joinRoom(roomId, roomParams)
+    joinRoom(roomId, roomParams, token)
       .then((res) => {
         dispatch(setRoom(res));
 

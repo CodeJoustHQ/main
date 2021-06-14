@@ -28,11 +28,11 @@ public class GameReport {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<Problem> problems = new ArrayList<>();
+    // @OneToMany(fetch = FetchType.EAGER)
+    // private List<Problem> problems = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<User> users = new ArrayList<>();
+    // @OneToMany(fetch = FetchType.EAGER)
+    // private List<User> users = new ArrayList<>();
 
     // The start time of the game
     private Instant createdDateTime;

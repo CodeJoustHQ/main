@@ -206,6 +206,13 @@ function LobbyPage() {
     }
   }, [room, setStateFromRoom]);
 
+  // If the user token changes due to login state, update user account.
+  useEffect(() => {
+    console.log(currentUser);
+    console.log(currentUser?.accountUid);
+    console.log(token);
+  }, [currentUser, token]);
+
   // Function to determine if the given user is the host or not
   const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
 
