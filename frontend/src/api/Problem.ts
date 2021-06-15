@@ -30,7 +30,12 @@ export type SelectableProblem = {
   problemId: string,
   name: string,
   difficulty: Difficulty,
+  problemTags: ProblemTag[],
   selected?: boolean,
+};
+
+export type ProblemIdParam = {
+  problemId: string,
 };
 
 export type ProblemInput = {

@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useAppDispatch, useAppSelector } from '../../util/Hook';
-import { getAccount } from '../../api/Account';
-import { setAccount } from '../../redux/Account';
+import { fetchAccount } from '../../redux/Account';
 import ErrorMessage from '../../components/core/Error';
 import Loading from '../../components/core/Loading';
 import MyProblems from './MyProblems';
 import DashboardSidebar from './DashboardSidebar';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 export enum DashboardTab {
   PROBLEMS, GAME_HISTORY, SUGGEST_FEATURE,
@@ -32,21 +32,22 @@ const InnerContent = styled.div`
 function DashboardPage() {
   const dispatch = useAppDispatch();
 
-  const { firebaseUser, token } = useAppSelector((state) => state.account);
+  const { account } = useAppSelector((state) => state.account);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [tab, setTab] = useState<DashboardTab>(DashboardTab.PROBLEMS);
 
   useEffect(() => {
-    if (firebaseUser && token) {
+    if (!account) {
       setLoading(true);
-      getAccount(firebaseUser.uid, token)
-        .then((res) => dispatch(setAccount(res)))
-        .catch((err) => setError(err.message))
-        .finally(() => setLoading(false));
+      dispatch(fetchAccount())
+        .then(unwrapResult)
+        .catch((err) => setError(err.message));
+    } else {
+      setLoading(false);
     }
-  }, [dispatch, firebaseUser, token]);
+  }, [dispatch, account]);
 
   const getDisplay = useCallback(() => {
     switch (tab) {

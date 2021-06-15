@@ -35,10 +35,13 @@ function CreateGamePage() {
 
   // Render the "Enter nickname" state.
   return (
-    <EnterNicknamePage
-      enterNicknameHeaderText="Enter a nickname to create the game!"
-      enterNicknameAction={createJoinLobby}
-    />
+    <>
+      <EnterNicknamePage
+        enterNicknameHeaderText="Enter your name to create the room!"
+        enterNicknameAction={createJoinLobby}
+      />
+      <p>As the host, you will be a spectator by default.</p>
+    </>
   );
 }
 

@@ -4,6 +4,7 @@ import { Problem } from '../../api/Problem';
 import ProblemCard from '../card/ProblemCard';
 import { TextInput } from '../core/Input';
 import { TextButton } from '../core/Button';
+import { problemMatchesFilterText } from '../../util/Utility';
 
 const FilterContainer = styled.div`
   display: flex;
@@ -58,16 +59,8 @@ function FilteredProblemList(props: FilteredProblemListProps) {
       </FilterContainer>
 
       {problems.map((problem: Problem) => {
-        const texts = filterText.toLowerCase().split(',');
-
-        // Filter by name, difficulty, and tags (multiple queries separated by commas)
-        for (let i = 0; i < texts.length; i += 1) {
-          const text = texts[i].trim();
-          if (!problem.name.toLowerCase().includes(text)
-            && !problem.difficulty.toLowerCase().includes(text)
-            && !problem.problemTags.some((tag) => tag.name.toLowerCase().includes(text))) {
-            return null;
-          }
+        if (!problemMatchesFilterText(problem, filterText)) {
+          return null;
         }
 
         return (

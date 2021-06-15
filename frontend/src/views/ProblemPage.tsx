@@ -9,7 +9,7 @@ import {
 import { LargeText, MediumText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
-import ProblemDisplay from '../components/problem/ProblemDisplay';
+import ProblemDisplay from '../components/problem/editor/ProblemDisplay';
 import { generateRandomId } from '../util/Utility';
 import { useAppSelector, useProblemEditable } from '../util/Hook';
 import { PrimaryButtonLink } from '../components/core/Link';

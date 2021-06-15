@@ -130,7 +130,7 @@ function JoinGamePage() {
       joinPageContent = (
         <Content>
           <LargeText>
-            Enter the six-digit room ID to join the game!
+            Enter the six-digit room ID to join the room!
           </LargeText>
           <LargeCenterInputText
             id="roomIdInput"
@@ -186,7 +186,7 @@ function JoinGamePage() {
       joinPageContent = (
         <div>
           <EnterNicknamePage
-            enterNicknameHeaderText={`Enter a nickname to join room #${roomId}!`}
+            enterNicknameHeaderText={`Enter your name to join room #${roomId}!`}
             enterNicknameAction={redirectToLobby}
           />
         </div>

@@ -61,12 +61,12 @@ export const useClickOutside = (ref: RefObject<HTMLDivElement>, closeFunction: (
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
-export const useMousePosition = () => {
+export const useMousePosition = (pagePosition: boolean = false) => {
   const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
 
   const mouseMoveHandler = useCallback((e: MouseEvent) => {
-    setMousePosition({ x: e.clientX, y: e.clientY });
-  }, [setMousePosition]);
+    setMousePosition(pagePosition ? { x: e.pageX, y: e.pageY } : { x: e.clientX, y: e.clientY });
+  }, [setMousePosition, pagePosition]);
 
   useEffect(() => {
     document.addEventListener('mousemove', mouseMoveHandler);

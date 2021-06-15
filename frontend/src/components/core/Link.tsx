@@ -34,6 +34,12 @@ export const TextLink = styled(Link)`
   text-decoration: none;
 `;
 
+export const InheritedTextLink = styled(Link)`
+  font-size: inherit;
+  color: inherit;
+  text-decoration: underline;
+`;
+
 export const SecondaryHeaderTextLink = styled(TextLink)`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   color: ${({ theme }) => theme.colors.blueLink};
