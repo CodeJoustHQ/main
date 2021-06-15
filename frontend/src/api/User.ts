@@ -11,13 +11,13 @@ export type User = {
   accountUid?: AccountUid,
 };
 
-const basePath = '/api/v1/rooms';
+const basePath = '/api/v1/user';
 const routes = {
-  updateUserAccount: (userId: string) => `${basePath}/user/${userId}/account`,
+  updateUserAccount: (userId: string) => `${basePath}/${userId}/account`,
 };
 
 export const updateUserAccount = (userId: string, token: string | null):
-  Promise<User> => axios.post<User>(routes.updateUserAccount(userId), getAuthHttpHeader(token))
+  Promise<User> => axios.put<User>(routes.updateUserAccount(userId), {}, getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

@@ -209,7 +209,11 @@ function LobbyPage() {
   // If the user token changes due to login state, update user account.
   useEffect(() => {
     if (currentUser?.userId && Boolean(currentUser?.accountUid) !== Boolean(token)) {
-      updateUserAccount(currentUser?.userId, token);
+      updateUserAccount(currentUser?.userId, token).then((user: User) => {
+        console.log(user);
+      }).catch((err) => {
+        setError(err.message);
+      });
     }
   }, [currentUser, token]);
 
