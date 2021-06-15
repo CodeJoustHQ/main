@@ -29,13 +29,10 @@ import com.codejoust.main.util.Utility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import lombok.extern.log4j.Log4j2;
-
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@Log4j2
 public class RoomService {
 
     public static final int ROOM_ID_LENGTH = 6;
@@ -67,8 +64,6 @@ public class RoomService {
     }
 
     public RoomDto joinRoom(String roomId, JoinRoomRequest request, String token) {
-        log.info("Token");
-        log.info(token);
         Room room = repository.findRoomByRoomId(roomId);
 
         // Return error if room could not be found
@@ -110,7 +105,6 @@ public class RoomService {
             // If account present, throw error; otherwise, join room.
             // TODO: Potential error, two users same account, join at same time.
             String uid = firebaseService.verifyToken(token);
-            log.info(uid);
             Account account = accountRepository.findAccountByUid(uid);
             for (User roomUser : room.getUsers()) {
                 if (roomUser.getAccount() != null && roomUser.getAccount().equals(account)) {
@@ -138,8 +132,6 @@ public class RoomService {
     }
 
     public RoomDto createRoom(CreateRoomRequest request, String token) {
-        log.info("Token");
-        log.info(token);
         User host = UserMapper.toEntity(request.getHost());
 
         // Do not create room if provided host is invalid.
@@ -160,7 +152,6 @@ public class RoomService {
             host.setAccount(null);
         } else {
             String uid = firebaseService.verifyToken(token);
-            log.info(uid);
             host.setAccount(accountRepository.findAccountByUid(uid));
         }
 

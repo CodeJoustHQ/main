@@ -179,6 +179,7 @@ function LobbyPage() {
    * Set state variables from an updated room object
    */
   const setStateFromRoom = useCallback((newRoom: Room) => {
+    console.log(newRoom);
     setHost(newRoom.host);
     setUsers(newRoom.users);
     setActiveUsers(newRoom.activeUsers);

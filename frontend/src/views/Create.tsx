@@ -28,7 +28,6 @@ function CreateGamePage() {
     };
     createRoom(roomHost, token)
       .then((res) => {
-        console.log(res);
         dispatch(setRoom(res));
         dispatch(setCurrentUser(res.host));
         redirectToLobby(res, res.host);
