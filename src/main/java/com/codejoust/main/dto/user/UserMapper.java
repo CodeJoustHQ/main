@@ -19,7 +19,7 @@ public class UserMapper {
         UserDto userDto = mapper.map(entity, UserDto.class);
         AccountUidDto accountUidDto = new AccountUidDto();
         accountUidDto.setUid(entity.getAccount().getUid());
-        userDto.setAccountUidDto(accountUidDto);
+        userDto.setAccountUid(accountUidDto);
         return userDto;
     }
 

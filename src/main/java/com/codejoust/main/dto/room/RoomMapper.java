@@ -22,6 +22,9 @@ public class RoomMapper {
         }
         RoomDto roomDto = mapper.map(entity, RoomDto.class);
 
+        // Set the host to get all updated user account values.
+        roomDto.setHost(UserMapper.toDto(entity.getHost()));
+
         // Separate users into active and inactive ones, spectator list.
         List<UserDto> users = new ArrayList<>();
         List<UserDto> activeUsers = new ArrayList<>();
