@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useAppDispatch, useAppSelector } from '../../util/Hook';
-import { getAccount } from '../../api/Account';
-import { fetchAccount, setAccount } from '../../redux/Account';
+import { fetchAccount } from '../../redux/Account';
 import ErrorMessage from '../../components/core/Error';
 import Loading from '../../components/core/Loading';
 import MyProblems from './MyProblems';

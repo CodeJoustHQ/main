@@ -87,7 +87,7 @@ function App() {
       <PrivateRoute path="/problem/:id" component={ProblemPage} layout={MinimalLayout} exact />
       <CustomRoute path="/login" component={LoginPage} layout={MainLayout} exact />
       <CustomRoute path="/register" component={RegisterPage} layout={MainLayout} exact />
-      <CustomRoute path="/profile" component={ProfilePage} layout={MainLayout} exact />
+      <PrivateRoute path="/profile" component={ProfilePage} layout={MainLayout} exact />
       <CustomRoute path="/contact-us" component={ContactUsPage} layout={MainLayout} exact />
       <CustomRedirect from="/play" to="/game/join" />
       <CustomRoute path="*" component={NotFound} layout={MainLayout} />

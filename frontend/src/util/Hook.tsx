@@ -66,7 +66,7 @@ export const useMousePosition = (pagePosition: boolean = false) => {
 
   const mouseMoveHandler = useCallback((e: MouseEvent) => {
     setMousePosition(pagePosition ? { x: e.pageX, y: e.pageY } : { x: e.clientX, y: e.clientY });
-  }, [setMousePosition]);
+  }, [setMousePosition, pagePosition]);
 
   useEffect(() => {
     document.addEventListener('mousemove', mouseMoveHandler);

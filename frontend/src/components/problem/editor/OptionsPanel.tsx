@@ -74,7 +74,7 @@ function OptionsPanel(props: OptionsPanelProps) {
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
 
   const { account, firebaseUser, token } = useAppSelector((state) => state.account);
-  const mousePosition = useMousePosition();
+  const mousePosition = useMousePosition(true);
   const problemEditable = useProblemEditable(firebaseUser, newProblem);
 
   // Handle updating of normal text fields

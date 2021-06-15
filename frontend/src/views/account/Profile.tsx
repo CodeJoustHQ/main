@@ -8,7 +8,7 @@ const Content = styled.div`
   text-align: center;
 `;
 
-function DashboardPage() {
+function ProfilePage() {
   const { firebaseUser } = useAppSelector((state) => state.account);
 
   return (
@@ -29,4 +29,4 @@ function DashboardPage() {
   );
 }
 
-export default DashboardPage;
+export default ProfilePage;
