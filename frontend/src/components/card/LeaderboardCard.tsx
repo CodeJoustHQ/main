@@ -4,7 +4,7 @@ import { Player } from '../../api/Game';
 import { LowMarginText, SmallText } from '../core/Text';
 import PlayerIcon from './PlayerIcon';
 import { Color } from '../../api/Color';
-import useGetScore, { useGetSubmissionTime } from '../../util/Hook';
+import { useGetScore, useGetSubmissionTime } from '../../util/Hook';
 
 type ContentStyleType = {
   isCurrentPlayer: boolean,

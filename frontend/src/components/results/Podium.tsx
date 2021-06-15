@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import { Text, MediumText } from '../core/Text';
 import Language, { displayNameFromLanguage } from '../../api/Language';
-import useGetScore, { useBestSubmission, useGetSubmissionTime } from '../../util/Hook';
+import { useBestSubmission, useGetScore, useGetSubmissionTime } from '../../util/Hook';
 
 type PodiumProps = {
   place: number,

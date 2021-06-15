@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Player, Submission } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
 import { Color } from '../../api/Color';
-import useGetScore, { useBestSubmission, useGetSubmissionTime } from '../../util/Hook';
+import { useBestSubmission, useGetScore, useGetSubmissionTime } from '../../util/Hook';
 import Language, { displayNameFromLanguage } from '../../api/Language';
 import { TextButton } from '../core/Button';
 
@@ -111,11 +111,11 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
 
   const getSubmissionTime = () => {
     if (!time) {
-      return 'Never';
+      return 'N/A';
     }
 
-    const currentTime = new Date().getTime();
-    const diffMilliseconds = currentTime - new Date(time).getTime();
+    const startTime = new Date(gameStartTime).getTime();
+    const diffMilliseconds = new Date(time).getTime() - startTime;
     const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
     return `${diffMinutes}m ago`;
   };

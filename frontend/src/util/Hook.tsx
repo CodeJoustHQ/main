@@ -26,32 +26,28 @@ export const useBestSubmission = (player?: Player) => {
   return bestSubmission;
 };
 
-const useGetScore = (player?: Player) => {
+export const useGetScore = (player?: Player) => {
   const counted = new Set<number>();
   const [score, setScore] = useState<number>(0);
 
   useEffect(() => {
     if (player) {
       for (let i = 0; i < player.submissions.length; i += 1) {
-        if (player.submissions[i].numCorrect === player.submissions[i].numTestCases &&
-          !counted.has(player.submissions[i].problemIndex)) {
+        if (player.submissions[i].numCorrect === player.submissions[i].numTestCases
+          && !counted.has(player.submissions[i].problemIndex)) {
           counted.add(player.submissions[i].problemIndex);
         }
       }
 
       setScore(counted.size);
     }
-    
   }, [player, setScore]);
 
   if (player == null || player.submissions.length === 0) {
     return null;
   }
-  
   return score;
 };
-
-export default useGetScore;
 
 export const useGetSubmissionTime = (player?: Player) => {
   const counted = new Set<number>();
@@ -60,8 +56,8 @@ export const useGetSubmissionTime = (player?: Player) => {
   useEffect(() => {
     if (player) {
       for (let i = 0; i < player.submissions.length; i += 1) {
-        if (player.submissions[i].numCorrect === player.submissions[i].numTestCases &&
-          !counted.has(player.submissions[i].problemIndex)) {
+        if (player.submissions[i].numCorrect === player.submissions[i].numTestCases
+          && !counted.has(player.submissions[i].problemIndex)) {
           counted.add(player.submissions[i].problemIndex);
           setTime(player.submissions[i].startTime);
         }
