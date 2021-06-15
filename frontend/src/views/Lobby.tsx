@@ -14,7 +14,7 @@ import {
 import {
   connect, routes, subscribe, disconnect,
 } from '../api/Socket';
-import { User } from '../api/User';
+import { User, updateUserAccount } from '../api/User';
 import { isValidRoomId, leaveRoom, checkLocationState } from '../util/Utility';
 import { Difficulty } from '../api/Difficulty';
 import { PrimaryButton, SmallDifficultyButtonNoMargin, SecondaryRedButton } from '../components/core/Button';
@@ -179,7 +179,6 @@ function LobbyPage() {
    * Set state variables from an updated room object
    */
   const setStateFromRoom = useCallback((newRoom: Room) => {
-    console.log(newRoom);
     setHost(newRoom.host);
     setUsers(newRoom.users);
     setActiveUsers(newRoom.activeUsers);
@@ -209,9 +208,9 @@ function LobbyPage() {
 
   // If the user token changes due to login state, update user account.
   useEffect(() => {
-    console.log(currentUser);
-    console.log(currentUser?.accountUid);
-    console.log(token);
+    if (currentUser?.userId && Boolean(currentUser?.accountUid) !== Boolean(token)) {
+      updateUserAccount(currentUser?.userId, token);
+    }
   }, [currentUser, token]);
 
   // Function to determine if the given user is the host or not

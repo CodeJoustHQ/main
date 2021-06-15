@@ -99,11 +99,12 @@ public class RoomService {
         }
 
         // Set the account associated with the host, if any.
-        if (token == null) {
+        if (token.length() == 0) {
             user.setAccount(null);
         } else {
             // If account present, throw error; otherwise, join room.
             // TODO: Potential error, two users same account, join at same time.
+            // TODO: This occurs with usernames as well - already exists.
             String uid = firebaseService.verifyToken(token);
             Account account = accountRepository.findAccountByUid(uid);
             for (User roomUser : room.getUsers()) {
@@ -148,7 +149,7 @@ public class RoomService {
         }
 
         // Set the account associated with the host, if any.
-        if (token == null) {
+        if (token.length() == 0) {
             host.setAccount(null);
         } else {
             String uid = firebaseService.verifyToken(token);

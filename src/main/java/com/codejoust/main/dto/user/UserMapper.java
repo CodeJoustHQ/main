@@ -17,9 +17,16 @@ public class UserMapper {
             return null;
         }
         UserDto userDto = mapper.map(entity, UserDto.class);
-        AccountUidDto accountUidDto = new AccountUidDto();
-        accountUidDto.setUid(entity.getAccount().getUid());
-        userDto.setAccountUid(accountUidDto);
+
+        // Attach the account to the user, if it exists.
+        if (entity.getAccount() != null) {
+            AccountUidDto accountUidDto = new AccountUidDto();
+            accountUidDto.setUid(entity.getAccount().getUid());
+            userDto.setAccountUid(accountUidDto);
+        } else {
+            userDto.setAccountUid(null);
+        }
+        
         return userDto;
     }
 
