@@ -28,7 +28,7 @@ public class Player {
      * Solved variable if the user has successfully solved the problem,
      * or is still competing.
      */
-    private Boolean[] solved;
+    private boolean[] solved;
 
     // Color associated with this player, generated on backend in game start.
     private Color color;

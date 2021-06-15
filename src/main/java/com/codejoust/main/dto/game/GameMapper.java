@@ -69,7 +69,7 @@ public class GameMapper {
         for (User user : room.getUsers()) {
             Player player = PlayerMapper.playerFromUser(user);
             player.setColor(colorList.get(index));
-            player.setSolved(new Boolean[room.getNumProblems()]);
+            player.setSolved(new boolean[room.getNumProblems()]);
             players.put(user.getUserId(), player);
             index = (index + 1) % colorList.size();
         }

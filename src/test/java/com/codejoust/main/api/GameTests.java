@@ -218,6 +218,7 @@ public class GameTests {
         // Confirm that running the code does not create a submission.
         assertEquals(1, gameDto.getPlayers().size());
         PlayerDto player = gameDto.getPlayers().get(0);
+        assertEquals(0, player.getSubmissions().size());
         assertFalse(gameDto.getAllSolved());
     }
     

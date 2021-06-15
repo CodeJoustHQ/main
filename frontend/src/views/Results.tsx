@@ -356,6 +356,7 @@ function GameResultsPage() {
           inviteContent={inviteContent()}
           loading={loading}
           isCurrentPlayer={players[1]?.user.userId === currentUser?.userId}
+          numProblems={game?.problems.length || 1}
         />
         <Podium
           place={1}
@@ -364,6 +365,7 @@ function GameResultsPage() {
           inviteContent={inviteContent()}
           loading={loading}
           isCurrentPlayer={players[0]?.user.userId === currentUser?.userId}
+          numProblems={game?.problems.length || 1}
         />
         <Podium
           place={3}
@@ -372,6 +374,7 @@ function GameResultsPage() {
           inviteContent={inviteContent()}
           loading={loading}
           isCurrentPlayer={players[2]?.user.userId === currentUser?.userId}
+          numProblems={game?.problems.length || 1}
         />
       </PodiumContainer>
 
@@ -414,6 +417,7 @@ function GameResultsPage() {
           players={players}
           currentUser={currentUser}
           gameStartTime={startTime}
+          numProblems={game?.problems.length || 1}
           viewPlayerCode={(index: number) => setCodeModal(index)}
         />
       ) : null}

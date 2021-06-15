@@ -159,12 +159,6 @@ function GamePage() {
   };
 
   const createCodeLanguageArray = () => {
-    /*
-    Here is the console log statement I added that was being executed several times.
-    The languageList.length kept throwing a null pointer exception, despite being defined above.
-    */
-    console.log(languageList);
-
     while (languageList.length < problems.length) {
       languageList.push(Language.Java);
     }
@@ -396,8 +390,8 @@ function GamePage() {
         setLoading(false);
 
         // Set the 'test' submission type to correctly display result.
-        submissions[submissions.length - 1].submissionType = SubmissionType.Test;
-        setCurrentSubmission(getSubmission(currentProblemIndex, submissions));
+        res.submissionType = SubmissionType.Test;
+        setCurrentSubmission(res);
         checkSendTestCorrectNotification(res);
       })
       .catch((err) => {
@@ -422,8 +416,9 @@ function GamePage() {
         setLoading(false);
 
         // Set the 'submit' submission type to correctly display result.
-        submissions[submissions.length - 1].submissionType = SubmissionType.Submit;
-        setCurrentSubmission(getSubmission(currentProblemIndex, submissions));
+        res.submissionType = SubmissionType.Submit;
+        setSubmissions(submissions.concat([res]));
+        setCurrentSubmission(res);
         checkSendSolutionCorrectNotification(res);
       })
       .catch((err) => {
@@ -434,7 +429,7 @@ function GamePage() {
 
   const nextProblem = () => {
     setCurrentProblemIndex((currentProblemIndex + 1) % problems?.length);
-    setCurrentSubmission(getSubmission(currentProblemIndex, submissions));
+    setCurrentSubmission(getSubmission((currentProblemIndex + 1) % problems?.length, submissions));
   };
 
   const previousProblem = () => {
@@ -445,7 +440,7 @@ function GamePage() {
     }
 
     setCurrentProblemIndex(temp);
-    setCurrentSubmission(getSubmission(currentProblemIndex, submissions));
+    setCurrentSubmission(getSubmission(temp, submissions));
   };
 
   const endGameAction = () => {
@@ -466,7 +461,7 @@ function GamePage() {
       color={player.color}
       numProblems={problems.length}
     />
-  )), [players, currentUser]);
+  )), [players, currentUser, problems.length]);
 
   // Subscribe user to primary socket and to notifications.
   useEffect(() => {

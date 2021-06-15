@@ -4,6 +4,7 @@ import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -98,7 +99,7 @@ public class GameMapperTests {
         submission.setNumCorrect(TEST_CASES);
 
         Player player = game.getPlayers().get(TestFields.USER_ID);
-        player.setSolved(true);
+        player.setSolved(new boolean[]{true});
         player.setPlayerCode(playerCode);
         player.getSubmissions().add(submission);
 
@@ -113,7 +114,7 @@ public class GameMapperTests {
 
         PlayerDto playerDto = gameDto.getPlayers().get(0);
         assertEquals(UserMapper.toDto(user), playerDto.getUser());
-        assertEquals(player.getSolved(), playerDto.getSolved());
+        assertArrayEquals(player.getSolved(), playerDto.getSolved());
         assertEquals(1, playerDto.getSubmissions().size());
         assertEquals(player.getColor(), playerDto.getColor());
 
