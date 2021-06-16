@@ -12,6 +12,8 @@ import javax.persistence.OneToMany;
 import com.codejoust.main.dto.account.AccountRole;
 import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.model.problem.ProblemTag;
+import com.codejoust.main.model.report.GameReport;
+
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -46,6 +48,20 @@ public class Account {
     @Fetch(value = FetchMode.SUBSELECT)
     private List<ProblemTag> problemTags = new ArrayList<>();
 
+    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
+    @Setter(AccessLevel.PRIVATE)
+    @Fetch(value = FetchMode.SUBSELECT)
+    private List<GameReport> gameReports = new ArrayList<>();
+
     @Enumerated(EnumType.STRING)
     private AccountRole role = AccountRole.TEACHER;
+
+    // Add the game reports with most-recent as first.
+    public void addGameReport(GameReport gameReport) {
+        gameReports.add(0, gameReport);
+    }
+
+    public boolean removeGameReport(GameReport gameReport) {
+        return gameReports.remove(gameReport);
+    }
 }
