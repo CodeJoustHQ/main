@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum AccountError implements ApiError {
 
+    BAD_ROLE(HttpStatus.BAD_REQUEST, "Please choose a valid role (TEACHER or ADMIN)."),
     INVALID_CREDENTIALS(HttpStatus.BAD_REQUEST, "You do not have permission to perform this action. Ensure you're logged in to an account with valid permissions.");
 
     private final HttpStatus status;

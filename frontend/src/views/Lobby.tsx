@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Message, Subscription } from 'stompjs';
+import { useBeforeunload } from 'react-beforeunload';
 import styled from 'styled-components';
 import copy from 'copy-to-clipboard';
 import ErrorMessage from '../components/core/Error';
@@ -10,6 +11,8 @@ import {
   SecondaryHeaderText,
   SmallHeaderText,
   NoMarginSubtitleText,
+  LowMarginText,
+  Text,
 } from '../components/core/Text';
 import {
   connect, routes, subscribe, disconnect,
@@ -20,9 +23,10 @@ import { Difficulty } from '../api/Difficulty';
 import {
   PrimaryButton,
   SmallDifficultyButtonNoMargin,
-  InlineLobbyIcon,
   SecondaryRedButton,
+  TextButton,
 } from '../components/core/Button';
+import { InlineIcon } from '../components/core/Icon';
 import Loading from '../components/core/Loading';
 import PlayerCard from '../components/card/PlayerCard';
 import ActionCard from '../components/card/ActionCard';
@@ -42,17 +46,18 @@ import {
   InlineBackgroundCopyText,
 } from '../components/special/CopyIndicator';
 import IdContainer from '../components/special/IdContainer';
-import { FlexBareContainer } from '../components/core/Container';
+import { FlexBareContainer, LeftContainer } from '../components/core/Container';
 import { Slider, SliderContainer } from '../components/core/RangeSlider';
-import { Coordinate } from '../components/special/FloatingCircle';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
-import { getAllProblemTags, ProblemTag, SelectableProblem } from '../api/Problem';
-import { ProblemSelector, TagSelector } from '../components/problem/Selector';
-import { SelectedProblemsDisplay, SelectedTagsDisplay } from '../components/problem/SelectedDisplay';
-import { useAppDispatch, useAppSelector } from '../util/Hook';
+import { SelectableProblem } from '../api/Problem';
+import { ProblemSelector } from '../components/problem/Selector';
+import { SelectedProblemsDisplay } from '../components/problem/SelectedDisplay';
+import { useAppDispatch, useAppSelector, useMousePosition } from '../util/Hook';
 import { fetchRoom, setRoom } from '../redux/Room';
 import { setCurrentUser } from '../redux/User';
-import ActionCardHelpModal from '../components/core/ActionCardHelpModal';
+import { LobbyHelpModal } from '../components/core/HelpModal';
+import Modal from '../components/core/Modal';
+import { setGame } from '../redux/Game';
 
 type LobbyPageLocation = {
   user: User,
@@ -104,6 +109,10 @@ const BackgroundContainer = styled.div`
   overflow: auto;
 `;
 
+const ShowProblemSelectorContainer = styled.div`
+  margin: 10px 0;
+`;
+
 const DifficultyContainer = styled.div`
   margin-bottom: 10px;
 `;
@@ -137,6 +146,10 @@ const HoverElementSlider = styled(HoverElement)`
   height: 20px;
 `;
 
+const ExitModalButton = styled(PrimaryButton)`
+  margin: 20px 0;
+`;
+
 function LobbyPage() {
   // Get history object to be able to move between different pages
   const history = useHistory();
@@ -152,17 +165,17 @@ function LobbyPage() {
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [duration, setDuration] = useState<number | undefined>(15);
   const [selectedProblems, setSelectedProblems] = useState<SelectableProblem[]>([]);
-  const [selectedTags, setSelectedTags] = useState<ProblemTag[]>([]);
-  const [allTags, setAllTags] = useState<ProblemTag[]>([]);
   const [size, setSize] = useState<number | undefined>(10);
   const [numProblems, setNumProblems] = useState<number>(1);
-  const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
+  const [showProblemSelector, setShowProblemSelector] = useState(true);
 
   // React Redux
   const dispatch = useAppDispatch();
   const { room } = useAppSelector((state) => state);
   const { currentUser } = useAppSelector((state) => state);
+
+  const mousePosition = useMousePosition(true);
 
   // Hold error text.
   const [error, setError] = useState('');
@@ -179,10 +192,22 @@ function LobbyPage() {
   // Variable to hold whether the modal explaining the user cards is active.
   const [actionCardHelp, setActionCardHelp] = useState<boolean>(false);
 
+  // Function to determine if the given user is the host or not
+  const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
+
+  useBeforeunload(() => (isHost(currentUser)
+    ? 'Leave this page? If you leave, host permissions may be transferred to another user.'
+    : 'Leave this page? You can always rejoin later.'));
+
+  // If playing again, clear any old game state
+  useEffect(() => {
+    dispatch(setGame(null));
+  }, [dispatch]);
+
   /**
    * Set state variables from an updated room object
    */
-  const setStateFromRoom = (newRoom: Room) => {
+  const setStateFromRoom = useCallback((newRoom: Room) => {
     setHost(newRoom.host);
     setUsers(newRoom.users);
     setActiveUsers(newRoom.activeUsers);
@@ -194,17 +219,22 @@ function LobbyPage() {
     setSelectedProblems(newRoom.problems);
     setSize(newRoom.size);
     setNumProblems(newRoom.numProblems);
-  };
+
+    // Set the room and current user.
+    dispatch(setRoom(newRoom));
+    newRoom.users.forEach((user) => {
+      if (user.userId === currentUser?.userId) {
+        dispatch(setCurrentUser(user));
+      }
+    });
+  }, [currentUser, dispatch]);
 
   // Map the room in Redux to the state variables used in this file
   useEffect(() => {
     if (room) {
       setStateFromRoom(room);
     }
-  }, [room]);
-
-  // Function to determine if the given user is the host or not
-  const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
+  }, [room, setStateFromRoom]);
 
   const kickUser = (user: User) => {
     setLoading(true);
@@ -213,11 +243,10 @@ function LobbyPage() {
       initiator: currentUser as User,
       userToDelete: user,
     })
-      .then(() => {
-        setLoading(false);
-      })
       .catch((err) => {
         setError(err.message);
+      })
+      .finally(() => {
         setLoading(false);
       });
   };
@@ -261,9 +290,10 @@ function LobbyPage() {
     if (!loading) {
       setLoading(true);
       changeRoomHost(currentRoomId, request)
-        .then(() => setLoading(false))
         .catch((err) => {
           setError(err.message);
+        })
+        .finally(() => {
           setLoading(false);
         });
     }
@@ -293,13 +323,26 @@ function LobbyPage() {
   const handleStartGame = () => {
     setError('');
     const request = { initiator: currentUser as User };
-    startGame(currentRoomId, request)
-      .then(() => {
-        setLoading(true);
-      })
-      .catch((err) => {
-        setError(err.message);
-      });
+
+    // Determine if the room only has spectators.
+    let allSpectators: boolean = true;
+    room!.users.forEach((user: User) => {
+      if (!user.spectator) {
+        allSpectators = false;
+      }
+    });
+
+    // eslint-disable-next-line no-alert
+    if (!allSpectators || window.confirm('Everybody in this room is a spectator, which means this is '
+      + 'going to be a pretty boring game... are you sure you want to start the game?')) {
+      startGame(currentRoomId, request)
+        .then(() => {
+          setLoading(true);
+        })
+        .catch((err) => {
+          setError(err.message);
+        });
+    }
   };
 
   /**
@@ -321,12 +364,13 @@ function LobbyPage() {
       };
 
       updateRoomSettings(currentRoomId, newSettings)
-        .then(() => setLoading(false))
         .catch((err) => {
-          setLoading(false);
           setError(err.message);
           // Set difficulty back to original if REST call failed
           setDifficulty(oldDifficulty);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     }
   };
@@ -344,12 +388,13 @@ function LobbyPage() {
     };
 
     updateRoomSettings(currentRoomId, settings)
-      .then(() => setLoading(false))
       .catch((err) => {
-        setLoading(false);
         setError(err.message);
         // Set duration back to original if REST call failed
         setDuration(prevDuration);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -365,15 +410,16 @@ function LobbyPage() {
 
     const settings = {
       initiator: currentUser!,
-      problems: newProblems,
+      problems: newProblems.map((problem) => ({ problemId: problem.problemId })),
     };
 
     updateRoomSettings(currentRoomId, settings)
-      .then(() => setLoading(false))
       .catch((err) => {
-        setLoading(false);
         setError(err.message);
         setSelectedProblems(prevProblems);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -385,16 +431,6 @@ function LobbyPage() {
   const removeProblem = (index: number) => {
     const newProblems = selectedProblems.filter((_, i) => i !== index);
     updateSelectedProblems(newProblems);
-  };
-
-  const addTag = (newTag: ProblemTag) => {
-    const newTags = [...selectedTags, newTag];
-    setSelectedTags(newTags);
-  };
-
-  const removeTag = (index: number) => {
-    const newTags = selectedTags.filter((_, i) => i !== index);
-    setSelectedTags(newTags);
   };
 
   const onSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -440,13 +476,14 @@ function LobbyPage() {
     };
 
     updateRoomSettings(currentRoomId, settings)
-      .then(() => setLoading(false))
       .then(() => setError(''))
       .catch((err) => {
-        setLoading(false);
         setError(err.message);
         // Set size back to original if REST call failed
         setSize(prevSize);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -524,7 +561,7 @@ function LobbyPage() {
     };
 
     setLoading(true);
-    connect(roomId, userId).then(() => {
+    connect(userId).then(() => {
       // Body encrypt through JSON.
       subscribe(routes(roomId).subscribe_lobby, subscribeCallback).then((subscriptionParam) => {
         setSubscription(subscriptionParam);
@@ -539,25 +576,6 @@ function LobbyPage() {
       setError(err.message);
     }).finally(() => setLoading(false));
   }, [dispatch]);
-
-  // Get current mouse position.
-  const mouseMoveHandler = useCallback((e: MouseEvent) => {
-    setMousePosition({ x: e.pageX, y: e.pageY });
-  }, [setMousePosition]);
-
-  useEffect(() => {
-    getAllProblemTags()
-      .then((res) => {
-        setAllTags(res);
-      })
-      .catch((err) => {
-        setError(err.message);
-      });
-  }, []);
-
-  useEffect(() => {
-    window.onmousemove = mouseMoveHandler;
-  }, [mouseMoveHandler]);
 
   // Grab the nickname variable and add the user to the lobby.
   useEffect(() => {
@@ -620,12 +638,39 @@ function LobbyPage() {
   // Render the lobby.
   return (
     <>
-      <ActionCardHelpModal
+      <LobbyHelpModal
         show={actionCardHelp}
         exitModal={() => setActionCardHelp(false)}
       />
+      <Modal
+        show={showProblemSelector && isHost(currentUser)}
+        onExit={() => setShowProblemSelector(false)}
+        fullScreen
+      >
+        <LeftContainer>
+          <NoMarginMediumText>Select problems for this game:</NoMarginMediumText>
+          <Text>
+            Use the dropdown below to select the problems for your game.
+            Alternatively, skip this step to create a game with a random problem.
+          </Text>
+          { error ? <ErrorMessage message={error} /> : null }
+          <ProblemSelector
+            selectedProblems={selectedProblems}
+            onSelect={addProblem}
+          />
+          <SelectedProblemsDisplay
+            problems={selectedProblems}
+            onRemove={isHost(currentUser) ? removeProblem : null}
+          />
+          <ExitModalButton
+            onClick={() => setShowProblemSelector(false)}
+          >
+            All Good!
+          </ExitModalButton>
+        </LeftContainer>
+      </Modal>
       <HoverTooltip
-        visible={hoverVisible}
+        visible={hoverVisible && !isHost(currentUser)}
         x={mousePosition.x}
         y={mousePosition.y}
       >
@@ -685,16 +730,16 @@ function LobbyPage() {
                 ? ` (${users.length})`
                 : null
             }
-            <InlineLobbyIcon
+            <InlineIcon
               onClick={refreshRoomDetails}
             >
               refresh
-            </InlineLobbyIcon>
-            <InlineLobbyIcon
+            </InlineIcon>
+            <InlineIcon
               onClick={() => setActionCardHelp(true)}
             >
               help_outline
-            </InlineLobbyIcon>
+            </InlineIcon>
           </LobbyContainerTitle>
           <BackgroundContainer>
             {
@@ -710,50 +755,51 @@ function LobbyPage() {
         <RoomSettingsContainer>
           <LobbyContainerTitle>Room Settings</LobbyContainerTitle>
           <BackgroundContainer>
-            <NoMarginMediumText>Difficulty</NoMarginMediumText>
-            <DifficultyContainer>
-              {Object.keys(Difficulty).map((key) => {
-                const difficultyKey: Difficulty = Difficulty[key as keyof typeof Difficulty];
-                return (
-                  <HoverContainerSmallDifficultyButton key={key}>
-                    <HoverElementSmallDifficultyButton {...hoverProps} />
-                    <SmallDifficultyButtonNoMargin
-                      difficulty={difficultyKey}
-                      onClick={() => updateDifficultySetting(key)}
-                      active={difficulty === difficultyKey}
-                      enabled={isHost(currentUser)}
-                      disabled={!isHost(currentUser)}
-                    >
-                      {key}
-                    </SmallDifficultyButtonNoMargin>
-                  </HoverContainerSmallDifficultyButton>
-                );
-              })}
-            </DifficultyContainer>
+            {!selectedProblems.length ? (
+              <>
+                <NoMarginMediumText>Difficulty</NoMarginMediumText>
+                {isHost(currentUser) ? (
+                  <LowMarginText>
+                    Choose a difficulty for your randomly selected problem:
+                  </LowMarginText>
+                ) : null}
+                <DifficultyContainer>
+                  {Object.keys(Difficulty).map((key) => {
+                    const difficultyKey: Difficulty = Difficulty[key as keyof typeof Difficulty];
+                    return (
+                      <HoverContainerSmallDifficultyButton key={key}>
+                        <HoverElementSmallDifficultyButton {...hoverProps} />
+                        <SmallDifficultyButtonNoMargin
+                          difficulty={difficultyKey}
+                          onClick={() => updateDifficultySetting(key)}
+                          active={difficulty === difficultyKey}
+                          enabled={isHost(currentUser)}
+                          disabled={!isHost(currentUser)}
+                        >
+                          {key}
+                        </SmallDifficultyButtonNoMargin>
+                      </HoverContainerSmallDifficultyButton>
+                    );
+                  })}
+                </DifficultyContainer>
+              </>
+            ) : (
+              <>
+                <NoMarginMediumText>Problems</NoMarginMediumText>
+                <SelectedProblemsDisplay
+                  problems={selectedProblems}
+                  onRemove={isHost(currentUser) ? removeProblem : null}
+                />
+              </>
+            )}
 
-            <NoMarginMediumText>Selected Tags</NoMarginMediumText>
-            <SelectedTagsDisplay
-              tags={selectedTags}
-              onRemove={isHost(currentUser) ? removeTag : null}
-            />
             {isHost(currentUser) ? (
-              <TagSelector
-                tags={allTags}
-                selectedTags={selectedTags}
-                onSelect={addTag}
-              />
-            ) : null}
-
-            <NoMarginMediumText>Selected Problems</NoMarginMediumText>
-            <SelectedProblemsDisplay
-              problems={selectedProblems}
-              onRemove={isHost(currentUser) ? removeProblem : null}
-            />
-            {isHost(currentUser) ? (
-              <ProblemSelector
-                selectedProblems={selectedProblems}
-                onSelect={addProblem}
-              />
+              <ShowProblemSelectorContainer>
+                <TextButton onClick={() => setShowProblemSelector(true)}>
+                  {selectedProblems.length ? 'Edit problem selection ' : 'Or choose a specific problem '}
+                  &#8594;
+                </TextButton>
+              </ShowProblemSelectorContainer>
             ) : null}
 
             <NoMarginMediumText>Duration</NoMarginMediumText>
@@ -778,19 +824,7 @@ function LobbyPage() {
               {size === 31 ? 'No limit' : `${size === 1 ? '1 person' : `${size} people`}`}
             </NoMarginSubtitleText>
             <HoverContainerSlider>
-              <HoverElementSlider
-                enabled={isHost(currentUser)}
-                onMouseEnter={() => {
-                  if (!isHost(currentUser)) {
-                    setHoverVisible(true);
-                  }
-                }}
-                onMouseLeave={() => {
-                  if (!isHost(currentUser)) {
-                    setHoverVisible(false);
-                  }
-                }}
-              />
+              <HoverElementSlider {...hoverProps} />
               <SliderContainer>
                 <Slider
                   min={1}

@@ -1,6 +1,7 @@
 package com.codejoust.main.service;
 
 import com.codejoust.main.dao.RoomRepository;
+import com.codejoust.main.dto.game.GameMapper;
 import com.codejoust.main.dto.problem.SelectableProblemDto;
 import com.codejoust.main.dto.room.CreateRoomRequest;
 import com.codejoust.main.dto.room.DeleteRoomRequest;
@@ -17,6 +18,7 @@ import com.codejoust.main.exception.RoomError;
 import com.codejoust.main.exception.TimerError;
 import com.codejoust.main.exception.UserError;
 import com.codejoust.main.exception.api.ApiException;
+import com.codejoust.main.game_object.Game;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.Problem;
@@ -39,14 +41,17 @@ public class RoomService {
     private final RoomRepository repository;
     private final SocketService socketService;
     private final ProblemService problemService;
+    private final GameManagementService gameManagementService;
     private final Utility utility;
 
     @Autowired
     public RoomService(RoomRepository repository, SocketService socketService,
-                       ProblemService problemService, Utility utility) {
+                       ProblemService problemService, Utility utility,
+                       GameManagementService gameManagementService) {
         this.repository = repository;
         this.socketService = socketService;
         this.problemService = problemService;
+        this.gameManagementService = gameManagementService;
         this.utility = utility;
     }
 
@@ -90,7 +95,15 @@ public class RoomService {
         repository.save(room);
 
         RoomDto roomDto = RoomMapper.toDto(room);
-        socketService.sendSocketUpdate(roomDto);
+
+        // If active game, send to game socket; otherwise, send to room socket.
+        if (room.getActive()) {
+            Game game = gameManagementService.getGameFromRoomId(room.getRoomId());
+            game.setRoom(room);
+            socketService.sendSocketUpdate(GameMapper.toDto(game));
+        } else {
+            socketService.sendSocketUpdate(roomDto);
+        }
         return roomDto;
     }
 
@@ -363,8 +376,8 @@ public class RoomService {
             throw new ApiException(RoomError.NOT_FOUND);
         }
 
-        // Return error if user changes status to non-spectator in active game.
-        if (room.getActive() && !request.getSpectator()) {
+        // Return error if user changes status in active game.
+        if (room.getActive()) {
             throw new ApiException(RoomError.ACTIVE_GAME);
         }
 

@@ -57,7 +57,7 @@ public class GameTests {
 
     // Helper method to start the game for a given room
     private void startGameHelper(RoomDto room, UserDto host) throws Exception {
-        ProblemTestMethods.createSingleApprovedProblemAndTestCases(this.mockMvc);
+        ProblemTestMethods.createSingleVerifiedProblemAndTestCases(this.mockMvc);
 
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(host);
@@ -80,7 +80,7 @@ public class GameTests {
         StartGameRequest request = new StartGameRequest();
         request.setInitiator(roomDto.getHost());
 
-        ProblemTestMethods.createSingleApprovedProblemAndTestCases(this.mockMvc);
+        ProblemTestMethods.createSingleVerifiedProblemAndTestCases(this.mockMvc);
 
         RoomDto actual = MockHelper.postRequest(this.mockMvc, TestUrls.startGame(roomDto.getRoomId()), request, RoomDto.class, HttpStatus.OK);
 
@@ -101,8 +101,8 @@ public class GameTests {
 
         RoomDto roomDto = RoomTestMethods.setUpRoomWithOneUser(this.mockMvc, host);
 
-        ProblemTestMethods.createSingleApprovedProblemAndTestCases(this.mockMvc);
-        ProblemDto problemDto = ProblemTestMethods.createSingleApprovedProblemAndTestCases(this.mockMvc);
+        ProblemTestMethods.createSingleVerifiedProblemAndTestCases(this.mockMvc);
+        ProblemDto problemDto = ProblemTestMethods.createSingleVerifiedProblemAndTestCases(this.mockMvc);
 
         UpdateSettingsRequest updateRequest = new UpdateSettingsRequest();
         updateRequest.setInitiator(host);

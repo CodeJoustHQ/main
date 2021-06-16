@@ -75,15 +75,11 @@ function JoinGamePage() {
     if (!loading) {
       setLoading(true);
       getRoom(roomIdParam)
-        .then((res) => {
+        .then(() => {
           setLoading(false);
 
-          // TODO: Check to be removed to allow spectator view.
-          if (res.active) {
-            setError('This room has already started; please wait for the host to play again.');
-          } else {
-            setPageState(2);
-          }
+          // Allow user to enter as spectator.
+          setPageState(2);
         }).catch((err) => {
           setLoading(false);
           setError(err.message);
@@ -134,7 +130,7 @@ function JoinGamePage() {
       joinPageContent = (
         <Content>
           <LargeText>
-            Enter the six-digit room ID to join the game!
+            Enter the six-digit room ID to join the room!
           </LargeText>
           <LargeCenterInputText
             id="roomIdInput"
@@ -190,7 +186,7 @@ function JoinGamePage() {
       joinPageContent = (
         <div>
           <EnterNicknamePage
-            enterNicknameHeaderText={`Enter a nickname to join room #${roomId}!`}
+            enterNicknameHeaderText={`Enter your name to join room #${roomId}!`}
             enterNicknameAction={redirectToLobby}
           />
         </div>

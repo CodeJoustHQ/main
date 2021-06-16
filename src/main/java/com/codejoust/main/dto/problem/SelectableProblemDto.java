@@ -12,4 +12,5 @@ public class SelectableProblemDto {
     private String problemId;
     private String name;
     private ProblemDifficulty difficulty;
+    private ProblemTagDto problemTags;
 }

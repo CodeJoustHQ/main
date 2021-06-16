@@ -5,7 +5,10 @@ import ErrorMessage from '../core/Error';
 import { displayNameFromDifficulty } from '../../api/Difficulty';
 import { InlineDifficultyDisplayButton } from '../core/Button';
 import { TextInput } from '../core/Input';
-import { useClickOutside } from '../../util/Hook';
+import { useAppDispatch, useAppSelector, useClickOutside } from '../../util/Hook';
+import { User } from '../../api/User';
+import { fetchAccount } from '../../redux/Account';
+import { problemMatchesFilterText } from '../../util/Utility';
 
 type ProblemSelectorProps = {
   selectedProblems: SelectableProblem[],
@@ -18,6 +21,10 @@ type TagSelectorProps = {
   onSelect: (newlySelected: ProblemTag) => void,
 };
 
+type SpectatorSelectorProps = {
+  spectators: User[],
+};
+
 type ContentProps = {
   show: boolean,
 };
@@ -28,6 +35,11 @@ const Content = styled.div`
   margin: 10px 0;
 `;
 
+const SpectatorContent = styled.div`
+  position: relative;
+  margin-left: 10px;
+`;
+
 const InnerContent = styled.div<ContentProps>`
   width: 100%;
   max-height: 200px;
@@ -35,6 +47,12 @@ const InnerContent = styled.div<ContentProps>`
   display: ${({ show }) => (show ? 'block' : 'none')};
   border-radius: 5px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24);
+`;
+
+const SpectatorInnerContent = styled(InnerContent)`
+  position: absolute;
+  max-height: 100px;
+  width: 8rem;
 `;
 
 const InlineElement = styled.div`
@@ -52,6 +70,15 @@ const InlineElement = styled.div`
   }
 `;
 
+const SpectatorInlineElement = styled(InlineElement)`
+  background-color: ${({ theme }) => theme.colors.white};
+
+  &:hover {
+    cursor: default;
+    background-color: ${({ theme }) => theme.colors.white};
+  }
+`;
+
 const ClickableInlineDifficultyDisplayButton = styled(InlineDifficultyDisplayButton)`
   &:hover {
     cursor: pointer;
@@ -63,6 +90,10 @@ const TextSearch = styled(TextInput)`
   margin: 0;
 `;
 
+const SpectatorTextSearch = styled(TextSearch)`
+  width: 8rem;
+`;
+
 const ElementName = styled.p`
   font-weight: bold;
   margin: 0;
@@ -72,28 +103,45 @@ export function ProblemSelector(props: ProblemSelectorProps) {
   const { selectedProblems, onSelect } = props;
 
   const [error, setError] = useState('');
-  const [problems, setProblems] = useState<SelectableProblem[]>([]);
+  const [verifiedProblems, setVerifiedProblems] = useState<SelectableProblem[]>([]);
   const [showProblems, setShowProblems] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const [allProblems, setAllProblems] = useState<SelectableProblem[]>([]);
 
+  const { account, token } = useAppSelector((state) => state.account);
+  const dispatch = useAppDispatch();
   const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchAccount());
+    }
+  }, [token, dispatch]);
+
+  useEffect(() => {
+    let accountProblems = account?.problems || [];
+    accountProblems = accountProblems.filter((problem) => problem.testCases.length > 0);
+
+    setAllProblems((accountProblems as SelectableProblem[]).concat(verifiedProblems));
+  }, [account, verifiedProblems]);
 
   // Close list of problems if clicked outside of div
   useClickOutside(ref, () => setShowProblems(false));
 
   useEffect(() => {
-    getProblems(true)
+    // If not logged in/no token provided, will only be able to view verified problems
+    getProblems(token || '', true)
       .then((res) => {
-        setProblems(res);
+        setVerifiedProblems(res);
       })
       .catch((err) => {
         setError(err.message);
       });
-  }, []);
+  }, [token]);
 
   const setSelectedStatus = (index: number) => {
     setShowProblems(false);
-    onSelect(problems[index]);
+    onSelect(allProblems[index]);
   };
 
   const setSearchStatus = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,17 +153,17 @@ export function ProblemSelector(props: ProblemSelectorProps) {
       <TextSearch
         onClick={() => setShowProblems(!showProblems)}
         onChange={setSearchStatus}
-        placeholder={problems.length ? 'Select problems (optional)' : 'Loading...'}
+        placeholder={allProblems.length ? 'Filter by name, difficulty, or tag (separate queries by comma)' : 'Loading...'}
       />
 
       <InnerContent show={showProblems} ref={ref}>
-        {problems.map((problem, index) => {
+        {allProblems.map((problem, index) => {
           // Only show problems that haven't been selected yet
           if (selectedProblems.some((p) => p.problemId === problem.problemId)) {
             return null;
           }
 
-          if (searchText && !problem.name.toLowerCase().includes(searchText.toLowerCase())) {
+          if (!problemMatchesFilterText(problem, searchText)) {
             return null;
           }
 
@@ -169,7 +217,7 @@ export function TagSelector(props: TagSelectorProps) {
       <TextSearch
         onClick={() => setShowTags(!showTags)}
         onChange={setSearchStatus}
-        placeholder={tags.length ? 'Select tags (optional)' : 'Loading...'}
+        placeholder={tags.length ? 'Select tags (optional)' : 'No tags found'}
       />
 
       <InnerContent show={showTags} ref={ref}>
@@ -196,5 +244,49 @@ export function TagSelector(props: TagSelectorProps) {
         })}
       </InnerContent>
     </Content>
+  );
+}
+
+export function SpectatorFilter(props: SpectatorSelectorProps) {
+  const { spectators } = props;
+
+  const [showSpectators, setShowSpectators] = useState(false);
+  const [searchText, setSearchText] = useState('');
+
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close list of tags if clicked outside of div
+  useClickOutside(ref, () => setShowSpectators(false));
+
+  const setSearchStatus = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+  };
+
+  return (
+    <SpectatorContent>
+      <SpectatorTextSearch
+        onClick={() => setShowSpectators(!showSpectators)}
+        onChange={setSearchStatus}
+        placeholder={spectators !== null ? `Spectators (${spectators.length})` : 'Loading...'}
+      />
+
+      <SpectatorInnerContent show={showSpectators} ref={ref}>
+        {spectators.map((spectator) => {
+          if (searchText && !spectator.nickname.toLowerCase().includes(searchText.toLowerCase())) {
+            return null;
+          }
+
+          return (
+            <SpectatorInlineElement
+              key={spectator.userId}
+            >
+              <ElementName>
+                {spectator.nickname}
+              </ElementName>
+            </SpectatorInlineElement>
+          );
+        })}
+      </SpectatorInnerContent>
+    </SpectatorContent>
   );
 }

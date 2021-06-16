@@ -7,6 +7,8 @@ import { setRoom } from '../redux/Room';
 import { setCurrentUser } from '../redux/User';
 import { setGame } from '../redux/Game';
 import { AppDispatch } from '../redux/Store';
+import { Problem, SelectableProblem } from '../api/Problem';
+import { Player, Submission } from '../api/Game';
 
 // Require validator for identifiers as no types are provided.
 const validateIdentifier = require('valid-identifier');
@@ -90,3 +92,45 @@ export const getAuthHttpHeader = (token: string) => ({
     Authorization: token,
   },
 });
+
+export const problemMatchesFilterText = (problem: Problem | SelectableProblem,
+  filterText: string): boolean => {
+  const texts = filterText.toLowerCase().split(',');
+
+  // Filter by name, difficulty, and tags (multiple queries separated by commas)
+  for (let i = 0; i < texts.length; i += 1) {
+    const text = texts[i].trim();
+    if (!problem.name.toLowerCase().includes(text)
+      && !problem.difficulty.toLowerCase().includes(text)
+      && !problem.problemTags.some((tag) => tag.name.toLowerCase().includes(text))) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+export const getScore = (bestSubmission: Submission | null) => {
+  if (!bestSubmission) {
+    return '0';
+  }
+
+  const percent = Math.round((bestSubmission.numCorrect / bestSubmission.numTestCases) * 100);
+  return `${percent}%`;
+};
+
+export const getSubmissionTime = (bestSubmission: Submission | null,
+  gameStartTime: string | null) => {
+  if (!bestSubmission || !gameStartTime) {
+    return 'N/A';
+  }
+
+  // Calculate time from start of game till best submission
+  const startTime = new Date(gameStartTime).getTime();
+  const diffMilliseconds = new Date(bestSubmission.startTime).getTime() - startTime;
+  const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
+
+  return ` ${diffMinutes} min`;
+};
+
+export const getSubmissionCount = (player: Player | null) => player?.submissions.length || '0';

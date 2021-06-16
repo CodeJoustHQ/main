@@ -18,7 +18,7 @@ export type Problem = {
   name: string,
   owner: AccountUid,
   description: string,
-  approval: boolean,
+  verified: boolean,
   difficulty: Difficulty,
   testCases: TestCase[],
   problemInputs: ProblemInput[],
@@ -30,7 +30,12 @@ export type SelectableProblem = {
   problemId: string,
   name: string,
   difficulty: Difficulty,
+  problemTags: ProblemTag[],
   selected?: boolean,
+};
+
+export type ProblemIdParam = {
+  problemId: string,
 };
 
 export type ProblemInput = {
@@ -107,22 +112,15 @@ const routes = {
   deleteProblemTag: (tagId: string) => `${basePath}/tags/${tagId}`,
 };
 
-export const getProblems = (approved?: boolean): Promise<Problem[]> => axios
-  .get<Problem[]>(approved ? `${routes.getProblems}?approved=true` : routes.getProblems)
+export const getProblems = (token: string, verified?: boolean): Promise<Problem[]> => axios
+  .get<Problem[]>(verified ? `${routes.getProblems}?verified=true` : routes.getProblems, getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
 
-export const getRandomProblem = (request: ProblemSettings): Promise<Problem> => axios
-  .get<Problem>(`${routes.getRandomProblem}?${new URLSearchParams(request).toString()}`)
-  .then((res) => res.data)
-  .catch((err) => {
-    throw axiosErrorHandler(err);
-  });
-
-export const getSingleProblem = (problemId: string): Promise<Problem> => axios
-  .get<Problem>(routes.getSingleProblem(problemId))
+export const getSingleProblem = (problemId: string, token: string): Promise<Problem> => axios
+  .get<Problem>(routes.getSingleProblem(problemId), getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
@@ -157,29 +155,22 @@ export const getDefaultCodeMap = (problemId: string): Promise<DefaultCodeType> =
     throw axiosErrorHandler(err);
   });
 
-export const getProblemsWithTag = (tagId: string): Promise<Problem[]> => axios
-  .get<Problem[]>(routes.getProblemsWithTag(tagId))
+export const getAllProblemTags = (token: string): Promise<ProblemTag[]> => axios
+  .get<ProblemTag[]>(routes.getAllProblemTags, getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
 
-export const getAllProblemTags = (): Promise<ProblemTag[]> => axios
-  .get<ProblemTag[]>(routes.getAllProblemTags)
+export const createProblemTag = (tag: ProblemTag, token: string): Promise<ProblemTag> => axios
+  .post<ProblemTag>(routes.createProblemTag, tag, getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
 
-export const createProblemTag = (problemTag: ProblemTag): Promise<ProblemTag> => axios
-  .post<ProblemTag>(routes.createProblemTag, problemTag)
-  .then((res) => res.data)
-  .catch((err) => {
-    throw axiosErrorHandler(err);
-  });
-
-export const deleteProblemTag = (tagId: string): Promise<ProblemTag> => axios
-  .post<ProblemTag>(routes.deleteProblemTag(tagId))
+export const deleteProblemTag = (tagId: string, token: string): Promise<ProblemTag> => axios
+  .delete<ProblemTag>(routes.deleteProblemTag(tagId), getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

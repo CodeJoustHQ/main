@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import copy from 'copy-to-clipboard';
+import { useBeforeunload } from 'react-beforeunload';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
-import { LargeText, SecondaryHeaderText, MainHeaderText } from '../components/core/Text';
-import {
-  Game, Player, playAgain, Submission,
-} from '../api/Game';
+import { unwrapResult } from '@reduxjs/toolkit';
+import { LargeText, MainHeaderText } from '../components/core/Text';
+import { Game, Player, playAgain } from '../api/Game';
 import { checkLocationState, leaveRoom } from '../util/Utility';
 import { errorHandler } from '../api/Error';
 import { TextButton, PrimaryButton, SecondaryRedButton } from '../components/core/Button';
@@ -18,7 +18,6 @@ import {
 import { User } from '../api/User';
 import Podium from '../components/results/Podium';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
-import { Coordinate } from '../components/special/FloatingCircle';
 import {
   CopyIndicator,
   CopyIndicatorContainer,
@@ -27,13 +26,11 @@ import {
 import ResultsTable from '../components/results/ResultsTable';
 import Modal from '../components/core/Modal';
 import FeedbackPopup from '../components/results/FeedbackPopup';
-import ResizableMonacoEditor from '../components/game/Editor';
-import Language from '../api/Language';
-import { useAppDispatch, useAppSelector } from '../util/Hook';
+import { useAppDispatch, useAppSelector, useMousePosition } from '../util/Hook';
 import { fetchGame, setGame } from '../redux/Game';
 import { setCurrentUser } from '../redux/User';
 import { setRoom } from '../redux/Room';
-import { unwrapResult } from '@reduxjs/toolkit';
+import PreviewCodeContent from '../components/results/PreviewCodeContent';
 
 const Content = styled.div`
   padding: 0;
@@ -48,19 +45,6 @@ const FeedbackButton = styled(TextButton)<ShowFeedbackPrompt>`
   top: 50%;
   right: ${({ show }) => (show ? '20px' : '-100px')};
   transition: right 300ms;
-`;
-
-const CodePreview = styled.div`
-  position: relative;
-  text-align: left;
-  margin: 10px auto;
-  
-  width: 75%;
-  height: 45vh;
-  padding: 8px 0;
-  box-sizing: border-box;
-  border: 1px solid ${({ theme }) => theme.colors.blue};
-  border-radius: 8px;
 `;
 
 const PrimaryButtonHoverElement = styled(HoverElement)`
@@ -116,7 +100,6 @@ function GameResultsPage() {
   const [roomId, setRoomId] = useState('');
 
   const [connected, setConnected] = useState(false);
-  const [mousePosition, setMousePosition] = useState<Coordinate>({ x: 0, y: 0 });
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
   const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState<boolean>(false);
@@ -128,6 +111,13 @@ function GameResultsPage() {
   const dispatch = useAppDispatch();
   const { game } = useAppSelector((state) => state);
   const { currentUser } = useAppSelector((state) => state);
+  const mousePosition = useMousePosition(true);
+
+  const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
+
+  useBeforeunload(() => (isHost(currentUser)
+    ? 'Leave this page? If you leave, host permissions may be transferred to another user.'
+    : 'Leave this page? You can always rejoin later.'));
 
   useEffect(() => {
     if (game) {
@@ -140,7 +130,6 @@ function GameResultsPage() {
         disconnect()
           .then(() => {
             dispatch(setRoom(null));
-            dispatch(setGame(null));
             history.replace(`/game/lobby?room=${game.room.roomId}`, {
               user: currentUser,
               roomId: game.room.roomId,
@@ -178,7 +167,7 @@ function GameResultsPage() {
         dispatch(setGame(updatedGame));
       };
 
-      connect(roomId, currentUser!.userId!).then(() => {
+      connect(currentUser!.userId!).then(() => {
         subscribe(routes(roomId).subscribe_game, subscribeCallback)
           .then(() => {
             setLoading(false);
@@ -202,17 +191,6 @@ function GameResultsPage() {
         setError(err.message);
       });
   };
-
-  const isHost = useCallback((user: User | null) => user?.userId === host?.userId, [host]);
-
-  // Get current mouse position.
-  const mouseMoveHandler = useCallback((e: MouseEvent) => {
-    setMousePosition({ x: e.pageX, y: e.pageY });
-  }, [setMousePosition]);
-
-  useEffect(() => {
-    window.onmousemove = mouseMoveHandler;
-  }, [mouseMoveHandler]);
 
   useEffect(() => {
     players.forEach((player, index) => {
@@ -259,38 +237,6 @@ function GameResultsPage() {
     </InviteContainer>
   );
 
-  const getPreviewCodeContent = useCallback(() => {
-    if (!players[codeModal] || !players[codeModal].submissions.length) {
-      return null;
-    }
-
-    let bestSubmission: Submission | undefined;
-    players[codeModal].submissions.forEach((submission) => {
-      if (!bestSubmission || submission.numCorrect > bestSubmission.numCorrect) {
-        bestSubmission = submission;
-      }
-    });
-
-    return (
-      <div>
-        <SecondaryHeaderText bold>
-          {`Previewing code for player "${players[codeModal].user.nickname}"`}
-        </SecondaryHeaderText>
-        <CodePreview>
-          <ResizableMonacoEditor
-            onLanguageChange={null}
-            onCodeChange={null}
-            getCurrentLanguage={null}
-            defaultCodeMap={null}
-            currentProblem={0}
-            defaultLanguage={bestSubmission?.language as Language || Language.Python}
-            defaultCode={bestSubmission?.code || 'Uh oh! An error occurred fetching this player\'s code'}
-          />
-        </CodePreview>
-      </div>
-    );
-  }, [players, codeModal]);
-
   return (
     <Content>
       <CopyIndicatorContainer copied={copiedRoomLink}>
@@ -314,7 +260,9 @@ function GameResultsPage() {
       </Modal>
 
       <Modal show={codeModal !== -1} onExit={() => setCodeModal(-1)} fullScreen>
-        {getPreviewCodeContent()}
+        <PreviewCodeContent
+          player={players[codeModal]}
+        />
       </Modal>
 
       <Modal
@@ -323,7 +271,7 @@ function GameResultsPage() {
           setPlaceModal(-1);
           setDisplayPlaceModal(false);
         }}
-        fullScreen
+        fullScreen={false}
       >
         {placeModal !== -1 ? (
           <PlaceContent>
@@ -334,15 +282,6 @@ function GameResultsPage() {
               </b>
               !
             </MainHeaderText>
-            <iframe
-              title="Airtable feedback form"
-              className="airtable-embed"
-              src="https://airtable.com/embed/shrGkEhC6RhAxRCxG?backgroundColor=blue"
-              frameBorder="0"
-              width="80%"
-              height="900"
-              style={{ background: 'transparent' }}
-            />
           </PlaceContent>
         ) : null}
       </Modal>
@@ -419,6 +358,7 @@ function GameResultsPage() {
           gameStartTime={startTime}
           numProblems={game?.problems.length || 1}
           viewPlayerCode={(index: number) => setCodeModal(index)}
+          spectatePlayer={null}
         />
       ) : null}
     </Content>

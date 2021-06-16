@@ -6,6 +6,7 @@ import { Color } from '../../api/Color';
 import { useBestSubmission, useGetScore, useGetSubmissionTime } from '../../util/Hook';
 import Language, { displayNameFromLanguage } from '../../api/Language';
 import { TextButton } from '../core/Button';
+// import { getScore, getSubmissionCount, getSubmissionTime } from '../../util/Utility';
 
 const Content = styled.tr`
   border-radius: 5px;
@@ -83,12 +84,13 @@ type PlayerResultsCardProps = {
   gameStartTime: string,
   color: Color,
   numProblems: number,
-  onViewCode: () => void,
+  onViewCode: (() => void) | null,
+  onSpectateLive: (() => void) | null,
 };
 
 function PlayerResultsItem(props: PlayerResultsCardProps) {
   const {
-    player, place, isCurrentPlayer, color, gameStartTime, numProblems, onViewCode,
+    player, place, isCurrentPlayer, color, gameStartTime, numProblems, onViewCode, onSpectateLive,
   } = props;
 
   const score = useGetScore(player);
@@ -159,7 +161,19 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
       <td>
         <Text>{getSubmissionCount()}</Text>
       </td>
-      <CodeColumn>{getSubmissionLanguage()}</CodeColumn>
+      {!onSpectateLive ? (
+        <CodeColumn>{getSubmissionLanguage()}</CodeColumn>
+      ) : null}
+      {onSpectateLive ? (
+        <CodeColumn>
+          <PreviewContainer>
+            <TextButton onClick={onSpectateLive}>
+              Launch
+              <PreviewIcon className="material-icons">launch</PreviewIcon>
+            </TextButton>
+          </PreviewContainer>
+        </CodeColumn>
+      ) : null}
     </Content>
   );
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { PrimaryButton } from './Button';
+import { GreenSmallButton, PrimaryButton } from './Button';
 
 // Wrap a button inside of a Link to get the styling of a button
 const createButtonLink = (Button:any, props:any) => {
@@ -20,6 +20,7 @@ const createButtonLink = (Button:any, props:any) => {
 };
 
 export const PrimaryButtonLink = (props:any) => createButtonLink(PrimaryButton, props);
+export const GreenSmallButtonLink = (props:any) => createButtonLink(GreenSmallButton, props);
 
 export const NavbarLink = styled(Link)`
   color: ${({ theme }) => theme.colors.text};
@@ -33,6 +34,12 @@ export const TextLink = styled(Link)`
   text-decoration: none;
 `;
 
+export const InheritedTextLink = styled(Link)`
+  font-size: inherit;
+  color: inherit;
+  text-decoration: underline;
+`;
+
 export const SecondaryHeaderTextLink = styled(TextLink)`
   font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   color: ${({ theme }) => theme.colors.blueLink};
@@ -40,4 +47,10 @@ export const SecondaryHeaderTextLink = styled(TextLink)`
 
 export const InlineExternalLink = styled.a`
   color: ${({ theme }) => theme.colors.blueLink};
+`;
+
+export const DivLink = styled(Link)`
+  display: block;
+  color: inherit;
+  text-decoration: inherit;
 `;

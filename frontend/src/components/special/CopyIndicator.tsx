@@ -39,17 +39,6 @@ export const CopyIndicator = styled(DefaultButton)`
   background: ${({ theme }) => theme.colors.gradients.green};
 `;
 
-export const InlineCopyText = styled(ContactHeaderText)`
-  display: inline-block;
-  margin: 0;
-  cursor: pointer;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.text};
-`;
-
-export const SmallInlineCopyText = styled(InlineCopyText).attrs({ as: 'p' })`
-  font-size: ${({ theme }) => theme.fontSize.mediumSmall};
-`;
-
 export const InlineBackgroundCopyText = styled(ContactHeaderText)`
   display: inline-block;
   margin: 0;
@@ -64,10 +53,6 @@ export const InlineBackgroundCopyText = styled(ContactHeaderText)`
 export const InlineCopyIcon = styled.i.attrs(() => ({
   className: 'material-icons',
 }))`
-  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
   margin-left: 5px;
-`;
-
-export const SmallInlineCopyIcon = styled(InlineCopyIcon)`
-  font-size: ${({ theme }) => theme.fontSize.mediumSmall};
+  font-size: inherit;
 `;

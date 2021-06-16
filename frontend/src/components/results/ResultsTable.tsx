@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/control-has-associated-label */
 import React from 'react';
 import styled from 'styled-components';
 import { Player } from '../../api/Game';
@@ -5,6 +6,7 @@ import PlayerResultsItem from './PlayerResultsItem';
 import { User } from '../../api/User';
 
 const Content = styled.table`
+  text-align: center;
   width: 65%;
   min-width: 600px;
   margin: 0 auto;
@@ -36,12 +38,13 @@ type ResultsTableProps = {
   currentUser: User | null,
   gameStartTime: string,
   numProblems: number,
-  viewPlayerCode: (index: number) => void,
+  viewPlayerCode: ((index: number) => void) | null,
+  spectatePlayer: ((index: number) => void) | null,
 };
 
 function ResultsTable(props: ResultsTableProps) {
   const {
-    players, currentUser, gameStartTime, numProblems, viewPlayerCode,
+    players, currentUser, gameStartTime, numProblems, viewPlayerCode, spectatePlayer,
   } = props;
 
   return (
@@ -52,7 +55,8 @@ function ResultsTable(props: ResultsTableProps) {
         <th>Score</th>
         <th>Time</th>
         <SmallColumn>Submissions</SmallColumn>
-        <th>Code</th>
+        {!spectatePlayer ? <th>Code</th> : null}
+        {spectatePlayer ? <th>Spectate Live</th> : null}
       </tr>
       {players?.map((player, index) => (
         <PlayerResultsItem
@@ -62,7 +66,8 @@ function ResultsTable(props: ResultsTableProps) {
           gameStartTime={gameStartTime}
           color={player.color}
           numProblems={numProblems}
-          onViewCode={() => viewPlayerCode(index)}
+          onViewCode={viewPlayerCode ? (() => viewPlayerCode(index)) : null}
+          onSpectateLive={spectatePlayer ? (() => spectatePlayer(index)) : null}
         />
       ))}
     </Content>

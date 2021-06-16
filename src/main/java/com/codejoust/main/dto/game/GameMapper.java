@@ -66,12 +66,15 @@ public class GameMapper {
         List<Color> colorList = new ArrayList<>(Utility.COLOR_LIST);
         Collections.shuffle(colorList);
 
+        // Map all non-spectators to players.
         for (User user : room.getUsers()) {
-            Player player = PlayerMapper.playerFromUser(user);
-            player.setColor(colorList.get(index));
-            player.setSolved(new boolean[room.getNumProblems()]);
-            players.put(user.getUserId(), player);
-            index = (index + 1) % colorList.size();
+            if (!user.getSpectator()) {
+                Player player = PlayerMapper.playerFromUser(user);
+                player.setColor(colorList.get(index));
+                player.setSolved(new boolean[room.getNumProblems()]);
+                players.put(user.getUserId(), player);
+                index = (index + 1) % colorList.size();
+            }
         }
 
         return game;

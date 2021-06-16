@@ -12,18 +12,20 @@ import JoinGamePage from '../../views/Join';
 import CreateGamePage from '../../views/Create';
 import GameResultsPage from '../../views/Results';
 import LobbyPage from '../../views/Lobby';
-import AllProblemsPage from '../../views/AllProblemsPage';
+import VerifiedProblemsPage from '../../views/VerifiedProblemsPage';
 import ProblemPage from '../../views/ProblemPage';
 import CreateProblemPage from '../../views/CreateProblemPage';
 import CircleBackgroundLayout from '../layout/CircleBackground';
-import DashboardPage from '../../views/account/Dashboard';
+import DashboardPage from '../../views/dashboard/Dashboard';
 import LoginPage from '../../views/account/Login';
 import RegisterPage from '../../views/account/Register';
+import ProfilePage from '../../views/account/Profile';
 import ContactUsPage from '../../views/ContactUs';
 import MinimalLayout from '../layout/MinimalLayout';
-import { useAppDispatch } from '../../util/Hook';
+import FullLayout from '../layout/FullLayout';
+import { useAppDispatch, useAppSelector } from '../../util/Hook';
 import app from '../../api/Firebase';
-import { setFirebaseUser, FirebaseUserType, setToken } from '../../redux/Account';
+import { setFirebaseUser, FirebaseUserType, setToken, fetchAccount } from '../../redux/Account';
 import { CenteredContainer } from '../core/Container';
 import Loading from '../core/Loading';
 
@@ -37,6 +39,8 @@ function App() {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
 
+  const { firebaseUser } = useAppSelector((state) => state.account);
+
   // Track page view on every change in location and clear errors when switching pages
   useEffect(() => {
     ReactGA.pageview(location.pathname);
@@ -44,14 +48,17 @@ function App() {
 
   // Set authentication status when Firebase auth status changes
   useEffect(() => {
-    app.auth().onAuthStateChanged((firebaseUser) => {
-      dispatch(setFirebaseUser(firebaseUser?.toJSON() as FirebaseUserType || null));
+    app.auth().onAuthStateChanged((user) => {
+      dispatch(setFirebaseUser(user?.toJSON() as FirebaseUserType || null));
       setLoading(false);
 
       // Save Token in Redux state if authenticated
-      if (firebaseUser) {
-        firebaseUser.getIdToken(true)
-          .then((token) => dispatch(setToken(token)));
+      if (user) {
+        user.getIdToken(true)
+          .then((token) => {
+            dispatch(setToken(token));
+            dispatch(fetchAccount());
+          });
       }
     });
   }, [dispatch, setLoading]);
@@ -67,18 +74,20 @@ function App() {
 
   return (
     <Switch>
-      <CustomRoute path="/" component={LandingPage} layout={CircleBackgroundLayout} exact />
+      {firebaseUser
+        ? <CustomRoute path="/" component={DashboardPage} layout={FullLayout} exact />
+        : <CustomRoute path="/" component={LandingPage} layout={CircleBackgroundLayout} exact />}
       <CustomRoute path="/game" component={GamePage} layout={GameLayout} exact />
       <CustomRoute path="/game/join" component={JoinGamePage} layout={CircleBackgroundLayout} exact />
       <CustomRoute path="/game/create" component={CreateGamePage} layout={CircleBackgroundLayout} exact />
       <CustomRoute path="/game/lobby" component={LobbyPage} layout={MinimalLayout} exact />
       <CustomRoute path="/game/results" component={GameResultsPage} layout={MinimalLayout} exact />
-      <PrivateRoute path="/problems/all" component={AllProblemsPage} layout={MinimalLayout} exact />
+      <PrivateRoute path="/problems/all" component={VerifiedProblemsPage} layout={MinimalLayout} exact />
       <PrivateRoute path="/problem/create" component={CreateProblemPage} layout={MinimalLayout} exact />
       <PrivateRoute path="/problem/:id" component={ProblemPage} layout={MinimalLayout} exact />
-      <PrivateRoute path="/dashboard" component={DashboardPage} layout={MinimalLayout} exact />
       <CustomRoute path="/login" component={LoginPage} layout={MainLayout} exact />
       <CustomRoute path="/register" component={RegisterPage} layout={MainLayout} exact />
+      <PrivateRoute path="/profile" component={ProfilePage} layout={MainLayout} exact />
       <CustomRoute path="/contact-us" component={ContactUsPage} layout={MainLayout} exact />
       <CustomRedirect from="/play" to="/game/join" />
       <CustomRoute path="*" component={NotFound} layout={MainLayout} />

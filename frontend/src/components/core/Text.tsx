@@ -37,6 +37,11 @@ export const NoMarginSubtitleText = styled.p`
   margin: 0;
 `;
 
+export const NoMarginDefaultText = styled.p`
+  font-size: ${({ theme }) => theme.fontSize.default};
+  margin: 0;
+`;
+
 export const SmallHoverText = styled(SmallHeaderText)`
   font-size: ${({ theme }) => theme.fontSize.medium};
   margin: 0;
@@ -60,6 +65,11 @@ export const NoMarginMediumText = styled(MediumText)`
 
 export const LargeText = styled.h3`
   font-size: ${({ theme }) => theme.fontSize.xLarge};
+`;
+
+export const LargeCenterText = styled.h3`
+  font-size: ${({ theme }) => theme.fontSize.xLarge};
+  text-align: center;
 `;
 
 export const LandingHeaderTitle = styled.h1`
@@ -136,4 +146,10 @@ export const WhiteText = styled(Text)`
 export const BottomFooterText = styled(Text)`
   color: ${({ theme }) => theme.colors.gray};
   font-size: ${({ theme }) => theme.fontSize.mediumSmall};
+`;
+
+export const SelectedItemText = styled.p`
+  font-weight: bold;
+  display: inline;
+  margin: 0 10px;
 `;

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
-  createProblemTag,
+  createProblemTag, deleteProblemTag,
   getAllProblemTags,
   ProblemTag,
 } from '../../api/Problem';
@@ -20,6 +20,7 @@ import ErrorMessage from '../core/Error';
 import { FilterAllTagsDisplay, SelectedTagsDisplay } from './SelectedDisplay';
 import { TagSelector } from './Selector';
 import Modal from '../core/Modal';
+import { useAppSelector } from '../../util/Hook';
 
 const LargeTextInput = styled(TextInput)`
   width: 40%;
@@ -44,35 +45,62 @@ function ProblemTags(props: ProblemTagsParams) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    getAllProblemTags()
+  const { token } = useAppSelector((state) => state.account);
+
+  const fetchTags = useCallback(() => {
+    if (!token) {
+      return;
+    }
+
+    getAllProblemTags(token!)
       .then((res) => {
         setAllTags(res);
+        setError('');
       })
       .catch((err) => {
         setError(err.message);
       });
-  }, []);
+  }, [token]);
+
+  useEffect(() => {
+    fetchTags();
+  }, [fetchTags]);
 
   // Make request to create a new tag, refresh tag list
   const createNewTag = (newTagName: string) => {
+    if (!token) {
+      return;
+    }
+
     const tag: ProblemTag = {
       name: newTagName,
     };
     setLoading(true);
-    createProblemTag(tag).then(() => {
+    createProblemTag(tag, token!).then(() => {
       // If the tag was created, refresh all problem tags.
-      getAllProblemTags().then((allProblemTags) => {
-        setAllTags(allProblemTags);
-        setError('');
-      }).catch((err) => {
-        setError(err.message);
-      });
-    }).catch((err) => {
-      setError(err.message);
-    }).finally(() => {
-      setLoading(false);
-    });
+      fetchTags();
+      setTagName('');
+    }).catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  };
+
+  const deleteTag = (tagId: string) => {
+    if (!token || !window.confirm('Delete this tag? It will be removed from all problems that have it selected.')) {
+      return;
+    }
+
+    setLoading(true);
+    deleteProblemTag(tagId, token!)
+      .then(() => {
+        problemTags.forEach((tag, index) => {
+          if (tag.tagId === tagId) {
+            removeTag(index);
+          }
+        });
+        setAllTags(allTags.filter((tag) => tag.tagId !== tagId));
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -80,7 +108,7 @@ function ProblemTags(props: ProblemTagsParams) {
       <LowMarginMediumText>Tags</LowMarginMediumText>
       <SelectedTagsDisplay
         tags={problemTags}
-        onRemove={removeTag}
+        onRemove={!viewOnly ? removeTag : null}
       />
       {
         !viewOnly ? (
@@ -112,6 +140,7 @@ function ProblemTags(props: ProblemTagsParams) {
               <LowMarginMediumText>Filter Tags</LowMarginMediumText>
               <FilterAllTagsDisplay
                 tags={allTags}
+                onDelete={deleteTag}
               />
             </Modal>
           </>

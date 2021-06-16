@@ -1,100 +1,37 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
-import SplitterLayout from 'react-splitter-layout';
-import MarkdownEditor from 'rich-markdown-editor';
 import { useBeforeunload } from 'react-beforeunload';
 import { Message, Subscription } from 'stompjs';
-import copy from 'copy-to-clipboard';
 import { unwrapResult } from '@reduxjs/toolkit';
-import Editor from '../components/game/Editor';
-import { DefaultCodeType, getDefaultCodeMap, Problem } from '../api/Problem';
+import styled from 'styled-components';
 import { errorHandler } from '../api/Error';
 import {
-  CenteredContainer, FlexCenter, FlexContainer,
-  FlexInfoBar, FlexLeft, FlexRight, MainContainer,
-  Panel, SplitterContainer,
+  FlexCenter, FlexContainer, FlexInfoBar, FlexLeft,
+  FlexRight, MainContainer,
 } from '../components/core/Container';
-import ErrorMessage from '../components/core/Error';
 import 'react-splitter-layout/lib/index.css';
 import { checkLocationState, leaveRoom } from '../util/Utility';
-import { ProblemHeaderText, BottomFooterText } from '../components/core/Text';
-import Console from '../components/game/Console';
 import Loading from '../components/core/Loading';
 import { User } from '../api/User';
-import { GameNotification, NotificationType } from '../api/GameNotification';
-import { Difficulty, displayNameFromDifficulty } from '../api/Difficulty';
-import {
-  Game, Player, runSolution,
-  Submission, SubmissionType, submitSolution, manuallyEndGame,
-} from '../api/Game';
-import LeaderboardCard from '../components/card/LeaderboardCard';
+import { Difficulty } from '../api/Difficulty';
+import { Game, manuallyEndGame } from '../api/Game';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
 import {
   TextButton, DifficultyDisplayButton, SmallButton, DangerButton,
 } from '../components/core/Button';
 import {
-  connect, routes, send, subscribe,
+  connect, routes, subscribe,
 } from '../api/Socket';
-import GameNotificationContainer from '../components/game/GameNotificationContainer';
-import Language from '../api/Language';
-import {
-  CopyIndicator,
-  BottomCopyIndicatorContainer,
-  SmallInlineCopyIcon,
-  SmallInlineCopyText,
-} from '../components/special/CopyIndicator';
 import { useAppDispatch, useAppSelector } from '../util/Hook';
 import { fetchGame, setGame } from '../redux/Game';
 import { setCurrentUser } from '../redux/User';
+import PlayerGameView from '../components/game/PlayerGameView';
+import SpectatorGameView from '../components/game/SpectatorGameView';
+import { Text } from '../components/core/Text';
 
-const StyledMarkdownEditor = styled(MarkdownEditor)`
-  margin-top: 15px;
-  padding: 0;
-  
-  p {
-    font-family: ${({ theme }) => theme.font};
-  }
-
-  // The specific list of attributes to have dark text color.
-  .ProseMirror > p, blockquote, h1, h2, h3, ul, ol, table {
-    color: ${({ theme }) => theme.colors.text};
-  }
-`;
-
-const OverflowPanel = styled(Panel)`
-  overflow-y: auto;
-  height: 100%;
-  padding: 0 25px;
-`;
-
-const NoPaddingPanel = styled(Panel)`
-  padding: 0;
-`;
-
-const LeaderboardContent = styled.div`
-  text-align: center;
-  margin: 0 auto;
-  width: 75%;
-  overflow-x: scroll;
-  white-space: nowrap;
-    
-  // Show shadows if there is scrollable content  
-  background-image: 
-    /* Shadow covers */ 
-    ${({ theme: { colors: { background } } }) => `linear-gradient(to right, ${background}, ${background})`},
-    ${({ theme: { colors: { background } } }) => `linear-gradient(to left, ${background}, ${background})`},
-  
-    /* Shadows */ 
-    ${({ theme: { colors: { background } } }) => `linear-gradient(to right, rgba(0,0,0.8,.12), ${background})`},
-    ${({ theme: { colors: { background } } }) => `linear-gradient(to left, rgba(0,0,0,.12), ${background})`};
-
-  background-position: left center, right center, 0.15% center, 99.85% center;
-  background-repeat: no-repeat;
-  background-color: ${({ theme }) => theme.colors.background};
-  background-size: 20px 100%, 20px 100%, 10px 100%, 10px 100%;
-  background-attachment: local, local, scroll, scroll;
+const SpectatorText = styled(Text)`
+  margin: 0 0 0 20px;
 `;
 
 type LocationState = {
@@ -108,30 +45,29 @@ function GamePage() {
   const history = useHistory();
   const location = useLocation<LocationState>();
 
+  // todo: possibly delete
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
 
   const [roomId, setRoomId] = useState<string>('');
 
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
-  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
   const [host, setHost] = useState<User | null>(null);
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [spectators, setSpectators] = useState<User[]>([]);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
+
+  // todo: move block to new file
   const [problems, setProblems] = useState<Problem[]>([]);
   const [languageList, setLanguageList] = useState<Language[]>([Language.Java]);
   const [codeList, setCodeList] = useState<string[]>(['']);
   const [currentSubmission, setCurrentSubmission] = useState<Submission | null>(null);
   const [currentProblemIndex, setCurrentProblemIndex] = useState<number>(0);
+
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);
-  const [defaultCodeList, setDefaultCodeList] = useState<DefaultCodeType[]>([]);
-
-  // When variable null, show nothing; otherwise, show notification.
-  const [gameNotification, setGameNotification] = useState<GameNotification | null>(null);
 
   // Variable to hold whether the user is subscribed to the primary Game socket.
   const [gameSocket, setGameSocket] = useState<Subscription | null>(null);
@@ -145,19 +81,19 @@ function GamePage() {
    * Some browsers will display this message, others will display a fixed
    * message; see https://github.com/jacobbuck/react-beforeunload.
    */
-  useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
+  useBeforeunload(() => 'Leaving this page may cause you to lose your code, host status, and/or other data.');
 
   const setStateFromGame = (newGame: Game) => {
     setHost(newGame.room.host);
     setRoomId(newGame.room.roomId);
-    setPlayers(newGame.players);
     setGameTimer(newGame.gameTimer);
-    setProblems(newGame.problems);
     setAllSolved(newGame.allSolved);
     setTimeUp(newGame.gameTimer.timeUp);
     setGameEnded(newGame.gameEnded);
+    setSpectators(newGame.room.spectators);
   };
 
+  // todo: move
   const createCodeLanguageArray = () => {
     while (languageList.length < problems.length) {
       languageList.push(Language.Java);
@@ -171,8 +107,10 @@ function GamePage() {
   const dispatch = useAppDispatch();
   const { currentUser, game } = useAppSelector((state) => state);
 
+  // todo: move to useEffect
   createCodeLanguageArray();
 
+  // todo: all of this and setDefaultCode, migrate to file
   const setOneCurrentLanguage = (newLanguage: Language) => {
     languageList[currentProblemIndex] = newLanguage;
   };
@@ -240,6 +178,7 @@ function GamePage() {
       setFullPageLoading(false);
       setStateFromGame(game);
 
+      // todo: remaining part of block, migrate
       // If default code list is empty and current user is loaded, fetch the code from the backend
       if (!defaultCodeList.length && currentUser) {
         let matchFound = false;
@@ -258,19 +197,7 @@ function GamePage() {
         }
       }
     }
-  }, [game, currentUser, defaultCodeList, setDefaultCodeFromProblems, setFullPageLoading]);
-
-  /**
-   * Display the notification as a callback from the notification
-   * subscription. Do not display anything if notification is already
-   * present or initiator is the current user.
-   */
-  const displayNotification = useCallback((result: Message) => {
-    const notificationResult: GameNotification = JSON.parse(result.body);
-    if (currentUser?.userId !== notificationResult?.initiator?.userId) {
-      setGameNotification(notificationResult);
-    }
-  }, [currentUser]);
+  }, [game, setFullPageLoading]);
 
   // Check if game is over or not and redirect to results page if so
   useEffect(() => {
@@ -296,7 +223,7 @@ function GamePage() {
     };
 
     // Connect to the socket if not already
-    connect(roomIdParam, userId).then(() => {
+    connect(userId).then(() => {
       // Subscribe to the main Game channel to receive Game updates.
       if (!gameSocket) {
         subscribe(routes(roomIdParam).subscribe_game, subscribeUserCallback)
@@ -310,9 +237,9 @@ function GamePage() {
           });
       }
 
-      // Subscribe for Game Notifications.
+      // Subscribe for Game Notifications (removed the display).
       if (!notificationSocket) {
-        subscribe(routes(roomIdParam).subscribe_notification, displayNotification)
+        subscribe(routes(roomIdParam).subscribe_notification, () => {})
           .then((subscription) => {
             setNotificationSocket(subscription);
           }).catch((err) => {
@@ -320,7 +247,7 @@ function GamePage() {
           });
       }
     });
-  }, [dispatch, displayNotification, gameSocket, notificationSocket]);
+  }, [dispatch, gameSocket, notificationSocket]);
 
   // Called every time location changes
   useEffect(() => {
@@ -338,95 +265,10 @@ function GamePage() {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
       });
     }
-  }, [game, currentUser, dispatch, location, history, setDefaultCodeFromProblems]);
+    // todo: the block that was here (now deleted), copy that over
+  }, [game, currentUser, dispatch, location, history]);
 
-  // Creates Event when splitter bar is dragged
-  const onSecondaryPanelSizeChange = () => {
-    const event = new Event('secondaryPanelSizeChange');
-    window.dispatchEvent(event);
-  };
-
-  // Send notification if test submission is correct and currentUser is set.
-  const checkSendTestCorrectNotification = (submissionParam: Submission) => {
-    if (submissionParam.numCorrect === submissionParam.numTestCases && currentUser) {
-      const notificationBody: string = JSON.stringify({
-        initiator: currentUser,
-        time: new Date(),
-        notificationType: NotificationType.TestCorrect,
-        content: 'success',
-      });
-      send(routes(roomId).subscribe_notification, {}, notificationBody);
-    }
-  };
-
-  // Send notification if solution is correct and currentUser is set.
-  const checkSendSolutionCorrectNotification = (submissionParam: Submission) => {
-    if (currentUser) {
-      const notificationBody: string = JSON.stringify({
-        initiator: currentUser,
-        time: new Date(),
-        notificationType:
-          (submissionParam.numCorrect === submissionParam.numTestCases)
-            ? NotificationType.SubmitCorrect : NotificationType.SubmitIncorrect,
-      });
-      send(routes(roomId).subscribe_notification, {}, notificationBody);
-    }
-  };
-
-  // Callback when user runs code against custom test case
-  const runCode = (input: string) => {
-    setLoading(true);
-    setError('');
-    const request = {
-      initiator: currentUser!,
-      input,
-      code: codeList[currentProblemIndex],
-      language: languageList[currentProblemIndex],
-      problemIndex: currentProblemIndex,
-    };
-
-    runSolution(roomId, request)
-      .then((res) => {
-        setLoading(false);
-
-        // Set the 'test' submission type to correctly display result.
-        res.submissionType = SubmissionType.Test;
-        setCurrentSubmission(res);
-        checkSendTestCorrectNotification(res);
-      })
-      .catch((err) => {
-        setLoading(false);
-        setError(err.message);
-      });
-  };
-
-  // Callback when user runs code against custom test case
-  const submitCode = () => {
-    setLoading(true);
-    setError('');
-    const request = {
-      initiator: currentUser!,
-      code: codeList[currentProblemIndex],
-      language: languageList[currentProblemIndex],
-      problemIndex: currentProblemIndex,
-    };
-
-    submitSolution(roomId, request)
-      .then((res) => {
-        setLoading(false);
-
-        // Set the 'submit' submission type to correctly display result.
-        res.submissionType = SubmissionType.Submit;
-        setSubmissions(submissions.concat([res]));
-        setCurrentSubmission(res);
-        checkSendSolutionCorrectNotification(res);
-      })
-      .catch((err) => {
-        setLoading(false);
-        setError(err.message);
-      });
-  };
-
+  // todo: copy over
   const nextProblem = () => {
     setCurrentProblemIndex((currentProblemIndex + 1) % problems?.length);
     setCurrentSubmission(getSubmission((currentProblemIndex + 1) % problems?.length, submissions));
@@ -453,6 +295,7 @@ function GamePage() {
       .catch((err) => setError(err.message));
   };
 
+  // todo: copy this method over
   const displayPlayerLeaderboard = useCallback(() => players.map((player, index) => (
     <LeaderboardCard
       player={player}
@@ -481,15 +324,16 @@ function GamePage() {
 
   return (
     <FlexContainer>
-      <GameNotificationContainer
-        onClickFunc={setGameNotification}
-        gameNotification={gameNotification}
-      />
       <FlexInfoBar>
         <FlexLeft>
           Room:
           {' '}
           {roomId || 'N/A'}
+          <SpectatorText>
+            Spectators (
+            {spectators.length}
+            )
+          </SpectatorText>
         </FlexLeft>
         <FlexCenter>
           <GameTimerContainer gameTimer={gameTimer || null} />
@@ -505,91 +349,17 @@ function GamePage() {
           ) : null}
         </FlexRight>
       </FlexInfoBar>
-      <LeaderboardContent>
-        {displayPlayerLeaderboard()}
-      </LeaderboardContent>
-
-      {loading ? <CenteredContainer><Loading /></CenteredContainer> : null}
-      {error ? <CenteredContainer><ErrorMessage message={error} /></CenteredContainer> : null}
-      <SplitterContainer>
-        <SplitterLayout
-          onSecondaryPaneSizeChange={onSecondaryPanelSizeChange}
-          percentage
-          primaryMinSize={20}
-          secondaryMinSize={35}
-          customClassName="game-splitter-container"
-        >
-          {/* Problem title/description panel */}
-          <OverflowPanel className="display-box-shadow">
-            <ProblemHeaderText>{problems[currentProblemIndex]?.name}</ProblemHeaderText>
-            {problems[currentProblemIndex] ? (
-              <DifficultyDisplayButton
-                difficulty={problems[currentProblemIndex].difficulty!}
-                enabled={false}
-                active
-              >
-                {displayNameFromDifficulty(problems[currentProblemIndex].difficulty!)}
-              </DifficultyDisplayButton>
-            ) : null}
-            <StyledMarkdownEditor
-              defaultValue={problems[0]?.description}
-              value={problems[currentProblemIndex]?.description}
-              onChange={() => ''}
-              readOnly
-            />
-            <BottomFooterText>
-              {'Notice an issue? Contact us at '}
-              <SmallInlineCopyText
-                onClick={() => {
-                  copy('support@codejoust.co');
-                  setCopiedEmail(true);
-                }}
-              >
-                support@codejoust.co
-                <SmallInlineCopyIcon>content_copy</SmallInlineCopyIcon>
-              </SmallInlineCopyText>
-            </BottomFooterText>
-          </OverflowPanel>
-
-          {/* Code editor and console panels */}
-          <SplitterLayout
-            vertical
-            percentage
-            primaryMinSize={20}
-            secondaryMinSize={0}
-          >
-            <NoPaddingPanel>
-              <Editor
-                onCodeChange={setOneCurrentCode}
-                onLanguageChange={setOneCurrentLanguage}
-                getCurrentLanguage={() => languageList[currentProblemIndex]}
-                defaultCodeMap={defaultCodeList}
-                currentProblem={currentProblemIndex}
-                defaultLanguage={Language.Java}
-                defaultCode={null}
-              />
-            </NoPaddingPanel>
-
-            <Panel>
-              <Console
-                testCases={problems[currentProblemIndex]?.testCases}
-                submission={currentSubmission}
-                onRun={runCode}
-                onSubmit={submitCode}
-              />
-            </Panel>
-          </SplitterLayout>
-        </SplitterLayout>
-      </SplitterContainer>
-
-      <SmallButton onClick={previousProblem}>Previous</SmallButton>
-      <SmallButton onClick={nextProblem}>Next</SmallButton>
-
-      <BottomCopyIndicatorContainer copied={copiedEmail}>
-        <CopyIndicator onClick={() => setCopiedEmail(false)}>
-          Email copied!&nbsp;&nbsp;✕
-        </CopyIndicator>
-      </BottomCopyIndicatorContainer>
+      { // todo: this entire block that was deleted, copy over
+        currentUser?.spectator ? (
+          <SpectatorGameView />
+        ) : (
+          <PlayerGameView
+            gameError={error}
+            spectateGame={null}
+            spectatorUnsubscribePlayer={null}
+          />
+        )
+      }
     </FlexContainer>
   );
 }

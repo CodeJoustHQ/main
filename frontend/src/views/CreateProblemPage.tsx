@@ -9,7 +9,7 @@ import {
 import { LargeText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
-import ProblemDisplay from '../components/problem/ProblemDisplay';
+import ProblemDisplay from '../components/problem/editor/ProblemDisplay';
 import { Difficulty } from '../api/Difficulty';
 import { useAppSelector } from '../util/Hook';
 
@@ -26,7 +26,7 @@ function CreateProblemPage() {
     name: '',
     owner: { uid: firebaseUser?.uid || 'n/a' },
     description: '',
-    approval: false,
+    verified: false,
     difficulty: Difficulty.Easy,
     testCases: [],
     problemInputs: [],
