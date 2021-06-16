@@ -15,6 +15,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.ManyToMany;
 
 import com.codejoust.main.model.Account;
+import com.codejoust.main.model.report.GameReport;
+
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -74,6 +76,11 @@ public class Problem {
     @JoinColumn(name = "problem_tag_id")
     @Fetch(value = FetchMode.SUBSELECT)
     private List<ProblemTag> problemTags = new ArrayList<>();
+
+    // This column holds the primary key of the game report
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "game_report_table_id")
+    private GameReport gameReport;
 
     @Enumerated(EnumType.STRING)
     private ProblemIOType outputType;

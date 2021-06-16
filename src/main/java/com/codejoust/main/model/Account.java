@@ -7,6 +7,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 import com.codejoust.main.dto.account.AccountRole;
@@ -48,20 +49,11 @@ public class Account {
     @Fetch(value = FetchMode.SUBSELECT)
     private List<ProblemTag> problemTags = new ArrayList<>();
 
-    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
-    @Setter(AccessLevel.PRIVATE)
-    @Fetch(value = FetchMode.SUBSELECT)
-    private List<GameReport> gameReports = new ArrayList<>();
+    // @ManyToMany(mappedBy = "owner", fetch = FetchType.EAGER)
+    // @Setter(AccessLevel.PRIVATE)
+    // @Fetch(value = FetchMode.SUBSELECT)
+    // private List<GameReport> gameReports = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private AccountRole role = AccountRole.TEACHER;
-
-    // Add the game reports with most-recent as first.
-    public void addGameReport(GameReport gameReport) {
-        gameReports.add(0, gameReport);
-    }
-
-    public boolean removeGameReport(GameReport gameReport) {
-        return gameReports.remove(gameReport);
-    }
 }

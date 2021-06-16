@@ -3,9 +3,12 @@ package com.codejoust.main.model.report;
 import java.time.Instant;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,4 +36,9 @@ public class SubmissionReport {
     private Integer numTestCases;
 
     private Double runtime;
+
+    // This column holds the primary key of the associated submission group
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "submission_group_table_id")
+    private SubmissionGroupReport submissionGroupReport;
 }

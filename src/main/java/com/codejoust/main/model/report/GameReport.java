@@ -14,6 +14,10 @@ import javax.persistence.OneToMany;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.Problem;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,10 +34,14 @@ public class GameReport {
 
     private String gameReportId;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "gameReport", fetch = FetchType.EAGER)
+    @Setter(AccessLevel.PRIVATE)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<Problem> problems = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "gameReport", fetch = FetchType.EAGER)
+    @Setter(AccessLevel.PRIVATE)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<User> users = new ArrayList<>();
 
     // The start time of the game
