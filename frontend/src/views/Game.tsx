@@ -17,9 +17,7 @@ import { Difficulty } from '../api/Difficulty';
 import { Game, manuallyEndGame } from '../api/Game';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
-import {
-  TextButton, DifficultyDisplayButton, SmallButton, DangerButton,
-} from '../components/core/Button';
+import { TextButton, DangerButton } from '../components/core/Button';
 import {
   connect, routes, subscribe,
 } from '../api/Socket';
@@ -45,10 +43,6 @@ function GamePage() {
   const history = useHistory();
   const location = useLocation<LocationState>();
 
-  // todo: possibly delete
-  const [copiedEmail, setCopiedEmail] = useState(false);
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
-
   const [roomId, setRoomId] = useState<string>('');
 
   const [fullPageLoading, setFullPageLoading] = useState<boolean>(true);
@@ -57,13 +51,6 @@ function GamePage() {
   const [host, setHost] = useState<User | null>(null);
   const [spectators, setSpectators] = useState<User[]>([]);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
-
-  // todo: move block to new file
-  const [problems, setProblems] = useState<Problem[]>([]);
-  const [languageList, setLanguageList] = useState<Language[]>([Language.Java]);
-  const [codeList, setCodeList] = useState<string[]>(['']);
-  const [currentSubmission, setCurrentSubmission] = useState<Submission | null>(null);
-  const [currentProblemIndex, setCurrentProblemIndex] = useState<number>(0);
 
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
@@ -93,109 +80,14 @@ function GamePage() {
     setSpectators(newGame.room.spectators);
   };
 
-  // todo: move
-  const createCodeLanguageArray = () => {
-    while (languageList.length < problems.length) {
-      languageList.push(Language.Java);
-    }
-
-    while (codeList.length < problems.length) {
-      codeList.push('');
-    }
-  };
-
   const dispatch = useAppDispatch();
   const { currentUser, game } = useAppSelector((state) => state);
-
-  // todo: move to useEffect
-  createCodeLanguageArray();
-
-  // todo: all of this and setDefaultCode, migrate to file
-  const setOneCurrentLanguage = (newLanguage: Language) => {
-    languageList[currentProblemIndex] = newLanguage;
-  };
-
-  const setOneCurrentCode = (newCode: string) => {
-    codeList[currentProblemIndex] = newCode;
-  };
-
-  // Returns the most recent submission made for problem of index curr.
-  const getSubmission = (curr: number, playerSubmissions: Submission[]) => {
-    for (let i = playerSubmissions.length - 1; i >= 0; i -= 1) {
-      if (playerSubmissions[i].problemIndex === curr) {
-        return playerSubmissions[i];
-      }
-    }
-
-    return null;
-  };
-
-  const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
-    playerSubmissions: Submission[]) => {
-    setSubmissions(playerSubmissions);
-    const promises: Promise<DefaultCodeType>[] = [];
-    problemsParam.forEach((problem) => {
-      if (problem && problem.problemId) {
-        promises.push(getDefaultCodeMap(problem.problemId));
-      }
-    });
-
-    // Get the result of promises and set the default code list.
-    Promise.all(promises).then((result) => {
-      const newCodeList = [];
-      const newLanguageList = [];
-      const codeMap = result;
-
-      for (let i = 0; i < result.length; i += 1) {
-        newCodeList.push(result[i][Language.Java]);
-        newLanguageList.push(Language.Java);
-      }
-
-      // If previous code and language specified, save those as defaults
-      for (let i = 0; i < result.length; i += 1) {
-        const temp = getSubmission(i, playerSubmissions);
-
-        if (temp != null) {
-          newCodeList[i] = temp.code;
-          codeMap[i][temp.language as Language] = temp.code;
-          newLanguageList[i] = temp.language as Language;
-          setCurrentProblemIndex(i);
-        }
-      }
-
-      // Set this user's current code
-      setCodeList(newCodeList);
-      setLanguageList(newLanguageList);
-      setDefaultCodeList(codeMap);
-    }).catch((err) => {
-      setError(err.message);
-    });
-  }, [setDefaultCodeList, setCodeList, setLanguageList]);
 
   // Map the game in Redux to the state variables used in this file
   useEffect(() => {
     if (game) {
       setFullPageLoading(false);
       setStateFromGame(game);
-
-      // todo: remaining part of block, migrate
-      // If default code list is empty and current user is loaded, fetch the code from the backend
-      if (!defaultCodeList.length && currentUser) {
-        let matchFound = false;
-
-        // If this user refreshed and has already submitted code, load and save their latest code
-        game.players.forEach((player) => {
-          if (player.user.userId === currentUser?.userId && player.submissions) {
-            setDefaultCodeFromProblems(game.problems, player.submissions);
-            matchFound = true;
-          }
-        });
-
-        // If no previous code, proceed as normal with the default Java language
-        if (!matchFound) {
-          setDefaultCodeFromProblems(game.problems, []);
-        }
-      }
     }
   }, [game, setFullPageLoading]);
 
@@ -265,25 +157,7 @@ function GamePage() {
         error: errorHandler('No valid room details were provided, so you could not view the game page.'),
       });
     }
-    // todo: the block that was here (now deleted), copy that over
   }, [game, currentUser, dispatch, location, history]);
-
-  // todo: copy over
-  const nextProblem = () => {
-    setCurrentProblemIndex((currentProblemIndex + 1) % problems?.length);
-    setCurrentSubmission(getSubmission((currentProblemIndex + 1) % problems?.length, submissions));
-  };
-
-  const previousProblem = () => {
-    let temp = currentProblemIndex - 1;
-
-    if (temp < 0) {
-      temp += problems?.length;
-    }
-
-    setCurrentProblemIndex(temp);
-    setCurrentSubmission(getSubmission(temp, submissions));
-  };
 
   const endGameAction = () => {
     // eslint-disable-next-line no-alert
@@ -294,17 +168,6 @@ function GamePage() {
     manuallyEndGame(roomId, { initiator: currentUser! })
       .catch((err) => setError(err.message));
   };
-
-  // todo: copy this method over
-  const displayPlayerLeaderboard = useCallback(() => players.map((player, index) => (
-    <LeaderboardCard
-      player={player}
-      isCurrentPlayer={player.user.userId === currentUser?.userId}
-      place={index + 1}
-      color={player.color}
-      numProblems={problems.length}
-    />
-  )), [players, currentUser, problems.length]);
 
   // Subscribe user to primary socket and to notifications.
   useEffect(() => {
@@ -349,7 +212,7 @@ function GamePage() {
           ) : null}
         </FlexRight>
       </FlexInfoBar>
-      { // todo: this entire block that was deleted, copy over
+      {
         currentUser?.spectator ? (
           <SpectatorGameView />
         ) : (

@@ -158,13 +158,19 @@ function PlayerGameView(props: PlayerGameViewProps) {
   const { currentUser, game } = useAppSelector((state) => state);
 
   const [copiedEmail, setCopiedEmail] = useState(false);
-  const [submission, setSubmission] = useState<Submission | null>(null);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+
+  const [problems, setProblems] = useState<Problem[]>([]); // todo: change to game.problems
+  const [languageList, setLanguageList] = useState<Language[]>([Language.Java]);
+  const [codeList, setCodeList] = useState<string[]>(['']);
+  const [currentSubmission, setCurrentSubmission] = useState<Submission | null>(null);
+  const [currentProblemIndex, setCurrentProblemIndex] = useState<number>(0);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>(gameError);
 
-  const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.Java);
-  const [currentCode, setCurrentCode] = useState('');
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.Java); // todo: replace with languagelist
+  const [currentCode, setCurrentCode] = useState(''); // todo: replace with codelist
   const [defaultCodeList, setDefaultCodeList] = useState<DefaultCodeType[]>([]);
 
   // Variable to hold whether the user is subscribed to their own player socket.
@@ -182,6 +188,39 @@ function PlayerGameView(props: PlayerGameViewProps) {
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
+  const createCodeLanguageArray = () => {
+    while (languageList.length < problems.length) {
+      languageList.push(Language.Java);
+    }
+
+    while (codeList.length < problems.length) {
+      codeList.push('');
+    }
+  };
+
+  // todo: move into useEffect
+  createCodeLanguageArray();
+
+  // todo: no directly modifying state
+  const setOneCurrentLanguage = (newLanguage: Language) => {
+    languageList[currentProblemIndex] = newLanguage;
+  };
+
+  const setOneCurrentCode = (newCode: string) => {
+    codeList[currentProblemIndex] = newCode;
+  };
+
+  // Returns the most recent submission made for problem of index curr.
+  const getSubmission = (curr: number, playerSubmissions: Submission[]) => {
+    for (let i = playerSubmissions.length - 1; i >= 0; i -= 1) {
+      if (playerSubmissions[i].problemIndex === curr) {
+        return playerSubmissions[i];
+      }
+    }
+
+    return null;
+  };
+
   // References necessary for the spectator subscription callback.
   const stateRef = useRef<StateRefType>();
   stateRef.current = {
@@ -192,7 +231,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
   };
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
-    code: string, language: Language) => {
+    playerSubmissions: Submission[]) => {
+    setSubmissions(playerSubmissions);
+
     const promises: Promise<DefaultCodeType>[] = [];
     problemsParam.forEach((problem) => {
       if (problem && problem.problemId) {
@@ -202,22 +243,36 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
     // Get the result of promises and set the default code list.
     Promise.all(promises).then((result) => {
-      const codeMap = result[0];
+      const newCodeList = [];
+      const newLanguageList = [];
+      const codeMap = result;
 
-      // If previous code and language specified, save those as defaults
-      if (code) {
-        codeMap[language] = code;
+      // Save the default code in these temporary lists
+      for (let i = 0; i < result.length; i += 1) {
+        newCodeList.push(result[i][Language.Java]);
+        newLanguageList.push(Language.Java);
       }
 
-      // Set this user's current code and language
-      setCurrentCode(codeMap[language]);
-      setCurrentLanguage(language);
+      // If previous code and language specified, override the defaults
+      for (let i = 0; i < result.length; i += 1) {
+        const temp = getSubmission(i, playerSubmissions);
 
-      setDefaultCodeList(result);
+        if (temp) {
+          newCodeList[i] = temp.code;
+          codeMap[i][temp.language as Language] = temp.code;
+          newLanguageList[i] = temp.language as Language;
+          setCurrentProblemIndex(i);
+        }
+      }
+
+      // Set this user's current code
+      setCodeList(newCodeList);
+      setLanguageList(newLanguageList);
+      setDefaultCodeList(codeMap);
     }).catch((err) => {
       setError(err.message);
     });
-  }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage]);
+  }, [setDefaultCodeList, setCodeList, setLanguageList]);
 
   const sendViewUpdate = useCallback((gameParam: Game | null | undefined,
     currentUserParam: User | null | undefined,
@@ -293,15 +348,15 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
         // If this user refreshed and has already submitted code, load and save their latest code
         game.players.forEach((player) => {
-          if (player.user.userId === currentUser?.userId && player.code) {
-            setDefaultCodeFromProblems(game.problems, player.code, player.language as Language);
+          if (player.user.userId === currentUser?.userId && player.submissions) {
+            setDefaultCodeFromProblems(game.problems, player.submissions);
             matchFound = true;
           }
         });
 
         // If no previous code, proceed as normal with the default Java language
         if (!matchFound) {
-          setDefaultCodeFromProblems(game.problems, '', Language.Java);
+          setDefaultCodeFromProblems(game.problems, []);
         }
       }
     }
@@ -321,8 +376,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
     const request = {
       initiator: currentUser!,
       input,
-      code: currentCode,
-      language: currentLanguage,
+      code: codeList[currentProblemIndex],
+      language: languageList[currentProblemIndex],
+      problemIndex: currentProblemIndex,
     };
 
     runSolution(game!.room.roomId, request)
@@ -332,7 +388,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
         // Set the 'test' submission type to correctly display result.
         // eslint-disable-next-line no-param-reassign
         res.submissionType = SubmissionType.Test;
-        setSubmission(res);
+        setCurrentSubmission(res);
       })
       .catch((err) => {
         setLoading(false);
@@ -346,8 +402,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
     setError('');
     const request = {
       initiator: currentUser!,
-      code: currentCode,
-      language: currentLanguage,
+      code: codeList[currentProblemIndex],
+      language: languageList[currentProblemIndex],
+      problemIndex: currentProblemIndex,
     };
 
     submitSolution(game!.room.roomId, request)
@@ -357,12 +414,30 @@ function PlayerGameView(props: PlayerGameViewProps) {
         // Set the 'submit' submission type to correctly display result.
         // eslint-disable-next-line no-param-reassign
         res.submissionType = SubmissionType.Submit;
-        setSubmission(res);
+        setSubmissions(submissions.concat([res]));
+        setCurrentSubmission(res);
       })
       .catch((err) => {
         setLoading(false);
         setError(err.message);
       });
+  };
+
+  // todo: no wrap
+  const nextProblem = () => {
+    setCurrentProblemIndex((currentProblemIndex + 1) % problems?.length);
+    setCurrentSubmission(getSubmission((currentProblemIndex + 1) % problems?.length, submissions));
+  };
+
+  const previousProblem = () => {
+    let temp = currentProblemIndex - 1;
+
+    if (temp < 0) {
+      temp += problems?.length;
+    }
+
+    setCurrentProblemIndex(temp);
+    setCurrentSubmission(getSubmission(temp, submissions));
   };
 
   const displayPlayerLeaderboard = useCallback(() => game?.players.map((player, index) => (
@@ -371,8 +446,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
       isCurrentPlayer={player.user.userId === currentUser?.userId}
       place={index + 1}
       color={player.color}
+      numProblems={problems.length}
     />
-  )), [game, currentUser]);
+  )), [game, currentUser, problems.length]);
 
   return (
     <>
@@ -433,14 +509,13 @@ function PlayerGameView(props: PlayerGameViewProps) {
           {/* Problem title/description panel */}
           <OverflowPanel className="display-box-shadow">
             <ProblemHeaderText>
-              {!spectateGame ? game?.problems[0]?.name : spectateGame?.problem.name}
+              {!spectateGame ? game?.problems[currentProblemIndex]?.name : spectateGame?.problem.name}
             </ProblemHeaderText>
-            {/* TODO: I don't know whether we have to verify that the problem exists. */}
             {
               !spectateGame ? (
-                getDifficultyDisplayButton(game?.problems[0].difficulty!)
+                getDifficultyDisplayButton(game?.problems[currentProblemIndex].difficulty!)
               ) : (
-                getDifficultyDisplayButton(spectateGame?.problem.difficulty!)
+                getDifficultyDisplayButton(spectateGame?.problem.difficulty!) // todo: change problems
               )
             }
             <StyledMarkdownEditor
@@ -449,7 +524,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
               ) : (
                 spectateGame?.problem.description
               )}
-              value={spectateGame ? spectateGame?.problem.description : undefined}
+              value={spectateGame ? spectateGame?.problem.description : problems[currentProblemIndex]?.description}
               onChange={() => ''}
               readOnly
             />
@@ -478,18 +553,20 @@ function PlayerGameView(props: PlayerGameViewProps) {
               >
                 <NoPaddingPanel>
                   <Editor
-                    onCodeChange={setCurrentCode}
-                    onLanguageChange={setCurrentLanguage}
-                    codeMap={defaultCodeList[0]}
-                    defaultLanguage={currentLanguage}
+                    onCodeChange={setOneCurrentCode}
+                    onLanguageChange={setOneCurrentLanguage}
+                    getCurrentLanguage={() => languageList[currentProblemIndex]}
+                    defaultCodeMap={defaultCodeList}
+                    currentProblem={currentProblemIndex}
+                    defaultLanguage={Language.Java}
                     defaultCode={null}
                     liveCode={null}
                   />
                 </NoPaddingPanel>
                 <Panel>
                   <Console
-                    testCases={game?.problems[0]?.testCases || []}
-                    submission={submission}
+                    testCases={problems[currentProblemIndex]?.testCases}
+                    submission={currentSubmission}
                     onRun={runCode}
                     onSubmit={submitCode}
                   />
@@ -500,8 +577,10 @@ function PlayerGameView(props: PlayerGameViewProps) {
                 <Editor
                   onLanguageChange={null}
                   onCodeChange={null}
-                  codeMap={null}
                   defaultLanguage={spectateGame?.language as Language}
+                  getCurrentLanguage={() => spectateGame?.language as Language} // todo modified: is this right?
+                  defaultCodeMap={null} // todo: verify this is right
+                  currentProblem={currentProblemIndex} // todo: needed
                   defaultCode={spectateGame?.code}
                   liveCode={spectateGame?.code}
                 />
