@@ -20,7 +20,6 @@ import com.codejoust.main.exception.TimerError;
 import com.codejoust.main.exception.UserError;
 import com.codejoust.main.exception.api.ApiException;
 import com.codejoust.main.game_object.Game;
-import com.codejoust.main.model.Account;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.Problem;
@@ -102,17 +101,8 @@ public class RoomService {
         if (token.length() == 0) {
             user.setAccount(null);
         } else {
-            // If account present, throw error; otherwise, join room.
-            // TODO: Potential error, two users same account, join at same time.
-            // TODO: This occurs with usernames as well - already exists.
             String uid = firebaseService.verifyToken(token);
-            Account account = accountRepository.findAccountByUid(uid);
-            for (User roomUser : room.getUsers()) {
-                if (roomUser.getAccount() != null && roomUser.getAccount().equals(account)) {
-                    throw new ApiException(RoomError.DUPLICATE_ACCOUNT);
-                }
-            }
-            user.setAccount(account);
+            user.setAccount(accountRepository.findAccountByUid(uid));
         }
 
         // Add the user to the room.
