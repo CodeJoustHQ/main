@@ -841,19 +841,7 @@ function LobbyPage() {
               {`${numProblems} problem${numProblems === 1 ? '' : 's'}`}
             </NoMarginSubtitleText>
             <HoverContainerSlider>
-              <HoverElementSlider
-                enabled={isHost(currentUser)}
-                onMouseEnter={() => {
-                  if (!isHost(currentUser)) {
-                    setHoverVisible(true);
-                  }
-                }}
-                onMouseLeave={() => {
-                  if (!isHost(currentUser)) {
-                    setHoverVisible(false);
-                  }
-                }}
-              />
+              <HoverElementSlider {...hoverProps} />
               <SliderContainer>
                 <Slider
                   min={1}

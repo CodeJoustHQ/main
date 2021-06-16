@@ -33,7 +33,7 @@ import {
   Player,
 } from '../../api/Game';
 import LeaderboardCard from '../card/LeaderboardCard';
-import { getDifficultyDisplayButton, InheritedTextButton } from '../core/Button';
+import { getDifficultyDisplayButton, InheritedTextButton, SmallButton } from '../core/Button';
 import { SpectatorBackIcon } from '../core/Icon';
 import Language from '../../api/Language';
 import { CopyIndicator, BottomCopyIndicatorContainer, InlineCopyIcon } from '../special/CopyIndicator';
@@ -160,7 +160,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
 
-  const [problems, setProblems] = useState<Problem[]>([]); // todo: change to game.problems
+  const [problems, setProblems] = useState<Problem[]>([]);
   const [languageList, setLanguageList] = useState<Language[]>([Language.Java]);
   const [codeList, setCodeList] = useState<string[]>(['']);
   const [currentSubmission, setCurrentSubmission] = useState<Submission | null>(null);
@@ -169,8 +169,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>(gameError);
 
-  const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.Java); // todo: replace with languagelist
-  const [currentCode, setCurrentCode] = useState(''); // todo: replace with codelist
   const [defaultCodeList, setDefaultCodeList] = useState<DefaultCodeType[]>([]);
 
   // Variable to hold whether the user is subscribed to their own player socket.
@@ -179,6 +177,10 @@ function PlayerGameView(props: PlayerGameViewProps) {
   // Variables to hold the player stats when spectating.
   const [spectatedPlayer, setSpectatedPlayer] = useState<Player | null>(null);
   const bestSubmission = useBestSubmission(spectatedPlayer);
+
+  useEffect(() => setProblems(game?.problems || []), [game]);
+  console.log(game);
+  console.log(problems);
 
   /**
    * Display beforeUnload message to inform the user that they may lose
@@ -226,8 +228,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
   stateRef.current = {
     game,
     currentUser,
-    currentCode,
-    currentLanguage,
+    currentCode: codeList[currentProblemIndex],
+    currentLanguage: languageList[currentProblemIndex],
   };
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
@@ -295,8 +297,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
   // Send updates via socket to any spectators.
   useEffect(() => {
-    sendViewUpdate(game, currentUser, currentCode, currentLanguage);
-  }, [game, currentUser, currentCode, currentLanguage, sendViewUpdate]);
+    sendViewUpdate(game, currentUser, codeList[currentProblemIndex], languageList[currentProblemIndex]);
+  }, [game, currentUser, codeList, languageList, currentProblemIndex, sendViewUpdate]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePlayer = useCallback((roomIdParam: string, userIdParam: string) => {
@@ -589,6 +591,10 @@ function PlayerGameView(props: PlayerGameViewProps) {
           }
         </SplitterLayout>
       </SplitterContainer>
+
+      <SmallButton onClick={previousProblem}>Previous</SmallButton>
+      <SmallButton onClick={nextProblem}>Next</SmallButton>
+
       <BottomCopyIndicatorContainer copied={copiedEmail}>
         <CopyIndicator onClick={() => setCopiedEmail(false)}>
           Email copied!&nbsp;&nbsp;✕
