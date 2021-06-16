@@ -1,5 +1,6 @@
 package com.codejoust.main.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -7,6 +8,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
@@ -49,10 +51,12 @@ public class Account {
     @Fetch(value = FetchMode.SUBSELECT)
     private List<ProblemTag> problemTags = new ArrayList<>();
 
-    // @ManyToMany(mappedBy = "owner", fetch = FetchType.EAGER)
-    // @Setter(AccessLevel.PRIVATE)
-    // @Fetch(value = FetchMode.SUBSELECT)
-    // private List<GameReport> gameReports = new ArrayList<>();
+    // List of tags associated with this problem
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH}, fetch = FetchType.EAGER)
+    @Setter(AccessLevel.PRIVATE)
+    @JoinColumn(name = "game_report_id")
+    @Fetch(value = FetchMode.SUBSELECT)
+    private List<GameReport> gameReports = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private AccountRole role = AccountRole.TEACHER;
