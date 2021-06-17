@@ -1,6 +1,7 @@
 package com.codejoust.main.util;
 
 import com.codejoust.main.dto.account.AccountRole;
+import com.codejoust.main.dto.account.AccountUidDto;
 import com.codejoust.main.dto.problem.CreateProblemRequest;
 import com.codejoust.main.dto.problem.ProblemInputDto;
 import com.codejoust.main.dto.user.UserDto;
@@ -177,6 +178,12 @@ public class TestFields {
         Account account = new Account();
         account.setUid(UID_2);
         account.setRole(AccountRole.TEACHER);
+        return account;
+    }
+
+    public static AccountUidDto accountUidDto1() {
+        AccountUidDto account = new AccountUidDto();
+        account.setUid(UID);
         return account;
     }
 }

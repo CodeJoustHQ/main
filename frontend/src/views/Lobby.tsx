@@ -210,7 +210,7 @@ function LobbyPage() {
   useEffect(() => {
     if (currentUser?.userId && Boolean(currentUser?.accountUid) !== Boolean(token)) {
       updateUserAccount(currentUser?.userId, token).then((user: User) => {
-        console.log(user);
+        dispatch(setCurrentUser(user));
       }).catch((err) => {
         setError(err.message);
       });
