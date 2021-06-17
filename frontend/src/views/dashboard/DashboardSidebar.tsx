@@ -95,7 +95,7 @@ function DashboardSidebar(props: DashboardSidebarProps) {
       </InnerContent>
 
       <BottomContent>
-        <NewGameLink to="/game/create">Start New Game</NewGameLink>
+        <NewGameLink to="/game/create">Create New Room</NewGameLink>
         <br />
         <TextLink to="/game/join">
           Or join a room &#8594;

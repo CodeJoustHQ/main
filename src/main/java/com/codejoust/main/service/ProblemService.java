@@ -27,6 +27,7 @@ import com.codejoust.main.service.generators.DefaultCodeGeneratorService;
 import com.codejoust.main.util.Utility;
 import com.google.gson.Gson;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Log4j2
 @Service
 public class ProblemService {
     
@@ -276,9 +278,12 @@ public class ProblemService {
         List<Problem> problems;
         if (difficulty == ProblemDifficulty.RANDOM) {
             problems = problemRepository.findAllByVerified(true);
+            log.info("Fetching random problems");
         } else {
             problems = problemRepository.findAllByDifficultyAndVerified(difficulty, true);
+            log.info("Fetching problems for difficulty {}", difficulty);
         }
+        log.info(problems);
 
         if (problems == null) {
             throw new ApiException(ProblemError.INTERNAL_ERROR);

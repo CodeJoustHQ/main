@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { getProblems, Problem } from '../api/Problem';
+import { getProblems } from '../api/Problem';
 import { LargeText } from '../components/core/Text';
 import ErrorMessage from '../components/core/Error';
 import Loading from '../components/core/Loading';
-import { useAppSelector } from '../util/Hook';
 import { TextLink } from '../components/core/Link';
 import FilteredProblemList from '../components/problem/FilteredProblemList';
+import { useAppDispatch, useAppSelector } from '../util/Hook';
+import { setVerifiedProblems } from '../redux/Problem';
 
 const Content = styled.div`
   padding: 0 20%;
 `;
 
-function AllProblemsPage() {
-  const [problems, setProblems] = useState<Problem[]>([]);
+function VerifiedProblemsPage() {
+  const dispatch = useAppDispatch();
+  const { verifiedProblems } = useAppSelector((state) => state.problem);
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -26,17 +29,17 @@ function AllProblemsPage() {
 
     setLoading(true);
     getProblems(token!, true)
-      .then((res) => setProblems(res))
+      .then((res) => dispatch(setVerifiedProblems(res)))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [token]);
+  }, [token, dispatch]);
 
   return (
     <Content>
-      <LargeText>View All Problems</LargeText>
-      <TextLink to="/problem/create">Create new problem</TextLink>
+      <LargeText>Verified Problems</LargeText>
+      <TextLink to="/game/create">Create new problem &#8594;</TextLink>
 
-      <FilteredProblemList problems={problems} />
+      <FilteredProblemList problems={verifiedProblems} />
 
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
@@ -44,4 +47,4 @@ function AllProblemsPage() {
   );
 }
 
-export default AllProblemsPage;
+export default VerifiedProblemsPage;

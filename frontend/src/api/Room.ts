@@ -2,7 +2,7 @@ import axios from 'axios';
 import { axiosErrorHandler } from './Error';
 import { User } from './User';
 import { Difficulty } from './Difficulty';
-import { SelectableProblem } from './Problem';
+import { ProblemIdParam, SelectableProblem } from './Problem';
 import { getAuthHttpHeader } from '../util/Utility';
 
 export type Room = {
@@ -32,7 +32,7 @@ export type UpdateSettingsParams = {
   initiator: User,
   difficulty?: Difficulty,
   duration?: number,
-  problems?: SelectableProblem[],
+  problems?: ProblemIdParam[],
   size?: number,
 };
 

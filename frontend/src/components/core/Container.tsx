@@ -190,3 +190,12 @@ export const SelectedItemContainer = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
   border-radius: 5px;
 `;
+
+export const SettingsContainer = styled.div`
+  text-align: left;
+  margin: 0.25rem 0 1rem 0;
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.12);
+  background: ${({ theme }) => theme.colors.white};
+`;
