@@ -135,6 +135,7 @@ type StateRefType = {
   currentUser: User | null,
   currentCode: string,
   currentLanguage: string,
+  currentIndex: number,
 }
 
 /**
@@ -179,8 +180,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
   const bestSubmission = useBestSubmission(spectatedPlayer);
 
   useEffect(() => setProblems(game?.problems || []), [game]);
-  console.log(game);
-  console.log(problems);
 
   /**
    * Display beforeUnload message to inform the user that they may lose
@@ -190,26 +189,37 @@ function PlayerGameView(props: PlayerGameViewProps) {
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
-  const createCodeLanguageArray = () => {
-    while (languageList.length < problems.length) {
-      languageList.push(Language.Java);
-    }
+  // const createCodeLanguageArray = () => {
+  //   while (languageList.length < problems.length) {
+  //     languageList.push(Language.Java);
+  //   }
+  //
+  //   while (codeList.length < problems.length) {
+  //     codeList.push('');
+  //   }
+  // };
 
-    while (codeList.length < problems.length) {
-      codeList.push('');
-    }
-  };
+  // useEffect(() => createCodeLanguageArray(), []);
 
-  // todo: move into useEffect
-  createCodeLanguageArray();
+  const getCurrentLanguage = useCallback(() => languageList[currentProblemIndex],
+    [languageList, currentProblemIndex]);
 
-  // todo: no directly modifying state
   const setOneCurrentLanguage = (newLanguage: Language) => {
-    languageList[currentProblemIndex] = newLanguage;
+    setLanguageList(languageList.map((current, index) => {
+      if (index === currentProblemIndex) {
+        return newLanguage;
+      }
+      return current;
+    }));
   };
 
   const setOneCurrentCode = (newCode: string) => {
-    codeList[currentProblemIndex] = newCode;
+    setCodeList(codeList.map((current, index) => {
+      if (index === currentProblemIndex) {
+        return newCode;
+      }
+      return current;
+    }));
   };
 
   // Returns the most recent submission made for problem of index curr.
@@ -230,6 +240,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
     currentUser,
     currentCode: codeList[currentProblemIndex],
     currentLanguage: languageList[currentProblemIndex],
+    currentIndex: currentProblemIndex,
   };
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
@@ -279,11 +290,12 @@ function PlayerGameView(props: PlayerGameViewProps) {
   const sendViewUpdate = useCallback((gameParam: Game | null | undefined,
     currentUserParam: User | null | undefined,
     currentCodeParam: string | undefined,
-    currentLanguageParam: string | undefined) => {
+    currentLanguageParam: string | undefined,
+    currentIndexParam: number | undefined) => {
     if (gameParam && currentUserParam) {
       const spectatorViewBody: string = JSON.stringify({
         user: currentUserParam,
-        problem: gameParam.problems[0],
+        problem: gameParam.problems[currentIndexParam || 0], // must satisfy problems.length > 0
         code: currentCodeParam,
         language: currentLanguageParam,
       });
@@ -297,7 +309,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
   // Send updates via socket to any spectators.
   useEffect(() => {
-    sendViewUpdate(game, currentUser, codeList[currentProblemIndex], languageList[currentProblemIndex]);
+    sendViewUpdate(game, currentUser, codeList[currentProblemIndex],
+      languageList[currentProblemIndex], currentProblemIndex);
   }, [game, currentUser, codeList, languageList, currentProblemIndex, sendViewUpdate]);
 
   // Re-subscribe in order to get the correct subscription callback.
@@ -306,7 +319,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
     const subscribePlayerCallback = (result: Message) => {
       if (JSON.parse(result.body).newSpectator) {
         sendViewUpdate(stateRef.current?.game, stateRef.current?.currentUser,
-          stateRef.current?.currentCode, stateRef.current?.currentLanguage);
+          stateRef.current?.currentCode, stateRef.current?.currentLanguage,
+          stateRef.current?.currentIndex);
       }
     };
 
@@ -557,7 +571,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
                   <Editor
                     onCodeChange={setOneCurrentCode}
                     onLanguageChange={setOneCurrentLanguage}
-                    getCurrentLanguage={() => languageList[currentProblemIndex]}
+                    getCurrentLanguage={getCurrentLanguage}
                     defaultCodeMap={defaultCodeList}
                     currentProblem={currentProblemIndex}
                     defaultLanguage={Language.Java}
