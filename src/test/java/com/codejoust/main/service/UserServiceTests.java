@@ -11,10 +11,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.codejoust.main.dao.AccountRepository;
 import com.codejoust.main.dao.UserRepository;
 import com.codejoust.main.dto.user.CreateUserRequest;
 import com.codejoust.main.dto.user.DeleteUserRequest;
@@ -34,6 +36,12 @@ public class UserServiceTests {
 
     @Mock
     private Utility utility;
+
+    @Mock
+    private FirebaseService firebaseService;
+
+    @Mock
+    private AccountRepository accountRepository;
 
     @Spy
     @InjectMocks
@@ -117,5 +125,32 @@ public class UserServiceTests {
         ApiException exception = assertThrows(ApiException.class, () -> service.deleteUser(request));
 
         assertEquals(UserError.IN_ROOM, exception.getError());
+    }
+
+    @Test
+    public void updateUserAccountNoneSuccess() {
+        User user = new User();
+        user.setUserId(TestFields.USER_ID);
+        when(repository.findUserByUserId(TestFields.USER_ID)).thenReturn(user);
+
+        UserDto response = service.updateUserAccount(user.getUserId(), "");
+        verify(repository).save(user);
+        assertEquals(TestFields.USER_ID, response.getUserId());
+        assertNull(response.getAccountUid());
+    }
+
+    @Test
+    public void updateUserAccountPresentSuccess() {
+        User user = new User();
+        user.setUserId(TestFields.USER_ID);
+        when(repository.findUserByUserId(TestFields.USER_ID)).thenReturn(user);
+        when(firebaseService.verifyToken(TestFields.TOKEN)).thenReturn(TestFields.UID);
+        when(accountRepository.findAccountByUid(TestFields.UID)).thenReturn(TestFields.account1());
+
+        UserDto response = service.updateUserAccount(user.getUserId(), TestFields.TOKEN);
+        user.setAccount(TestFields.account1());
+        verify(repository).save(user);
+        assertEquals(TestFields.USER_ID, response.getUserId());
+        assertEquals(TestFields.accountUidDto1(), response.getAccountUid());
     }
 }
