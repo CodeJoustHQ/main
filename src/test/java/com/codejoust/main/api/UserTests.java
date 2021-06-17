@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 @SpringBootTest(properties = "spring.datasource.type=com.zaxxer.hikari.HikariDataSource")
 @AutoConfigureMockMvc
@@ -105,5 +106,43 @@ public class UserTests {
 
         ApiErrorResponse actual = MockHelper.deleteRequest(this.mockMvc, TestUrls.user(), request, ApiErrorResponse.class, ERROR.getStatus());
         assertEquals(ERROR.getResponse(), actual);
+    }
+
+    @Test
+    public void updateUserAccountNone() throws Exception {
+        /**
+         * 1. Create a user through a POST request.
+         * 2. Create the PUT request with no token to update user account.
+         * 3. Verify that no account is attached to the user.
+         */
+
+        CreateUserRequest createUserRequest = new CreateUserRequest();
+        createUserRequest.setNickname(TestFields.NICKNAME);
+        createUserRequest.setUserId(TestFields.USER_ID);
+
+        UserDto expected = MockHelper.postRequest(this.mockMvc, TestUrls.user(), createUserRequest, UserDto.class, HttpStatus.CREATED);
+
+        UserDto actual = MockHelper.putRequestNoToken(this.mockMvc, TestUrls.updateUserAccount(expected.getUserId()), new Object(), UserDto.class, HttpStatus.OK);
+        assertEquals(expected.getUserId(), actual.getUserId());
+        assertNull(actual.getAccountUid());
+    }
+
+    @Test
+    public void updateUserAccountPresent() throws Exception {
+        /**
+         * 1. Create a user through a POST request.
+         * 2. Create the PUT request with an token to update user account.
+         * 3. Verify that the account is attached to the user.
+         */
+
+        CreateUserRequest createUserRequest = new CreateUserRequest();
+        createUserRequest.setNickname(TestFields.NICKNAME);
+        createUserRequest.setUserId(TestFields.USER_ID);
+
+        UserDto expected = MockHelper.postRequest(this.mockMvc, TestUrls.user(), createUserRequest, UserDto.class, HttpStatus.CREATED);
+
+        UserDto actual = MockHelper.putRequest(this.mockMvc, TestUrls.updateUserAccount(expected.getUserId()), new Object(), UserDto.class, HttpStatus.OK);
+        assertEquals(expected.getUserId(), actual.getUserId());
+        assertEquals(TestFields.accountUidDto1(), actual.getAccountUid());
     }
 }

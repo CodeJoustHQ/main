@@ -129,6 +129,12 @@ public class UserServiceTests {
 
     @Test
     public void updateUserAccountNoneSuccess() {
+        /**
+         * 1. Create a user and mock the find user repository call.
+         * 2. Call update user account with no account token.
+         * 3. Verify that the user saved, and user response, has no account.
+         */
+
         User user = new User();
         user.setUserId(TestFields.USER_ID);
         when(repository.findUserByUserId(TestFields.USER_ID)).thenReturn(user);
@@ -141,6 +147,13 @@ public class UserServiceTests {
 
     @Test
     public void updateUserAccountPresentSuccess() {
+        /**
+         * 1. Create a user and mock the find user repository call.
+         * 2. Mock the firebase service and account repository calls.
+         * 3. Call update user account with an account token.
+         * 4. Verify that the user saved, and user response, has the account.
+         */
+
         User user = new User();
         user.setUserId(TestFields.USER_ID);
         when(repository.findUserByUserId(TestFields.USER_ID)).thenReturn(user);
