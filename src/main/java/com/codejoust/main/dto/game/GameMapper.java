@@ -106,34 +106,29 @@ public class GameMapper {
                 return -1;
             }
 
-            SubmissionDto bestSub1 = submissions1.get(0);
-            SubmissionDto bestSub2 = submissions2.get(0);
-
-            // Get the best solution by each player (highest score, then earliest submission)
-            for (SubmissionDto sub : submissions1) {
-                if (sub.getNumCorrect() > bestSub1.getNumCorrect()) {
-                    bestSub1 = sub;
-                }
-            }
-
-            for (SubmissionDto sub : submissions2) {
-                if (sub.getNumCorrect() > bestSub2.getNumCorrect()) {
-                    bestSub2 = sub;
-                }
-            }
+            int score1 = getScore(submissions1);
+            int score2 = getScore(submissions2);
 
             // If both have the same numCorrect, whoever submits earlier is first
-            if (bestSub1.getNumCorrect().equals(bestSub2.getNumCorrect())) {
-                return bestSub1.getStartTime().compareTo(bestSub2.getStartTime());
+            if (score1 == score2) {
+                Instant time1 = getTime(submissions1);
+                Instant time2 = getTime(submissions2);
+
+                // If neither has submitted correctly, oh well (if one is null, the other must be as well)
+                if (time1 == null || time2 == null) {
+                    return 0;
+                }
+
+                return time1.compareTo(time2);
             }
 
             // Whoever has higher numCorrect is first
-            return bestSub2.getNumCorrect() - bestSub1.getNumCorrect();
+            return score2 - score1;
         });
     }
 
     // Get total number of problems solved
-    private int getScore(List<SubmissionDto> submissions) {
+    private static int getScore(List<SubmissionDto> submissions) {
         Set<Integer> set = new HashSet<>();
         for (SubmissionDto submission : submissions) {
             if (submission.getNumCorrect().equals(submission.getNumTestCases())) {
@@ -145,7 +140,7 @@ public class GameMapper {
     }
 
     // Get time of latest correct solution, or null if none exists
-    private Instant getTime(List<SubmissionDto> submissions) {
+    private static Instant getTime(List<SubmissionDto> submissions) {
         Set<Integer> set = new HashSet<>();
         Instant instant = null;
 
