@@ -87,9 +87,11 @@ public class GameMapper {
 
         List<SubmissionResultDto> notHidden = new LinkedList<>();
 
-        for (int i = submission.getResults().size() - 1; i >= 0; i--) {
-            if (!submission.getResults().get(i).isHidden()) {
-                notHidden.add(mapper.map(submission.getResults().get(i), SubmissionResultDto.class));
+        if (submission.getResults() != null) {
+            for (int i = submission.getResults().size() - 1; i >= 0; i--) {
+                if (!submission.getResults().get(i).isHidden()) {
+                    notHidden.add(mapper.map(submission.getResults().get(i), SubmissionResultDto.class));
+                }
             }
         }
 
