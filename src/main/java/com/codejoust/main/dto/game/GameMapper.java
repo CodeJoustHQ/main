@@ -5,6 +5,7 @@ import org.modelmapper.convention.MatchingStrategies;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -84,9 +85,20 @@ public class GameMapper {
             return null;
         }
 
-        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
+        List<SubmissionResultDto> notHidden = new LinkedList<>();
 
-        return mapper.map(submission, SubmissionDto.class);
+        for (int i = submission.getResults().size() - 1; i >= 0; i--) {
+            if (!submission.getResults().get(i).isHidden()) {
+                notHidden.add(mapper.map(submission.getResults().get(i), SubmissionResultDto.class));
+            }
+        }
+
+
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
+        SubmissionDto returned = mapper.map(submission, SubmissionDto.class);
+        returned.setResults(notHidden);
+
+        return returned;
     }
 
     // Sort by numCorrect followed by startTime

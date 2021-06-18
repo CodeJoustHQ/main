@@ -93,28 +93,30 @@ function Console(props: ConsoleProps) {
         setOutput('');
         setConsoleOutput('');
       } else {
-        let firstFailure: SubmissionResult | undefined;
         let firstNonHiddenFailure: SubmissionResult | undefined;
 
-        // Find the first incorrect and non-hidden incorrect results
+        // Find the first non-hidden incorrect results
         newSubmission.results.forEach((result) => {
-          if (!firstFailure && !result.correct) {
-            firstFailure = result;
-          }
           if (!firstNonHiddenFailure && !result.correct && !result.hidden) {
             firstNonHiddenFailure = result;
           }
         });
 
-        // Ideally display non-hidden failure but otherwise just any failure
-        const res: SubmissionResult = (firstNonHiddenFailure || firstFailure)!;
-
-        // Set state to the latest results
-        setTitle(res.error ? 'Runtime Error' : 'Wrong Answer');
-        setSubtitle(`${newSubmission.numCorrect} / ${newSubmission.numTestCases} passed`);
-        setInput(res.hidden ? 'hidden' : res.input);
-        setOutput(res.hidden ? 'hidden' : res.error || res.userOutput.trim());
-        setConsoleOutput(res.hidden ? 'hidden' : res.console);
+        if (firstNonHiddenFailure) {
+          // Set state to the first non-hidden results if it exists
+          setTitle(firstNonHiddenFailure.error ? 'Runtime Error' : 'Wrong Answer');
+          setSubtitle(`${newSubmission.numCorrect} / ${newSubmission.numTestCases} passed`);
+          setInput(firstNonHiddenFailure.input);
+          setOutput(firstNonHiddenFailure.error || firstNonHiddenFailure.userOutput.trim());
+          setConsoleOutput(firstNonHiddenFailure.console);
+        } else {
+          // Set state to default hidden failure message if no non-hidden results are found
+          setTitle('Runtime Error or Wrong Answer');
+          setSubtitle(`${newSubmission.numCorrect} / ${newSubmission.numTestCases} passed`);
+          setInput('hidden');
+          setOutput('hidden');
+          setConsoleOutput('hidden');
+        }
       }
     };
 
