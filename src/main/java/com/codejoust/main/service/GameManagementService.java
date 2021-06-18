@@ -174,7 +174,7 @@ public class GameManagementService {
         game.setGameTimer(gameTimer);
 
         // Schedule the game to end after <duration> seconds.
-        EndGameTimerTask endGameTimerTask = new EndGameTimerTask(socketService, game);
+        EndGameTimerTask endGameTimerTask = new EndGameTimerTask(this, socketService, game);
         gameTimer.getTimer().schedule(endGameTimerTask, duration * 1000);
     }
 
@@ -283,7 +283,7 @@ public class GameManagementService {
         return gameDto;
     }
 
-    protected void handleEndGame(Game game) {
+    public void handleEndGame(Game game) {
         // Cancel all previously scheduled timers
         GameTimer gameTimer = game.getGameTimer();
         gameTimer.getTimer().cancel();
@@ -291,6 +291,14 @@ public class GameManagementService {
         for (Timer timer : gameTimer.getNotificationTimers()) {
             timer.cancel();
         }
+
+        // Create new game report based on all information
+        // TODO: Wait for existing submission calls to complete...?
+        createGameReport();
+    }
+
+    protected void createGameReport() {
+
     }
 
     protected boolean isGameOver(Game game) {

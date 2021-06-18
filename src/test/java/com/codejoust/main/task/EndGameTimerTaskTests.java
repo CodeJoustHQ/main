@@ -14,6 +14,7 @@ import com.codejoust.main.game_object.GameTimer;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.ProblemDifficulty;
+import com.codejoust.main.service.GameManagementService;
 import com.codejoust.main.service.SocketService;
 
 import com.codejoust.main.util.EndGameTimerTask;
@@ -29,6 +30,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class EndGameTimerTaskTests {
 
     @Mock
+    private GameManagementService gameManagementService;
+    
+    @Mock
     private SocketService socketService;
 
     @BeforeEach
@@ -38,7 +42,7 @@ public class EndGameTimerTaskTests {
 
     @Test
     public void endGameTimerTaskSocketMessageNullGame() {
-        assertThrows(ApiException.class, () -> new EndGameTimerTask(socketService, null));
+        assertThrows(ApiException.class, () -> new EndGameTimerTask(gameManagementService, socketService, null));
     }
 
     @Test
@@ -58,7 +62,7 @@ public class EndGameTimerTaskTests {
         GameTimer gameTimer = new GameTimer(10L);
         game.setGameTimer(gameTimer);
 
-        assertThrows(ApiException.class, () -> new EndGameTimerTask(null, game));
+        assertThrows(ApiException.class, () -> new EndGameTimerTask(gameManagementService, null, game));
     }
 
     @Test
@@ -76,7 +80,7 @@ public class EndGameTimerTaskTests {
 
         Game game = GameMapper.fromRoom(room);
 
-        assertThrows(ApiException.class, () -> new EndGameTimerTask(socketService, game));
+        assertThrows(ApiException.class, () -> new EndGameTimerTask(gameManagementService, socketService, game));
     }
 
     @Test
@@ -85,7 +89,7 @@ public class EndGameTimerTaskTests {
         GameTimer gameTimer = new GameTimer(10L);
         game.setGameTimer(gameTimer);
 
-        assertThrows(ApiException.class, () -> new EndGameTimerTask(socketService, game));
+        assertThrows(ApiException.class, () -> new EndGameTimerTask(gameManagementService, socketService, game));
     }
 
     @Test
@@ -104,7 +108,7 @@ public class EndGameTimerTaskTests {
         GameTimer gameTimer = new GameTimer(10L);
         game.setGameTimer(gameTimer);
 
-        assertThrows(ApiException.class, () -> new EndGameTimerTask(socketService, game));
+        assertThrows(ApiException.class, () -> new EndGameTimerTask(gameManagementService, socketService, game));
     }
 
     @Test
@@ -130,7 +134,7 @@ public class EndGameTimerTaskTests {
 
         MockitoAnnotations.initMocks(this);
 
-        EndGameTimerTask endGameTimerTask = new EndGameTimerTask(socketService, game);
+        EndGameTimerTask endGameTimerTask = new EndGameTimerTask(gameManagementService, socketService, game);
         gameTimer.getTimer().schedule(endGameTimerTask,  1000L);
 
         /**
