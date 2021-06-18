@@ -3,10 +3,13 @@ package com.codejoust.main.dto.game;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.codejoust.main.dto.problem.ProblemDto;
 import com.codejoust.main.dto.problem.ProblemMapper;
@@ -127,5 +130,33 @@ public class GameMapper {
             // Whoever has higher numCorrect is first
             return bestSub2.getNumCorrect() - bestSub1.getNumCorrect();
         });
+    }
+
+    // Get total number of problems solved
+    private int getScore(List<SubmissionDto> submissions) {
+        Set<Integer> set = new HashSet<>();
+        for (SubmissionDto submission : submissions) {
+            if (submission.getNumCorrect().equals(submission.getNumTestCases())) {
+                set.add(submission.getProblemIndex());
+            }
+        }
+
+        return set.size();
+    }
+
+    // Get time of latest correct solution, or null if none exists
+    private Instant getTime(List<SubmissionDto> submissions) {
+        Set<Integer> set = new HashSet<>();
+        Instant instant = null;
+
+        for (SubmissionDto submission : submissions) {
+            if (submission.getNumCorrect().equals(submission.getNumTestCases())
+                    && !set.contains(submission.getProblemIndex())) {
+                set.add(submission.getProblemIndex());
+                instant = submission.getStartTime();
+            }
+        }
+
+        return instant;
     }
 }
