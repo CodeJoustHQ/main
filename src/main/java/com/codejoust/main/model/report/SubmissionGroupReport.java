@@ -31,6 +31,14 @@ public class SubmissionGroupReport {
 
     private String gameReportId;
 
+    private Integer numProblems;
+
+    private Integer numTestCases;
+
+    private Integer numProblemsSolved;
+    
+    private Integer numTestCasesPassed;
+
     @OneToMany(mappedBy = "submissionGroupReport", fetch = FetchType.EAGER)
     @Setter(AccessLevel.PRIVATE)
     private List<SubmissionReport> submissionReports = new ArrayList<>();
@@ -39,4 +47,8 @@ public class SubmissionGroupReport {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_table_id")
     private User user;
+
+    public void addSubmissionReport(SubmissionReport submissionReport) {
+        submissionReports.add(submissionReport);
+    }
 }

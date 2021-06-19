@@ -64,4 +64,8 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     @Setter(AccessLevel.PRIVATE)
     private List<SubmissionGroupReport> submissionGroupReports = new ArrayList<>();
+
+    public void addSubmissionGroupReport(SubmissionGroupReport submissionGroupReport) {
+        submissionGroupReports.add(submissionGroupReport);
+    }
 }

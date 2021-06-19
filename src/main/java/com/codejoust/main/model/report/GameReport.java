@@ -3,6 +3,7 @@ package com.codejoust.main.model.report;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -32,12 +33,17 @@ public class GameReport {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    private String gameReportId;
+    @EqualsAndHashCode.Include
+    private String gameReportId = UUID.randomUUID().toString();
 
+    // TODO: What if a problem is deleted? What if that happens during a game?
     @OneToMany(mappedBy = "gameReport", fetch = FetchType.EAGER)
-    @Setter(AccessLevel.PRIVATE)
     @Fetch(value = FetchMode.SUBSELECT)
     private List<Problem> problems = new ArrayList<>();
+
+    private Integer numProblems;
+    
+    private Integer numProblemTestCases;
 
     @OneToMany(mappedBy = "gameReport", fetch = FetchType.EAGER)
     @Setter(AccessLevel.PRIVATE)
@@ -52,4 +58,8 @@ public class GameReport {
 
     // How the game ended.
     private GameEndType gameEndType;
+
+    public void addUser(User user) {
+        users.add(user);
+    }
 }

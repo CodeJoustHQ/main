@@ -13,6 +13,7 @@ import com.codejoust.main.dto.game.GameNotificationDto;
 import com.codejoust.main.dto.game.PlayAgainRequest;
 import com.codejoust.main.dto.game.StartGameRequest;
 import com.codejoust.main.dto.game.SubmissionDto;
+import com.codejoust.main.dto.game.SubmissionMapper;
 import com.codejoust.main.dto.game.SubmissionRequest;
 import com.codejoust.main.dto.room.RoomDto;
 import com.codejoust.main.dto.room.RoomMapper;
@@ -25,9 +26,13 @@ import com.codejoust.main.game_object.Game;
 import com.codejoust.main.game_object.GameTimer;
 import com.codejoust.main.game_object.Player;
 import com.codejoust.main.game_object.PlayerCode;
+import com.codejoust.main.game_object.Submission;
+import com.codejoust.main.model.Account;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.Problem;
+import com.codejoust.main.model.report.GameReport;
+import com.codejoust.main.model.report.SubmissionGroupReport;
 import com.codejoust.main.util.EndGameTimerTask;
 import com.codejoust.main.util.Utility;
 
@@ -294,11 +299,54 @@ public class GameManagementService {
 
         // Create new game report based on all information
         // TODO: Wait for existing submission calls to complete...?
-        createGameReport();
+        createGameReport(game);
     }
 
-    protected void createGameReport() {
+    protected void createGameReport(Game game) {
+        GameReport gameReport = new GameReport();
+        gameReport.setProblems(game.getProblems());
+        gameReport.setNumProblems(game.getProblems().size());
 
+        // TODO: Confirm that all the user information, particularly accounts, will always be up-to-date.
+        for (Player player : game.getPlayers().values()) {
+            // For each user, add the relevant submission info.
+            User user = player.getUser();
+
+            // Construct the new submission group report for each user.
+            SubmissionGroupReport submissionGroupReport = new SubmissionGroupReport();
+            submissionGroupReport.setGameReportId(gameReport.getGameReportId());
+
+            // TODO: How should I indicate the top submissions / whether a problem was solved for each problem?
+            Integer numTestCases = 0;
+            Integer numTestCasesPassed = 0;
+            Integer numProblemsSolved = 0;
+            for (Submission submission : player.getSubmissions()) {
+                numTestCases += submission.getNumTestCases();
+                numTestCasesPassed += submission.getNumCorrect();
+
+                // If the problem was solved, increment numProblemsSolved.
+                if (submission.getNumTestCases() == submission.getNumCorrect()) {
+                    numProblemsSolved++;
+                }
+
+                submissionGroupReport.addSubmissionReport(SubmissionMapper.toSubmissionReport(submission));
+            }
+            
+            // Set the problems and test cases statistics.
+            submissionGroupReport.setNumProblemsSolved(numProblemsSolved);
+            submissionGroupReport.setNumTestCases(numTestCases);
+            submissionGroupReport.setNumTestCasesPassed(numTestCasesPassed);
+            
+            // Add the submission group report and the user.
+            user.addSubmissionGroupReport(submissionGroupReport);
+            gameReport.addUser(user);
+
+            // If account exists and game report is not added, add game report.
+            Account account = user.getAccount();
+            if (account != null && !account.getGameReports().contains(gameReport)) {
+                account.addGameReport(gameReport);
+            }
+        }
     }
 
     protected boolean isGameOver(Game game) {

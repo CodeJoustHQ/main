@@ -60,4 +60,8 @@ public class Account {
 
     @Enumerated(EnumType.STRING)
     private AccountRole role = AccountRole.TEACHER;
+
+    public void addGameReport(GameReport gameReport) {
+        gameReports.add(0, gameReport);
+    }
 }
