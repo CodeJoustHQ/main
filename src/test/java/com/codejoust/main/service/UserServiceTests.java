@@ -139,7 +139,7 @@ public class UserServiceTests {
         user.setUserId(TestFields.USER_ID);
         when(repository.findUserByUserId(TestFields.USER_ID)).thenReturn(user);
 
-        UserDto response = service.updateUserAccount(user.getUserId(), "");
+        UserDto response = service.updateUserAccount(user.getUserId(), null);
         verify(repository).save(user);
         assertEquals(TestFields.USER_ID, response.getUserId());
         assertNull(response.getAccountUid());
