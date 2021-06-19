@@ -43,7 +43,7 @@ public class RoomController extends BaseRestController {
     }
 
     @PostMapping("/rooms")
-    public ResponseEntity<RoomDto> createRoom(@RequestBody CreateRoomRequest request, @RequestHeader(name="Authorization") String token) {
+    public ResponseEntity<RoomDto> createRoom(@RequestBody CreateRoomRequest request, @RequestHeader(name="Authorization", required = false) String token) {
         return new ResponseEntity<>(service.createRoom(request, token), HttpStatus.CREATED);
     }
 

@@ -22,7 +22,7 @@ import com.codejoust.main.dto.problem.CreateTestCaseRequest;
 import com.codejoust.main.dto.problem.ProblemDto;
 import com.codejoust.main.dto.problem.ProblemTagDto;
 import com.codejoust.main.dto.problem.ProblemTestCaseDto;
-import com.codejoust.main.game_object.CodeLanguage;
+import com.codejoust.main.model.report.CodeLanguage;
 import com.codejoust.main.service.ProblemService;
 
 @RestController
