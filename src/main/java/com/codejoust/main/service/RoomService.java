@@ -98,7 +98,7 @@ public class RoomService {
         }
 
         // Set the account associated with the host, if any.
-        if (token.length() == 0) {
+        if (token == null) {
             user.setAccount(null);
         } else {
             String uid = firebaseService.verifyToken(token);
@@ -139,7 +139,7 @@ public class RoomService {
         }
 
         // Set the account associated with the host, if any.
-        if (token.length() == 0) {
+        if (token == null) {
             host.setAccount(null);
         } else {
             String uid = firebaseService.verifyToken(token);

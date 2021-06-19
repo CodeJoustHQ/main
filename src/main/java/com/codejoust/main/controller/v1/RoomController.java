@@ -38,7 +38,7 @@ public class RoomController extends BaseRestController {
     }
 
     @PutMapping("/rooms/{roomId}/users")
-    public ResponseEntity<RoomDto> joinRoom(@PathVariable String roomId,@RequestBody JoinRoomRequest request, @RequestHeader(name="Authorization") String token) {
+    public ResponseEntity<RoomDto> joinRoom(@PathVariable String roomId,@RequestBody JoinRoomRequest request, @RequestHeader(name="Authorization", required = false) String token) {
         return new ResponseEntity<>(service.joinRoom(roomId, request, token), HttpStatus.OK);
     }
 

@@ -32,7 +32,7 @@ public class UserController extends BaseRestController {
     }
 
     @PutMapping("/user/{userId}/account")
-    public ResponseEntity<UserDto> updateUserAccount(@PathVariable String userId, @RequestHeader(name="Authorization") String token) {
+    public ResponseEntity<UserDto> updateUserAccount(@PathVariable String userId, @RequestHeader(name="Authorization", required = false) String token) {
         return new ResponseEntity<>(service.updateUserAccount(userId, token), HttpStatus.OK);
     }
 

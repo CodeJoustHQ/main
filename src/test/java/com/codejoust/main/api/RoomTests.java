@@ -123,7 +123,7 @@ public class RoomTests {
         users.add(host);
         expected.setUsers(users);
 
-        RoomDto actual = MockHelper.postRequestNoToken(this.mockMvc, TestUrls.createRoom(), createRequest, RoomDto.class, HttpStatus.CREATED);
+        RoomDto actual = MockHelper.postRequestNoHeaders(this.mockMvc, TestUrls.createRoom(), createRequest, RoomDto.class, HttpStatus.CREATED);
 
         assertEquals(expected.getHost(), actual.getHost());
         assertEquals(expected.getUsers(), actual.getUsers());
@@ -214,7 +214,7 @@ public class RoomTests {
         users.add(host);
         createExpected.setUsers(users);
 
-        RoomDto createActual = MockHelper.postRequestNoToken(this.mockMvc, TestUrls.createRoom(), createRequest, RoomDto.class, HttpStatus.CREATED);
+        RoomDto createActual = MockHelper.postRequestNoHeaders(this.mockMvc, TestUrls.createRoom(), createRequest, RoomDto.class, HttpStatus.CREATED);
 
         assertEquals(createExpected.getHost(), createActual.getHost());
         assertEquals(createExpected.getUsers(), createActual.getUsers());
@@ -238,7 +238,7 @@ public class RoomTests {
         expected.setUsers(users);
         expected.setRoomId(roomId);
 
-        RoomDto actual = MockHelper.putRequestNoToken(this.mockMvc, TestUrls.joinRoom(createActual.getRoomId()), joinRequest, RoomDto.class, HttpStatus.OK);
+        RoomDto actual = MockHelper.putRequestNoHeaders(this.mockMvc, TestUrls.joinRoom(createActual.getRoomId()), joinRequest, RoomDto.class, HttpStatus.OK);
 
         assertEquals(expected.getRoomId(), actual.getRoomId());
         assertEquals(expected.getHost(), actual.getHost());

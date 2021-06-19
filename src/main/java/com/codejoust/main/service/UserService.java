@@ -63,7 +63,7 @@ public class UserService {
     public UserDto updateUserAccount(String userId, String token) {
         User user = repository.findUserByUserId(userId);
 
-        if (token.length() == 0) {
+        if (token == null) {
             user.setAccount(null);
         } else {
             String uid = firebaseService.verifyToken(token);
