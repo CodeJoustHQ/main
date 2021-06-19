@@ -9,6 +9,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
 import com.codejoust.main.model.User;
@@ -39,9 +40,10 @@ public class GameReport {
     @Fetch(value = FetchMode.SUBSELECT)
     private List<Problem> problems = new ArrayList<>();
 
-    @OneToMany(mappedBy = "gameReport", fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER)
     @Setter(AccessLevel.PRIVATE)
     @Fetch(value = FetchMode.SUBSELECT)
+    @JoinColumn(name = "users_table_id")
     private List<User> users = new ArrayList<>();
 
     // The start time of the game

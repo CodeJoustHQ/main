@@ -12,7 +12,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import com.codejoust.main.model.report.GameReport;
 import com.codejoust.main.model.report.SubmissionGroupReport;
 
 import lombok.AccessLevel;
@@ -54,11 +53,6 @@ public class User {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "room_table_id")
     private Room room;
-
-    // This column holds the primary key of the game report
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "game_report_table_id")
-    private GameReport gameReport;
 
     // Thie list holds the submission group associated with the current room
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
