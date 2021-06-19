@@ -35,9 +35,10 @@ public class GameReport {
 
     private String gameReportId;
 
-    @OneToMany(mappedBy = "gameReport", fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER)
     @Setter(AccessLevel.PRIVATE)
     @Fetch(value = FetchMode.SUBSELECT)
+    @JoinColumn(name = "problems_table_id")
     private List<Problem> problems = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.EAGER)

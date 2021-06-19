@@ -14,6 +14,9 @@ import javax.persistence.OneToMany;
 
 import com.codejoust.main.model.report.SubmissionGroupReport;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -55,7 +58,9 @@ public class User {
     private Room room;
 
     // Thie list holds the submission group associated with the current room
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER)
     @Setter(AccessLevel.PRIVATE)
+    @Fetch(value = FetchMode.SUBSELECT)
+    @JoinColumn(name = "submission_group_reports_table_id")
     private List<SubmissionGroupReport> submissionGroupReports = new ArrayList<>();
 }
