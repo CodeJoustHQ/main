@@ -3,6 +3,7 @@ package com.codejoust.main.model.report;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -15,7 +16,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 import com.codejoust.main.model.User;
-import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.model.problem.ProblemContainer;
 
 import org.hibernate.annotations.Fetch;
@@ -36,7 +36,8 @@ public class GameReport {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    private String gameReportId;
+    @EqualsAndHashCode.Include
+    private String gameReportId = UUID.randomUUID().toString();
 
     @OneToMany(fetch = FetchType.EAGER)
     @Setter(AccessLevel.PRIVATE)
