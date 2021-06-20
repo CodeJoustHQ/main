@@ -6,9 +6,7 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 import SplitterLayout from 'react-splitter-layout';
-import MarkdownEditor from 'rich-markdown-editor';
 import { useBeforeunload } from 'react-beforeunload';
-import copy from 'copy-to-clipboard';
 import { Message, Subscription } from 'stompjs';
 import Editor from './Editor';
 import { DefaultCodeType, getDefaultCodeMap, Problem } from '../../api/Problem';
@@ -20,7 +18,7 @@ import {
 } from '../core/Container';
 import ErrorMessage from '../core/Error';
 import 'react-splitter-layout/lib/index.css';
-import { ProblemHeaderText, BottomFooterText, NoMarginDefaultText } from '../core/Text';
+import { NoMarginDefaultText } from '../core/Text';
 import Console from './Console';
 import Loading from '../core/Loading';
 import {
@@ -33,34 +31,14 @@ import {
   Player,
 } from '../../api/Game';
 import LeaderboardCard from '../card/LeaderboardCard';
-import { getDifficultyDisplayButton, InheritedTextButton, SmallButton } from '../core/Button';
+import { SmallButton } from '../core/Button';
 import { SpectatorBackIcon } from '../core/Icon';
 import Language from '../../api/Language';
-import { CopyIndicator, BottomCopyIndicatorContainer, InlineCopyIcon } from '../special/CopyIndicator';
 import { useAppSelector, useBestSubmission } from '../../util/Hook';
 import { routes, send, subscribe } from '../../api/Socket';
 import { User } from '../../api/User';
 import { getScore, getSubmissionCount, getSubmissionTime } from '../../util/Utility';
-
-const StyledMarkdownEditor = styled(MarkdownEditor)`
-  margin-top: 15px;
-  padding: 0;
-  
-  p {
-    font-family: ${({ theme }) => theme.font};
-  }
-
-  // The specific list of attributes to have dark text color.
-  .ProseMirror > p, blockquote, h1, h2, h3, ul, ol, table {
-    color: ${({ theme }) => theme.colors.text};
-  }
-`;
-
-const OverflowPanel = styled(Panel)`
-  overflow-y: auto;
-  height: 100%;
-  padding: 0 25px;
-`;
+import ProblemPanel from './ProblemPanel';
 
 const NoPaddingPanel = styled(Panel)`
   padding: 0;
@@ -158,7 +136,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
   const { currentUser, game } = useAppSelector((state) => state);
 
-  const [copiedEmail, setCopiedEmail] = useState(false);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
 
   const [problems, setProblems] = useState<Problem[]>([]);
@@ -511,45 +488,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
           secondaryMinSize={35}
           customClassName={!spectateGame ? 'game-splitter-container' : undefined}
         >
-          {/* Problem title/description panel */}
-          <OverflowPanel className="display-box-shadow">
-            <ProblemHeaderText>
-              {!spectateGame
-                ? game?.problems[currentProblemIndex]?.name
-                : spectateGame?.problem.name}
-            </ProblemHeaderText>
-            {
-              !spectateGame ? (
-                getDifficultyDisplayButton(game?.problems[currentProblemIndex].difficulty!)
-              ) : (
-                getDifficultyDisplayButton(spectateGame?.problem.difficulty!)
-              )
-            }
-            <StyledMarkdownEditor
-              defaultValue={!spectateGame ? (
-                game?.problems[0]?.description
-              ) : (
-                spectateGame?.problem.description
-              )}
-              value={spectateGame
-                ? spectateGame?.problem.description
-                : problems[currentProblemIndex]?.description}
-              onChange={() => ''}
-              readOnly
-            />
-            <BottomFooterText>
-              {'Notice an issue? Contact us at '}
-              <InheritedTextButton
-                onClick={() => {
-                  copy('support@codejoust.co');
-                  setCopiedEmail(true);
-                }}
-              >
-                support@codejoust.co
-                <InlineCopyIcon>content_copy</InlineCopyIcon>
-              </InheritedTextButton>
-            </BottomFooterText>
-          </OverflowPanel>
+          <ProblemPanel
+            problem={!spectateGame ? game?.problems[currentProblemIndex] : spectateGame.problem}
+          />
 
           {/* Code editor and console panels */}
           {
@@ -582,7 +523,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
                 </Panel>
               </SplitterLayout>
             ) : (
-              <NoPaddingPanel className="display-box-shadow">
+              <NoPaddingPanel>
                 <Editor
                   onLanguageChange={null}
                   onCodeChange={null}
@@ -601,12 +542,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
       <SmallButton onClick={previousProblem}>Previous</SmallButton>
       <SmallButton onClick={nextProblem}>Next</SmallButton>
-
-      <BottomCopyIndicatorContainer copied={copiedEmail}>
-        <CopyIndicator onClick={() => setCopiedEmail(false)}>
-          Email copied!&nbsp;&nbsp;✕
-        </CopyIndicator>
-      </BottomCopyIndicatorContainer>
     </>
   );
 }
