@@ -189,18 +189,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
-  // const createCodeLanguageArray = () => {
-  //   while (languageList.length < problems.length) {
-  //     languageList.push(Language.Java);
-  //   }
-  //
-  //   while (codeList.length < problems.length) {
-  //     codeList.push('');
-  //   }
-  // };
-
-  // useEffect(() => createCodeLanguageArray(), []);
-
   const getCurrentLanguage = useCallback(() => languageList[currentProblemIndex],
     [languageList, currentProblemIndex]);
 
@@ -439,7 +427,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
       });
   };
 
-  // todo: no wrap
   const nextProblem = () => {
     setCurrentProblemIndex((currentProblemIndex + 1) % problems?.length);
     setCurrentSubmission(getSubmission((currentProblemIndex + 1) % problems?.length, submissions));
@@ -525,13 +512,15 @@ function PlayerGameView(props: PlayerGameViewProps) {
           {/* Problem title/description panel */}
           <OverflowPanel className="display-box-shadow">
             <ProblemHeaderText>
-              {!spectateGame ? game?.problems[currentProblemIndex]?.name : spectateGame?.problem.name}
+              {!spectateGame
+                ? game?.problems[currentProblemIndex]?.name
+                : spectateGame?.problem.name}
             </ProblemHeaderText>
             {
               !spectateGame ? (
                 getDifficultyDisplayButton(game?.problems[currentProblemIndex].difficulty!)
               ) : (
-                getDifficultyDisplayButton(spectateGame?.problem.difficulty!) // todo: change problems
+                getDifficultyDisplayButton(spectateGame?.problem.difficulty!)
               )
             }
             <StyledMarkdownEditor
@@ -540,7 +529,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
               ) : (
                 spectateGame?.problem.description
               )}
-              value={spectateGame ? spectateGame?.problem.description : problems[currentProblemIndex]?.description}
+              value={spectateGame
+                ? spectateGame?.problem.description
+                : problems[currentProblemIndex]?.description}
               onChange={() => ''}
               readOnly
             />
@@ -594,9 +585,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
                   onLanguageChange={null}
                   onCodeChange={null}
                   defaultLanguage={spectateGame?.language as Language}
-                  getCurrentLanguage={() => spectateGame?.language as Language} // todo modified: is this right?
-                  defaultCodeMap={null} // todo: verify this is right
-                  currentProblem={currentProblemIndex} // todo: needed
+                  getCurrentLanguage={() => spectateGame?.language as Language}
+                  defaultCodeMap={null}
+                  currentProblem={currentProblemIndex}
                   defaultCode={spectateGame?.code}
                   liveCode={spectateGame?.code}
                 />
