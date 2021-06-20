@@ -70,7 +70,7 @@ const LeaderboardContent = styled.div`
   text-align: center;
   margin: 0 auto;
   width: 75%;
-  overflow-x: scroll;
+  overflow-x: auto;
   white-space: nowrap;
     
   // Show shadows if there is scrollable content  
@@ -428,19 +428,21 @@ function PlayerGameView(props: PlayerGameViewProps) {
   };
 
   const nextProblem = () => {
-    setCurrentProblemIndex((currentProblemIndex + 1) % problems?.length);
-    setCurrentSubmission(getSubmission((currentProblemIndex + 1) % problems?.length, submissions));
+    const next = currentProblemIndex + 1;
+
+    if (problems && next < problems.length) {
+      setCurrentProblemIndex(next);
+      setCurrentSubmission(getSubmission(next, submissions));
+    }
   };
 
   const previousProblem = () => {
-    let temp = currentProblemIndex - 1;
+    const prev = currentProblemIndex - 1;
 
-    if (temp < 0) {
-      temp += problems?.length;
+    if (prev >= 0) {
+      setCurrentProblemIndex(prev);
+      setCurrentSubmission(getSubmission(prev, submissions));
     }
-
-    setCurrentProblemIndex(temp);
-    setCurrentSubmission(getSubmission(temp, submissions));
   };
 
   const displayPlayerLeaderboard = useCallback(() => game?.players.map((player, index) => (

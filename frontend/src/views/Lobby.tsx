@@ -657,6 +657,7 @@ function LobbyPage() {
           <ProblemSelector
             selectedProblems={selectedProblems}
             onSelect={addProblem}
+            loading={loading}
           />
           <SelectedProblemsDisplay
             problems={selectedProblems}

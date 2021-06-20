@@ -70,7 +70,7 @@ const LanguageSelect = styled.select`
 const monacoEditorOptions: EditorConstructionOptions = {
   automaticLayout: true,
   fixedOverflowWidgets: true,
-  fontFamily: 'Monaco',
+  fontFamily: 'Monaco, monospace',
   hideCursorInOverviewRuler: true,
   minimap: { enabled: false },
   overviewRulerBorder: false,
