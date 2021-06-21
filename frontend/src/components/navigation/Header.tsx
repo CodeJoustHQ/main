@@ -51,6 +51,7 @@ const NavButton = styled(TextButton)`
 const RightContainer = styled.div`
   float: right;
   margin-right: 50px;
+  z-index: 2;
   
   @media(max-width: 600px) {
     margin-right: 0;
