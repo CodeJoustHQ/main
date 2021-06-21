@@ -17,7 +17,6 @@ const Content = styled.div`
 
 const InnerContent = styled.div`
   position: relative;
-  z-index: 1;
 `;
 
 const CircleContent = styled.div`
