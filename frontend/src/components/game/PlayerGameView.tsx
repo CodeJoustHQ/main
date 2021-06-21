@@ -31,7 +31,6 @@ import {
   Player,
 } from '../../api/Game';
 import LeaderboardCard from '../card/LeaderboardCard';
-import { SmallButton } from '../core/Button';
 import { SpectatorBackIcon } from '../core/Icon';
 import Language from '../../api/Language';
 import { useAppSelector, useBestSubmission } from '../../util/Hook';
@@ -490,6 +489,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
         >
           <ProblemPanel
             problem={!spectateGame ? game?.problems[currentProblemIndex] : spectateGame.problem}
+            onNext={currentProblemIndex < problems.length - 1 ? nextProblem : null}
+            onPrev={currentProblemIndex > 0 ? previousProblem : null}
           />
 
           {/* Code editor and console panels */}
@@ -539,9 +540,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
           }
         </SplitterLayout>
       </SplitterContainer>
-
-      <SmallButton onClick={previousProblem}>Previous</SmallButton>
-      <SmallButton onClick={nextProblem}>Next</SmallButton>
     </>
   );
 }

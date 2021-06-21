@@ -3,9 +3,11 @@ import styled from 'styled-components';
 import MarkdownEditor from 'rich-markdown-editor';
 import copy from 'copy-to-clipboard';
 import { BottomFooterText, ProblemHeaderText } from '../core/Text';
-import { getDifficultyDisplayButton, InheritedTextButton } from '../core/Button';
+import { DefaultButton, getDifficultyDisplayButton, InheritedTextButton } from '../core/Button';
 import { BottomCopyIndicatorContainer, CopyIndicator, InlineCopyIcon } from '../special/CopyIndicator';
-import { Panel } from '../core/Container';
+import {
+  FlexHorizontalContainer, FlexLeft, FlexRight, Panel,
+} from '../core/Container';
 import { Problem } from '../../api/Problem';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
@@ -28,19 +30,46 @@ const OverflowPanel = styled(Panel)`
   padding: 0 25px;
 `;
 
+const ProblemNavContainer = styled(FlexRight)`
+  align-items: baseline;
+  padding: 15px 0;
+`;
+
+const ProblemNavButton = styled(DefaultButton)`
+  font-size: ${({ theme }) => theme.fontSize.default};
+  color: ${({ theme }) => theme.colors.gray};
+  background-color: ${({ theme }) => theme.colors.white};
+  border-radius: 5px;
+  width: 40px;
+  height: 40px;
+  margin: 5px;
+`;
+
 type ProblemPanelProps = {
   problem: Problem | undefined,
+  onNext: (() => void) | null,
+  onPrev: (() => void) | null,
 };
 
 function ProblemPanel(props: ProblemPanelProps) {
-  const { problem } = props;
+  const { problem, onNext, onPrev } = props;
 
   const [copiedEmail, setCopiedEmail] = useState(false);
 
   return (
     <OverflowPanel>
-      <ProblemHeaderText>{problem?.name || 'Loading...'}</ProblemHeaderText>
-      {problem ? getDifficultyDisplayButton(problem.difficulty) : null}
+      <FlexHorizontalContainer>
+        <FlexLeft>
+          <div>
+            <ProblemHeaderText>{problem?.name || 'Loading...'}</ProblemHeaderText>
+            {problem ? getDifficultyDisplayButton(problem.difficulty) : null}
+          </div>
+        </FlexLeft>
+        <ProblemNavContainer>
+          <ProblemNavButton onClick={onPrev || undefined}>&#60;</ProblemNavButton>
+          <ProblemNavButton onClick={onNext || undefined}>&#62;</ProblemNavButton>
+        </ProblemNavContainer>
+      </FlexHorizontalContainer>
 
       <StyledMarkdownEditor
         defaultValue={problem?.description || ''}
