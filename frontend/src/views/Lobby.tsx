@@ -694,7 +694,7 @@ function LobbyPage() {
           >
             codejoust.co/play?room=
             {currentRoomId}
-            <InlineCopyIcon>content_copy</InlineCopyIcon>
+            <InlineCopyIcon />
           </InlineBackgroundCopyText>
           {' '}
           or at

@@ -45,7 +45,7 @@ function ContactUsPage() {
             }}
           >
             support@codejoust.co
-            <InlineCopyIcon>content_copy</InlineCopyIcon>
+            <InlineCopyIcon />
           </InheritedTextButton>
           . Say hello!
         </ContactHeaderText>

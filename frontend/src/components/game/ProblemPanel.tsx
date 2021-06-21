@@ -9,6 +9,7 @@ import {
   FlexHorizontalContainer, FlexLeft, FlexRight, Panel,
 } from '../core/Container';
 import { Problem } from '../../api/Problem';
+import { NextIcon, PrevIcon } from '../core/Icon';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
   margin-top: 15px;
@@ -35,14 +36,29 @@ const ProblemNavContainer = styled(FlexRight)`
   padding: 15px 0;
 `;
 
-const ProblemNavButton = styled(DefaultButton)`
+type ProblemNavButtonProps = {
+  disabled: boolean,
+};
+
+const ProblemNavButton = styled(DefaultButton)<ProblemNavButtonProps>`
   font-size: ${({ theme }) => theme.fontSize.default};
   color: ${({ theme }) => theme.colors.gray};
-  background-color: ${({ theme }) => theme.colors.white};
+  background-color: ${({ theme, disabled }) => (disabled ? theme.colors.background : theme.colors.white)};
   border-radius: 5px;
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
   margin: 5px;
+  
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.16);
+  
+  &:hover {
+    box-shadow: ${({ disabled }) => (disabled ? '0 1px 6px rgba(0, 0, 0, 0.16)' : '0 1px 6px rgba(0, 0, 0, 0.20)')};
+    cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')}; 
+  }
+  
+  i {
+    line-height: 35px;
+  }
 `;
 
 type ProblemPanelProps = {
@@ -66,8 +82,12 @@ function ProblemPanel(props: ProblemPanelProps) {
           </div>
         </FlexLeft>
         <ProblemNavContainer>
-          <ProblemNavButton onClick={onPrev || undefined}>&#60;</ProblemNavButton>
-          <ProblemNavButton onClick={onNext || undefined}>&#62;</ProblemNavButton>
+          <ProblemNavButton onClick={onPrev || undefined} disabled={!onPrev}>
+            <PrevIcon />
+          </ProblemNavButton>
+          <ProblemNavButton onClick={onNext || undefined} disabled={!onNext}>
+            <NextIcon />
+          </ProblemNavButton>
         </ProblemNavContainer>
       </FlexHorizontalContainer>
 
@@ -86,7 +106,7 @@ function ProblemPanel(props: ProblemPanelProps) {
           }}
         >
           support@codejoust.co
-          <InlineCopyIcon>content_copy</InlineCopyIcon>
+          <InlineCopyIcon />
         </InheritedTextButton>
       </BottomFooterText>
 

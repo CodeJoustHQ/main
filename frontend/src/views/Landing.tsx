@@ -200,7 +200,7 @@ function LandingPage() {
               }}
             >
               hello@codejoust.co
-              <InlineCopyIcon>content_copy</InlineCopyIcon>
+              <InlineCopyIcon />
             </InheritedTextButton>
             {' '}
             for one-on-one support within 24 hours.

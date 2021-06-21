@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { DefaultButton } from '../core/Button';
 import { ContactHeaderText } from '../core/Text';
+import React from 'react';
 
 type CopyIndicator = {
   copied: boolean,
@@ -50,9 +51,13 @@ export const InlineBackgroundCopyText = styled(ContactHeaderText)`
   cursor: pointer;
 `;
 
-export const InlineCopyIcon = styled.i.attrs(() => ({
-  className: 'material-icons',
-}))`
+const InlineCopyIconWrapper = styled.i`
   margin-left: 5px;
   font-size: inherit;
 `;
+
+export const InlineCopyIcon = () => (
+  <InlineCopyIconWrapper className="material-icons">
+    content_copy
+  </InlineCopyIconWrapper>
+);

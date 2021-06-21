@@ -232,7 +232,7 @@ function GameResultsPage() {
     >
       <InviteText>
         Invite
-        <InlineCopyIcon>content_copy</InlineCopyIcon>
+        <InlineCopyIcon />
       </InviteText>
     </InviteContainer>
   );
