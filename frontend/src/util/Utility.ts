@@ -142,3 +142,20 @@ export const getSubmissionTime = (bestSubmission: Submission | null,
 };
 
 export const getSubmissionCount = (player: Player | null) => player?.submissions.length || '0';
+
+/**
+ * De-duplicate a list of SelectableProblems.
+ * Solution at: https://stackoverflow.com/a/1584377/7517518.
+ */
+export const dedupProblems = (array: SelectableProblem[]) => {
+  for (let i = 0; i < array.length; i += 1) {
+    for (let j = i + 1; j < array.length; j += 1) {
+      if (array[i].problemId === array[j].problemId) {
+        array.splice(j, 1);
+        j -= 1;
+      }
+    }
+  }
+
+  return array;
+};

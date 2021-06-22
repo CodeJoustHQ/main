@@ -76,7 +76,7 @@ function LandingPage() {
     <Content>
       <CopyIndicatorContainer copied={copiedEmail}>
         <CopyIndicator onClick={() => setCopiedEmail(false)}>
-          Link copied!&nbsp;&nbsp;✕
+          Email copied!&nbsp;&nbsp;✕
         </CopyIndicator>
       </CopyIndicatorContainer>
 
