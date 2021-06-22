@@ -15,7 +15,7 @@ public enum ProblemError implements ApiError {
     BAD_IOTYPE(HttpStatus.BAD_REQUEST, "Please choose a valid Problem IO Type."),
     INCORRECT_INPUT_COUNT(HttpStatus.BAD_REQUEST, "Please specify the correct number of parameters for this problem."),
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "Please ensure each line of test case input/output is valid and is of the correct type."),
-    INVALID_NUMBER_REQUEST(HttpStatus.BAD_REQUEST, "Please request a valid number of problems."),
+    INVALID_NUMBER_REQUEST(HttpStatus.BAD_REQUEST, "Please request a valid number of problems (between 1-10)."),
     INVALID_VARIABLE_NAME(HttpStatus.BAD_REQUEST, "Please ensure all variable names are valid for Java and Python."),
     EMPTY_FIELD(HttpStatus.BAD_REQUEST, "Please enter a value for each required field."),
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "An internal error occurred when attempting to find a problem."),

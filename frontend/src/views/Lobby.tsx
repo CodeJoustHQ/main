@@ -651,7 +651,7 @@ function LobbyPage() {
           <NoMarginMediumText>Select problems for this game:</NoMarginMediumText>
           <Text>
             Use the dropdown below to select the problems for your game.
-            Alternatively, skip this step to create a game with a random problem.
+            Alternatively, skip this step to create a game with random problems.
           </Text>
           { error ? <ErrorMessage message={error} /> : null }
           <ProblemSelector

@@ -308,7 +308,8 @@ public class RoomService {
         
         // Set number of problems if not null
         if (request.getNumProblems() != null) {
-            if (request.getNumProblems() <= 0 || request.getNumProblems() > MAX_NUM_PROBLEMS) {
+            if (request.getNumProblems() <= 0 || request.getNumProblems() > MAX_NUM_PROBLEMS
+                    || request.getProblems() != null && request.getProblems().size() > MAX_NUM_PROBLEMS) {
                 throw new ApiException(ProblemError.INVALID_NUMBER_REQUEST);
             }
             room.setNumProblems(request.getNumProblems());
@@ -322,15 +323,11 @@ public class RoomService {
         return roomDto;
     }
 
-    private Room updateRoomSettingsSelectedProblems(List<SelectableProblemDto> selectedProblems, Room room) {
+    private void updateRoomSettingsSelectedProblems(List<SelectableProblemDto> selectedProblems, Room room) {
         // Set selected problems if not null
         boolean problemsHaveChanged = false;
 
         if (selectedProblems != null) {
-            if (selectedProblems.size() > room.getNumProblems()) {
-                throw new ApiException(RoomError.TOO_MANY_PROBLEMS);
-            }
-
             problemsHaveChanged = checkSelectedProblemChanges(selectedProblems, room);
         }
 
@@ -346,9 +343,13 @@ public class RoomService {
                 newProblems.add(problem);
             }
             room.setProblems(newProblems);
-        }
 
-        return room;
+            if (newProblems.size() > 0) {
+                room.setNumProblems(newProblems.size());
+            } else {
+                room.setNumProblems(1);
+            }
+        }
     }
 
     private boolean checkSelectedProblemChanges(List<SelectableProblemDto> selectedProblems, Room room) {
