@@ -1,6 +1,5 @@
 package com.codejoust.main.util;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -34,7 +33,6 @@ public class RoomTestMethods {
         createRequest.setHost(host);
 
         MvcResult result = mockMvc.perform(post(POST_ROOM_CREATE)
-                .header(HttpHeaders.AUTHORIZATION, "")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(createRequest)))
                 .andDo(print()).andExpect(status().isCreated())
@@ -58,7 +56,6 @@ public class RoomTestMethods {
         createRequest.setHost(host);
 
         MvcResult result = mockMvc.perform(post(POST_ROOM_CREATE)
-                .header(HttpHeaders.AUTHORIZATION, "")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(createRequest)))
                 .andDo(print()).andExpect(status().isCreated())
@@ -72,7 +69,6 @@ public class RoomTestMethods {
         joinRequest.setUser(user);
 
         result = mockMvc.perform(put(String.format(PUT_ROOM_JOIN, room.getRoomId()))
-                .header(HttpHeaders.AUTHORIZATION, "")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(joinRequest)))
                 .andDo(print()).andExpect(status().isOk())

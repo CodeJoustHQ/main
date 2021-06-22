@@ -13,13 +13,14 @@ const Content = styled.div`
   height: 50px;
   padding: 20px;
   text-align: center;
-  z-index: 1;
+  z-index: 2;
 `;
 
 const MinimalContent = styled.div`
   height: 20px;
   padding: 20px 20px 0 20px;
   text-align: center;
+  z-index: 2;
 `;
 
 const LeftHeader = styled(NavbarLink)`
@@ -51,6 +52,7 @@ const NavButton = styled(TextButton)`
 const RightContainer = styled.div`
   float: right;
   margin-right: 50px;
+  z-index: 1;
   
   @media(max-width: 600px) {
     margin-right: 0;

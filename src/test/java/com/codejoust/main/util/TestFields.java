@@ -5,7 +5,6 @@ import com.codejoust.main.dto.account.AccountUidDto;
 import com.codejoust.main.dto.problem.CreateProblemRequest;
 import com.codejoust.main.dto.problem.ProblemInputDto;
 import com.codejoust.main.dto.user.UserDto;
-import com.codejoust.main.game_object.CodeLanguage;
 import com.codejoust.main.game_object.PlayerCode;
 import com.codejoust.main.model.Account;
 import com.codejoust.main.model.problem.Problem;
@@ -14,6 +13,7 @@ import com.codejoust.main.model.problem.ProblemIOType;
 import com.codejoust.main.model.problem.ProblemInput;
 import com.codejoust.main.model.problem.ProblemTag;
 import com.codejoust.main.model.problem.ProblemTestCase;
+import com.codejoust.main.model.report.CodeLanguage;
 import com.codejoust.main.service.FirebaseService;
 
 import java.util.ArrayList;

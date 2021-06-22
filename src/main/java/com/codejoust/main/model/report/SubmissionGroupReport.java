@@ -9,10 +9,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import com.codejoust.main.model.User;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -31,22 +31,17 @@ public class SubmissionGroupReport {
 
     private String gameReportId;
 
-    private Integer numProblems;
-
     private Integer numTestCases;
 
     private Integer numProblemsSolved;
     
     private Integer numTestCasesPassed;
 
-    @OneToMany(mappedBy = "submissionGroupReport", fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER)
     @Setter(AccessLevel.PRIVATE)
+    @Fetch(value = FetchMode.SUBSELECT)
+    @JoinColumn(name = "submission_reports_table_id")
     private List<SubmissionReport> submissionReports = new ArrayList<>();
-
-    // This column holds the primary key of the user who made these submissions
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_table_id")
-    private User user;
 
     public void addSubmissionReport(SubmissionReport submissionReport) {
         submissionReports.add(submissionReport);

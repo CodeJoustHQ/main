@@ -122,9 +122,9 @@ public class UserTests {
 
         UserDto expected = MockHelper.postRequest(this.mockMvc, TestUrls.user(), createUserRequest, UserDto.class, HttpStatus.CREATED);
 
-        UserDto actual = MockHelper.putRequestNoToken(this.mockMvc, TestUrls.updateUserAccount(expected.getUserId()), new Object(), UserDto.class, HttpStatus.OK);
+        UserDto actual = MockHelper.putRequestNoHeaders(this.mockMvc, TestUrls.updateUserAccount(expected.getUserId()), new Object(), UserDto.class, HttpStatus.OK);
         assertEquals(expected.getUserId(), actual.getUserId());
-        assertNull(actual.getAccountUid());
+        assertNull(actual.getAccount());
     }
 
     @Test
@@ -143,6 +143,6 @@ public class UserTests {
 
         UserDto actual = MockHelper.putRequest(this.mockMvc, TestUrls.updateUserAccount(expected.getUserId()), new Object(), UserDto.class, HttpStatus.OK);
         assertEquals(expected.getUserId(), actual.getUserId());
-        assertEquals(TestFields.accountUidDto1(), actual.getAccountUid());
+        assertEquals(TestFields.accountUidDto1(), actual.getAccount());
     }
 }

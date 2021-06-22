@@ -8,7 +8,7 @@ export type User = {
   userId?: string,
   spectator?: boolean,
   sessionId?: string,
-  accountUid?: AccountUid,
+  account?: AccountUid,
 };
 
 const basePath = '/api/v1/user';

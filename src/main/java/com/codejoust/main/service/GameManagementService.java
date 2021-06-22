@@ -304,8 +304,8 @@ public class GameManagementService {
 
     protected void createGameReport(Game game) {
         GameReport gameReport = new GameReport();
-        gameReport.setProblems(game.getProblems());
-        gameReport.setNumProblems(game.getProblems().size());
+        // TODO: Create ProblemContainer class.
+        // gameReport.setProblems(game.getProblems());
 
         // TODO: Confirm that all the user information, particularly accounts, will always be up-to-date.
         for (Player player : game.getPlayers().values()) {

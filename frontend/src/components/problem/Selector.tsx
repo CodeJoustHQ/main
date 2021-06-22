@@ -8,7 +8,7 @@ import { TextInput } from '../core/Input';
 import { useAppDispatch, useAppSelector, useClickOutside } from '../../util/Hook';
 import { User } from '../../api/User';
 import { fetchAccount } from '../../redux/Account';
-import { problemMatchesFilterText } from '../../util/Utility';
+import { dedupProblems, problemMatchesFilterText } from '../../util/Utility';
 
 type ProblemSelectorProps = {
   selectedProblems: SelectableProblem[],
@@ -122,7 +122,9 @@ export function ProblemSelector(props: ProblemSelectorProps) {
     let accountProblems = account?.problems || [];
     accountProblems = accountProblems.filter((problem) => problem.testCases.length > 0);
 
-    setAllProblems((accountProblems as SelectableProblem[]).concat(verifiedProblems));
+    // Merge list with verified problems and de-duplicate the result.
+    const problemsWithDupes = (accountProblems as SelectableProblem[]).concat(verifiedProblems);
+    setAllProblems(dedupProblems(problemsWithDupes));
   }, [account, verifiedProblems]);
 
   // Close list of problems if clicked outside of div

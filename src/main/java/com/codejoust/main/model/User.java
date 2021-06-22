@@ -12,8 +12,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import com.codejoust.main.model.report.GameReport;
 import com.codejoust.main.model.report.SubmissionGroupReport;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -55,14 +57,11 @@ public class User {
     @JoinColumn(name = "room_table_id")
     private Room room;
 
-    // This column holds the primary key of the game report
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "game_report_table_id")
-    private GameReport gameReport;
-
     // Thie list holds the submission group associated with the current room
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER)
     @Setter(AccessLevel.PRIVATE)
+    @Fetch(value = FetchMode.SUBSELECT)
+    @JoinColumn(name = "submission_group_reports_table_id")
     private List<SubmissionGroupReport> submissionGroupReports = new ArrayList<>();
 
     public void addSubmissionGroupReport(SubmissionGroupReport submissionGroupReport) {
