@@ -244,7 +244,7 @@ function LobbyPage() {
         setError(err.message);
       });
     }
-  }, [currentUser, token]);
+  }, [currentUser, token, dispatch]);
 
   const kickUser = (user: User) => {
     setLoading(true);
