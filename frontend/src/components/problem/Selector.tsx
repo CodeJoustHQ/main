@@ -99,6 +99,20 @@ const ElementName = styled.p`
   margin: 0;
 `;
 
+function arrayUnique(array: SelectableProblem[]) {
+  const a = array.concat();
+  for (let i = 0; i < a.length; i += 1) {
+    for (let j = i + 1; j < a.length; j += 1) {
+      if (a[i].problemId === a[j].problemId) {
+        a.splice(j, 1);
+        j -= 1;
+      }
+    }
+  }
+
+  return a;
+}
+
 export function ProblemSelector(props: ProblemSelectorProps) {
   const { selectedProblems, onSelect } = props;
 
@@ -122,7 +136,11 @@ export function ProblemSelector(props: ProblemSelectorProps) {
     let accountProblems = account?.problems || [];
     accountProblems = accountProblems.filter((problem) => problem.testCases.length > 0);
 
-    setAllProblems((accountProblems as SelectableProblem[]).concat(verifiedProblems));
+    // Merge list with verified problems and de-duplicate the result.
+    const problemsWithDupes = (accountProblems as SelectableProblem[]).concat(verifiedProblems);
+    console.log(problemsWithDupes);
+    console.log(arrayUnique(problemsWithDupes));
+    setAllProblems(arrayUnique(problemsWithDupes));
   }, [account, verifiedProblems]);
 
   // Close list of problems if clicked outside of div
