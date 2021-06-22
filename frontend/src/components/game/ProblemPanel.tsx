@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import MarkdownEditor from 'rich-markdown-editor';
 import copy from 'copy-to-clipboard';
-import { BottomFooterText, ProblemHeaderText } from '../core/Text';
+import { BottomFooterText, ProblemHeaderText, SmallText } from '../core/Text';
 import { DefaultButton, getDifficultyDisplayButton, InheritedTextButton } from '../core/Button';
 import { BottomCopyIndicatorContainer, CopyIndicator, InlineCopyIcon } from '../special/CopyIndicator';
 import {
+  CenteredContainer,
   FlexHorizontalContainer, FlexLeft, FlexRight, Panel,
 } from '../core/Container';
 import { Problem } from '../../api/Problem';
@@ -36,6 +37,10 @@ const ProblemNavContainer = styled(FlexRight)`
   padding: 15px 0;
 `;
 
+const ProblemCountText = styled(SmallText)`
+  color: gray;
+`;
+
 type ProblemNavButtonProps = {
   disabled: boolean,
 };
@@ -62,13 +67,16 @@ const ProblemNavButton = styled(DefaultButton)<ProblemNavButtonProps>`
 `;
 
 type ProblemPanelProps = {
-  problem: Problem | undefined,
+  problems: Problem[],
+  index: number,
   onNext: (() => void) | null,
   onPrev: (() => void) | null,
 };
 
 function ProblemPanel(props: ProblemPanelProps) {
-  const { problem, onNext, onPrev } = props;
+  const {
+    problems, index, onNext, onPrev,
+  } = props;
 
   const [copiedEmail, setCopiedEmail] = useState(false);
 
@@ -77,23 +85,30 @@ function ProblemPanel(props: ProblemPanelProps) {
       <FlexHorizontalContainer>
         <FlexLeft>
           <div>
-            <ProblemHeaderText>{problem?.name || 'Loading...'}</ProblemHeaderText>
-            {problem ? getDifficultyDisplayButton(problem.difficulty) : null}
+            <ProblemHeaderText>{problems[index]?.name || 'Loading...'}</ProblemHeaderText>
+            {problems[index] ? getDifficultyDisplayButton(problems[index].difficulty) : null}
           </div>
         </FlexLeft>
         <ProblemNavContainer>
-          <ProblemNavButton onClick={onPrev || undefined} disabled={!onPrev}>
-            <PrevIcon />
-          </ProblemNavButton>
-          <ProblemNavButton onClick={onNext || undefined} disabled={!onNext}>
-            <NextIcon />
-          </ProblemNavButton>
+          <CenteredContainer>
+            <div>
+              <ProblemNavButton onClick={onPrev || undefined} disabled={!onPrev}>
+                <PrevIcon />
+              </ProblemNavButton>
+              <ProblemNavButton onClick={onNext || undefined} disabled={!onNext}>
+                <NextIcon />
+              </ProblemNavButton>
+            </div>
+            <ProblemCountText>
+              {`Problem ${index + 1} of ${problems.length}`}
+            </ProblemCountText>
+          </CenteredContainer>
         </ProblemNavContainer>
       </FlexHorizontalContainer>
 
       <StyledMarkdownEditor
-        defaultValue={problem?.description || ''}
-        value={problem?.description || ''}
+        defaultValue={problems[index]?.description || ''}
+        value={problems[index]?.description || ''}
         onChange={() => ''}
         readOnly
       />

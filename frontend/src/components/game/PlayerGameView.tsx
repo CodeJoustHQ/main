@@ -488,7 +488,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
           customClassName={!spectateGame ? 'game-splitter-container' : undefined}
         >
           <ProblemPanel
-            problem={!spectateGame ? game?.problems[currentProblemIndex] : spectateGame.problem}
+            problems={game?.problems || []}
+            index={!spectateGame ? currentProblemIndex : game?.problems
+              .findIndex((p) => p.problemId === spectateGame.problem.problemId) || 0}
             onNext={currentProblemIndex < problems.length - 1 ? nextProblem : null}
             onPrev={currentProblemIndex > 0 ? previousProblem : null}
           />
