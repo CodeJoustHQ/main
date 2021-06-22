@@ -663,9 +663,7 @@ function LobbyPage() {
             problems={selectedProblems}
             onRemove={isHost(currentUser) ? removeProblem : null}
           />
-          <ExitModalButton
-            onClick={() => setShowProblemSelector(false)}
-          >
+          <ExitModalButton onClick={() => setShowProblemSelector(false)}>
             All Good!
           </ExitModalButton>
         </LeftContainer>
@@ -726,29 +724,17 @@ function LobbyPage() {
         <PlayersContainer>
           <LobbyContainerTitle>
             Players
-            {
-              users
-                ? ` (${users.length})`
-                : null
-            }
-            <InlineIcon
-              onClick={refreshRoomDetails}
-            >
+            { users ? ` (${users.length})` : null }
+            <InlineIcon onClick={refreshRoomDetails}>
               refresh
             </InlineIcon>
-            <InlineIcon
-              onClick={() => setActionCardHelp(true)}
-            >
+            <InlineIcon onClick={() => setActionCardHelp(true)}>
               help_outline
             </InlineIcon>
           </LobbyContainerTitle>
           <BackgroundContainer>
-            {
-              displayUsers(activeUsers, true)
-            }
-            {
-              displayUsers(inactiveUsers, false)
-            }
+            {displayUsers(activeUsers, true)}
+            {displayUsers(inactiveUsers, false)}
             { error ? <ErrorMessage message={error} /> : null }
             { loading ? <Loading /> : null }
           </BackgroundContainer>
@@ -761,7 +747,7 @@ function LobbyPage() {
                 <NoMarginMediumText>Difficulty</NoMarginMediumText>
                 {isHost(currentUser) ? (
                   <LowMarginText>
-                    Choose a difficulty for your randomly selected problem:
+                    Choose a difficulty for your randomly selected problems:
                   </LowMarginText>
                 ) : null}
                 <DifficultyContainer>
@@ -783,6 +769,28 @@ function LobbyPage() {
                     );
                   })}
                 </DifficultyContainer>
+                <NoMarginMediumText>Number of Problems</NoMarginMediumText>
+                <NoMarginSubtitleText>
+                  {`${numProblems} problem${numProblems === 1 ? '' : 's'}`}
+                </NoMarginSubtitleText>
+                <HoverContainerSlider>
+                  <HoverElementSlider {...hoverProps} />
+                  <SliderContainer>
+                    <Slider
+                      min={1}
+                      max={10}
+                      value={numProblems}
+                      disabled={!isHost(currentUser)}
+                      onChange={(e) => {
+                        const newNumProblems = Number(e.target.value);
+                        if (newNumProblems >= 1 && newNumProblems <= 10) {
+                          setNumProblems(newNumProblems);
+                        }
+                      }}
+                      onMouseUp={updateNumProblems}
+                    />
+                  </SliderContainer>
+                </HoverContainerSlider>
               </>
             ) : (
               <>
@@ -834,28 +842,6 @@ function LobbyPage() {
                   disabled={!isHost(currentUser)}
                   onChange={onSizeSliderChange}
                   onMouseUp={updateSize}
-                />
-              </SliderContainer>
-            </HoverContainerSlider>
-            <NoMarginMediumText>Number of Problems</NoMarginMediumText>
-            <NoMarginSubtitleText>
-              {`${numProblems} problem${numProblems === 1 ? '' : 's'}`}
-            </NoMarginSubtitleText>
-            <HoverContainerSlider>
-              <HoverElementSlider {...hoverProps} />
-              <SliderContainer>
-                <Slider
-                  min={1}
-                  max={10}
-                  value={numProblems}
-                  disabled={!isHost(currentUser)}
-                  onChange={(e) => {
-                    const newNumProblems = Number(e.target.value);
-                    if (newNumProblems >= 1 && newNumProblems <= 10) {
-                      setNumProblems(newNumProblems);
-                    }
-                  }}
-                  onMouseUp={updateNumProblems}
                 />
               </SliderContainer>
             </HoverContainerSlider>
