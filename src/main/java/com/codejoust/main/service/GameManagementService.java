@@ -145,22 +145,14 @@ public class GameManagementService {
         List<Problem> problems = game.getProblems();
         problems.addAll(room.getProblems());
 
-        // Fill remaining problems with random ones by difficulty
-        int remaining = room.getNumProblems() - problems.size();
+        // Otherwise, fetch random problems
+        if (problems.size() == 0) {
+            List<Problem> randomProblems = problemService.getProblemsFromDifficulty(room.getDifficulty(), room.getNumProblems());
+            problems.addAll(randomProblems);
 
-        if (remaining < 0) {
-            throw new ApiException(RoomError.TOO_MANY_PROBLEMS);
-        } else if (remaining > 0) {
-            List<Problem> otherProblems = problemService.getProblemsFromDifficulty(room.getDifficulty(), room.getNumProblems());
-            for (Problem problem : otherProblems) {
-                if (!problems.contains(problem) && problems.size() < room.getNumProblems()) {
-                    problems.add(problem);
-                }
+            if (problems.size() < room.getNumProblems()) {
+                throw new ApiException(ProblemError.NOT_ENOUGH_FOUND);
             }
-        }
-
-        if (problems.size() < room.getNumProblems()) {
-            throw new ApiException(ProblemError.NOT_ENOUGH_FOUND);
         }
 
         setStartGameTimer(game, time);

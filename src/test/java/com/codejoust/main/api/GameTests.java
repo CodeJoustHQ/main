@@ -127,11 +127,9 @@ public class GameTests {
 
         GameDto gameDto = MockHelper.getRequest(this.mockMvc, TestUrls.getGame(roomDto.getRoomId()), GameDto.class, HttpStatus.OK);
 
-        assertEquals(3, gameDto.getRoom().getNumProblems());
-        assertEquals(3, gameDto.getProblems().size());
+        assertEquals(1, gameDto.getRoom().getNumProblems());
+        assertEquals(1, gameDto.getProblems().size());
         assertEquals(problemDto.getProblemId(), gameDto.getProblems().get(0).getProblemId());
-        assertNotEquals(gameDto.getProblems().get(0).getProblemId(), gameDto.getProblems().get(1).getProblemId());
-        assertNotEquals(gameDto.getProblems().get(1).getProblemId(), gameDto.getProblems().get(2).getProblemId());
     }
 
     @Test

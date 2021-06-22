@@ -586,32 +586,6 @@ public class RoomServiceTests {
     }
 
     @Test
-    public void updateRoomSettingsTooManySelectedProblems() {
-        Room room = new Room();
-        room.setRoomId(TestFields.ROOM_ID);
-        User host = new User();
-        host.setNickname(TestFields.NICKNAME);
-        room.setHost(host);
-        room.addUser(host);
-
-        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
-
-        UpdateSettingsRequest request = new UpdateSettingsRequest();
-        request.setInitiator(UserMapper.toDto(host));
-        request.setNumProblems(1);
-
-        SelectableProblemDto problemDto = new SelectableProblemDto();
-        problemDto.setProblemId(TestFields.PROBLEM_ID);
-        SelectableProblemDto problemDto2 = new SelectableProblemDto();
-        problemDto.setProblemId(TestFields.PROBLEM_ID_2);
-        request.setProblems(Arrays.asList(problemDto, problemDto2));
-
-        ApiException exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomSettings(TestFields.ROOM_ID, request));
-        assertEquals(RoomError.TOO_MANY_PROBLEMS, exception.getError());
-    }
-
-    @Test
     public void updateRoomSettingsChoosingProblemsModifiesNumProblems() {
         /**
          * 1. Update the room with two problems
