@@ -1,6 +1,5 @@
 package com.codejoust.main.dto.user;
 
-import com.codejoust.main.dto.account.AccountUidDto;
 import com.codejoust.main.model.User;
 
 import org.modelmapper.ModelMapper;
@@ -16,18 +15,7 @@ public class UserMapper {
         if (entity == null) {
             return null;
         }
-        UserDto userDto = mapper.map(entity, UserDto.class);
-
-        // Attach the account to the user, if it exists.
-        if (entity.getAccount() != null) {
-            AccountUidDto accountUidDto = new AccountUidDto();
-            accountUidDto.setUid(entity.getAccount().getUid());
-            userDto.setAccountUid(accountUidDto);
-        } else {
-            userDto.setAccountUid(null);
-        }
-        
-        return userDto;
+        return mapper.map(entity, UserDto.class);
     }
 
     public static User toEntity(UserDto dto) {

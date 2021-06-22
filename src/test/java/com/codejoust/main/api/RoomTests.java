@@ -96,7 +96,7 @@ public class RoomTests {
         assertEquals(expected.getUsers(), actual.getUsers());
         assertEquals(ProblemDifficulty.RANDOM, actual.getDifficulty());
         assertEquals(0, actual.getProblems().size());
-        assertEquals(TestFields.accountUidDto1(), actual.getHost().getAccountUid());
+        assertEquals(TestFields.accountUidDto1(), actual.getHost().getAccount());
 
         // Send GET request to validate that room exists
         String roomId = actual.getRoomId();
@@ -129,7 +129,7 @@ public class RoomTests {
         assertEquals(expected.getUsers(), actual.getUsers());
         assertEquals(ProblemDifficulty.RANDOM, actual.getDifficulty());
         assertEquals(0, actual.getProblems().size());
-        assertNull(actual.getHost().getAccountUid());
+        assertNull(actual.getHost().getAccount());
 
         // Send GET request to validate that room exists
         String roomId = actual.getRoomId();
@@ -172,7 +172,7 @@ public class RoomTests {
 
         assertEquals(createExpected.getHost(), createActual.getHost());
         assertEquals(createExpected.getUsers(), createActual.getUsers());
-        assertEquals(TestFields.accountUidDto1(), createActual.getHost().getAccountUid());
+        assertEquals(TestFields.accountUidDto1(), createActual.getHost().getAccount());
 
         // Get id of created room to join
         String roomId = createActual.getRoomId();
@@ -197,7 +197,7 @@ public class RoomTests {
         assertEquals(expected.getRoomId(), actual.getRoomId());
         assertEquals(expected.getHost(), actual.getHost());
         assertEquals(expected.getUsers(), actual.getUsers());
-        assertEquals(TestFields.accountUidDto1(), actual.getHost().getAccountUid());
+        assertEquals(TestFields.accountUidDto1(), actual.getHost().getAccount());
     }
 
     @Test
@@ -218,7 +218,7 @@ public class RoomTests {
 
         assertEquals(createExpected.getHost(), createActual.getHost());
         assertEquals(createExpected.getUsers(), createActual.getUsers());
-        assertNull(createActual.getHost().getAccountUid());
+        assertNull(createActual.getHost().getAccount());
 
         // Get id of created room to join
         String roomId = createActual.getRoomId();
@@ -243,7 +243,7 @@ public class RoomTests {
         assertEquals(expected.getRoomId(), actual.getRoomId());
         assertEquals(expected.getHost(), actual.getHost());
         assertEquals(expected.getUsers(), actual.getUsers());
-        assertNull(actual.getHost().getAccountUid());
+        assertNull(actual.getHost().getAccount());
     }
 
     @Test

@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.codejoust.main.dto.user.UserDto;
-import com.codejoust.main.dto.user.UserMapper;
 import com.codejoust.main.model.Room;
-import com.codejoust.main.model.User;
 
 import org.modelmapper.ModelMapper;
 
@@ -22,18 +20,11 @@ public class RoomMapper {
         }
         RoomDto roomDto = mapper.map(entity, RoomDto.class);
 
-        // Set the host to get all updated user account values.
-        roomDto.setHost(UserMapper.toDto(entity.getHost()));
-
         // Separate users into active and inactive ones, spectator list.
-        List<UserDto> users = new ArrayList<>();
         List<UserDto> activeUsers = new ArrayList<>();
         List<UserDto> inactiveUsers = new ArrayList<>();
         List<UserDto> spectators = new ArrayList<>();
-        for (User user : entity.getUsers()) {
-            UserDto userDto = UserMapper.toDto(user);
-            users.add(userDto);
-
+        for (UserDto userDto : roomDto.getUsers()) {
             if (userDto.getSessionId() != null) {
                 activeUsers.add(userDto);
             } else {
@@ -44,7 +35,6 @@ public class RoomMapper {
                 spectators.add(userDto);
             }
         }
-        roomDto.setUsers(users);
         roomDto.setActiveUsers(activeUsers);
         roomDto.setInactiveUsers(inactiveUsers);
         roomDto.setSpectators(spectators);

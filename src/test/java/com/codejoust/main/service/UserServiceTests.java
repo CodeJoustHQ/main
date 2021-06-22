@@ -142,7 +142,7 @@ public class UserServiceTests {
         UserDto response = service.updateUserAccount(user.getUserId(), null);
         verify(repository).save(user);
         assertEquals(TestFields.USER_ID, response.getUserId());
-        assertNull(response.getAccountUid());
+        assertNull(response.getAccount());
     }
 
     @Test
@@ -164,6 +164,6 @@ public class UserServiceTests {
         user.setAccount(TestFields.account1());
         verify(repository).save(user);
         assertEquals(TestFields.USER_ID, response.getUserId());
-        assertEquals(TestFields.accountUidDto1(), response.getAccountUid());
+        assertEquals(TestFields.accountUidDto1(), response.getAccount());
     }
 }
