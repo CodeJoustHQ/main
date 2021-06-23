@@ -103,7 +103,7 @@ export function LobbyHelpModal(props: HelpModalProps) {
           <HelpText>
             <b>Difficulty</b>
             : If no problems are selected, the host can choose a difficulty setting
-            and play the game with a randomly selected problem.
+            and play the game with randomly selected problems.
           </HelpText>
         </>
         <>

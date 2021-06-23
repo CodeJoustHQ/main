@@ -797,7 +797,7 @@ function LobbyPage() {
                 <NoMarginMediumText>Problems</NoMarginMediumText>
                 <SelectedProblemsDisplay
                   problems={selectedProblems}
-                  onRemove={isHost(currentUser) ? removeProblem : null}
+                  onRemove={isHost(currentUser) && !loading ? removeProblem : null}
                 />
               </>
             )}
