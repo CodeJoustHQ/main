@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import copy from 'copy-to-clipboard';
 import { DefaultButton, InheritedTextButton } from '../core/Button';
@@ -71,21 +71,37 @@ export function CopyableContent(props: CopyableContentProps) {
   const { children, text, top } = props;
 
   const [copied, setCopied] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const Container = top ? CopyIndicatorContainer : BottomCopyIndicatorContainer;
+
+  const onCopy = () => {
+    copy(text);
+    setCopied(true);
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => setCopied(false), 2000);
+  };
+
+  const closeIndicator = () => {
+    setCopied(false);
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  };
 
   return (
     <>
       <Container copied={copied}>
-        <CopyIndicator onClick={() => setCopied(false)}>
-          Link copied!&nbsp;&nbsp;✕
+        <CopyIndicator onClick={closeIndicator}>
+          Copied!&nbsp;&nbsp;✕
         </CopyIndicator>
       </Container>
 
-      <InlineContainer onClick={() => {
-        copy(text);
-        setCopied(true);
-      }}
-      >
+      <InlineContainer onClick={onCopy}>
         {children}
       </InlineContainer>
     </>
