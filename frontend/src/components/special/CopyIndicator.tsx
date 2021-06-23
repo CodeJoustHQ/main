@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import copy from 'copy-to-clipboard';
 import { DefaultButton, InheritedTextButton } from '../core/Button';
-import { ContactHeaderText } from '../core/Text';
+import { InlineContainer } from '../core/Container';
 
 type CopyIndicator = {
   copied: boolean,
@@ -45,17 +45,6 @@ const CopyIndicator = styled(DefaultButton)`
   background: ${({ theme }) => theme.colors.gradients.green};
 `;
 
-const InlineBackgroundCopyText = styled(ContactHeaderText)`
-  display: inline-block;
-  margin: 0;
-  padding: 0.25rem 0.5rem;
-  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
-  background: ${({ theme }) => theme.colors.text};
-  color: ${({ theme }) => theme.colors.white};
-  border-radius: 0.5rem;
-  cursor: pointer;
-`;
-
 const InlineCopyIconWrapper = styled.i`
   margin-left: 5px;
   font-size: inherit;
@@ -67,13 +56,19 @@ export const InlineCopyIcon = () => (
   </InlineCopyIconWrapper>
 );
 
+type CopyableContentProps = {
+  children: React.ReactNode,
+  text: string,
+  top: boolean,
+};
+
 type CopyableProps = {
   text: string,
   top: boolean,
 };
 
-export function Copyable(props: CopyableProps) {
-  const { text, top } = props;
+export function CopyableContent(props: CopyableContentProps) {
+  const { children, text, top } = props;
 
   const [copied, setCopied] = useState(false);
   const Container = top ? CopyIndicatorContainer : BottomCopyIndicatorContainer;
@@ -86,14 +81,26 @@ export function Copyable(props: CopyableProps) {
         </CopyIndicator>
       </Container>
 
-      <InheritedTextButton onClick={() => {
+      <InlineContainer onClick={() => {
         copy(text);
         setCopied(true);
       }}
       >
+        {children}
+      </InlineContainer>
+    </>
+  );
+}
+
+export function Copyable(props: CopyableProps) {
+  const { text, top } = props;
+
+  return (
+    <CopyableContent text={text} top={top}>
+      <InheritedTextButton>
         {text}
         <InlineCopyIcon />
       </InheritedTextButton>
-    </>
+    </CopyableContent>
   );
 }

@@ -4,6 +4,10 @@ export const RelativeContainer = styled.div`
   position: relative;
 `;
 
+export const InlineContainer = styled.div`
+  display: inline;
+`;
+
 export const FlexContainer = styled.div`
   display: flex;
   flex: auto;

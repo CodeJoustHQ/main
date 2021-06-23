@@ -25,6 +25,7 @@ import { fetchGame, setGame } from '../redux/Game';
 import { setCurrentUser } from '../redux/User';
 import { setRoom } from '../redux/Room';
 import PreviewCodeContent from '../components/results/PreviewCodeContent';
+import { CopyableContent, InlineCopyIcon } from '../components/special/CopyIndicator';
 
 const Content = styled.div`
   padding: 0;
@@ -218,26 +219,18 @@ function GameResultsPage() {
 
   // Content to display for inviting players (if not enough players on the podium)
   const inviteContent = () => (
-    <InviteContainer
-      onClick={() => {
-        // copy(`https://codejoust.co/play?room=${roomId}`);
-        // setCopiedRoomLink(true);
-      }}
-    >
-      <InviteText>
-        Invite
-        {/*<InlineCopyIcon />*/}
-      </InviteText>
-    </InviteContainer>
+    <CopyableContent text={`https://codejoust.co/play?room=${roomId}`} top>
+      <InviteContainer>
+        <InviteText>
+          Invite
+          <InlineCopyIcon />
+        </InviteText>
+      </InviteContainer>
+    </CopyableContent>
   );
 
   return (
     <Content>
-      {/*<CopyIndicatorContainer copied={copiedRoomLink}>*/}
-      {/*  <CopyIndicator onClick={() => setCopiedRoomLink(false)}>*/}
-      {/*    Link copied!&nbsp;&nbsp;✕*/}
-      {/*  </CopyIndicator>*/}
-      {/*</CopyIndicatorContainer>*/}
       <HoverTooltip
         visible={hoverVisible}
         x={mousePosition.x}

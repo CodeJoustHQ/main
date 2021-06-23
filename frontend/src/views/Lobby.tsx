@@ -12,6 +12,7 @@ import {
   NoMarginSubtitleText,
   LowMarginText,
   Text,
+  ContactHeaderText,
 } from '../components/core/Text';
 import {
   connect, routes, subscribe, disconnect,
@@ -51,6 +52,7 @@ import { setCurrentUser } from '../redux/User';
 import { LobbyHelpModal } from '../components/core/HelpModal';
 import Modal from '../components/core/Modal';
 import { setGame } from '../redux/Game';
+import { CopyableContent, InlineCopyIcon } from '../components/special/CopyIndicator';
 
 type LobbyPageLocation = {
   user: User,
@@ -143,6 +145,18 @@ const ExitModalButton = styled(PrimaryButton)`
   margin: 20px 0;
 `;
 
+const CopyableRoomLink = styled(ContactHeaderText)`
+  display: inline-block;
+  margin: 0;
+  padding: 0.25rem 0.5rem;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  background: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.white};
+  border-radius: 0.5rem;
+  cursor: pointer;
+  text-decoration: none;
+`;
+
 function LobbyPage() {
   // Get history object to be able to move between different pages
   const history = useHistory();
@@ -178,9 +192,6 @@ function LobbyPage() {
 
   // Variable to hold the socket subscription, or null if not connected
   const [subscription, setSubscription] = useState<Subscription | null>(null);
-
-  // Variable to hold whether the room link was copied.
-  const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
 
   // Variable to hold whether the modal explaining the user cards is active.
   const [actionCardHelp, setActionCardHelp] = useState<boolean>(false);
@@ -668,25 +679,16 @@ function LobbyPage() {
       >
         Only the host can start the game and update settings
       </HoverTooltip>
-      {/*<CopyIndicatorContainer copied={copiedRoomLink}>*/}
-      {/*  <CopyIndicator onClick={() => setCopiedRoomLink(false)}>*/}
-      {/*    Link copied!&nbsp;&nbsp;✕*/}
-      {/*  </CopyIndicator>*/}
-      {/*</CopyIndicatorContainer>*/}
       <HeaderContainer>
         <SecondaryHeaderText>
           Join with the link
           {' '}
-          {/*<InlineBackgroundCopyText*/}
-          {/*  onClick={() => {*/}
-          {/*    copy(`https://codejoust.co/play?room=${currentRoomId}`);*/}
-          {/*    setCopiedRoomLink(true);*/}
-          {/*  }}*/}
-          {/*>*/}
-          {/*  codejoust.co/play?room=*/}
-          {/*  {currentRoomId}*/}
-          {/*  <InlineCopyIcon />*/}
-          {/*</InlineBackgroundCopyText>*/}
+          <CopyableContent text={`https://codejoust.co/play?room=${currentRoomId}`} top>
+            <CopyableRoomLink>
+              {`codejoust.co/play?room=${currentRoomId}`}
+              <InlineCopyIcon />
+            </CopyableRoomLink>
+          </CopyableContent>
           {' '}
           or at
           {' '}
