@@ -717,7 +717,6 @@ function LobbyPage() {
         >
           Leave Room
         </SecondaryRedButton>
-
       </HeaderContainer>
 
       <FlexBareContainerLeft>
@@ -725,18 +724,14 @@ function LobbyPage() {
           <LobbyContainerTitle>
             Players
             { users ? ` (${users.length})` : null }
-            <InlineIcon onClick={refreshRoomDetails}>
-              refresh
-            </InlineIcon>
-            <InlineIcon onClick={() => setActionCardHelp(true)}>
-              help_outline
-            </InlineIcon>
+            <InlineIcon onClick={refreshRoomDetails}>refresh</InlineIcon>
+            <InlineIcon onClick={() => setActionCardHelp(true)}>help_outline</InlineIcon>
           </LobbyContainerTitle>
           <BackgroundContainer>
             {displayUsers(activeUsers, true)}
             {displayUsers(inactiveUsers, false)}
-            { error ? <ErrorMessage message={error} /> : null }
-            { loading ? <Loading /> : null }
+            {error ? <ErrorMessage message={error} /> : null}
+            {loading ? <Loading /> : null}
           </BackgroundContainer>
         </PlayersContainer>
         <RoomSettingsContainer>
