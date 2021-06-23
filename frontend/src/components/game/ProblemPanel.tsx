@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import MarkdownEditor from 'rich-markdown-editor';
-import copy from 'copy-to-clipboard';
 import { BottomFooterText, ProblemHeaderText, SmallText } from '../core/Text';
-import { DefaultButton, getDifficultyDisplayButton, InheritedTextButton } from '../core/Button';
-import { BottomCopyIndicatorContainer, CopyIndicator, InlineCopyIcon } from '../special/CopyIndicator';
+import { DefaultButton, getDifficultyDisplayButton } from '../core/Button';
+import { Copyable } from '../special/CopyIndicator';
 import {
   CenteredContainer,
   FlexHorizontalContainer, FlexLeft, FlexRight, Panel,
@@ -78,8 +77,6 @@ function ProblemPanel(props: ProblemPanelProps) {
     problems, index, onNext, onPrev,
   } = props;
 
-  const [copiedEmail, setCopiedEmail] = useState(false);
-
   return (
     <OverflowPanel>
       <FlexHorizontalContainer>
@@ -113,23 +110,10 @@ function ProblemPanel(props: ProblemPanelProps) {
         readOnly
       />
       <BottomFooterText>
-        {'Notice an issue? Contact us at '}
-        <InheritedTextButton
-          onClick={() => {
-            copy('support@codejoust.co');
-            setCopiedEmail(true);
-          }}
-        >
-          support@codejoust.co
-          <InlineCopyIcon />
-        </InheritedTextButton>
+        Notice an issue? Contact us at
+        {' '}
+        <Copyable text="support@codejoust.co" top={false} />
       </BottomFooterText>
-
-      <BottomCopyIndicatorContainer copied={copiedEmail}>
-        <CopyIndicator onClick={() => setCopiedEmail(false)}>
-          Email copied!&nbsp;&nbsp;✕
-        </CopyIndicator>
-      </BottomCopyIndicatorContainer>
     </OverflowPanel>
   );
 }

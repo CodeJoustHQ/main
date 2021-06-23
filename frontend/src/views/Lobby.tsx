@@ -4,7 +4,6 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import { Message, Subscription } from 'stompjs';
 import { useBeforeunload } from 'react-beforeunload';
 import styled from 'styled-components';
-import copy from 'copy-to-clipboard';
 import ErrorMessage from '../components/core/Error';
 import {
   NoMarginMediumText,
@@ -39,12 +38,6 @@ import {
   setSpectator,
 } from '../api/Room';
 import { errorHandler } from '../api/Error';
-import {
-  CopyIndicator,
-  CopyIndicatorContainer,
-  InlineCopyIcon,
-  InlineBackgroundCopyText,
-} from '../components/special/CopyIndicator';
 import IdContainer from '../components/special/IdContainer';
 import { FlexBareContainer, LeftContainer } from '../components/core/Container';
 import { Slider, SliderContainer } from '../components/core/RangeSlider';
@@ -675,25 +668,25 @@ function LobbyPage() {
       >
         Only the host can start the game and update settings
       </HoverTooltip>
-      <CopyIndicatorContainer copied={copiedRoomLink}>
-        <CopyIndicator onClick={() => setCopiedRoomLink(false)}>
-          Link copied!&nbsp;&nbsp;✕
-        </CopyIndicator>
-      </CopyIndicatorContainer>
+      {/*<CopyIndicatorContainer copied={copiedRoomLink}>*/}
+      {/*  <CopyIndicator onClick={() => setCopiedRoomLink(false)}>*/}
+      {/*    Link copied!&nbsp;&nbsp;✕*/}
+      {/*  </CopyIndicator>*/}
+      {/*</CopyIndicatorContainer>*/}
       <HeaderContainer>
         <SecondaryHeaderText>
           Join with the link
           {' '}
-          <InlineBackgroundCopyText
-            onClick={() => {
-              copy(`https://codejoust.co/play?room=${currentRoomId}`);
-              setCopiedRoomLink(true);
-            }}
-          >
-            codejoust.co/play?room=
-            {currentRoomId}
-            <InlineCopyIcon />
-          </InlineBackgroundCopyText>
+          {/*<InlineBackgroundCopyText*/}
+          {/*  onClick={() => {*/}
+          {/*    copy(`https://codejoust.co/play?room=${currentRoomId}`);*/}
+          {/*    setCopiedRoomLink(true);*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*  codejoust.co/play?room=*/}
+          {/*  {currentRoomId}*/}
+          {/*  <InlineCopyIcon />*/}
+          {/*</InlineBackgroundCopyText>*/}
           {' '}
           or at
           {' '}

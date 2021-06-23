@@ -183,7 +183,7 @@ function LandingPage() {
           <SecondaryHeaderText>
             Create an account now or email us at
             {' '}
-            <Copyable text="hello@codejoust.co" />
+            <Copyable text="hello@codejoust.co" top />
             {' '}
             for one-on-one support within 24 hours.
           </SecondaryHeaderText>

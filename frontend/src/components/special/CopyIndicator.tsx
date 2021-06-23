@@ -8,7 +8,7 @@ type CopyIndicator = {
   copied: boolean,
 };
 
-export const CopyIndicatorContainer = styled.div.attrs((props: CopyIndicator) => ({
+const CopyIndicatorContainer = styled.div.attrs((props: CopyIndicator) => ({
   style: {
     transform: (!props.copied) ? 'translateY(-60px)' : null,
   },
@@ -21,7 +21,7 @@ export const CopyIndicatorContainer = styled.div.attrs((props: CopyIndicator) =>
   z-index: 5;
 `;
 
-export const BottomCopyIndicatorContainer = styled.div.attrs((props: CopyIndicator) => ({
+const BottomCopyIndicatorContainer = styled.div.attrs((props: CopyIndicator) => ({
   style: {
     transform: (!props.copied) ? 'translateY(60px)' : null,
     visibility: (props.copied) ? 'visible' : 'hidden',
@@ -32,9 +32,10 @@ export const BottomCopyIndicatorContainer = styled.div.attrs((props: CopyIndicat
   left: 50%;
   transition: transform 0.25s;
   line-height: 0;
+  z-index: 5;
 `;
 
-export const CopyIndicator = styled(DefaultButton)`
+const CopyIndicator = styled(DefaultButton)`
   position: relative;
   left: -50%;
   margin: 0 auto;
@@ -44,7 +45,7 @@ export const CopyIndicator = styled(DefaultButton)`
   background: ${({ theme }) => theme.colors.gradients.green};
 `;
 
-export const InlineBackgroundCopyText = styled(ContactHeaderText)`
+const InlineBackgroundCopyText = styled(ContactHeaderText)`
   display: inline-block;
   margin: 0;
   padding: 0.25rem 0.5rem;
@@ -68,20 +69,22 @@ export const InlineCopyIcon = () => (
 
 type CopyableProps = {
   text: string,
+  top: boolean,
 };
 
 export function Copyable(props: CopyableProps) {
-  const { text } = props;
+  const { text, top } = props;
 
   const [copied, setCopied] = useState(false);
+  const Container = top ? CopyIndicatorContainer : BottomCopyIndicatorContainer;
 
   return (
     <>
-      <CopyIndicatorContainer copied={copied}>
+      <Container copied={copied}>
         <CopyIndicator onClick={() => setCopied(false)}>
           Link copied!&nbsp;&nbsp;✕
         </CopyIndicator>
-      </CopyIndicatorContainer>
+      </Container>
 
       <InheritedTextButton onClick={() => {
         copy(text);

@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import copy from 'copy-to-clipboard';
 import { useBeforeunload } from 'react-beforeunload';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
@@ -18,11 +17,6 @@ import {
 import { User } from '../api/User';
 import Podium from '../components/results/Podium';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
-import {
-  CopyIndicator,
-  CopyIndicatorContainer,
-  InlineCopyIcon,
-} from '../components/special/CopyIndicator';
 import ResultsTable from '../components/results/ResultsTable';
 import Modal from '../components/core/Modal';
 import FeedbackPopup from '../components/results/FeedbackPopup';
@@ -101,7 +95,7 @@ function GameResultsPage() {
 
   const [connected, setConnected] = useState(false);
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
-  const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
+  // const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState<boolean>(false);
   const [showFeedbackPrompt, setShowFeedbackPrompt] = useState<boolean>(false);
   const [codeModal, setCodeModal] = useState(-1);
@@ -226,24 +220,24 @@ function GameResultsPage() {
   const inviteContent = () => (
     <InviteContainer
       onClick={() => {
-        copy(`https://codejoust.co/play?room=${roomId}`);
-        setCopiedRoomLink(true);
+        // copy(`https://codejoust.co/play?room=${roomId}`);
+        // setCopiedRoomLink(true);
       }}
     >
       <InviteText>
         Invite
-        <InlineCopyIcon />
+        {/*<InlineCopyIcon />*/}
       </InviteText>
     </InviteContainer>
   );
 
   return (
     <Content>
-      <CopyIndicatorContainer copied={copiedRoomLink}>
-        <CopyIndicator onClick={() => setCopiedRoomLink(false)}>
-          Link copied!&nbsp;&nbsp;✕
-        </CopyIndicator>
-      </CopyIndicatorContainer>
+      {/*<CopyIndicatorContainer copied={copiedRoomLink}>*/}
+      {/*  <CopyIndicator onClick={() => setCopiedRoomLink(false)}>*/}
+      {/*    Link copied!&nbsp;&nbsp;✕*/}
+      {/*  </CopyIndicator>*/}
+      {/*</CopyIndicatorContainer>*/}
       <HoverTooltip
         visible={hoverVisible}
         x={mousePosition.x}

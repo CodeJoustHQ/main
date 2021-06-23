@@ -1,22 +1,13 @@
 import React, { useState } from 'react';
-import copy from 'copy-to-clipboard';
 import { DynamicWidthContainer } from '../components/core/Container';
 import { InlineExternalLink } from '../components/core/Link';
 import { ContactHeaderTitle, ContactHeaderText } from '../components/core/Text';
-import { CopyIndicator, CopyIndicatorContainer, InlineCopyIcon } from '../components/special/CopyIndicator';
 import Subscribe from '../components/special/Subscribe';
-import { InheritedTextButton } from '../components/core/Button';
+import { Copyable } from '../components/special/CopyIndicator';
 
 function ContactUsPage() {
-  const [copiedEmail, setCopiedEmail] = useState<boolean>(false);
-
   return (
     <>
-      <CopyIndicatorContainer copied={copiedEmail}>
-        <CopyIndicator onClick={() => setCopiedEmail(false)}>
-          Email copied!&nbsp;&nbsp;✕
-        </CopyIndicator>
-      </CopyIndicatorContainer>
       <DynamicWidthContainer>
         <ContactHeaderTitle>
           Contact Us
@@ -38,15 +29,7 @@ function ContactUsPage() {
         <ContactHeaderText>
           You can contact us at
           {' '}
-          <InheritedTextButton
-            onClick={() => {
-              copy('support@codejoust.co');
-              setCopiedEmail(true);
-            }}
-          >
-            support@codejoust.co
-            <InlineCopyIcon />
-          </InheritedTextButton>
+          <Copyable text="support@codejoust.co" top />
           . Say hello!
         </ContactHeaderText>
         <br />
