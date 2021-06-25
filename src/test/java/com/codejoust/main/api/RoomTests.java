@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -77,7 +78,7 @@ public class RoomTests {
     }
 
     @Test
-    public void createAndGetValidRoom() throws Exception {
+    public void createAndGetValidRoomAccount() throws Exception {
         // POST request to create valid room should return successful response
         UserDto host = TestFields.userDto1();
         CreateRoomRequest createRequest = new CreateRoomRequest();
@@ -95,6 +96,40 @@ public class RoomTests {
         assertEquals(expected.getUsers(), actual.getUsers());
         assertEquals(ProblemDifficulty.RANDOM, actual.getDifficulty());
         assertEquals(0, actual.getProblems().size());
+        assertEquals(TestFields.accountUidDto1(), actual.getHost().getAccount());
+
+        // Send GET request to validate that room exists
+        String roomId = actual.getRoomId();
+        expected.setRoomId(roomId);
+        RoomDto actualGet = MockHelper.getRequest(this.mockMvc, TestUrls.getRoom(actual.getRoomId()), RoomDto.class, HttpStatus.OK);
+
+        assertEquals(expected.getRoomId(), actualGet.getRoomId());
+        assertEquals(expected.getHost(), actualGet.getHost());
+        assertEquals(expected.getUsers(), actualGet.getUsers());
+        assertEquals(ProblemDifficulty.RANDOM, actual.getDifficulty());
+        assertEquals(0, actual.getProblems().size());
+    }
+
+    @Test
+    public void createAndGetValidRoomNoAccount() throws Exception {
+        // POST request to create valid room should return successful response
+        UserDto host = TestFields.userDto1();
+        CreateRoomRequest createRequest = new CreateRoomRequest();
+        createRequest.setHost(host);
+
+        RoomDto expected = new RoomDto();
+        expected.setHost(host);
+        List<UserDto> users = new ArrayList<>();
+        users.add(host);
+        expected.setUsers(users);
+
+        RoomDto actual = MockHelper.postRequestNoHeaders(this.mockMvc, TestUrls.createRoom(), createRequest, RoomDto.class, HttpStatus.CREATED);
+
+        assertEquals(expected.getHost(), actual.getHost());
+        assertEquals(expected.getUsers(), actual.getUsers());
+        assertEquals(ProblemDifficulty.RANDOM, actual.getDifficulty());
+        assertEquals(0, actual.getProblems().size());
+        assertNull(actual.getHost().getAccount());
 
         // Send GET request to validate that room exists
         String roomId = actual.getRoomId();
@@ -120,7 +155,7 @@ public class RoomTests {
     }
 
     @Test
-    public void createAndJoinRoom() throws Exception {
+    public void createAndJoinRoomAccount() throws Exception {
         // POST request to create room and PUT request to join room should succeed
         UserDto host = TestFields.userDto1();
         CreateRoomRequest createRequest = new CreateRoomRequest();
@@ -137,6 +172,7 @@ public class RoomTests {
 
         assertEquals(createExpected.getHost(), createActual.getHost());
         assertEquals(createExpected.getUsers(), createActual.getUsers());
+        assertEquals(TestFields.accountUidDto1(), createActual.getHost().getAccount());
 
         // Get id of created room to join
         String roomId = createActual.getRoomId();
@@ -161,6 +197,53 @@ public class RoomTests {
         assertEquals(expected.getRoomId(), actual.getRoomId());
         assertEquals(expected.getHost(), actual.getHost());
         assertEquals(expected.getUsers(), actual.getUsers());
+        assertEquals(TestFields.accountUidDto1(), actual.getHost().getAccount());
+    }
+
+    @Test
+    public void createAndJoinRoomNoAccount() throws Exception {
+        // POST request to create room and PUT request to join room should succeed
+        UserDto host = TestFields.userDto1();
+        CreateRoomRequest createRequest = new CreateRoomRequest();
+        createRequest.setHost(host);
+
+        // 1. Send POST request and verify room was created
+        RoomDto createExpected = new RoomDto();
+        createExpected.setHost(host);
+        List<UserDto> users = new ArrayList<>();
+        users.add(host);
+        createExpected.setUsers(users);
+
+        RoomDto createActual = MockHelper.postRequestNoHeaders(this.mockMvc, TestUrls.createRoom(), createRequest, RoomDto.class, HttpStatus.CREATED);
+
+        assertEquals(createExpected.getHost(), createActual.getHost());
+        assertEquals(createExpected.getUsers(), createActual.getUsers());
+        assertNull(createActual.getHost().getAccount());
+
+        // Get id of created room to join
+        String roomId = createActual.getRoomId();
+
+        // Create User and List<User> for PUT request
+        UserDto user = TestFields.userDto2();
+        users = new ArrayList<>();
+        users.add(host);
+        users.add(user);
+
+        // 2. Send PUT request and verify room was joined
+        JoinRoomRequest joinRequest = new JoinRoomRequest();
+        joinRequest.setUser(user);
+
+        RoomDto expected = new RoomDto();
+        expected.setHost(host);
+        expected.setUsers(users);
+        expected.setRoomId(roomId);
+
+        RoomDto actual = MockHelper.putRequestNoHeaders(this.mockMvc, TestUrls.joinRoom(createActual.getRoomId()), joinRequest, RoomDto.class, HttpStatus.OK);
+
+        assertEquals(expected.getRoomId(), actual.getRoomId());
+        assertEquals(expected.getHost(), actual.getHost());
+        assertEquals(expected.getUsers(), actual.getUsers());
+        assertNull(actual.getHost().getAccount());
     }
 
     @Test

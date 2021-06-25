@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.codejoust.main.dto.user.UserDto;
-import com.codejoust.main.game_object.CodeLanguage;
+import com.codejoust.main.model.report.CodeLanguage;
 import com.codejoust.main.util.Color;
 
 import lombok.EqualsAndHashCode;

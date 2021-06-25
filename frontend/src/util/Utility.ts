@@ -87,11 +87,19 @@ export const onEnterAction = (action: () => void, event: React.KeyboardEvent<HTM
   }
 };
 
-export const getAuthHttpHeader = (token: string) => ({
-  headers: {
-    Authorization: token,
-  },
-});
+export const getAuthHttpHeader = (token: string | null) => {
+  // If token is provided, return headers with authorization token.
+  if (token) {
+    return {
+      headers: {
+        Authorization: token,
+      },
+    };
+  }
+
+  // If no token is provided, return undefined.
+  return undefined;
+};
 
 export const problemMatchesFilterText = (problem: Problem | SelectableProblem,
   filterText: string): boolean => {
