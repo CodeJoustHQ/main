@@ -83,7 +83,7 @@ function SpectatorGameView() {
             subscribePlayer(game.room.roomId, game.players[index].user.userId!);
           }
         }}
-        numProblems={game?.problems.length || 1}
+        problems={game?.problems || []}
       />
       {error ? <CenteredContainer><ErrorMessage message={error} /></CenteredContainer> : null}
       {loading ? <CenteredContainer><Loading /></CenteredContainer> : null}

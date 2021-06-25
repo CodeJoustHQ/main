@@ -343,7 +343,7 @@ function GameResultsPage() {
           players={players}
           currentUser={currentUser}
           gameStartTime={startTime}
-          numProblems={game?.problems.length || 1}
+          problems={game?.problems || []}
           viewPlayerCode={(index: number) => setCodeModal(index)}
           spectatePlayer={null}
         />

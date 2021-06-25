@@ -7,6 +7,7 @@ import { User } from '../../api/User';
 import { NextIcon, PrevIcon } from '../core/Icon';
 import { ProblemNavButton } from '../core/Button';
 import { Problem } from '../../api/Problem';
+import { NoMarginSubtitleText } from '../core/Text';
 
 const Content = styled.div`
   width: 65%;
@@ -34,6 +35,18 @@ const TableContent = styled.table`
   }
 `;
 
+const TopContent = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70px;
+`;
+
+const ProblemText = styled(NoMarginSubtitleText)`
+  display: inline;
+  margin: 0 12px;
+`;
+
 const PrimaryTableHeader = styled.th`
   text-align: left;
 `;
@@ -46,18 +59,17 @@ type ResultsTableProps = {
   players: Player[],
   currentUser: User | null,
   gameStartTime: string,
-  numProblems: number,
+  problems: Problem[],
   viewPlayerCode: ((index: number) => void) | null,
   spectatePlayer: ((index: number) => void) | null,
 };
 
 function ResultsTable(props: ResultsTableProps) {
   const {
-    players, currentUser, gameStartTime, numProblems, viewPlayerCode, spectatePlayer,
+    players, currentUser, gameStartTime, problems, viewPlayerCode, spectatePlayer,
   } = props;
 
   const [problemIndex, setProblemIndex] = useState(0);
-  const problems: string[] = ['t', 'af', 'af']; // TODO: temp - replace with prop
 
   const nextProblem = () => {
     const next = problemIndex + 1;
@@ -77,12 +89,18 @@ function ResultsTable(props: ResultsTableProps) {
 
   return (
     <Content>
-      <ProblemNavButton onClick={previousProblem} disabled={problemIndex <= 0}>
-        <PrevIcon />
-      </ProblemNavButton>
-      <ProblemNavButton onClick={nextProblem} disabled={problemIndex + 1 >= problems.length}>
-        <NextIcon />
-      </ProblemNavButton>
+      <TopContent>
+        <ProblemNavButton onClick={previousProblem} disabled={problemIndex <= 0}>
+          <PrevIcon />
+        </ProblemNavButton>
+        <ProblemText>
+          {`Problem ${problemIndex + 1} of ${problems.length}. `}
+          <b>{problems[problemIndex]?.name || ''}</b>
+        </ProblemText>
+        <ProblemNavButton onClick={nextProblem} disabled={problemIndex + 1 >= problems.length}>
+          <NextIcon />
+        </ProblemNavButton>
+      </TopContent>
       <TableContent>
         <tr>
           <th />
@@ -100,7 +118,7 @@ function ResultsTable(props: ResultsTableProps) {
             isCurrentPlayer={currentUser?.userId === player.user.userId}
             gameStartTime={gameStartTime}
             color={player.color}
-            numProblems={numProblems}
+            numProblems={problems.length}
             onViewCode={viewPlayerCode ? (() => viewPlayerCode(index)) : null}
             onSpectateLive={spectatePlayer ? (() => spectatePlayer(index)) : null}
           />
