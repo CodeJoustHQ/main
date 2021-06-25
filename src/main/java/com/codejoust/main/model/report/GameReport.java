@@ -60,6 +60,10 @@ public class GameReport {
     // How the game ended.
     private GameEndType gameEndType;
 
+    public void addProblemContainer(ProblemContainer problemContainer) {
+        problemContainers.add(problemContainer);
+    }
+    
     public void addUser(User user) {
         users.add(user);
     }

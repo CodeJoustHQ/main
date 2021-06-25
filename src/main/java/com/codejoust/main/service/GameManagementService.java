@@ -31,6 +31,7 @@ import com.codejoust.main.model.Account;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.Problem;
+import com.codejoust.main.model.problem.ProblemContainer;
 import com.codejoust.main.model.report.GameReport;
 import com.codejoust.main.model.report.SubmissionGroupReport;
 import com.codejoust.main.util.EndGameTimerTask;
@@ -304,6 +305,8 @@ public class GameManagementService {
 
     protected void createGameReport(Game game) {
         GameReport gameReport = new GameReport();
+        // TODO: There is still an issue if problems are updated during the game.
+        
         // TODO: Create ProblemContainer class.
         // gameReport.setProblems(game.getProblems());
 
@@ -347,6 +350,15 @@ public class GameManagementService {
                 account.addGameReport(gameReport);
             }
         }
+
+        // 
+        game.getProblems().forEach((problem) -> {
+            ProblemContainer problemContainer = new ProblemContainer();
+            problemContainer.setProblem(problem);
+            problemContainer.setTestCaseCount(problem.getTestCases().size());
+            
+            // gameReport.addProblemContainer()
+        });
     }
 
     protected boolean isGameOver(Game game) {
