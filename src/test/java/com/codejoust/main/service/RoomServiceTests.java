@@ -75,7 +75,7 @@ public class RoomServiceTests {
         Mockito.doReturn(TestFields.USER_ID).when(utility).generateUniqueId(eq(UserService.USER_ID_LENGTH), eq(Utility.USER_ID_KEY));
 
         // Verify create room request succeeds and returns correct response
-        RoomDto response = roomService.createRoom(request);
+        RoomDto response = roomService.createRoom(request, null);
 
         verify(repository).save(Mockito.any(Room.class));
         assertEquals(TestFields.ROOM_ID, response.getRoomId());
@@ -107,7 +107,7 @@ public class RoomServiceTests {
 
         // Mock repository to return room when called
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
-        RoomDto response = roomService.joinRoom(TestFields.ROOM_ID, request);
+        RoomDto response = roomService.joinRoom(TestFields.ROOM_ID, request, null);
 
         verify(socketService).sendSocketUpdate(eq(response));
         assertEquals(TestFields.ROOM_ID, response.getRoomId());
@@ -130,7 +130,7 @@ public class RoomServiceTests {
         Mockito.doReturn(null).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
 
         // Assert that service.joinRoom(request) throws the correct exception
-        ApiException exception = assertThrows(ApiException.class, () -> roomService.joinRoom(TestFields.ROOM_ID, request));
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.joinRoom(TestFields.ROOM_ID, request, null));
 
         verify(repository).findRoomByRoomId(TestFields.ROOM_ID);
         assertEquals(RoomError.NOT_FOUND, exception.getError());
@@ -159,7 +159,7 @@ public class RoomServiceTests {
 
         // Mock repository to return room when called
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
-        ApiException exception = assertThrows(ApiException.class, () -> roomService.joinRoom(TestFields.ROOM_ID, request));
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.joinRoom(TestFields.ROOM_ID, request, null));
 
         verify(repository).findRoomByRoomId(TestFields.ROOM_ID);
         assertEquals(RoomError.DUPLICATE_USERNAME, exception.getError());
@@ -237,7 +237,7 @@ public class RoomServiceTests {
 
         // Mock repository to return room when called
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
-        ApiException exception = assertThrows(ApiException.class, () -> roomService.joinRoom(TestFields.ROOM_ID, request));
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.joinRoom(TestFields.ROOM_ID, request, null));
 
         verify(repository).findRoomByRoomId(TestFields.ROOM_ID);
         assertEquals(RoomError.ALREADY_FULL, exception.getError());
@@ -271,7 +271,7 @@ public class RoomServiceTests {
 
         // Mock repository to return room when called
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
-        assertDoesNotThrow(() -> roomService.joinRoom(TestFields.ROOM_ID, request));
+        assertDoesNotThrow(() -> roomService.joinRoom(TestFields.ROOM_ID, request, null));
         verify(repository).findRoomByRoomId(TestFields.ROOM_ID);
 
         assertEquals(102, room.getUsers().size());

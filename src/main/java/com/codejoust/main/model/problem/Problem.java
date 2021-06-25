@@ -15,6 +15,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.ManyToMany;
 
 import com.codejoust.main.model.Account;
+
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
