@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { User } from '../api/User';
 import { removeUser } from '../api/Room';
 import { disconnect } from '../api/Socket';
@@ -134,6 +134,14 @@ export const getSubmissionTime = (bestSubmission: Submission | null,
 };
 
 export const getSubmissionCount = (player: Player | null) => player?.submissions.length || '0';
+
+export const getSubmission = (curr: number, playerSubmissions: Submission[]) => {
+  for (let i = playerSubmissions.length - 1; i >= 0; i -= 1) {
+    if (playerSubmissions[i].problemIndex === curr) {
+      return playerSubmissions[i];
+    }
+  }
+};
 
 /**
  * De-duplicate a list of SelectableProblems.

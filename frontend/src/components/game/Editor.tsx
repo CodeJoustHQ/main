@@ -5,6 +5,16 @@ import styled, { ThemeContext } from 'styled-components';
 import Language, { fromString, languageToEditorLanguage } from '../../api/Language';
 import { DefaultCodeType } from '../../api/Problem';
 
+/**
+ * onLanguageChange - a callback, called when the currentLanguage changes
+ * onCodeChange - a callback, called when the code changes
+ * getCurrentLanguage - a function passed in by the PlayerGameView which can be called to get the
+ * working language
+ * defaultCodeMap - a map of all the default code for each problem and language
+ * defaultLanguage - the default language for the editor
+ * currentProblem - the problem which is current being worked on
+ * liveCode - ????
+ */
 type EditorProps = {
   onLanguageChange: ((language: Language) => void) | null,
   onCodeChange: ((code: string) => void) | null,

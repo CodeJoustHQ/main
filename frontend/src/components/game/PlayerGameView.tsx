@@ -37,10 +37,12 @@ import { getDifficultyDisplayButton, InheritedTextButton, SmallButton } from '..
 import { SpectatorBackIcon } from '../core/Icon';
 import Language from '../../api/Language';
 import { CopyIndicator, BottomCopyIndicatorContainer, InlineCopyIcon } from '../special/CopyIndicator';
-import { useAppSelector, useBestSubmission } from '../../util/Hook';
+import { useAppSelector, useBestSubmission, useGetSubmission } from '../../util/Hook';
 import { routes, send, subscribe } from '../../api/Socket';
 import { User } from '../../api/User';
-import { getScore, getSubmissionCount, getSubmissionTime } from '../../util/Utility';
+import {
+  getScore, getSubmissionCount, getSubmissionTime, getSubmission,
+} from '../../util/Utility';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
   margin-top: 15px;
@@ -164,8 +166,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [languageList, setLanguageList] = useState<Language[]>([Language.Java]);
   const [codeList, setCodeList] = useState<string[]>(['']);
-  const [currentSubmission, setCurrentSubmission] = useState<Submission | null>(null);
   const [currentProblemIndex, setCurrentProblemIndex] = useState<number>(0);
+  let currentSubmission = useGetSubmission(currentProblemIndex, submissions);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>(gameError);
@@ -189,18 +191,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
-  // const createCodeLanguageArray = () => {
-  //   while (languageList.length < problems.length) {
-  //     languageList.push(Language.Java);
-  //   }
-  //
-  //   while (codeList.length < problems.length) {
-  //     codeList.push('');
-  //   }
-  // };
-
-  // useEffect(() => createCodeLanguageArray(), []);
-
   const getCurrentLanguage = useCallback(() => languageList[currentProblemIndex],
     [languageList, currentProblemIndex]);
 
@@ -220,17 +210,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
       }
       return current;
     }));
-  };
-
-  // Returns the most recent submission made for problem of index curr.
-  const getSubmission = (curr: number, playerSubmissions: Submission[]) => {
-    for (let i = playerSubmissions.length - 1; i >= 0; i -= 1) {
-      if (playerSubmissions[i].problemIndex === curr) {
-        return playerSubmissions[i];
-      }
-    }
-
-    return null;
   };
 
   // References necessary for the spectator subscription callback.
@@ -404,7 +383,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
         // Set the 'test' submission type to correctly display result.
         // eslint-disable-next-line no-param-reassign
         res.submissionType = SubmissionType.Test;
-        setCurrentSubmission(res);
+        currentSubmission = res;
       })
       .catch((err) => {
         setLoading(false);
@@ -431,7 +410,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
         // eslint-disable-next-line no-param-reassign
         res.submissionType = SubmissionType.Submit;
         setSubmissions(submissions.concat([res]));
-        setCurrentSubmission(res);
       })
       .catch((err) => {
         setLoading(false);
@@ -442,7 +420,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
   // todo: no wrap
   const nextProblem = () => {
     setCurrentProblemIndex((currentProblemIndex + 1) % problems?.length);
-    setCurrentSubmission(getSubmission((currentProblemIndex + 1) % problems?.length, submissions));
   };
 
   const previousProblem = () => {
@@ -453,7 +430,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
     }
 
     setCurrentProblemIndex(temp);
-    setCurrentSubmission(getSubmission(temp, submissions));
   };
 
   const displayPlayerLeaderboard = useCallback(() => game?.players.map((player, index) => (
