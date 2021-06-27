@@ -37,7 +37,7 @@ function VerifiedProblemsPage() {
   return (
     <Content>
       <LargeText>Verified Problems</LargeText>
-      <TextLink to="/game/create">Create new problem &#8594;</TextLink>
+      <TextLink to="/problem/create">Create new problem &#8594;</TextLink>
 
       <FilteredProblemList problems={verifiedProblems} />
 

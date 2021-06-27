@@ -130,10 +130,15 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           <TopButtonsContainer>
             <InvertedSmallButton
               onClick={() => {
-                // eslint-disable-next-line no-alert
                 if (JSON.stringify(problem) === JSON.stringify(newProblem)
+                  // eslint-disable-next-line no-alert
                   || window.confirm('Go back? Your unsaved changes will be lost.')) {
-                  history.goBack();
+                  // Use the return link if available; otherwise, use dashboard.
+                  if (history.action !== 'POP') {
+                    history.goBack();
+                  } else {
+                    history.push('/');
+                  }
                 }
               }}
             >
