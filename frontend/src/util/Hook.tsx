@@ -45,7 +45,7 @@ export const useGetScore = (player?: Player) => {
 
       setScore(counted.size);
     }
-  }, [player, setScore]);
+  }, [player, setScore, counted]);
 
   if (player == null || player.submissions.length === 0) {
     return null;
@@ -67,7 +67,7 @@ export const useGetSubmissionTime = (player?: Player) => {
         }
       }
     }
-  }, [player]);
+  }, [player, counted]);
 
   if (!time && player && player.submissions.length > 0) {
     setTime(player.submissions[player.submissions.length - 1].startTime);
