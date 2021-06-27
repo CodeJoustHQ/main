@@ -9,7 +9,7 @@ import { Problem } from '../api/Problem';
 import { Coordinate } from '../components/special/FloatingCircle';
 import app from '../api/Firebase';
 
-// todo: verify correct usages of this function
+// Finds the first best submission by a player (for a specific problem, if specified)
 export const useBestSubmission = (player?: Player | null, problemIndex?: number) => {
   const [bestSubmission, setBestSubmission] = useState<Submission | null>(null);
 
@@ -30,11 +30,12 @@ export const useBestSubmission = (player?: Player | null, problemIndex?: number)
 
       setBestSubmission(newBestSubmission);
     }
-  }, [player, setBestSubmission]);
+  }, [player, setBestSubmission, problemIndex]);
 
   return bestSubmission;
 };
 
+// Calculates the overall score of a player (number solved)
 export const useGetScore = (player?: Player) => {
   const counted = new Set<number>();
   const [score, setScore] = useState<number>(0);
@@ -58,6 +59,7 @@ export const useGetScore = (player?: Player) => {
   return score;
 };
 
+// Calculates the time taken for the latest 100% correct solution for a problem
 export const useGetSubmissionTime = (player?: Player) => {
   const counted = new Set<number>();
   const [time, setTime] = useState<string>();

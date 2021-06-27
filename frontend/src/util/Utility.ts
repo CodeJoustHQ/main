@@ -110,7 +110,7 @@ export const problemMatchesFilterText = (problem: Problem | SelectableProblem,
   return true;
 };
 
-// todo: verify correct usages of these functions
+// Displays the percentage correct of a specific submission
 export const getScore = (bestSubmission: Submission | null) => {
   if (!bestSubmission) {
     return '0';
@@ -120,6 +120,7 @@ export const getScore = (bestSubmission: Submission | null) => {
   return `${percent}%`;
 };
 
+// Displays the time taken for a specific submission
 export const getSubmissionTime = (bestSubmission: Submission | null,
   gameStartTime: string | null) => {
   if (!bestSubmission || !gameStartTime) {
@@ -134,6 +135,7 @@ export const getSubmissionTime = (bestSubmission: Submission | null,
   return ` ${diffMinutes} min`;
 };
 
+// Gets the number of submissions for a specific player and problem
 export const getSubmissionCount = (player: Player | null, problemIndex?: number) => {
   const submissions = (problemIndex !== undefined)
     ? player?.submissions.filter((s) => s.problemIndex === problemIndex) : player?.submissions;

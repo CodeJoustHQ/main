@@ -108,8 +108,7 @@ function ResultsTable(props: ResultsTableProps) {
           <th>Score</th>
           <th>Time</th>
           <SmallColumn>Submissions</SmallColumn>
-          {!spectatePlayer ? <th>Code</th> : null}
-          {spectatePlayer ? <th>Spectate Live</th> : null}
+          {!spectatePlayer ? <th>Code</th> : <th>Spectate Live</th>}
         </tr>
         {players?.map((player, index) => (
           <PlayerResultsItem

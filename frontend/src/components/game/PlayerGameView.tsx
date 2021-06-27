@@ -151,9 +151,19 @@ function PlayerGameView(props: PlayerGameViewProps) {
   // Variable to hold whether the user is subscribed to their own player socket.
   const [playerSocket, setPlayerSocket] = useState<Subscription | null>(null);
 
+  // References necessary for the spectator subscription callback.
+  const stateRef = useRef<StateRefType>();
+  stateRef.current = {
+    game,
+    currentUser,
+    currentCode: codeList[currentProblemIndex],
+    currentLanguage: languageList[currentProblemIndex],
+    currentIndex: currentProblemIndex,
+  };
+
   // Variables to hold the player stats when spectating.
   const [spectatedPlayer, setSpectatedPlayer] = useState<Player | null>(null);
-  const bestSubmission = useBestSubmission(spectatedPlayer);
+  const bestSubmission = useBestSubmission(spectatedPlayer, stateRef.current.currentIndex);
 
   useEffect(() => setProblems(game?.problems || []), [game]);
 
@@ -195,16 +205,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
     }
 
     return null;
-  };
-
-  // References necessary for the spectator subscription callback.
-  const stateRef = useRef<StateRefType>();
-  stateRef.current = {
-    game,
-    currentUser,
-    currentCode: codeList[currentProblemIndex],
-    currentLanguage: languageList[currentProblemIndex],
-    currentIndex: currentProblemIndex,
   };
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
@@ -469,7 +469,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
                 <NoMarginDefaultText>
                   <b>Submissions:</b>
                   {' '}
-                  {getSubmissionCount(spectatedPlayer)}
+                  {getSubmissionCount(spectatedPlayer, stateRef.current.currentIndex)}
                 </NoMarginDefaultText>
               </GameHeaderStatsSubContainer>
             </GameHeaderStatsContainer>

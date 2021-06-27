@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Player, Submission } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
 import { Color } from '../../api/Color';
-import { useBestSubmission, useGetScore, useGetSubmissionTime } from '../../util/Hook';
+import { useBestSubmission } from '../../util/Hook';
 import Language, { displayNameFromLanguage } from '../../api/Language';
 import { TextButton } from '../core/Button';
 import { getScore, getSubmissionCount, getSubmissionTime } from '../../util/Utility';
