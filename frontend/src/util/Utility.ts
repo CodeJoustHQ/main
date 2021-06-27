@@ -110,6 +110,7 @@ export const problemMatchesFilterText = (problem: Problem | SelectableProblem,
   return true;
 };
 
+// todo: verify correct usages of these functions
 export const getScore = (bestSubmission: Submission | null) => {
   if (!bestSubmission) {
     return '0';
@@ -133,4 +134,9 @@ export const getSubmissionTime = (bestSubmission: Submission | null,
   return ` ${diffMinutes} min`;
 };
 
-export const getSubmissionCount = (player: Player | null) => player?.submissions.length || '0';
+export const getSubmissionCount = (player: Player | null, problemIndex?: number) => {
+  const submissions = (problemIndex !== undefined)
+    ? player?.submissions.filter((s) => s.problemIndex === problemIndex) : player?.submissions;
+
+  return submissions?.length || '0';
+};

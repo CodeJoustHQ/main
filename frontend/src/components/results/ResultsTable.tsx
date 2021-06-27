@@ -118,7 +118,7 @@ function ResultsTable(props: ResultsTableProps) {
             isCurrentPlayer={currentUser?.userId === player.user.userId}
             gameStartTime={gameStartTime}
             color={player.color}
-            numProblems={problems.length}
+            problemIndex={problemIndex}
             onViewCode={viewPlayerCode ? (() => viewPlayerCode(index)) : null}
             onSpectateLive={spectatePlayer ? (() => spectatePlayer(index)) : null}
           />
