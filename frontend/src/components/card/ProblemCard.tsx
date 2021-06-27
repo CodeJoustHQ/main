@@ -43,6 +43,14 @@ const TitleText = styled(LargeText)`
   vertical-align: middle;
 `;
 
+const DescriptionText = styled(Text)`
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  word-break: break-all;
+`;
+
 function ProblemCard(props: ProblemCardProps) {
   const { problem } = props;
 
@@ -52,7 +60,7 @@ function ProblemCard(props: ProblemCardProps) {
         <InnerContent>
           <TitleText>{problem.name}</TitleText>
           {getDifficultyDisplayButton(problem.difficulty, true)}
-          <Text>{`${problem.description.substring(0, 80)}...`}</Text>
+          <DescriptionText>{problem.description}</DescriptionText>
 
           {problem.problemTags.map((tag) => (
             <ProblemTagContainer key={tag.name}>
