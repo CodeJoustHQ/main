@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
+import java.util.concurrent.TimeUnit;
 
 import com.codejoust.main.dao.RoomRepository;
 import com.codejoust.main.dto.game.EndGameRequest;
@@ -302,8 +303,12 @@ public class GameManagementService {
             timer.cancel();
         }
 
-        // Create new game report based on all information
-        // TODO: Wait for existing submission calls to complete...?
+        // After one minute (wait for existing submissions) create game report.
+        try {
+            TimeUnit.MINUTES.sleep(1);
+        } catch (InterruptedException e) {
+            log.info(e.toString());
+        }
         createGameReport(game);
     }
 
