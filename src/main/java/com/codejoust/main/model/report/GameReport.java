@@ -39,16 +39,16 @@ public class GameReport {
     @EqualsAndHashCode.Include
     private String gameReportId = UUID.randomUUID().toString();
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Setter(AccessLevel.PRIVATE)
     @Fetch(value = FetchMode.SUBSELECT)
     @JoinColumn(name = "problem_containers_table_id")
     private List<ProblemContainer> problemContainers = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @Setter(AccessLevel.PRIVATE)
-    @JoinColumn(name = "users_table_id")
     @Fetch(value = FetchMode.SUBSELECT)
+    @JoinColumn(name = "users_table_id")
     private List<User> users = new ArrayList<>();
 
     // The start time of the game

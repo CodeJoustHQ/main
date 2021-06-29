@@ -52,7 +52,7 @@ public class Account {
     private List<ProblemTag> problemTags = new ArrayList<>();
 
     // List of tags associated with this problem
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH}, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Setter(AccessLevel.PRIVATE)
     @JoinColumn(name = "game_report_id")
     @Fetch(value = FetchMode.SUBSELECT)

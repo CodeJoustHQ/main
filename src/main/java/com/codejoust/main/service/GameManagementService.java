@@ -4,13 +4,17 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 
+import com.codejoust.main.dao.AccountRepository;
 import com.codejoust.main.dao.GameReportRepository;
 import com.codejoust.main.dao.RoomRepository;
+import com.codejoust.main.dao.UserRepository;
 import com.codejoust.main.dto.game.EndGameRequest;
 import com.codejoust.main.dto.game.GameDto;
 import com.codejoust.main.dto.game.GameMapper;
@@ -53,6 +57,8 @@ public class GameManagementService {
 
     private final RoomRepository repository;
     private final GameReportRepository gameReportRepository;
+    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
     private final SocketService socketService;
     private final LiveGameService liveGameService;
     private final NotificationService notificationService;
@@ -61,11 +67,19 @@ public class GameManagementService {
     private final Map<String, Game> currentGameMap;
 
     @Autowired
-    protected GameManagementService(RoomRepository repository, GameReportRepository gameReportRepository, SocketService socketService,
-                                    LiveGameService liveGameService, NotificationService notificationService,
-                                    SubmitService submitService, ProblemService problemService) {
+    protected GameManagementService(RoomRepository repository,
+                                    GameReportRepository gameReportRepository,
+                                    UserRepository userRepository,
+                                    AccountRepository accountRepository,
+                                    SocketService socketService,
+                                    LiveGameService liveGameService,
+                                    NotificationService notificationService,
+                                    SubmitService submitService,
+                                    ProblemService problemService) {
         this.repository = repository;
         this.gameReportRepository = gameReportRepository;
+        this.userRepository = userRepository;
+        this.accountRepository = accountRepository;
         this.socketService = socketService;
         this.liveGameService = liveGameService;
         this.notificationService = notificationService;
@@ -307,12 +321,15 @@ public class GameManagementService {
         }
 
         // After one minute (wait for existing submissions) create game report.
-        try {
-            TimeUnit.MINUTES.sleep(1);
-        } catch (InterruptedException e) {
-            log.info(e.toString());
-        }
+        log.info("One minute delay");
+        // try {
+        //     TimeUnit.MINUTES.sleep(1);
+        // } catch (InterruptedException e) {
+        //     log.info(e.toString());
+        // }
+        log.info("Create game report");
         createGameReport(game);
+        log.info("Finished game report");
     }
 
     protected void createGameReport(Game game) {
@@ -368,15 +385,6 @@ public class GameManagementService {
             gameReport.addUser(user);
         }
 
-        // Iterate through all room users, players and spectators included.
-        for (User user : game.getRoom().getUsers()) {
-            // If account exists and game report is not added, add game report.
-            Account account = user.getAccount();
-            if (account != null && !account.getGameReports().contains(gameReport)) {
-                account.addGameReport(gameReport);
-            }
-        }
-
         // Set problem container variables.
         List<Problem> problems = game.getProblems();
         for (int i = 0; i < numProblems; i++) {
@@ -402,7 +410,22 @@ public class GameManagementService {
             gameReport.setGameEndType(GameEndType.TIME_UP);
         }
 
+        log.info("Save game report");
         gameReportRepository.save(gameReport);
+
+        // Iterate through all room users, players and spectators included.
+        Set<Account> addedAccounts = new HashSet<>();
+        for (User user : game.getRoom().getUsers()) {
+            // If account exists and game report is not added, add game report.
+            Account account = user.getAccount();
+            if (account != null && !addedAccounts.contains(account)) {
+                account.addGameReport(gameReport);
+                addedAccounts.add(account);
+                accountRepository.save(account);
+            } else if (account == null) {
+                userRepository.save(user);
+            }
+        }
     }
 
     private String compactProblemsSolved(boolean[] problemsSolved) {
