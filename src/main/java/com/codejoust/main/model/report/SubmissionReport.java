@@ -25,6 +25,8 @@ public class SubmissionReport {
 
     private CodeLanguage language;
 
+    private int problemIndex;
+
     // The time that the submission was received.
     private Instant startTime;
 

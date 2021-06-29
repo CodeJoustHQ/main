@@ -33,7 +33,12 @@ public class SubmissionGroupReport {
 
     private Integer numTestCases;
 
-    private Integer numProblemsSolved;
+    /**
+     * String to represent problems solved.
+     * Each index represents the problem index.
+     * 0 = Not Solved, 1 = Solved.
+     */
+    private String problemsSolved;
     
     private Integer numTestCasesPassed;
 

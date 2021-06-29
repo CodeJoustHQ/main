@@ -1,5 +1,6 @@
 package com.codejoust.main.service;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -305,6 +306,7 @@ public class GameManagementService {
 
     protected void createGameReport(Game game) {
         GameReport gameReport = new GameReport();
+        int numProblems = game.getProblems().size();
         // TODO: There is still an issue if problems are updated during the game.
         
         // TODO: Create ProblemContainer class.
@@ -321,24 +323,27 @@ public class GameManagementService {
 
             // TODO: How should I indicate the top submissions / whether a problem was solved for each problem?
             Integer numTestCases = 0;
-            Integer numTestCasesPassed = 0;
-            Integer numProblemsSolved = 0;
+            boolean[] problemsSolved = new boolean[numProblems];
+            int[] testCasesPassed = new int[numProblems];
             for (Submission submission : player.getSubmissions()) {
+                int problemIndex = submission.getProblemIndex();
                 numTestCases += submission.getNumTestCases();
-                numTestCasesPassed += submission.getNumCorrect();
 
-                // If the problem was solved, increment numProblemsSolved.
-                if (submission.getNumTestCases() == submission.getNumCorrect()) {
-                    numProblemsSolved++;
+                // If the problem was solved, set boolean value to true.
+                if (submission.getNumTestCases() == submission.getNumCorrect() && !problemsSolved[problemIndex]) {
+                    problemsSolved[problemIndex] = true;
                 }
+
+                // Get the maximum number of test cases passed for each problem.
+                testCasesPassed[problemIndex] = Math.max(testCasesPassed[problemIndex], submission.getNumCorrect());
 
                 submissionGroupReport.addSubmissionReport(SubmissionMapper.toSubmissionReport(submission));
             }
             
             // Set the problems and test cases statistics.
-            submissionGroupReport.setNumProblemsSolved(numProblemsSolved);
             submissionGroupReport.setNumTestCases(numTestCases);
-            submissionGroupReport.setNumTestCasesPassed(numTestCasesPassed);
+            submissionGroupReport.setProblemsSolved(compactProblemsSolved(problemsSolved));
+            submissionGroupReport.setNumTestCasesPassed(Arrays.stream(testCasesPassed).sum());
             
             // Add the submission group report and the user.
             user.addSubmissionGroupReport(submissionGroupReport);
@@ -359,6 +364,18 @@ public class GameManagementService {
             
             // gameReport.addProblemContainer()
         });
+    }
+
+    private String compactProblemsSolved(boolean[] problemsSolved) {
+        StringBuilder builder = new StringBuilder();
+        for (boolean problemSolved : problemsSolved) {
+            if (problemSolved) {
+                builder.append("1"); 
+            } else {
+                builder.append("0");
+            }
+        }
+        return builder.toString();
     }
 
     protected boolean isGameOver(Game game) {
