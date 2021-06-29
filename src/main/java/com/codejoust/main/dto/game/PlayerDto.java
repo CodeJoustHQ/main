@@ -13,12 +13,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class PlayerDto {
+    @EqualsAndHashCode.Include
     private UserDto user;
     private String code;
     private CodeLanguage language;
     private List<SubmissionDto> submissions = new ArrayList<>();
-    private Boolean solved;
+    private boolean[] solved;
     private Color color;
 }

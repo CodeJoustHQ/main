@@ -17,9 +17,7 @@ import { Difficulty } from '../api/Difficulty';
 import { Game, manuallyEndGame } from '../api/Game';
 import GameTimerContainer from '../components/game/GameTimerContainer';
 import { GameTimer } from '../api/GameTimer';
-import {
-  TextButton, DangerButton,
-} from '../components/core/Button';
+import { TextButton, DangerButton } from '../components/core/Button';
 import {
   connect, routes, subscribe,
 } from '../api/Socket';
@@ -53,6 +51,7 @@ function GamePage() {
   const [host, setHost] = useState<User | null>(null);
   const [spectators, setSpectators] = useState<User[]>([]);
   const [gameTimer, setGameTimer] = useState<GameTimer | null>(null);
+
   const [timeUp, setTimeUp] = useState(false);
   const [allSolved, setAllSolved] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);

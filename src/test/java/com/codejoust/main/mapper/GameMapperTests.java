@@ -4,6 +4,7 @@ import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -34,9 +35,10 @@ public class GameMapperTests {
     private static final int TEST_CASES = 10;
 
     // Helper method to add a dummy submission to a PlayerDto object
-    private void addSubmissionHelper(PlayerDto playerDto, int numCorrect) {
+    private void addSubmissionHelper(PlayerDto playerDto, int numCorrect, int problemIndex) {
         SubmissionDto submissionDto = new SubmissionDto();
         submissionDto.setNumCorrect(numCorrect);
+        submissionDto.setProblemIndex(problemIndex);
         submissionDto.setStartTime(Instant.now());
 
         playerDto.getSubmissions().add(submissionDto);
@@ -104,7 +106,7 @@ public class GameMapperTests {
         submission.setNumCorrect(TEST_CASES);
 
         Player player = game.getPlayers().get(TestFields.USER_ID);
-        player.setSolved(true);
+        player.setSolved(new boolean[]{true});
         player.setPlayerCode(playerCode);
         player.getSubmissions().add(submission);
 
@@ -119,9 +121,7 @@ public class GameMapperTests {
 
         PlayerDto playerDto = gameDto.getPlayers().get(0);
         assertEquals(UserMapper.toDto(user), playerDto.getUser());
-        assertEquals(player.getSolved(), playerDto.getSolved());
-        assertEquals(playerCode.getCode(), playerDto.getCode());
-        assertEquals(playerCode.getLanguage(), playerDto.getLanguage());
+        assertArrayEquals(player.getSolved(), playerDto.getSolved());
         assertEquals(1, playerDto.getSubmissions().size());
         assertEquals(player.getColor(), playerDto.getColor());
 
@@ -159,20 +159,23 @@ public class GameMapperTests {
 
         // Note: order of addSubmissionHelper matters (time of submission)
         PlayerDto player1 = new PlayerDto();
-        addSubmissionHelper(player1, 0);
+        addSubmissionHelper(player1, TEST_CASES, 0);
+        addSubmissionHelper(player1, TEST_CASES, 0);
+        addSubmissionHelper(player1, TEST_CASES, 0);
 
         PlayerDto player2 = new PlayerDto();
-        addSubmissionHelper(player2, 0);
-        addSubmissionHelper(player2, 3);
+        addSubmissionHelper(player2, TEST_CASES, 0);
+        addSubmissionHelper(player2, TEST_CASES, 1);
 
         PlayerDto player3 = new PlayerDto();
-        addSubmissionHelper(player3, 3);
-
-        addSubmissionHelper(player2, 3);
+        addSubmissionHelper(player3, 0, 0);
 
         PlayerDto player4 = new PlayerDto();
-        addSubmissionHelper(player4, 5);
-        addSubmissionHelper(player4, 1);
+        addSubmissionHelper(player4, TEST_CASES, 0);
+        addSubmissionHelper(player4, TEST_CASES, 1);
+
+        // Player 2 submits wrong afterwards, but it doesn't count against his time
+        addSubmissionHelper(player2, 0, 1);
 
         PlayerDto player5 = new PlayerDto();
 
@@ -182,13 +185,13 @@ public class GameMapperTests {
         players.add(player4);
         players.add(player5);
 
-        // Player order should be: [4, 2, 3, 1, 5]
+        // Player order should be: [2, 4, 1, 3, 5]
         GameMapper.sortLeaderboard(players);
 
-        assertEquals(player4, players.get(0));
-        assertEquals(player2, players.get(1));
-        assertEquals(player3, players.get(2));
-        assertEquals(player1, players.get(3));
+        assertEquals(player2, players.get(0));
+        assertEquals(player4, players.get(1));
+        assertEquals(player1, players.get(2));
+        assertEquals(player3, players.get(3));
         assertEquals(player5, players.get(4));
     }
 
@@ -196,8 +199,10 @@ public class GameMapperTests {
     public void toDtoSortsLeaderboard() {
         Submission sub1 = new Submission();
         sub1.setNumCorrect(0);
+        sub1.setNumTestCases(TEST_CASES);
         Submission sub2 = new Submission();
-        sub2.setNumCorrect(1);
+        sub2.setNumCorrect(TEST_CASES);
+        sub2.setNumTestCases(TEST_CASES);
 
         Player player1 = new Player();
         player1.getSubmissions().add(sub1);
@@ -213,7 +218,7 @@ public class GameMapperTests {
         List<PlayerDto> players = gameDto.getPlayers();
 
         assertEquals(2, players.size());
-        assertEquals(1, players.get(0).getSubmissions().get(0).getNumCorrect());
+        assertEquals(TEST_CASES, players.get(0).getSubmissions().get(0).getNumCorrect());
         assertEquals(0, players.get(1).getSubmissions().get(0).getNumCorrect());
     }
 }

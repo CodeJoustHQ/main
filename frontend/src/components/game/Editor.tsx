@@ -8,9 +8,11 @@ import { DefaultCodeType } from '../../api/Problem';
 type EditorProps = {
   onLanguageChange: ((language: Language) => void) | null,
   onCodeChange: ((code: string) => void) | null,
-  codeMap: DefaultCodeType | null,
+  getCurrentLanguage: (() => Language) | null,
+  defaultCodeMap: DefaultCodeType[] | null,
   defaultLanguage: Language,
   defaultCode: string | null,
+  currentProblem: number,
   liveCode: string | null,
 };
 
@@ -68,7 +70,7 @@ const LanguageSelect = styled.select`
 const monacoEditorOptions: EditorConstructionOptions = {
   automaticLayout: true,
   fixedOverflowWidgets: true,
-  fontFamily: 'Monaco',
+  fontFamily: 'Monaco, monospace',
   hideCursorInOverviewRuler: true,
   minimap: { enabled: false },
   overviewRulerBorder: false,
@@ -89,17 +91,23 @@ const monacoEditorOptions: EditorConstructionOptions = {
 // This function refreshes the width of Monaco editor upon change in container size
 function ResizableMonacoEditor(props: EditorProps) {
   const {
-    onLanguageChange, onCodeChange, codeMap, defaultLanguage,
-    defaultCode, liveCode,
+    onLanguageChange, onCodeChange, getCurrentLanguage,
+    defaultCodeMap, defaultLanguage, defaultCode, currentProblem, liveCode,
   } = props;
 
   const theme = useContext(ThemeContext);
   const [currentLanguage, setCurrentLanguage] = useState<Language>(defaultLanguage);
   const [codeEditor, setCodeEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const [codeMap, setCodeMap] = useState<DefaultCodeType[] | null>(defaultCodeMap);
+  const [previousProblem, setPreviousProblem] = useState<number>(0);
 
   useEffect(() => {
     setCurrentLanguage(defaultLanguage);
   }, [defaultLanguage]);
+
+  useEffect(() => {
+    setCodeMap(defaultCodeMap);
+  }, [defaultCodeMap]);
 
   const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor) => {
     setCodeEditor(editor);
@@ -126,8 +134,10 @@ function ResizableMonacoEditor(props: EditorProps) {
   const handleLanguageChange = (language: Language) => {
     // Save the code for this language
     if (codeMap != null && codeEditor != null) {
-      codeMap[currentLanguage] = codeEditor.getValue();
-      codeEditor.setValue(codeMap[language]);
+      const codeMapTemp = codeMap;
+      codeMapTemp[currentProblem][currentLanguage] = codeEditor.getValue();
+      setCodeMap(codeMapTemp);
+      codeEditor.setValue(codeMap[currentProblem][language]);
     }
 
     // Change the language and initial code for the editor
@@ -139,9 +149,31 @@ function ResizableMonacoEditor(props: EditorProps) {
 
   useEffect(() => {
     if (codeMap != null && codeEditor != null) {
-      codeEditor.setValue(codeMap[currentLanguage]);
+      if (codeMap[currentProblem] != null) {
+        const codeMapTemp = codeMap;
+
+        if (codeEditor.getValue() !== 'Loading...') {
+          codeMapTemp[previousProblem][currentLanguage] = codeEditor.getValue();
+        }
+
+        setCodeMap(codeMapTemp);
+        setPreviousProblem(currentProblem);
+
+        let newLanguage = currentLanguage;
+
+        if (getCurrentLanguage !== null) {
+          newLanguage = getCurrentLanguage();
+
+          if (newLanguage !== currentLanguage) {
+            setCurrentLanguage(newLanguage);
+          }
+        }
+
+        codeEditor.setValue(codeMap[currentProblem][newLanguage]);
+      }
     }
-  }, [currentLanguage, codeMap, codeEditor, setCodeEditor]);
+  }, [currentLanguage, codeMap, codeEditor, setCodeEditor,
+    currentProblem, previousProblem, getCurrentLanguage]);
 
   return (
     <Content>

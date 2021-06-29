@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import copy from 'copy-to-clipboard';
 import { useBeforeunload } from 'react-beforeunload';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Message } from 'stompjs';
@@ -18,11 +17,6 @@ import {
 import { User } from '../api/User';
 import Podium from '../components/results/Podium';
 import { HoverContainer, HoverElement, HoverTooltip } from '../components/core/HoverTooltip';
-import {
-  CopyIndicator,
-  CopyIndicatorContainer,
-  InlineCopyIcon,
-} from '../components/special/CopyIndicator';
 import ResultsTable from '../components/results/ResultsTable';
 import Modal from '../components/core/Modal';
 import FeedbackPopup from '../components/results/FeedbackPopup';
@@ -31,6 +25,7 @@ import { fetchGame, setGame } from '../redux/Game';
 import { setCurrentUser } from '../redux/User';
 import { setRoom } from '../redux/Room';
 import PreviewCodeContent from '../components/results/PreviewCodeContent';
+import { CopyableContent, InlineCopyIcon } from '../components/special/CopyIndicator';
 
 const Content = styled.div`
   padding: 0;
@@ -101,7 +96,7 @@ function GameResultsPage() {
 
   const [connected, setConnected] = useState(false);
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
-  const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
+  // const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState<boolean>(false);
   const [showFeedbackPrompt, setShowFeedbackPrompt] = useState<boolean>(false);
   const [codeModal, setCodeModal] = useState(-1);
@@ -224,26 +219,18 @@ function GameResultsPage() {
 
   // Content to display for inviting players (if not enough players on the podium)
   const inviteContent = () => (
-    <InviteContainer
-      onClick={() => {
-        copy(`https://codejoust.co/play?room=${roomId}`);
-        setCopiedRoomLink(true);
-      }}
-    >
-      <InviteText>
-        Invite
-        <InlineCopyIcon>content_copy</InlineCopyIcon>
-      </InviteText>
-    </InviteContainer>
+    <CopyableContent text={`https://codejoust.co/play?room=${roomId}`} top>
+      <InviteContainer>
+        <InviteText>
+          Invite
+          <InlineCopyIcon />
+        </InviteText>
+      </InviteContainer>
+    </CopyableContent>
   );
 
   return (
     <Content>
-      <CopyIndicatorContainer copied={copiedRoomLink}>
-        <CopyIndicator onClick={() => setCopiedRoomLink(false)}>
-          Link copied!&nbsp;&nbsp;✕
-        </CopyIndicator>
-      </CopyIndicatorContainer>
       <HoverTooltip
         visible={hoverVisible}
         x={mousePosition.x}
@@ -295,6 +282,7 @@ function GameResultsPage() {
           inviteContent={inviteContent()}
           loading={loading}
           isCurrentPlayer={players[1]?.user.userId === currentUser?.userId}
+          numProblems={game?.problems.length || 1}
         />
         <Podium
           place={1}
@@ -303,6 +291,7 @@ function GameResultsPage() {
           inviteContent={inviteContent()}
           loading={loading}
           isCurrentPlayer={players[0]?.user.userId === currentUser?.userId}
+          numProblems={game?.problems.length || 1}
         />
         <Podium
           place={3}
@@ -311,6 +300,7 @@ function GameResultsPage() {
           inviteContent={inviteContent()}
           loading={loading}
           isCurrentPlayer={players[2]?.user.userId === currentUser?.userId}
+          numProblems={game?.problems.length || 1}
         />
       </PodiumContainer>
 
@@ -353,6 +343,7 @@ function GameResultsPage() {
           players={players}
           currentUser={currentUser}
           gameStartTime={startTime}
+          numProblems={game?.problems.length || 1}
           viewPlayerCode={(index: number) => setCodeModal(index)}
           spectatePlayer={null}
         />

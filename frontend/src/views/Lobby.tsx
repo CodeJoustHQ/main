@@ -4,7 +4,6 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import { Message, Subscription } from 'stompjs';
 import { useBeforeunload } from 'react-beforeunload';
 import styled from 'styled-components';
-import copy from 'copy-to-clipboard';
 import ErrorMessage from '../components/core/Error';
 import {
   NoMarginMediumText,
@@ -13,6 +12,7 @@ import {
   NoMarginSubtitleText,
   LowMarginText,
   Text,
+  ContactHeaderText,
 } from '../components/core/Text';
 import {
   connect, routes, subscribe, disconnect,
@@ -39,12 +39,6 @@ import {
   setSpectator,
 } from '../api/Room';
 import { errorHandler } from '../api/Error';
-import {
-  CopyIndicator,
-  CopyIndicatorContainer,
-  InlineCopyIcon,
-  InlineBackgroundCopyText,
-} from '../components/special/CopyIndicator';
 import IdContainer from '../components/special/IdContainer';
 import { FlexBareContainer, LeftContainer } from '../components/core/Container';
 import { Slider, SliderContainer } from '../components/core/RangeSlider';
@@ -58,6 +52,7 @@ import { setCurrentUser } from '../redux/User';
 import { LobbyHelpModal } from '../components/core/HelpModal';
 import Modal from '../components/core/Modal';
 import { setGame } from '../redux/Game';
+import { CopyableContent, InlineCopyIcon } from '../components/special/CopyIndicator';
 
 type LobbyPageLocation = {
   user: User,
@@ -150,6 +145,18 @@ const ExitModalButton = styled(PrimaryButton)`
   margin: 20px 0;
 `;
 
+const CopyableRoomLink = styled(ContactHeaderText)`
+  display: inline-block;
+  margin: 0;
+  padding: 0.25rem 0.5rem;
+  font-size: ${({ theme }) => theme.fontSize.mediumLarge};
+  background: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.white};
+  border-radius: 0.5rem;
+  cursor: pointer;
+  text-decoration: none;
+`;
+
 function LobbyPage() {
   // Get history object to be able to move between different pages
   const history = useHistory();
@@ -166,6 +173,7 @@ function LobbyPage() {
   const [duration, setDuration] = useState<number | undefined>(15);
   const [selectedProblems, setSelectedProblems] = useState<SelectableProblem[]>([]);
   const [size, setSize] = useState<number | undefined>(10);
+  const [numProblems, setNumProblems] = useState<number>(1);
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
   const [showProblemSelector, setShowProblemSelector] = useState(true);
 
@@ -185,9 +193,6 @@ function LobbyPage() {
 
   // Variable to hold the socket subscription, or null if not connected
   const [subscription, setSubscription] = useState<Subscription | null>(null);
-
-  // Variable to hold whether the room link was copied.
-  const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
 
   // Variable to hold whether the modal explaining the user cards is active.
   const [actionCardHelp, setActionCardHelp] = useState<boolean>(false);
@@ -218,6 +223,7 @@ function LobbyPage() {
     setDuration(newRoom.duration / 60);
     setSelectedProblems(newRoom.problems);
     setSize(newRoom.size);
+    setNumProblems(newRoom.numProblems);
 
     // Set the room and current user.
     dispatch(setRoom(newRoom));
@@ -343,7 +349,8 @@ function LobbyPage() {
     });
 
     // eslint-disable-next-line no-alert
-    if (!allSpectators || window.confirm('Everybody in this room is a spectator, which means this is going to be a pretty boring game... are you sure you want to start the game?')) {
+    if (!allSpectators || window.confirm('Everybody in this room is a spectator, which means this is '
+      + 'going to be a pretty boring game... are you sure you want to start the game?')) {
       startGame(currentRoomId, request)
         .then(() => {
           setLoading(true);
@@ -496,6 +503,25 @@ function LobbyPage() {
       });
   };
 
+  const updateNumProblems = () => {
+    setError('');
+    setLoading(true);
+    const prevNumProblems = numProblems;
+    const settings = {
+      initiator: currentUser!,
+      numProblems,
+    };
+
+    updateRoomSettings(currentRoomId, settings)
+      .then(() => setLoading(false))
+      .catch((err) => {
+        setLoading(false);
+        setError(err.message);
+        // Set numProblems back to original if REST call failed
+        setNumProblems(prevNumProblems);
+      });
+  };
+
   /**
    * Display the passed-in list of users on the UI, either as
    * active or inactive.
@@ -641,20 +667,19 @@ function LobbyPage() {
           <NoMarginMediumText>Select problems for this game:</NoMarginMediumText>
           <Text>
             Use the dropdown below to select the problems for your game.
-            Alternatively, skip this step to create a game with a random problem.
+            Alternatively, skip this step to create a game with random problems.
           </Text>
           { error ? <ErrorMessage message={error} /> : null }
           <ProblemSelector
             selectedProblems={selectedProblems}
             onSelect={addProblem}
+            loading={loading}
           />
           <SelectedProblemsDisplay
             problems={selectedProblems}
             onRemove={isHost(currentUser) ? removeProblem : null}
           />
-          <ExitModalButton
-            onClick={() => setShowProblemSelector(false)}
-          >
+          <ExitModalButton onClick={() => setShowProblemSelector(false)}>
             All Good!
           </ExitModalButton>
         </LeftContainer>
@@ -666,25 +691,16 @@ function LobbyPage() {
       >
         Only the host can start the game and update settings
       </HoverTooltip>
-      <CopyIndicatorContainer copied={copiedRoomLink}>
-        <CopyIndicator onClick={() => setCopiedRoomLink(false)}>
-          Link copied!&nbsp;&nbsp;✕
-        </CopyIndicator>
-      </CopyIndicatorContainer>
       <HeaderContainer>
         <SecondaryHeaderText>
           Join with the link
           {' '}
-          <InlineBackgroundCopyText
-            onClick={() => {
-              copy(`https://codejoust.co/play?room=${currentRoomId}`);
-              setCopiedRoomLink(true);
-            }}
-          >
-            codejoust.co/play?room=
-            {currentRoomId}
-            <InlineCopyIcon>content_copy</InlineCopyIcon>
-          </InlineBackgroundCopyText>
+          <CopyableContent text={`https://codejoust.co/play?room=${currentRoomId}`} top>
+            <CopyableRoomLink>
+              {`codejoust.co/play?room=${currentRoomId}`}
+              <InlineCopyIcon />
+            </CopyableRoomLink>
+          </CopyableContent>
           {' '}
           or at
           {' '}
@@ -708,38 +724,21 @@ function LobbyPage() {
         >
           Leave Room
         </SecondaryRedButton>
-
       </HeaderContainer>
 
       <FlexBareContainerLeft>
         <PlayersContainer>
           <LobbyContainerTitle>
             Players
-            {
-              users
-                ? ` (${users.length})`
-                : null
-            }
-            <InlineIcon
-              onClick={refreshRoomDetails}
-            >
-              refresh
-            </InlineIcon>
-            <InlineIcon
-              onClick={() => setActionCardHelp(true)}
-            >
-              help_outline
-            </InlineIcon>
+            { users ? ` (${users.length})` : null }
+            <InlineIcon onClick={refreshRoomDetails}>refresh</InlineIcon>
+            <InlineIcon onClick={() => setActionCardHelp(true)}>help_outline</InlineIcon>
           </LobbyContainerTitle>
           <BackgroundContainer>
-            {
-              displayUsers(activeUsers, true)
-            }
-            {
-              displayUsers(inactiveUsers, false)
-            }
-            { error ? <ErrorMessage message={error} /> : null }
-            { loading ? <Loading /> : null }
+            {displayUsers(activeUsers, true)}
+            {displayUsers(inactiveUsers, false)}
+            {error ? <ErrorMessage message={error} /> : null}
+            {loading ? <Loading /> : null}
           </BackgroundContainer>
         </PlayersContainer>
         <RoomSettingsContainer>
@@ -750,7 +749,7 @@ function LobbyPage() {
                 <NoMarginMediumText>Difficulty</NoMarginMediumText>
                 {isHost(currentUser) ? (
                   <LowMarginText>
-                    Choose a difficulty for your randomly selected problem:
+                    Choose a difficulty for your randomly selected problems:
                   </LowMarginText>
                 ) : null}
                 <DifficultyContainer>
@@ -772,13 +771,35 @@ function LobbyPage() {
                     );
                   })}
                 </DifficultyContainer>
+                <NoMarginMediumText>Number of Problems</NoMarginMediumText>
+                <NoMarginSubtitleText>
+                  {`${numProblems} problem${numProblems === 1 ? '' : 's'}`}
+                </NoMarginSubtitleText>
+                <HoverContainerSlider>
+                  <HoverElementSlider {...hoverProps} />
+                  <SliderContainer>
+                    <Slider
+                      min={1}
+                      max={10}
+                      value={numProblems}
+                      disabled={!isHost(currentUser)}
+                      onChange={(e) => {
+                        const newNumProblems = Number(e.target.value);
+                        if (newNumProblems >= 1 && newNumProblems <= 10) {
+                          setNumProblems(newNumProblems);
+                        }
+                      }}
+                      onMouseUp={updateNumProblems}
+                    />
+                  </SliderContainer>
+                </HoverContainerSlider>
               </>
             ) : (
               <>
                 <NoMarginMediumText>Problems</NoMarginMediumText>
                 <SelectedProblemsDisplay
                   problems={selectedProblems}
-                  onRemove={isHost(currentUser) ? removeProblem : null}
+                  onRemove={isHost(currentUser) && !loading ? removeProblem : null}
                 />
               </>
             )}

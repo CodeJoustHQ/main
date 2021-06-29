@@ -30,6 +30,52 @@ export const useBestSubmission = (player?: Player | null) => {
   return bestSubmission;
 };
 
+export const useGetScore = (player?: Player) => {
+  const counted = new Set<number>();
+  const [score, setScore] = useState<number>(0);
+
+  useEffect(() => {
+    if (player) {
+      for (let i = 0; i < player.submissions.length; i += 1) {
+        if (player.submissions[i].numCorrect === player.submissions[i].numTestCases
+          && !counted.has(player.submissions[i].problemIndex)) {
+          counted.add(player.submissions[i].problemIndex);
+        }
+      }
+
+      setScore(counted.size);
+    }
+  }, [player, setScore, counted]);
+
+  if (player == null || player.submissions.length === 0) {
+    return null;
+  }
+  return score;
+};
+
+export const useGetSubmissionTime = (player?: Player) => {
+  const counted = new Set<number>();
+  const [time, setTime] = useState<string>();
+
+  useEffect(() => {
+    if (player) {
+      for (let i = 0; i < player.submissions.length; i += 1) {
+        if (player.submissions[i].numCorrect === player.submissions[i].numTestCases
+          && !counted.has(player.submissions[i].problemIndex)) {
+          counted.add(player.submissions[i].problemIndex);
+          setTime(player.submissions[i].startTime);
+        }
+      }
+    }
+  }, [player, counted]);
+
+  if (!time && player && player.submissions.length > 0) {
+    setTime(player.submissions[player.submissions.length - 1].startTime);
+  }
+
+  return time;
+};
+
 export const useProblemEditable = (user: FirebaseUserType | null, problem: Problem | null) => {
   const [editable, setEditable] = useState(false);
 

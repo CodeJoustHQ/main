@@ -130,7 +130,7 @@ function Console(props: ConsoleProps) {
       // Default values
       setTitle('Console');
       setSubtitle('');
-      setInput(testCases[0].input);
+      setInput(testCases ? testCases[0].input : '');
       setOutput('');
       setConsoleOutput('');
     }

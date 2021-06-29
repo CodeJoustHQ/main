@@ -13,4 +13,5 @@ public class SubmissionRequest {
     private String code;
     private String input;
     private UserDto initiator;
+    private int problemIndex = 0;
 }

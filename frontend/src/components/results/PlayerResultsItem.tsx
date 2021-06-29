@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Player, Submission } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
 import { Color } from '../../api/Color';
-import { Player } from '../../api/Game';
-import { useBestSubmission } from '../../util/Hook';
+import { useBestSubmission, useGetScore, useGetSubmissionTime } from '../../util/Hook';
 import Language, { displayNameFromLanguage } from '../../api/Language';
 import { TextButton } from '../core/Button';
-import { getScore, getSubmissionCount, getSubmissionTime } from '../../util/Utility';
+// import { getScore, getSubmissionCount, getSubmissionTime } from '../../util/Utility';
 
 const Content = styled.tr`
   border-radius: 5px;
@@ -83,22 +83,46 @@ type PlayerResultsCardProps = {
   isCurrentPlayer: boolean,
   gameStartTime: string,
   color: Color,
+  numProblems: number,
   onViewCode: (() => void) | null,
   onSpectateLive: (() => void) | null,
 };
 
 function PlayerResultsItem(props: PlayerResultsCardProps) {
   const {
-    player, place, isCurrentPlayer, color, gameStartTime, onViewCode,
-    onSpectateLive,
+    player, place, isCurrentPlayer, color, gameStartTime, numProblems, onViewCode, onSpectateLive,
   } = props;
 
-  const bestSubmission = useBestSubmission(player);
+  const score = useGetScore(player);
+  const time = useGetSubmissionTime(player);
+  const bestSubmission : Submission | null = useBestSubmission(player);
 
   const getDisplayNickname = () => {
     const { nickname } = player.user;
     return `${nickname} ${isCurrentPlayer ? '(you)' : ''}`;
   };
+
+  const getScore = () => {
+    if (!score) {
+      return '0';
+    }
+
+    const percent = Math.round((score / numProblems) * 100);
+    return `${percent}%`;
+  };
+
+  const getSubmissionTime = () => {
+    if (!time) {
+      return 'N/A';
+    }
+
+    const startTime = new Date(gameStartTime).getTime();
+    const diffMilliseconds = new Date(time).getTime() - startTime;
+    const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
+    return `${diffMinutes}m ago`;
+  };
+
+  const getSubmissionCount = () => player.submissions.length || '0';
 
   const getSubmissionLanguage = () => {
     if (!bestSubmission) {
@@ -129,13 +153,13 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
       </PlayerContent>
 
       <td>
-        <Text>{getScore(bestSubmission)}</Text>
+        <Text>{getScore()}</Text>
       </td>
       <td>
-        <Text>{getSubmissionTime(bestSubmission, gameStartTime)}</Text>
+        <Text>{getSubmissionTime()}</Text>
       </td>
       <td>
-        <Text>{getSubmissionCount(player)}</Text>
+        <Text>{getSubmissionCount()}</Text>
       </td>
       {!onSpectateLive ? (
         <CodeColumn>{getSubmissionLanguage()}</CodeColumn>

@@ -34,6 +34,7 @@ export type UpdateSettingsParams = {
   duration?: number,
   problems?: ProblemIdParam[],
   size?: number,
+  numProblems?: number,
 };
 
 export type ChangeHostParams = {
