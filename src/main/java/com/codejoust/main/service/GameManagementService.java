@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 
+import com.codejoust.main.dao.GameReportRepository;
 import com.codejoust.main.dao.RoomRepository;
 import com.codejoust.main.dto.game.EndGameRequest;
 import com.codejoust.main.dto.game.GameDto;
@@ -51,6 +52,7 @@ import org.springframework.stereotype.Service;
 public class GameManagementService {
 
     private final RoomRepository repository;
+    private final GameReportRepository gameReportRepository;
     private final SocketService socketService;
     private final LiveGameService liveGameService;
     private final NotificationService notificationService;
@@ -59,10 +61,11 @@ public class GameManagementService {
     private final Map<String, Game> currentGameMap;
 
     @Autowired
-    protected GameManagementService(RoomRepository repository, SocketService socketService,
+    protected GameManagementService(RoomRepository repository, GameReportRepository gameReportRepository, SocketService socketService,
                                     LiveGameService liveGameService, NotificationService notificationService,
                                     SubmitService submitService, ProblemService problemService) {
         this.repository = repository;
+        this.gameReportRepository = gameReportRepository;
         this.socketService = socketService;
         this.liveGameService = liveGameService;
         this.notificationService = notificationService;
@@ -363,7 +366,10 @@ public class GameManagementService {
             // Add the submission group report and the user.
             user.addSubmissionGroupReport(submissionGroupReport);
             gameReport.addUser(user);
+        }
 
+        // Iterate through all room users, players and spectators included.
+        for (User user : game.getRoom().getUsers()) {
             // If account exists and game report is not added, add game report.
             Account account = user.getAccount();
             if (account != null && !account.getGameReports().contains(gameReport)) {
@@ -395,6 +401,8 @@ public class GameManagementService {
         } else {
             gameReport.setGameEndType(GameEndType.TIME_UP);
         }
+
+        gameReportRepository.save(gameReport);
     }
 
     private String compactProblemsSolved(boolean[] problemsSolved) {
