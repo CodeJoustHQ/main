@@ -1,5 +1,7 @@
 package com.codejoust.main.service;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +35,7 @@ import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.model.problem.ProblemContainer;
+import com.codejoust.main.model.report.GameEndType;
 import com.codejoust.main.model.report.GameReport;
 import com.codejoust.main.model.report.SubmissionGroupReport;
 import com.codejoust.main.util.EndGameTimerTask;
@@ -307,12 +310,12 @@ public class GameManagementService {
     protected void createGameReport(Game game) {
         GameReport gameReport = new GameReport();
         int numProblems = game.getProblems().size();
-        // TODO: There is still an issue if problems are updated during the game.
-        
-        // TODO: Create ProblemContainer class.
-        // gameReport.setProblems(game.getProblems());
+        int numPlayers = game.getPlayers().size();
 
-        // TODO: Confirm that all the user information, particularly accounts, will always be up-to-date.
+        // Initialize the statistic variables for each problem.
+        int[] userSolved = new int[numProblems];
+        double[] totalTestCasesPassed = new double[numProblems];
+        double[] totalAttemptCount = new double[numProblems];
         for (Player player : game.getPlayers().values()) {
             // For each user, add the relevant submission info.
             User user = player.getUser();
@@ -321,23 +324,30 @@ public class GameManagementService {
             SubmissionGroupReport submissionGroupReport = new SubmissionGroupReport();
             submissionGroupReport.setGameReportId(gameReport.getGameReportId());
 
-            // TODO: How should I indicate the top submissions / whether a problem was solved for each problem?
-            Integer numTestCases = 0;
+            // Iterate through each submission and update group statistics.
+            int numTestCases = 0;
             boolean[] problemsSolved = new boolean[numProblems];
             int[] testCasesPassed = new int[numProblems];
             for (Submission submission : player.getSubmissions()) {
                 int problemIndex = submission.getProblemIndex();
                 numTestCases += submission.getNumTestCases();
+                totalAttemptCount[problemIndex]++;
 
                 // If the problem was solved, set boolean value to true.
                 if (submission.getNumTestCases() == submission.getNumCorrect() && !problemsSolved[problemIndex]) {
                     problemsSolved[problemIndex] = true;
+                    userSolved[problemIndex]++;
                 }
 
                 // Get the maximum number of test cases passed for each problem.
                 testCasesPassed[problemIndex] = Math.max(testCasesPassed[problemIndex], submission.getNumCorrect());
 
                 submissionGroupReport.addSubmissionReport(SubmissionMapper.toSubmissionReport(submission));
+            }
+
+            // Iterate through the test cases passed to add to the game total.
+            for (int i = 0; i < testCasesPassed.length; i++) {
+                totalTestCasesPassed[i] += testCasesPassed[i];
             }
             
             // Set the problems and test cases statistics.
@@ -356,14 +366,30 @@ public class GameManagementService {
             }
         }
 
-        // 
-        game.getProblems().forEach((problem) -> {
+        // Set problem container variables.
+        List<Problem> problems = game.getProblems();
+        for (int i = 0; i < numProblems; i++) {
+            Problem problem = problems.get(i);
             ProblemContainer problemContainer = new ProblemContainer();
             problemContainer.setProblem(problem);
+            problemContainer.setUserSolvedCount(userSolved[i]);
             problemContainer.setTestCaseCount(problem.getTestCases().size());
-            
-            // gameReport.addProblemContainer()
-        });
+            problemContainer.setAverageTestCasesPassed(totalTestCasesPassed[i] / problem.getTestCases().size());
+            problemContainer.setAverageAttemptCount(totalAttemptCount[i] / numPlayers);
+            gameReport.addProblemContainer(problemContainer);
+        }
+
+        Instant startTime = game.getGameTimer().getStartTime();
+        gameReport.setCreatedDateTime(startTime);
+        gameReport.setDuration(Duration.between(startTime, Instant.now()).getSeconds());
+
+        if (game.getGameEnded()) {
+            gameReport.setGameEndType(GameEndType.MANUAL_END);
+        } else if (game.getAllSolved()) {
+            gameReport.setGameEndType(GameEndType.ALL_SOLVED);
+        } else {
+            gameReport.setGameEndType(GameEndType.TIME_UP);
+        }
     }
 
     private String compactProblemsSolved(boolean[] problemsSolved) {
