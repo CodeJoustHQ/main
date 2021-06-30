@@ -79,19 +79,9 @@ function LeaderboardCard(props: LeaderboardCardProps) {
   const score = useGetScore(player);
   const time = useGetSubmissionTime(player);
 
-  const getScoreDisplay = () => {
-    if (!score) {
-      return 0;
-    }
-    return score;
-  };
+  const getScoreDisplay = () => `${score || 0}/${numProblems}`;
 
-  const getScorePercentage = () => {
-    if (!score) {
-      return '';
-    }
-    return ` ${Math.round((score / numProblems) * 100)}%`;
-  };
+  const getAllSolved = () => player.solved.every((solved: boolean) => solved);
 
   const getSubmissionTime = () => {
     if (!time) {
@@ -115,7 +105,7 @@ function LeaderboardCard(props: LeaderboardCardProps) {
         nickname={player.user.nickname}
         active={Boolean(player.user.sessionId)}
       />
-      <LowMarginText bold={player.solved}>{`${place}.${getScorePercentage()}`}</LowMarginText>
+      <LowMarginText bold={getAllSolved()}>{`${place}. ${getScoreDisplay()}`}</LowMarginText>
 
       {showHover ? (
         <HoverBar>
@@ -123,7 +113,7 @@ function LeaderboardCard(props: LeaderboardCardProps) {
             <SmallText bold>{player.user.nickname}</SmallText>
           </CenteredScrollableContent>
           <CenteredScrollableContent>
-            <SmallText>{`Score: ${getScoreDisplay()}`}</SmallText>
+            <SmallText>{`Solved: ${getScoreDisplay()}`}</SmallText>
           </CenteredScrollableContent>
           <CenteredScrollableContent>
             <SmallText>{`Last: ${getSubmissionTime()}`}</SmallText>

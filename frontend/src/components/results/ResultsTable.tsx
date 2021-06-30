@@ -69,6 +69,7 @@ function ResultsTable(props: ResultsTableProps) {
     players, currentUser, gameStartTime, problems, viewPlayerCode, spectatePlayer,
   } = props;
 
+  // todo: use value -1 to represent overview mode
   const [problemIndex, setProblemIndex] = useState(0);
 
   const nextProblem = () => {

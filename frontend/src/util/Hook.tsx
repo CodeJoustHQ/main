@@ -36,7 +36,7 @@ export const useBestSubmission = (player?: Player | null, problemIndex?: number)
 };
 
 // Calculates the overall score of a player (number solved)
-export const useGetScore = (player?: Player) => {
+export const useGetScore = (player?: Player): number | null => {
   const counted = new Set<number>();
   const [score, setScore] = useState<number>(0);
 

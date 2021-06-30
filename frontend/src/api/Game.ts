@@ -9,7 +9,7 @@ import { Color } from './Color';
 export type Player = {
   user: User,
   submissions: Submission[],
-  solved: boolean,
+  solved: boolean[],
   color: Color,
 };
 
