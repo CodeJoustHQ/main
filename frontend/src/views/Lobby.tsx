@@ -172,6 +172,7 @@ function LobbyPage() {
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [duration, setDuration] = useState<number | undefined>(15);
   const [selectedProblems, setSelectedProblems] = useState<SelectableProblem[]>([]);
+  const [tempSelectedProblems, setTempSelectedProblems] = useState<SelectableProblem[]>([]);
   const [size, setSize] = useState<number | undefined>(10);
   const [numProblems, setNumProblems] = useState<number>(1);
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
@@ -421,8 +422,11 @@ function LobbyPage() {
     setError('');
     setLoading(true);
 
+    console.log(newProblems);
+
     const prevProblems = selectedProblems;
     setSelectedProblems(newProblems);
+    setTempSelectedProblems([]);
 
     const settings = {
       initiator: currentUser!,
@@ -433,15 +437,26 @@ function LobbyPage() {
       .catch((err) => {
         setError(err.message);
         setSelectedProblems(prevProblems);
+        console.log('err');
       })
       .finally(() => {
         setLoading(false);
+        console.log(selectedProblems);
+        console.log(tempSelectedProblems);
       });
   };
 
+  // Add a problem to be selected - these will be submitted as a batch.
   const addProblem = (newProblem: SelectableProblem) => {
-    const newProblems = [...selectedProblems, newProblem];
-    updateSelectedProblems(newProblems);
+    const problemsToUse = tempSelectedProblems.length ? tempSelectedProblems : selectedProblems;
+    const newProblems = [...problemsToUse, newProblem];
+    setTempSelectedProblems(newProblems);
+  };
+
+  // Submit the batch of selected problems and close the modal.
+  const submitTempProblems = () => {
+    updateSelectedProblems(tempSelectedProblems);
+    setShowProblemSelector(false);
   };
 
   const removeProblem = (index: number) => {
@@ -671,15 +686,15 @@ function LobbyPage() {
           </Text>
           { error ? <ErrorMessage message={error} /> : null }
           <ProblemSelector
-            selectedProblems={selectedProblems}
+            selectedProblems={tempSelectedProblems.length ? tempSelectedProblems : selectedProblems}
             onSelect={addProblem}
             loading={loading}
           />
           <SelectedProblemsDisplay
-            problems={selectedProblems}
+            problems={tempSelectedProblems.length ? tempSelectedProblems : selectedProblems}
             onRemove={isHost(currentUser) ? removeProblem : null}
           />
-          <ExitModalButton onClick={() => setShowProblemSelector(false)}>
+          <ExitModalButton onClick={submitTempProblems}>
             All Good!
           </ExitModalButton>
         </LeftContainer>
@@ -798,7 +813,7 @@ function LobbyPage() {
               <>
                 <NoMarginMediumText>Problems</NoMarginMediumText>
                 <SelectedProblemsDisplay
-                  problems={selectedProblems}
+                  problems={tempSelectedProblems.length ? tempSelectedProblems : selectedProblems}
                   onRemove={isHost(currentUser) && !loading ? removeProblem : null}
                 />
               </>
