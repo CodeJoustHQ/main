@@ -46,8 +46,8 @@ type ProblemNavButtonProps = {
 
 const ProblemNavButton = styled(DefaultButton)<ProblemNavButtonProps>`
   font-size: ${({ theme }) => theme.fontSize.default};
-  color: ${({ theme }) => theme.colors.gray};
-  background-color: ${({ theme, disabled }) => (disabled ? theme.colors.background : theme.colors.white)};
+  color: ${({ theme, disabled }) => (disabled ? theme.colors.lightgray : theme.colors.gray)};
+  background-color: ${({ theme }) => theme.colors.white};
   border-radius: 5px;
   width: 35px;
   height: 35px;

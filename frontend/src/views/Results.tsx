@@ -96,7 +96,6 @@ function GameResultsPage() {
 
   const [connected, setConnected] = useState(false);
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
-  // const [copiedRoomLink, setCopiedRoomLink] = useState<boolean>(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState<boolean>(false);
   const [showFeedbackPrompt, setShowFeedbackPrompt] = useState<boolean>(false);
   const [codeModal, setCodeModal] = useState(-1);
