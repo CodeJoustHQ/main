@@ -17,7 +17,7 @@ import {
 import {
   connect, routes, subscribe, disconnect,
 } from '../api/Socket';
-import { User } from '../api/User';
+import { User, updateUserAccount } from '../api/User';
 import { isValidRoomId, leaveRoom, checkLocationState } from '../util/Utility';
 import { Difficulty } from '../api/Difficulty';
 import {
@@ -181,6 +181,7 @@ function LobbyPage() {
   const dispatch = useAppDispatch();
   const { room } = useAppSelector((state) => state);
   const { currentUser } = useAppSelector((state) => state);
+  const { token } = useAppSelector((state) => state.account);
 
   const mousePosition = useMousePosition(true);
 
@@ -239,6 +240,17 @@ function LobbyPage() {
       setStateFromRoom(room);
     }
   }, [room, setStateFromRoom]);
+
+  // If the user token changes due to login state, update user account.
+  useEffect(() => {
+    if (currentUser?.userId && Boolean(currentUser?.account) !== Boolean(token)) {
+      updateUserAccount(currentUser?.userId, token).then((user: User) => {
+        dispatch(setCurrentUser(user));
+      }).catch((err) => {
+        setError(err.message);
+      });
+    }
+  }, [currentUser, token, dispatch]);
 
   const kickUser = (user: User) => {
     setLoading(true);

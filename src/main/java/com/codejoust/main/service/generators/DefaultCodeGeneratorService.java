@@ -2,9 +2,9 @@ package com.codejoust.main.service.generators;
 
 import java.util.List;
 
-import com.codejoust.main.game_object.CodeLanguage;
 import com.codejoust.main.model.problem.ProblemIOType;
 import com.codejoust.main.model.problem.ProblemInput;
+import com.codejoust.main.model.report.CodeLanguage;
 
 import org.springframework.stereotype.Service;
 

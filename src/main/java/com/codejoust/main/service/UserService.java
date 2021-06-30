@@ -1,5 +1,6 @@
 package com.codejoust.main.service;
 
+import com.codejoust.main.dao.AccountRepository;
 import com.codejoust.main.dao.UserRepository;
 import com.codejoust.main.dto.user.CreateUserRequest;
 import com.codejoust.main.dto.user.DeleteUserRequest;
@@ -18,14 +19,21 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository repository;
+    private final FirebaseService firebaseService;
+    private final AccountRepository accountRepository;
     private final Utility utility;
     
     // The length of the user ID.
     public static final int USER_ID_LENGTH = 6;
 
     @Autowired
-    public UserService(UserRepository repository, Utility utility) {
+    public UserService(UserRepository repository,
+                        FirebaseService firebaseService,
+                        AccountRepository accountRepository,
+                        Utility utility) {
         this.repository = repository;
+        this.firebaseService = firebaseService;
+        this.accountRepository = accountRepository;
         this.utility = utility;
     }
 
@@ -47,6 +55,21 @@ public class UserService {
             user.setUserId(request.getUserId());
         }
         
+        repository.save(user);
+
+        return UserMapper.toDto(user);
+    }
+
+    public UserDto updateUserAccount(String userId, String token) {
+        User user = repository.findUserByUserId(userId);
+
+        if (token == null) {
+            user.setAccount(null);
+        } else {
+            String uid = firebaseService.verifyToken(token);
+            user.setAccount(accountRepository.findAccountByUid(uid));
+        }
+
         repository.save(user);
 
         return UserMapper.toDto(user);

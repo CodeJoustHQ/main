@@ -17,15 +17,14 @@ import com.codejoust.main.dto.problem.ProblemTestCaseDto;
 import com.codejoust.main.exception.ProblemError;
 import com.codejoust.main.exception.api.ApiError;
 import com.codejoust.main.exception.api.ApiErrorResponse;
-import com.codejoust.main.game_object.CodeLanguage;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
+import com.codejoust.main.model.report.CodeLanguage;
 import com.codejoust.main.util.MockHelper;
 import com.codejoust.main.util.ProblemTestMethods;
 import com.codejoust.main.util.TestFields;
 import com.codejoust.main.util.TestUrls;
 import com.codejoust.main.util.UtilityTestMethods;
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.junit.jupiter.api.Test;
@@ -54,9 +53,6 @@ class ProblemTests {
 
     @Autowired
     private MockMvc mockMvc;
-
-    private static final String DIFFICULTY_KEY = "difficulty";
-    private static final String NUM_PROBLEMS_KEY = "numProblems";
 
     private static final String javaDefaultCode = String.join("\n",
         "import java.util.*;",
