@@ -1,5 +1,7 @@
 package com.codejoust.main.game_object;
 
+import com.codejoust.main.model.report.CodeLanguage;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;

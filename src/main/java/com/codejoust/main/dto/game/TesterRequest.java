@@ -1,7 +1,7 @@
 package com.codejoust.main.dto.game;
 
 import com.codejoust.main.dto.problem.ProblemDto;
-import com.codejoust.main.game_object.CodeLanguage;
+import com.codejoust.main.model.report.CodeLanguage;
 
 import lombok.Getter;
 import lombok.Setter;

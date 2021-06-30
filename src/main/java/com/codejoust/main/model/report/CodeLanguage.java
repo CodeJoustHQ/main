@@ -1,4 +1,4 @@
-package com.codejoust.main.game_object;
+package com.codejoust.main.model.report;
 
 import com.codejoust.main.exception.GameError;
 import com.codejoust.main.exception.api.ApiException;

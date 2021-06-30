@@ -2,6 +2,8 @@ package com.codejoust.main.util;
 
 public class TestUrls {
 
+    private static final String PUT_UPDATE_USER_ACCOUNT = "/api/v1/user/%s/account";
+
     private static final String GET_ROOM = "/api/v1/rooms/%s";
     private static final String PUT_ROOM_JOIN = "/api/v1/rooms/%s/users";
     private static final String POST_ROOM_CREATE = "/api/v1/rooms";
@@ -35,6 +37,10 @@ public class TestUrls {
     private static final String GET_ACCOUNT = "/api/v1/accounts/%s";
 
 
+    public static String updateUserAccount(String userId) {
+        return String.format(PUT_UPDATE_USER_ACCOUNT, userId);
+    }
+    
     public static String getRoom(String roomId) {
         return String.format(GET_ROOM, roomId);
     }

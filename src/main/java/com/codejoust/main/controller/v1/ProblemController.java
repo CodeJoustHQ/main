@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,12 +20,9 @@ import com.codejoust.main.dto.problem.CreateProblemRequest;
 import com.codejoust.main.dto.problem.CreateProblemTagRequest;
 import com.codejoust.main.dto.problem.CreateTestCaseRequest;
 import com.codejoust.main.dto.problem.ProblemDto;
-import com.codejoust.main.dto.problem.ProblemMapper;
-import com.codejoust.main.dto.problem.ProblemSettingsDto;
 import com.codejoust.main.dto.problem.ProblemTagDto;
 import com.codejoust.main.dto.problem.ProblemTestCaseDto;
-import com.codejoust.main.game_object.CodeLanguage;
-import com.codejoust.main.model.problem.Problem;
+import com.codejoust.main.model.report.CodeLanguage;
 import com.codejoust.main.service.ProblemService;
 
 @RestController
