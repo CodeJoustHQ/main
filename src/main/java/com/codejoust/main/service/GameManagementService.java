@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
-import java.util.concurrent.TimeUnit;
 
 import com.codejoust.main.dao.AccountRepository;
 import com.codejoust.main.dao.GameReportRepository;
@@ -44,6 +43,7 @@ import com.codejoust.main.model.problem.ProblemContainer;
 import com.codejoust.main.model.report.GameEndType;
 import com.codejoust.main.model.report.GameReport;
 import com.codejoust.main.model.report.SubmissionGroupReport;
+import com.codejoust.main.task.CreateGameReportTask;
 import com.codejoust.main.task.EndGameTimerTask;
 import com.codejoust.main.util.Utility;
 
@@ -320,19 +320,15 @@ public class GameManagementService {
             timer.cancel();
         }
 
-        // After one minute (wait for existing submissions) create game report.
-        log.info("One minute delay");
-        // try {
-        //     TimeUnit.MINUTES.sleep(1);
-        // } catch (InterruptedException e) {
-        //     log.info(e.toString());
-        // }
-        log.info("Create game report");
-        createGameReport(game);
-        log.info("Finished game report");
+        log.info("Create game report timer");
+        CreateGameReportTask createGameReportTask = new CreateGameReportTask(this, game);
+        Timer createGameReportTimer = new Timer();
+        createGameReportTimer.schedule(createGameReportTask, GameTimer.DURATION_1 * 1000);
+        log.info("Passed game report timer");
     }
 
-    protected void createGameReport(Game game) {
+    public void createGameReport(Game game) {
+        log.info("Started to create game report");
         GameReport gameReport = new GameReport();
         int numProblems = game.getProblems().size();
         int numPlayers = game.getPlayers().size();
@@ -426,6 +422,7 @@ public class GameManagementService {
                 userRepository.save(user);
             }
         }
+        log.info("Create game report");
     }
 
     private String compactProblemsSolved(boolean[] problemsSolved) {
