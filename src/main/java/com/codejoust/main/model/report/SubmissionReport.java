@@ -2,6 +2,7 @@ package com.codejoust.main.model.report;
 
 import java.time.Instant;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,6 +22,7 @@ public class SubmissionReport {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     
+    @Column(columnDefinition = "TEXT")
     private String code;
 
     private CodeLanguage language;
