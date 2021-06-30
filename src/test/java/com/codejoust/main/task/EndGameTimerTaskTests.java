@@ -16,8 +16,6 @@ import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.service.GameManagementService;
 import com.codejoust.main.service.SocketService;
-
-import com.codejoust.main.util.EndGameTimerTask;
 import com.codejoust.main.util.TestFields;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;

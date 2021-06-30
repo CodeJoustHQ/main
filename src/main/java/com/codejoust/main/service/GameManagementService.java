@@ -44,7 +44,7 @@ import com.codejoust.main.model.problem.ProblemContainer;
 import com.codejoust.main.model.report.GameEndType;
 import com.codejoust.main.model.report.GameReport;
 import com.codejoust.main.model.report.SubmissionGroupReport;
-import com.codejoust.main.util.EndGameTimerTask;
+import com.codejoust.main.task.EndGameTimerTask;
 import com.codejoust.main.util.Utility;
 
 import lombok.extern.log4j.Log4j2;
