@@ -173,6 +173,7 @@ function LobbyPage() {
   const [duration, setDuration] = useState<number | undefined>(15);
   const [selectedProblems, setSelectedProblems] = useState<SelectableProblem[]>([]);
   const [tempSelectedProblems, setTempSelectedProblems] = useState<SelectableProblem[]>([]);
+  const [modifiedProblems, setModifiedProblems] = useState(false);
   const [size, setSize] = useState<number | undefined>(10);
   const [numProblems, setNumProblems] = useState<number>(1);
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
@@ -222,7 +223,10 @@ function LobbyPage() {
     setActive(newRoom.active);
     setDifficulty(newRoom.difficulty);
     setDuration(newRoom.duration / 60);
-    setSelectedProblems(newRoom.problems);
+    // If problems were modified, do not set the problems
+    if (!modifiedProblems) {
+      setSelectedProblems(newRoom.problems);
+    }
     setSize(newRoom.size);
     setNumProblems(newRoom.numProblems);
 
@@ -422,11 +426,8 @@ function LobbyPage() {
     setError('');
     setLoading(true);
 
-    console.log(newProblems);
-
     const prevProblems = selectedProblems;
     setSelectedProblems(newProblems);
-    setTempSelectedProblems([]);
 
     const settings = {
       initiator: currentUser!,
@@ -437,20 +438,20 @@ function LobbyPage() {
       .catch((err) => {
         setError(err.message);
         setSelectedProblems(prevProblems);
-        console.log('err');
       })
       .finally(() => {
         setLoading(false);
-        console.log(selectedProblems);
-        console.log(tempSelectedProblems);
+        setTempSelectedProblems([]);
+        setModifiedProblems(false);
       });
   };
 
   // Add a problem to be selected - these will be submitted as a batch.
   const addProblem = (newProblem: SelectableProblem) => {
-    const problemsToUse = tempSelectedProblems.length ? tempSelectedProblems : selectedProblems;
+    const problemsToUse = modifiedProblems ? tempSelectedProblems : selectedProblems;
     const newProblems = [...problemsToUse, newProblem];
     setTempSelectedProblems(newProblems);
+    setModifiedProblems(true);
   };
 
   // Submit the batch of selected problems and close the modal.
@@ -459,9 +460,12 @@ function LobbyPage() {
     setShowProblemSelector(false);
   };
 
-  const removeProblem = (index: number) => {
-    const newProblems = selectedProblems.filter((_, i) => i !== index);
-    updateSelectedProblems(newProblems);
+  const removeTempProblem = (index: number) => {
+    const problemsToUse = modifiedProblems ? tempSelectedProblems : selectedProblems;
+    const newProblems = problemsToUse.filter((_, i) => i !== index);
+
+    setTempSelectedProblems(newProblems);
+    setModifiedProblems(true);
   };
 
   const onSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -686,15 +690,15 @@ function LobbyPage() {
           </Text>
           { error ? <ErrorMessage message={error} /> : null }
           <ProblemSelector
-            selectedProblems={tempSelectedProblems.length ? tempSelectedProblems : selectedProblems}
+            selectedProblems={modifiedProblems ? tempSelectedProblems : selectedProblems}
             onSelect={addProblem}
             loading={loading}
           />
           <SelectedProblemsDisplay
-            problems={tempSelectedProblems.length ? tempSelectedProblems : selectedProblems}
-            onRemove={isHost(currentUser) ? removeProblem : null}
+            problems={modifiedProblems ? tempSelectedProblems : selectedProblems}
+            onRemove={isHost(currentUser) ? removeTempProblem : null}
           />
-          <ExitModalButton onClick={submitTempProblems}>
+          <ExitModalButton onClick={submitTempProblems} disabled={Boolean(loading)}>
             All Good!
           </ExitModalButton>
         </LeftContainer>
@@ -813,8 +817,8 @@ function LobbyPage() {
               <>
                 <NoMarginMediumText>Problems</NoMarginMediumText>
                 <SelectedProblemsDisplay
-                  problems={tempSelectedProblems.length ? tempSelectedProblems : selectedProblems}
-                  onRemove={isHost(currentUser) && !loading ? removeProblem : null}
+                  problems={modifiedProblems ? tempSelectedProblems : selectedProblems}
+                  onRemove={null}
                 />
               </>
             )}
