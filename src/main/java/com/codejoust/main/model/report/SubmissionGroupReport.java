@@ -32,8 +32,6 @@ public class SubmissionGroupReport {
 
     private String gameReportId;
 
-    private Integer numTestCases;
-
     /**
      * String to represent problems solved.
      * Each index represents the problem index.

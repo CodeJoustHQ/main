@@ -346,12 +346,10 @@ public class GameManagementService {
             submissionGroupReport.setGameReportId(gameReport.getGameReportId());
 
             // Iterate through each submission and update group statistics.
-            int numTestCases = 0;
             boolean[] problemsSolved = new boolean[numProblems];
             int[] testCasesPassed = new int[numProblems];
             for (Submission submission : player.getSubmissions()) {
                 int problemIndex = submission.getProblemIndex();
-                numTestCases += submission.getNumTestCases();
                 totalAttemptCount[problemIndex]++;
 
                 // If the problem was solved, set boolean value to true.
@@ -372,7 +370,6 @@ public class GameManagementService {
             }
             
             // Set the problems and test cases statistics.
-            submissionGroupReport.setNumTestCases(numTestCases);
             submissionGroupReport.setProblemsSolved(compactProblemsSolved(problemsSolved));
             submissionGroupReport.setNumTestCasesPassed(Arrays.stream(testCasesPassed).sum());
             
@@ -382,17 +379,21 @@ public class GameManagementService {
         }
 
         // Set problem container variables.
+        int numTestCases = 0;
         List<Problem> problems = game.getProblems();
         for (int i = 0; i < numProblems; i++) {
             Problem problem = problems.get(i);
+            numTestCases += problem.getTestCases().size();
+
             ProblemContainer problemContainer = new ProblemContainer();
             problemContainer.setProblem(problem);
             problemContainer.setUserSolvedCount(userSolved[i]);
             problemContainer.setTestCaseCount(problem.getTestCases().size());
-            problemContainer.setAverageTestCasesPassed(totalTestCasesPassed[i] / problem.getTestCases().size());
+            problemContainer.setAverageTestCasesPassed(totalTestCasesPassed[i] / numPlayers);
             problemContainer.setAverageAttemptCount(totalAttemptCount[i] / numPlayers);
             gameReport.addProblemContainer(problemContainer);
         }
+        gameReport.setNumTestCases(numTestCases);
 
         Instant startTime = game.getGameTimer().getStartTime();
         gameReport.setCreatedDateTime(startTime);

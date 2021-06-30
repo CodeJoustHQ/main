@@ -51,6 +51,8 @@ public class GameReport {
     @JoinColumn(name = "users_table_id")
     private List<User> users = new ArrayList<>();
 
+    private int numTestCases;
+
     // The start time of the game
     private Instant createdDateTime;
 
