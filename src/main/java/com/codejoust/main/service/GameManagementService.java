@@ -320,15 +320,12 @@ public class GameManagementService {
             timer.cancel();
         }
 
-        log.info("Create game report timer");
         CreateGameReportTask createGameReportTask = new CreateGameReportTask(this, game);
         Timer createGameReportTimer = new Timer();
         createGameReportTimer.schedule(createGameReportTask, GameTimer.DURATION_1 * 1000);
-        log.info("Passed game report timer");
     }
 
     public void createGameReport(Game game) {
-        log.info("Started to create game report");
         GameReport gameReport = new GameReport();
         int numProblems = game.getProblems().size();
         int numPlayers = game.getPlayers().size();
@@ -407,7 +404,6 @@ public class GameManagementService {
             gameReport.setGameEndType(GameEndType.TIME_UP);
         }
 
-        log.info("Save game report");
         gameReportRepository.save(gameReport);
 
         // Iterate through all room users, players and spectators included.
@@ -423,7 +419,9 @@ public class GameManagementService {
                 userRepository.save(user);
             }
         }
-        log.info("Create game report");
+
+        // Log the completion of the latest game report.
+        log.info("Created game report for game with Room ID {}", game.getRoom().getRoomId());
     }
 
     private String compactProblemsSolved(boolean[] problemsSolved) {
