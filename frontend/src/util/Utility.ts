@@ -128,6 +128,25 @@ export const getScore = (bestSubmission: Submission | null) => {
   return `${percent}%`;
 };
 
+// Find and return the best submission. A non-hook variant of useBestSubmission
+export const getBestSubmission = (player?: Player | null, problemIndex?: number) => {
+  let newBestSubmission = null as Submission | null;
+
+  if (player) {
+    // If problemIndex is specified, find best submission only for that problem
+    const submissions = (problemIndex !== undefined && problemIndex !== -1)
+      ? player.submissions.filter((s) => s.problemIndex === problemIndex) : player.submissions;
+
+    submissions.forEach((submission) => {
+      if (!newBestSubmission || submission.numCorrect > newBestSubmission.numCorrect) {
+        newBestSubmission = submission;
+      }
+    });
+  }
+
+  return newBestSubmission;
+};
+
 // Displays the time taken for a specific submission
 export const getSubmissionTime = (bestSubmission: Submission | null,
   gameStartTime: string | null) => {

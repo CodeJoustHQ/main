@@ -60,7 +60,7 @@ type ResultsTableProps = {
   currentUser: User | null,
   gameStartTime: string,
   problems: Problem[],
-  viewPlayerCode: ((index: number) => void) | null,
+  viewPlayerCode: ((playerIndex: number, probIndex: number) => void) | null,
   spectatePlayer: ((index: number) => void) | null,
 };
 
@@ -70,7 +70,7 @@ function ResultsTable(props: ResultsTableProps) {
   } = props;
 
   // todo: use value -1 to represent overview mode
-  const [problemIndex, setProblemIndex] = useState(0);
+  const [problemIndex, setProblemIndex] = useState(-1);
 
   const nextProblem = () => {
     const next = problemIndex + 1;
@@ -83,7 +83,7 @@ function ResultsTable(props: ResultsTableProps) {
   const previousProblem = () => {
     const prev = problemIndex - 1;
 
-    if (prev >= 0) {
+    if (prev >= -1) {
       setProblemIndex(prev);
     }
   };
@@ -91,12 +91,12 @@ function ResultsTable(props: ResultsTableProps) {
   return (
     <Content>
       <TopContent>
-        <ProblemNavButton onClick={previousProblem} disabled={problemIndex <= 0}>
+        <ProblemNavButton onClick={previousProblem} disabled={problemIndex <= -1}>
           <PrevIcon />
         </ProblemNavButton>
         <ProblemText>
-          {`Problem ${problemIndex + 1} of ${problems.length}. `}
-          <b>{problems[problemIndex]?.name || ''}</b>
+          {problemIndex !== -1 ? `Problem ${problemIndex + 1} of ${problems.length}. ` : null}
+          <b>{problemIndex !== -1 ? problems[problemIndex]?.name || '' : 'Overview'}</b>
         </ProblemText>
         <ProblemNavButton onClick={nextProblem} disabled={problemIndex + 1 >= problems.length}>
           <NextIcon />
@@ -119,7 +119,7 @@ function ResultsTable(props: ResultsTableProps) {
             gameStartTime={gameStartTime}
             color={player.color}
             problemIndex={problemIndex}
-            onViewCode={viewPlayerCode ? (() => viewPlayerCode(index)) : null}
+            onViewCode={viewPlayerCode ? (() => viewPlayerCode(index, problemIndex)) : null}
             onSpectateLive={spectatePlayer ? (() => spectatePlayer(index)) : null}
           />
         ))}

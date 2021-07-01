@@ -8,6 +8,7 @@ import { FirebaseUserType } from '../redux/Account';
 import { Problem } from '../api/Problem';
 import { Coordinate } from '../components/special/FloatingCircle';
 import app from '../api/Firebase';
+import { getBestSubmission } from './Utility';
 
 /**
  * Finds the best submission by a player (the first one, if there's a tie).
@@ -22,22 +23,7 @@ export const useBestSubmission = (player?: Player | null, problemIndex?: number)
   const [bestSubmission, setBestSubmission] = useState<Submission | null>(null);
 
   useEffect(() => {
-    if (player) {
-      let newBestSubmission: Submission | null = null;
-
-      // If problemIndex is specified, find best submission only for that problem
-      const submissions = (problemIndex !== undefined && problemIndex !== -1)
-        ? player.submissions.filter((s) => s.problemIndex === problemIndex) : player.submissions;
-
-      // Find best submission
-      submissions.forEach((submission) => {
-        if (!newBestSubmission || submission.numCorrect > newBestSubmission.numCorrect) {
-          newBestSubmission = submission;
-        }
-      });
-
-      setBestSubmission(newBestSubmission);
-    }
+    setBestSubmission(getBestSubmission(player, problemIndex));
   }, [player, setBestSubmission, problemIndex]);
 
   return bestSubmission;

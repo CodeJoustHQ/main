@@ -98,7 +98,12 @@ function GameResultsPage() {
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState<boolean>(false);
   const [showFeedbackPrompt, setShowFeedbackPrompt] = useState<boolean>(false);
+
+  // If not -1, codeModal represents the index of the player whose code should show in the modal
   const [codeModal, setCodeModal] = useState(-1);
+  const [problemIndex, setProblemIndex] = useState(0);
+
+  // If not -1, placeModal is set to the index of the player whose place should show in the modal
   const [placeModal, setPlaceModal] = useState(-1);
   const [displayPlaceModal, setDisplayPlaceModal] = useState(true);
 
@@ -211,6 +216,11 @@ function GameResultsPage() {
     return 'th';
   };
 
+  const onViewPlayerCode = (playerIndex: number, probIndex: number) => {
+    setProblemIndex(probIndex);
+    setCodeModal(playerIndex);
+  };
+
   // Reset hover status on host changes
   useEffect(() => {
     setHoverVisible(false);
@@ -248,6 +258,7 @@ function GameResultsPage() {
       <Modal show={codeModal !== -1} onExit={() => setCodeModal(-1)} fullScreen>
         <PreviewCodeContent
           player={players[codeModal]}
+          problemIndex={problemIndex}
         />
       </Modal>
 
@@ -343,7 +354,7 @@ function GameResultsPage() {
           currentUser={currentUser}
           gameStartTime={startTime}
           problems={game?.problems || []}
-          viewPlayerCode={(index: number) => setCodeModal(index)}
+          viewPlayerCode={onViewPlayerCode}
           spectatePlayer={null}
         />
       ) : null}
