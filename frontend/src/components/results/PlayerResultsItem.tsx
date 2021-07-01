@@ -139,6 +139,27 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
     return `${getTimeBetween(gameStartTime, finalSubmissionTime)} min`;
   };
 
+  const getFinalColumn = () => {
+    if (problemIndex === -1) {
+      return null;
+    }
+
+    if (!onSpectateLive) {
+      return <CodeColumn>{getSubmissionLanguage()}</CodeColumn>;
+    }
+
+    return (
+      <CodeColumn>
+        <PreviewContainer>
+          <TextButton onClick={onSpectateLive}>
+            Launch
+            <PreviewIcon className="material-icons">launch</PreviewIcon>
+          </TextButton>
+        </PreviewContainer>
+      </CodeColumn>
+    );
+  };
+
   return (
     <Content>
       <PlaceColumn>
@@ -161,19 +182,7 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
       <td>
         <Text>{getSubmissionCount(player, problemIndex)}</Text>
       </td>
-      {!onSpectateLive ? (
-        <CodeColumn>{getSubmissionLanguage()}</CodeColumn>
-      ) : null}
-      {onSpectateLive ? (
-        <CodeColumn>
-          <PreviewContainer>
-            <TextButton onClick={onSpectateLive}>
-              Launch
-              <PreviewIcon className="material-icons">launch</PreviewIcon>
-            </TextButton>
-          </PreviewContainer>
-        </CodeColumn>
-      ) : null}
+      {getFinalColumn()}
     </Content>
   );
 }

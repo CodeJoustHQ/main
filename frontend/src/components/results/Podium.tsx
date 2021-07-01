@@ -134,11 +134,11 @@ function Podium(props: PodiumProps) {
       );
     }
 
-    const percent = Math.round((score / numProblems) * 100);
+    const { solved } = player;
     return (
       <ScoreText>
-        Scored
-        <b>{` ${percent}%`}</b>
+        Solved
+        <b>{` ${solved.filter((s) => s).length}/${solved.length}`}</b>
       </ScoreText>
     );
   };

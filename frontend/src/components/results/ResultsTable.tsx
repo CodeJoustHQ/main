@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import PlayerResultsItem from './PlayerResultsItem';
@@ -8,6 +8,7 @@ import { NextIcon, PrevIcon } from '../core/Icon';
 import { ProblemNavButton } from '../core/Button';
 import { Problem } from '../../api/Problem';
 import { NoMarginSubtitleText } from '../core/Text';
+import { getBestSubmission } from '../../util/Utility';
 
 const Content = styled.div`
   width: 65%;
@@ -69,8 +70,31 @@ function ResultsTable(props: ResultsTableProps) {
     players, currentUser, gameStartTime, problems, viewPlayerCode, spectatePlayer,
   } = props;
 
-  // todo: use value -1 to represent overview mode
+  // A value of -1 represents the Game Overview state
   const [problemIndex, setProblemIndex] = useState(-1);
+  const [sortedPlayers, setSortedPlayers] = useState(players);
+
+  useEffect(() => {
+    // By default, already sorted by overall num problems solved
+    if (problemIndex === -1) {
+      setSortedPlayers(players);
+      return;
+    }
+
+    setSortedPlayers(players.sort((p1, p2) => {
+      const p1Best = getBestSubmission(p1, problemIndex);
+      const p2Best = getBestSubmission(p2, problemIndex);
+
+      if ((p1Best?.numCorrect || 0) > (p2Best?.numCorrect || 0)) {
+        return -1;
+      }
+      if ((p1Best?.numCorrect || 0) < (p2Best?.numCorrect || 0)) {
+        return 1;
+      }
+
+      return (p1Best?.startTime || '') < (p2Best?.startTime || '') ? -1 : 1;
+    }));
+  }, [players, problemIndex]);
 
   const nextProblem = () => {
     const next = problemIndex + 1;
@@ -93,7 +117,7 @@ function ResultsTable(props: ResultsTableProps) {
       return null;
     }
 
-    return !spectatePlayer ? <th>Code</th> : <th>Spectate Live</th>
+    return !spectatePlayer ? <th>Code</th> : <th>Spectate Live</th>;
   };
 
   return (
@@ -104,7 +128,7 @@ function ResultsTable(props: ResultsTableProps) {
         </ProblemNavButton>
         <ProblemText>
           {problemIndex !== -1 ? `Problem ${problemIndex + 1} of ${problems.length}. ` : null}
-          <b>{problemIndex !== -1 ? problems[problemIndex]?.name || '' : 'Overview'}</b>
+          <b>{problemIndex !== -1 ? problems[problemIndex]?.name || '' : 'Game Overview'}</b>
         </ProblemText>
         <ProblemNavButton onClick={nextProblem} disabled={problemIndex + 1 >= problems.length}>
           <NextIcon />
@@ -119,7 +143,7 @@ function ResultsTable(props: ResultsTableProps) {
           <SmallColumn>{problemIndex === -1 ? 'Submissions' : 'Attempts'}</SmallColumn>
           {getFinalColumn()}
         </tr>
-        {players?.map((player, index) => (
+        {sortedPlayers?.map((player, index) => (
           <PlayerResultsItem
             player={player}
             place={index + 1}
