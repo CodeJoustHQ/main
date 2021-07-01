@@ -21,6 +21,7 @@ public class UserMapperTests {
         user.setNickname(TestFields.NICKNAME);
         user.setUserId(TestFields.USER_ID);
         user.setSessionId(TestFields.SESSION_ID);
+        user.setAccount(TestFields.account1());
 
         UserDto response = UserMapper.toDto(user);
 
@@ -28,6 +29,7 @@ public class UserMapperTests {
         assertEquals(user.getNickname(), response.getNickname());
         assertEquals(user.getUserId(), response.getUserId());
         assertEquals(user.getSessionId(), response.getSessionId());
+        assertEquals(TestFields.accountUidDto1(), response.getAccount());
     }
 
     @Test

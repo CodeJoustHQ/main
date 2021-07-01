@@ -3,6 +3,7 @@ import { axiosErrorHandler } from './Error';
 import { User } from './User';
 import { Difficulty } from './Difficulty';
 import { ProblemIdParam, SelectableProblem } from './Problem';
+import { getAuthHttpHeader } from '../util/Utility';
 
 export type Room = {
   roomId: string,
@@ -63,15 +64,15 @@ const routes = {
   setSpectator: (roomId: string) => `${basePath}/${roomId}/spectator`,
 };
 
-export const createRoom = (roomParams: CreateRoomParams):
-  Promise<Room> => axios.post<Room>(routes.createRoom, roomParams)
+export const createRoom = (roomParams: CreateRoomParams, token: string | null):
+  Promise<Room> => axios.post<Room>(routes.createRoom, roomParams, getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);
   });
 
-export const joinRoom = (roomId: string, roomParams: JoinRoomParams):
-  Promise<Room> => axios.put<Room>(routes.joinRoom(roomId), roomParams)
+export const joinRoom = (roomId: string, roomParams: JoinRoomParams, token: string | null):
+  Promise<Room> => axios.put<Room>(routes.joinRoom(roomId), roomParams, getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

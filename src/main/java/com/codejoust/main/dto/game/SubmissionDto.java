@@ -1,6 +1,6 @@
 package com.codejoust.main.dto.game;
 
-import com.codejoust.main.game_object.CodeLanguage;
+import com.codejoust.main.model.report.CodeLanguage;
 import com.codejoust.main.util.InstantDeserializer;
 import com.codejoust.main.util.InstantSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;

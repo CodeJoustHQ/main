@@ -49,9 +49,31 @@ public class MockHelper {
         return UtilityTestMethods.toObject(jsonResponse, c);
     }
 
+    public static <T> T postRequestNoHeaders(MockMvc mockMvc, String url, Object body, Class<T> c, HttpStatus status) throws Exception {
+        MvcResult result = mockMvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(body)))
+                .andDo(print()).andExpect(status().is(status.value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        return UtilityTestMethods.toObject(jsonResponse, c);
+    }
+
     public static <T> T putRequest(MockMvc mockMvc, String url, Object body, Class<T> c, HttpStatus status) throws Exception {
         MvcResult result = mockMvc.perform(put(url)
                 .header(HttpHeaders.AUTHORIZATION, TestFields.TOKEN)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(UtilityTestMethods.convertObjectToJsonString(body)))
+                .andDo(print()).andExpect(status().is(status.value()))
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        return UtilityTestMethods.toObject(jsonResponse, c);
+    }
+
+    public static <T> T putRequestNoHeaders(MockMvc mockMvc, String url, Object body, Class<T> c, HttpStatus status) throws Exception {
+        MvcResult result = mockMvc.perform(put(url)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(UtilityTestMethods.convertObjectToJsonString(body)))
                 .andDo(print()).andExpect(status().is(status.value()))

@@ -17,7 +17,7 @@ import {
 import {
   connect, routes, subscribe, disconnect,
 } from '../api/Socket';
-import { User } from '../api/User';
+import { User, updateUserAccount } from '../api/User';
 import { isValidRoomId, leaveRoom, checkLocationState } from '../util/Utility';
 import { Difficulty } from '../api/Difficulty';
 import {
@@ -172,6 +172,8 @@ function LobbyPage() {
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [duration, setDuration] = useState<number | undefined>(15);
   const [selectedProblems, setSelectedProblems] = useState<SelectableProblem[]>([]);
+  const [tempSelectedProblems, setTempSelectedProblems] = useState<SelectableProblem[]>([]);
+  const [modifiedProblems, setModifiedProblems] = useState(false);
   const [size, setSize] = useState<number | undefined>(10);
   const [numProblems, setNumProblems] = useState<number>(1);
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
@@ -181,6 +183,7 @@ function LobbyPage() {
   const dispatch = useAppDispatch();
   const { room } = useAppSelector((state) => state);
   const { currentUser } = useAppSelector((state) => state);
+  const { token } = useAppSelector((state) => state.account);
 
   const mousePosition = useMousePosition(true);
 
@@ -220,7 +223,10 @@ function LobbyPage() {
     setActive(newRoom.active);
     setDifficulty(newRoom.difficulty);
     setDuration(newRoom.duration / 60);
-    setSelectedProblems(newRoom.problems);
+    // If problems were modified, do not set the problems
+    if (!modifiedProblems) {
+      setSelectedProblems(newRoom.problems);
+    }
     setSize(newRoom.size);
     setNumProblems(newRoom.numProblems);
 
@@ -239,6 +245,17 @@ function LobbyPage() {
       setStateFromRoom(room);
     }
   }, [room, setStateFromRoom]);
+
+  // If the user token changes due to login state, update user account.
+  useEffect(() => {
+    if (currentUser?.userId && Boolean(currentUser?.account) !== Boolean(token)) {
+      updateUserAccount(currentUser?.userId, token).then((user: User) => {
+        dispatch(setCurrentUser(user));
+      }).catch((err) => {
+        setError(err.message);
+      });
+    }
+  }, [currentUser, token, dispatch]);
 
   const kickUser = (user: User) => {
     setLoading(true);
@@ -424,17 +441,31 @@ function LobbyPage() {
       })
       .finally(() => {
         setLoading(false);
+        setTempSelectedProblems([]);
+        setModifiedProblems(false);
       });
   };
 
+  // Add a problem to be selected - these will be submitted as a batch.
   const addProblem = (newProblem: SelectableProblem) => {
-    const newProblems = [...selectedProblems, newProblem];
-    updateSelectedProblems(newProblems);
+    const problemsToUse = modifiedProblems ? tempSelectedProblems : selectedProblems;
+    const newProblems = [...problemsToUse, newProblem];
+    setTempSelectedProblems(newProblems);
+    setModifiedProblems(true);
   };
 
-  const removeProblem = (index: number) => {
-    const newProblems = selectedProblems.filter((_, i) => i !== index);
-    updateSelectedProblems(newProblems);
+  // Submit the batch of selected problems and close the modal.
+  const submitTempProblems = () => {
+    updateSelectedProblems(tempSelectedProblems);
+    setShowProblemSelector(false);
+  };
+
+  const removeTempProblem = (index: number) => {
+    const problemsToUse = modifiedProblems ? tempSelectedProblems : selectedProblems;
+    const newProblems = problemsToUse.filter((_, i) => i !== index);
+
+    setTempSelectedProblems(newProblems);
+    setModifiedProblems(true);
   };
 
   const onSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -659,15 +690,15 @@ function LobbyPage() {
           </Text>
           { error ? <ErrorMessage message={error} /> : null }
           <ProblemSelector
-            selectedProblems={selectedProblems}
+            selectedProblems={modifiedProblems ? tempSelectedProblems : selectedProblems}
             onSelect={addProblem}
             loading={loading}
           />
           <SelectedProblemsDisplay
-            problems={selectedProblems}
-            onRemove={isHost(currentUser) ? removeProblem : null}
+            problems={modifiedProblems ? tempSelectedProblems : selectedProblems}
+            onRemove={isHost(currentUser) ? removeTempProblem : null}
           />
-          <ExitModalButton onClick={() => setShowProblemSelector(false)}>
+          <ExitModalButton onClick={submitTempProblems} disabled={Boolean(loading)}>
             All Good!
           </ExitModalButton>
         </LeftContainer>
@@ -786,8 +817,8 @@ function LobbyPage() {
               <>
                 <NoMarginMediumText>Problems</NoMarginMediumText>
                 <SelectedProblemsDisplay
-                  problems={selectedProblems}
-                  onRemove={isHost(currentUser) && !loading ? removeProblem : null}
+                  problems={modifiedProblems ? tempSelectedProblems : selectedProblems}
+                  onRemove={null}
                 />
               </>
             )}

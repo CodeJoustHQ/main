@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -37,13 +38,13 @@ public class RoomController extends BaseRestController {
     }
 
     @PutMapping("/rooms/{roomId}/users")
-    public ResponseEntity<RoomDto> joinRoom(@PathVariable String roomId,@RequestBody JoinRoomRequest request) {
-        return new ResponseEntity<>(service.joinRoom(roomId, request), HttpStatus.OK);
+    public ResponseEntity<RoomDto> joinRoom(@PathVariable String roomId,@RequestBody JoinRoomRequest request, @RequestHeader(name="Authorization", required = false) String token) {
+        return new ResponseEntity<>(service.joinRoom(roomId, request, token), HttpStatus.OK);
     }
 
     @PostMapping("/rooms")
-    public ResponseEntity<RoomDto> createRoom(@RequestBody CreateRoomRequest request) {
-        return new ResponseEntity<>(service.createRoom(request), HttpStatus.CREATED);
+    public ResponseEntity<RoomDto> createRoom(@RequestBody CreateRoomRequest request, @RequestHeader(name="Authorization", required = false) String token) {
+        return new ResponseEntity<>(service.createRoom(request, token), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/rooms/{roomId}")

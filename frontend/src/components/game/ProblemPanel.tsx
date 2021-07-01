@@ -4,10 +4,7 @@ import MarkdownEditor from 'rich-markdown-editor';
 import { BottomFooterText, ProblemHeaderText, SmallText } from '../core/Text';
 import { getDifficultyDisplayButton, ProblemNavButton } from '../core/Button';
 import { Copyable } from '../special/CopyIndicator';
-import {
-  CenteredContainer,
-  FlexHorizontalContainer, FlexLeft, FlexRight, Panel,
-} from '../core/Container';
+import { CenteredContainer, Panel } from '../core/Container';
 import { Problem } from '../../api/Problem';
 import { NextIcon, PrevIcon } from '../core/Icon';
 
@@ -31,7 +28,23 @@ const OverflowPanel = styled(Panel)`
   padding: 0 25px;
 `;
 
-const ProblemNavContainer = styled(FlexRight)`
+const HeaderContainer = styled.div`
+  display: flex;
+  flex: auto;
+  justify-content: space-between;
+`;
+
+const TitleContainer = styled.div`
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  word-break: break-all;
+`;
+
+const ProblemNavContainer = styled.div`
+  width: 100px;
+  min-width: 100px;
   align-items: baseline;
   padding: 15px 0;
 `;
@@ -54,13 +67,13 @@ function ProblemPanel(props: ProblemPanelProps) {
 
   return (
     <OverflowPanel>
-      <FlexHorizontalContainer>
-        <FlexLeft>
-          <div>
+      <HeaderContainer>
+        <div>
+          <TitleContainer>
             <ProblemHeaderText>{problems[index]?.name || 'Loading...'}</ProblemHeaderText>
-            {problems[index] ? getDifficultyDisplayButton(problems[index].difficulty) : null}
-          </div>
-        </FlexLeft>
+          </TitleContainer>
+          {problems[index] ? getDifficultyDisplayButton(problems[index].difficulty) : null}
+        </div>
         <ProblemNavContainer>
           <CenteredContainer>
             <div>
@@ -76,7 +89,7 @@ function ProblemPanel(props: ProblemPanelProps) {
             </ProblemCountText>
           </CenteredContainer>
         </ProblemNavContainer>
-      </FlexHorizontalContainer>
+      </HeaderContainer>
 
       <StyledMarkdownEditor
         defaultValue={problems[index]?.description || ''}
