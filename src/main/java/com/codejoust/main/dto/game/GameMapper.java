@@ -49,15 +49,15 @@ public class GameMapper {
         List<ProblemDto> problems = new ArrayList<>();
         ProblemDto problemDto;
 
-        for (Problem p : game.getProblems()) {
-            problemDto = ProblemMapper.toDto(p);
+        for (Problem problem : game.getProblems()) {
+            problemDto = ProblemMapper.toDto(problem);
             
-            for (ProblemTestCaseDto e : problemDto.getTestCases()) {
-                if (e.isHidden()) {
-                    e.setInput("");
+            for (ProblemTestCaseDto testcase : problemDto.getTestCases()) {
+                if (testcase.isHidden()) {
+                    testcase.setInput("");
                 }
 
-                e.setOutput("");
+                testcase.setOutput("");
             }
 
             problems.add(problemDto);
@@ -105,7 +105,7 @@ public class GameMapper {
         List<SubmissionResultDto> testCases = new ArrayList<>();
 
         if (submission.getResults() != null) {
-            for (int i = submission.getResults().size() - 1; i >= 0; i--) {
+            for (int i = 0; i < submission.getResults().size(); i++) {
                 SubmissionResultDto testCase = mapper.map(submission.getResults().get(i), SubmissionResultDto.class);
                 testCase.setCorrectOutput("");
 
