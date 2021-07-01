@@ -137,7 +137,7 @@ type StateRefType = {
   currentUser: User | null,
   currentCode: string,
   currentLanguage: string,
-  currentIndex: number,
+  currentProblemIndex: number,
 }
 
 /**
@@ -219,7 +219,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
     currentUser,
     currentCode: codeList[currentProblemIndex],
     currentLanguage: languageList[currentProblemIndex],
-    currentIndex: currentProblemIndex,
+    currentProblemIndex,
   };
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
@@ -299,7 +299,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
       if (JSON.parse(result.body).newSpectator) {
         sendViewUpdate(stateRef.current?.game, stateRef.current?.currentUser,
           stateRef.current?.currentCode, stateRef.current?.currentLanguage,
-          stateRef.current?.currentIndex);
+          stateRef.current?.currentProblemIndex);
       }
     };
 
@@ -553,7 +553,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
                     getCurrentLanguage={getCurrentLanguage}
                     defaultCodeMap={defaultCodeList}
                     currentProblem={currentProblemIndex}
-                    defaultLanguage={Language.Java}
                     defaultCode={null}
                     liveCode={null}
                   />
@@ -572,8 +571,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
                 <Editor
                   onLanguageChange={null}
                   onCodeChange={null}
-                  defaultLanguage={spectateGame?.language as Language}
-                  getCurrentLanguage={() => spectateGame?.language as Language}
+                  getCurrentLanguage={() => spectateGame?.language as Language || Language.Java}
                   defaultCodeMap={null}
                   currentProblem={currentProblemIndex}
                   defaultCode={spectateGame?.code}

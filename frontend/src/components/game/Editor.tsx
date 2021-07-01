@@ -8,19 +8,16 @@ import { DefaultCodeType } from '../../api/Problem';
 /**
  * onLanguageChange - a callback, called when the currentLanguage changes
  * onCodeChange - a callback, called when the code changes
- * getCurrentLanguage - a function passed in by the PlayerGameView which can be called to get the
- * working language
+ * getCurrentLanguage - a function passed in, which can be called to get the current language
  * defaultCodeMap - a map of all the default code for each problem and language
- * defaultLanguage - the default language for the editor
  * currentProblem - the problem which is current being worked on
- * liveCode - ????
+ * liveCode - a string used for spectator view
  */
 type EditorProps = {
   onLanguageChange: ((language: Language) => void) | null,
   onCodeChange: ((code: string) => void) | null,
   getCurrentLanguage: (() => Language) | null,
   defaultCodeMap: DefaultCodeType[] | null,
-  defaultLanguage: Language,
   defaultCode: string | null,
   currentProblem: number,
   liveCode: string | null,
@@ -102,18 +99,14 @@ const monacoEditorOptions: EditorConstructionOptions = {
 function ResizableMonacoEditor(props: EditorProps) {
   const {
     onLanguageChange, onCodeChange, getCurrentLanguage,
-    defaultCodeMap, defaultLanguage, defaultCode, currentProblem, liveCode,
+    defaultCodeMap, defaultCode, currentProblem, liveCode,
   } = props;
 
   const theme = useContext(ThemeContext);
-  const [currentLanguage, setCurrentLanguage] = useState<Language>(defaultLanguage);
   const [codeEditor, setCodeEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
   const [codeMap, setCodeMap] = useState<DefaultCodeType[] | null>(defaultCodeMap);
   const [previousProblem, setPreviousProblem] = useState<number>(0);
-
-  useEffect(() => {
-    setCurrentLanguage(defaultLanguage);
-  }, [defaultLanguage]);
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.Java);
 
   useEffect(() => {
     setCodeMap(defaultCodeMap);
@@ -150,18 +143,19 @@ function ResizableMonacoEditor(props: EditorProps) {
       codeEditor.setValue(codeMap[currentProblem][language]);
     }
 
-    // Change the language and initial code for the editor
-    setCurrentLanguage(language);
+    // Call onLanguageChange
     if (onLanguageChange) {
       onLanguageChange(language);
     }
   };
 
+  // This hook will be called if the user switches the problem he or she is working on
   useEffect(() => {
     if (codeMap != null && codeEditor != null) {
       if (codeMap[currentProblem] != null) {
         const codeMapTemp = codeMap;
 
+        // If the value of the editor is not "Loading...", save it in the codeMap
         if (codeEditor.getValue() !== 'Loading...') {
           codeMapTemp[previousProblem][currentLanguage] = codeEditor.getValue();
         }
@@ -169,21 +163,19 @@ function ResizableMonacoEditor(props: EditorProps) {
         setCodeMap(codeMapTemp);
         setPreviousProblem(currentProblem);
 
-        let newLanguage = currentLanguage;
-
-        if (getCurrentLanguage !== null) {
-          newLanguage = getCurrentLanguage();
-
-          if (newLanguage !== currentLanguage) {
-            setCurrentLanguage(newLanguage);
-          }
+        // If getCurrentLanguage is defined, set currentLanguage to the returned value,
+        // which is the language that was last used for the new problem,
+        // and set the CodeEditor to be the code for the problem and language
+        if (getCurrentLanguage) {
+          setCurrentLanguage(getCurrentLanguage());
+          codeEditor.setValue(codeMap[currentProblem][getCurrentLanguage()]);
+        } else {
+          codeEditor.setValue(codeMap[currentProblem][currentLanguage]);
         }
-
-        codeEditor.setValue(codeMap[currentProblem][newLanguage]);
       }
     }
   }, [currentLanguage, codeMap, codeEditor, setCodeEditor,
-    currentProblem, previousProblem, getCurrentLanguage]);
+    currentProblem, previousProblem]);
 
   return (
     <Content>
