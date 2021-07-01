@@ -1,5 +1,6 @@
 package com.codejoust.main.api;
 
+import com.codejoust.main.dao.ProblemRepository;
 import com.codejoust.main.dto.game.GameDto;
 import com.codejoust.main.dto.game.GameNotificationDto;
 import com.codejoust.main.dto.game.GameNotificationRequest;
@@ -208,7 +209,6 @@ public class GameTests {
         assertEquals(TestFields.OUTPUT, resultDto.getUserOutput());
         assertNull(resultDto.getError());
         assertEquals(TestFields.INPUT, resultDto.getInput());
-        assertEquals(TestFields.OUTPUT, resultDto.getCorrectOutput());
         assertFalse(resultDto.isHidden());
         assertTrue(resultDto.isCorrect());
 

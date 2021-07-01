@@ -5,18 +5,19 @@ import org.modelmapper.convention.MatchingStrategies;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.codejoust.main.dto.problem.ProblemDto;
 import com.codejoust.main.dto.problem.ProblemMapper;
+import com.codejoust.main.dto.problem.ProblemTestCaseDto;
 import com.codejoust.main.dto.room.RoomMapper;
 import com.codejoust.main.game_object.Game;
 import com.codejoust.main.game_object.Player;
 import com.codejoust.main.game_object.Submission;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
+import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.util.Color;
 import com.codejoust.main.util.Utility;
 
@@ -26,6 +27,7 @@ public class GameMapper {
 
     protected GameMapper() {}
 
+    // Removes the correct output for non-hidden testcases and output and input for hidden testcases
     public static GameDto toDto(Game game) {
         if (game == null) {
             return null;
@@ -45,9 +47,23 @@ public class GameMapper {
         sortLeaderboard(players);
 
         List<ProblemDto> problems = new ArrayList<>();
-        game.getProblems().forEach(problem -> problems.add(ProblemMapper.toDto(problem)));
-        gameDto.setProblems(problems);
+        ProblemDto problemDto;
 
+        for (Problem p : game.getProblems()) {
+            problemDto = ProblemMapper.toDto(p);
+            
+            for (ProblemTestCaseDto e : problemDto.getTestCases()) {
+                if (e.isHidden()) {
+                    e.setInput("");
+                }
+
+                e.setOutput("");
+            }
+
+            problems.add(problemDto);
+        }
+
+        gameDto.setProblems(problems);
         gameDto.setAllSolved(game.getAllSolved());
 
         return gameDto;
@@ -80,27 +96,35 @@ public class GameMapper {
         return game;
     }
 
+    // Clears correctOutput from each result, and input, console, and userOutput from hidden results
     public static SubmissionDto submissionToDto(Submission submission) {
         if (submission == null) {
             return null;
         }
 
-        List<SubmissionResultDto> notHidden = new LinkedList<>();
+        List<SubmissionResultDto> testCases = new ArrayList<>();
 
         if (submission.getResults() != null) {
             for (int i = submission.getResults().size() - 1; i >= 0; i--) {
-                if (!submission.getResults().get(i).isHidden()) {
-                    notHidden.add(mapper.map(submission.getResults().get(i), SubmissionResultDto.class));
+                SubmissionResultDto testCase = mapper.map(submission.getResults().get(i), SubmissionResultDto.class);
+                testCase.setCorrectOutput("");
+
+                if (testCase.isHidden()) {
+                    testCase.setInput("");
+                    testCase.setConsole("");
+                    testCase.setUserOutput("");
                 }
+
+                testCases.add(testCase);
             }
         }
 
 
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
-        SubmissionDto returned = mapper.map(submission, SubmissionDto.class);
-        returned.setResults(notHidden);
+        SubmissionDto submissionDto = mapper.map(submission, SubmissionDto.class);
+        submissionDto.setResults(testCases);
 
-        return returned;
+        return submissionDto;
     }
 
     // Sort by numCorrect followed by startTime
