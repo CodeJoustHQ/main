@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import Language from '../../api/Language';
 import { SecondaryHeaderText } from '../core/Text';
 import ResizableMonacoEditor from '../game/Editor';
-import { useBestSubmission } from '../../util/Hook';
 import { getBestSubmission } from '../../util/Utility';
 
 const CodePreview = styled.div`

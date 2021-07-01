@@ -4,6 +4,7 @@ import { Player } from '../../api/Game';
 import { Text, MediumText } from '../core/Text';
 import Language, { displayNameFromLanguage } from '../../api/Language';
 import { useBestSubmission, useGetScore, useGetSubmissionTime } from '../../util/Hook';
+import { getTimeBetween } from '../../util/Utility';
 
 type PodiumProps = {
   place: number,
@@ -147,11 +148,7 @@ function Podium(props: PodiumProps) {
       return <SmallerText />;
     }
 
-    // Calculate time from start of game till best submission
-    const startTime = new Date(gameStartTime).getTime();
-    const diffMilliseconds = new Date(time).getTime() - startTime;
-    const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
-
+    const diffMinutes = getTimeBetween(gameStartTime, time);
     return (
       <SmallerText>
         in

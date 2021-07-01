@@ -3,10 +3,10 @@ import styled from 'styled-components';
 import { Player, Submission } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
 import { Color } from '../../api/Color';
-import { useBestSubmission } from '../../util/Hook';
+import { useBestSubmission, useGetSubmissionTime } from '../../util/Hook';
 import Language, { displayNameFromLanguage } from '../../api/Language';
 import { TextButton } from '../core/Button';
-import { getScore, getSubmissionCount, getSubmissionTime } from '../../util/Utility';
+import { getScore, getSubmissionCount, getSubmissionTime, getTimeBetween } from '../../util/Utility';
 
 const Content = styled.tr`
   border-radius: 5px;
@@ -94,6 +94,7 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
   } = props;
 
   const bestSubmission: Submission | null = useBestSubmission(player, problemIndex);
+  const finalSubmissionTime = useGetSubmissionTime(player);
 
   const getDisplayNickname = () => {
     const { nickname } = player.user;
@@ -126,6 +127,18 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
     return `${solved.filter((s) => s).length}/${solved.length}`;
   };
 
+  const getTimeToDisplay = () => {
+    if (problemIndex !== -1) {
+      return getSubmissionTime(bestSubmission, gameStartTime);
+    }
+
+    if (!finalSubmissionTime) {
+      return 'N/A';
+    }
+
+    return `${getTimeBetween(gameStartTime, finalSubmissionTime)} min`;
+  };
+
   return (
     <Content>
       <PlaceColumn>
@@ -143,7 +156,7 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
         <Text>{getScoreToDisplay()}</Text>
       </td>
       <td>
-        <Text>{getSubmissionTime(bestSubmission, gameStartTime)}</Text>
+        <Text>{getTimeToDisplay()}</Text>
       </td>
       <td>
         <Text>{getSubmissionCount(player, problemIndex)}</Text>

@@ -147,6 +147,13 @@ export const getBestSubmission = (player?: Player | null, problemIndex?: number)
   return newBestSubmission;
 };
 
+export const getTimeBetween = (start: string, end: string) => {
+  // Calculate time from start of game till best submission
+  const startTime = new Date(start).getTime();
+  const diffMilliseconds = new Date(end).getTime() - startTime;
+  return Math.floor(diffMilliseconds / (60 * 1000));
+};
+
 // Displays the time taken for a specific submission
 export const getSubmissionTime = (bestSubmission: Submission | null,
   gameStartTime: string | null) => {
@@ -154,12 +161,7 @@ export const getSubmissionTime = (bestSubmission: Submission | null,
     return 'N/A';
   }
 
-  // Calculate time from start of game till best submission
-  const startTime = new Date(gameStartTime).getTime();
-  const diffMilliseconds = new Date(bestSubmission.startTime).getTime() - startTime;
-  const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
-
-  return ` ${diffMinutes} min`;
+  return ` ${getTimeBetween(gameStartTime, bestSubmission.startTime)} min`;
 };
 
 // Gets the number of submissions for a specific player and problem

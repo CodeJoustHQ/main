@@ -88,6 +88,14 @@ function ResultsTable(props: ResultsTableProps) {
     }
   };
 
+  const getFinalColumn = () => {
+    if (problemIndex === -1) {
+      return null;
+    }
+
+    return !spectatePlayer ? <th>Code</th> : <th>Spectate Live</th>
+  };
+
   return (
     <Content>
       <TopContent>
@@ -106,10 +114,10 @@ function ResultsTable(props: ResultsTableProps) {
         <tr>
           <th />
           <PrimaryTableHeader>Player</PrimaryTableHeader>
-          <th>Score</th>
+          <th>{problemIndex === -1 ? 'Problems Solved' : 'Tests Passed'}</th>
           <th>Time</th>
-          <SmallColumn>Submissions</SmallColumn>
-          {!spectatePlayer ? <th>Code</th> : <th>Spectate Live</th>}
+          <SmallColumn>{problemIndex === -1 ? 'Submissions' : 'Attempts'}</SmallColumn>
+          {getFinalColumn()}
         </tr>
         {players?.map((player, index) => (
           <PlayerResultsItem
