@@ -9,7 +9,15 @@ import { Problem } from '../api/Problem';
 import { Coordinate } from '../components/special/FloatingCircle';
 import app from '../api/Firebase';
 
-// Finds the first best submission by a player (for a specific problem, if specified)
+/**
+ * Finds the best submission by a player (the first one, if there's a tie).
+ * If an index is specified that's not -1, then this will find the best submission
+ * for that problem specifically. If problemIndex is -1 (overview mode), then it
+ * will resort back to finding the best overall submission as usual.
+ *
+ * @param player The player in question
+ * @param problemIndex Optional index to specify a problem
+ */
 export const useBestSubmission = (player?: Player | null, problemIndex?: number) => {
   const [bestSubmission, setBestSubmission] = useState<Submission | null>(null);
 
@@ -18,7 +26,7 @@ export const useBestSubmission = (player?: Player | null, problemIndex?: number)
       let newBestSubmission: Submission | null = null;
 
       // If problemIndex is specified, find best submission only for that problem
-      const submissions = (problemIndex !== undefined)
+      const submissions = (problemIndex !== undefined && problemIndex !== -1)
         ? player.submissions.filter((s) => s.problemIndex === problemIndex) : player.submissions;
 
       // Find best submission

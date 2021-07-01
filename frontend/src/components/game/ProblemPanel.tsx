@@ -50,7 +50,7 @@ const ProblemNavContainer = styled.div`
 `;
 
 const ProblemCountText = styled(SmallText)`
-  color: gray;
+  color: ${({ theme }) => theme.colors.gray};
 `;
 
 type ProblemPanelProps = {

@@ -145,7 +145,7 @@ export const getSubmissionTime = (bestSubmission: Submission | null,
 
 // Gets the number of submissions for a specific player and problem
 export const getSubmissionCount = (player: Player | null, problemIndex?: number): number => {
-  const submissions = (problemIndex !== undefined)
+  const submissions = (problemIndex !== undefined && problemIndex !== -1)
     ? player?.submissions.filter((s) => s.problemIndex === problemIndex) : player?.submissions;
 
   return submissions?.length || 0;

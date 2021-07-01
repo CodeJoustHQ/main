@@ -115,6 +115,17 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
     );
   };
 
+  const getScoreToDisplay = () => {
+    // Show score of specific problem (in percent)
+    if (problemIndex !== -1) {
+      return getScore(bestSubmission);
+    }
+
+    // If in overview mode, show overall number of problems solved
+    const { solved } = player;
+    return `${solved.filter((s) => s).length}/${solved.length}`;
+  };
+
   return (
     <Content>
       <PlaceColumn>
@@ -129,7 +140,7 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
       </PlayerContent>
 
       <td>
-        <Text>{getScore(bestSubmission)}</Text>
+        <Text>{getScoreToDisplay()}</Text>
       </td>
       <td>
         <Text>{getSubmissionTime(bestSubmission, gameStartTime)}</Text>
