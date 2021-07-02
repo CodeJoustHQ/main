@@ -29,30 +29,6 @@ export const useBestSubmission = (player?: Player | null, problemIndex?: number)
   return bestSubmission;
 };
 
-// Calculates the overall score of a player (number solved)
-export const useGetScore = (player?: Player): number | null => {
-  const counted = new Set<number>();
-  const [score, setScore] = useState<number>(0);
-
-  useEffect(() => {
-    if (player) {
-      for (let i = 0; i < player.submissions.length; i += 1) {
-        if (player.submissions[i].numCorrect === player.submissions[i].numTestCases
-          && !counted.has(player.submissions[i].problemIndex)) {
-          counted.add(player.submissions[i].problemIndex);
-        }
-      }
-
-      setScore(counted.size);
-    }
-  }, [player, setScore, counted]);
-
-  if (player == null || player.submissions.length === 0) {
-    return null;
-  }
-  return score;
-};
-
 // Calculates the time taken for the latest 100% correct solution for a problem
 export const useGetSubmissionTime = (player?: Player) => {
   const counted = new Set<number>();

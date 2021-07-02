@@ -81,7 +81,7 @@ function ResultsTable(props: ResultsTableProps) {
       return;
     }
 
-    setSortedPlayers(players.sort((p1, p2) => {
+    setSortedPlayers([...players].sort((p1, p2) => {
       const p1Best = getBestSubmission(p1, problemIndex);
       const p2Best = getBestSubmission(p2, problemIndex);
 

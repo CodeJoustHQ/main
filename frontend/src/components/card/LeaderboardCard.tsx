@@ -4,7 +4,7 @@ import { Player } from '../../api/Game';
 import { LowMarginText, SmallText } from '../core/Text';
 import PlayerIcon from './PlayerIcon';
 import { Color } from '../../api/Color';
-import { useGetScore, useGetSubmissionTime } from '../../util/Hook';
+import { useGetSubmissionTime } from '../../util/Hook';
 
 type ContentStyleType = {
   isCurrentPlayer: boolean,
@@ -76,7 +76,7 @@ function LeaderboardCard(props: LeaderboardCardProps) {
   } = props;
 
   const [showHover, setShowHover] = useState(false);
-  const score = useGetScore(player);
+  const score = player.solved.filter((s) => s).length;
   const time = useGetSubmissionTime(player);
 
   const getScoreDisplay = () => `${score || 0}/${numProblems}`;

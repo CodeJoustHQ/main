@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import { Text, MediumText } from '../core/Text';
 import Language, { displayNameFromLanguage } from '../../api/Language';
-import { useBestSubmission, useGetScore, useGetSubmissionTime } from '../../util/Hook';
+import { useBestSubmission, useGetSubmissionTime } from '../../util/Hook';
 import { getTimeBetween } from '../../util/Utility';
 
 type PodiumProps = {
@@ -90,7 +90,7 @@ function Podium(props: PodiumProps) {
     place, player, gameStartTime, loading, inviteContent, isCurrentPlayer, numProblems,
   } = props;
 
-  const score = useGetScore(player);
+  const score = (player?.solved || []).filter((s) => s).length;
   const bestSubmission = useBestSubmission(player);
   const time = useGetSubmissionTime(player);
 
