@@ -4,9 +4,7 @@ import MarkdownEditor from 'rich-markdown-editor';
 import { BottomFooterText, ProblemHeaderText, SmallText } from '../core/Text';
 import { DefaultButton, getDifficultyDisplayButton } from '../core/Button';
 import { Copyable } from '../special/CopyIndicator';
-import {
-  CenteredContainer, FlexLeft, FlexRight, Panel,
-} from '../core/Container';
+import { CenteredContainer, Panel } from '../core/Container';
 import { Problem } from '../../api/Problem';
 import { NextIcon, PrevIcon } from '../core/Icon';
 

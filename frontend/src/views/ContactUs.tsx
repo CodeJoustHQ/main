@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { DynamicWidthContainer } from '../components/core/Container';
 import { InlineExternalLink } from '../components/core/Link';
 import { ContactHeaderTitle, ContactHeaderText } from '../components/core/Text';
