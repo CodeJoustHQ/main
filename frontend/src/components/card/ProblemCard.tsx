@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Problem } from '../../api/Problem';
-import { LargeText, SelectedItemText, Text } from '../core/Text';
+import { LargeText, SelectedItemText, SingleLineText } from '../core/Text';
 import { getDifficultyDisplayButton } from '../core/Button';
 import { SelectedItemContainer } from '../core/Container';
 import { DivLink } from '../core/Link';
@@ -43,14 +43,6 @@ const TitleText = styled(LargeText)`
   vertical-align: middle;
 `;
 
-const DescriptionText = styled(Text)`
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  word-break: break-all;
-`;
-
 function ProblemCard(props: ProblemCardProps) {
   const { problem } = props;
 
@@ -60,7 +52,7 @@ function ProblemCard(props: ProblemCardProps) {
         <InnerContent>
           <TitleText>{problem.name}</TitleText>
           {getDifficultyDisplayButton(problem.difficulty, true)}
-          <DescriptionText>{problem.description}</DescriptionText>
+          <SingleLineText>{problem.description}</SingleLineText>
 
           {problem.problemTags.map((tag) => (
             <ProblemTagContainer key={tag.name}>
