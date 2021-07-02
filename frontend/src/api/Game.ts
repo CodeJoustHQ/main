@@ -82,6 +82,7 @@ export type Submission = {
 export type SpectateGame = {
   user: User,
   problem: Problem,
+  index: number,
   code: string,
   language: string,
 };

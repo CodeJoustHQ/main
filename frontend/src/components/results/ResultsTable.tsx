@@ -62,7 +62,7 @@ type ResultsTableProps = {
   gameStartTime: string,
   problems: Problem[],
   viewPlayerCode: ((playerIndex: number, probIndex: number) => void) | null,
-  spectatePlayer: ((index: number) => void) | null,
+  spectatePlayer: ((playerIndex: number, probIndex: number) => void) | null,
 };
 
 function ResultsTable(props: ResultsTableProps) {
@@ -152,7 +152,7 @@ function ResultsTable(props: ResultsTableProps) {
             color={player.color}
             problemIndex={problemIndex}
             onViewCode={viewPlayerCode ? (() => viewPlayerCode(index, problemIndex)) : null}
-            onSpectateLive={spectatePlayer ? (() => spectatePlayer(index)) : null}
+            onSpectateLive={spectatePlayer ? (() => spectatePlayer(index, problemIndex)) : null}
           />
         ))}
       </TableContent>
