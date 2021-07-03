@@ -103,6 +103,17 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
     return `${nickname} ${isCurrentPlayer ? '(you)' : ''}`;
   };
 
+  const getSubmissionTime = () => {
+    if (!time) {
+      return 'Never';
+    }
+
+    const currentTime = new Date().getTime();
+    const diffMilliseconds = currentTime - new Date(time).getTime();
+    const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
+    return `${diffMinutes}m ago`;
+  };
+
   const getSubmissionLanguage = () => {
     if (!bestSubmission) {
       return 'N/A';
@@ -135,7 +146,7 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
         <Text>{score}</Text>
       </td>
       <td>
-        <Text>{time}</Text>
+        <Text>{getSubmissionTime()}</Text>
       </td>
       <td>
         <Text>{getSubmissionCount()}</Text>

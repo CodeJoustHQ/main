@@ -115,7 +115,7 @@ function LeaderboardCard(props: LeaderboardCardProps) {
         nickname={player.user.nickname}
         active={Boolean(player.user.sessionId)}
       />
-      <LowMarginText bold={player.solved}>{`${place}.${getScorePercentage()}`}</LowMarginText>
+      <LowMarginText bold={player.solved.filter((element) => !element).length === 0}>{`${place}.${getScorePercentage()}`}</LowMarginText>
 
       {showHover ? (
         <HoverBar>
