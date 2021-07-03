@@ -101,6 +101,7 @@ function Console(props: ConsoleProps) {
           if (!firstFailure && !result.correct) {
             firstFailure = result;
           }
+
           if (!firstNonHiddenFailure && !result.correct && !result.hidden) {
             firstNonHiddenFailure = result;
           }
