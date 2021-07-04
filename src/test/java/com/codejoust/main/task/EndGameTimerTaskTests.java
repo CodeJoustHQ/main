@@ -34,6 +34,7 @@ public class EndGameTimerTaskTests {
 
     @Test
     public void endGameTimerTaskSocketMessageNullGame() {
+        MockitoAnnotations.initMocks(this);
         assertThrows(ApiException.class, () -> new EndGameTimerTask(gameManagementService, socketService, null));
     }
 

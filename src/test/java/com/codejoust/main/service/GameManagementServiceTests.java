@@ -27,6 +27,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 
+import com.codejoust.main.dao.GameReportRepository;
 import com.codejoust.main.dao.RoomRepository;
 import com.codejoust.main.dto.game.GameDto;
 import com.codejoust.main.dto.game.GameMapper;
@@ -52,12 +53,16 @@ import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.model.problem.ProblemDifficulty;
+import com.codejoust.main.model.report.GameReport;
 
 @ExtendWith(MockitoExtension.class)
 public class GameManagementServiceTests {
 
     @Mock
     private RoomRepository repository;
+
+    @Mock
+    private GameReportRepository gameReportRepository;
 
     @Mock
     private SocketService socketService;
@@ -1007,7 +1012,9 @@ public class GameManagementServiceTests {
         // Neither the end game nor time left notifications are sent
         verify(socketService, after(13000).never()).sendSocketUpdate(Mockito.any(String.class), Mockito.any(GameNotificationDto.class));
         verify(socketService, never()).sendSocketUpdate(Mockito.any(GameDto.class));
-        verify(gameService, after(100000)).createGameReport(game);
+
+        // Game report is saved after one minute past handleEndGame
+        verify(gameReportRepository, after(61300)).save(Mockito.any(GameReport.class));
     }
 
     @Test

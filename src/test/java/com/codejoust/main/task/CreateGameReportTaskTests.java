@@ -18,7 +18,6 @@ import com.codejoust.main.service.GameManagementService;
 import com.codejoust.main.service.SocketService;
 import com.codejoust.main.util.TestFields;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -33,13 +32,9 @@ public class CreateGameReportTaskTests {
     @Mock
     private SocketService socketService;
 
-    @BeforeEach
-    public void setup() throws Exception {
-        MockitoAnnotations.initMocks(this);
-    }
-
     @Test
     public void createGameReportTaskSocketMessageNullGame() {
+        MockitoAnnotations.initMocks(this);
         assertThrows(ApiException.class, () -> new CreateGameReportTask(gameManagementService, null));
     }
 
@@ -60,53 +55,9 @@ public class CreateGameReportTaskTests {
         GameTimer gameTimer = new GameTimer(10L);
         game.setGameTimer(gameTimer);
 
+        MockitoAnnotations.initMocks(this);
+
         assertThrows(ApiException.class, () -> new CreateGameReportTask(null, game));
-    }
-
-    @Test
-    public void createGameReportTaskSocketMessageNullGameTimer() {
-        User user = new User();
-        user.setNickname(TestFields.NICKNAME);
-        user.setUserId(TestFields.USER_ID);
-        user.setSessionId(TestFields.SESSION_ID);
-
-        Room room = new Room();
-        room.setRoomId(TestFields.ROOM_ID);
-        room.setDifficulty(ProblemDifficulty.MEDIUM);
-        room.setHost(user);
-        room.addUser(user);
-
-        Game game = GameMapper.fromRoom(room);
-
-        assertThrows(ApiException.class, () -> new CreateGameReportTask(gameManagementService, game));
-    }
-
-    @Test
-    public void createGameReportTaskSocketMessageNullRoom() {
-        Game game = new Game();
-        GameTimer gameTimer = new GameTimer(10L);
-        game.setGameTimer(gameTimer);
-
-        assertThrows(ApiException.class, () -> new CreateGameReportTask(gameManagementService, game));
-    }
-
-    @Test
-    public void createGameReportTaskSocketMessageNullRoomId() {
-        User user = new User();
-        user.setNickname(TestFields.NICKNAME);
-        user.setUserId(TestFields.USER_ID);
-        user.setSessionId(TestFields.SESSION_ID);
-
-        Room room = new Room();
-        room.setDifficulty(ProblemDifficulty.MEDIUM);
-        room.setHost(user);
-        room.addUser(user);
-
-        Game game = GameMapper.fromRoom(room);
-        GameTimer gameTimer = new GameTimer(10L);
-        game.setGameTimer(gameTimer);
-
-        assertThrows(ApiException.class, () -> new CreateGameReportTask(gameManagementService, game));
     }
 
     @Test
