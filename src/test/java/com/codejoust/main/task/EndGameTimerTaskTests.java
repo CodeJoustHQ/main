@@ -18,7 +18,6 @@ import com.codejoust.main.service.GameManagementService;
 import com.codejoust.main.service.SocketService;
 import com.codejoust.main.util.TestFields;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -32,11 +31,6 @@ public class EndGameTimerTaskTests {
     
     @Mock
     private SocketService socketService;
-
-    @BeforeEach
-    public void setup() throws Exception {
-        MockitoAnnotations.initMocks(this);
-    }
 
     @Test
     public void endGameTimerTaskSocketMessageNullGame() {
@@ -60,11 +54,13 @@ public class EndGameTimerTaskTests {
         GameTimer gameTimer = new GameTimer(10L);
         game.setGameTimer(gameTimer);
 
+        MockitoAnnotations.initMocks(this);
+
         assertThrows(ApiException.class, () -> new EndGameTimerTask(gameManagementService, null, game));
     }
 
     @Test
-    public void endGameTimerTaskSocketMessageNullGameTimer() {
+    public void endGameTimerTaskSocketMessageNullGameManagementService() {
         User user = new User();
         user.setNickname(TestFields.NICKNAME);
         user.setUserId(TestFields.USER_ID);
@@ -77,36 +73,12 @@ public class EndGameTimerTaskTests {
         room.addUser(user);
 
         Game game = GameMapper.fromRoom(room);
-
-        assertThrows(ApiException.class, () -> new EndGameTimerTask(gameManagementService, socketService, game));
-    }
-
-    @Test
-    public void endGameTimerTaskSocketMessageNullRoom() {
-        Game game = new Game();
         GameTimer gameTimer = new GameTimer(10L);
         game.setGameTimer(gameTimer);
 
-        assertThrows(ApiException.class, () -> new EndGameTimerTask(gameManagementService, socketService, game));
-    }
+        MockitoAnnotations.initMocks(this);
 
-    @Test
-    public void endGameTimerTaskSocketMessageNullRoomId() {
-        User user = new User();
-        user.setNickname(TestFields.NICKNAME);
-        user.setUserId(TestFields.USER_ID);
-        user.setSessionId(TestFields.SESSION_ID);
-
-        Room room = new Room();
-        room.setDifficulty(ProblemDifficulty.MEDIUM);
-        room.setHost(user);
-        room.addUser(user);
-
-        Game game = GameMapper.fromRoom(room);
-        GameTimer gameTimer = new GameTimer(10L);
-        game.setGameTimer(gameTimer);
-
-        assertThrows(ApiException.class, () -> new EndGameTimerTask(gameManagementService, socketService, game));
+        assertThrows(ApiException.class, () -> new EndGameTimerTask(null, socketService, game));
     }
 
     @Test
@@ -137,13 +109,14 @@ public class EndGameTimerTaskTests {
 
         /**
          * Confirm that the socket update is not called immediately, 
-         * but is called 1 second later (wait for timer task).
+         * but is called 1 second later (wait for timer task),
+         * along with the game management service.
          */
 
-        // verify(socketService, never()).sendSocketUpdate(eq(gameDto));
+        verify(socketService, never()).sendSocketUpdate(eq(gameDto));
 
-        // verify(socketService, timeout(1200)).sendSocketUpdate(eq(gameDto));
+        verify(socketService, timeout(1200)).sendSocketUpdate(eq(gameDto));
 
-        verify(gameManagementService, timeout(10000)).handleEndGame(game);
+        verify(gameManagementService, timeout(1200)).handleEndGame(game);
     }
 }

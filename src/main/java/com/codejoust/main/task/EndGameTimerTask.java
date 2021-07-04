@@ -25,7 +25,7 @@ public class EndGameTimerTask extends TimerTask {
         this.game = game;
 
         // Handle potential errors for run().
-        if (game == null || game.getGameTimer() == null || game.getRoom() == null || game.getRoom().getRoomId() == null || socketService == null) {
+        if (game == null || socketService == null || gameManagementService == null) {
             throw new ApiException(TimerError.NULL_SETTING);
         }
     }

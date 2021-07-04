@@ -18,7 +18,7 @@ public class CreateGameReportTask extends TimerTask {
         this.game = game;
 
         // Handle potential errors for run().
-        if (game == null) {
+        if (gameManagementService == null || game == null) {
             throw new ApiException(TimerError.NULL_SETTING);
         }
     }

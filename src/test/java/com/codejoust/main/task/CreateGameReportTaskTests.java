@@ -60,7 +60,7 @@ public class CreateGameReportTaskTests {
         GameTimer gameTimer = new GameTimer(10L);
         game.setGameTimer(gameTimer);
 
-        assertThrows(ApiException.class, () -> new CreateGameReportTask(gameManagementService, game));
+        assertThrows(ApiException.class, () -> new CreateGameReportTask(null, game));
     }
 
     @Test

@@ -986,7 +986,7 @@ public class GameManagementServiceTests {
     }
 
     @Test
-    public void endGameCancelsTimers() {
+    public void endGameCancelsTimersCreateReport() {
         Room room = new Room();
         room.setRoomId(TestFields.ROOM_ID);
         room.setDuration(12L);
@@ -1007,6 +1007,7 @@ public class GameManagementServiceTests {
         // Neither the end game nor time left notifications are sent
         verify(socketService, after(13000).never()).sendSocketUpdate(Mockito.any(String.class), Mockito.any(GameNotificationDto.class));
         verify(socketService, never()).sendSocketUpdate(Mockito.any(GameDto.class));
+        verify(gameService, after(100000)).createGameReport(game);
     }
 
     @Test
