@@ -468,6 +468,13 @@ function LobbyPage() {
     setModifiedProblems(true);
   };
 
+  // If user clicks close or outside of problem selection modal, discard changes
+  const closeModalWithoutSaving = () => {
+    setTempSelectedProblems([]);
+    setModifiedProblems(false);
+    setShowProblemSelector(false);
+  };
+
   const onSizeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
 
@@ -679,7 +686,7 @@ function LobbyPage() {
       />
       <Modal
         show={showProblemSelector && isHost(currentUser)}
-        onExit={() => setShowProblemSelector(false)}
+        onExit={closeModalWithoutSaving}
         fullScreen
       >
         <LeftContainer>
@@ -823,7 +830,7 @@ function LobbyPage() {
               </>
             )}
 
-            {isHost(currentUser) ? (
+            {isHost(currentUser) && !loading ? (
               <ShowProblemSelectorContainer>
                 <TextButton onClick={() => setShowProblemSelector(true)}>
                   {selectedProblems.length ? 'Edit problem selection ' : 'Or choose a specific problem '}
