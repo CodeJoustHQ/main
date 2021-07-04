@@ -25,7 +25,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class EndGameTimerTaskTests {
+public class CreateGameReportTaskTests {
 
     @Mock
     private GameManagementService gameManagementService;
@@ -39,12 +39,12 @@ public class EndGameTimerTaskTests {
     }
 
     @Test
-    public void endGameTimerTaskSocketMessageNullGame() {
-        assertThrows(ApiException.class, () -> new EndGameTimerTask(gameManagementService, socketService, null));
+    public void createGameReportTaskSocketMessageNullGame() {
+        assertThrows(ApiException.class, () -> new CreateGameReportTask(gameManagementService, null));
     }
 
     @Test
-    public void endGameTimerTaskSocketMessageNullSocketService() {
+    public void createGameReportTaskSocketMessageNullSocketService() {
         User user = new User();
         user.setNickname(TestFields.NICKNAME);
         user.setUserId(TestFields.USER_ID);
@@ -60,11 +60,11 @@ public class EndGameTimerTaskTests {
         GameTimer gameTimer = new GameTimer(10L);
         game.setGameTimer(gameTimer);
 
-        assertThrows(ApiException.class, () -> new EndGameTimerTask(gameManagementService, null, game));
+        assertThrows(ApiException.class, () -> new CreateGameReportTask(gameManagementService, game));
     }
 
     @Test
-    public void endGameTimerTaskSocketMessageNullGameTimer() {
+    public void createGameReportTaskSocketMessageNullGameTimer() {
         User user = new User();
         user.setNickname(TestFields.NICKNAME);
         user.setUserId(TestFields.USER_ID);
@@ -78,20 +78,20 @@ public class EndGameTimerTaskTests {
 
         Game game = GameMapper.fromRoom(room);
 
-        assertThrows(ApiException.class, () -> new EndGameTimerTask(gameManagementService, socketService, game));
+        assertThrows(ApiException.class, () -> new CreateGameReportTask(gameManagementService, game));
     }
 
     @Test
-    public void endGameTimerTaskSocketMessageNullRoom() {
+    public void createGameReportTaskSocketMessageNullRoom() {
         Game game = new Game();
         GameTimer gameTimer = new GameTimer(10L);
         game.setGameTimer(gameTimer);
 
-        assertThrows(ApiException.class, () -> new EndGameTimerTask(gameManagementService, socketService, game));
+        assertThrows(ApiException.class, () -> new CreateGameReportTask(gameManagementService, game));
     }
 
     @Test
-    public void endGameTimerTaskSocketMessageNullRoomId() {
+    public void createGameReportTaskSocketMessageNullRoomId() {
         User user = new User();
         user.setNickname(TestFields.NICKNAME);
         user.setUserId(TestFields.USER_ID);
@@ -106,11 +106,11 @@ public class EndGameTimerTaskTests {
         GameTimer gameTimer = new GameTimer(10L);
         game.setGameTimer(gameTimer);
 
-        assertThrows(ApiException.class, () -> new EndGameTimerTask(gameManagementService, socketService, game));
+        assertThrows(ApiException.class, () -> new CreateGameReportTask(gameManagementService, game));
     }
 
     @Test
-    public void endGameTimerTaskSocketMessage() {
+    public void createGameReportTaskSocketMessage() {
         User user = new User();
         user.setNickname(TestFields.NICKNAME);
         user.setUserId(TestFields.USER_ID);
@@ -132,18 +132,16 @@ public class EndGameTimerTaskTests {
 
         MockitoAnnotations.initMocks(this);
 
-        EndGameTimerTask endGameTimerTask = new EndGameTimerTask(gameManagementService, socketService, game);
-        gameTimer.getTimer().schedule(endGameTimerTask,  1000L);
+        CreateGameReportTask createGameReportTask = new CreateGameReportTask(gameManagementService, game);
+        gameTimer.getTimer().schedule(createGameReportTask,  1000L);
 
         /**
          * Confirm that the socket update is not called immediately, 
          * but is called 1 second later (wait for timer task).
          */
 
-        // verify(socketService, never()).sendSocketUpdate(eq(gameDto));
+        verify(socketService, never()).sendSocketUpdate(eq(gameDto));
 
-        // verify(socketService, timeout(1200)).sendSocketUpdate(eq(gameDto));
-
-        verify(gameManagementService, timeout(10000)).handleEndGame(game);
+        verify(socketService, timeout(1200)).sendSocketUpdate(eq(gameDto));
     }
 }
