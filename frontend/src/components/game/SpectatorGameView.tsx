@@ -17,6 +17,7 @@ function SpectatorGameView() {
   const [spectateGame, setSpectateGame] = useState<SpectateGame | null>();
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [problemIndex, setProblemIndex] = useState(0);
 
   // Unsubscribe from the player socket.
   const unsubscribePlayer = useCallback(() => {
@@ -66,6 +67,7 @@ function SpectatorGameView() {
         gameError={error}
         spectateGame={spectateGame}
         spectatorUnsubscribePlayer={unsubscribePlayer}
+        defaultIndex={problemIndex}
       />
     );
   }
@@ -78,9 +80,10 @@ function SpectatorGameView() {
         currentUser={currentUser}
         gameStartTime={game?.gameTimer.startTime || ''}
         viewPlayerCode={null}
-        spectatePlayer={(index: number) => {
+        spectatePlayer={(playerIndex: number, probIndex: number) => {
           if (game) {
-            subscribePlayer(game.room.roomId, game.players[index].user.userId!);
+            setProblemIndex(probIndex);
+            subscribePlayer(game.room.roomId, game.players[playerIndex].user.userId!);
           }
         }}
         problems={game?.problems || []}

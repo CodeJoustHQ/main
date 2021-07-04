@@ -38,7 +38,6 @@ import { routes, send, subscribe } from '../../api/Socket';
 import { User } from '../../api/User';
 import { getScore, getSubmissionCount, getSubmissionTime } from '../../util/Utility';
 import ProblemPanel from './ProblemPanel';
-import
 
 const NoPaddingPanel = styled(Panel)`
   padding: 0;
@@ -121,17 +120,19 @@ type StateRefType = {
  * the game page is used for the spectator view. spectateGame is the live data,
  * primarily the player code, of the player being spectated.
  * spectatorUnsubscribePlayer unsubscribes the spectator from the player socket
- * and brings them back to the main spectator page.
+ * and brings them back to the main spectator page. defaultIndex is an optional
+ * parameter to specify which problem to open on when loading this component.
  */
 type PlayerGameViewProps = {
   gameError: string,
   spectateGame: SpectateGame | null,
   spectatorUnsubscribePlayer: (() => void) | null,
+  defaultIndex: number | null,
 };
 
 function PlayerGameView(props: PlayerGameViewProps) {
   const {
-    gameError, spectateGame, spectatorUnsubscribePlayer,
+    gameError, spectateGame, spectatorUnsubscribePlayer, defaultIndex,
   } = props;
 
   const { currentUser, game } = useAppSelector((state) => state);
@@ -142,7 +143,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
   const [languageList, setLanguageList] = useState<Language[]>([Language.Java]);
   const [codeList, setCodeList] = useState<string[]>(['']);
   const [currentSubmission, setCurrentSubmission] = useState<Submission | null>(null);
-  const [currentProblemIndex, setCurrentProblemIndex] = useState<number>(0);
+  const [currentProblemIndex, setCurrentProblemIndex] = useState<number>(defaultIndex || 0);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>(gameError);
@@ -209,7 +210,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
   };
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
-    playerSubmissions: Submission[]) => {
+    playerSubmissions: Submission[], focusLatest = true) => {
     setSubmissions(playerSubmissions);
 
     const promises: Promise<DefaultCodeType>[] = [];
@@ -239,7 +240,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
           newCodeList[i] = temp.code;
           codeMap[i][temp.language as Language] = temp.code;
           newLanguageList[i] = temp.language as Language;
-          setCurrentProblemIndex(i);
+          if (focusLatest) {
+            setCurrentProblemIndex(i);
+          }
         }
       }
 
@@ -350,13 +353,13 @@ function PlayerGameView(props: PlayerGameViewProps) {
   // If spectator and first time on page, load list of problems
   useEffect(() => {
     if (spectatedPlayer && !defaultCodeList.length && game?.problems) {
-      setDefaultCodeFromProblems(game.problems, spectatedPlayer.submissions);
+      setDefaultCodeFromProblems(game.problems, spectatedPlayer.submissions, false);
     }
   }, [game, spectatedPlayer, defaultCodeList, setDefaultCodeFromProblems]);
 
   // When spectate game code changes, update the corresponding problem with that code
   useEffect(() => {
-    if (spectateGame?.code && spectateGame.index && spectateGame.language) {
+    if (spectateGame?.code && spectateGame.language && spectateGame.index !== undefined) {
       setOneCurrentCode(spectateGame.code, spectateGame.index);
       setOneCurrentLanguage(spectateGame.language as Language, spectateGame.index);
     }
@@ -470,6 +473,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
               Spectating:
               {' '}
               <b>{spectateGame?.user.nickname}</b>
+              {currentProblemIndex === spectateGame?.index ? ' (live)' : null}
             </GameHeaderText>
           </GameHeaderContainerChild>
           <GameHeaderContainerChild>
@@ -548,12 +552,12 @@ function PlayerGameView(props: PlayerGameViewProps) {
                 <Editor
                   onLanguageChange={null}
                   onCodeChange={null}
-                  defaultLanguage={spectateGame?.language as Language}
-                  getCurrentLanguage={() => spectateGame?.language as Language}
+                  defaultLanguage={getCurrentLanguage()}
+                  getCurrentLanguage={getCurrentLanguage}
                   defaultCodeMap={null}
                   currentProblem={currentProblemIndex}
-                  defaultCode={spectateGame?.code}
-                  liveCode={null} // todo: check if needed
+                  defaultCode={null}
+                  liveCode={codeList[currentProblemIndex]}
                 />
               </NoPaddingPanel>
             )
