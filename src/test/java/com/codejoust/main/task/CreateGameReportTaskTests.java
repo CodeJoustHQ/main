@@ -2,7 +2,6 @@ package com.codejoust.main.task;
 
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
@@ -86,13 +85,6 @@ public class CreateGameReportTaskTests {
         CreateGameReportTask createGameReportTask = new CreateGameReportTask(gameManagementService, game);
         gameTimer.getTimer().schedule(createGameReportTask,  1000L);
 
-        /**
-         * Confirm that the socket update is not called immediately, 
-         * but is called 1 second later (wait for timer task).
-         */
-
-        verify(socketService, never()).sendSocketUpdate(eq(gameDto));
-
-        verify(socketService, timeout(1200)).sendSocketUpdate(eq(gameDto));
+        verify(gameManagementService, timeout(1200)).createGameReport(eq(game));
     }
 }

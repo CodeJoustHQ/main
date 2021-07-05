@@ -24,8 +24,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import com.codejoust.main.dao.GameReportRepository;
 import com.codejoust.main.dao.RoomRepository;
@@ -84,7 +86,7 @@ public class GameManagementServiceTests {
     private GameManagementService gameService;
 
     // Helper method to add a dummy submission to a Player object
-    private void addSubmissionHelper(Player player, int numCorrect) {
+    private void addSubmissionHelper(Player player, int problemIndex, int numCorrect) {
         Submission submission = new Submission();
         submission.setNumCorrect(numCorrect);
         submission.setNumTestCases(TestFields.NUM_PROBLEMS);
@@ -92,7 +94,9 @@ public class GameManagementServiceTests {
 
         player.getSubmissions().add(submission);
         if (numCorrect == TestFields.NUM_PROBLEMS) {
-            player.setSolved(new boolean[]{true});
+            boolean[] solved = player.getSolved();
+            solved[problemIndex] = true;
+            player.setSolved(solved);
         }
     }
 
@@ -365,7 +369,7 @@ public class GameManagementServiceTests {
         submissionDto.setNumTestCases(TestFields.NUM_PROBLEMS);
         Mockito.doAnswer(new Answer<SubmissionDto>() {
             public SubmissionDto answer(InvocationOnMock invocation) {
-                addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID), 10);
+                addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID), 0, 10);
                 game.setAllSolved(true);
                 return submissionDto;
             }})
@@ -406,8 +410,8 @@ public class GameManagementServiceTests {
         Game game = gameService.getGameFromRoomId(TestFields.ROOM_ID);
 
         // Add submissions for the first two users.
-        addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID), 10);
-        addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID_2), 10);
+        addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID), 0, 10);
+        addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID_2), 0, 10);
 
         SubmissionRequest request = new SubmissionRequest();
         request.setLanguage(TestFields.PYTHON_LANGUAGE);
@@ -420,7 +424,7 @@ public class GameManagementServiceTests {
         submissionDto.setNumTestCases(TestFields.NUM_PROBLEMS);
         Mockito.doAnswer(new Answer<SubmissionDto>() {
             public SubmissionDto answer(InvocationOnMock invocation) {
-                addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID_3), 10);
+                addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID_3), 0, 10);
                 game.setAllSolved(true);
                 return submissionDto;
             }})
@@ -466,7 +470,7 @@ public class GameManagementServiceTests {
         submissionDto.setNumTestCases(TestFields.NUM_PROBLEMS);
         Mockito.doAnswer(new Answer<SubmissionDto>() {
             public SubmissionDto answer(InvocationOnMock invocation) {
-                addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID), 10);
+                addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID), 0, 10);
                 return submissionDto;
             }})
           .when(submitService).submitSolution(game, request);
@@ -912,12 +916,12 @@ public class GameManagementServiceTests {
         Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
         Game game = gameService.getGameFromRoomId(TestFields.ROOM_ID);
-        gameService.updateCode(TestFields.ROOM_ID, TestFields.USER_ID, TestFields.PLAYER_CODE);
+        gameService.updateCode(TestFields.ROOM_ID, TestFields.USER_ID, TestFields.PLAYER_CODE_1);
 
         Player player = game.getPlayers().get(TestFields.USER_ID);
 
         // Confirm that the live game service method is called correctly.
-        verify(liveGameService).updateCode(eq(player), eq(TestFields.PLAYER_CODE));
+        verify(liveGameService).updateCode(eq(player), eq(TestFields.PLAYER_CODE_1));
     }
 
     @Test
@@ -932,7 +936,7 @@ public class GameManagementServiceTests {
 
         Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
-        ApiException exception = assertThrows(ApiException.class, () -> gameService.updateCode("999999", TestFields.USER_ID, TestFields.PLAYER_CODE));
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.updateCode("999999", TestFields.USER_ID, TestFields.PLAYER_CODE_1));
         assertEquals(GameError.NOT_FOUND, exception.getError());
     }
 
@@ -948,7 +952,7 @@ public class GameManagementServiceTests {
 
         Mockito.doReturn(Collections.singletonList(new Problem())).when(problemService).getProblemsFromDifficulty(Mockito.any(), Mockito.any());
         gameService.createAddGameFromRoom(room);
-        ApiException exception = assertThrows(ApiException.class, () -> gameService.updateCode(TestFields.ROOM_ID, "999999", TestFields.PLAYER_CODE));
+        ApiException exception = assertThrows(ApiException.class, () -> gameService.updateCode(TestFields.ROOM_ID, "999999", TestFields.PLAYER_CODE_1));
         assertEquals(GameError.USER_NOT_IN_GAME, exception.getError());
     }
 
@@ -1015,6 +1019,108 @@ public class GameManagementServiceTests {
 
         // Game report is saved after one minute past handleEndGame
         verify(gameReportRepository, after(61300)).save(Mockito.any(GameReport.class));
+    }
+
+    @Test
+    public void createGameReportMultipleAttributes() {
+        /**
+         * Create a game report to test multiple different attributes:
+         * 1. Logged-in users, logged-out users, players, and spectators.
+         * 2. Correct and partially correct submissions.
+         * 3. Multiple problems, one of which is deleted before game end.
+         */
+
+        Room room = new Room();
+        room.setRoomId(TestFields.ROOM_ID);
+        room.setDuration(120L);
+        User user1 = new User();
+        user1.setNickname(TestFields.NICKNAME);
+        user1.setUserId(TestFields.USER_ID);
+        user1.setAccount(TestFields.account1());
+        User user2 = new User();
+        user2.setNickname(TestFields.NICKNAME_2);
+        user2.setUserId(TestFields.USER_ID_2);
+        user2.setAccount(TestFields.account1());
+        User user3 = new User();
+        user3.setNickname(TestFields.NICKNAME_3);
+        user3.setUserId(TestFields.USER_ID_3);
+        User user4 = new User();
+        user4.setNickname(TestFields.NICKNAME_4);
+        user4.setUserId(TestFields.USER_ID_4);
+        user4.setSpectator(true);
+        room.addUser(user1);
+        room.addUser(user2);
+        room.addUser(user3);
+        room.addUser(user4);
+        room.setHost(user1);
+
+        List<Problem> problems = new ArrayList<>();
+        problems.add(TestFields.problem1());
+        problems.add(TestFields.problem2());
+        room.setProblems(problems);
+
+        gameService.createAddGameFromRoom(room);
+        Game game = gameService.getGameFromRoomId(room.getRoomId());
+
+        SubmissionRequest correctSubmission = new SubmissionRequest();
+        correctSubmission.setLanguage(TestFields.PYTHON_LANGUAGE);
+        correctSubmission.setCode(TestFields.PYTHON_CODE);
+        correctSubmission.setInitiator(UserMapper.toDto(user1));
+
+        // First correct submission for problem 0 with user1.
+        SubmissionDto correctSubmissionDto = new SubmissionDto();
+        correctSubmissionDto.setNumCorrect(TestFields.NUM_PROBLEMS);
+        correctSubmissionDto.setNumTestCases(TestFields.NUM_PROBLEMS);
+        Mockito.doAnswer(new Answer<SubmissionDto>() {
+            public SubmissionDto answer(InvocationOnMock invocation) {
+                addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID), 0, 10);
+                game.setAllSolved(true);
+                return correctSubmissionDto;
+            }})
+          .when(submitService).submitSolution(game, correctSubmission);
+
+        gameService.submitSolution(TestFields.ROOM_ID, correctSubmission);
+
+        // Second correct submission for problem 0 with user3.
+        correctSubmission.setInitiator(UserMapper.toDto(user3));
+        correctSubmissionDto.setNumCorrect(TestFields.NUM_PROBLEMS);
+        correctSubmissionDto.setNumTestCases(TestFields.NUM_PROBLEMS);
+        Mockito.doAnswer(new Answer<SubmissionDto>() {
+            public SubmissionDto answer(InvocationOnMock invocation) {
+                addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID_3), 0, 10);
+                game.setAllSolved(true);
+                return correctSubmissionDto;
+            }})
+          .when(submitService).submitSolution(game, correctSubmission);
+
+        gameService.submitSolution(TestFields.ROOM_ID, correctSubmission);
+
+        // Partially correct submission for problem 1 with user3.
+        SubmissionRequest partialSubmission = new SubmissionRequest();
+        partialSubmission.setLanguage(TestFields.PYTHON_LANGUAGE);
+        partialSubmission.setCode(TestFields.PYTHON_CODE);
+        partialSubmission.setInitiator(UserMapper.toDto(user3));
+
+        // First correct submission for problem 0 with user1.
+        SubmissionDto partialSubmissionDto = new SubmissionDto();
+        partialSubmissionDto.setNumCorrect(TestFields.NUM_PROBLEMS);
+        partialSubmissionDto.setNumTestCases(TestFields.NUM_PROBLEMS);
+        Mockito.doAnswer(new Answer<SubmissionDto>() {
+            public SubmissionDto answer(InvocationOnMock invocation) {
+                addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID_3), 1, 5);
+                game.setAllSolved(true);
+                return partialSubmissionDto;
+            }})
+          .when(submitService).submitSolution(game, partialSubmission);
+        gameService.submitSolution(TestFields.ROOM_ID, partialSubmission);
+
+        gameService.createGameReport(game);
+
+        GameReport gameReport = new GameReport();
+
+
+        // Game report is saved after one minute past handleEndGame
+        verify(gameReportRepository, after(61300)).save(eq(gameReport));
     }
 
     @Test
