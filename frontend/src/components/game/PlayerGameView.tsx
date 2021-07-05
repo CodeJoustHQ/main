@@ -113,6 +113,8 @@ type StateRefType = {
   currentCode: string,
   currentLanguage: string,
   currentIndex: number,
+  codeList: string[],
+  languageList: Language[],
 }
 
 /**
@@ -161,6 +163,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
     currentCode: codeList[currentProblemIndex],
     currentLanguage: languageList[currentProblemIndex],
     currentIndex: currentProblemIndex,
+    codeList,
+    languageList,
   };
 
   // Variables to hold the player stats when spectating.
@@ -180,23 +184,29 @@ function PlayerGameView(props: PlayerGameViewProps) {
   const getCurrentLanguage = useCallback(() => languageList[currentProblemIndex],
     [languageList, currentProblemIndex]);
 
-  const setOneCurrentLanguage = (newLanguage: Language, specifiedIndex?: number) => {
-    setLanguageList(languageList.map((current, index) => {
-      if (index === (specifiedIndex || currentProblemIndex)) {
+  const setOneCurrentLanguage = useCallback((newLanguage: Language, specifiedIndex?: number) => {
+    setLanguageList((stateRef.current?.languageList || []).map((current, index) => {
+      if (index === (specifiedIndex !== undefined ? specifiedIndex : currentProblemIndex)) {
         return newLanguage;
       }
       return current;
     }));
-  };
+  }, [currentProblemIndex]);
 
-  const setOneCurrentCode = (newCode: string, specifiedIndex?: number) => {
-    setCodeList(codeList.map((current, index) => {
-      if (index === (specifiedIndex || currentProblemIndex)) {
+  const setOneCurrentCode = useCallback((newCode: string, specifiedIndex?: number) => {
+    setCodeList((stateRef.current?.codeList || []).map((current, index) => {
+      if (index === (specifiedIndex !== undefined ? specifiedIndex : currentProblemIndex)) {
         return newCode;
       }
       return current;
     }));
-  };
+    console.log((stateRef.current?.codeList || []).map((current, index) => {
+      if (index === (specifiedIndex !== undefined ? specifiedIndex : currentProblemIndex)) {
+        return newCode;
+      }
+      return current;
+    }));
+  }, [currentProblemIndex]);
 
   // Returns the most recent submission made for problem of index curr.
   const getSubmission = (curr: number, playerSubmissions: Submission[]) => {
@@ -210,7 +220,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
   };
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
-    playerSubmissions: Submission[], focusLatest = true) => {
+    playerSubmissions: Submission[]) => {
     setSubmissions(playerSubmissions);
 
     const promises: Promise<DefaultCodeType>[] = [];
@@ -240,9 +250,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
           newCodeList[i] = temp.code;
           codeMap[i][temp.language as Language] = temp.code;
           newLanguageList[i] = temp.language as Language;
-          if (focusLatest) {
-            setCurrentProblemIndex(i);
-          }
+          setCurrentProblemIndex(i);
         }
       }
 
@@ -259,7 +267,10 @@ function PlayerGameView(props: PlayerGameViewProps) {
     currentUserParam: User | null | undefined,
     currentCodeParam: string | undefined,
     currentLanguageParam: string | undefined,
-    currentIndexParam: number | undefined) => {
+    currentIndexParam: number | undefined,
+    currentCodeList: string[] | undefined,
+    currentLanguageList: Language[] | undefined,
+    sendFullLists = false) => {
     if (gameParam && currentUserParam) {
       const body: SpectateGame = {
         user: currentUserParam,
@@ -267,6 +278,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
         index: currentIndexParam || 0,
         code: currentCodeParam || '',
         language: currentLanguageParam || Language.Java,
+        codeList: sendFullLists ? currentCodeList : undefined,
+        languageList: sendFullLists ? currentLanguageList : undefined,
       };
       const spectatorViewBody: string = JSON.stringify(body);
 
@@ -281,7 +294,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
   // Send updates via socket to any spectators.
   useEffect(() => {
     sendViewUpdate(game, currentUser, codeList[currentProblemIndex],
-      languageList[currentProblemIndex], currentProblemIndex);
+      languageList[currentProblemIndex], currentProblemIndex, codeList, languageList);
   }, [game, currentUser, codeList, languageList, currentProblemIndex, sendViewUpdate]);
 
   // Re-subscribe in order to get the correct subscription callback.
@@ -291,7 +304,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
       if (JSON.parse(result.body).newSpectator) {
         sendViewUpdate(stateRef.current?.game, stateRef.current?.currentUser,
           stateRef.current?.currentCode, stateRef.current?.currentLanguage,
-          stateRef.current?.currentIndex);
+          stateRef.current?.currentIndex, stateRef.current?.codeList,
+          stateRef.current?.languageList, true);
       }
     };
 
@@ -330,8 +344,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
        * If default code list is empty and current user (non-spectator) is
        * loaded, fetch the code from the backend
        */
-      if (!defaultCodeList.length && !currentUser.spectator) {
+      if (!defaultCodeList.length && currentUser && !currentUser.spectator) {
         let matchFound = false;
+        console.log('in call to fetch problems');
 
         // If this user refreshed and has already submitted code, load and save their latest code
         game.players.forEach((player) => {
@@ -350,20 +365,18 @@ function PlayerGameView(props: PlayerGameViewProps) {
   }, [game, currentUser, defaultCodeList, setDefaultCodeFromProblems,
     subscribePlayer, playerSocket, getSpectatedPlayer]);
 
-  // If spectator and first time on page, load list of problems
-  useEffect(() => {
-    if (spectatedPlayer && !defaultCodeList.length && game?.problems) {
-      setDefaultCodeFromProblems(game.problems, spectatedPlayer.submissions, false);
-    }
-  }, [game, spectatedPlayer, defaultCodeList, setDefaultCodeFromProblems]);
-
   // When spectate game code changes, update the corresponding problem with that code
   useEffect(() => {
-    if (spectateGame?.code && spectateGame.language && spectateGame.index !== undefined) {
+    console.log('here');
+    console.log(spectateGame);
+    if (spectateGame?.codeList && spectateGame.languageList) {
+      setCodeList(spectateGame.codeList);
+      setLanguageList(spectateGame.languageList);
+    } else if (spectateGame?.code && spectateGame.language && spectateGame.index !== undefined) {
       setOneCurrentCode(spectateGame.code, spectateGame.index);
       setOneCurrentLanguage(spectateGame.language as Language, spectateGame.index);
     }
-  }, [spectateGame]);
+  }, [spectateGame, setOneCurrentCode, setOneCurrentLanguage]);
 
   // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {

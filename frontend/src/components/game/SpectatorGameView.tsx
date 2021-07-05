@@ -39,6 +39,8 @@ function SpectatorGameView() {
     const subscribePlayerCallback = (result: Message) => {
       if (!JSON.parse(result.body).newSpectator) {
         const updatedSpectateGame: SpectateGame = JSON.parse(result.body);
+        console.log('in spectator page');
+        console.log(updatedSpectateGame);
         setSpectateGame(updatedSpectateGame);
       }
     };
@@ -80,10 +82,11 @@ function SpectatorGameView() {
         currentUser={currentUser}
         gameStartTime={game?.gameTimer.startTime || ''}
         viewPlayerCode={null}
-        spectatePlayer={(playerIndex: number, probIndex: number) => {
-          if (game) {
+        spectatePlayer={(playerUserId: string, probIndex: number) => {
+          const player = game?.players.find((p) => p.user.userId === playerUserId);
+          if (game && player) {
             setProblemIndex(probIndex);
-            subscribePlayer(game.room.roomId, game.players[playerIndex].user.userId!);
+            subscribePlayer(game.room.roomId, player.user.userId!);
           }
         }}
         problems={game?.problems || []}

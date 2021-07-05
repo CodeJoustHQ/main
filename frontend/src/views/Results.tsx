@@ -216,9 +216,9 @@ function GameResultsPage() {
     return 'th';
   };
 
-  const onViewPlayerCode = (playerIndex: number, probIndex: number) => {
+  const onViewPlayerCode = (playerUserId: string, probIndex: number) => {
     setProblemIndex(probIndex);
-    setCodeModal(playerIndex);
+    setCodeModal(players.findIndex((p) => p.user.userId === playerUserId));
   };
 
   // Reset hover status on host changes
@@ -292,7 +292,6 @@ function GameResultsPage() {
           inviteContent={inviteContent()}
           loading={loading}
           isCurrentPlayer={players[1]?.user.userId === currentUser?.userId}
-          numProblems={game?.problems.length || 1}
         />
         <Podium
           place={1}
@@ -301,7 +300,6 @@ function GameResultsPage() {
           inviteContent={inviteContent()}
           loading={loading}
           isCurrentPlayer={players[0]?.user.userId === currentUser?.userId}
-          numProblems={game?.problems.length || 1}
         />
         <Podium
           place={3}
@@ -310,7 +308,6 @@ function GameResultsPage() {
           inviteContent={inviteContent()}
           loading={loading}
           isCurrentPlayer={players[2]?.user.userId === currentUser?.userId}
-          numProblems={game?.problems.length || 1}
         />
       </PodiumContainer>
 

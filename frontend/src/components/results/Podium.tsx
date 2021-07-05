@@ -13,7 +13,6 @@ type PodiumProps = {
   inviteContent: React.ReactNode,
   loading: boolean,
   isCurrentPlayer: boolean,
-  numProblems: number,
 };
 
 type MedalProps = {
@@ -87,7 +86,7 @@ const Medal = styled.div<MedalProps>`
 
 function Podium(props: PodiumProps) {
   const {
-    place, player, gameStartTime, loading, inviteContent, isCurrentPlayer, numProblems,
+    place, player, gameStartTime, loading, inviteContent, isCurrentPlayer,
   } = props;
 
   const score = (player?.solved || []).filter((s) => s).length;
