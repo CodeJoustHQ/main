@@ -166,6 +166,7 @@ function LobbyPage() {
   const [duration, setDuration] = useState<number | undefined>(15);
   const [selectedProblems, setSelectedProblems] = useState<SelectableProblem[]>([]);
   const [size, setSize] = useState<number | undefined>(10);
+  const [numProblems, setNumProblems] = useState<number>(1);
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
   const [showProblemSelector, setShowProblemSelector] = useState(true);
 
@@ -218,6 +219,7 @@ function LobbyPage() {
     setDuration(newRoom.duration / 60);
     setSelectedProblems(newRoom.problems);
     setSize(newRoom.size);
+    setNumProblems(newRoom.numProblems);
 
     // Set the room and current user.
     dispatch(setRoom(newRoom));
@@ -343,7 +345,8 @@ function LobbyPage() {
     });
 
     // eslint-disable-next-line no-alert
-    if (!allSpectators || window.confirm('Everybody in this room is a spectator, which means this is going to be a pretty boring game... are you sure you want to start the game?')) {
+    if (!allSpectators || window.confirm('Everybody in this room is a spectator, which means this is '
+      + 'going to be a pretty boring game... are you sure you want to start the game?')) {
       startGame(currentRoomId, request)
         .then(() => {
           setLoading(true);
@@ -492,6 +495,25 @@ function LobbyPage() {
         setSize(prevSize);
       })
       .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const updateNumProblems = () => {
+    setError('');
+    setLoading(true);
+    const prevNumProblems = numProblems;
+    const settings = {
+      initiator: currentUser!,
+      numProblems,
+    };
+
+    updateRoomSettings(currentRoomId, settings)
+      .catch((err) => {
+        setError(err.message);
+        // Set numProblems back to original if REST call failed
+        setNumProblems(prevNumProblems);
+      }).finally(() => {
         setLoading(false);
       });
   };
@@ -823,6 +845,28 @@ function LobbyPage() {
                   disabled={!isHost(currentUser)}
                   onChange={onSizeSliderChange}
                   onMouseUp={updateSize}
+                />
+              </SliderContainer>
+            </HoverContainerSlider>
+            <NoMarginMediumText>Number of Problems</NoMarginMediumText>
+            <NoMarginSubtitleText>
+              {`${numProblems} problem${numProblems === 1 ? '' : 's'}`}
+            </NoMarginSubtitleText>
+            <HoverContainerSlider>
+              <HoverElementSlider {...hoverProps} />
+              <SliderContainer>
+                <Slider
+                  min={1}
+                  max={10}
+                  value={numProblems}
+                  disabled={!isHost(currentUser)}
+                  onChange={(e) => {
+                    const newNumProblems = Number(e.target.value);
+                    if (newNumProblems >= 1 && newNumProblems <= 10) {
+                      setNumProblems(newNumProblems);
+                    }
+                  }}
+                  onMouseUp={updateNumProblems}
                 />
               </SliderContainer>
             </HoverContainerSlider>

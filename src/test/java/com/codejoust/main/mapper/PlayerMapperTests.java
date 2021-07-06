@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.codejoust.main.dto.game.PlayerMapper;
@@ -25,7 +24,6 @@ public class PlayerMapperTests {
 
         assertEquals(user, player.getUser());
         assertNull(player.getPlayerCode());
-        assertFalse(player.getSolved());
         assertEquals(0, player.getSubmissions().size());
     }
 }

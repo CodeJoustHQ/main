@@ -277,6 +277,31 @@ public class RoomServiceTests {
         assertEquals(102, room.getUsers().size());
     }
 
+    @Test
+    public void setInvalidNumProblemsFailure() {
+        /**
+         * Verify update settings request fails when numProblems is
+         * set to outside of the allowable range
+         */
+        User host = new User();
+        host.setNickname(TestFields.NICKNAME);
+
+        Room room = new Room();
+        room.setRoomId(TestFields.ROOM_ID);
+        room.setHost(host);
+        room.addUser(host);
+        
+        UpdateSettingsRequest request = new UpdateSettingsRequest();
+        request.setInitiator(UserMapper.toDto(host));
+        request.setNumProblems(15);
+
+        // Mock repository to return room when called
+        Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
+        ApiException exception = assertThrows(ApiException.class, () -> roomService.updateRoomSettings(TestFields.ROOM_ID, request));
+
+        verify(repository).findRoomByRoomId(TestFields.ROOM_ID);
+        assertEquals(ProblemError.INVALID_NUMBER_REQUEST, exception.getError());
+    }
     
     @Test
     public void getRoomSuccess() {

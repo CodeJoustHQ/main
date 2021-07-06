@@ -186,6 +186,10 @@ public class GameManagementService {
             throw new ApiException(GameError.EMPTY_FIELD);
         }
 
+        if (request.getProblemIndex() >= game.getProblems().size() || request.getProblemIndex() < 0) {
+            throw new ApiException(GameError.BAD_SETTING);
+        }
+
         String initiatorUserId = request.getInitiator().getUserId();
         if (!game.getPlayers().containsKey(initiatorUserId)) {
             throw new ApiException(GameError.INVALID_PERMISSIONS);
@@ -200,6 +204,10 @@ public class GameManagementService {
 
         if (request.getInitiator() == null || request.getCode() == null || request.getLanguage() == null) {
             throw new ApiException(GameError.EMPTY_FIELD);
+        }
+
+        if (request.getProblemIndex() >= game.getProblems().size() || request.getProblemIndex() < 0) {
+            throw new ApiException(GameError.BAD_SETTING);
         }
 
         String initiatorUserId = request.getInitiator().getUserId();

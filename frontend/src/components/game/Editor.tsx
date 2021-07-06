@@ -5,12 +5,21 @@ import styled, { ThemeContext } from 'styled-components';
 import Language, { fromString, languageToEditorLanguage } from '../../api/Language';
 import { DefaultCodeType } from '../../api/Problem';
 
+/**
+ * onLanguageChange - a callback, called when the currentLanguage changes
+ * onCodeChange - a callback, called when the code changes
+ * getCurrentLanguage - a function passed in, which can be called to get the current language
+ * defaultCodeMap - a map of all the default code for each problem and language
+ * currentProblem - the problem which is current being worked on
+ * liveCode - a string used for spectator view
+ */
 type EditorProps = {
   onLanguageChange: ((language: Language) => void) | null,
   onCodeChange: ((code: string) => void) | null,
-  codeMap: DefaultCodeType | null,
-  defaultLanguage: Language,
+  getCurrentLanguage: (() => Language) | null,
+  defaultCodeMap: DefaultCodeType[] | null,
   defaultCode: string | null,
+  currentProblem: number,
   liveCode: string | null,
 };
 
@@ -89,17 +98,19 @@ const monacoEditorOptions: EditorConstructionOptions = {
 // This function refreshes the width of Monaco editor upon change in container size
 function ResizableMonacoEditor(props: EditorProps) {
   const {
-    onLanguageChange, onCodeChange, codeMap, defaultLanguage,
-    defaultCode, liveCode,
+    onLanguageChange, onCodeChange, getCurrentLanguage,
+    defaultCodeMap, defaultCode, currentProblem, liveCode,
   } = props;
 
   const theme = useContext(ThemeContext);
-  const [currentLanguage, setCurrentLanguage] = useState<Language>(defaultLanguage);
   const [codeEditor, setCodeEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const [codeMap, setCodeMap] = useState<DefaultCodeType[] | null>(defaultCodeMap);
+  const [previousProblem, setPreviousProblem] = useState<number>(0);
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.Java);
 
   useEffect(() => {
-    setCurrentLanguage(defaultLanguage);
-  }, [defaultLanguage]);
+    setCodeMap(defaultCodeMap);
+  }, [defaultCodeMap]);
 
   const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor) => {
     setCodeEditor(editor);
@@ -126,22 +137,45 @@ function ResizableMonacoEditor(props: EditorProps) {
   const handleLanguageChange = (language: Language) => {
     // Save the code for this language
     if (codeMap != null && codeEditor != null) {
-      codeMap[currentLanguage] = codeEditor.getValue();
-      codeEditor.setValue(codeMap[language]);
+      const codeMapTemp = codeMap;
+      codeMapTemp[currentProblem][currentLanguage] = codeEditor.getValue();
+      setCodeMap(codeMapTemp);
+      codeEditor.setValue(codeMap[currentProblem][language]);
     }
 
-    // Change the language and initial code for the editor
-    setCurrentLanguage(language);
+    // Call onLanguageChange
     if (onLanguageChange) {
       onLanguageChange(language);
     }
   };
 
+  // This hook will be called if the user switches the problem he or she is working on
   useEffect(() => {
     if (codeMap != null && codeEditor != null) {
-      codeEditor.setValue(codeMap[currentLanguage]);
+      if (codeMap[currentProblem] != null) {
+        const codeMapTemp = codeMap;
+
+        // If the value of the editor is not "Loading...", save it in the codeMap
+        if (codeEditor.getValue() !== 'Loading...') {
+          codeMapTemp[previousProblem][currentLanguage] = codeEditor.getValue();
+        }
+
+        setCodeMap(codeMapTemp);
+        setPreviousProblem(currentProblem);
+
+        // If getCurrentLanguage is defined, set currentLanguage to the returned value,
+        // which is the language that was last used for the new problem,
+        // and set the CodeEditor to be the code for the problem and language
+        if (getCurrentLanguage) {
+          setCurrentLanguage(getCurrentLanguage());
+          codeEditor.setValue(codeMap[currentProblem][getCurrentLanguage()]);
+        } else {
+          codeEditor.setValue(codeMap[currentProblem][currentLanguage]);
+        }
+      }
     }
-  }, [currentLanguage, codeMap, codeEditor, setCodeEditor]);
+  }, [currentLanguage, codeMap, codeEditor, setCodeEditor, getCurrentLanguage,
+    currentProblem, previousProblem]);
 
   return (
     <Content>

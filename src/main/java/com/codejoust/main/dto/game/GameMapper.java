@@ -3,10 +3,13 @@ package com.codejoust.main.dto.game;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.codejoust.main.dto.problem.ProblemDto;
 import com.codejoust.main.dto.problem.ProblemMapper;
@@ -88,6 +91,7 @@ public class GameMapper {
             if (!user.getSpectator()) {
                 Player player = PlayerMapper.playerFromUser(user);
                 player.setColor(colorList.get(index));
+                player.setSolved(new boolean[room.getNumProblems()]);
                 players.put(user.getUserId(), player);
                 index = (index + 1) % colorList.size();
             }
@@ -140,29 +144,52 @@ public class GameMapper {
                 return -1;
             }
 
-            SubmissionDto bestSub1 = submissions1.get(0);
-            SubmissionDto bestSub2 = submissions2.get(0);
-
-            // Get the best solution by each player (highest score, then earliest submission)
-            for (SubmissionDto sub : submissions1) {
-                if (sub.getNumCorrect() > bestSub1.getNumCorrect()) {
-                    bestSub1 = sub;
-                }
-            }
-
-            for (SubmissionDto sub : submissions2) {
-                if (sub.getNumCorrect() > bestSub2.getNumCorrect()) {
-                    bestSub2 = sub;
-                }
-            }
+            int score1 = getScore(submissions1);
+            int score2 = getScore(submissions2);
 
             // If both have the same numCorrect, whoever submits earlier is first
-            if (bestSub1.getNumCorrect().equals(bestSub2.getNumCorrect())) {
-                return bestSub1.getStartTime().compareTo(bestSub2.getStartTime());
+            if (score1 == score2) {
+                Instant time1 = getTime(submissions1);
+                Instant time2 = getTime(submissions2);
+
+                // If neither has submitted correctly, oh well (if one is null, the other must be as well)
+                if (time1 == null || time2 == null) {
+                    return 0;
+                }
+
+                return time1.compareTo(time2);
             }
 
             // Whoever has higher numCorrect is first
-            return bestSub2.getNumCorrect() - bestSub1.getNumCorrect();
+            return score2 - score1;
         });
+    }
+
+    // Get total number of problems solved
+    private static int getScore(List<SubmissionDto> submissions) {
+        Set<Integer> set = new HashSet<>();
+        for (SubmissionDto submission : submissions) {
+            if (submission.getNumCorrect().equals(submission.getNumTestCases())) {
+                set.add(submission.getProblemIndex());
+            }
+        }
+
+        return set.size();
+    }
+
+    // Get time of latest correct solution, or null if none exists
+    private static Instant getTime(List<SubmissionDto> submissions) {
+        Set<Integer> set = new HashSet<>();
+        Instant instant = null;
+
+        for (SubmissionDto submission : submissions) {
+            if (submission.getNumCorrect().equals(submission.getNumTestCases())
+                    && !set.contains(submission.getProblemIndex())) {
+                set.add(submission.getProblemIndex());
+                instant = submission.getStartTime();
+            }
+        }
+
+        return instant;
     }
 }

@@ -33,14 +33,16 @@ import {
   Player,
 } from '../../api/Game';
 import LeaderboardCard from '../card/LeaderboardCard';
-import { getDifficultyDisplayButton, InheritedTextButton } from '../core/Button';
+import { getDifficultyDisplayButton, InheritedTextButton, SmallButton } from '../core/Button';
 import { SpectatorBackIcon } from '../core/Icon';
 import Language from '../../api/Language';
 import { CopyIndicator, BottomCopyIndicatorContainer, InlineCopyIcon } from '../special/CopyIndicator';
-import { useAppSelector, useBestSubmission } from '../../util/Hook';
+import { useAppSelector, useBestSubmission, useGetSubmission } from '../../util/Hook';
 import { routes, send, subscribe } from '../../api/Socket';
 import { User } from '../../api/User';
-import { getScore, getSubmissionCount, getSubmissionTime } from '../../util/Utility';
+import {
+  getScore, getSubmissionCount, getSubmissionTime, getSubmission,
+} from '../../util/Utility';
 
 const StyledMarkdownEditor = styled(MarkdownEditor)`
   margin-top: 15px;
@@ -135,6 +137,7 @@ type StateRefType = {
   currentUser: User | null,
   currentCode: string,
   currentLanguage: string,
+  currentProblemIndex: number,
 }
 
 /**
@@ -158,13 +161,17 @@ function PlayerGameView(props: PlayerGameViewProps) {
   const { currentUser, game } = useAppSelector((state) => state);
 
   const [copiedEmail, setCopiedEmail] = useState(false);
-  const [submission, setSubmission] = useState<Submission | null>(null);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+
+  const [problems, setProblems] = useState<Problem[]>([]);
+  const [languageList, setLanguageList] = useState<Language[]>([Language.Java]);
+  const [codeList, setCodeList] = useState<string[]>(['']);
+  const [currentProblemIndex, setCurrentProblemIndex] = useState<number>(0);
+  let currentSubmission = useGetSubmission(currentProblemIndex, submissions);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>(gameError);
 
-  const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.Java);
-  const [currentCode, setCurrentCode] = useState('');
   const [defaultCodeList, setDefaultCodeList] = useState<DefaultCodeType[]>([]);
 
   // Variable to hold whether the user is subscribed to their own player socket.
@@ -174,6 +181,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
   const [spectatedPlayer, setSpectatedPlayer] = useState<Player | null>(null);
   const bestSubmission = useBestSubmission(spectatedPlayer);
 
+  useEffect(() => setProblems(game?.problems || []), [game]);
+
   /**
    * Display beforeUnload message to inform the user that they may lose
    * their code / data if they leave the page.
@@ -182,17 +191,41 @@ function PlayerGameView(props: PlayerGameViewProps) {
    */
   useBeforeunload(() => 'Leaving this page may cause you to lose your current code and data.');
 
+  const getCurrentLanguage = useCallback(() => languageList[currentProblemIndex],
+    [languageList, currentProblemIndex]);
+
+  const setOneCurrentLanguage = (newLanguage: Language) => {
+    setLanguageList(languageList.map((current, index) => {
+      if (index === currentProblemIndex) {
+        return newLanguage;
+      }
+      return current;
+    }));
+  };
+
+  const setOneCurrentCode = (newCode: string) => {
+    setCodeList(codeList.map((current, index) => {
+      if (index === currentProblemIndex) {
+        return newCode;
+      }
+      return current;
+    }));
+  };
+
   // References necessary for the spectator subscription callback.
   const stateRef = useRef<StateRefType>();
   stateRef.current = {
     game,
     currentUser,
-    currentCode,
-    currentLanguage,
+    currentCode: codeList[currentProblemIndex],
+    currentLanguage: languageList[currentProblemIndex],
+    currentProblemIndex,
   };
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
-    code: string, language: Language) => {
+    playerSubmissions: Submission[]) => {
+    setSubmissions(playerSubmissions);
+
     const promises: Promise<DefaultCodeType>[] = [];
     problemsParam.forEach((problem) => {
       if (problem && problem.problemId) {
@@ -202,31 +235,46 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
     // Get the result of promises and set the default code list.
     Promise.all(promises).then((result) => {
-      const codeMap = result[0];
+      const newCodeList = [];
+      const newLanguageList = [];
+      const codeMap = result;
 
-      // If previous code and language specified, save those as defaults
-      if (code) {
-        codeMap[language] = code;
+      // Save the default code in these temporary lists
+      for (let i = 0; i < result.length; i += 1) {
+        newCodeList.push(result[i][Language.Java]);
+        newLanguageList.push(Language.Java);
       }
 
-      // Set this user's current code and language
-      setCurrentCode(codeMap[language]);
-      setCurrentLanguage(language);
+      // If previous code and language specified, override the defaults
+      for (let i = 0; i < result.length; i += 1) {
+        const temp = getSubmission(i, playerSubmissions);
 
-      setDefaultCodeList(result);
+        if (temp) {
+          newCodeList[i] = temp.code;
+          codeMap[i][temp.language as Language] = temp.code;
+          newLanguageList[i] = temp.language as Language;
+          setCurrentProblemIndex(i);
+        }
+      }
+
+      // Set this user's current code
+      setCodeList(newCodeList);
+      setLanguageList(newLanguageList);
+      setDefaultCodeList(codeMap);
     }).catch((err) => {
       setError(err.message);
     });
-  }, [setDefaultCodeList, setCurrentCode, setCurrentLanguage]);
+  }, [setDefaultCodeList, setCodeList, setLanguageList]);
 
   const sendViewUpdate = useCallback((gameParam: Game | null | undefined,
     currentUserParam: User | null | undefined,
     currentCodeParam: string | undefined,
-    currentLanguageParam: string | undefined) => {
+    currentLanguageParam: string | undefined,
+    currentIndexParam: number | undefined) => {
     if (gameParam && currentUserParam) {
       const spectatorViewBody: string = JSON.stringify({
         user: currentUserParam,
-        problem: gameParam.problems[0],
+        problem: gameParam.problems[currentIndexParam || 0], // must satisfy problems.length > 0
         code: currentCodeParam,
         language: currentLanguageParam,
       });
@@ -240,8 +288,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
   // Send updates via socket to any spectators.
   useEffect(() => {
-    sendViewUpdate(game, currentUser, currentCode, currentLanguage);
-  }, [game, currentUser, currentCode, currentLanguage, sendViewUpdate]);
+    sendViewUpdate(game, currentUser, codeList[currentProblemIndex],
+      languageList[currentProblemIndex], currentProblemIndex);
+  }, [game, currentUser, codeList, languageList, currentProblemIndex, sendViewUpdate]);
 
   // Re-subscribe in order to get the correct subscription callback.
   const subscribePlayer = useCallback((roomIdParam: string, userIdParam: string) => {
@@ -249,7 +298,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
     const subscribePlayerCallback = (result: Message) => {
       if (JSON.parse(result.body).newSpectator) {
         sendViewUpdate(stateRef.current?.game, stateRef.current?.currentUser,
-          stateRef.current?.currentCode, stateRef.current?.currentLanguage);
+          stateRef.current?.currentCode, stateRef.current?.currentLanguage,
+          stateRef.current?.currentProblemIndex);
       }
     };
 
@@ -293,15 +343,15 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
         // If this user refreshed and has already submitted code, load and save their latest code
         game.players.forEach((player) => {
-          if (player.user.userId === currentUser?.userId && player.code) {
-            setDefaultCodeFromProblems(game.problems, player.code, player.language as Language);
+          if (player.user.userId === currentUser?.userId && player.submissions) {
+            setDefaultCodeFromProblems(game.problems, player.submissions);
             matchFound = true;
           }
         });
 
         // If no previous code, proceed as normal with the default Java language
         if (!matchFound) {
-          setDefaultCodeFromProblems(game.problems, '', Language.Java);
+          setDefaultCodeFromProblems(game.problems, []);
         }
       }
     }
@@ -321,8 +371,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
     const request = {
       initiator: currentUser!,
       input,
-      code: currentCode,
-      language: currentLanguage,
+      code: codeList[currentProblemIndex],
+      language: languageList[currentProblemIndex],
+      problemIndex: currentProblemIndex,
     };
 
     runSolution(game!.room.roomId, request)
@@ -332,7 +383,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
         // Set the 'test' submission type to correctly display result.
         // eslint-disable-next-line no-param-reassign
         res.submissionType = SubmissionType.Test;
-        setSubmission(res);
+        currentSubmission = res;
       })
       .catch((err) => {
         setLoading(false);
@@ -346,8 +397,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
     setError('');
     const request = {
       initiator: currentUser!,
-      code: currentCode,
-      language: currentLanguage,
+      code: codeList[currentProblemIndex],
+      language: languageList[currentProblemIndex],
+      problemIndex: currentProblemIndex,
     };
 
     submitSolution(game!.room.roomId, request)
@@ -357,12 +409,26 @@ function PlayerGameView(props: PlayerGameViewProps) {
         // Set the 'submit' submission type to correctly display result.
         // eslint-disable-next-line no-param-reassign
         res.submissionType = SubmissionType.Submit;
-        setSubmission(res);
+        setSubmissions(submissions.concat([res]));
       })
       .catch((err) => {
         setLoading(false);
         setError(err.message);
       });
+  };
+
+  const nextProblem = () => {
+    setCurrentProblemIndex((currentProblemIndex + 1) % problems?.length);
+  };
+
+  const previousProblem = () => {
+    let temp = currentProblemIndex - 1;
+
+    if (temp < 0) {
+      temp += problems?.length;
+    }
+
+    setCurrentProblemIndex(temp);
   };
 
   const displayPlayerLeaderboard = useCallback(() => game?.players.map((player, index) => (
@@ -371,8 +437,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
       isCurrentPlayer={player.user.userId === currentUser?.userId}
       place={index + 1}
       color={player.color}
+      numProblems={problems.length}
     />
-  )), [game, currentUser]);
+  )), [game, currentUser, problems.length]);
 
   return (
     <>
@@ -433,12 +500,13 @@ function PlayerGameView(props: PlayerGameViewProps) {
           {/* Problem title/description panel */}
           <OverflowPanel className="display-box-shadow">
             <ProblemHeaderText>
-              {!spectateGame ? game?.problems[0]?.name : spectateGame?.problem.name}
+              {!spectateGame
+                ? game?.problems[currentProblemIndex]?.name
+                : spectateGame?.problem.name}
             </ProblemHeaderText>
-            {/* TODO: I don't know whether we have to verify that the problem exists. */}
             {
               !spectateGame ? (
-                getDifficultyDisplayButton(game?.problems[0].difficulty!)
+                getDifficultyDisplayButton(game?.problems[currentProblemIndex].difficulty!)
               ) : (
                 getDifficultyDisplayButton(spectateGame?.problem.difficulty!)
               )
@@ -449,7 +517,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
               ) : (
                 spectateGame?.problem.description
               )}
-              value={spectateGame ? spectateGame?.problem.description : undefined}
+              value={spectateGame
+                ? spectateGame?.problem.description
+                : problems[currentProblemIndex]?.description}
               onChange={() => ''}
               readOnly
             />
@@ -478,18 +548,19 @@ function PlayerGameView(props: PlayerGameViewProps) {
               >
                 <NoPaddingPanel>
                   <Editor
-                    onCodeChange={setCurrentCode}
-                    onLanguageChange={setCurrentLanguage}
-                    codeMap={defaultCodeList[0]}
-                    defaultLanguage={currentLanguage}
+                    onCodeChange={setOneCurrentCode}
+                    onLanguageChange={setOneCurrentLanguage}
+                    getCurrentLanguage={getCurrentLanguage}
+                    defaultCodeMap={defaultCodeList}
+                    currentProblem={currentProblemIndex}
                     defaultCode={null}
                     liveCode={null}
                   />
                 </NoPaddingPanel>
                 <Panel>
                   <Console
-                    testCases={game?.problems[0]?.testCases || []}
-                    submission={submission}
+                    testCases={problems[currentProblemIndex]?.testCases}
+                    submission={currentSubmission}
                     onRun={runCode}
                     onSubmit={submitCode}
                   />
@@ -500,8 +571,9 @@ function PlayerGameView(props: PlayerGameViewProps) {
                 <Editor
                   onLanguageChange={null}
                   onCodeChange={null}
-                  codeMap={null}
-                  defaultLanguage={spectateGame?.language as Language}
+                  getCurrentLanguage={() => spectateGame?.language as Language || Language.Java}
+                  defaultCodeMap={null}
+                  currentProblem={currentProblemIndex}
                   defaultCode={spectateGame?.code}
                   liveCode={spectateGame?.code}
                 />
@@ -510,6 +582,10 @@ function PlayerGameView(props: PlayerGameViewProps) {
           }
         </SplitterLayout>
       </SplitterContainer>
+
+      <SmallButton onClick={previousProblem}>Previous</SmallButton>
+      <SmallButton onClick={nextProblem}>Next</SmallButton>
+
       <BottomCopyIndicatorContainer copied={copiedEmail}>
         <CopyIndicator onClick={() => setCopiedEmail(false)}>
           Email copied!&nbsp;&nbsp;✕

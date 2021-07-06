@@ -87,7 +87,7 @@ public class GameManagementServiceTests {
 
         player.getSubmissions().add(submission);
         if (numCorrect == TestFields.NUM_PROBLEMS) {
-            player.setSolved(true);
+            player.setSolved(new boolean[]{true});
         }
     }
 
