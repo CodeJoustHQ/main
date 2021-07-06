@@ -325,7 +325,7 @@ public class GameManagementService {
         createGameReportTimer.schedule(createGameReportTask, GameTimer.DURATION_1 * 1000);
     }
 
-    public void createGameReport(Game game) {
+    public GameReport createGameReport(Game game) {
         GameReport gameReport = new GameReport();
         int numProblems = game.getProblems().size();
         int numPlayers = game.getPlayers().size();
@@ -422,6 +422,7 @@ public class GameManagementService {
 
         // Log the completion of the latest game report.
         log.info("Created game report for game with Room ID {}", game.getRoom().getRoomId());
+        return gameReport;
     }
 
     private String compactProblemsSolved(boolean[] problemsSolved) {
