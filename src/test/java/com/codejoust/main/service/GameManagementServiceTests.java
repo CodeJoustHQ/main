@@ -1149,8 +1149,6 @@ public class GameManagementServiceTests {
         // Confirm that the game report, account, and users are saved.
         verify(gameReportRepository).save(Mockito.any(GameReport.class));
         verify(accountRepository).save(eq(user1.getAccount()));
-        verify(userRepository).save(eq(user3));
-        verify(userRepository).save(eq(user4));
 
         // Check assertions for top-level report variables.
         assertEquals(game.getGameTimer().getStartTime(), gameReport.getCreatedDateTime());

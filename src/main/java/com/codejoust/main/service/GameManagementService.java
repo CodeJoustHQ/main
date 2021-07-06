@@ -13,7 +13,6 @@ import java.util.Timer;
 import com.codejoust.main.dao.AccountRepository;
 import com.codejoust.main.dao.GameReportRepository;
 import com.codejoust.main.dao.RoomRepository;
-import com.codejoust.main.dao.UserRepository;
 import com.codejoust.main.dto.game.EndGameRequest;
 import com.codejoust.main.dto.game.GameDto;
 import com.codejoust.main.dto.game.GameMapper;
@@ -57,7 +56,6 @@ public class GameManagementService {
 
     private final RoomRepository repository;
     private final GameReportRepository gameReportRepository;
-    private final UserRepository userRepository;
     private final AccountRepository accountRepository;
     private final SocketService socketService;
     private final LiveGameService liveGameService;
@@ -69,7 +67,6 @@ public class GameManagementService {
     @Autowired
     protected GameManagementService(RoomRepository repository,
                                     GameReportRepository gameReportRepository,
-                                    UserRepository userRepository,
                                     AccountRepository accountRepository,
                                     SocketService socketService,
                                     LiveGameService liveGameService,
@@ -78,7 +75,6 @@ public class GameManagementService {
                                     ProblemService problemService) {
         this.repository = repository;
         this.gameReportRepository = gameReportRepository;
-        this.userRepository = userRepository;
         this.accountRepository = accountRepository;
         this.socketService = socketService;
         this.liveGameService = liveGameService;
@@ -418,8 +414,6 @@ public class GameManagementService {
                 account.addGameReport(gameReport);
                 addedAccounts.add(account);
                 accountRepository.save(account);
-            } else if (account == null) {
-                userRepository.save(user);
             }
         }
 
