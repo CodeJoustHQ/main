@@ -1207,7 +1207,7 @@ public class GameManagementServiceTests {
          * 2. Start and immediately end game, manually triggering the create
          * game report.
          * 3. Start and immediately end game again, and check that user has two
-         * submission group reports.
+         * submission group reports, as well as the all solved game end type.
          */
 
         Room room = new Room();
@@ -1232,9 +1232,10 @@ public class GameManagementServiceTests {
 
         gameService.createAddGameFromRoom(room);
         game = gameService.getGameFromRoomId(room.getRoomId());
-        game.setGameEnded(true);
+        game.setAllSolved(true);
         GameReport gameReport = gameService.createGameReport(game);
     
+        assertEquals(GameEndType.ALL_SOLVED, gameReport.getGameEndType());
         assertEquals(2, gameReport.getUsers().get(0).getSubmissionGroupReports().size());
     }
 
