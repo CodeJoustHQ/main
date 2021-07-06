@@ -1059,7 +1059,7 @@ public class GameManagementServiceTests {
 
         Room room = new Room();
         room.setRoomId(TestFields.ROOM_ID);
-        room.setDuration(120000000L);
+        room.setDuration(120L);
         User user1 = new User();
         user1.setNickname(TestFields.NICKNAME);
         user1.setUserId(TestFields.USER_ID);
@@ -1196,6 +1196,46 @@ public class GameManagementServiceTests {
         assertEquals(1, submissionGroupReport3.getNumTestCasesPassed());
         assertEquals("10", submissionGroupReport3.getProblemsSolved());
         assertEquals(2, submissionGroupReport3.getSubmissionReports().size());
+    }
+
+    @Test
+    public void createTwoGameReports() {
+        /**
+         * Create two games to verify that two submission group reports are
+         * made with the same user.
+         * 1. Create room with one user and one problem.
+         * 2. Start and immediately end game, manually triggering the create
+         * game report.
+         * 3. Start and immediately end game again, and check that user has two
+         * submission group reports.
+         */
+
+        Room room = new Room();
+        room.setRoomId(TestFields.ROOM_ID);
+        room.setDuration(120L);
+        User user1 = new User();
+        user1.setNickname(TestFields.NICKNAME);
+        user1.setUserId(TestFields.USER_ID);
+        user1.setAccount(TestFields.account1());
+        room.addUser(user1);
+        room.setHost(user1);
+
+        List<Problem> problems = new ArrayList<>();
+        problems.add(TestFields.problem1());
+        room.setProblems(problems);
+        room.setNumProblems(problems.size());
+
+        gameService.createAddGameFromRoom(room);
+        Game game = gameService.getGameFromRoomId(room.getRoomId());
+        game.setGameEnded(true);
+        gameService.createGameReport(game);
+
+        gameService.createAddGameFromRoom(room);
+        game = gameService.getGameFromRoomId(room.getRoomId());
+        game.setGameEnded(true);
+        GameReport gameReport = gameService.createGameReport(game);
+    
+        assertEquals(2, gameReport.getUsers().get(0).getSubmissionGroupReports().size());
     }
 
     @Test
