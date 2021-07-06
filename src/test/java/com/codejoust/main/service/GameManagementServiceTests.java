@@ -57,9 +57,11 @@ import com.codejoust.main.game_object.Submission;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.Problem;
+import com.codejoust.main.model.problem.ProblemContainer;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.report.GameEndType;
 import com.codejoust.main.model.report.GameReport;
+import com.codejoust.main.model.report.SubmissionGroupReport;
 
 @ExtendWith(MockitoExtension.class)
 public class GameManagementServiceTests {
@@ -1077,20 +1079,16 @@ public class GameManagementServiceTests {
         gameService.createAddGameFromRoom(room);
         Game game = gameService.getGameFromRoomId(room.getRoomId());
 
+        // First correct submission for problem 0 with user1.
         SubmissionRequest correctSubmission = new SubmissionRequest();
         correctSubmission.setLanguage(TestFields.PYTHON_LANGUAGE);
         correctSubmission.setCode(TestFields.PYTHON_CODE);
         correctSubmission.setInitiator(UserMapper.toDto(user1));
-
-        // First correct submission for problem 0 with user1.
-        SubmissionDto correctSubmissionDto = new SubmissionDto();
-        correctSubmissionDto.setNumCorrect(TestFields.NUM_PROBLEMS);
-        correctSubmissionDto.setNumTestCases(TestFields.NUM_PROBLEMS);
         Mockito.doAnswer(new Answer<SubmissionDto>() {
             public SubmissionDto answer(InvocationOnMock invocation) {
                 addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID), 0, TestFields.PLAYER_CODE_1, 1);
                 game.setAllSolved(true);
-                return correctSubmissionDto;
+                return new SubmissionDto();
             }})
           .when(submitService).submitSolution(game, correctSubmission);
 
@@ -1098,33 +1096,37 @@ public class GameManagementServiceTests {
 
         // Second correct submission for problem 0 with user3.
         correctSubmission.setInitiator(UserMapper.toDto(user3));
-        correctSubmissionDto.setNumCorrect(TestFields.NUM_PROBLEMS);
-        correctSubmissionDto.setNumTestCases(TestFields.NUM_PROBLEMS);
         Mockito.doAnswer(new Answer<SubmissionDto>() {
             public SubmissionDto answer(InvocationOnMock invocation) {
                 addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID_3), 0, TestFields.PLAYER_CODE_1, 1);
                 game.setAllSolved(true);
-                return correctSubmissionDto;
+                return new SubmissionDto();
             }})
           .when(submitService).submitSolution(game, correctSubmission);
 
         gameService.submitSolution(TestFields.ROOM_ID, correctSubmission);
 
-        // Partially correct submission for problem 1 with user3.
+        // Incorrect submission for problem 1 with user3.
         SubmissionRequest incorrectSubmission = new SubmissionRequest();
         incorrectSubmission.setLanguage(TestFields.PYTHON_LANGUAGE);
         incorrectSubmission.setCode(TestFields.PYTHON_CODE);
         incorrectSubmission.setInitiator(UserMapper.toDto(user3));
-
-        // Incorrect submission for problem 0 with user1.
-        SubmissionDto incorrectSubmissionDto = new SubmissionDto();
-        incorrectSubmissionDto.setNumCorrect(TestFields.NUM_PROBLEMS);
-        incorrectSubmissionDto.setNumTestCases(TestFields.NUM_PROBLEMS);
         Mockito.doAnswer(new Answer<SubmissionDto>() {
             public SubmissionDto answer(InvocationOnMock invocation) {
                 addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID_3), 1, TestFields.PLAYER_CODE_2, 0);
                 game.setAllSolved(true);
-                return incorrectSubmissionDto;
+                return new SubmissionDto();
+            }})
+          .when(submitService).submitSolution(game, incorrectSubmission);
+        gameService.submitSolution(TestFields.ROOM_ID, incorrectSubmission);
+
+        // Incorrect submission for problem 0 with user1.
+        incorrectSubmission.setInitiator(UserMapper.toDto(user1));
+        Mockito.doAnswer(new Answer<SubmissionDto>() {
+            public SubmissionDto answer(InvocationOnMock invocation) {
+                addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID), 0, TestFields.PLAYER_CODE_2, 0);
+                game.setAllSolved(true);
+                return new SubmissionDto();
             }})
           .when(submitService).submitSolution(game, incorrectSubmission);
         gameService.submitSolution(TestFields.ROOM_ID, incorrectSubmission);
@@ -1140,9 +1142,32 @@ public class GameManagementServiceTests {
         verify(userRepository).save(eq(user4));
 
         // Check assertions for top-level report variables.
-        assertEquals(gameReport.getCreatedDateTime(), game.getGameTimer().getStartTime());
-        assertEquals(gameReport.getNumTestCases(), 2);
-        assertEquals(gameReport.getGameEndType(), GameEndType.MANUAL_END);
+        assertEquals(game.getGameTimer().getStartTime(), gameReport.getCreatedDateTime());
+        assertEquals(2, gameReport.getNumTestCases());
+        assertEquals((double) 2 / 3, gameReport.getAverageProblemsSolved());
+        assertEquals((double) 2 / 3, gameReport.getAverageTestCasesPassed());
+        assertEquals(GameEndType.MANUAL_END, gameReport.getGameEndType());
+
+        // Check assertions for individual problem containers.
+        assertEquals(2, gameReport.getProblemContainers().size());
+        ProblemContainer problemContainer1 = gameReport.getProblemContainers().get(0);
+        assertEquals(1, problemContainer1.getAverageAttemptCount());
+        assertEquals((double) 2 / 3, problemContainer1.getAverageTestCasesPassed());
+        assertEquals(TestFields.problem1().getName(), problemContainer1.getProblem().getName());
+        assertEquals(1, problemContainer1.getTestCaseCount());
+        assertEquals(2, problemContainer1.getUserSolvedCount());
+        ProblemContainer problemContainer2 = gameReport.getProblemContainers().get(1);
+        assertEquals((double) 1 / 3, problemContainer2.getAverageAttemptCount());
+        assertEquals(0, problemContainer2.getAverageTestCasesPassed());
+        assertEquals(TestFields.problem2().getName(), problemContainer2.getProblem().getName());
+        assertEquals(1, problemContainer2.getTestCaseCount());
+        assertEquals(0, problemContainer2.getUserSolvedCount());
+
+        // Check assertions for each user and submission group.
+        assertEquals(3, gameReport.getUsers().size());
+        assertEquals(1, gameReport.getUsers().get(0).getSubmissionGroupReports().size());
+        SubmissionGroupReport submissionGroupReport1 = gameReport.getUsers().get(0).getSubmissionGroupReports().get(0);
+        assertEquals(gameReport.getGameReportId(), submissionGroupReport1.getGameReportId());
     }
 
     @Test
