@@ -404,6 +404,9 @@ public class GameManagementService {
             gameReport.setGameEndType(GameEndType.TIME_UP);
         }
 
+        gameReport.setAverageTestCasesPassed(Arrays.stream(totalTestCasesPassed).sum() / numPlayers);
+        gameReport.setAverageProblemsSolved((double) Arrays.stream(userSolved).sum() / numPlayers);
+
         gameReportRepository.save(gameReport);
 
         // Iterate through all room users, players and spectators included.

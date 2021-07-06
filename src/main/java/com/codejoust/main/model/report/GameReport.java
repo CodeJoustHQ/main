@@ -53,6 +53,12 @@ public class GameReport {
 
     private int numTestCases;
 
+    // The average (mean) number of test cases passed.
+    private Double averageTestCasesPassed;
+
+    // The average (mean) number of problems solved.
+    private Double averageProblemsSolved;
+
     // The start time of the game
     private Instant createdDateTime;
 

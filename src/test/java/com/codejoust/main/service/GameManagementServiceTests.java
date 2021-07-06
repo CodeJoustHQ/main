@@ -98,6 +98,7 @@ public class GameManagementServiceTests {
     // Helper method to add a dummy submission to a Player object
     private void addSubmissionHelper(Player player, int problemIndex, PlayerCode playerCode, int numCorrect) {
         Submission submission = new Submission();
+        submission.setProblemIndex(problemIndex);
         submission.setNumCorrect(numCorrect);
         submission.setNumTestCases(1);
         submission.setStartTime(Instant.now());
@@ -1110,23 +1111,23 @@ public class GameManagementServiceTests {
         gameService.submitSolution(TestFields.ROOM_ID, correctSubmission);
 
         // Partially correct submission for problem 1 with user3.
-        SubmissionRequest partialSubmission = new SubmissionRequest();
-        partialSubmission.setLanguage(TestFields.PYTHON_LANGUAGE);
-        partialSubmission.setCode(TestFields.PYTHON_CODE);
-        partialSubmission.setInitiator(UserMapper.toDto(user3));
+        SubmissionRequest incorrectSubmission = new SubmissionRequest();
+        incorrectSubmission.setLanguage(TestFields.PYTHON_LANGUAGE);
+        incorrectSubmission.setCode(TestFields.PYTHON_CODE);
+        incorrectSubmission.setInitiator(UserMapper.toDto(user3));
 
         // Incorrect submission for problem 0 with user1.
-        SubmissionDto partialSubmissionDto = new SubmissionDto();
-        partialSubmissionDto.setNumCorrect(TestFields.NUM_PROBLEMS);
-        partialSubmissionDto.setNumTestCases(TestFields.NUM_PROBLEMS);
+        SubmissionDto incorrectSubmissionDto = new SubmissionDto();
+        incorrectSubmissionDto.setNumCorrect(TestFields.NUM_PROBLEMS);
+        incorrectSubmissionDto.setNumTestCases(TestFields.NUM_PROBLEMS);
         Mockito.doAnswer(new Answer<SubmissionDto>() {
             public SubmissionDto answer(InvocationOnMock invocation) {
                 addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID_3), 1, TestFields.PLAYER_CODE_2, 0);
                 game.setAllSolved(true);
-                return partialSubmissionDto;
+                return incorrectSubmissionDto;
             }})
-          .when(submitService).submitSolution(game, partialSubmission);
-        gameService.submitSolution(TestFields.ROOM_ID, partialSubmission);
+          .when(submitService).submitSolution(game, incorrectSubmission);
+        gameService.submitSolution(TestFields.ROOM_ID, incorrectSubmission);
 
         // Set manually end game, and trigger game report creation directly.
         game.setGameEnded(true);
@@ -1138,6 +1139,9 @@ public class GameManagementServiceTests {
         verify(userRepository).save(eq(user3));
         verify(userRepository).save(eq(user4));
 
+        // Check assertions for top-level report variables.
+        assertEquals(gameReport.getCreatedDateTime(), game.getGameTimer().getStartTime());
+        assertEquals(gameReport.getNumTestCases(), 2);
         assertEquals(gameReport.getGameEndType(), GameEndType.MANUAL_END);
     }
 
