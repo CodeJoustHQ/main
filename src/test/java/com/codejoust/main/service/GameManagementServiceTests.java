@@ -1042,9 +1042,20 @@ public class GameManagementServiceTests {
          * 1. Logged-in users, logged-out users, players, and spectators.
          * 2. Correct and partially correct submissions.
          * 3. Multiple problems, with submissions for each.
+         * 
+         * The test goes through the following steps:
+         * 1. Create a room with four users: two with same account, one
+         * anonymous, and one anonymous spectator.
+         * 2. Add two different problems to the room, and start the game.
+         * 3. Add submissions: user1 submits correctly to the first problem,
+         * then a new incorrect submission to the first problem. user2 does
+         * not submit. user3 submits correctly to the first problem, then
+         * incorrectly to the second problem.
+         * 4. Check that the game and relevant account and user objects save.
+         * 5. Check assertions for the general game report statistics,
+         * each of the problem containers, and each of the users' submission
+         * group reports.
          */
-
-        // User already includes many submission group reports.
 
         Room room = new Room();
         room.setRoomId(TestFields.ROOM_ID);
@@ -1168,6 +1179,23 @@ public class GameManagementServiceTests {
         assertEquals(1, gameReport.getUsers().get(0).getSubmissionGroupReports().size());
         SubmissionGroupReport submissionGroupReport1 = gameReport.getUsers().get(0).getSubmissionGroupReports().get(0);
         assertEquals(gameReport.getGameReportId(), submissionGroupReport1.getGameReportId());
+        assertEquals(1, submissionGroupReport1.getNumTestCasesPassed());
+        assertEquals("10", submissionGroupReport1.getProblemsSolved());
+        assertEquals(2, submissionGroupReport1.getSubmissionReports().size());
+        
+        assertEquals(1, gameReport.getUsers().get(1).getSubmissionGroupReports().size());
+        SubmissionGroupReport submissionGroupReport2 = gameReport.getUsers().get(1).getSubmissionGroupReports().get(0);
+        assertEquals(gameReport.getGameReportId(), submissionGroupReport2.getGameReportId());
+        assertEquals(0, submissionGroupReport2.getNumTestCasesPassed());
+        assertEquals("00", submissionGroupReport2.getProblemsSolved());
+        assertEquals(0, submissionGroupReport2.getSubmissionReports().size());
+
+        assertEquals(1, gameReport.getUsers().get(2).getSubmissionGroupReports().size());
+        SubmissionGroupReport submissionGroupReport3 = gameReport.getUsers().get(2).getSubmissionGroupReports().get(0);
+        assertEquals(gameReport.getGameReportId(), submissionGroupReport3.getGameReportId());
+        assertEquals(1, submissionGroupReport3.getNumTestCasesPassed());
+        assertEquals("10", submissionGroupReport3.getProblemsSolved());
+        assertEquals(2, submissionGroupReport3.getSubmissionReports().size());
     }
 
     @Test
