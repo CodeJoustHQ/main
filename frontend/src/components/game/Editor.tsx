@@ -174,7 +174,7 @@ function ResizableMonacoEditor(props: EditorProps) {
         }
       }
     }
-  }, [currentLanguage, codeMap, codeEditor, setCodeEditor,
+  }, [currentLanguage, codeMap, codeEditor, setCodeEditor, getCurrentLanguage,
     currentProblem, previousProblem]);
 
   return (

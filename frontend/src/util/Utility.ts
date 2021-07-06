@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { User } from '../api/User';
 import { removeUser } from '../api/Room';
 import { disconnect } from '../api/Socket';

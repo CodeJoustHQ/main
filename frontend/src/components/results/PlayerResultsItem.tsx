@@ -89,7 +89,7 @@ type PlayerResultsCardProps = {
 
 function PlayerResultsItem(props: PlayerResultsCardProps) {
   const {
-    player, place, isCurrentPlayer, color, gameStartTime, numProblems, onViewCode, onSpectateLive,
+    player, place, isCurrentPlayer, color, onViewCode, onSpectateLive,
   } = props;
 
   const score = useGetScore(player);
