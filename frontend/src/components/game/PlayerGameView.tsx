@@ -33,11 +33,13 @@ import {
 import LeaderboardCard from '../card/LeaderboardCard';
 import { SpectatorBackIcon } from '../core/Icon';
 import Language from '../../api/Language';
-import { useAppSelector, useBestSubmission } from '../../util/Hook';
 import { routes, send, subscribe } from '../../api/Socket';
 import { User } from '../../api/User';
-import { getScore, getSubmissionCount, getSubmissionTime } from '../../util/Utility';
 import ProblemPanel from './ProblemPanel';
+import { useAppSelector, useBestSubmission, useGetSubmission } from '../../util/Hook';
+import {
+  getScore, getSubmissionCount, getSubmissionTime, getSubmission,
+} from '../../util/Utility';
 
 const NoPaddingPanel = styled(Panel)`
   padding: 0;
@@ -144,8 +146,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [languageList, setLanguageList] = useState<Language[]>([Language.Java]);
   const [codeList, setCodeList] = useState<string[]>(['']);
-  const [currentSubmission, setCurrentSubmission] = useState<Submission | null>(null);
   const [currentProblemIndex, setCurrentProblemIndex] = useState<number>(defaultIndex || 0);
+  let currentSubmission = useGetSubmission(currentProblemIndex, submissions);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>(gameError);
@@ -207,17 +209,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
       return current;
     }));
   }, [currentProblemIndex]);
-
-  // Returns the most recent submission made for problem of index curr.
-  const getSubmission = (curr: number, playerSubmissions: Submission[]) => {
-    for (let i = playerSubmissions.length - 1; i >= 0; i -= 1) {
-      if (playerSubmissions[i].problemIndex === curr) {
-        return playerSubmissions[i];
-      }
-    }
-
-    return null;
-  };
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
     playerSubmissions: Submission[]) => {
@@ -403,7 +394,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
         // Set the 'test' submission type to correctly display result.
         // eslint-disable-next-line no-param-reassign
         res.submissionType = SubmissionType.Test;
-        setCurrentSubmission(res);
+        currentSubmission = res; // note: this seems a bit improper (fine as long as it works ig)
       })
       .catch((err) => {
         setLoading(false);
@@ -430,7 +421,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
         // eslint-disable-next-line no-param-reassign
         res.submissionType = SubmissionType.Submit;
         setSubmissions(submissions.concat([res]));
-        setCurrentSubmission(res);
       })
       .catch((err) => {
         setLoading(false);
@@ -443,7 +433,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
     if (problems && next < problems.length) {
       setCurrentProblemIndex(next);
-      setCurrentSubmission(getSubmission(next, submissions));
     }
   };
 
@@ -452,7 +441,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
     if (prev >= 0) {
       setCurrentProblemIndex(prev);
-      setCurrentSubmission(getSubmission(prev, submissions));
     }
   };
 
@@ -505,7 +493,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
                 <NoMarginDefaultText>
                   <b>Submissions:</b>
                   {' '}
-                  {getSubmissionCount(spectatedPlayer, stateRef.current.currentIndex)}
+                  {getSubmissionCount(spectatedPlayer, stateRef.current?.currentIndex)}
                 </NoMarginDefaultText>
               </GameHeaderStatsSubContainer>
             </GameHeaderStatsContainer>
@@ -546,7 +534,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
                     getCurrentLanguage={getCurrentLanguage}
                     defaultCodeMap={defaultCodeList}
                     currentProblem={currentProblemIndex}
-                    defaultLanguage={Language.Java}
                     defaultCode={null}
                     liveCode={null}
                   />
@@ -565,7 +552,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
                 <Editor
                   onLanguageChange={null}
                   onCodeChange={null}
-                  defaultLanguage={getCurrentLanguage()}
                   getCurrentLanguage={getCurrentLanguage}
                   defaultCodeMap={null}
                   currentProblem={currentProblemIndex}

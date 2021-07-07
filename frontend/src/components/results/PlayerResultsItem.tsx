@@ -6,7 +6,9 @@ import { Color } from '../../api/Color';
 import { useBestSubmission, useGetSubmissionTime } from '../../util/Hook';
 import Language, { displayNameFromLanguage } from '../../api/Language';
 import { TextButton } from '../core/Button';
-import { getScore, getSubmissionCount, getSubmissionTime, getTimeBetween } from '../../util/Utility';
+import {
+  getScore, getSubmissionCount, getSubmissionTime, getTimeBetween,
+} from '../../util/Utility';
 
 const Content = styled.tr`
   border-radius: 5px;

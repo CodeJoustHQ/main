@@ -172,6 +172,17 @@ export const getSubmissionCount = (player: Player | null, problemIndex?: number)
   return submissions?.length || 0;
 };
 
+// Returns the most recent submission made for problem of index curr (or null if none)
+export const getSubmission = (curr: number, playerSubmissions: Submission[]) => {
+  for (let i = playerSubmissions.length - 1; i >= 0; i -= 1) {
+    if (playerSubmissions[i].problemIndex === curr) {
+      return playerSubmissions[i];
+    }
+  }
+
+  return null;
+};
+
 /**
  * De-duplicate a list of SelectableProblems.
  * Solution at: https://stackoverflow.com/a/1584377/7517518.
