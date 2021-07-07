@@ -10,19 +10,24 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.codejoust.main.dto.game.GameDto;
 import com.codejoust.main.dto.game.GameMapper;
 import com.codejoust.main.dto.game.PlayerDto;
 import com.codejoust.main.dto.game.SubmissionDto;
+import com.codejoust.main.dto.game.SubmissionResultDto;
+import com.codejoust.main.dto.problem.ProblemDto;
 import com.codejoust.main.dto.problem.ProblemMapper;
+import com.codejoust.main.dto.problem.ProblemTestCaseDto;
 import com.codejoust.main.dto.room.RoomMapper;
 import com.codejoust.main.dto.user.UserMapper;
 import com.codejoust.main.game_object.Game;
 import com.codejoust.main.game_object.Player;
 import com.codejoust.main.game_object.PlayerCode;
 import com.codejoust.main.game_object.Submission;
+import com.codejoust.main.game_object.SubmissionResult;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.Problem;
@@ -77,7 +82,17 @@ public class GameMapperTests {
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(TestFields.INPUT);
         testCase.setOutput(TestFields.OUTPUT);
+        testCase.setHidden(false);
         testCase.setProblem(problem);
+        problem.addTestCase(testCase);
+        
+        ProblemTestCase testCase2 = new ProblemTestCase();
+        testCase2.setInput(TestFields.INPUT_2);
+        testCase2.setOutput(TestFields.OUTPUT_2);
+        testCase2.setHidden(true);
+        testCase2.setProblem(problem);
+        problem.addTestCase(testCase2);
+
 
         List<Problem> problems = new ArrayList<>();
         problems.add(problem);
@@ -114,10 +129,20 @@ public class GameMapperTests {
 
         assertEquals(RoomMapper.toDto(room), gameDto.getRoom());
         assertEquals(1, gameDto.getPlayers().size());
-        assertEquals(ProblemMapper.toDto(problem), gameDto.getProblems().get(0));
         assertEquals(game.getPlayAgain(), gameDto.getPlayAgain());
         assertEquals(game.getAllSolved(), gameDto.getAllSolved());
         assertEquals(game.getGameEnded(), gameDto.getGameEnded());
+
+        ProblemDto problemDto = gameDto.getProblems().get(0);
+
+        assertEquals(TestFields.PROBLEM_NAME, problemDto.getName());
+        assertEquals(TestFields.PROBLEM_DESCRIPTION, problemDto.getDescription());
+        assertEquals(ProblemDifficulty.MEDIUM, problemDto.getDifficulty());
+
+        ProblemTestCaseDto testCaseDto = problemDto.getTestCases().get(0);
+
+        assertEquals(TestFields.INPUT, testCaseDto.getInput());
+        assertEquals("", testCaseDto.getOutput());
 
         PlayerDto playerDto = gameDto.getPlayers().get(0);
         assertEquals(UserMapper.toDto(user), playerDto.getUser());
@@ -145,12 +170,39 @@ public class GameMapperTests {
         submission.setNumCorrect(TEST_CASES);
         submission.setRuntime(5.5);
 
+        SubmissionResult result = new SubmissionResult();
+        result.setCorrectOutput(TestFields.OUTPUT);
+        result.setHidden(false);
+        List<SubmissionResult> submissionResults = Collections.singletonList(result);
+        submission.setResults(submissionResults);
+
         SubmissionDto submissionDto = GameMapper.submissionToDto(submission);
         assertEquals(submission.getPlayerCode().getCode(), submissionDto.getCode());
         assertEquals(submission.getPlayerCode().getLanguage(), submissionDto.getLanguage());
         assertEquals(submission.getNumCorrect(), submissionDto.getNumCorrect());
         assertEquals(submission.getStartTime(), submissionDto.getStartTime());
         assertEquals(submission.getRuntime(), submissionDto.getRuntime());
+        assertEquals("", submissionDto.getResults().get(0).getCorrectOutput());
+    }
+
+    @Test
+    public void submissionToDtoHiddenTestCases() {
+        Submission submission = new Submission();
+
+        SubmissionResult result = new SubmissionResult();
+        result.setHidden(true);
+        result.setConsole(TestFields.OUTPUT);
+        result.setUserOutput(TestFields.OUTPUT);
+        result.setInput(TestFields.INPUT);
+        result.setCorrectOutput(TestFields.OUTPUT);
+        List<SubmissionResult> submissionResults = Collections.singletonList(result);
+        submission.setResults(submissionResults);
+
+        SubmissionResultDto resultDto = GameMapper.submissionToDto(submission).getResults().get(0);
+        assertEquals("", resultDto.getConsole());
+        assertEquals("", resultDto.getUserOutput());
+        assertEquals("", resultDto.getInput());
+        assertEquals("", resultDto.getCorrectOutput());
     }
 
     @Test

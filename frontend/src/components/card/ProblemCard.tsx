@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Problem } from '../../api/Problem';
-import { LargeText, SelectedItemText, Text } from '../core/Text';
+import { LargeText, SelectedItemText, SingleLineText } from '../core/Text';
 import { getDifficultyDisplayButton } from '../core/Button';
 import { SelectedItemContainer } from '../core/Container';
 import { DivLink } from '../core/Link';
@@ -52,7 +52,7 @@ function ProblemCard(props: ProblemCardProps) {
         <InnerContent>
           <TitleText>{problem.name}</TitleText>
           {getDifficultyDisplayButton(problem.difficulty, true)}
-          <Text>{`${problem.description.substring(0, 80)}...`}</Text>
+          <SingleLineText>{problem.description}</SingleLineText>
 
           {problem.problemTags.map((tag) => (
             <ProblemTagContainer key={tag.name}>

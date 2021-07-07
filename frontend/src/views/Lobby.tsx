@@ -539,12 +539,12 @@ function LobbyPage() {
     };
 
     updateRoomSettings(currentRoomId, settings)
-      .then(() => setLoading(false))
       .catch((err) => {
-        setLoading(false);
         setError(err.message);
         // Set numProblems back to original if REST call failed
         setNumProblems(prevNumProblems);
+      }).finally(() => {
+        setLoading(false);
       });
   };
 

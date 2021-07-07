@@ -6,7 +6,6 @@ import { Color } from '../../api/Color';
 import { useBestSubmission, useGetScore, useGetSubmissionTime } from '../../util/Hook';
 import Language, { displayNameFromLanguage } from '../../api/Language';
 import { TextButton } from '../core/Button';
-// import { getScore, getSubmissionCount, getSubmissionTime } from '../../util/Utility';
 
 const Content = styled.tr`
   border-radius: 5px;
@@ -90,39 +89,30 @@ type PlayerResultsCardProps = {
 
 function PlayerResultsItem(props: PlayerResultsCardProps) {
   const {
-    player, place, isCurrentPlayer, color, gameStartTime, numProblems, onViewCode, onSpectateLive,
+    player, place, isCurrentPlayer, color, onViewCode, onSpectateLive,
   } = props;
 
   const score = useGetScore(player);
   const time = useGetSubmissionTime(player);
   const bestSubmission : Submission | null = useBestSubmission(player);
 
+  const getSubmissionCount = () => player.submissions.length || '0';
+
   const getDisplayNickname = () => {
     const { nickname } = player.user;
     return `${nickname} ${isCurrentPlayer ? '(you)' : ''}`;
   };
 
-  const getScore = () => {
-    if (!score) {
-      return '0';
-    }
-
-    const percent = Math.round((score / numProblems) * 100);
-    return `${percent}%`;
-  };
-
   const getSubmissionTime = () => {
     if (!time) {
-      return 'N/A';
+      return 'Never';
     }
 
-    const startTime = new Date(gameStartTime).getTime();
-    const diffMilliseconds = new Date(time).getTime() - startTime;
+    const currentTime = new Date().getTime();
+    const diffMilliseconds = currentTime - new Date(time).getTime();
     const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
     return `${diffMinutes}m ago`;
   };
-
-  const getSubmissionCount = () => player.submissions.length || '0';
 
   const getSubmissionLanguage = () => {
     if (!bestSubmission) {
@@ -153,7 +143,7 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
       </PlayerContent>
 
       <td>
-        <Text>{getScore()}</Text>
+        <Text>{score}</Text>
       </td>
       <td>
         <Text>{getSubmissionTime()}</Text>

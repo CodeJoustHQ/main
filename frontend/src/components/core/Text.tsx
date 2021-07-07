@@ -153,3 +153,11 @@ export const SelectedItemText = styled.p`
   display: inline;
   margin: 0 10px;
 `;
+
+export const SingleLineText = styled(Text)`
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  word-break: break-all;
+`;

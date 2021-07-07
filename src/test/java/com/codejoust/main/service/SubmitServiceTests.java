@@ -113,7 +113,7 @@ public class SubmitServiceTests {
         assertEquals(TestFields.OUTPUT, resultDto.getUserOutput());
         assertNull(resultDto.getError());
         assertEquals(TestFields.INPUT, resultDto.getInput());
-        assertEquals(TestFields.OUTPUT, resultDto.getCorrectOutput());
+        assertEquals("", resultDto.getCorrectOutput());
         assertFalse(resultDto.isHidden());
         assertTrue(resultDto.isCorrect());
         

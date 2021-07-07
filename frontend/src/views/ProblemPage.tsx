@@ -37,18 +37,21 @@ function ProblemPage() {
       return;
     }
 
-    setLoading(true);
-    getSingleProblem(params.id, token!)
-      .then((res) => {
-        res.testCases.forEach((testCase) => {
-          // eslint-disable-next-line no-param-reassign
-          testCase.id = generateRandomId();
-        });
-        setProblem(res);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [params, token]);
+    // Checks added to ensure problem fetched only once.
+    if (!problem && !loading) {
+      setLoading(true);
+      getSingleProblem(params.id, token!)
+        .then((res) => {
+          res.testCases.forEach((testCase) => {
+            // eslint-disable-next-line no-param-reassign
+            testCase.id = generateRandomId();
+          });
+          setProblem(res);
+        })
+        .catch((err) => setError(err.message))
+        .finally(() => setLoading(false));
+    }
+  }, [params, token, problem, loading]);
 
   if (!problem) {
     if (error && !loading) {

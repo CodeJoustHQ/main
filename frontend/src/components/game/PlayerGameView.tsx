@@ -33,11 +33,13 @@ import {
 import LeaderboardCard from '../card/LeaderboardCard';
 import { SpectatorBackIcon } from '../core/Icon';
 import Language from '../../api/Language';
-import { useAppSelector, useBestSubmission } from '../../util/Hook';
 import { routes, send, subscribe } from '../../api/Socket';
 import { User } from '../../api/User';
-import { getScore, getSubmissionCount, getSubmissionTime } from '../../util/Utility';
 import ProblemPanel from './ProblemPanel';
+import { useAppSelector, useBestSubmission, useGetSubmission } from '../../util/Hook';
+import {
+  getScore, getSubmissionCount, getSubmissionTime, getSubmission,
+} from '../../util/Utility';
 
 const NoPaddingPanel = styled(Panel)`
   padding: 0;
@@ -112,7 +114,7 @@ type StateRefType = {
   currentUser: User | null,
   currentCode: string,
   currentLanguage: string,
-  currentIndex: number,
+  currentProblemIndex: number,
 }
 
 /**
@@ -140,8 +142,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [languageList, setLanguageList] = useState<Language[]>([Language.Java]);
   const [codeList, setCodeList] = useState<string[]>(['']);
-  const [currentSubmission, setCurrentSubmission] = useState<Submission | null>(null);
   const [currentProblemIndex, setCurrentProblemIndex] = useState<number>(0);
+  let currentSubmission = useGetSubmission(currentProblemIndex, submissions);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>(gameError);
@@ -186,17 +188,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
     }));
   };
 
-  // Returns the most recent submission made for problem of index curr.
-  const getSubmission = (curr: number, playerSubmissions: Submission[]) => {
-    for (let i = playerSubmissions.length - 1; i >= 0; i -= 1) {
-      if (playerSubmissions[i].problemIndex === curr) {
-        return playerSubmissions[i];
-      }
-    }
-
-    return null;
-  };
-
   // References necessary for the spectator subscription callback.
   const stateRef = useRef<StateRefType>();
   stateRef.current = {
@@ -204,7 +195,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
     currentUser,
     currentCode: codeList[currentProblemIndex],
     currentLanguage: languageList[currentProblemIndex],
-    currentIndex: currentProblemIndex,
+    currentProblemIndex,
   };
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
@@ -284,7 +275,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
       if (JSON.parse(result.body).newSpectator) {
         sendViewUpdate(stateRef.current?.game, stateRef.current?.currentUser,
           stateRef.current?.currentCode, stateRef.current?.currentLanguage,
-          stateRef.current?.currentIndex);
+          stateRef.current?.currentProblemIndex);
       }
     };
 
@@ -368,7 +359,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
         // Set the 'test' submission type to correctly display result.
         // eslint-disable-next-line no-param-reassign
         res.submissionType = SubmissionType.Test;
-        setCurrentSubmission(res);
+        currentSubmission = res; // note: this seems a bit improper (fine as long as it works ig)
       })
       .catch((err) => {
         setLoading(false);
@@ -395,7 +386,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
         // eslint-disable-next-line no-param-reassign
         res.submissionType = SubmissionType.Submit;
         setSubmissions(submissions.concat([res]));
-        setCurrentSubmission(res);
       })
       .catch((err) => {
         setLoading(false);
@@ -408,7 +398,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
     if (problems && next < problems.length) {
       setCurrentProblemIndex(next);
-      setCurrentSubmission(getSubmission(next, submissions));
     }
   };
 
@@ -417,7 +406,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
     if (prev >= 0) {
       setCurrentProblemIndex(prev);
-      setCurrentSubmission(getSubmission(prev, submissions));
     }
   };
 
@@ -511,7 +499,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
                     getCurrentLanguage={getCurrentLanguage}
                     defaultCodeMap={defaultCodeList}
                     currentProblem={currentProblemIndex}
-                    defaultLanguage={Language.Java}
                     defaultCode={null}
                     liveCode={null}
                   />
@@ -530,8 +517,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
                 <Editor
                   onLanguageChange={null}
                   onCodeChange={null}
-                  defaultLanguage={spectateGame?.language as Language}
-                  getCurrentLanguage={() => spectateGame?.language as Language}
+                  getCurrentLanguage={() => spectateGame?.language as Language || Language.Java}
                   defaultCodeMap={null}
                   currentProblem={currentProblemIndex}
                   defaultCode={spectateGame?.code}
