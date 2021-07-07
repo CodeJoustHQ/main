@@ -202,12 +202,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
       }
       return current;
     }));
-    console.log((stateRef.current?.codeList || []).map((current, index) => {
-      if (index === (specifiedIndex !== undefined ? specifiedIndex : currentProblemIndex)) {
-        return newCode;
-      }
-      return current;
-    }));
   }, [currentProblemIndex]);
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
@@ -266,7 +260,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
       const body: SpectateGame = {
         user: currentUserParam,
         problem: gameParam.problems[currentIndexParam || 0], // must satisfy problems.length > 0
-        index: currentIndexParam || 0,
+        problemIndex: currentIndexParam || 0,
         code: currentCodeParam || '',
         language: currentLanguageParam || Language.Java,
         codeList: sendFullLists ? currentCodeList : undefined,
@@ -337,7 +331,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
        */
       if (!defaultCodeList.length && currentUser && !currentUser.spectator) {
         let matchFound = false;
-        console.log('in call to fetch problems');
 
         // If this user refreshed and has already submitted code, load and save their latest code
         game.players.forEach((player) => {
@@ -358,14 +351,12 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
   // When spectate game code changes, update the corresponding problem with that code
   useEffect(() => {
-    console.log('here');
-    console.log(spectateGame);
     if (spectateGame?.codeList && spectateGame.languageList) {
       setCodeList(spectateGame.codeList);
       setLanguageList(spectateGame.languageList);
-    } else if (spectateGame?.code && spectateGame.language && spectateGame.index !== undefined) {
-      setOneCurrentCode(spectateGame.code, spectateGame.index);
-      setOneCurrentLanguage(spectateGame.language as Language, spectateGame.index);
+    } else if (spectateGame?.code && spectateGame.language && spectateGame.problemIndex !== undefined) {
+      setOneCurrentCode(spectateGame.code, spectateGame.problemIndex);
+      setOneCurrentLanguage(spectateGame.language as Language, spectateGame.problemIndex);
     }
   }, [spectateGame, setOneCurrentCode, setOneCurrentLanguage]);
 
@@ -474,7 +465,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
               Spectating:
               {' '}
               <b>{spectateGame?.user.nickname}</b>
-              {currentProblemIndex === spectateGame?.index ? ' (live)' : null}
+              {currentProblemIndex === spectateGame?.problemIndex ? ' (live)' : null}
             </GameHeaderText>
           </GameHeaderContainerChild>
           <GameHeaderContainerChild>

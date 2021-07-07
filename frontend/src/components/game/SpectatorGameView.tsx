@@ -39,8 +39,6 @@ function SpectatorGameView() {
     const subscribePlayerCallback = (result: Message) => {
       if (!JSON.parse(result.body).newSpectator) {
         const updatedSpectateGame: SpectateGame = JSON.parse(result.body);
-        console.log('in spectator page');
-        console.log(updatedSpectateGame);
         setSpectateGame(updatedSpectateGame);
       }
     };
