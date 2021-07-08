@@ -272,7 +272,6 @@ public class ProblemService {
             roomRepository.save(room);
         }
 
-        // Also if it's currently in any room. toDto
         problemRepository.delete(problem);
 
         return ProblemMapper.toDto(problem);
