@@ -140,6 +140,13 @@ function ResizableMonacoEditor(props: EditorProps) {
     }
   };
 
+  // When spectating, clear any extraneous selections that occur when code changes
+  useEffect(() => {
+    if (codeEditor) {
+      codeEditor.setSelection(new monaco.Selection(0, 0, 0, 0));
+    }
+  }, [liveCode]);
+
   const handleLanguageChange = (language: Language) => {
     // Save the code for this language
     if (codeMap != null && codeEditor != null) {
