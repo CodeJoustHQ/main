@@ -92,6 +92,7 @@ export const useGetSubmission = (curr: number, playerSubmissions: Submission[]) 
   return submission;
 };
 
+// Whether or not the current user can edit this problem or not
 export const useProblemEditable = (user: FirebaseUserType | null, problem: Problem | null) => {
   const [editable, setEditable] = useState(false);
 

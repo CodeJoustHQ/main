@@ -184,7 +184,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           }
         </SettingsContainerHighPadding>
 
-        {editMode && problemEditable
+        {editMode
           ? (
             <TestCaseEditor
               newProblem={newProblem}

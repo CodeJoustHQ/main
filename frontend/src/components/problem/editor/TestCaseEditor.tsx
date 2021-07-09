@@ -7,6 +7,7 @@ import { CheckboxInput, FixedTextArea } from '../../core/Input';
 import { GreenSmallButtonBlock, RedTextButton } from '../../core/Button';
 import { Problem, TestCase } from '../../../api/Problem';
 import { generateRandomId } from '../../../util/Utility';
+import { useAppSelector, useProblemEditable } from '../../../util/Hook';
 
 const SettingsContainerRelative = styled(SettingsContainer)`
   position: relative;
@@ -45,6 +46,9 @@ type TestCaseEditorProps = {
 
 function TestCaseEditor(props: TestCaseEditorProps) {
   const { newProblem, setNewProblem } = props;
+
+  const { firebaseUser } = useAppSelector((state) => state.account);
+  const problemEditable = useProblemEditable(firebaseUser, newProblem);
 
   // Handle adding a new test case for this problem
   const addTestCase = () => {
@@ -118,7 +122,12 @@ function TestCaseEditor(props: TestCaseEditorProps) {
               ref={providedDroppable.innerRef}
             >
               {newProblem.testCases.map((testCase, index) => (
-                <Draggable key={testCase.id} draggableId={testCase.id} index={index}>
+                <Draggable
+                  key={testCase.id}
+                  draggableId={testCase.id}
+                  index={index}
+                  isDragDisabled={!problemEditable}
+                >
                   {(providedDraggable: any) => (
                     <div
                       ref={providedDraggable.innerRef}
@@ -136,6 +145,7 @@ function TestCaseEditor(props: TestCaseEditorProps) {
                             <NoMarginTopText>Input</NoMarginTopText>
                             <FixedTextArea
                               value={newProblem.testCases[index].input}
+                              disabled={!problemEditable}
                               onChange={(e) => {
                                 const current = newProblem.testCases[index];
                                 handleTestCaseChange(index, current.id, e.target.value,
@@ -147,6 +157,7 @@ function TestCaseEditor(props: TestCaseEditorProps) {
                             <NoMarginTopText>Output</NoMarginTopText>
                             <FixedTextArea
                               value={newProblem.testCases[index].output}
+                              disabled={!problemEditable}
                               onChange={(e) => {
                                 const current = newProblem.testCases[index];
                                 handleTestCaseChange(index, current.id,
@@ -162,6 +173,7 @@ function TestCaseEditor(props: TestCaseEditorProps) {
                             <Text>Explanation (optional)</Text>
                             <FixedTextArea
                               value={newProblem.testCases[index].explanation}
+                              disabled={!problemEditable}
                               onChange={(e) => {
                                 const current = newProblem.testCases[index];
                                 handleTestCaseChange(index,
@@ -180,6 +192,7 @@ function TestCaseEditor(props: TestCaseEditorProps) {
                               <CheckboxInput
                                 id={`problem-hidden-${index}`}
                                 checked={newProblem.testCases[index].hidden}
+                                disabled={!problemEditable}
                                 onChange={(e) => {
                                   const current = newProblem.testCases[index];
                                   handleTestCaseChange(index,
@@ -190,13 +203,13 @@ function TestCaseEditor(props: TestCaseEditorProps) {
                             </label>
                           </HiddenContainer>
 
-                          <MarginLeftRightAutoContainer>
-                            <RedTextButton
-                              onClick={() => deleteTestCase(index)}
-                            >
-                              Delete
-                            </RedTextButton>
-                          </MarginLeftRightAutoContainer>
+                          {problemEditable ? (
+                            <MarginLeftRightAutoContainer>
+                              <RedTextButton onClick={() => deleteTestCase(index)}>
+                                  Delete
+                              </RedTextButton>
+                            </MarginLeftRightAutoContainer>
+                          ) : null}
                         </FlexBareContainer>
                       </SettingsContainerRelative>
                     </div>
@@ -207,11 +220,11 @@ function TestCaseEditor(props: TestCaseEditorProps) {
           )}
         </Droppable>
       </DragDropContext>
-      <GreenSmallButtonBlock
-        onClick={addTestCase}
-      >
-        Add
-      </GreenSmallButtonBlock>
+      {problemEditable ? (
+        <GreenSmallButtonBlock onClick={addTestCase}>
+          Add
+        </GreenSmallButtonBlock>
+      ) : null}
       {!newProblem.testCases.length ? (
         <Text>At least one test case is required in order to use this problem in a game.</Text>
       ) : null}
