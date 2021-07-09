@@ -36,7 +36,7 @@ import Language from '../../api/Language';
 import { routes, send, subscribe } from '../../api/Socket';
 import { User } from '../../api/User';
 import ProblemPanel from './ProblemPanel';
-import { useAppSelector, useBestSubmission, useGetSubmission } from '../../util/Hook';
+import { useAppSelector, useBestSubmission } from '../../util/Hook';
 import {
   getScore, getSubmissionCount, getSubmissionTime, getSubmission,
 } from '../../util/Utility';
@@ -147,7 +147,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
   const [languageList, setLanguageList] = useState<Language[]>([Language.Java]);
   const [codeList, setCodeList] = useState<string[]>(['']);
   const [currentProblemIndex, setCurrentProblemIndex] = useState<number>(defaultIndex || 0);
-  let currentSubmission = useGetSubmission(currentProblemIndex, submissions);
+  const [currentSubmission, setCurrentSubmission] = useState<Submission | null>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>(gameError);
@@ -354,7 +354,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
     if (spectateGame?.codeList && spectateGame.languageList) {
       setCodeList(spectateGame.codeList);
       setLanguageList(spectateGame.languageList);
-    } else if (spectateGame?.code && spectateGame.language && spectateGame.problemIndex !== undefined) {
+    } else if (spectateGame?.code && spectateGame.language
+        && spectateGame.problemIndex !== undefined) {
       setOneCurrentCode(spectateGame.code, spectateGame.problemIndex);
       setOneCurrentLanguage(spectateGame.language as Language, spectateGame.problemIndex);
     }
@@ -385,7 +386,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
         // Set the 'test' submission type to correctly display result.
         // eslint-disable-next-line no-param-reassign
         res.submissionType = SubmissionType.Test;
-        currentSubmission = res; // TODO: this may be improper and cause potential bugs
+        setCurrentSubmission(res);
       })
       .catch((err) => {
         setLoading(false);
@@ -412,6 +413,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
         // eslint-disable-next-line no-param-reassign
         res.submissionType = SubmissionType.Submit;
         setSubmissions(submissions.concat([res]));
+        setCurrentSubmission(res);
       })
       .catch((err) => {
         setLoading(false);
@@ -424,6 +426,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
     if (problems && next < problems.length) {
       setCurrentProblemIndex(next);
+      setCurrentSubmission(getSubmission(next, submissions));
     }
   };
 
@@ -432,6 +435,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
 
     if (prev >= 0) {
       setCurrentProblemIndex(prev);
+      setCurrentSubmission(getSubmission(prev, submissions));
     }
   };
 

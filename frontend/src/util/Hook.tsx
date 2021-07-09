@@ -53,22 +53,6 @@ export const useGetSubmissionTime = (player?: Player) => {
   return time;
 };
 
-// Returns the most recent submission made for problem of index curr.
-export const useGetSubmission = (curr: number, playerSubmissions: Submission[]) => {
-  const [submission, setSubmission] = useState<Submission | null>(null);
-
-  useEffect(() => {
-    for (let i = playerSubmissions.length - 1; i >= 0; i -= 1) {
-      if (playerSubmissions[i].problemIndex === curr) {
-        setSubmission(playerSubmissions[i]);
-        i = -1;
-      }
-    }
-  }, [curr, playerSubmissions]);
-
-  return submission;
-};
-
 export const useProblemEditable = (user: FirebaseUserType | null, problem: Problem | null) => {
   const [editable, setEditable] = useState(false);
 
