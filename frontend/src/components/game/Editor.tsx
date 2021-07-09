@@ -134,6 +134,19 @@ function ResizableMonacoEditor(props: EditorProps) {
     });
   };
 
+  const handleCodeChange = () => {
+    if (onCodeChange) {
+      onCodeChange(codeEditor?.getValue() || '');
+    }
+  };
+
+  // When spectating, clear any extraneous selections that occur when code changes
+  useEffect(() => {
+    if (codeEditor) {
+      codeEditor.setSelection(new monaco.Selection(0, 0, 0, 0));
+    }
+  }, [codeEditor, liveCode]);
+
   const handleLanguageChange = (language: Language) => {
     // Save the code for this language
     if (codeMap != null && codeEditor != null) {
@@ -199,7 +212,7 @@ function ResizableMonacoEditor(props: EditorProps) {
           height="100%"
           editorDidMount={handleEditorDidMount}
           editorWillMount={handleEditorWillMount}
-          onChange={() => onCodeChange && onCodeChange(codeEditor?.getValue() || '')}
+          onChange={handleCodeChange}
           language={languageToEditorLanguage(currentLanguage)}
           defaultValue={defaultCode || 'Loading...'}
           value={liveCode}

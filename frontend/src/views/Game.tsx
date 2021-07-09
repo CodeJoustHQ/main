@@ -220,6 +220,7 @@ function GamePage() {
             gameError={error}
             spectateGame={null}
             spectatorUnsubscribePlayer={null}
+            defaultIndex={0}
           />
         )
       }

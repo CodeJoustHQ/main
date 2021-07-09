@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { Player } from '../../api/Game';
 import { Text, MediumText } from '../core/Text';
 import Language, { displayNameFromLanguage } from '../../api/Language';
-import { useBestSubmission, useGetScore, useGetSubmissionTime } from '../../util/Hook';
+import { useBestSubmission, useGetSubmissionTime } from '../../util/Hook';
+import { getTimeBetween } from '../../util/Utility';
 
 type PodiumProps = {
   place: number,
@@ -12,7 +13,6 @@ type PodiumProps = {
   inviteContent: React.ReactNode,
   loading: boolean,
   isCurrentPlayer: boolean,
-  numProblems: number,
 };
 
 type MedalProps = {
@@ -86,10 +86,10 @@ const Medal = styled.div<MedalProps>`
 
 function Podium(props: PodiumProps) {
   const {
-    place, player, gameStartTime, loading, inviteContent, isCurrentPlayer, numProblems,
+    place, player, gameStartTime, loading, inviteContent, isCurrentPlayer,
   } = props;
 
-  const score = useGetScore(player);
+  const score = (player?.solved || []).filter((s) => s).length;
   const bestSubmission = useBestSubmission(player);
   const time = useGetSubmissionTime(player);
 
@@ -133,11 +133,11 @@ function Podium(props: PodiumProps) {
       );
     }
 
-    const percent = Math.round((score / numProblems) * 100);
+    const { solved } = player;
     return (
       <ScoreText>
-        Scored
-        <b>{` ${percent}%`}</b>
+        Solved
+        <b>{` ${solved.filter((s) => s).length}/${solved.length}`}</b>
       </ScoreText>
     );
   };
@@ -147,11 +147,7 @@ function Podium(props: PodiumProps) {
       return <SmallerText />;
     }
 
-    // Calculate time from start of game till best submission
-    const startTime = new Date(gameStartTime).getTime();
-    const diffMilliseconds = new Date(time).getTime() - startTime;
-    const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
-
+    const diffMinutes = getTimeBetween(gameStartTime, time);
     return (
       <SmallerText>
         in

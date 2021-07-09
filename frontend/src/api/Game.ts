@@ -5,6 +5,7 @@ import { Room } from './Room';
 import { User } from './User';
 import { Problem } from './Problem';
 import { Color } from './Color';
+import Language from './Language';
 
 export type Player = {
   user: User,
@@ -82,8 +83,11 @@ export type Submission = {
 export type SpectateGame = {
   user: User,
   problem: Problem,
+  problemIndex: number,
   code: string,
   language: string,
+  codeList?: string[],
+  languageList?: Language[],
 };
 
 const basePath = '/api/v1';
