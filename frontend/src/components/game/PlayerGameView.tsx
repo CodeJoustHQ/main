@@ -385,7 +385,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
         // Set the 'test' submission type to correctly display result.
         // eslint-disable-next-line no-param-reassign
         res.submissionType = SubmissionType.Test;
-        currentSubmission = res; // note: this seems a bit improper (fine as long as it works ig)
+        currentSubmission = res; // TODO: this may be improper and cause potential bugs
       })
       .catch((err) => {
         setLoading(false);
