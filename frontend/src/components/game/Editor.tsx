@@ -145,7 +145,7 @@ function ResizableMonacoEditor(props: EditorProps) {
     if (codeEditor) {
       codeEditor.setSelection(new monaco.Selection(0, 0, 0, 0));
     }
-  }, [liveCode]);
+  }, [codeEditor, liveCode]);
 
   const handleLanguageChange = (language: Language) => {
     // Save the code for this language
