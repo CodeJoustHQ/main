@@ -1,5 +1,6 @@
 package com.codejoust.main.service;
 
+import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,6 +52,9 @@ public class RoomServiceTests {
 
     @Mock
     private RoomRepository repository;
+
+    @Mock
+    private ProblemService problemService;
 
     @Mock
     private SocketService socketService;
@@ -581,7 +586,14 @@ public class RoomServiceTests {
     }
 
     @Test
-    public void updateRoomSettingsTooManySelectedProblems() {
+    public void updateRoomSettingsChoosingProblemsModifiesNumProblems() {
+        /**
+         * 1. Update the room with two problems
+         * 2. Verify the numProblems field is now set to 2
+         * 3. Get rid of all the problems
+         * 4. Verify the numProblems field is now set to 1
+         */
+
         Room room = new Room();
         room.setRoomId(TestFields.ROOM_ID);
         User host = new User();
@@ -590,6 +602,7 @@ public class RoomServiceTests {
         room.addUser(host);
 
         Mockito.doReturn(room).when(repository).findRoomByRoomId(eq(TestFields.ROOM_ID));
+        Mockito.doReturn(new Problem()).when(problemService).getProblemEntity(Mockito.any());
 
         UpdateSettingsRequest request = new UpdateSettingsRequest();
         request.setInitiator(UserMapper.toDto(host));
@@ -601,9 +614,12 @@ public class RoomServiceTests {
         problemDto.setProblemId(TestFields.PROBLEM_ID_2);
         request.setProblems(Arrays.asList(problemDto, problemDto2));
 
-        ApiException exception = assertThrows(ApiException.class, () ->
-                roomService.updateRoomSettings(TestFields.ROOM_ID, request));
-        assertEquals(RoomError.TOO_MANY_PROBLEMS, exception.getError());
+        RoomDto response = roomService.updateRoomSettings(TestFields.ROOM_ID, request);
+        assertEquals(2, response.getNumProblems());
+
+        request.setProblems(Collections.emptyList());
+        response = roomService.updateRoomSettings(TestFields.ROOM_ID, request);
+        assertEquals(1, response.getNumProblems());
     }
 
     @Test

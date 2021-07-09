@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 
 export const InlineIcon = styled.i.attrs(() => ({
@@ -38,24 +39,12 @@ export const InlineErrorIcon = styled(InlineIcon).attrs((props: ShowError) => ({
   }
 `;
 
-export const InlineShowIcon = styled.i.attrs(() => ({
-  className: 'material-icons',
-}))`
-  display: inline-block;
-  position: relative;
-  top: 0.1rem;
-  margin-left: 0.3rem;
-  border-radius: 1rem;
-  font-size: ${({ theme }) => theme.fontSize.medium};
-  color: ${({ theme }) => theme.colors.font};
-`;
-
 export const SpectatorBackIcon = styled.i.attrs(() => ({
   className: 'material-icons',
 }))`
   position: absolute;
   top: 50%;
-  left: 0%;
+  left: 0;
   transform: translate(0%, -50%);
   text-align: center;
   margin: 0;
@@ -70,3 +59,15 @@ export const SpectatorBackIcon = styled.i.attrs(() => ({
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.24);
   }
 `;
+
+export const PrevIcon = () => (
+  <i className="material-icons">
+    navigate_before
+  </i>
+);
+
+export const NextIcon = () => (
+  <i className="material-icons">
+    navigate_next
+  </i>
+);

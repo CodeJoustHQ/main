@@ -13,6 +13,7 @@ import { dedupProblems, problemMatchesFilterText } from '../../util/Utility';
 type ProblemSelectorProps = {
   selectedProblems: SelectableProblem[],
   onSelect: (newlySelected: SelectableProblem) => void,
+  loading: boolean,
 };
 
 type TagSelectorProps = {
@@ -100,7 +101,7 @@ const ElementName = styled.p`
 `;
 
 export function ProblemSelector(props: ProblemSelectorProps) {
-  const { selectedProblems, onSelect } = props;
+  const { selectedProblems, onSelect, loading } = props;
 
   const [error, setError] = useState('');
   const [verifiedProblems, setVerifiedProblems] = useState<SelectableProblem[]>([]);
@@ -153,9 +154,9 @@ export function ProblemSelector(props: ProblemSelectorProps) {
   return (
     <Content>
       <TextSearch
-        onClick={() => setShowProblems(!showProblems)}
+        onClick={() => !loading && setShowProblems(!showProblems)}
         onChange={setSearchStatus}
-        placeholder={allProblems.length ? 'Filter by name, difficulty, or tag (separate queries by comma)' : 'Loading...'}
+        placeholder={allProblems.length && !loading ? 'Filter by name, difficulty, or tag (separate queries by comma)' : 'Loading...'}
       />
 
       <InnerContent show={showProblems} ref={ref}>

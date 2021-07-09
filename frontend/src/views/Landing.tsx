@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import copy from 'copy-to-clipboard';
 import { PrimaryButtonLink, TextLink } from '../components/core/Link';
 import { Image, ShadowImage } from '../components/core/Image';
 import {
@@ -9,8 +8,7 @@ import {
 import {
   ColumnContainer, RowContainer, Separator, TextLeftColumnContainer,
 } from '../components/core/Container';
-import { CopyIndicator, CopyIndicatorContainer, InlineCopyIcon } from '../components/special/CopyIndicator';
-import { InheritedTextButton } from '../components/core/Button';
+import { Copyable } from '../components/special/CopyIndicator';
 import { FloatingCircles } from '../components/layout/CircleBackground';
 
 const Content = styled.div`
@@ -70,16 +68,8 @@ const CallToActionColumn = styled(ColumnContainer)`
 `;
 
 function LandingPage() {
-  const [copiedEmail, setCopiedEmail] = useState(false);
-
   return (
     <Content>
-      <CopyIndicatorContainer copied={copiedEmail}>
-        <CopyIndicator onClick={() => setCopiedEmail(false)}>
-          Email copied!&nbsp;&nbsp;✕
-        </CopyIndicator>
-      </CopyIndicatorContainer>
-
       <RowContainer>
         <ColumnContainer width="40%">
           <HeroTextContainer>
@@ -193,15 +183,7 @@ function LandingPage() {
           <SecondaryHeaderText>
             Create an account now or email us at
             {' '}
-            <InheritedTextButton
-              onClick={() => {
-                copy('hello@codejoust.co');
-                setCopiedEmail(true);
-              }}
-            >
-              hello@codejoust.co
-              <InlineCopyIcon>content_copy</InlineCopyIcon>
-            </InheritedTextButton>
+            <Copyable text="hello@codejoust.co" top />
             {' '}
             for one-on-one support within 24 hours.
           </SecondaryHeaderText>
