@@ -38,6 +38,8 @@ import com.codejoust.main.model.problem.ProblemTag;
 import com.codejoust.main.model.problem.ProblemTestCase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -857,11 +859,32 @@ public class ProblemServiceTests {
 
     @Test
     public void cloneProblemSuccess() {
-        // todo - cloning user should be different
+        Problem problem = TestFields.problem1();
+        problem.setVerified(true);
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
+        Mockito.doReturn(TestFields.UID_2).when(firebaseService).verifyToken(TestFields.TOKEN_2);
+        Mockito.doReturn(TestFields.account2()).when(accountRepository).findAccountByUid(TestFields.UID_2);
+
+        ProblemDto clone = problemService.cloneProblem(problem.getProblemId(), TestFields.TOKEN_2);
+
+        assertEquals(problem.getOutputType(), clone.getOutputType());
+        assertFalse(clone.getVerified());
+        assertNotEquals(problem.getProblemId(), clone.getProblemId());
+        assertNotEquals(problem.getOwner().getUid(), clone.getOwner().getUid());
     }
 
     @Test
     public void cloneProblemUnauthorized() {
-        // todo
+        Problem problem = TestFields.problem1();
+        ApiError ERROR = AccountError.INVALID_CREDENTIALS;
+
+        Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
+        Mockito.doThrow(new ApiException(ERROR)).when(firebaseService).verifyTokenMatchesUid("bad-token", problem.getOwner().getUid());
+
+        ApiException exception = assertThrows(ApiException.class, () ->
+                problemService.cloneProblem(problem.getProblemId(), "bad-token"));
+
+        assertEquals(AccountError.INVALID_CREDENTIALS, exception.getError());
     }
 }
