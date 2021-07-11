@@ -854,4 +854,14 @@ public class ProblemServiceTests {
 
         assertEquals(AccountError.INVALID_CREDENTIALS, exception.getError());
     }
+
+    @Test
+    public void cloneProblemSuccess() {
+        // todo - cloning user should be different
+    }
+
+    @Test
+    public void cloneProblemUnauthorized() {
+        // todo
+    }
 }

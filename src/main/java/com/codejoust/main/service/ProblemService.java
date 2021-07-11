@@ -105,6 +105,14 @@ public class ProblemService {
         return ProblemMapper.toDto(problem);
     }
 
+    public ProblemDto cloneProblem(String problemId, String token) {
+        Problem problem = problemRepository.findProblemByProblemId(problemId);
+
+        // todo:
+
+        return ProblemMapper.toDto(problem);
+    }
+
     public ProblemDto getProblem(String problemId, String token) {
         Problem problem = problemRepository.findProblemByProblemId(problemId);
 

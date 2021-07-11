@@ -41,6 +41,11 @@ public class ProblemController extends BaseRestController {
 
     }
 
+    @PostMapping("/problems/{problemId}/clone")
+    public ResponseEntity<ProblemDto> createProblemFromExisting(@PathVariable String problemId, @RequestHeader(name="Authorization") String token) {
+        return new ResponseEntity<>(service.cloneProblem(problemId, token), HttpStatus.CREATED);
+    }
+
     @GetMapping("/problems/{problemId}")
     public ResponseEntity<ProblemDto> getProblem(@PathVariable String problemId, @RequestHeader (name="Authorization", required = false) String token) {
         return new ResponseEntity<>(service.getProblem(problemId, token), HttpStatus.OK);
