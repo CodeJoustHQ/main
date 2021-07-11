@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -108,9 +109,41 @@ public class ProblemService {
     public ProblemDto cloneProblem(String problemId, String token) {
         Problem problem = problemRepository.findProblemByProblemId(problemId);
 
-        // todo:
+        if (problem == null || problem.getOwner() == null) {
+            throw new ApiException(ProblemError.NOT_FOUND);
+        }
 
-        return ProblemMapper.toDto(problem);
+        if (!problem.getVerified()) {
+            service.verifyTokenMatchesUid(token, problem.getOwner().getUid());
+        }
+
+        String uid = service.verifyToken(token);
+        Account account = accountRepository.findAccountByUid(uid);
+
+        Problem copy = gson.fromJson(gson.toJson(problem), Problem.class);
+        copy.setId(null); // Set null to indicate new problem
+        copy.setVerified(false);
+        copy.setOwner(account);
+        copy.setProblemId(UUID.randomUUID().toString()); // Re-generate unique UUID
+
+        // Update test case and problem input IDs and problem reference correctly
+        for (ProblemTestCase testCase : copy.getTestCases()) {
+            testCase.setId(null);
+            testCase.setProblem(copy);
+        }
+        for (ProblemInput problemInput : copy.getProblemInputs()) {
+            problemInput.setId(null);
+            problemInput.setProblem(copy);
+        }
+
+        // Remove tags, since tags are owner-specific
+        for (ProblemTag tag : copy.getProblemTags()) {
+            copy.removeProblemTag(tag);
+        }
+        
+        problemRepository.save(copy);
+
+        return ProblemMapper.toDto(copy);
     }
 
     public ProblemDto getProblem(String problemId, String token) {

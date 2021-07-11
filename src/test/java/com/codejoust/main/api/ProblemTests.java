@@ -481,4 +481,10 @@ class ProblemTests {
         List<ProblemDto> tags = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblemTags(), listType, HttpStatus.OK);
         assertEquals(0, tags.size());
     }
+
+
+    @Test
+    public void cloneProblemSuccess() {
+        // two problems exist, changing one doesn't affect the other?
+    }
 }
