@@ -3,6 +3,7 @@ package com.codejoust.main.api;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -484,7 +485,53 @@ class ProblemTests {
 
 
     @Test
-    public void cloneProblemSuccess() {
-        // two problems exist, changing one doesn't affect the other?
+    public void cloneProblemSuccess() throws Exception {
+        /**
+         * 1. Create a default problem with tags
+         * 2. Clone the problem
+         * 3. Verify the cloned problem has the correct features
+         * 4. Verify 2 problems now exist
+         */
+
+        ProblemDto problemDto = ProblemTestMethods.createSingleProblemAndTags(this.mockMvc);
+
+        ProblemDto response = MockHelper.postRequest(this.mockMvc, TestUrls.cloneProblem(problemDto.getProblemId()), null, ProblemDto.class, HttpStatus.OK);
+        assertFalse(response.getVerified());
+        assertTrue(response.getProblemTags().isEmpty());
+
+        Type listType = new TypeToken<ArrayList<ProblemDto>>(){}.getType();
+        List<ProblemDto> problems = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblems(), listType, HttpStatus.OK);
+
+        assertEquals(2, problems.size());
+        assertEquals(problems.get(0).getDescription(), problems.get(1).getDescription());
+        assertEquals(problems.get(0).getProblemInputs(), problems.get(1).getProblemInputs());
+        assertNotEquals(problems.get(0).getProblemId(), problems.get(1).getProblemId());
+    }
+
+    @Test
+    public void cloneProblemModificationSuccess() throws Exception {
+        /**
+         * 1. Create a default problem with tags
+         * 2. Clone the problem
+         * 3. Modify the cloned problem and original problem
+         * 4. Verify that the changes in each do not affect each other
+         */
+
+        ProblemDto problemDto = ProblemTestMethods.createSingleProblemAndTestCases(this.mockMvc);
+        ProblemDto response = MockHelper.postRequest(this.mockMvc, TestUrls.cloneProblem(problemDto.getProblemId()), null, ProblemDto.class, HttpStatus.OK);
+
+        problemDto.setTestCases(Collections.emptyList());
+        response.getProblemInputs().get(0).setName("testNewName");
+
+        MockHelper.putRequest(this.mockMvc, TestUrls.editProblem(problemDto.getProblemId()), problemDto, ProblemDto.class, HttpStatus.OK);
+        MockHelper.putRequest(this.mockMvc, TestUrls.editProblem(problemDto.getProblemId()), response, ProblemDto.class, HttpStatus.OK);
+
+        Type listType = new TypeToken<ArrayList<ProblemDto>>(){}.getType();
+        List<ProblemDto> problems = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblems(), listType, HttpStatus.OK);
+
+        assertEquals(2, problems.size());
+        assertEquals(problems.get(0).getName(), problems.get(1).getName());
+        assertNotEquals(problems.get(0).getTestCases(), problems.get(1).getTestCases());
+        assertNotEquals(problems.get(0).getProblemInputs(), problems.get(1).getProblemInputs());
     }
 }

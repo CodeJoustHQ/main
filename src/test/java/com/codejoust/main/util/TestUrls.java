@@ -23,6 +23,7 @@ public class TestUrls {
     private static final String GET_PROBLEM_RANDOM = "/api/v1/problems/random";
     private static final String GET_PROBLEM_ALL = "/api/v1/problems";
     private static final String POST_PROBLEM_CREATE = "/api/v1/problems";
+    private static final String POST_PROBLEM_CLONE = "/api/v1/problems/%s/clone";
     private static final String POST_TEST_CASE_CREATE = "/api/v1/problems/%s/test-case";
     private static final String PUT_PROBLEM_EDIT = "/api/v1/problems/%s";
     private static final String DELETE_PROBLEM = "/api/v1/problems/%s";
@@ -107,6 +108,10 @@ public class TestUrls {
 
     public static String createProblem() {
         return POST_PROBLEM_CREATE;
+    }
+
+    public static String cloneProblem(String problemId) {
+        return String.format(POST_PROBLEM_CLONE, problemId);
     }
 
     public static String createTestcase(String problemId) {

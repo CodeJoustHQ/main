@@ -140,7 +140,7 @@ public class ProblemService {
         for (ProblemTag tag : copy.getProblemTags()) {
             copy.removeProblemTag(tag);
         }
-        
+
         problemRepository.save(copy);
 
         return ProblemMapper.toDto(copy);
