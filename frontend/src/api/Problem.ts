@@ -103,6 +103,7 @@ const routes = {
   getRandomProblem: `${basePath}/random`,
   getSingleProblem: (problemId: string) => `${basePath}/${problemId}`,
   editProblem: (problemId: string) => `${basePath}/${problemId}`,
+  cloneProblem: (problemId: string) => `${basePath}/${problemId}/clone`,
   deleteProblem: (problemId: string) => `${basePath}/${problemId}`,
   createTestCase: (problemId: string) => `${basePath}/${problemId}/test-case`,
   defaultCodeMap: (problemId: string) => `${basePath}/${problemId}/default-code`,
@@ -136,6 +137,13 @@ export const createProblem = (problem: Problem, token: string): Promise<Problem>
 export const editProblem = (problemId: string,
   updatedProblem: Problem, token: string): Promise<Problem> => axios
   .put<Problem>(routes.editProblem(problemId), updatedProblem, getAuthHttpHeader(token))
+  .then((res) => res.data)
+  .catch((err) => {
+    throw axiosErrorHandler(err);
+  });
+
+export const cloneProblem = (problemId: string, token: string): Promise<Problem> => axios
+  .put<Problem>(routes.cloneProblem(problemId), null, getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

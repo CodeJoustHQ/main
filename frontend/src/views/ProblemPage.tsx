@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import {
+  cloneProblem,
   editProblem,
   getSingleProblem,
   Problem,
@@ -13,6 +14,7 @@ import ProblemDisplay from '../components/problem/editor/ProblemDisplay';
 import { generateRandomId } from '../util/Utility';
 import { useAppSelector, useProblemEditable } from '../util/Hook';
 import { PrimaryButtonLink } from '../components/core/Link';
+import { GrayTextButton } from '../components/core/Button';
 
 const Content = styled.div`
   display: flex;
@@ -23,6 +25,7 @@ type ProblemParams = {
 };
 
 function ProblemPage() {
+  const history = useHistory();
   const { firebaseUser, token } = useAppSelector((state) => state.account);
 
   const [problem, setProblem] = useState<Problem | null>(null);
@@ -87,9 +90,28 @@ function ProblemPage() {
       });
   };
 
+  const handleClone = () => {
+    if (!token) {
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    cloneProblem(problem.problemId, token!)
+      .then((res) => {
+        history.push(`/problem/${res.problemId}`);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  };
+
   return (
     <>
       <LargeText>{problemEditable ? 'Edit Problem' : 'Preview Problem'}</LargeText>
+      <GrayTextButton onClick={handleClone}>Make a copy of this problem &#8594;</GrayTextButton>
+
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
       <Content>
