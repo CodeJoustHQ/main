@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import {
   LowMarginText,
@@ -7,7 +7,7 @@ import {
   SecondaryHeaderText,
 } from '../../components/core/Text';
 import { GreenSmallButtonLink, TextLink, InheritedTextLink } from '../../components/core/Link';
-import { useAppSelector } from '../../util/Hook';
+import { useAppDispatch, useAppSelector } from '../../util/Hook';
 import {
   CenteredContainer,
   FlexHorizontalContainer,
@@ -15,6 +15,7 @@ import {
   RelativeContainer,
 } from '../../components/core/Container';
 import FilteredProblemList from '../../components/problem/FilteredProblemList';
+import { fetchAccount } from '../../redux/Account';
 
 type MyProblemsProps = {
   loading: boolean,
@@ -43,7 +44,12 @@ const CreateButtonLink = styled(GreenSmallButtonLink)`
 function MyProblems(props: MyProblemsProps) {
   const { loading } = props;
 
+  const dispatch = useAppDispatch();
   const { account } = useAppSelector((state) => state.account);
+
+  useEffect(() => {
+    dispatch(fetchAccount());
+  }, []);
 
   return (
     <Content>

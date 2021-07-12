@@ -143,7 +143,7 @@ export const editProblem = (problemId: string,
   });
 
 export const cloneProblem = (problemId: string, token: string): Promise<Problem> => axios
-  .put<Problem>(routes.cloneProblem(problemId), null, getAuthHttpHeader(token))
+  .post<Problem>(routes.cloneProblem(problemId), null, getAuthHttpHeader(token))
   .then((res) => res.data)
   .catch((err) => {
     throw axiosErrorHandler(err);

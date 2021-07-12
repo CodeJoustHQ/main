@@ -20,6 +20,10 @@ const Content = styled.div`
   display: flex;
 `;
 
+const LowMarginLargeText = styled(LargeText)`
+  margin: 12px auto;
+`;
+
 type ProblemParams = {
   id: string,
 };
@@ -41,7 +45,7 @@ function ProblemPage() {
     }
 
     // Checks added to ensure problem fetched only once.
-    if (!problem && !loading) {
+    if (!problem && !loading && !error) {
       setLoading(true);
       getSingleProblem(params.id, token!)
         .then((res) => {
@@ -109,7 +113,7 @@ function ProblemPage() {
 
   return (
     <>
-      <LargeText>{problemEditable ? 'Edit Problem' : 'Preview Problem'}</LargeText>
+      <LowMarginLargeText>{problemEditable ? 'Edit Problem' : 'Preview Problem'}</LowMarginLargeText>
       <GrayTextButton onClick={handleClone}>Make a copy of this problem &#8594;</GrayTextButton>
 
       { error ? <ErrorMessage message={error} /> : null }

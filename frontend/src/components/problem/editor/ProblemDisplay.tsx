@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import MarkdownEditor from 'rich-markdown-editor';
@@ -97,6 +97,11 @@ function ProblemDisplay(props: ProblemDisplayParams) {
   const [error, setError] = useState('');
   const [helpModal, setHelpModal] = useState<boolean>(false);
 
+  // When the default problem changes, update new problem to match it
+  useEffect(() => {
+    setNewProblem(problem);
+  }, [problem]);
+
   // Variable used to force refresh the editor.
   const [refreshEditor, setRefreshEditor] = useState<number>(0);
 
@@ -130,6 +135,8 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           <TopButtonsContainer>
             <InvertedSmallButton
               onClick={() => {
+                console.log(JSON.stringify(problem));
+                console.log(JSON.stringify(newProblem));
                 if (JSON.stringify(problem) === JSON.stringify(newProblem)
                   // eslint-disable-next-line no-alert
                   || window.confirm('Go back? Your unsaved changes will be lost.')) {
