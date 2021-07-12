@@ -79,6 +79,35 @@ public class Problem {
     @Enumerated(EnumType.STRING)
     private ProblemIOType outputType;
 
+    public Problem() {}
+
+    public Problem(Problem original, Account account) {
+        this.name = original.name;
+        this.description = original.description;
+        this.verified = false;
+        this.owner = account;
+        this.difficulty = original.difficulty;
+        this.outputType = original.outputType;
+
+        for (ProblemTestCase testCase : original.testCases) {
+            ProblemTestCase clonedTestCase = new ProblemTestCase();
+            clonedTestCase.setInput(testCase.getInput());
+            clonedTestCase.setOutput(testCase.getOutput());
+            clonedTestCase.setHidden(testCase.getHidden());
+            clonedTestCase.setExplanation(testCase.getExplanation());
+
+            this.addTestCase(clonedTestCase);
+        }
+
+        for (ProblemInput input : original.problemInputs) {
+            ProblemInput clonedInput = new ProblemInput();
+            clonedInput.setName(input.getName());
+            clonedInput.setType(input.getType());
+
+            this.addProblemInput(clonedInput);
+        }
+    }
+
     public void addTestCase(ProblemTestCase testCase) {
         testCases.add(testCase);
         testCase.setProblem(this);

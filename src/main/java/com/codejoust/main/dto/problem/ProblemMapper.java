@@ -1,11 +1,14 @@
 package com.codejoust.main.dto.problem;
 
+import com.codejoust.main.model.Account;
 import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.model.problem.ProblemInput;
 import com.codejoust.main.model.problem.ProblemTag;
 import com.codejoust.main.model.problem.ProblemTestCase;
 
 import org.modelmapper.ModelMapper;
+
+import java.util.UUID;
 
 public class ProblemMapper {
 
@@ -51,5 +54,36 @@ public class ProblemMapper {
         }
         
         return mapper.map(entity, ProblemTagDto.class);
+    }
+
+    public static Problem clone(Problem entity, Account account) {
+        if (entity == null) {
+            return null;
+        }
+
+        Problem clone = mapper.map(entity, Problem.class);
+
+        // Set null to indicate new problem
+        clone.setId(null);
+        clone.setVerified(false);
+        clone.setOwner(account);
+        clone.setProblemId(UUID.randomUUID().toString()); // Re-generate unique UUID
+
+        // Update test case and problem input IDs and problem reference correctly
+        for (ProblemTestCase testCase : clone.getTestCases()) {
+            testCase.setId(null);
+            testCase.setProblem(clone);
+        }
+        for (ProblemInput problemInput : clone.getProblemInputs()) {
+            problemInput.setId(null);
+            problemInput.setProblem(clone);
+        }
+
+        // Remove tags, since tags are owner-specific
+        while (!clone.getProblemTags().isEmpty()) {
+            clone.removeProblemTag(clone.getProblemTags().get(0));
+        }
+
+        return clone;
     }
 }

@@ -31,6 +31,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -52,6 +54,9 @@ public class ProblemService {
     private final List<DefaultCodeGeneratorService> defaultCodeGeneratorServiceList;
     private final Random random = new Random();
     private final Gson gson = new Gson();
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     public ProblemService(FirebaseService service,
@@ -120,27 +125,7 @@ public class ProblemService {
         String uid = service.verifyToken(token);
         Account account = accountRepository.findAccountByUid(uid);
 
-        Problem copy = gson.fromJson(gson.toJson(problem), Problem.class);
-        copy.setId(null); // Set null to indicate new problem
-        copy.setVerified(false);
-        copy.setOwner(account);
-        copy.setProblemId(UUID.randomUUID().toString()); // Re-generate unique UUID
-
-        // Update test case and problem input IDs and problem reference correctly
-        for (ProblemTestCase testCase : copy.getTestCases()) {
-            testCase.setId(null);
-            testCase.setProblem(copy);
-        }
-        for (ProblemInput problemInput : copy.getProblemInputs()) {
-            problemInput.setId(null);
-            problemInput.setProblem(copy);
-        }
-
-        // Remove tags, since tags are owner-specific
-        for (ProblemTag tag : copy.getProblemTags()) {
-            copy.removeProblemTag(tag);
-        }
-
+        Problem copy = new Problem(problem, account);
         problemRepository.save(copy);
 
         return ProblemMapper.toDto(copy);

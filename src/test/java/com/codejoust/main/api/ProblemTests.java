@@ -495,7 +495,7 @@ class ProblemTests {
 
         ProblemDto problemDto = ProblemTestMethods.createSingleProblemAndTags(this.mockMvc);
 
-        ProblemDto response = MockHelper.postRequest(this.mockMvc, TestUrls.cloneProblem(problemDto.getProblemId()), null, ProblemDto.class, HttpStatus.OK);
+        ProblemDto response = MockHelper.postRequest(this.mockMvc, TestUrls.cloneProblem(problemDto.getProblemId()), null, ProblemDto.class, HttpStatus.CREATED);
         assertFalse(response.getVerified());
         assertTrue(response.getProblemTags().isEmpty());
 
@@ -518,13 +518,13 @@ class ProblemTests {
          */
 
         ProblemDto problemDto = ProblemTestMethods.createSingleProblemAndTestCases(this.mockMvc);
-        ProblemDto response = MockHelper.postRequest(this.mockMvc, TestUrls.cloneProblem(problemDto.getProblemId()), null, ProblemDto.class, HttpStatus.OK);
+        ProblemDto response = MockHelper.postRequest(this.mockMvc, TestUrls.cloneProblem(problemDto.getProblemId()), null, ProblemDto.class, HttpStatus.CREATED);
 
         problemDto.setTestCases(Collections.emptyList());
         response.getProblemInputs().get(0).setName("testNewName");
 
         MockHelper.putRequest(this.mockMvc, TestUrls.editProblem(problemDto.getProblemId()), problemDto, ProblemDto.class, HttpStatus.OK);
-        MockHelper.putRequest(this.mockMvc, TestUrls.editProblem(problemDto.getProblemId()), response, ProblemDto.class, HttpStatus.OK);
+        MockHelper.putRequest(this.mockMvc, TestUrls.editProblem(response.getProblemId()), response, ProblemDto.class, HttpStatus.OK);
 
         Type listType = new TypeToken<ArrayList<ProblemDto>>(){}.getType();
         List<ProblemDto> problems = MockHelper.getRequest(this.mockMvc, TestUrls.getAllProblems(), listType, HttpStatus.OK);
