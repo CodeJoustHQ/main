@@ -116,6 +116,7 @@ public class TestFields {
         problem.setOutputType(TestFields.IO_TYPE_2);
 
         ProblemTestCase originalTestCase = new ProblemTestCase();
+        originalTestCase.setId(ID);
         originalTestCase.setInput(TestFields.INPUT_3);
         originalTestCase.setOutput(TestFields.OUTPUT_3);
         problem.addTestCase(originalTestCase);

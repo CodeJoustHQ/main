@@ -1,12 +1,15 @@
 package com.codejoust.main.entity;
 
+import com.codejoust.main.model.Account;
 import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.codejoust.main.model.problem.Problem;
@@ -78,5 +81,32 @@ public class ProblemEntityTests {
         assertEquals(1, problem.getProblemInputs().size());
         assertEquals(problemInput, problem.getProblemInputs().get(0));
         assertEquals(problem, problemInput.getProblem());
+    }
+
+    @Test
+    public void cloneProblemFromOriginal() {
+        Problem original = TestFields.problem1();
+        Account account = TestFields.account2();
+
+        Problem clone = new Problem(original, account);
+
+        // Basic fields match or don't match
+        assertNotEquals(original.getProblemId(), clone.getProblemId());
+        assertEquals(original.getName(), clone.getName());
+        assertEquals(original.getDescription(), clone.getDescription());
+        assertEquals(original.getDifficulty(), clone.getDifficulty());
+        assertEquals(original.getOutputType(), clone.getOutputType());
+
+        // Specially set fields are as expected
+        assertNull(clone.getId());
+        assertEquals(account, clone.getOwner());
+        assertFalse(clone.getVerified());
+        assertTrue(clone.getProblemTags().isEmpty());
+
+        // List fields are cloned but don't identical
+        assertEquals(original.getTestCases().size(), clone.getTestCases().size());
+        assertNotEquals(original.getTestCases(), clone.getTestCases());
+        assertEquals(original.getProblemInputs().size(), clone.getProblemInputs().size());
+        assertNotEquals(original.getProblemInputs(), clone.getProblemInputs());
     }
 }
