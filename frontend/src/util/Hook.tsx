@@ -75,8 +75,20 @@ export const useClickOutside = (ref: RefObject<HTMLDivElement>, closeFunction: (
       }
     };
 
+    const handleClickEsc = (event: KeyboardEvent) => {
+      // Check if escape key is clicked
+      if (event.key === 'Escape' || event.key === 'Esc') {
+        closeFunction();
+      }
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleClickEsc);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleClickEsc);
+    };
   }, [ref, closeFunction]);
 };
 
