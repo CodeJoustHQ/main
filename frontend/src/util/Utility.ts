@@ -118,6 +118,7 @@ export const problemMatchesFilterText = (problem: Problem | SelectableProblem,
   return true;
 };
 
+// Displays the percentage correct of a specific submission
 export const getScore = (bestSubmission: Submission | null) => {
   if (!bestSubmission) {
     return '0';
@@ -127,28 +128,59 @@ export const getScore = (bestSubmission: Submission | null) => {
   return `${percent}%`;
 };
 
+// Find and return the best submission. A non-hook variant of useBestSubmission
+export const getBestSubmission = (player?: Player | null, problemIndex?: number) => {
+  let newBestSubmission = null as Submission | null;
+
+  if (player) {
+    // If problemIndex is specified, find best submission only for that problem
+    const submissions = (problemIndex !== undefined && problemIndex !== -1)
+      ? player.submissions.filter((s) => s.problemIndex === problemIndex) : player.submissions;
+
+    submissions.forEach((submission) => {
+      if (!newBestSubmission || submission.numCorrect > newBestSubmission.numCorrect) {
+        newBestSubmission = submission;
+      }
+    });
+  }
+
+  return newBestSubmission;
+};
+
+export const getTimeBetween = (start: string, end: string) => {
+  // Calculate time from start of game till best submission
+  const startTime = new Date(start).getTime();
+  const diffMilliseconds = new Date(end).getTime() - startTime;
+  return Math.floor(diffMilliseconds / (60 * 1000));
+};
+
+// Displays the time taken for a specific submission
 export const getSubmissionTime = (bestSubmission: Submission | null,
   gameStartTime: string | null) => {
   if (!bestSubmission || !gameStartTime) {
     return 'N/A';
   }
 
-  // Calculate time from start of game till best submission
-  const startTime = new Date(gameStartTime).getTime();
-  const diffMilliseconds = new Date(bestSubmission.startTime).getTime() - startTime;
-  const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
-
-  return ` ${diffMinutes} min`;
+  return ` ${getTimeBetween(gameStartTime, bestSubmission.startTime)} min`;
 };
 
-export const getSubmissionCount = (player: Player | null) => player?.submissions.length || '0';
+// Gets the number of submissions for a specific player and problem
+export const getSubmissionCount = (player: Player | null, problemIndex?: number): number => {
+  const submissions = (problemIndex !== undefined && problemIndex !== -1)
+    ? player?.submissions.filter((s) => s.problemIndex === problemIndex) : player?.submissions;
 
+  return submissions?.length || 0;
+};
+
+// Returns the most recent submission made for problem of index curr (or null if none)
 export const getSubmission = (curr: number, playerSubmissions: Submission[]) => {
   for (let i = playerSubmissions.length - 1; i >= 0; i -= 1) {
     if (playerSubmissions[i].problemIndex === curr) {
       return playerSubmissions[i];
     }
   }
+
+  return null;
 };
 
 /**

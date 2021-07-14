@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import MarkdownEditor from 'rich-markdown-editor';
 import { BottomFooterText, ProblemHeaderText, SmallText } from '../core/Text';
-import { DefaultButton, getDifficultyDisplayButton } from '../core/Button';
+import { getDifficultyDisplayButton, ProblemNavButton } from '../core/Button';
 import { Copyable } from '../special/CopyIndicator';
 import { CenteredContainer, Panel } from '../core/Container';
 import { Problem } from '../../api/Problem';
@@ -50,32 +50,7 @@ const ProblemNavContainer = styled.div`
 `;
 
 const ProblemCountText = styled(SmallText)`
-  color: gray;
-`;
-
-type ProblemNavButtonProps = {
-  disabled: boolean,
-};
-
-const ProblemNavButton = styled(DefaultButton)<ProblemNavButtonProps>`
-  font-size: ${({ theme }) => theme.fontSize.default};
-  color: ${({ theme, disabled }) => (disabled ? theme.colors.lightgray : theme.colors.gray)};
-  background-color: ${({ theme }) => theme.colors.white};
-  border-radius: 5px;
-  width: 35px;
-  height: 35px;
-  margin: 5px;
-  
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.16);
-  
-  &:hover {
-    box-shadow: ${({ disabled }) => (disabled ? '0 1px 6px rgba(0, 0, 0, 0.16)' : '0 1px 6px rgba(0, 0, 0, 0.20)')};
-    cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')}; 
-  }
-  
-  i {
-    line-height: 35px;
-  }
+  color: ${({ theme }) => theme.colors.gray};
 `;
 
 type ProblemPanelProps = {

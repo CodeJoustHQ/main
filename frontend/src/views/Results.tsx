@@ -98,7 +98,12 @@ function GameResultsPage() {
   const [hoverVisible, setHoverVisible] = useState<boolean>(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState<boolean>(false);
   const [showFeedbackPrompt, setShowFeedbackPrompt] = useState<boolean>(false);
+
+  // If not -1, codeModal represents the index of the player whose code should show in the modal
   const [codeModal, setCodeModal] = useState(-1);
+  const [problemIndex, setProblemIndex] = useState(0);
+
+  // If not -1, placeModal is set to the index of the player whose place should show in the modal
   const [placeModal, setPlaceModal] = useState(-1);
   const [displayPlaceModal, setDisplayPlaceModal] = useState(true);
 
@@ -211,6 +216,11 @@ function GameResultsPage() {
     return 'th';
   };
 
+  const onViewPlayerCode = (playerUserId: string, probIndex: number) => {
+    setProblemIndex(probIndex);
+    setCodeModal(players.findIndex((p) => p.user.userId === playerUserId));
+  };
+
   // Reset hover status on host changes
   useEffect(() => {
     setHoverVisible(false);
@@ -248,6 +258,7 @@ function GameResultsPage() {
       <Modal show={codeModal !== -1} onExit={() => setCodeModal(-1)} fullScreen>
         <PreviewCodeContent
           player={players[codeModal]}
+          problemIndex={problemIndex}
         />
       </Modal>
 
@@ -281,7 +292,6 @@ function GameResultsPage() {
           inviteContent={inviteContent()}
           loading={loading}
           isCurrentPlayer={players[1]?.user.userId === currentUser?.userId}
-          numProblems={game?.problems.length || 1}
         />
         <Podium
           place={1}
@@ -290,7 +300,6 @@ function GameResultsPage() {
           inviteContent={inviteContent()}
           loading={loading}
           isCurrentPlayer={players[0]?.user.userId === currentUser?.userId}
-          numProblems={game?.problems.length || 1}
         />
         <Podium
           place={3}
@@ -299,7 +308,6 @@ function GameResultsPage() {
           inviteContent={inviteContent()}
           loading={loading}
           isCurrentPlayer={players[2]?.user.userId === currentUser?.userId}
-          numProblems={game?.problems.length || 1}
         />
       </PodiumContainer>
 
@@ -342,8 +350,8 @@ function GameResultsPage() {
           players={players}
           currentUser={currentUser}
           gameStartTime={startTime}
-          numProblems={game?.problems.length || 1}
-          viewPlayerCode={(index: number) => setCodeModal(index)}
+          problems={game?.problems || []}
+          viewPlayerCode={onViewPlayerCode}
           spectatePlayer={null}
         />
       ) : null}
