@@ -109,10 +109,16 @@ public class WebSocketConnectionEvents {
             user.setSessionId(null);
             userRepository.save(user);
 
-            // Get room, conditionally update the host, and send socket update.
             Room room = user.getRoom();
-            RoomDto roomDto = roomService.conditionallyUpdateRoomHost(room, user, false);
-            socketService.sendSocketUpdate(roomDto);
+
+            // If user is anonymous, switch hosts if possible
+            if (user.getAccount() == null) {
+                RoomDto roomDto = roomService.conditionallyUpdateRoomHost(room, user, false);
+                socketService.sendSocketUpdate(roomDto);
+            } else {
+                // Otherwise, keep the host with the current user
+                socketService.sendSocketUpdate(RoomMapper.toDto(room));
+            }
 
             // If a game exists, update the room info for that game
             gameService.conditionallyUpdateSocketInfo(room, user);
