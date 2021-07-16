@@ -55,7 +55,12 @@ function ProblemPage() {
           });
           setProblem(res);
         })
-        .catch((err) => setError(err.message))
+        .catch((err) => {
+          // todo: check error for type
+          // if it's of a certain type, like bad test case, then save that info in a state var
+          // use that state var to highlight a field as errored
+          setError(err.message);
+        })
         .finally(() => setLoading(false));
     }
   }, [params, token, problem, loading]);
