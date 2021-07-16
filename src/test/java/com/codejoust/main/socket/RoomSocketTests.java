@@ -62,6 +62,7 @@ public class RoomSocketTests {
     private RoomDto room;
     private StompSession hostSession;
 
+
     @BeforeEach
     public void setup() throws Exception {
         // Include the test authorization token in each request
@@ -262,6 +263,13 @@ public class RoomSocketTests {
 
     @Test
     public void socketChangesHostOnDisconnection() throws Exception {
+        // Remove the default authorization token from the test request
+        template.getRestTemplate().setInterceptors(Collections.emptyList());
+
+        // Update host user to no longer be attached to an account
+        String updateUserEndpoint = String.format("http://localhost:%s/api/v1/user/%s/account", port, room.getHost().getUserId());
+        template.exchange(updateUserEndpoint, HttpMethod.PUT, null, Object.class);
+
         // Have someone join the room
         UserDto user = TestFields.userDto2();
         JoinRoomRequest joinRequest = new JoinRoomRequest();
@@ -269,7 +277,7 @@ public class RoomSocketTests {
 
         HttpEntity<JoinRoomRequest> joinEntity = new HttpEntity<>(joinRequest);
         String joinRoomEndpoint = String.format("%s/%s/users", baseRestEndpoint, room.getRoomId());
-        template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
+        RoomDto response = template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
 
         // Initially, the new user is not connected, so their sessionId should be null
         RoomDto actual = blockingQueue.poll(5, SECONDS);
@@ -315,6 +323,48 @@ public class RoomSocketTests {
         // Ensure that the second connected user is the new host
         user = actual.getUsers().get(1);
         assertEquals(actual.getHost(), user);
+    }
+
+    @Test
+    public void socketDoesNotChangeHostWhenLoggedIn() throws Exception {
+        // Store the original host's userId
+        String originalHostUserId = room.getHost().getUserId();
+
+        // Have someone join the room and connect to the socket
+        UserDto user = TestFields.userDto2();
+        JoinRoomRequest joinRequest = new JoinRoomRequest();
+        joinRequest.setUser(user);
+
+        HttpEntity<JoinRoomRequest> joinEntity = new HttpEntity<>(joinRequest);
+        String joinRoomEndpoint = String.format("%s/%s/users", baseRestEndpoint, room.getRoomId());
+        template.exchange(joinRoomEndpoint, HttpMethod.PUT, joinEntity, RoomDto.class).getBody();
+
+        RoomDto actual = blockingQueue.poll(5, SECONDS);
+        assertNotNull(actual);
+
+        StompSession session = SocketTestMethods.connectToSocket(CONNECT_ENDPOINT, user.getUserId(), this.port);
+        session.subscribe(String.format(SUBSCRIBE_ENDPOINT, actual.getRoomId()), new StompFrameHandler() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return RoomDto.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                blockingQueue.add((RoomDto) payload);
+            }
+        });
+
+        actual = blockingQueue.poll(5, SECONDS);
+        assertNotNull(actual);
+        assertNotNull(actual.getUsers().get(1).getSessionId());
+
+        // When the host disconnects, the host should NOT be changed
+        hostSession.disconnect();
+
+        actual = blockingQueue.poll(5, SECONDS);
+        assertNotNull(actual);
+        assertEquals(originalHostUserId, actual.getHost().getUserId());
     }
 
     @Test
