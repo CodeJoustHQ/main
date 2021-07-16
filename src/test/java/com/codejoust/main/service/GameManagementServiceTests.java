@@ -1,6 +1,7 @@
 package com.codejoust.main.service;
 
 import com.codejoust.main.dto.game.EndGameRequest;
+import com.codejoust.main.exception.NotificationError;
 import com.codejoust.main.util.TestFields;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -777,7 +778,7 @@ public class GameManagementServiceTests {
         notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
 
         ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification(TestFields.ROOM_ID, notificationDto));
-        assertEquals(GameError.NOTIFICATION_REQUIRES_INITIATOR, exception.getError());
+        assertEquals(NotificationError.NOTIFICATION_REQUIRES_INITIATOR, exception.getError());
     }
 
     @Test
@@ -807,7 +808,7 @@ public class GameManagementServiceTests {
         notificationDto.setNotificationType(NotificationType.TEST_CORRECT);
 
         ApiException exception = assertThrows(ApiException.class, () -> gameService.sendNotification(TestFields.ROOM_ID, notificationDto));
-        assertEquals(GameError.NOTIFICATION_REQUIRES_CONTENT, exception.getError());
+        assertEquals(NotificationError.NOTIFICATION_REQUIRES_CONTENT, exception.getError());
     }
 
     @Test

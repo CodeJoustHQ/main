@@ -16,8 +16,6 @@ public enum GameError implements ApiError {
     GAME_NOT_OVER(HttpStatus.FORBIDDEN, "You may not perform this action because the game is not over."),
     INVALID_PERMISSIONS(HttpStatus.FORBIDDEN, "You do not have permission to perform this action."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "A game could not be found with the given id."),
-    NOTIFICATION_REQUIRES_INITIATOR(HttpStatus.BAD_REQUEST, "The request action could not be completed because an initiator is required for this notification."),
-    NOTIFICATION_REQUIRES_CONTENT(HttpStatus.BAD_REQUEST, "The request action could not be completed because content is required for this notification."),
     TESTER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "An internal error occurred connecting to the tester service."),
     USER_NOT_IN_GAME(HttpStatus.BAD_REQUEST, "The requested action could not be completed because the user is not in the game.");
 

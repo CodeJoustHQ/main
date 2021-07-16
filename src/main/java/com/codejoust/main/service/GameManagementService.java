@@ -18,6 +18,7 @@ import com.codejoust.main.dto.room.RoomDto;
 import com.codejoust.main.dto.room.RoomMapper;
 import com.codejoust.main.dto.user.UserMapper;
 import com.codejoust.main.exception.GameError;
+import com.codejoust.main.exception.NotificationError;
 import com.codejoust.main.exception.ProblemError;
 import com.codejoust.main.exception.RoomError;
 import com.codejoust.main.exception.api.ApiException;
@@ -237,13 +238,13 @@ public class GameManagementService {
         // If initiator doesn't exist, the notification must not require one.
         if (notificationDto.getInitiator() == null
             && Utility.initiatorNotifications.contains(notificationDto.getNotificationType())) {
-            throw new ApiException(GameError.NOTIFICATION_REQUIRES_INITIATOR);
+            throw new ApiException(NotificationError.NOTIFICATION_REQUIRES_INITIATOR);
         }
         
         // If content doesn't exist, the notification must not require any.
         if (notificationDto.getContent() == null
             && Utility.contentNotifications.contains(notificationDto.getNotificationType())) {
-            throw new ApiException(GameError.NOTIFICATION_REQUIRES_CONTENT);       
+            throw new ApiException(NotificationError.NOTIFICATION_REQUIRES_CONTENT);
         }
 
         return notificationService.sendNotification(roomId, notificationDto);
