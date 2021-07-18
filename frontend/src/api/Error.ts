@@ -10,6 +10,7 @@ export type FrontendError
 export type GenericError
   = 'BAD_SETTING'
   | 'EMPTY_FIELD'
+  | 'INVALID_INPUT'
   | 'INVALID_PERMISSIONS'
   | 'NOT_FOUND';
 
@@ -28,19 +29,21 @@ export type NotificationError
   | 'NOTIFICATION_REQUIRES_CONTENT'
   | 'NOTIFICATION_REQUIRES_INITIATOR';
 
+// Includes ProblemErrors in both main and tester
 export type ProblemError
   = 'BAD_DIFFICULTY'
   | 'BAD_INPUT'
   | 'BAD_IOTYPE'
+  | 'BAD_PARAMETER_SETTINGS'
   | 'BAD_PROBLEM_TAG'
   | 'BAD_VERIFIED_STATUS'
   | 'DUPLICATE_TAG_NAME'
   | 'INCORRECT_INPUT_COUNT'
-  | 'INVALID_INPUT'
   | 'INVALID_NUMBER_REQUEST'
   | 'INVALID_VARIABLE_NAME'
   | 'INTERNAL_ERROR'
   | 'NOT_ENOUGH_FOUND'
+  | 'OBJECT_MATCH_IOTYPE'
   | 'TAG_NAME_ALREADY_EXISTS'
   | 'TAG_NOT_FOUND';
 
@@ -62,11 +65,33 @@ export type UserError
   = 'IN_ROOM'
   | 'INVALID_USER';
 
-// todo: verify that tester errors follow same format and fill
-// the remainder of these in
+/**
+ * The following are the errors that originate from the tester repo,
+ * but can propagate through main via TesterError. ProblemError and
+ * RequestError are not included because they've been accounted for
+ * by one of the above error strings.
+ */
+export type DockerError
+  = 'BUILD_DOCKER_CONTAINER'
+  | 'CREATE_TEMP_FOLDER'
+  | 'DELETE_TEMP_FOLDER'
+  | 'INVALID_DELETE_PATH'
+  | 'WRITE_CODE_TO_DISK';
+
+export type ParserError
+  = 'BAD_SECTION'
+  | 'INCORRECT_COUNT'
+  | 'INVALID_OUTPUT'
+  | 'MISFORMATTED_OUTPUT'
+  | 'UNEXPECTED_ERROR';
+
+export type LanguageError
+  = 'BAD_LANGUAGE';
+
 export type TesterError
-  = 'TODO'
-  | 'TODO2';
+  = DockerError
+  | ParserError
+  | LanguageError;
 
 export type ErrorType
   = FrontendError
