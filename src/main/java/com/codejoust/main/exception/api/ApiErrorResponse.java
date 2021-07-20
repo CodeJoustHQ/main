@@ -17,9 +17,15 @@ public class ApiErrorResponse implements Serializable {
 
     private final String message;
     private final String type;
+    private final Object body;
 
     public ApiErrorResponse(String message, String type) {
+        this(message, type, null);
+    }
+
+    public ApiErrorResponse(String message, String type, Object body) {
         this.message = message;
         this.type = type;
+        this.body = body;
     }
 }

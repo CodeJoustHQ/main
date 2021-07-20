@@ -14,6 +14,7 @@ import com.codejoust.main.dto.problem.ProblemTagDto;
 import com.codejoust.main.dto.problem.ProblemTestCaseDto;
 import com.codejoust.main.exception.AccountError;
 import com.codejoust.main.exception.ProblemError;
+import com.codejoust.main.exception.TestCaseError;
 import com.codejoust.main.exception.api.ApiException;
 import com.codejoust.main.model.Account;
 import com.codejoust.main.model.problem.Problem;
@@ -199,10 +200,11 @@ public class ProblemService {
         }
 
         problem.getTestCases().clear();
-        for (ProblemTestCaseDto testCaseDto : updatedProblem.getTestCases()) {
+        for (int i = 0; i < updatedProblem.getTestCases().size(); i++) {
+            ProblemTestCaseDto testCaseDto = updatedProblem.getTestCases().get(i);
             // Ensure that the user entered valid inputs and outputs for the problem
-            validateInputsGsonParseable(testCaseDto.getInput(), updatedProblem.getProblemInputs());
-            validateGsonParseable(testCaseDto.getOutput(), updatedProblem.getOutputType());
+            validateInputsGsonParseable(testCaseDto.getInput(), updatedProblem.getProblemInputs(), i);
+            validateGsonParseable(testCaseDto.getOutput(), updatedProblem.getOutputType(), i);
 
             ProblemTestCase testCase = new ProblemTestCase();
             testCase.setInput(testCaseDto.getInput());
@@ -353,9 +355,9 @@ public class ProblemService {
                 .map(ProblemMapper::toProblemInputDto)
                 .collect(Collectors.toList());
 
-        validateInputsGsonParseable(request.getInput(), inputs);
-        validateGsonParseable(request.getOutput(), problem.getOutputType());
-
+        int newTestCaseIndex = problem.getTestCases().size();
+        validateInputsGsonParseable(request.getInput(), inputs, newTestCaseIndex);
+        validateGsonParseable(request.getOutput(), problem.getOutputType(), newTestCaseIndex);
 
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(request.getInput());
@@ -374,15 +376,15 @@ public class ProblemService {
     }
 
     // Check to make sure test case inputs and outputs are Gson-parsable
-    protected void validateInputsGsonParseable(String input, List<ProblemInputDto> types) {
+    protected void validateInputsGsonParseable(String input, List<ProblemInputDto> types, int index) {
         if (input == null) {
-            throw new ApiException(ProblemError.INVALID_INPUT);
+            throw new ApiException(TestCaseError.invalidInput(index));
         }
 
         // Each parameter input should be on a separate line
         String[] inputs = input.trim().split("\n");
         if (inputs.length != types.size()) {
-            throw new ApiException(ProblemError.INCORRECT_INPUT_COUNT);
+            throw new ApiException(TestCaseError.incorrectCount(index));
         }
 
         for (int i = 0; i < types.size(); i++) {
@@ -391,13 +393,13 @@ public class ProblemService {
                 throw new ApiException(ProblemError.BAD_INPUT);
             }
 
-            validateGsonParseable(inputs[i], types.get(i).getType());
+            validateGsonParseable(inputs[i], types.get(i).getType(), index);
         }
     }
 
-    private void validateGsonParseable(String input, ProblemIOType type) {
+    private void validateGsonParseable(String input, ProblemIOType type, int index) {
         if (input == null) {
-            throw new ApiException(ProblemError.INVALID_INPUT);
+            throw new ApiException(TestCaseError.invalidInput(index));
         }
 
         try {
@@ -405,11 +407,11 @@ public class ProblemService {
 
             // Trigger catch block to return invalid input error
             if (result == null) {
-                throw new ApiException(ProblemError.INVALID_INPUT);
+                throw new ApiException(TestCaseError.invalidInput(index));
             }
 
         } catch (Exception e) {
-            throw new ApiException(ProblemError.INVALID_INPUT);
+            throw new ApiException(TestCaseError.invalidInput(index));
         }
     }
     
