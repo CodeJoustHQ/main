@@ -13,7 +13,7 @@ import com.codejoust.main.game_object.GameTimer;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.ProblemDifficulty;
-import com.codejoust.main.service.GameManagementService;
+import com.codejoust.main.service.ReportService;
 import com.codejoust.main.service.SocketService;
 import com.codejoust.main.util.TestFields;
 import org.junit.Test;
@@ -26,7 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class CreateGameReportTaskTests {
 
     @Mock
-    private GameManagementService gameManagementService;
+    private ReportService reportService;
     
     @Mock
     private SocketService socketService;
@@ -34,7 +34,7 @@ public class CreateGameReportTaskTests {
     @Test
     public void createGameReportTaskSocketMessageNullGame() {
         MockitoAnnotations.initMocks(this);
-        assertThrows(ApiException.class, () -> new CreateGameReportTask(gameManagementService, null));
+        assertThrows(ApiException.class, () -> new CreateGameReportTask(reportService, null));
     }
 
     @Test
@@ -82,9 +82,9 @@ public class CreateGameReportTaskTests {
 
         MockitoAnnotations.initMocks(this);
 
-        CreateGameReportTask createGameReportTask = new CreateGameReportTask(gameManagementService, game);
+        CreateGameReportTask createGameReportTask = new CreateGameReportTask(reportService, game);
         gameTimer.getTimer().schedule(createGameReportTask,  1000L);
 
-        verify(gameManagementService, timeout(1200)).createGameReport(eq(game));
+        verify(reportService, timeout(1200)).createGameReport(eq(game));
     }
 }
