@@ -43,6 +43,20 @@ public class DefaultCodeGeneratorServiceTests {
         "\t\t"
     );
 
+    private static final String cppDefaultCode = String.join("\n",
+        "#include <vector>",
+        "",
+        "using namespace std;",
+        "",
+        "class Solution {",
+        "\tpublic:",
+        "\t\tvector<int> solve(vector<int> nums) {",
+        "\t\t\t",
+        "\t\t}",
+        "}",
+        ""
+    );
+
     /**
      * Helper method to test the "getDefaultCode" method across languages.
      * 
@@ -64,5 +78,10 @@ public class DefaultCodeGeneratorServiceTests {
     @Test
     public void getDefaultCodePython() {
         getDefaultCodeSetupMethod(pythonDefaultCodeGeneratorService, pythonDefaultCode);
+    }
+
+    @Test
+    public void getDefaultCodeCpp() {
+        getDefaultCodeSetupMethod(cppDefaultCodeGeneratorService, cppDefaultCode);
     }
 }

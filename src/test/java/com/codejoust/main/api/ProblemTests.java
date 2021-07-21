@@ -379,7 +379,7 @@ class ProblemTests {
 
         assertEquals(javaDefaultCode, actual.get(CodeLanguage.JAVA));
         assertEquals(pythonDefaultCode, actual.get(CodeLanguage.PYTHON));
-        assertEquals(2, actual.size());
+        assertEquals(3, actual.size());
     }
 
     @Test
