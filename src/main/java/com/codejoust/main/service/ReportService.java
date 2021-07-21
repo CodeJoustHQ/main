@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.codejoust.main.dao.ProblemRepository;
 import com.codejoust.main.dao.AccountRepository;
 import com.codejoust.main.dao.GameReportRepository;
 import com.codejoust.main.dto.game.SubmissionMapper;
@@ -29,12 +30,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReportService {
 
+    private final ProblemRepository problemRepository;
     private final GameReportRepository gameReportRepository;
     private final AccountRepository accountRepository;
 
     @Autowired
-    protected ReportService(GameReportRepository gameReportRepository,
+    protected ReportService(ProblemRepository problemRepository,
+                                    GameReportRepository gameReportRepository,
                                     AccountRepository accountRepository) {
+        this.problemRepository = problemRepository;
         this.gameReportRepository = gameReportRepository;
         this.accountRepository = accountRepository;
     }
@@ -120,6 +124,12 @@ public class ReportService {
 
         gameReport.setAverageTestCasesPassed(Arrays.stream(totalTestCasesPassed).sum() / numPlayers);
         gameReport.setAverageProblemsSolved((double) Arrays.stream(userSolved).sum() / numPlayers);
+
+        // Set the Problem fields with the updated database problem.
+        for (ProblemContainer problemContainer : gameReport.getProblemContainers()) {
+            Problem problem = problemRepository.findProblemByProblemId(problemContainer.getProblem().getProblemId());
+            problemContainer.setProblem(problem);
+        }
 
         gameReportRepository.save(gameReport);
 
