@@ -3,10 +3,12 @@ import styled from 'styled-components';
 import { Player, Submission } from '../../api/Game';
 import { LowMarginText, Text } from '../core/Text';
 import { Color } from '../../api/Color';
-import { useBestSubmission, useGetScore, useGetSubmissionTime } from '../../util/Hook';
+import { useBestSubmission, useGetSubmissionTime } from '../../util/Hook';
 import Language, { displayNameFromLanguage } from '../../api/Language';
 import { TextButton } from '../core/Button';
-// import { getScore, getSubmissionCount, getSubmissionTime } from '../../util/Utility';
+import {
+  getScore, getSubmissionCount, getSubmissionTime, getTimeBetween,
+} from '../../util/Utility';
 
 const Content = styled.tr`
   border-radius: 5px;
@@ -83,46 +85,23 @@ type PlayerResultsCardProps = {
   isCurrentPlayer: boolean,
   gameStartTime: string,
   color: Color,
-  numProblems: number,
+  problemIndex: number,
   onViewCode: (() => void) | null,
   onSpectateLive: (() => void) | null,
 };
 
 function PlayerResultsItem(props: PlayerResultsCardProps) {
   const {
-    player, place, isCurrentPlayer, color, gameStartTime, numProblems, onViewCode, onSpectateLive,
+    player, place, isCurrentPlayer, color, gameStartTime, problemIndex, onViewCode, onSpectateLive,
   } = props;
 
-  const score = useGetScore(player);
-  const time = useGetSubmissionTime(player);
-  const bestSubmission : Submission | null = useBestSubmission(player);
+  const bestSubmission: Submission | null = useBestSubmission(player, problemIndex);
+  const finalSubmissionTime = useGetSubmissionTime(player);
 
   const getDisplayNickname = () => {
     const { nickname } = player.user;
     return `${nickname} ${isCurrentPlayer ? '(you)' : ''}`;
   };
-
-  const getScore = () => {
-    if (!score) {
-      return '0';
-    }
-
-    const percent = Math.round((score / numProblems) * 100);
-    return `${percent}%`;
-  };
-
-  const getSubmissionTime = () => {
-    if (!time) {
-      return 'N/A';
-    }
-
-    const startTime = new Date(gameStartTime).getTime();
-    const diffMilliseconds = new Date(time).getTime() - startTime;
-    const diffMinutes = Math.floor(diffMilliseconds / (60 * 1000));
-    return `${diffMinutes}m ago`;
-  };
-
-  const getSubmissionCount = () => player.submissions.length || '0';
 
   const getSubmissionLanguage = () => {
     if (!bestSubmission) {
@@ -136,6 +115,50 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
           <PreviewIcon className="material-icons">launch</PreviewIcon>
         </TextButton>
       </PreviewContainer>
+    );
+  };
+
+  const getScoreToDisplay = () => {
+    // Show score of specific problem (in percent)
+    if (problemIndex !== -1) {
+      return getScore(bestSubmission);
+    }
+
+    // If in overview mode, show overall number of problems solved
+    const { solved } = player;
+    return `${solved.filter((s) => s).length}/${solved.length}`;
+  };
+
+  const getTimeToDisplay = () => {
+    if (problemIndex !== -1) {
+      return getSubmissionTime(bestSubmission, gameStartTime);
+    }
+
+    if (!finalSubmissionTime) {
+      return 'N/A';
+    }
+
+    return `${getTimeBetween(gameStartTime, finalSubmissionTime)} min`;
+  };
+
+  const getFinalColumn = () => {
+    if (problemIndex === -1) {
+      return null;
+    }
+
+    if (!onSpectateLive) {
+      return <CodeColumn>{getSubmissionLanguage()}</CodeColumn>;
+    }
+
+    return (
+      <CodeColumn>
+        <PreviewContainer>
+          <TextButton onClick={onSpectateLive}>
+            Launch
+            <PreviewIcon className="material-icons">launch</PreviewIcon>
+          </TextButton>
+        </PreviewContainer>
+      </CodeColumn>
     );
   };
 
@@ -153,27 +176,15 @@ function PlayerResultsItem(props: PlayerResultsCardProps) {
       </PlayerContent>
 
       <td>
-        <Text>{getScore()}</Text>
+        <Text>{getScoreToDisplay()}</Text>
       </td>
       <td>
-        <Text>{getSubmissionTime()}</Text>
+        <Text>{getTimeToDisplay()}</Text>
       </td>
       <td>
-        <Text>{getSubmissionCount()}</Text>
+        <Text>{getSubmissionCount(player, problemIndex)}</Text>
       </td>
-      {!onSpectateLive ? (
-        <CodeColumn>{getSubmissionLanguage()}</CodeColumn>
-      ) : null}
-      {onSpectateLive ? (
-        <CodeColumn>
-          <PreviewContainer>
-            <TextButton onClick={onSpectateLive}>
-              Launch
-              <PreviewIcon className="material-icons">launch</PreviewIcon>
-            </TextButton>
-          </PreviewContainer>
-        </CodeColumn>
-      ) : null}
+      {getFinalColumn()}
     </Content>
   );
 }

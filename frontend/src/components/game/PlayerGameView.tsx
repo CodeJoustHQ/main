@@ -33,11 +33,13 @@ import {
 import LeaderboardCard from '../card/LeaderboardCard';
 import { SpectatorBackIcon } from '../core/Icon';
 import Language from '../../api/Language';
-import { useAppSelector, useBestSubmission } from '../../util/Hook';
 import { routes, send, subscribe } from '../../api/Socket';
 import { User } from '../../api/User';
-import { getScore, getSubmissionCount, getSubmissionTime } from '../../util/Utility';
 import ProblemPanel from './ProblemPanel';
+import { useAppSelector, useBestSubmission } from '../../util/Hook';
+import {
+  getScore, getSubmissionCount, getSubmissionTime, getSubmission,
+} from '../../util/Utility';
 
 const NoPaddingPanel = styled(Panel)`
   padding: 0;
@@ -113,6 +115,8 @@ type StateRefType = {
   currentCode: string,
   currentLanguage: string,
   currentIndex: number,
+  codeList: string[],
+  languageList: Language[],
 }
 
 /**
@@ -120,17 +124,19 @@ type StateRefType = {
  * the game page is used for the spectator view. spectateGame is the live data,
  * primarily the player code, of the player being spectated.
  * spectatorUnsubscribePlayer unsubscribes the spectator from the player socket
- * and brings them back to the main spectator page.
+ * and brings them back to the main spectator page. defaultIndex is an optional
+ * parameter to specify which problem to open on when loading this component.
  */
 type PlayerGameViewProps = {
   gameError: string,
   spectateGame: SpectateGame | null,
   spectatorUnsubscribePlayer: (() => void) | null,
+  defaultIndex: number | null,
 };
 
 function PlayerGameView(props: PlayerGameViewProps) {
   const {
-    gameError, spectateGame, spectatorUnsubscribePlayer,
+    gameError, spectateGame, spectatorUnsubscribePlayer, defaultIndex,
   } = props;
 
   const { currentUser, game } = useAppSelector((state) => state);
@@ -140,8 +146,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [languageList, setLanguageList] = useState<Language[]>([Language.Java]);
   const [codeList, setCodeList] = useState<string[]>(['']);
+  const [currentProblemIndex, setCurrentProblemIndex] = useState<number>(defaultIndex || 0);
   const [currentSubmission, setCurrentSubmission] = useState<Submission | null>(null);
-  const [currentProblemIndex, setCurrentProblemIndex] = useState<number>(0);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>(gameError);
@@ -151,9 +157,21 @@ function PlayerGameView(props: PlayerGameViewProps) {
   // Variable to hold whether the user is subscribed to their own player socket.
   const [playerSocket, setPlayerSocket] = useState<Subscription | null>(null);
 
+  // References necessary for the spectator subscription callback.
+  const stateRef = useRef<StateRefType>();
+  stateRef.current = {
+    game,
+    currentUser,
+    currentCode: codeList[currentProblemIndex],
+    currentLanguage: languageList[currentProblemIndex],
+    currentIndex: currentProblemIndex,
+    codeList,
+    languageList,
+  };
+
   // Variables to hold the player stats when spectating.
   const [spectatedPlayer, setSpectatedPlayer] = useState<Player | null>(null);
-  const bestSubmission = useBestSubmission(spectatedPlayer);
+  const bestSubmission = useBestSubmission(spectatedPlayer, stateRef.current.currentIndex);
 
   useEffect(() => setProblems(game?.problems || []), [game]);
 
@@ -168,44 +186,23 @@ function PlayerGameView(props: PlayerGameViewProps) {
   const getCurrentLanguage = useCallback(() => languageList[currentProblemIndex],
     [languageList, currentProblemIndex]);
 
-  const setOneCurrentLanguage = (newLanguage: Language) => {
-    setLanguageList(languageList.map((current, index) => {
-      if (index === currentProblemIndex) {
+  const setOneCurrentLanguage = useCallback((newLanguage: Language, specifiedIndex?: number) => {
+    setLanguageList((stateRef.current?.languageList || []).map((current, index) => {
+      if (index === (specifiedIndex !== undefined ? specifiedIndex : currentProblemIndex)) {
         return newLanguage;
       }
       return current;
     }));
-  };
+  }, [currentProblemIndex]);
 
-  const setOneCurrentCode = (newCode: string) => {
-    setCodeList(codeList.map((current, index) => {
-      if (index === currentProblemIndex) {
+  const setOneCurrentCode = useCallback((newCode: string, specifiedIndex?: number) => {
+    setCodeList((stateRef.current?.codeList || []).map((current, index) => {
+      if (index === (specifiedIndex !== undefined ? specifiedIndex : currentProblemIndex)) {
         return newCode;
       }
       return current;
     }));
-  };
-
-  // Returns the most recent submission made for problem of index curr.
-  const getSubmission = (curr: number, playerSubmissions: Submission[]) => {
-    for (let i = playerSubmissions.length - 1; i >= 0; i -= 1) {
-      if (playerSubmissions[i].problemIndex === curr) {
-        return playerSubmissions[i];
-      }
-    }
-
-    return null;
-  };
-
-  // References necessary for the spectator subscription callback.
-  const stateRef = useRef<StateRefType>();
-  stateRef.current = {
-    game,
-    currentUser,
-    currentCode: codeList[currentProblemIndex],
-    currentLanguage: languageList[currentProblemIndex],
-    currentIndex: currentProblemIndex,
-  };
+  }, [currentProblemIndex]);
 
   const setDefaultCodeFromProblems = useCallback((problemsParam: Problem[],
     playerSubmissions: Submission[]) => {
@@ -255,14 +252,22 @@ function PlayerGameView(props: PlayerGameViewProps) {
     currentUserParam: User | null | undefined,
     currentCodeParam: string | undefined,
     currentLanguageParam: string | undefined,
-    currentIndexParam: number | undefined) => {
+    currentIndexParam: number | undefined,
+    currentCodeList: string[] | undefined,
+    currentLanguageList: Language[] | undefined,
+    sendFullLists = false) => {
     if (gameParam && currentUserParam) {
-      const spectatorViewBody: string = JSON.stringify({
+      const body: SpectateGame = {
         user: currentUserParam,
         problem: gameParam.problems[currentIndexParam || 0], // must satisfy problems.length > 0
-        code: currentCodeParam,
-        language: currentLanguageParam,
-      });
+        problemIndex: currentIndexParam || 0,
+        code: currentCodeParam || '',
+        language: currentLanguageParam || Language.Java,
+        codeList: sendFullLists ? currentCodeList : undefined,
+        languageList: sendFullLists ? currentLanguageList : undefined,
+      };
+      const spectatorViewBody: string = JSON.stringify(body);
+
       send(
         routes(gameParam.room.roomId, currentUserParam.userId).subscribe_player,
         {},
@@ -274,7 +279,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
   // Send updates via socket to any spectators.
   useEffect(() => {
     sendViewUpdate(game, currentUser, codeList[currentProblemIndex],
-      languageList[currentProblemIndex], currentProblemIndex);
+      languageList[currentProblemIndex], currentProblemIndex, codeList, languageList);
   }, [game, currentUser, codeList, languageList, currentProblemIndex, sendViewUpdate]);
 
   // Re-subscribe in order to get the correct subscription callback.
@@ -284,7 +289,8 @@ function PlayerGameView(props: PlayerGameViewProps) {
       if (JSON.parse(result.body).newSpectator) {
         sendViewUpdate(stateRef.current?.game, stateRef.current?.currentUser,
           stateRef.current?.currentCode, stateRef.current?.currentLanguage,
-          stateRef.current?.currentIndex);
+          stateRef.current?.currentIndex, stateRef.current?.codeList,
+          stateRef.current?.languageList, true);
       }
     };
 
@@ -323,7 +329,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
        * If default code list is empty and current user (non-spectator) is
        * loaded, fetch the code from the backend
        */
-      if (!defaultCodeList.length && !currentUser.spectator) {
+      if (!defaultCodeList.length && currentUser && !currentUser.spectator) {
         let matchFound = false;
 
         // If this user refreshed and has already submitted code, load and save their latest code
@@ -342,6 +348,18 @@ function PlayerGameView(props: PlayerGameViewProps) {
     }
   }, [game, currentUser, defaultCodeList, setDefaultCodeFromProblems,
     subscribePlayer, playerSocket, getSpectatedPlayer]);
+
+  // When spectate game code changes, update the corresponding problem with that code
+  useEffect(() => {
+    if (spectateGame?.codeList && spectateGame.languageList) {
+      setCodeList(spectateGame.codeList);
+      setLanguageList(spectateGame.languageList);
+    } else if (spectateGame?.code && spectateGame.language
+        && spectateGame.problemIndex !== undefined) {
+      setOneCurrentCode(spectateGame.code, spectateGame.problemIndex);
+      setOneCurrentLanguage(spectateGame.language as Language, spectateGame.problemIndex);
+    }
+  }, [spectateGame, setOneCurrentCode, setOneCurrentLanguage]);
 
   // Creates Event when splitter bar is dragged
   const onSecondaryPanelSizeChange = () => {
@@ -451,6 +469,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
               Spectating:
               {' '}
               <b>{spectateGame?.user.nickname}</b>
+              {currentProblemIndex === spectateGame?.problemIndex ? ' (live)' : null}
             </GameHeaderText>
           </GameHeaderContainerChild>
           <GameHeaderContainerChild>
@@ -469,7 +488,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
                 <NoMarginDefaultText>
                   <b>Submissions:</b>
                   {' '}
-                  {getSubmissionCount(spectatedPlayer)}
+                  {getSubmissionCount(spectatedPlayer, stateRef.current?.currentIndex)}
                 </NoMarginDefaultText>
               </GameHeaderStatsSubContainer>
             </GameHeaderStatsContainer>
@@ -489,8 +508,7 @@ function PlayerGameView(props: PlayerGameViewProps) {
         >
           <ProblemPanel
             problems={game?.problems || []}
-            index={!spectateGame ? currentProblemIndex : game?.problems
-              .findIndex((p) => p.problemId === spectateGame.problem.problemId) || 0}
+            index={currentProblemIndex}
             onNext={currentProblemIndex < problems.length - 1 ? nextProblem : null}
             onPrev={currentProblemIndex > 0 ? previousProblem : null}
           />
@@ -511,7 +529,6 @@ function PlayerGameView(props: PlayerGameViewProps) {
                     getCurrentLanguage={getCurrentLanguage}
                     defaultCodeMap={defaultCodeList}
                     currentProblem={currentProblemIndex}
-                    defaultLanguage={Language.Java}
                     defaultCode={null}
                     liveCode={null}
                   />
@@ -530,12 +547,11 @@ function PlayerGameView(props: PlayerGameViewProps) {
                 <Editor
                   onLanguageChange={null}
                   onCodeChange={null}
-                  defaultLanguage={spectateGame?.language as Language}
-                  getCurrentLanguage={() => spectateGame?.language as Language}
+                  getCurrentLanguage={getCurrentLanguage}
                   defaultCodeMap={null}
                   currentProblem={currentProblemIndex}
-                  defaultCode={spectateGame?.code}
-                  liveCode={spectateGame?.code}
+                  defaultCode={null}
+                  liveCode={codeList[currentProblemIndex]}
                 />
               </NoPaddingPanel>
             )

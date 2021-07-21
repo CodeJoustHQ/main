@@ -24,7 +24,6 @@ const CopyIndicatorContainer = styled.div.attrs((props: CopyIndicator) => ({
 const BottomCopyIndicatorContainer = styled.div.attrs((props: CopyIndicator) => ({
   style: {
     transform: (!props.copied) ? 'translateY(60px)' : null,
-    visibility: (props.copied) ? 'visible' : 'hidden',
   },
 }))<CopyIndicator>`
   position: fixed;

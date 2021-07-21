@@ -1,9 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Player, Submission } from '../../api/Game';
+import { Player } from '../../api/Game';
 import Language from '../../api/Language';
 import { SecondaryHeaderText } from '../core/Text';
 import ResizableMonacoEditor from '../game/Editor';
+import { getBestSubmission } from '../../util/Utility';
 
 const CodePreview = styled.div`
   position: relative;
@@ -20,21 +21,17 @@ const CodePreview = styled.div`
 
 type PreviewCodeContentProps = {
   player: Player | undefined,
+  problemIndex: number,
 }
 
 function PreviewCodeContent(props: PreviewCodeContentProps) {
-  const { player } = props;
+  const { player, problemIndex } = props;
+
+  const bestSubmission = getBestSubmission(player, problemIndex);
 
   if (player === undefined || !player || !player.submissions.length) {
     return null;
   }
-
-  let bestSubmission: Submission | undefined;
-  player.submissions.forEach((submission) => {
-    if (!bestSubmission || submission.numCorrect > bestSubmission.numCorrect) {
-      bestSubmission = submission;
-    }
-  });
 
   return (
     <div>
@@ -45,10 +42,9 @@ function PreviewCodeContent(props: PreviewCodeContentProps) {
         <ResizableMonacoEditor
           onLanguageChange={null}
           onCodeChange={null}
-          getCurrentLanguage={null}
+          getCurrentLanguage={() => bestSubmission?.language as Language || Language.Java}
           defaultCodeMap={null}
           currentProblem={0}
-          defaultLanguage={bestSubmission?.language as Language || Language.Java}
           defaultCode={bestSubmission?.code || 'Uh oh! An error occurred fetching this player\'s code'}
           liveCode={null}
         />

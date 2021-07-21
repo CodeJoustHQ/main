@@ -351,6 +351,10 @@ public class RoomService {
         boolean problemsHaveChanged = false;
 
         if (selectedProblems != null) {
+            if (selectedProblems.size() > MAX_NUM_PROBLEMS) {
+                throw new ApiException(ProblemError.INVALID_NUMBER_REQUEST);
+            }
+
             problemsHaveChanged = checkSelectedProblemChanges(selectedProblems, room);
         }
 

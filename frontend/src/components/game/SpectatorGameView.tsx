@@ -17,6 +17,7 @@ function SpectatorGameView() {
   const [spectateGame, setSpectateGame] = useState<SpectateGame | null>();
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [problemIndex, setProblemIndex] = useState(0);
 
   // Unsubscribe from the player socket.
   const unsubscribePlayer = useCallback(() => {
@@ -66,6 +67,7 @@ function SpectatorGameView() {
         gameError={error}
         spectateGame={spectateGame}
         spectatorUnsubscribePlayer={unsubscribePlayer}
+        defaultIndex={problemIndex}
       />
     );
   }
@@ -78,12 +80,14 @@ function SpectatorGameView() {
         currentUser={currentUser}
         gameStartTime={game?.gameTimer.startTime || ''}
         viewPlayerCode={null}
-        spectatePlayer={(index: number) => {
-          if (game) {
-            subscribePlayer(game.room.roomId, game.players[index].user.userId!);
+        spectatePlayer={(playerUserId: string, probIndex: number) => {
+          const player = game?.players.find((p) => p.user.userId === playerUserId);
+          if (game && player) {
+            setProblemIndex(probIndex);
+            subscribePlayer(game.room.roomId, player.user.userId!);
           }
         }}
-        numProblems={game?.problems.length || 1}
+        problems={game?.problems || []}
       />
       {error ? <CenteredContainer><ErrorMessage message={error} /></CenteredContainer> : null}
       {loading ? <CenteredContainer><Loading /></CenteredContainer> : null}

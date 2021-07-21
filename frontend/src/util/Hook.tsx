@@ -8,51 +8,28 @@ import { FirebaseUserType } from '../redux/Account';
 import { Problem } from '../api/Problem';
 import { Coordinate } from '../components/special/FloatingCircle';
 import app from '../api/Firebase';
+import { getBestSubmission } from './Utility';
 
-export const useBestSubmission = (player?: Player | null) => {
+/**
+ * Finds the best submission by a player (the first one, if there's a tie).
+ * If an index is specified that's not -1, then this will find the best submission
+ * for that problem specifically. If problemIndex is -1 (overview mode), then it
+ * will resort back to finding the best overall submission as usual.
+ *
+ * @param player The player in question
+ * @param problemIndex Optional index to specify a problem
+ */
+export const useBestSubmission = (player?: Player | null, problemIndex?: number) => {
   const [bestSubmission, setBestSubmission] = useState<Submission | null>(null);
 
   useEffect(() => {
-    if (player) {
-      let newBestSubmission: Submission | null = null;
-
-      // Find best submission
-      player.submissions.forEach((submission) => {
-        if (!newBestSubmission || submission.numCorrect > newBestSubmission.numCorrect) {
-          newBestSubmission = submission;
-        }
-      });
-
-      setBestSubmission(newBestSubmission);
-    }
-  }, [player, setBestSubmission]);
+    setBestSubmission(getBestSubmission(player, problemIndex));
+  }, [player, setBestSubmission, problemIndex]);
 
   return bestSubmission;
 };
 
-export const useGetScore = (player?: Player) => {
-  const counted = new Set<number>();
-  const [score, setScore] = useState<number>(0);
-
-  useEffect(() => {
-    if (player) {
-      for (let i = 0; i < player.submissions.length; i += 1) {
-        if (player.submissions[i].numCorrect === player.submissions[i].numTestCases
-          && !counted.has(player.submissions[i].problemIndex)) {
-          counted.add(player.submissions[i].problemIndex);
-        }
-      }
-
-      setScore(counted.size);
-    }
-  }, [player, setScore, counted]);
-
-  if (player == null || player.submissions.length === 0) {
-    return null;
-  }
-  return score;
-};
-
+// Calculates the time taken for the latest 100% correct solution for a problem
 export const useGetSubmissionTime = (player?: Player) => {
   const counted = new Set<number>();
   const [time, setTime] = useState<string>();
