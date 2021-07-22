@@ -10,7 +10,6 @@ export type FrontendError
 export type GenericError
   = 'BAD_SETTING'
   | 'EMPTY_FIELD'
-  | 'INVALID_INPUT'
   | 'INVALID_PERMISSIONS'
   | 'NOT_FOUND';
 
@@ -38,7 +37,6 @@ export type ProblemError
   | 'BAD_PROBLEM_TAG'
   | 'BAD_VERIFIED_STATUS'
   | 'DUPLICATE_TAG_NAME'
-  | 'INCORRECT_INPUT_COUNT'
   | 'INVALID_NUMBER_REQUEST'
   | 'INVALID_VARIABLE_NAME'
   | 'INTERNAL_ERROR'
@@ -57,6 +55,10 @@ export type RoomError
   | 'TOO_MANY_PROBLEMS'
   | 'USER_NOT_FOUND';
 
+export type TestCaseError
+  = 'INCORRECT_INPUT_COUNT'
+  | 'INVALID_INPUT';
+
 export type TimerError
   = 'INVALID_DURATION'
   | 'NULL_SETTING';
@@ -67,9 +69,9 @@ export type UserError
 
 /**
  * The following are the errors that originate from the tester repo,
- * but can propagate through main via TesterError. ProblemError and
- * RequestError are not included because they've been accounted for
- * by one of the above error strings.
+ * but can propagate through main via TesterError. ProblemError,
+ * TestCaseError, and RequestError are not included because they've
+ * been accounted for by one of the above error strings.
  */
 export type DockerError
   = 'BUILD_DOCKER_CONTAINER'
@@ -96,13 +98,14 @@ export type TesterError
 export type ErrorType
   = FrontendError
   | GenericError
+  | AccountError
   | GameError
   | NotificationError
   | ProblemError
   | RoomError
-  | UserError
+  | TestCaseError
   | TimerError
-  | AccountError
+  | UserError
   | TesterError;
 
 export type ErrorResponse = {
@@ -111,8 +114,13 @@ export type ErrorResponse = {
   message: string,
   type: ErrorType,
   // Any data passed along with the error
-  data?: any,
+  body?: any,
 };
+
+export type TestCaseErrorBody = {
+  index: number,
+  field: 'INPUT' | 'OUTPUT',
+}
 
 export type AxiosError = {
   response?: {

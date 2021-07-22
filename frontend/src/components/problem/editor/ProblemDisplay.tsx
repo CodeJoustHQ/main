@@ -18,6 +18,7 @@ import { ProblemHelpModal } from '../../core/HelpModal';
 import OptionsPanel from './OptionsPanel';
 import TestCaseEditor from './TestCaseEditor';
 import { InlineIcon } from '../../core/Icon';
+import { TestCaseErrorBody } from '../../../api/Error';
 
 const defaultDescription: string = [
   'Replace this line with a short description.',
@@ -81,11 +82,13 @@ type ProblemDisplayParams = {
   actionText: string,
   onClick: (newProblem: Problem) => void,
   editMode: boolean,
+  // Details surrounding any test case errors (or null if none)
+  testCaseError: TestCaseErrorBody | null,
 };
 
 function ProblemDisplay(props: ProblemDisplayParams) {
   const {
-    problem, onClick, actionText, editMode,
+    problem, onClick, actionText, editMode, testCaseError,
   } = props;
 
   const history = useHistory();
@@ -135,8 +138,6 @@ function ProblemDisplay(props: ProblemDisplayParams) {
           <TopButtonsContainer>
             <InvertedSmallButton
               onClick={() => {
-                console.log(JSON.stringify(problem));
-                console.log(JSON.stringify(newProblem));
                 if (JSON.stringify(problem) === JSON.stringify(newProblem)
                   // eslint-disable-next-line no-alert
                   || window.confirm('Go back? Your unsaved changes will be lost.')) {
@@ -196,6 +197,7 @@ function ProblemDisplay(props: ProblemDisplayParams) {
             <TestCaseEditor
               newProblem={newProblem}
               setNewProblem={setNewProblem}
+              testCaseError={testCaseError}
             />
           ) : null}
 

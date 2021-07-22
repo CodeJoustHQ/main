@@ -118,7 +118,11 @@ export const ConsoleTextArea = styled.textarea`
   }
 `;
 
-export const FixedTextArea = styled.textarea`
+type TextAreaProps = {
+  error?: boolean,
+}
+
+export const FixedTextArea = styled.textarea<TextAreaProps>`
   font-family: monospace;
   margin: 2px;
   width: 100%;
@@ -127,7 +131,7 @@ export const FixedTextArea = styled.textarea`
   resize: none;
 
   padding: 5px;
-  border: 2px solid ${({ theme }) => theme.colors.darkBlue};
+  border: 2px solid ${({ theme, error }) => (error ? theme.colors.red : theme.colors.darkBlue)};
   border-radius: 0.25rem;
   
   font-size: ${({ theme }) => theme.fontSize.default};

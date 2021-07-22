@@ -61,7 +61,13 @@ function CreateProblemPage() {
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
       <Content>
-        <ProblemDisplay problem={problem!} onClick={handleSubmit} actionText="Create" editMode={false} />
+        <ProblemDisplay
+          problem={problem!}
+          onClick={handleSubmit}
+          actionText="Create"
+          editMode={false}
+          testCaseError={null}
+        />
       </Content>
     </>
   );

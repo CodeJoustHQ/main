@@ -15,6 +15,7 @@ import { generateRandomId } from '../util/Utility';
 import { useAppSelector, useProblemEditable } from '../util/Hook';
 import { PrimaryButtonLink } from '../components/core/Link';
 import { GrayTextButton } from '../components/core/Button';
+import { ErrorResponse, TestCaseErrorBody } from '../api/Error';
 
 const Content = styled.div`
   display: flex;
@@ -34,10 +35,18 @@ function ProblemPage() {
 
   const [problem, setProblem] = useState<Problem | null>(null);
   const [error, setError] = useState('');
+  // If not -1, this holds the index of the test case causing the current error
+  const [testCaseError, setTestCaseError] = useState<TestCaseErrorBody | null>(null);
+
   const [loading, setLoading] = useState(false);
 
   const problemEditable = useProblemEditable(firebaseUser, problem);
   const params = useParams<ProblemParams>();
+
+  const clearErrors = () => {
+    setError('');
+    setTestCaseError(null);
+  };
 
   useEffect(() => {
     if (!token) {
@@ -56,9 +65,6 @@ function ProblemPage() {
           setProblem(res);
         })
         .catch((err) => {
-          // todo: check error for type
-          // if it's of a certain type, like bad test case, then save that info in a state var
-          // use that state var to highlight a field as errored
           setError(err.message);
         })
         .finally(() => setLoading(false));
@@ -87,16 +93,18 @@ function ProblemPage() {
     }
 
     setLoading(true);
-    setError('');
+    clearErrors();
     editProblem(newProblem.problemId, newProblem, token!)
       .then((res) => {
         setProblem(res);
-        setLoading(false);
       })
-      .catch((err) => {
+      .catch((err: ErrorResponse) => {
         setError(err.message);
-        setLoading(false);
-      });
+        if (err.type === 'INVALID_INPUT') {
+          setTestCaseError(err.body as TestCaseErrorBody);
+        }
+      })
+      .finally(() => setLoading(false));
   };
 
   const handleClone = () => {
@@ -105,7 +113,7 @@ function ProblemPage() {
     }
 
     setLoading(true);
-    setError('');
+    clearErrors();
     cloneProblem(problem.problemId, token!)
       .then((res) => {
         history.push(`/problem/${res.problemId}`);
@@ -124,7 +132,13 @@ function ProblemPage() {
       { error ? <ErrorMessage message={error} /> : null }
       { loading ? <Loading /> : null }
       <Content>
-        <ProblemDisplay problem={problem!} onClick={handleEdit} actionText="Save" editMode />
+        <ProblemDisplay
+          problem={problem!}
+          onClick={handleEdit}
+          actionText="Save"
+          testCaseError={testCaseError}
+          editMode
+        />
       </Content>
     </>
   );

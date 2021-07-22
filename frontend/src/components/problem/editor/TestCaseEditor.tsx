@@ -8,6 +8,7 @@ import { GreenSmallButtonBlock, RedTextButton } from '../../core/Button';
 import { Problem, TestCase } from '../../../api/Problem';
 import { generateRandomId } from '../../../util/Utility';
 import { useAppSelector, useProblemEditable } from '../../../util/Hook';
+import { TestCaseErrorBody } from '../../../api/Error';
 
 const SettingsContainerRelative = styled(SettingsContainer)`
   position: relative;
@@ -42,10 +43,11 @@ const NoMarginTopText = styled(Text)`
 type TestCaseEditorProps = {
   newProblem: Problem,
   setNewProblem: (problem: Problem) => void,
+  testCaseError: TestCaseErrorBody | null,
 };
 
 function TestCaseEditor(props: TestCaseEditorProps) {
-  const { newProblem, setNewProblem } = props;
+  const { newProblem, setNewProblem, testCaseError } = props;
 
   const { firebaseUser } = useAppSelector((state) => state.account);
   const problemEditable = useProblemEditable(firebaseUser, newProblem);
@@ -151,6 +153,8 @@ function TestCaseEditor(props: TestCaseEditorProps) {
                                 handleTestCaseChange(index, current.id, e.target.value,
                                   current.output, current.hidden, current.explanation);
                               }}
+                              error={Boolean(testCaseError
+                                && testCaseError.index === index && testCaseError.field === 'INPUT')}
                             />
                           </InputContainer>
                           <MarginLeftRightAutoContainer>
@@ -164,6 +168,8 @@ function TestCaseEditor(props: TestCaseEditorProps) {
                                   current.input, e.target.value,
                                   current.hidden, current.explanation);
                               }}
+                              error={Boolean(testCaseError
+                                && testCaseError.index === index && testCaseError.field === 'OUTPUT')}
                             />
                           </MarginLeftRightAutoContainer>
                         </FlexBareContainer>
@@ -206,7 +212,7 @@ function TestCaseEditor(props: TestCaseEditorProps) {
                           {problemEditable ? (
                             <MarginLeftRightAutoContainer>
                               <RedTextButton onClick={() => deleteTestCase(index)}>
-                                  Delete
+                                Delete
                               </RedTextButton>
                             </MarginLeftRightAutoContainer>
                           ) : null}
