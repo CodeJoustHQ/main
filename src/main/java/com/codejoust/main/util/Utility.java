@@ -12,6 +12,7 @@ import javax.lang.model.SourceVersion;
 
 import com.codejoust.main.dao.RoomRepository;
 import com.codejoust.main.dao.UserRepository;
+import com.codejoust.main.game_object.Game;
 import com.codejoust.main.game_object.NotificationType;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,5 +131,15 @@ public class Utility {
      */
     private static boolean isLetter(Character c) {
         return Character.toUpperCase(c) != Character.toLowerCase(c);
+    }
+
+    /**
+     * Check if the game is over.
+     * 
+     * @param game the game in question
+     * @return a boolean verifying whether the game is over
+     */
+    public static boolean isGameOver(Game game) {
+        return game.getGameEnded() || game.getAllSolved() || (game.getGameTimer() != null && game.getGameTimer().isTimeUp());
     }
 }

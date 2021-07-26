@@ -47,7 +47,6 @@ import com.codejoust.main.exception.ProblemError;
 import com.codejoust.main.exception.RoomError;
 import com.codejoust.main.exception.api.ApiException;
 import com.codejoust.main.game_object.Game;
-import com.codejoust.main.game_object.GameTimer;
 import com.codejoust.main.game_object.NotificationType;
 import com.codejoust.main.game_object.Player;
 import com.codejoust.main.model.Room;
@@ -961,28 +960,6 @@ public class GameManagementServiceTests {
         gameService.createAddGameFromRoom(room);
         ApiException exception = assertThrows(ApiException.class, () -> gameService.updateCode(TestFields.ROOM_ID, TestFields.USER_ID, null));
         assertEquals(GameError.EMPTY_FIELD, exception.getError());
-    }
-
-    @Test
-    public void isGameOverFunctionsCorrectly() {
-        Game game = new Game();
-        game.setGameTimer(new GameTimer(TestFields.DURATION));
-
-        game.setAllSolved(false);
-        game.getGameTimer().setTimeUp(false);
-        assertFalse(gameService.isGameOver(game));
-
-        game.setAllSolved(true);
-        game.getGameTimer().setTimeUp(false);
-        assertTrue(gameService.isGameOver(game));
-
-        game.setAllSolved(false);
-        game.getGameTimer().setTimeUp(true);
-        assertTrue(gameService.isGameOver(game));
-
-        game.setAllSolved(false);
-        game.setGameTimer(null);
-        assertFalse(gameService.isGameOver(game));
     }
 
     @Test

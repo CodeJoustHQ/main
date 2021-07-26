@@ -113,7 +113,7 @@ public class GameManagementService {
     public RoomDto playAgain(String roomId, PlayAgainRequest request) {
         Game game = getGameFromRoomId(roomId);
 
-        if (!isGameOver(game)) {
+        if (!Utility.isGameOver(game)) {
             throw new ApiException(GameError.GAME_NOT_OVER);
         }
 
@@ -216,7 +216,7 @@ public class GameManagementService {
 
         SubmissionDto submissionDto = submitService.submitSolution(game, request);
 
-        if (isGameOver(game)) {
+        if (Utility.isGameOver(game)) {
             handleEndGame(game);
         }
 
@@ -302,10 +302,6 @@ public class GameManagementService {
         CreateGameReportTask createGameReportTask = new CreateGameReportTask(reportService, game);
         Timer createGameReportTimer = new Timer();
         createGameReportTimer.schedule(createGameReportTask, GameTimer.DURATION_1 * 1000);
-    }
-
-    protected boolean isGameOver(Game game) {
-        return game.getGameEnded() || game.getAllSolved() || (game.getGameTimer() != null && game.getGameTimer().isTimeUp());
     }
 
     // Update people's socket active status

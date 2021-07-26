@@ -19,6 +19,8 @@ import static org.mockito.Mockito.verify;
 
 import com.codejoust.main.dao.RoomRepository;
 import com.codejoust.main.dao.UserRepository;
+import com.codejoust.main.game_object.Game;
+import com.codejoust.main.game_object.GameTimer;
 import com.codejoust.main.model.User;
 import com.codejoust.main.service.RoomService;
 import com.codejoust.main.service.UserService;
@@ -98,5 +100,27 @@ public class UtilityTests {
     @ValueSource(strings = {"rocket", "rocketrocket", "hi12", "H$ello", "jimmyNeutron"})
     public void validateIdentifierTrue(String inputName) {
         assertTrue(Utility.validateIdentifier(inputName));
+    }
+
+    @Test
+    public void isGameOverFunctionsCorrectly() {
+        Game game = new Game();
+        game.setGameTimer(new GameTimer(TestFields.DURATION));
+
+        game.setAllSolved(false);
+        game.getGameTimer().setTimeUp(false);
+        assertFalse(Utility.isGameOver(game));
+
+        game.setAllSolved(true);
+        game.getGameTimer().setTimeUp(false);
+        assertTrue(Utility.isGameOver(game));
+
+        game.setAllSolved(false);
+        game.getGameTimer().setTimeUp(true);
+        assertTrue(Utility.isGameOver(game));
+
+        game.setAllSolved(false);
+        game.setGameTimer(null);
+        assertFalse(Utility.isGameOver(game));
     }
 }

@@ -25,6 +25,7 @@ import com.codejoust.main.game_object.PlayerCode;
 import com.codejoust.main.game_object.Submission;
 import com.codejoust.main.game_object.SubmissionResult;
 import com.codejoust.main.model.problem.Problem;
+import com.codejoust.main.util.Utility;
 import com.google.gson.Gson;
 
 import lombok.extern.log4j.Log4j2;
@@ -144,30 +145,35 @@ public class SubmitService {
         testerRequest.setProblem(problemDto);
 
         Submission submission = getSubmission(testerRequest);
-        submission.setProblemIndex(request.getProblemIndex());
-        player.getSubmissions().add(submission);
 
-        if (submission.getNumCorrect().equals(submission.getNumTestCases())) {
-            player.getSolved()[request.getProblemIndex()] = true;
-        }
+        // Add submission score if game is not over.
+        if (Utility.isGameOver(game)) {
+            submission.setProblemIndex(request.getProblemIndex());
+            player.getSubmissions().add(submission);
 
-        // Variable to indicate whether all players have solved the problem.
-        boolean allSolved = true;
-        for (Player p : game.getPlayers().values()) {
-            for (Boolean b : p.getSolved()) {
-                if (b == null || !b) {
-                    allSolved = false;
-                    break;
+            if (submission.getNumCorrect().equals(submission.getNumTestCases())) {
+                player.getSolved()[request.getProblemIndex()] = true;
+            }
+
+            // Variable to indicate whether all players have solved the problem.
+            boolean allSolved = true;
+            for (Player p : game.getPlayers().values()) {
+                for (Boolean b : p.getSolved()) {
+                    if (b == null || !b) {
+                        allSolved = false;
+                        break;
+                    }
                 }
+            }
+
+            // If the users have all completed the problem, set all solved to true.
+            if (allSolved) {
+                game.setAllSolved(true);
             }
         }
 
-        // If the users have all completed the problem, set all solved to true.
-        if (allSolved) {
-            game.setAllSolved(true);
-        }
-
-        return GameMapper.submissionToDto(submission);
+        // TODO: Will this be an issue if the submission is not actually counted? Should I return null in that case?
+        return GameMapper.submissionToDto(submission);        
     }
 
     // Get submission (either through tester or using a dummy response)
