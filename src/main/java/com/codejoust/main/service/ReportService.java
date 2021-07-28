@@ -44,6 +44,12 @@ public class ReportService {
     }
 
     public GameReport createGameReport(Game game) {
+        // Check if game report has already been created (or attempted).
+        if (game.getCreateGameReportStarted()) {
+            return null;
+        }
+        game.setCreateGameReportStarted(true);
+
         GameReport gameReport = new GameReport();
         int numProblems = game.getProblems().size();
         int numPlayers = game.getPlayers().size();

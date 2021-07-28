@@ -31,4 +31,7 @@ public class Game {
 
     // Boolean to hold whether the host ended the game early
     private Boolean gameEnded = false;
+
+    // Boolean to hold whether the process of creating the game report started
+    private Boolean createGameReportStarted = false;
 }
