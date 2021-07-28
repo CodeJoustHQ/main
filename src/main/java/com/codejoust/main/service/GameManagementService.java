@@ -28,7 +28,6 @@ import com.codejoust.main.game_object.PlayerCode;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.Problem;
-import com.codejoust.main.task.CreateGameReportTask;
 import com.codejoust.main.task.EndGameTimerTask;
 import com.codejoust.main.util.Utility;
 
@@ -299,9 +298,7 @@ public class GameManagementService {
             timer.cancel();
         }
 
-        CreateGameReportTask createGameReportTask = new CreateGameReportTask(reportService, game);
-        Timer createGameReportTimer = new Timer();
-        createGameReportTimer.schedule(createGameReportTask, GameTimer.DURATION_1 * 1000);
+        reportService.createGameReport(game);
     }
 
     // Update people's socket active status

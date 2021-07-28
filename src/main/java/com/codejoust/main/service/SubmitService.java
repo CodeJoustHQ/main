@@ -173,7 +173,7 @@ public class SubmitService {
         }
 
         // TODO: Will this be an issue if the submission is not actually counted? Should I return null in that case?
-        return GameMapper.submissionToDto(submission);        
+        return GameMapper.submissionToDto(submission);
     }
 
     // Get submission (either through tester or using a dummy response)
