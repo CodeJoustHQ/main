@@ -53,7 +53,6 @@ import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.Problem;
 import com.codejoust.main.model.problem.ProblemDifficulty;
-import com.codejoust.main.model.report.GameReport;
 import com.codejoust.main.util.UtilityTestMethods;
 
 @ExtendWith(MockitoExtension.class)
@@ -85,6 +84,9 @@ public class GameManagementServiceTests {
 
     @Mock
     private LiveGameService liveGameService;
+
+    @Mock
+    private ReportService reportService;
 
     @Spy
     @InjectMocks
@@ -985,8 +987,8 @@ public class GameManagementServiceTests {
         verify(socketService, after(13000).never()).sendSocketUpdate(Mockito.any(String.class), Mockito.any(GameNotificationDto.class));
         verify(socketService, never()).sendSocketUpdate(Mockito.any(GameDto.class));
 
-        // Game report is saved after one minute past handleEndGame
-        verify(gameReportRepository, after(61300)).save(Mockito.any(GameReport.class));
+        // The game report is created upon end game
+        verify(reportService).createGameReport(eq(game));
     }
 
     @Test

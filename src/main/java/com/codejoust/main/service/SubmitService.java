@@ -147,7 +147,7 @@ public class SubmitService {
         Submission submission = getSubmission(testerRequest);
 
         // Add submission score if game is not over.
-        if (Utility.isGameOver(game)) {
+        if (!Utility.isGameOver(game)) {
             submission.setProblemIndex(request.getProblemIndex());
             player.getSubmissions().add(submission);
 

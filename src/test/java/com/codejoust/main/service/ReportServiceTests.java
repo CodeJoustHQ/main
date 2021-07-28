@@ -20,6 +20,7 @@ import java.util.List;
 
 import com.codejoust.main.dao.AccountRepository;
 import com.codejoust.main.dao.GameReportRepository;
+import com.codejoust.main.dao.ProblemRepository;
 import com.codejoust.main.dao.RoomRepository;
 import com.codejoust.main.dao.UserRepository;
 import com.codejoust.main.dto.game.SubmissionDto;
@@ -49,6 +50,9 @@ public class ReportServiceTests {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ProblemRepository problemRepository;
 
     @Mock
     private SocketService socketService;
@@ -118,10 +122,12 @@ public class ReportServiceTests {
         room.addUser(user3);
         room.addUser(user4);
         room.setHost(user1);
+        Problem problem1 = TestFields.problem1();
+        Problem problem2 = TestFields.problem2();
 
         List<Problem> problems = new ArrayList<>();
-        problems.add(TestFields.problem1());
-        problems.add(TestFields.problem2());
+        problems.add(problem1);
+        problems.add(problem2);
         room.setProblems(problems);
         room.setNumProblems(problems.size());
 
@@ -136,23 +142,19 @@ public class ReportServiceTests {
         Mockito.doAnswer(new Answer<SubmissionDto>() {
             public SubmissionDto answer(InvocationOnMock invocation) {
                 UtilityTestMethods.addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID), 0, TestFields.PLAYER_CODE_1, 1);
-                game.setAllSolved(true);
                 return new SubmissionDto();
             }})
           .when(submitService).submitSolution(game, correctSubmission);
-
-          gameManagementService.submitSolution(TestFields.ROOM_ID, correctSubmission);
+        gameManagementService.submitSolution(TestFields.ROOM_ID, correctSubmission);
 
         // Second correct submission for problem 0 with user3.
         correctSubmission.setInitiator(UserMapper.toDto(user3));
         Mockito.doAnswer(new Answer<SubmissionDto>() {
             public SubmissionDto answer(InvocationOnMock invocation) {
                 UtilityTestMethods.addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID_3), 0, TestFields.PLAYER_CODE_1, 1);
-                game.setAllSolved(true);
                 return new SubmissionDto();
             }})
           .when(submitService).submitSolution(game, correctSubmission);
-
         gameManagementService.submitSolution(TestFields.ROOM_ID, correctSubmission);
 
         // Incorrect submission for problem 1 with user3.
@@ -163,7 +165,6 @@ public class ReportServiceTests {
         Mockito.doAnswer(new Answer<SubmissionDto>() {
             public SubmissionDto answer(InvocationOnMock invocation) {
                 UtilityTestMethods.addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID_3), 1, TestFields.PLAYER_CODE_2, 0);
-                game.setAllSolved(true);
                 return new SubmissionDto();
             }})
           .when(submitService).submitSolution(game, incorrectSubmission);
@@ -174,7 +175,6 @@ public class ReportServiceTests {
         Mockito.doAnswer(new Answer<SubmissionDto>() {
             public SubmissionDto answer(InvocationOnMock invocation) {
                 UtilityTestMethods.addSubmissionHelper(game.getPlayers().get(TestFields.USER_ID), 0, TestFields.PLAYER_CODE_2, 0);
-                game.setAllSolved(true);
                 return new SubmissionDto();
             }})
           .when(submitService).submitSolution(game, incorrectSubmission);
@@ -182,6 +182,8 @@ public class ReportServiceTests {
 
         // Set manually end game, and trigger game report creation directly.
         game.setGameEnded(true);
+        Mockito.doReturn(problem1).when(problemRepository).findProblemByProblemId(problem1.getProblemId());
+        Mockito.doReturn(problem2).when(problemRepository).findProblemByProblemId(problem2.getProblemId());
         GameReport gameReport = reportService.createGameReport(game);
 
         // Confirm that the game report, account, and users are saved.
@@ -255,15 +257,18 @@ public class ReportServiceTests {
         user1.setAccount(TestFields.account1());
         room.addUser(user1);
         room.setHost(user1);
+        Problem problem1 = TestFields.problem1();
 
         List<Problem> problems = new ArrayList<>();
-        problems.add(TestFields.problem1());
+        problems.add(problem1);
         room.setProblems(problems);
         room.setNumProblems(problems.size());
 
         gameManagementService.createAddGameFromRoom(room);
         Game game = gameManagementService.getGameFromRoomId(room.getRoomId());
         game.setGameEnded(true);
+
+        Mockito.doReturn(problem1).when(problemRepository).findProblemByProblemId(problem1.getProblemId());
         reportService.createGameReport(game);
 
         gameManagementService.createAddGameFromRoom(room);
