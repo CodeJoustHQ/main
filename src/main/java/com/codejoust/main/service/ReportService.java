@@ -132,7 +132,6 @@ public class ReportService {
         gameReport.setAverageProblemsSolved((double) Arrays.stream(userSolved).sum() / numPlayers);
 
         // Set the Problem fields with the updated database problem.
-        // TODO: Take care of this in the test suite.
         for (ProblemContainer problemContainer : gameReport.getProblemContainers()) {
             Problem problem = problemRepository.findProblemByProblemId(problemContainer.getProblem().getProblemId());
             problemContainer.setProblem(problem);

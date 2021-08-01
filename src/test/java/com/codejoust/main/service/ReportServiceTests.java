@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
@@ -180,10 +181,10 @@ public class ReportServiceTests {
           .when(submitService).submitSolution(game, incorrectSubmission);
         gameManagementService.submitSolution(TestFields.ROOM_ID, incorrectSubmission);
 
-        // Set manually end game, and trigger game report creation directly.
+        // Set end game, second problem deleted, and trigger game report.
         game.setGameEnded(true);
         Mockito.doReturn(problem1).when(problemRepository).findProblemByProblemId(problem1.getProblemId());
-        Mockito.doReturn(problem2).when(problemRepository).findProblemByProblemId(problem2.getProblemId());
+        Mockito.doReturn(null).when(problemRepository).findProblemByProblemId(problem2.getProblemId());
         GameReport gameReport = reportService.createGameReport(game);
 
         // Confirm that the game report, account, and users are saved.
@@ -200,15 +201,15 @@ public class ReportServiceTests {
         // Check assertions for individual problem containers.
         assertEquals(2, gameReport.getProblemContainers().size());
         ProblemContainer problemContainer1 = gameReport.getProblemContainers().get(0);
+        assertEquals(problem1, problemContainer1.getProblem());
         assertEquals(1, problemContainer1.getAverageAttemptCount());
         assertEquals((double) 2 / 3, problemContainer1.getAverageTestCasesPassed());
-        assertEquals(TestFields.problem1().getName(), problemContainer1.getProblem().getName());
         assertEquals(1, problemContainer1.getTestCaseCount());
         assertEquals(2, problemContainer1.getUserSolvedCount());
         ProblemContainer problemContainer2 = gameReport.getProblemContainers().get(1);
+        assertNull(problemContainer2.getProblem());
         assertEquals((double) 1 / 3, problemContainer2.getAverageAttemptCount());
         assertEquals(0, problemContainer2.getAverageTestCasesPassed());
-        assertEquals(TestFields.problem2().getName(), problemContainer2.getProblem().getName());
         assertEquals(1, problemContainer2.getTestCaseCount());
         assertEquals(0, problemContainer2.getUserSolvedCount());
 
