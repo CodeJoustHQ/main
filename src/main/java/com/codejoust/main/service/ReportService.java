@@ -60,14 +60,11 @@ public class ReportService {
         double[] totalAttemptCount = new double[numProblems];
         computeGameStatisticsAndAddSubmissions(gameReport, game, numProblems,
             numPlayers, userSolved, totalTestCasesPassed, totalAttemptCount);
-
         setGameReportStatistics(gameReport, game, numPlayers, userSolved,
             totalTestCasesPassed);
-
         createProblemContainers(gameReport, game, numProblems, numPlayers,
             userSolved, totalTestCasesPassed, totalAttemptCount);
         gameReportRepository.save(gameReport);
-
         addGameReportAccounts(gameReport, game);
 
         // Log the completion of the latest game report.
