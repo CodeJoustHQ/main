@@ -54,10 +54,46 @@ public class ReportService {
         int numProblems = game.getProblems().size();
         int numPlayers = game.getPlayers().size();
 
-        // Initialize the statistic variables for each problem.
+        // Compute the statistic variables per problem, add submission reports.
         int[] userSolved = new int[numProblems];
         double[] totalTestCasesPassed = new double[numProblems];
         double[] totalAttemptCount = new double[numProblems];
+        computeGameStatisticsAndAddSubmissions(gameReport, game, numProblems,
+            numPlayers, userSolved, totalTestCasesPassed, totalAttemptCount);
+
+        setGameReportStatistics(gameReport, game, numPlayers, userSolved,
+            totalTestCasesPassed);
+
+        createProblemContainers(gameReport, game, numProblems, numPlayers,
+            userSolved, totalTestCasesPassed, totalAttemptCount);
+        gameReportRepository.save(gameReport);
+
+        addGameReportAccounts(gameReport, game);
+
+        // Log the completion of the latest game report.
+        log.info("Created game report for game with Room ID {}", game.getRoom().getRoomId());
+        return gameReport;
+    }
+
+    /**
+     * Compute the game statistics userSolved, totalTestCasesPassed, and
+     * totalAttemptCount. Submission reports and submission group reports
+     * were also added.
+     * 
+     * @param gameReport The game report in progress.
+     * @param game The game that has just concluded.
+     * @param numProblems The number of problems in the game.
+     * @param numPlayers The number of players (non-spectators) in the game.
+     * @param userSolved The number of users that solved each problem.
+     * @param totalTestCasesPassed The total test cases passed across all
+     * users for each problem.
+     * @param totalAttemptCount The total attempt count across all users for
+     * each problem.
+     */
+    public void computeGameStatisticsAndAddSubmissions(GameReport gameReport,
+        Game game, int numProblems, int numPlayers, int[] userSolved,
+        double[] totalTestCasesPassed, double[] totalAttemptCount) {
+
         for (Player player : game.getPlayers().values()) {
             // For each user, add the relevant submission info.
             User user = player.getUser();
@@ -98,6 +134,21 @@ public class ReportService {
             user.addSubmissionGroupReport(submissionGroupReport);
             gameReport.addUser(user);
         }
+    }
+
+    /**
+     * Set the game report statistics, including the timing information,
+     * the game end type, and test case and solve data.
+     * 
+     * @param gameReport The game report in progress.
+     * @param game The game that has just concluded.
+     * @param numPlayers The number of players (non-spectators) in the game.
+     * @param userSolved The number of users that solved each problem.
+     * @param totalTestCasesPassed The total test cases passed across all
+     * users for each problem.
+     */
+    public void setGameReportStatistics(GameReport gameReport, Game game,
+        int numPlayers, int[] userSolved, double[] totalTestCasesPassed) {
 
         Instant startTime = game.getGameTimer().getStartTime();
         gameReport.setCreatedDateTime(startTime);
@@ -113,15 +164,6 @@ public class ReportService {
 
         gameReport.setAverageTestCasesPassed(Arrays.stream(totalTestCasesPassed).sum() / numPlayers);
         gameReport.setAverageProblemsSolved((double) Arrays.stream(userSolved).sum() / numPlayers);
-
-        createProblemContainers(gameReport, game, numProblems, numPlayers, userSolved, totalTestCasesPassed, totalAttemptCount);
-        gameReportRepository.save(gameReport);
-
-        addGameReportAccounts(gameReport, game);
-
-        // Log the completion of the latest game report.
-        log.info("Created game report for game with Room ID {}", game.getRoom().getRoomId());
-        return gameReport;
     }
 
     /**
