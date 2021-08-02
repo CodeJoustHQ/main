@@ -99,23 +99,6 @@ public class ReportService {
             gameReport.addUser(user);
         }
 
-        // Set problem container variables.
-        int numTestCases = 0;
-        List<Problem> problems = game.getProblems();
-        for (int i = 0; i < numProblems; i++) {
-            Problem problem = problems.get(i);
-            numTestCases += problem.getTestCases().size();
-
-            ProblemContainer problemContainer = new ProblemContainer();
-            problemContainer.setProblem(problem);
-            problemContainer.setUserSolvedCount(userSolved[i]);
-            problemContainer.setTestCaseCount(problem.getTestCases().size());
-            problemContainer.setAverageTestCasesPassed(totalTestCasesPassed[i] / numPlayers);
-            problemContainer.setAverageAttemptCount(totalAttemptCount[i] / numPlayers);
-            gameReport.addProblemContainer(problemContainer);
-        }
-        gameReport.setNumTestCases(numTestCases);
-
         Instant startTime = game.getGameTimer().getStartTime();
         gameReport.setCreatedDateTime(startTime);
         gameReport.setDuration(Duration.between(startTime, Instant.now()).getSeconds());
@@ -131,14 +114,61 @@ public class ReportService {
         gameReport.setAverageTestCasesPassed(Arrays.stream(totalTestCasesPassed).sum() / numPlayers);
         gameReport.setAverageProblemsSolved((double) Arrays.stream(userSolved).sum() / numPlayers);
 
-        // Set the Problem fields with the updated database problem.
-        for (ProblemContainer problemContainer : gameReport.getProblemContainers()) {
-            Problem problem = problemRepository.findProblemByProblemId(problemContainer.getProblem().getProblemId());
-            problemContainer.setProblem(problem);
-        }
-
+        createProblemContainers(gameReport, game, numProblems, numPlayers, userSolved, totalTestCasesPassed, totalAttemptCount);
         gameReportRepository.save(gameReport);
 
+        addGameReportAccounts(gameReport, game);
+
+        // Log the completion of the latest game report.
+        log.info("Created game report for game with Room ID {}", game.getRoom().getRoomId());
+        return gameReport;
+    }
+
+    /**
+     * Create and add the problem containers to the game report, as well
+     * as iterating through and setting the number of test cases.
+     * 
+     * @param gameReport The game report in progress.
+     * @param game The game that has just concluded.
+     * @param numProblems The number of problems in the game.
+     * @param numPlayers The number of players (non-spectators) in the game.
+     * @param userSolved The number of users that solved each problem.
+     * @param totalTestCasesPassed The total test cases passed across all
+     * users for each problem.
+     * @param totalAttemptCount The total attempt count across all users for
+     * each problem.
+     */
+    public void createProblemContainers(GameReport gameReport, Game game,
+        int numProblems, int numPlayers, int[] userSolved,
+        double[] totalTestCasesPassed, double[] totalAttemptCount) {
+
+        // Set problem container variables.
+        int numTestCases = 0;
+        List<Problem> problems = game.getProblems();
+        for (int i = 0; i < numProblems; i++) {
+            Problem problem = problems.get(i);
+            numTestCases += problem.getTestCases().size();
+
+            ProblemContainer problemContainer = new ProblemContainer();
+            problemContainer.setUserSolvedCount(userSolved[i]);
+            problemContainer.setTestCaseCount(problem.getTestCases().size());
+            problemContainer.setAverageTestCasesPassed(totalTestCasesPassed[i] / numPlayers);
+            problemContainer.setAverageAttemptCount(totalAttemptCount[i] / numPlayers);
+
+            // Set the Problem fields with the updated database problem.
+            problemContainer.setProblem(problemRepository.findProblemByProblemId(problem.getProblemId()));
+            gameReport.addProblemContainer(problemContainer);
+        }
+        gameReport.setNumTestCases(numTestCases);
+    }
+
+    /**
+     * Add the game report to the associated accounts (players and spectators).
+     * 
+     * @param gameReport The game report in progress.
+     * @param game The game that has just concluded.
+     */
+    public void addGameReportAccounts(GameReport gameReport, Game game) {
         // Iterate through all room users, players and spectators included.
         Set<Account> addedAccounts = new HashSet<>();
         for (User user : game.getRoom().getUsers()) {
@@ -150,12 +180,17 @@ public class ReportService {
                 accountRepository.save(account);
             }
         }
-
-        // Log the completion of the latest game report.
-        log.info("Created game report for game with Room ID {}", game.getRoom().getRoomId());
-        return gameReport;
     }
 
+    /**
+     * The String that represents the different problems solved by a user,
+     * where the index of the String represents a specific problem and a
+     * 1 = solved, 0 = not solved.
+     * 
+     * @param problemsSolved The boolean array representing the problems
+     * solved by the user.
+     * @return A String representing the problems solved by the user.
+     */
     private String compactProblemsSolved(boolean[] problemsSolved) {
         StringBuilder builder = new StringBuilder();
         for (boolean problemSolved : problemsSolved) {
