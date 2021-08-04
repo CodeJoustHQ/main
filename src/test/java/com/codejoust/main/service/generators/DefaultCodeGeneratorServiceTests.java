@@ -25,6 +25,10 @@ public class DefaultCodeGeneratorServiceTests {
     @InjectMocks
     private PythonDefaultCodeGeneratorService pythonDefaultCodeGeneratorService;
 
+    @Spy
+    @InjectMocks
+    private CppDefaultCodeGeneratorService cppDefaultCodeGeneratorService;
+
     private static final String javaDefaultCode = String.join("\n",
         "import java.util.*;",
         "",
