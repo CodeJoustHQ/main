@@ -203,8 +203,8 @@ public class ProblemService {
         for (int i = 0; i < updatedProblem.getTestCases().size(); i++) {
             ProblemTestCaseDto testCaseDto = updatedProblem.getTestCases().get(i);
             // Ensure that the user entered valid inputs and outputs for the problem
-            validateInputsGsonParseable(testCaseDto.getInput(), updatedProblem.getProblemInputs(), i);
-            validateGsonParseable(testCaseDto.getOutput(), updatedProblem.getOutputType(), i);
+            validateInputsGsonParseable(testCaseDto.getInput(), updatedProblem.getProblemInputs(), i, TestCaseError.INPUT_FIELD);
+            validateGsonParseable(testCaseDto.getOutput(), updatedProblem.getOutputType(), i, TestCaseError.OUTPUT_FIELD);
 
             ProblemTestCase testCase = new ProblemTestCase();
             testCase.setInput(testCaseDto.getInput());
@@ -356,8 +356,8 @@ public class ProblemService {
                 .collect(Collectors.toList());
 
         int newTestCaseIndex = problem.getTestCases().size();
-        validateInputsGsonParseable(request.getInput(), inputs, newTestCaseIndex);
-        validateGsonParseable(request.getOutput(), problem.getOutputType(), newTestCaseIndex);
+        validateInputsGsonParseable(request.getInput(), inputs, newTestCaseIndex, TestCaseError.INPUT_FIELD);
+        validateGsonParseable(request.getOutput(), problem.getOutputType(), newTestCaseIndex, TestCaseError.OUTPUT_FIELD);
 
         ProblemTestCase testCase = new ProblemTestCase();
         testCase.setInput(request.getInput());
@@ -376,9 +376,9 @@ public class ProblemService {
     }
 
     // Check to make sure test case inputs and outputs are Gson-parsable
-    protected void validateInputsGsonParseable(String input, List<ProblemInputDto> types, int index) {
+    protected void validateInputsGsonParseable(String input, List<ProblemInputDto> types, int index, String field) {
         if (input == null) {
-            throw new ApiException(TestCaseError.invalidInput(index));
+            throw new ApiException(TestCaseError.invalidInput(index, field));
         }
 
         // Each parameter input should be on a separate line
@@ -393,13 +393,13 @@ public class ProblemService {
                 throw new ApiException(ProblemError.BAD_INPUT);
             }
 
-            validateGsonParseable(inputs[i], types.get(i).getType(), index);
+            validateGsonParseable(inputs[i], types.get(i).getType(), index, field);
         }
     }
 
-    private void validateGsonParseable(String input, ProblemIOType type, int index) {
+    private void validateGsonParseable(String input, ProblemIOType type, int index, String field) {
         if (input == null) {
-            throw new ApiException(TestCaseError.invalidInput(index));
+            throw new ApiException(TestCaseError.invalidInput(index, field));
         }
 
         try {
@@ -407,11 +407,11 @@ public class ProblemService {
 
             // Trigger catch block to return invalid input error
             if (result == null) {
-                throw new ApiException(TestCaseError.invalidInput(index));
+                throw new ApiException(TestCaseError.invalidInput(index, field));
             }
 
         } catch (Exception e) {
-            throw new ApiException(TestCaseError.invalidInput(index));
+            throw new ApiException(TestCaseError.invalidInput(index, field));
         }
     }
     
