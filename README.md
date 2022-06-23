@@ -3,7 +3,25 @@
 CodeJoust is an online real-time competitive coding platform where users can 
 compete live against friends to solve programming problems. Players can create
 or join a room, choose a problem difficulty and room duration, invite friends,
-and begin coding to see who's the best! 
+and begin coding to see who's the best!
+
+## Screenshots
+
+**Lobby Page:** Create a room and invite friends.
+
+<img src="frontend/public/landing/lobby.png" width="75%" />
+
+**Game Page:** Race to find a solution.
+
+<img src="frontend/public/landing/game.png" width="75%" />
+
+**Results Widgets:** Compare your standing amongst competitors.
+
+<img src="frontend/public/landing/results.png" width="75%" />
+
+**Problem Page:** Create and edit problems to use in the game.
+
+<img src="frontend/public/landing/edit_problem.png" width="75%" />
 
 ## Running Locally
 
