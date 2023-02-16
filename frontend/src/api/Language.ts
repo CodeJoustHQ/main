@@ -2,7 +2,7 @@ enum Language {
   Python = 'PYTHON',
   // Ruby = 'RUBY',
   // Swift = 'SWIFT',
-  // CPP = 'CPP',
+  CPP = 'CPP',
   // PHP = 'PHP',
   // C = 'C',
   Java = 'JAVA',
@@ -31,8 +31,8 @@ export const languageToEditorLanguage = (key: Language): string => {
       return 'python';
     // case Language.Ruby:
     //   return 'ruby';
-    // case Language.CPP:
-    //   return 'c++';
+    case Language.CPP:
+      return 'c++';
     // case Language.PHP:
     //   return 'php';
     // case Language.C:

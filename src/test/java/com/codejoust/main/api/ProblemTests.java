@@ -72,6 +72,20 @@ class ProblemTests {
         "\t\t"
     ).replaceAll("\t", "    ");
 
+    public static final String cppDefaultCode = String.join("\n",
+        "#include <vector>",
+        "",
+        "using namespace std;",
+        "",
+        "class Solution {",
+        "\tpublic:",
+        "\t\tvector<int> solve(vector<int> nums) {",
+        "\t\t\t",
+        "\t\t}",
+        "}",
+        ""
+    ).replaceAll("\t", "    ");
+
     @Test
     public void getProblemNonExistent() throws Exception {
         ApiError ERROR = ProblemError.NOT_FOUND;
@@ -379,7 +393,8 @@ class ProblemTests {
 
         assertEquals(javaDefaultCode, actual.get(CodeLanguage.JAVA));
         assertEquals(pythonDefaultCode, actual.get(CodeLanguage.PYTHON));
-        assertEquals(2, actual.size());
+        assertEquals(cppDefaultCode, actual.get(CodeLanguage.CPP));
+        assertEquals(3, actual.size());
     }
 
     @Test

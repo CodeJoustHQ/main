@@ -25,6 +25,10 @@ public class DefaultCodeGeneratorServiceTests {
     @InjectMocks
     private PythonDefaultCodeGeneratorService pythonDefaultCodeGeneratorService;
 
+    @Spy
+    @InjectMocks
+    private CppDefaultCodeGeneratorService cppDefaultCodeGeneratorService;
+
     private static final String javaDefaultCode = String.join("\n",
         "import java.util.*;",
         "",
@@ -41,6 +45,20 @@ public class DefaultCodeGeneratorServiceTests {
         "",
         "\tdef solve(self, nums: list[int]) -> list[int]:",
         "\t\t"
+    );
+
+    private static final String cppDefaultCode = String.join("\n",
+        "#include <vector>",
+        "",
+        "using namespace std;",
+        "",
+        "class Solution {",
+        "\tpublic:",
+        "\t\tvector<int> solve(vector<int> nums) {",
+        "\t\t\t",
+        "\t\t}",
+        "}",
+        ""
     );
 
     /**
@@ -64,5 +82,10 @@ public class DefaultCodeGeneratorServiceTests {
     @Test
     public void getDefaultCodePython() {
         getDefaultCodeSetupMethod(pythonDefaultCodeGeneratorService, pythonDefaultCode);
+    }
+
+    @Test
+    public void getDefaultCodeCpp() {
+        getDefaultCodeSetupMethod(cppDefaultCodeGeneratorService, cppDefaultCode);
     }
 }
