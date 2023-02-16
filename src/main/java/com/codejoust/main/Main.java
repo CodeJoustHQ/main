@@ -30,6 +30,7 @@ public class Main {
 			log.error("Could not find the firebase keyfile in an environment variable.");
 			log.error("Please set this value before launching the program.");
 			System.exit(1);
+			return;
 		}
 
 		InputStream stream = new ByteArrayInputStream(keyfile.getBytes(StandardCharsets.UTF_8));
