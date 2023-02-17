@@ -358,7 +358,8 @@ public class RoomService {
             problemsHaveChanged = checkSelectedProblemChanges(selectedProblems, room);
         }
 
-        if (problemsHaveChanged) {
+        // Secondary check that selected problems are not null is superfluous but removes linter warning.
+        if (problemsHaveChanged && selectedProblems != null) {
             List<Problem> newProblems = new ArrayList<>();
             for (SelectableProblemDto selected : selectedProblems) {
                 Problem problem = problemService.getProblemEntity(selected.getProblemId());

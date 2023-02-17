@@ -29,6 +29,8 @@ public class Main {
 		if (keyfile == null) {
 			log.error("Could not find the firebase keyfile in an environment variable.");
 			log.error("Please set this value before launching the program.");
+
+			// Exit the program with unsuccessful status; return used to satisfy linter warning.
 			System.exit(1);
 			return;
 		}
