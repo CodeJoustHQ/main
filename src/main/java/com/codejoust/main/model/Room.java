@@ -148,4 +148,12 @@ public class Room {
 
         return users.size() >= size;
     }
+
+    public boolean addProblem(Problem problem) {
+        return problems.add(problem);
+    }
+    
+    public boolean removeProblem(Problem problem) {
+        return problems.remove(problem);
+    }
 }

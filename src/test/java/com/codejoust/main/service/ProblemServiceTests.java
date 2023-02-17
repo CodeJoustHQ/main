@@ -1,6 +1,7 @@
 package com.codejoust.main.service;
 
 import com.codejoust.main.dao.AccountRepository;
+import com.codejoust.main.dao.ProblemContainerRepository;
 import com.codejoust.main.exception.AccountError;
 import com.codejoust.main.exception.api.ApiError;
 import com.codejoust.main.util.TestFields;
@@ -20,6 +21,7 @@ import java.util.List;
 
 import com.codejoust.main.dao.ProblemRepository;
 import com.codejoust.main.dao.ProblemTagRepository;
+import com.codejoust.main.dao.RoomRepository;
 import com.codejoust.main.dto.problem.CreateProblemRequest;
 import com.codejoust.main.dto.problem.CreateProblemTagRequest;
 import com.codejoust.main.dto.problem.CreateTestCaseRequest;
@@ -30,7 +32,9 @@ import com.codejoust.main.dto.problem.ProblemTagDto;
 import com.codejoust.main.dto.problem.ProblemTestCaseDto;
 import com.codejoust.main.exception.ProblemError;
 import com.codejoust.main.exception.api.ApiException;
+import com.codejoust.main.model.Room;
 import com.codejoust.main.model.problem.Problem;
+import com.codejoust.main.model.problem.ProblemContainer;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
 import com.codejoust.main.model.problem.ProblemInput;
@@ -56,6 +60,12 @@ public class ProblemServiceTests {
 
     @Mock
     private AccountRepository accountRepository;
+
+    @Mock
+    private ProblemContainerRepository problemContainerRepository;
+
+    @Mock
+    private RoomRepository roomRepository;
 
     @Mock
     private FirebaseService firebaseService;
@@ -656,6 +666,12 @@ public class ProblemServiceTests {
 
     @Test
     public void deleteProblemSuccess() {
+        /**
+         * 1. Create the problem and mock the return of findProblemByProblemId.
+         * 2. Create an associated ProblemContainer and mock its return.
+         * 3. Create an associated Room and mock its return.
+         * 4. Delete the problem and verify the calls and assertions.
+         */
         Problem problem = new Problem();
         problem.setName(TestFields.NAME);
         problem.setDescription(TestFields.DESCRIPTION);
@@ -664,9 +680,22 @@ public class ProblemServiceTests {
 
         Mockito.doReturn(problem).when(repository).findProblemByProblemId(problem.getProblemId());
 
+        ProblemContainer problemContainer = new ProblemContainer();
+        problemContainer.setProblem(problem);
+        problemContainer.setTestCaseCount(problem.getTestCases().size());
+        Mockito.doReturn(Collections.singletonList(problemContainer)).when(problemContainerRepository).findAllByProblem(problem);
+        problemContainer.setProblem(null);
+
+        Room room = new Room();
+        room.addProblem(problem);
+        Mockito.doReturn(Collections.singletonList(room)).when(roomRepository).findByProblems_ProblemId(problem.getProblemId());
+        room.removeProblem(problem);
+
         ProblemDto response = problemService.deleteProblem(problem.getProblemId(), TestFields.TOKEN);
 
         verify(repository).delete(problem);
+        verify(problemContainerRepository).save(problemContainer);
+        verify(roomRepository).save(room);
 
         assertEquals(problem.getName(), response.getName());
         assertEquals(problem.getDescription(), response.getDescription());

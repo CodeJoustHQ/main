@@ -28,7 +28,7 @@ import com.codejoust.main.game_object.PlayerCode;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.Problem;
-import com.codejoust.main.util.EndGameTimerTask;
+import com.codejoust.main.task.EndGameTimerTask;
 import com.codejoust.main.util.Utility;
 
 import lombok.extern.log4j.Log4j2;
@@ -45,18 +45,24 @@ public class GameManagementService {
     private final NotificationService notificationService;
     private final SubmitService submitService;
     private final ProblemService problemService;
+    private final ReportService reportService;
     private final Map<String, Game> currentGameMap;
 
     @Autowired
-    protected GameManagementService(RoomRepository repository, SocketService socketService,
-                                    LiveGameService liveGameService, NotificationService notificationService,
-                                    SubmitService submitService, ProblemService problemService) {
+    protected GameManagementService(RoomRepository repository,
+                                    SocketService socketService,
+                                    LiveGameService liveGameService,
+                                    NotificationService notificationService,
+                                    SubmitService submitService,
+                                    ProblemService problemService,
+                                    ReportService reportService) {
         this.repository = repository;
         this.socketService = socketService;
         this.liveGameService = liveGameService;
         this.notificationService = notificationService;
         this.submitService = submitService;
         this.problemService = problemService;
+        this.reportService = reportService;
         currentGameMap = new HashMap<>();
     }
 
@@ -106,7 +112,7 @@ public class GameManagementService {
     public RoomDto playAgain(String roomId, PlayAgainRequest request) {
         Game game = getGameFromRoomId(roomId);
 
-        if (!isGameOver(game)) {
+        if (!Utility.isGameOver(game)) {
             throw new ApiException(GameError.GAME_NOT_OVER);
         }
 
@@ -166,7 +172,7 @@ public class GameManagementService {
         game.setGameTimer(gameTimer);
 
         // Schedule the game to end after <duration> seconds.
-        EndGameTimerTask endGameTimerTask = new EndGameTimerTask(socketService, game);
+        EndGameTimerTask endGameTimerTask = new EndGameTimerTask(this, socketService, game);
         gameTimer.getTimer().schedule(endGameTimerTask, duration * 1000);
     }
 
@@ -209,7 +215,7 @@ public class GameManagementService {
 
         SubmissionDto submissionDto = submitService.submitSolution(game, request);
 
-        if (isGameOver(game)) {
+        if (Utility.isGameOver(game)) {
             handleEndGame(game);
         }
 
@@ -283,7 +289,7 @@ public class GameManagementService {
         return gameDto;
     }
 
-    protected void handleEndGame(Game game) {
+    public void handleEndGame(Game game) {
         // Cancel all previously scheduled timers
         GameTimer gameTimer = game.getGameTimer();
         gameTimer.getTimer().cancel();
@@ -291,10 +297,8 @@ public class GameManagementService {
         for (Timer timer : gameTimer.getNotificationTimers()) {
             timer.cancel();
         }
-    }
 
-    protected boolean isGameOver(Game game) {
-        return game.getGameEnded() || game.getAllSolved() || (game.getGameTimer() != null && game.getGameTimer().isTimeUp());
+        reportService.createGameReport(game);
     }
 
     // Update people's socket active status

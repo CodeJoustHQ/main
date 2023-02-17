@@ -14,12 +14,10 @@ import com.codejoust.main.game_object.GameTimer;
 import com.codejoust.main.model.Room;
 import com.codejoust.main.model.User;
 import com.codejoust.main.model.problem.ProblemDifficulty;
+import com.codejoust.main.service.GameManagementService;
 import com.codejoust.main.service.SocketService;
-
-import com.codejoust.main.util.EndGameTimerTask;
 import com.codejoust.main.util.TestFields;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -29,16 +27,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class EndGameTimerTaskTests {
 
     @Mock
+    private GameManagementService gameManagementService;
+    
+    @Mock
     private SocketService socketService;
-
-    @BeforeEach
-    public void setup() throws Exception {
-        MockitoAnnotations.initMocks(this);
-    }
 
     @Test
     public void endGameTimerTaskSocketMessageNullGame() {
-        assertThrows(ApiException.class, () -> new EndGameTimerTask(socketService, null));
+        MockitoAnnotations.initMocks(this);
+        assertThrows(ApiException.class, () -> new EndGameTimerTask(gameManagementService, socketService, null));
     }
 
     @Test
@@ -58,11 +55,13 @@ public class EndGameTimerTaskTests {
         GameTimer gameTimer = new GameTimer(10L);
         game.setGameTimer(gameTimer);
 
-        assertThrows(ApiException.class, () -> new EndGameTimerTask(null, game));
+        MockitoAnnotations.initMocks(this);
+
+        assertThrows(ApiException.class, () -> new EndGameTimerTask(gameManagementService, null, game));
     }
 
     @Test
-    public void endGameTimerTaskSocketMessageNullGameTimer() {
+    public void endGameTimerTaskSocketMessageNullGameManagementService() {
         User user = new User();
         user.setNickname(TestFields.NICKNAME);
         user.setUserId(TestFields.USER_ID);
@@ -75,36 +74,12 @@ public class EndGameTimerTaskTests {
         room.addUser(user);
 
         Game game = GameMapper.fromRoom(room);
-
-        assertThrows(ApiException.class, () -> new EndGameTimerTask(socketService, game));
-    }
-
-    @Test
-    public void endGameTimerTaskSocketMessageNullRoom() {
-        Game game = new Game();
         GameTimer gameTimer = new GameTimer(10L);
         game.setGameTimer(gameTimer);
 
-        assertThrows(ApiException.class, () -> new EndGameTimerTask(socketService, game));
-    }
+        MockitoAnnotations.initMocks(this);
 
-    @Test
-    public void endGameTimerTaskSocketMessageNullRoomId() {
-        User user = new User();
-        user.setNickname(TestFields.NICKNAME);
-        user.setUserId(TestFields.USER_ID);
-        user.setSessionId(TestFields.SESSION_ID);
-
-        Room room = new Room();
-        room.setDifficulty(ProblemDifficulty.MEDIUM);
-        room.setHost(user);
-        room.addUser(user);
-
-        Game game = GameMapper.fromRoom(room);
-        GameTimer gameTimer = new GameTimer(10L);
-        game.setGameTimer(gameTimer);
-
-        assertThrows(ApiException.class, () -> new EndGameTimerTask(socketService, game));
+        assertThrows(ApiException.class, () -> new EndGameTimerTask(null, socketService, game));
     }
 
     @Test
@@ -130,16 +105,19 @@ public class EndGameTimerTaskTests {
 
         MockitoAnnotations.initMocks(this);
 
-        EndGameTimerTask endGameTimerTask = new EndGameTimerTask(socketService, game);
+        EndGameTimerTask endGameTimerTask = new EndGameTimerTask(gameManagementService, socketService, game);
         gameTimer.getTimer().schedule(endGameTimerTask,  1000L);
 
         /**
          * Confirm that the socket update is not called immediately, 
-         * but is called 1 second later (wait for timer task).
+         * but is called 1 second later (wait for timer task),
+         * along with the game management service.
          */
 
         verify(socketService, never()).sendSocketUpdate(eq(gameDto));
 
         verify(socketService, timeout(1200)).sendSocketUpdate(eq(gameDto));
+
+        verify(gameManagementService, timeout(1200)).handleEndGame(game);
     }
 }
