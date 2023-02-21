@@ -14,7 +14,7 @@ import com.codejoust.main.game_object.NotificationType;
 import com.codejoust.main.service.SocketService;
 
 import com.codejoust.main.util.NotificationTimerTask;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

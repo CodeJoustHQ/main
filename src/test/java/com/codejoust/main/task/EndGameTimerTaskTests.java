@@ -18,7 +18,7 @@ import com.codejoust.main.service.SocketService;
 
 import com.codejoust.main.util.EndGameTimerTask;
 import com.codejoust.main.util.TestFields;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
