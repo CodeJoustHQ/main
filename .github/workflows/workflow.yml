@@ -20,18 +20,3 @@ jobs:
         java-version: 11
     - name: Build with Maven
       run: ./mvnw test
-
-  deploy:
-    needs: test
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    env:
-      JASYPT_ENCRYPTOR_PASSWORD: ${{secrets.JASYPT_ENCRYPTOR_PASSWORD}}
-      PROBLEM_ACCESS_PASSWORD: ${{secrets.PROBLEM_ACCESS_PASSWORD}}
-    steps:
-      - uses: actions/checkout@v2
-      - uses: akhileshns/heroku-deploy@v3.4.6
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "codejoust"
-          heroku_email: "support@codejoust.co"

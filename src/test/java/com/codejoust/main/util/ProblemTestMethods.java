@@ -8,7 +8,6 @@ import com.codejoust.main.dto.problem.ProblemTagDto;
 import com.codejoust.main.dto.problem.ProblemTestCaseDto;
 import com.codejoust.main.model.problem.ProblemDifficulty;
 import com.codejoust.main.model.problem.ProblemIOType;
-import com.codejoust.main.model.problem.ProblemTag;
 import com.codejoust.main.service.SubmitService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -166,20 +165,20 @@ public class ProblemTestMethods {
      * @throws Exception if anything wrong occurs
      */
     public static ProblemTagDto createSingleProblemTag(MockMvc mockMvc) throws Exception {
-        ProblemTag problemTag = new ProblemTag();
-        problemTag.setName(TestFields.TAG_NAME);
+        ProblemTagDto problemTagDto = new ProblemTagDto();
+        problemTagDto.setName(TestFields.TAG_NAME);
 
         MvcResult problemTagResult = mockMvc.perform(post(POST_PROBLEM_TAG_CREATE)
                 .header(HttpHeaders.AUTHORIZATION, TestFields.TOKEN)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(UtilityTestMethods.convertObjectToJsonString(problemTag)))
+                .content(UtilityTestMethods.convertObjectToJsonString(problemTagDto)))
                 .andDo(print()).andExpect(status().isCreated())
                 .andReturn();
 
         String problemTagJsonResponse = problemTagResult.getResponse().getContentAsString();
         ProblemTagDto problemTagActual = UtilityTestMethods.toObject(problemTagJsonResponse, ProblemTagDto.class);
 
-        assertEquals(problemTag.getName(), problemTagActual.getName());
+        assertEquals(problemTagDto.getName(), problemTagActual.getName());
 
         return problemTagActual;
     }

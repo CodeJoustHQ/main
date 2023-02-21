@@ -3,4 +3,5 @@
   "eslint.workingDirectories": [
     "./frontend"
   ],
+  "java.compile.nullAnalysis.mode": "automatic",
 }
